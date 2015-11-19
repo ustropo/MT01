@@ -113,7 +113,7 @@ extern USB_UTR_t    tfat_ptr;
 
 /*** File System Interface for HMSC ***/
 extern void     R_usb_hmsc_DriveClose(USB_UTR_t *ptr, uint16_t addr, uint16_t data2);
-
+extern TaskHandle_t  x_tn_usb_connected;
 /*****************************************************************************
 Enumerated Types
 ******************************************************************************/
@@ -433,6 +433,7 @@ void usb_hmsc_SampleAplTask(void)
     USB_CLSINFO_t   *mes;
     uint16_t        addr;
     uint8_t 		usbEnter;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 #ifdef FREE_RTOS_PP
     for( ;; )
@@ -467,14 +468,14 @@ void usb_hmsc_SampleAplTask(void)
             /* Mount to the file system */
         case USB_HMSC_DRIVEMOUNT:
         	/* File system media work area memory mount. */
-        	res = R_tfat_f_mount(0, &usb_gFatfs);
+        	//res = R_tfat_f_mount(0, &usb_gFatfs);
+            /* Notify the task that the transmission is complete. */
+        	xTaskNotifyGive( x_tn_usb_connected );
+
         	if( res != TFAT_FR_OK )
         	{
         		USB_PRINTF1("R_tfat_f_mount error: %d\n", res);
         	}
-        	LED10 = LED_ON;
-        	usbEnter = USB_ENTER;
-            xQueueSend( qKeyboard, &usbEnter, 0 );
         	/* Send message to myself: Wait. */
         	usb_ghmsc_SmpAplProcess = USB_HMSC_WAIT;
         	break;

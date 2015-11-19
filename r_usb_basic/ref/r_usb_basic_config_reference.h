@@ -123,7 +123,7 @@ MCU separate setting
     USB_DEBUG_OFF_PP : No output the debugging message
     USB_DEBUG_ON_PP  : Output the debugging message
 */
-#define USB_DEBUG_OUTPUT_PP             USB_DEBUG_OFF_PP
+#define USB_DEBUG_OUTPUT_PP             USB_DEBUG_ON_PP
 
 /* 
     Debug Hook function call setting

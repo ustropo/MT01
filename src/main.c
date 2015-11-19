@@ -73,7 +73,6 @@ void main(void)
         while (1);
     }
     serial_init();
-    printf("teste");
     r_main();
     vTaskStartScheduler();
     while (1)

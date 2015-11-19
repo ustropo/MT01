@@ -54,8 +54,8 @@ Private global variables and functions
 #if SOCKET_IF_USE_SEMP
 xSemaphoreHandle r_socket_semaphore;
 #endif
-xSemaphoreHandle r_file_semaphore;
-xSemaphoreHandle menuSemaphore;
+
+TaskHandle_t  x_tn_usb_connected = NULL;
 
 xTaskHandle task_handle0;
 xTaskHandle task_handle1;
@@ -384,7 +384,7 @@ void FreeRTOSConfig( void )
             xQueueSend( mpl_handle7, &tmpPtr, 0 );
         }
     }
-	vSemaphoreCreateBinary(menuSemaphore);
+
 	qKeyboard = xQueueCreate(  1, sizeof(void *) );
     /* Task */
 #if 0
@@ -405,7 +405,7 @@ void FreeRTOSConfig( void )
 
     xTaskCreate( (pdTASK_CODE)browse_menu,     "Menu_task   ",  512, NULL, 2, NULL); /* Menu_task      */
 
-    xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  5000, NULL, 2, NULL); /* Menu_task      */
+    xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  5000, NULL, 2, &x_tn_usb_connected); /* Menu_task      */
 
 }
 

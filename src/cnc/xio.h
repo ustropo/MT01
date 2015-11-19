@@ -146,7 +146,7 @@ typedef void (*x_flow_t)(xioDev_t *d);
 #include "./xio/xio_FsFat.h"
 // Static structure allocations
 extern xioDev_t 		ds[XIO_DEV_COUNT];			// allocate top-level dev structs
-//xioFsfat_t	    ufsfat[XIO_DEV_USBFILE_COUNT];
+extern xioFsfat_t	    ufsfat[XIO_DEV_USBFILE_COUNT];
 extern struct controllerSingleton tg;		// needed by init() for default source
 
 /*************************************************************************

@@ -36,6 +36,11 @@
 #include "pwm.h"
 #include "xio.h"
 
+#ifdef FREE_RTOS_PP
+#include "FreeRTOS.h"
+#include "task.h"
+#endif
+
 #ifdef __AVR
 #include <avr/interrupt.h>
 #include "xmega/xmega_interrupts.h"
@@ -117,7 +122,7 @@ static void _application_init(void)
 	hardware_init();				// system hardware setup 			- must be first
 	persistence_init();				// set up EEPROM or other NVM		- must be second
 //RXMOD	rtc_init();						// real time counter
-//	xio_init();						// eXtended IO subsystem
+	xio_init();						// eXtended IO subsystem
 
 	// do these next
 	stepper_init(); 				// stepper subsystem 				- must precede gpio_init()
@@ -141,6 +146,8 @@ static void _application_init(void)
 
 int main_cnc_task(void)
 {
+    /* Block to wait for prvTask1() to notify this task. */
+    ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
 	// system initialization
 	_system_init();
 

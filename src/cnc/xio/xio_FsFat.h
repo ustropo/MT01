@@ -61,7 +61,7 @@
 /* 
  * FILE DEVICE CONFIGS 
  */
-
+#include "r_tfat_lib.h"
 
 /* 
  * FILE device extended control structure 
@@ -70,10 +70,10 @@
  */
 
 // file-type device control struct
-//typedef struct xioFILE {
-//	FATFS gFatfs;
-//	FIL f;
-//} xioFsfat_t;
+typedef struct xioFILE {
+	FATFS gFatfs;
+	FIL f;
+} xioFsfat_t;
 
 /* 
  * FILE DEVICE FUNCTION PROTOTYPES

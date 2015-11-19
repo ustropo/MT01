@@ -246,7 +246,28 @@ static stat_t _command_dispatch()
 	}
 	cs.read_index = 0;
 #endif // __ARM
+#ifdef __RX
+	stat_t status;
 
+	// read input line or return if not a completed line
+	// xio_gets() is a non-blocking workalike of fgets()
+	while (true) {
+		if ((status = xio_gets(cs.primary_src, cs.in_buf, sizeof(cs.in_buf))) == STAT_OK) {
+			cs.bufp = cs.in_buf;
+			break;
+		}
+		// handle end-of-file from file devices
+		if (status == STAT_EOF) {						// EOF can come from file devices only
+			if (cfg.comm_mode == TEXT_MODE) {
+				fprintf_P(stderr, PSTR("End of command file\n"));
+			} else {
+				rpt_exception(STAT_EOF);				// not really an exception
+			}
+			tg_reset_source();							// reset to default source
+		}
+		return (status);								// Note: STAT_EAGAIN, errors, etc. will drop through
+	}
+#endif // __AVR
 	// set up the buffers
 	cs.linelen = strlen(cs.in_buf)+1;					// linelen only tracks primary input
 	strncpy(cs.saved_buf, cs.bufp, SAVED_BUFFER_LEN-1);	// save input buffer for reporting

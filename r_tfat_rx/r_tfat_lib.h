@@ -192,6 +192,12 @@ FRESULT R_tfat_f_chmod(const char*, uint8_t, uint8_t);
 FRESULT R_tfat_f_utime(const char*, const FILINFO*);
 /* Rename/Move a file or directory */
 FRESULT R_tfat_f_rename(const char*, const char*);
+
+int f_putc (char c, FIL* fp);										/* Put a character to the file */
+int f_puts (const char* str, FIL* cp);								/* Put a string to the file */
+int f_printf (FIL* fp, const char* str, ...);						/* Put a formatted string to the file */
+char* f_gets (char* buff, int len, FIL* fp);						/* Get a string from the file */
+
 /* Forward data to the stream */
 #if defined(__K0R__)
 FRESULT R_tfat_f_forward(FIL*, uint16_t(*)(const uint8_t*, uint16_t), unsigned short, uint16_t*);

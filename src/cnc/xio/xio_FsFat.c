@@ -25,12 +25,13 @@
 #include <string.h>				// for memset
 #include <stdint.h>				//
 //#include "platform.h"
-//#include "r_tfat_lib.h"
 #include "xio.h"
 
 /******************************************************************************
  * FILE CONFIGURATION RECORDS
  ******************************************************************************/
+
+xioFsfat_t	    ufsfat[XIO_DEV_USBFILE_COUNT];
 
 struct cfgFILE {
 	x_open_t x_open;			// see xio.h for typedefs
@@ -63,15 +64,15 @@ static struct cfgFILE const cfgFile[] = {
 
 void xio_init_fsfat()
 {
-//	for (uint8_t i=0; i<XIO_DEV_USBFILE_COUNT; i++) {
-//		xio_open_generic(XIO_DEV_USBFILE_OFFSET + i,
-//						(x_open_t)pgm_read_word(&cfgFile[i].x_open),
-//						(x_ctrl_t)pgm_read_word(&cfgFile[i].x_ctrl),
-//						(x_gets_t)pgm_read_word(&cfgFile[i].x_gets),
-//						(x_getc_t)pgm_read_word(&cfgFile[i].x_getc),
-//						(x_putc_t)pgm_read_word(&cfgFile[i].x_putc),
-//						(x_flow_t)pgm_read_word(&cfgFile[i].x_flow));
-//	}
+	for (uint8_t i=0; i<XIO_DEV_USBFILE_COUNT; i++) {
+		xio_open_generic(XIO_DEV_USBFILE_OFFSET + i,
+						(x_open_t)(cfgFile[i].x_open),
+						(x_ctrl_t)(cfgFile[i].x_ctrl),
+						(x_gets_t)(cfgFile[i].x_gets),
+						(x_getc_t)(cfgFile[i].x_getc),
+						(x_putc_t)(cfgFile[i].x_putc),
+						(x_flow_t)(cfgFile[i].x_flow));
+	}
 }
 
 /*
@@ -82,18 +83,30 @@ void xio_init_fsfat()
  */
 FILE * xio_open_file(const uint8_t dev, const char *addr, const flags_t flags)
 {
+    FRESULT fr;    /* FatFs return code */
 	xioDev_t *d = (xioDev_t *)&ds[dev];
-//	d->x = &ufs[dev - XIO_DEV_USBFILE_OFFSET];			// bind extended struct to device
-//	xioFile_t *dx = (xioFile_t *)d->x;
-//
-//	R_tfat_f_mount(0, dx->gFatfs);
+	d->x = &ufsfat[dev - XIO_DEV_USBFILE_OFFSET];			// bind extended struct to device
+	xioFsfat_t *dx = (xioFsfat_t *)d->x;
+
+	R_tfat_f_mount(0, &dx->gFatfs);
+
+    /* Open a text file */
+    fr = R_tfat_f_open(&dx->f, "teste.nc", TFAT_FA_READ);
 
 	return(&d->file);								// return pointer to the FILE stream
 }
 
 int xio_gets_fsfat(xioDev_t *d, char *buf, const int size)
 {
-	return(0);
+	xioFsfat_t *dx = (xioFsfat_t *)d->x;
+
+	d->signal = XIO_SIG_OK;			// initialize signal
+	if (f_gets(buf, size, &dx->f) == NULL) {
+		clearerr(&d->file);
+		return (XIO_EOF);
+	}
+	printf(buf);
+	return(XIO_OK);
 }
 
 int xio_getc_fsfat(FILE *stream)
@@ -103,5 +116,5 @@ int xio_getc_fsfat(FILE *stream)
 
 int xio_putc_fsfat(const char c, FILE *stream)
 {
-	return(0);
+	return(-1);
 }
