@@ -7,7 +7,7 @@
 /* Note       : This is a typical example.                                      */
 /*                                                                              */
 /*  Copyright(c) 2013 Renesas Electronics Corp.                                 */
-/*                  And Renesas Solutions Corp. ,All Rights Reserved.           */
+/*                  And Renesas Solutionpts Corp. ,All Rights Reserved.           */
 /*                                                                              */
 /********************************************************************************/
 /*                                                                              */
