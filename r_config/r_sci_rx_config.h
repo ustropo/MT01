@@ -53,8 +53,8 @@ Configuration Options
 // * = port connector RDKRX63N, RSKRX210, RSKRX11x
                                           // mcu supported channels
 #define SCI_CFG_CH0_INCLUDED    (0)       // RX63N  RX210* RX113
-#define SCI_CFG_CH1_INCLUDED    (1)       // RX63N  RX210  RX113* RX110/111*
-#define SCI_CFG_CH2_INCLUDED    (0)       // RX63N*        RX113
+#define SCI_CFG_CH1_INCLUDED    (0)       // RX63N  RX210  RX113* RX110/111*
+#define SCI_CFG_CH2_INCLUDED    (1)       // RX63N*        RX113
 #define SCI_CFG_CH3_INCLUDED    (0)       // RX63N
 #define SCI_CFG_CH4_INCLUDED    (0)       // RX63N
 #define SCI_CFG_CH5_INCLUDED    (0)       // RX63N  RX210  RX113  RX110/111

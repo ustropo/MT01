@@ -65,14 +65,14 @@ Private global variables and functions
 * Arguments    : character to output
 * Return Value : none
 ***********************************************************************************************************************/
-void charput (uint32_t output_char)
-{
-	/* Wait for transmit buffer to be empty */
-	while(0 != (E1_DBG_PORT.DBGSTAT & TXFL0EN));
-
-	/* Write the character out */
-	E1_DBG_PORT.TX_DATA = output_char;
-}
+//void charput (uint32_t output_char)
+//{
+//	/* Wait for transmit buffer to be empty */
+//	while(0 != (E1_DBG_PORT.DBGSTAT & TXFL0EN));
+//
+//	/* Write the character out */
+//	E1_DBG_PORT.TX_DATA = output_char;
+//}
 
 /***********************************************************************************************************************
 * Function Name: charget
@@ -80,11 +80,11 @@ void charput (uint32_t output_char)
 * Arguments    : none
 * Return Value : received character
 ***********************************************************************************************************************/
-uint32_t charget (void)
-{
-	/* Wait for rx buffer buffer to be ready */
-	while(0 == (E1_DBG_PORT.DBGSTAT & RXFL0EN));
-
-	/* Read data, send back up */
-	return E1_DBG_PORT.RX_DATA;
-}
+//uint32_t charget (void)
+//{
+//	/* Wait for rx buffer buffer to be ready */
+//	while(0 == (E1_DBG_PORT.DBGSTAT & RXFL0EN));
+//
+//	/* Read data, send back up */
+//	return E1_DBG_PORT.RX_DATA;
+//}

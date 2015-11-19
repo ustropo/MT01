@@ -11745,8 +11745,8 @@ GCR_TPU8_TCI8V=6,GCR_TPU8_TCI8U=6,GCR_TPU9_TCI9V=6,GCR_TPU10_TCI10V=6,GCR_TPU10_
 #define	 _CLR( x )		__CLR( x )
 #define	  CLR( x , y )	_CLR( _ ## x ## _ ## y )
 #define	__CN( x )		ICU.SEL.BIT.CN ## x
-#define	 _CN( x )		__CN( x )
-#define	  CN( x , y )	_CN( _ ## x ## _ ## y )
+#define	 _CN1( x )		__CN1( x )
+#define	  CN( x , y )	_CN1( _ ## x ## _ ## y )
 
 #define	AD		(*(volatile struct st_ad      __evenaccess *)0x89800)
 #define	BSC		(*(volatile struct st_bsc     __evenaccess *)0x81300)

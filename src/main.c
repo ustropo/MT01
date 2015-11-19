@@ -28,10 +28,12 @@
 /******************************************************************************
 Includes   <System Includes> , "Project Includes"
 ******************************************************************************/
+#include <stdio.h>
 #include "platform.h"
 #include "r_usb_basic_if.h"
 #include "r_usb_hmsc_config.h"
 #include "r_usb_hmsc_if.h"
+#include "serial_printf.h"
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
@@ -70,7 +72,8 @@ void main(void)
     {
         while (1);
     }
-
+    serial_init();
+    printf("teste");
     r_main();
     vTaskStartScheduler();
     while (1)
