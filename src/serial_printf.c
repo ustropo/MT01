@@ -45,10 +45,11 @@ void SerialCallback(void *p_args);
 Global variables and functions
 ******************************************************************************/
 
+sci_hdl_t Console;
+
 void serial_init(void)
 {
 	sci_cfg_t config;
-	sci_hdl_t Console;
 	sci_err_t err;
 	config.async.baud_rate = 115200;
 	config.async.clk_src = SCI_CLK_INT;
@@ -69,8 +70,7 @@ void serial_init(void)
 ******************************************************************************/
 void charput(uint8_t output_char)
 {
-	static sci_hdl_t Console;
-	sci_err_t err;
+	volatile sci_err_t err;
 	err = R_SCI_Send(Console, &output_char, 1);
 }
 /******************************************************************************

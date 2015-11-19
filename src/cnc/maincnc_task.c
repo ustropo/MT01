@@ -117,7 +117,7 @@ static void _application_init(void)
 	hardware_init();				// system hardware setup 			- must be first
 	persistence_init();				// set up EEPROM or other NVM		- must be second
 //RXMOD	rtc_init();						// real time counter
-	xio_init();						// eXtended IO subsystem
+//	xio_init();						// eXtended IO subsystem
 
 	// do these next
 	stepper_init(); 				// stepper subsystem 				- must precede gpio_init()
@@ -132,7 +132,7 @@ static void _application_init(void)
 	planner_init();					// motion planning subsystem
 	canonical_machine_init();		// canonical machine				- must follow config_init()
 
-	rpt_print_system_ready_message();// (LAST) announce system is ready
+//	rpt_print_system_ready_message();// (LAST) announce system is ready
 }
 
 /*

@@ -66,7 +66,7 @@ static void output_ports_configure(void)
 	MPC.P14PFS.BYTE = 0x12; /* USB0_OVRCURA */
 	MPC.P16PFS.BYTE = 0x12; /* USB0_VBUS */
 	PORT1.PODR.BYTE = 0x00 ; /* All outputs low to start */
-    PORT1.PDR.BYTE  = 0xFF ;  /* All  outputs */
+    PORT1.PDR.BYTE  = 0xFB ;  /* All  outputs */
     
     /* Port 2 - USB control  */
     PORT2.PODR.BYTE = 0x00 ;    /* All outputs low to start */
