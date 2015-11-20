@@ -43,6 +43,7 @@ Includes   <System Includes> , "Project Includes"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "lcd.h"
 
 
 #define USB_HOST_USBIP_NUM  USB_USBIP_0
@@ -50,7 +51,7 @@ Includes   <System Includes> , "Project Includes"
 /******************************************************************************
 External variables and functions
 ******************************************************************************/
-void r_main(void);
+void usb_main(void);
 void usb_mcu_init(void);
 extern void	usb_cstd_IdleTaskStart(void);
 extern void	usb_hmsc_task_start(void);
@@ -67,23 +68,34 @@ Return value    : none
 ******************************************************************************/
 void main(void)
 {
-    bool ret = false;
-    /* Reserve the CMT0 for FreeRTOS */
-    ret = R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_CMT0));
-    while (false == ret) /* can't lock the CMT0 resource */
-    {
-        while (1);
-    }
-    serial_init();
-    r_main();
-    vTaskStartScheduler();
+	bool ret = false;
+	/* Reserve the CMT0 for FreeRTOS */
+	ret = R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_CMT0));
+	while (false == ret) /* can't lock the CMT0 resource */
+	{
+		while (1);
+	}
+	serial_init();
+
+	/* Initialize USB */
+	usb_main();
+
+	/* Initialize lcd */
+	ut_lcd_init();
+
+	/* Initialize RTOS */
+	FreeRTOSConfig();
+
+	/* Start tasks - only returns if something bad happened! */
+	vTaskStartScheduler();
     while (1)
     {
+
     }
 }
 
 
-void r_main()
+void usb_main()
 {
     usb_err_t   usb_err = USB_SUCCESS;
     usb_mcu_init();

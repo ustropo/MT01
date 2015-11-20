@@ -41,6 +41,8 @@
 #include "queue.h"
 #include "semphr.h"
 
+#include "ut_state.h"
+
 #include "r_usb_basic_if.h"
 #include "r_usb_hmsc_if.h"
 #include "r_tfat_lib.h"
@@ -55,8 +57,7 @@ Private global variables and functions
 xSemaphoreHandle r_socket_semaphore;
 #endif
 
-TaskHandle_t  x_tn_usb_connected = NULL;
-
+xTaskHandle task_main_handle;
 xTaskHandle task_handle0;
 xTaskHandle task_handle1;
 xTaskHandle task_handle2;
@@ -124,8 +125,7 @@ extern void usb_hmsc_Task(void);
 extern void usb_hmsc_StrgDriveTask(void);
 extern void hmsc_cstd_task_start( void );
 extern void keyboard_task(void);
-extern void main_cnc_task(void);
-extern void browse_menu(uint8_t keyEntry);
+extern void states_task(void);
 void usb_hmsc_main_task(USB_VP_INT stacd);
 /******************************************************************************
 Function Name   : vApplicationMallocFailedHook
@@ -401,12 +401,8 @@ void FreeRTOSConfig( void )
     xTaskCreate( (pdTASK_CODE)hmsc_cstd_task_start,     "HMSC_MAIN_TSK   ",  128, NULL, 2, NULL); /* HMSC_MAIN_TASK      */
 
     /*User interface task*/
-    xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task   ",  128, NULL, 2, NULL); /* keyboard_task      */
-
-    xTaskCreate( (pdTASK_CODE)browse_menu,     "Menu_task   ",  512, NULL, 2, NULL); /* Menu_task      */
-
-    xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  5000, NULL, 2, &x_tn_usb_connected); /* Menu_task      */
-
+    xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task    ",  128, NULL, 2, NULL); /* keyboard_task      */
+    xTaskCreate( (pdTASK_CODE)states_task,     "states_task    ",  10*1024, NULL, 2, &task_main_handle); /* states_task      */
 }
 
 /******************************************************************************/

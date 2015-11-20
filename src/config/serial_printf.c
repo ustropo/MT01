@@ -32,7 +32,7 @@
 * History : MM.DD.YYYY Version Description
 *         : 10.05.2010 1.00    First Release
 ******************************************************************************/
-#if 1
+
 /******************************************************************************
 Includes   <System Includes> , "Project Includes"
 *****************************************************************************/
@@ -50,7 +50,7 @@ sci_hdl_t Console;
 void serial_init(void)
 {
 	sci_cfg_t config;
-	sci_err_t err;
+	//sci_err_t err;
 	config.async.baud_rate = 115200;
 	config.async.clk_src = SCI_CLK_INT;
 	config.async.data_size = SCI_DATA_8BIT;
@@ -58,7 +58,7 @@ void serial_init(void)
 	config.async.parity_type = SCI_EVEN_PARITY; // ignored because parity is disabled
 	config.async.stop_bits = SCI_STOPBITS_1;
 	config.async.int_priority = 2; // 1=lowest, 15=highest
-	err = R_SCI_Open(SCI_CH2, SCI_MODE_ASYNC, &config, SerialCallback, &Console);
+	R_SCI_Open(SCI_CH2, SCI_MODE_ASYNC, &config, SerialCallback, &Console);
 
 }
 
@@ -71,7 +71,7 @@ void serial_init(void)
 void charput(uint8_t output_char)
 {
 	volatile sci_err_t err;
-	while ((err = R_SCI_Send(Console, &output_char, 1)) == SCI_ERR_INSUFFICIENT_SPACE);
+	err = R_SCI_Send(Console, &output_char, 1);
 }
 /******************************************************************************
 End of function  charput
@@ -165,4 +165,3 @@ void SerialCallback(void *p_args)
 		nop();
 	}
 }
-#endif

@@ -19,9 +19,12 @@ Includes   <System Includes> , "Project Includes"
 /*****************************************************************************
 Macro definitions
 ******************************************************************************/
-#define KEY_UP 		(0x01U)
-#define KEY_DOWN 	(0x02U)
-#define KEY_ENTER 	(0x04U)
+#define KEY_UP 		(0x0004U)
+#define KEY_DOWN 	(0x0010U)
+#define KEY_RIGHT	(0x2000U)
+#define KEY_LEFT	(0x20000000U)
+#define KEY_ESC		(0x40000U)
+#define KEY_ENTER 	(0x100000U)
 /******************************************************************************
 Section    <Section Definition> , "Data Sections"
 ******************************************************************************/

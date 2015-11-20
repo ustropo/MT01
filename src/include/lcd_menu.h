@@ -2,84 +2,64 @@
 // LCD menu - HEADER
 // ***********************************************************************
 
-
-
 #ifndef __LCD_MENU
 #define __LCD_MENU
+
 #include "FreeRTOS.h"
 #include "task.h"
-#include "queue.h"
-
 
 // ***********************************************************************
 // Macros
 // ***********************************************************************
-// Define display type (outcomment other two)
-#define USE_FOUR_ROW_DISPLAY
-//#define USE_THREE_ROW_DISPLAY
-//#define USE_TWO_ROW_DISPLAY
-
-// Want an always visible floaty header?
-//#define USE_ALWAYS_VISIBLE_HEADER
-
-// Define char which gets shown as selection
-#define SELECTION_CHAR	'>'
-
-// Don't touch these
-#if         defined USE_FOUR_ROW_DISPLAY
-
-	#define DISPLAY_ROWS	8
-	#define UPPER_SPACE 	7
-	#define LOWER_SPACE 	1
-
-#endif
-
-#if			defined USE_THREE_ROW_DISPLAY
-	
-	#define DISPLAY_ROWS	3
-	#define UPPER_SPACE 	1
-	#define LOWER_SPACE 	1
-
-#endif
-
-#if			defined USE_TWO_ROW_DISPLAY
-	
-	#define DISPLAY_ROWS	2
-	#define UPPER_SPACE 	1
-	#define LOWER_SPACE 	0
-
-#endif
+#define MENU_MAX_ITEMS		6
+#define MENU_MAX_ITEM_STR	32
 
 // ***********************************************************************
 // Typedefs
 // ***********************************************************************
-// Define single menu entry
-typedef const struct MenuStructure
-{	const char *text;
-	unsigned char num_menupoints;
-	unsigned char up;
-	unsigned char down;
-	unsigned char enter;
-  	void ( *fp )( void );
-	// unsigned char value;
-}MenuEntry;
+
+typedef void (*ut_item_func_ptr)(uint8_t);
+
+/**
+ *
+ */
+typedef struct
+{
+	const char* text;
+	ut_item_func_ptr callback_func;
+} ut_menu_item;
+
+/**
+ *
+ */
+typedef struct
+{
+	ut_menu_item items[MENU_MAX_ITEMS];
+	const char* title;
+	uint8_t selectedItem;
+	uint8_t numItems;
+	uint8_t offset;
+	uint8_t maxItemsPerPage;
+	uint8_t boShowTitle;
+} ut_menu;
 
 // ***********************************************************************
 // Variable declarations
 // ***********************************************************************
-extern const MenuEntry menu[];
 
 
 // ***********************************************************************
 // Prototypes
 // ***********************************************************************
-extern void show_menu(void);
-extern void browse_menu(void);
+
+extern void ut_menu_go_up(ut_menu* menu_ptr);
+extern void ut_menu_go_down(ut_menu* menu_ptr);
+extern void ut_menu_init(ut_menu* menu_ptr);
+extern void ut_menu_show(ut_menu* menu_ptr);
+extern int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout);
 
 // ***********************************************************************
 // Add User prototypes & variables
 // ***********************************************************************
-
-
 
 #endif // __LCD_MENU
