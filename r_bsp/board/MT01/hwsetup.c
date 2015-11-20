@@ -85,12 +85,12 @@ static void output_ports_configure(void)
      PORT5.PCR.BYTE  = 0x3F ;	 /* Pull up */
 
      /* Port A - serial memory & PWM  */
-     PORTA.PMR.BYTE  = 0x5A ;    /* SCI5 & TIOCA2 */
+     PORTA.PMR.BYTE  = 0x1A ;    /* SCI5 & TIOCA2 */
      MPC.PA1PFS.BYTE = 0x0A ;    /* PA1 is SCK */
      MPC.PA3PFS.BYTE = 0x0A ;    /* PA3 is MISO */
      MPC.PA4PFS.BYTE = 0x0A ;    /* PA4 is MOSI */
-     MPC.PA6PFS.BYTE = 0x03 ;	/* PA6 is PWM charge*/
-     PORTA.PDR.BYTE  = 0x80 ;    /* PA7 is CS */
+//     MPC.PA6PFS.BYTE = 0x03 ;	/* PA6 is PWM charge*/
+     PORTA.PDR.BYTE  = 0xC0 ;    /* PA7 is CS */
      PORTA.PODR.BYTE = 0x00 ;    /* */
      PORTA.PDR.BYTE  = 0xF7 ;    /* All outputs except MISO */
 

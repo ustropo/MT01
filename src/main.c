@@ -68,8 +68,6 @@ Return value    : none
 void main(void)
 {
     bool ret = false;
-    uint32_t cmt;
-    R_CMT_CreatePeriodic(1000,callbackcmt,&cmt);
     /* Reserve the CMT0 for FreeRTOS */
     ret = R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_CMT0));
     while (false == ret) /* can't lock the CMT0 resource */

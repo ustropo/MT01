@@ -54,7 +54,7 @@
 #define MOTOR_POWER_LEVEL			0.25					// default motor power level (0,000 - 1.000, ARM only)
 
 // Communications and reporting settings
-#define COMM_MODE					JSON_MODE				// one of: TEXT_MODE, JSON_MODE
+#define COMM_MODE					TEXT_MODE				// one of: TEXT_MODE, JSON_MODE
 #define TEXT_VERBOSITY				TV_VERBOSE				// one of: TV_SILENT, TV_VERBOSE
 #define NETWORK_MODE				NETWORK_STANDALONE
 

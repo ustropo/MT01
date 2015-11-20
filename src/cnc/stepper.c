@@ -267,10 +267,12 @@ void stepper_init()
 #endif // __ARM
 
 #ifdef __RX
-    R_TMR_CreatePeriodic(FREQUENCY_DDA,timer_dda_callback,TIMER_DDA);
+	uint32_t cmtch = TIMER_DWELL;
     R_TMR_CreateOneShot((uint8_t)(1000000/FREQUENCY_SGI),exec_timer_num,TIMER_EXEC);
+    R_TMR_CreatePeriodic(FREQUENCY_DDA,timer_dda_callback,TIMER_DDA);
     R_TMR_CreateOneShot((uint8_t)(1000000/FREQUENCY_SGI),load_timer_num,TIMER_LOAD);
-
+    R_CMT_CreatePeriodic(FREQUENCY_DWELL,timer_dwell_callback,&cmtch);
+    R_CMT_Control(TIMER_DWELL,CMT_RX_CMD_PAUSE,0);
 
 	// setup software interrupt load timer
 
@@ -636,7 +638,51 @@ MOTATE_TIMER_INTERRUPT(dda_timer_num)
 #ifdef __RX
 void timer_dda_callback(void *pdata)
 {
+	static bool flag_dda = 1;
+	static uint8_t enableCount = 0;
+	if (enableCount == 17)
+	{
+		PWMCH ^= 1;
+		enableCount = 0;
+	}
+	enableCount++;
+	flag_dda ^= 1;
+	if (!flag_dda)
+	{
+		if ((st_run.mot[MOTOR_1].substep_accumulator += st_run.mot[MOTOR_1].substep_increment) > 0) {
+			MOTOR1_STEP = TRUE;		// turn step bit on
+			st_run.mot[MOTOR_1].substep_accumulator -= st_run.dda_ticks_X_substeps;
+			INCREMENT_ENCODER(MOTOR_1);
+		}
+		if ((st_run.mot[MOTOR_2].substep_accumulator += st_run.mot[MOTOR_2].substep_increment) > 0) {
+			MOTOR2_STEP = TRUE;
+			st_run.mot[MOTOR_2].substep_accumulator -= st_run.dda_ticks_X_substeps;
+			INCREMENT_ENCODER(MOTOR_2);
+		}
+		if ((st_run.mot[MOTOR_3].substep_accumulator += st_run.mot[MOTOR_3].substep_increment) > 0) {
+			MOTOR3_STEP = TRUE;
+			st_run.mot[MOTOR_3].substep_accumulator -= st_run.dda_ticks_X_substeps;
+			INCREMENT_ENCODER(MOTOR_3);
+		}
+		if ((st_run.mot[MOTOR_4].substep_accumulator += st_run.mot[MOTOR_4].substep_increment) > 0) {
+			MOTOR4_STEP = TRUE;
+			st_run.mot[MOTOR_4].substep_accumulator -= st_run.dda_ticks_X_substeps;
+			INCREMENT_ENCODER(MOTOR_4);
+		}
+	}
+	else
+	{
+		// pulse stretching for using external drivers.- turn step bits off
+		MOTOR1_STEP = FALSE;				// ~ 5 uSec pulse width
+		MOTOR2_STEP = FALSE;				// ~ 4 uSec
+		MOTOR3_STEP = FALSE;				// ~ 3 uSec
+		MOTOR4_STEP = FALSE;				// ~ 2 uSec
 
+		if (--st_run.dda_ticks_downcount != 0) return;
+
+		R_TMR_Control(TIMER_DDA, TMR_CLEAR, 0);				// disable DDA timer
+		_load_move();										// load the next move
+	}
 }
 
 #endif // __ARM
@@ -669,7 +715,11 @@ MOTATE_TIMER_INTERRUPT(dwell_timer_num)
 #ifdef __RX
 void timer_dwell_callback(void *pdata)
 {								// DWELL timer interrupt
-
+	if (--st_run.dda_ticks_downcount == 0) {
+		//TIMER_DWELL.CTRLA = STEP_TIMER_DISABLE;			// disable DWELL timer
+		R_CMT_Control(TIMER_DWELL,CMT_RX_CMD_PAUSE,0);
+		_load_move();
+	}
 }
 #endif
 
@@ -727,12 +777,20 @@ namespace Motate {	// Define timer inside Motate namespace
 #ifdef __RX
 void st_request_exec_move()
 {
-	R_TMR_Control(TIMER_EXEC, TMR_START, 0);
+	if (st_pre.buffer_state == PREP_BUFFER_OWNED_BY_EXEC) {// bother interrupting
+		R_TMR_Control(TIMER_EXEC, TMR_START, 0); // trigger a LO interrupt
+	}
 }
 
 void exec_timer_num(void *pdata)
-{								// Exec timer interrupt
-	_request_load_move();
+{
+	// exec_move
+	if (st_pre.buffer_state == PREP_BUFFER_OWNED_BY_EXEC) {
+		if (mp_exec_move() != STAT_NOOP) {
+			st_pre.buffer_state = PREP_BUFFER_OWNED_BY_LOADER; // flip it back
+			_request_load_move();
+		}
+	}
 }
 #endif
 
@@ -787,7 +845,13 @@ namespace Motate {	// Define timer inside Motate namespace
 #ifdef __RX
 static void _request_load_move()
 {
-	R_TMR_Control(TIMER_LOAD, TMR_START, 0);
+	if (st_runtime_isbusy()) {
+		return;													// don't request a load if the runtime is busy
+	}
+	if (st_pre.buffer_state == PREP_BUFFER_OWNED_BY_LOADER) {	// bother interrupting
+		R_TMR_Control(TIMER_LOAD, TMR_START, 0);					// trigger a HI interrupt
+	}
+
 }
 
 void load_timer_num(void *pdata)
@@ -824,7 +888,7 @@ static void _load_move()
 		return;
 	}
 	// handle aline loads first (most common case)
-//	if (st_pre.move_type == MOVE_TYPE_ALINE) {
+	if (st_pre.move_type == MOVE_TYPE_ALINE) {
 
 		//**** setup the new segment ****
 
@@ -878,153 +942,153 @@ static void _load_move()
 		}
 		// accumulate counted steps to the step position and zero out counted steps for the segment currently being loaded
 		ACCUMULATE_ENCODER(MOTOR_1);
-//
-//#if (MOTORS >= 2)	//**** MOTOR_2 LOAD ****
-//		if ((st_run.mot[MOTOR_2].substep_increment = st_pre.mot[MOTOR_2].substep_increment) != 0) {
-//			if (st_pre.mot[MOTOR_2].accumulator_correction_flag == true) {
-//				st_pre.mot[MOTOR_2].accumulator_correction_flag = false;
-//				st_run.mot[MOTOR_2].substep_accumulator *= st_pre.mot[MOTOR_2].accumulator_correction;
-//			}
-//			if (st_pre.mot[MOTOR_2].direction != st_pre.mot[MOTOR_2].prev_direction) {
-//				st_pre.mot[MOTOR_2].prev_direction = st_pre.mot[MOTOR_2].direction;
-//				st_run.mot[MOTOR_2].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_2].substep_accumulator);
-//				if (st_pre.mot[MOTOR_2].direction == DIRECTION_CW){
-////RXMOD					PORT_MOTOR_2_VPORT.OUT &= ~DIRECTION_BIT_bm; else
-////				PORT_MOTOR_2_VPORT.OUT |= DIRECTION_BIT_bm;
-//			}
-//			SET_ENCODER_STEP_SIGN(MOTOR_2, st_pre.mot[MOTOR_2].step_sign);
-//			if (st_cfg.mot[MOTOR_2].power_mode != MOTOR_DISABLED) {
-////RXMOD					PORT_MOTOR_2_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
-//				st_run.mot[MOTOR_2].power_state = MOTOR_POWER_TIMEOUT_START;
-//			}
-//		} else {
-//			if (st_cfg.mot[MOTOR_2].power_mode == MOTOR_POWERED_IN_CYCLE) {
-////RXMOD					PORT_MOTOR_2_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
-//				st_run.mot[MOTOR_2].power_state = MOTOR_POWER_TIMEOUT_START;
-//			}
-//		}
-//		ACCUMULATE_ENCODER(MOTOR_2);
-//#endif
-//#if (MOTORS >= 3)	//**** MOTOR_3 LOAD ****
-//		if ((st_run.mot[MOTOR_3].substep_increment = st_pre.mot[MOTOR_3].substep_increment) != 0) {
-//			if (st_pre.mot[MOTOR_3].accumulator_correction_flag == true) {
-//				st_pre.mot[MOTOR_3].accumulator_correction_flag = false;
-//				st_run.mot[MOTOR_3].substep_accumulator *= st_pre.mot[MOTOR_3].accumulator_correction;
-//			}
-//			if (st_pre.mot[MOTOR_3].direction != st_pre.mot[MOTOR_3].prev_direction) {
-//				st_pre.mot[MOTOR_3].prev_direction = st_pre.mot[MOTOR_3].direction;
-//				st_run.mot[MOTOR_3].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_3].substep_accumulator);
-//				if (st_pre.mot[MOTOR_3].direction == DIRECTION_CW){
-////RXMOD					PORT_MOTOR_3_VPORT.OUT &= ~DIRECTION_BIT_bm; else
-////				PORT_MOTOR_3_VPORT.OUT |= DIRECTION_BIT_bm;
-//			}
-//			SET_ENCODER_STEP_SIGN(MOTOR_3, st_pre.mot[MOTOR_3].step_sign);
-//			if (st_cfg.mot[MOTOR_3].power_mode != MOTOR_DISABLED) {
-////RXMOD					PORT_MOTOR_3_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
-//				st_run.mot[MOTOR_3].power_state = MOTOR_POWER_TIMEOUT_START;
-//			}
-//		} else {
-//			if (st_cfg.mot[MOTOR_3].power_mode == MOTOR_POWERED_IN_CYCLE) {
-////RXMOD					PORT_MOTOR_3_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
-//				st_run.mot[MOTOR_3].power_state = MOTOR_POWER_TIMEOUT_START;
-//			}
-//		}
-//		ACCUMULATE_ENCODER(MOTOR_3);
-//#endif
-//#if (MOTORS >= 4)  //**** MOTOR_4 LOAD ****
-//		if ((st_run.mot[MOTOR_4].substep_increment = st_pre.mot[MOTOR_4].substep_increment) != 0) {
-//			if (st_pre.mot[MOTOR_4].accumulator_correction_flag == true) {
-//				st_pre.mot[MOTOR_4].accumulator_correction_flag = false;
-//				st_run.mot[MOTOR_4].substep_accumulator *= st_pre.mot[MOTOR_4].accumulator_correction;
-//			}
-//			if (st_pre.mot[MOTOR_4].direction != st_pre.mot[MOTOR_4].prev_direction) {
-//				st_pre.mot[MOTOR_4].prev_direction = st_pre.mot[MOTOR_4].direction;
-//				st_run.mot[MOTOR_4].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_4].substep_accumulator);
-//				if (st_pre.mot[MOTOR_4].direction == DIRECTION_CW){
-////RXMOD					PORT_MOTOR_4_VPORT.OUT &= ~DIRECTION_BIT_bm; else
-////				PORT_MOTOR_4_VPORT.OUT |= DIRECTION_BIT_bm;
-//			}
-//			SET_ENCODER_STEP_SIGN(MOTOR_4, st_pre.mot[MOTOR_4].step_sign);
-//			if (st_cfg.mot[MOTOR_4].power_mode != MOTOR_DISABLED) {
-////RXMOD					PORT_MOTOR_4_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
-//				st_run.mot[MOTOR_4].power_state = MOTOR_POWER_TIMEOUT_START;
-//			}
-//		} else {
-//			if (st_cfg.mot[MOTOR_4].power_mode == MOTOR_POWERED_IN_CYCLE) {
-////RXMOD					PORT_MOTOR_4_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
-//				st_run.mot[MOTOR_4].power_state = MOTOR_POWER_TIMEOUT_START;
-//			}
-//		}
-//		ACCUMULATE_ENCODER(MOTOR_4);
-//#endif
-//#if (MOTORS >= 5)	//**** MOTOR_5 LOAD ****
-//		if ((st_run.mot[MOTOR_5].substep_increment = st_pre.mot[MOTOR_5].substep_increment) != 0) {
-//			if (st_pre.mot[MOTOR_5].accumulator_correction_flag == true) {
-//				st_pre.mot[MOTOR_5].accumulator_correction_flag = false;
-//				st_run.mot[MOTOR_5].substep_accumulator *= st_pre.mot[MOTOR_5].accumulator_correction;
-//			}
-//			if (st_pre.mot[MOTOR_5].direction != st_pre.mot[MOTOR_5].prev_direction) {
-//				st_pre.mot[MOTOR_5].prev_direction = st_pre.mot[MOTOR_5].direction;
-//				st_run.mot[MOTOR_5].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_5].substep_accumulator);
-//				if (st_pre.mot[MOTOR_5].direction == DIRECTION_CW)
-//				PORT_MOTOR_5_VPORT.OUT &= ~DIRECTION_BIT_bm; else
-//				PORT_MOTOR_5_VPORT.OUT |= DIRECTION_BIT_bm;
-//			}
-//			PORT_MOTOR_5_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
-//			st_run.mot[MOTOR_5].power_state = MOTOR_POWER_TIMEOUT_START;
-//			SET_ENCODER_STEP_SIGN(MOTOR_5, st_pre.mot[MOTOR_5].step_sign);
-//		} else {
-//			if (st_cfg.mot[MOTOR_5].power_mode == MOTOR_POWERED_IN_CYCLE) {
-//				PORT_MOTOR_5_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
-//				st_run.mot[MOTOR_5].power_state = MOTOR_POWER_TIMEOUT_START;
-//			}
-//		}
-//		ACCUMULATE_ENCODER(MOTOR_5);
-//#endif
-//#if (MOTORS >= 6)	//**** MOTOR_6 LOAD ****
-//		if ((st_run.mot[MOTOR_6].substep_increment = st_pre.mot[MOTOR_6].substep_increment) != 0) {
-//			if (st_pre.mot[MOTOR_6].accumulator_correction_flag == true) {
-//				st_pre.mot[MOTOR_6].accumulator_correction_flag = false;
-//				st_run.mot[MOTOR_6].substep_accumulator *= st_pre.mot[MOTOR_6].accumulator_correction;
-//			}
-//			if (st_pre.mot[MOTOR_6].direction != st_pre.mot[MOTOR_6].prev_direction) {
-//				st_pre.mot[MOTOR_6].prev_direction = st_pre.mot[MOTOR_6].direction;
-//				st_run.mot[MOTOR_6].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_6].substep_accumulator);
-//				if (st_pre.mot[MOTOR_6].direction == DIRECTION_CW)
-//				PORT_MOTOR_6_VPORT.OUT &= ~DIRECTION_BIT_bm; else
-//				PORT_MOTOR_6_VPORT.OUT |= DIRECTION_BIT_bm;
-//			}
-//			PORT_MOTOR_6_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
-//			st_run.mot[MOTOR_6].power_state = MOTOR_POWER_TIMEOUT_START;
-//			SET_ENCODER_STEP_SIGN(MOTOR_6, st_pre.mot[MOTOR_6].step_sign);
-//		} else {
-//			if (st_cfg.mot[MOTOR_6].power_mode == MOTOR_POWERED_IN_CYCLE) {
-//				PORT_MOTOR_6_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
-//				st_run.mot[MOTOR_6].power_state = MOTOR_POWER_TIMEOUT_START;
-//			}
-//		}
-//		ACCUMULATE_ENCODER(MOTOR_6);
-//#endif
-//		//**** do this last ****
-//
-////RXMOD			TIMER_DDA.PER = st_pre.dda_period;
-////		TIMER_DDA.CTRLA = STEP_TIMER_ENABLE;			// enable the DDA timer
-//
-//	// handle dwells
-//	} else if (st_pre.move_type == MOVE_TYPE_DWELL) {
-//		st_run.dda_ticks_downcount = st_pre.dda_ticks;
-////RXMOD			TIMER_DWELL.PER = st_pre.dda_period;			// load dwell timer period
-////		TIMER_DWELL.CTRLA = STEP_TIMER_ENABLE;			// enable the dwell timer
-//
-//	// handle synchronous commands
-//	} else if (st_pre.move_type == MOVE_TYPE_COMMAND) {
-//		mp_runtime_command(st_pre.bf);
-//	}
-//
-//	// all other cases drop to here (e.g. Null moves after Mcodes skip to here)
-//	st_pre.move_type = MOVE_TYPE_NULL;
-//	st_pre.buffer_state = PREP_BUFFER_OWNED_BY_EXEC;	// we are done with the prep buffer - flip the flag back
-//	st_request_exec_move();								// exec and prep next move
+
+#if (MOTORS >= 2)	//**** MOTOR_2 LOAD ****
+		if ((st_run.mot[MOTOR_2].substep_increment = st_pre.mot[MOTOR_2].substep_increment) != 0) {
+			if (st_pre.mot[MOTOR_2].accumulator_correction_flag == true) {
+				st_pre.mot[MOTOR_2].accumulator_correction_flag = false;
+				st_run.mot[MOTOR_2].substep_accumulator *= st_pre.mot[MOTOR_2].accumulator_correction;
+			}
+			if (st_pre.mot[MOTOR_2].direction != st_pre.mot[MOTOR_2].prev_direction) {
+				st_pre.mot[MOTOR_2].prev_direction = st_pre.mot[MOTOR_2].direction;
+				st_run.mot[MOTOR_2].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_2].substep_accumulator);
+				if (st_pre.mot[MOTOR_2].direction == DIRECTION_CW)
+					MOTOR2_DIR = MOTOR_REVERSE; else
+				MOTOR2_DIR = MOTOR_FOWARD;
+			}
+			SET_ENCODER_STEP_SIGN(MOTOR_2, st_pre.mot[MOTOR_2].step_sign);
+			if (st_cfg.mot[MOTOR_2].power_mode != MOTOR_DISABLED) {
+//RXMOD					PORT_MOTOR_2_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
+				st_run.mot[MOTOR_2].power_state = MOTOR_POWER_TIMEOUT_START;
+			}
+		} else {
+			if (st_cfg.mot[MOTOR_2].power_mode == MOTOR_POWERED_IN_CYCLE) {
+//RXMOD					PORT_MOTOR_2_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
+				st_run.mot[MOTOR_2].power_state = MOTOR_POWER_TIMEOUT_START;
+			}
+		}
+		ACCUMULATE_ENCODER(MOTOR_2);
+#endif
+#if (MOTORS >= 3)	//**** MOTOR_3 LOAD ****
+		if ((st_run.mot[MOTOR_3].substep_increment = st_pre.mot[MOTOR_3].substep_increment) != 0) {
+			if (st_pre.mot[MOTOR_3].accumulator_correction_flag == true) {
+				st_pre.mot[MOTOR_3].accumulator_correction_flag = false;
+				st_run.mot[MOTOR_3].substep_accumulator *= st_pre.mot[MOTOR_3].accumulator_correction;
+			}
+			if (st_pre.mot[MOTOR_3].direction != st_pre.mot[MOTOR_3].prev_direction) {
+				st_pre.mot[MOTOR_3].prev_direction = st_pre.mot[MOTOR_3].direction;
+				st_run.mot[MOTOR_3].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_3].substep_accumulator);
+				if (st_pre.mot[MOTOR_3].direction == DIRECTION_CW)
+					MOTOR3_DIR = MOTOR_REVERSE; else
+				MOTOR3_DIR = MOTOR_FOWARD;
+			}
+			SET_ENCODER_STEP_SIGN(MOTOR_3, st_pre.mot[MOTOR_3].step_sign);
+			if (st_cfg.mot[MOTOR_3].power_mode != MOTOR_DISABLED) {
+//RXMOD					PORT_MOTOR_3_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
+				st_run.mot[MOTOR_3].power_state = MOTOR_POWER_TIMEOUT_START;
+			}
+		} else {
+			if (st_cfg.mot[MOTOR_3].power_mode == MOTOR_POWERED_IN_CYCLE) {
+//RXMOD					PORT_MOTOR_3_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
+				st_run.mot[MOTOR_3].power_state = MOTOR_POWER_TIMEOUT_START;
+			}
+		}
+		ACCUMULATE_ENCODER(MOTOR_3);
+#endif
+#if (MOTORS >= 4)  //**** MOTOR_4 LOAD ****
+		if ((st_run.mot[MOTOR_4].substep_increment = st_pre.mot[MOTOR_4].substep_increment) != 0) {
+			if (st_pre.mot[MOTOR_4].accumulator_correction_flag == true) {
+				st_pre.mot[MOTOR_4].accumulator_correction_flag = false;
+				st_run.mot[MOTOR_4].substep_accumulator *= st_pre.mot[MOTOR_4].accumulator_correction;
+			}
+			if (st_pre.mot[MOTOR_4].direction != st_pre.mot[MOTOR_4].prev_direction) {
+				st_pre.mot[MOTOR_4].prev_direction = st_pre.mot[MOTOR_4].direction;
+				st_run.mot[MOTOR_4].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_4].substep_accumulator);
+				if (st_pre.mot[MOTOR_4].direction == DIRECTION_CW)
+					MOTOR4_DIR = MOTOR_REVERSE; else
+				MOTOR4_DIR = MOTOR_FOWARD;
+			}
+			SET_ENCODER_STEP_SIGN(MOTOR_4, st_pre.mot[MOTOR_4].step_sign);
+			if (st_cfg.mot[MOTOR_4].power_mode != MOTOR_DISABLED) {
+//RXMOD					PORT_MOTOR_4_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
+				st_run.mot[MOTOR_4].power_state = MOTOR_POWER_TIMEOUT_START;
+			}
+		} else {
+			if (st_cfg.mot[MOTOR_4].power_mode == MOTOR_POWERED_IN_CYCLE) {
+//RXMOD					PORT_MOTOR_4_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
+				st_run.mot[MOTOR_4].power_state = MOTOR_POWER_TIMEOUT_START;
+			}
+		}
+		ACCUMULATE_ENCODER(MOTOR_4);
+#endif
+#if (MOTORS >= 5)	//**** MOTOR_5 LOAD ****
+		if ((st_run.mot[MOTOR_5].substep_increment = st_pre.mot[MOTOR_5].substep_increment) != 0) {
+			if (st_pre.mot[MOTOR_5].accumulator_correction_flag == true) {
+				st_pre.mot[MOTOR_5].accumulator_correction_flag = false;
+				st_run.mot[MOTOR_5].substep_accumulator *= st_pre.mot[MOTOR_5].accumulator_correction;
+			}
+			if (st_pre.mot[MOTOR_5].direction != st_pre.mot[MOTOR_5].prev_direction) {
+				st_pre.mot[MOTOR_5].prev_direction = st_pre.mot[MOTOR_5].direction;
+				st_run.mot[MOTOR_5].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_5].substep_accumulator);
+				if (st_pre.mot[MOTOR_5].direction == DIRECTION_CW)
+				PORT_MOTOR_5_VPORT.OUT &= ~DIRECTION_BIT_bm; else
+				PORT_MOTOR_5_VPORT.OUT |= DIRECTION_BIT_bm;
+			}
+			PORT_MOTOR_5_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
+			st_run.mot[MOTOR_5].power_state = MOTOR_POWER_TIMEOUT_START;
+			SET_ENCODER_STEP_SIGN(MOTOR_5, st_pre.mot[MOTOR_5].step_sign);
+		} else {
+			if (st_cfg.mot[MOTOR_5].power_mode == MOTOR_POWERED_IN_CYCLE) {
+				PORT_MOTOR_5_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
+				st_run.mot[MOTOR_5].power_state = MOTOR_POWER_TIMEOUT_START;
+			}
+		}
+		ACCUMULATE_ENCODER(MOTOR_5);
+#endif
+#if (MOTORS >= 6)	//**** MOTOR_6 LOAD ****
+		if ((st_run.mot[MOTOR_6].substep_increment = st_pre.mot[MOTOR_6].substep_increment) != 0) {
+			if (st_pre.mot[MOTOR_6].accumulator_correction_flag == true) {
+				st_pre.mot[MOTOR_6].accumulator_correction_flag = false;
+				st_run.mot[MOTOR_6].substep_accumulator *= st_pre.mot[MOTOR_6].accumulator_correction;
+			}
+			if (st_pre.mot[MOTOR_6].direction != st_pre.mot[MOTOR_6].prev_direction) {
+				st_pre.mot[MOTOR_6].prev_direction = st_pre.mot[MOTOR_6].direction;
+				st_run.mot[MOTOR_6].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_6].substep_accumulator);
+				if (st_pre.mot[MOTOR_6].direction == DIRECTION_CW)
+				PORT_MOTOR_6_VPORT.OUT &= ~DIRECTION_BIT_bm; else
+				PORT_MOTOR_6_VPORT.OUT |= DIRECTION_BIT_bm;
+			}
+			PORT_MOTOR_6_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
+			st_run.mot[MOTOR_6].power_state = MOTOR_POWER_TIMEOUT_START;
+			SET_ENCODER_STEP_SIGN(MOTOR_6, st_pre.mot[MOTOR_6].step_sign);
+		} else {
+			if (st_cfg.mot[MOTOR_6].power_mode == MOTOR_POWERED_IN_CYCLE) {
+				PORT_MOTOR_6_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;
+				st_run.mot[MOTOR_6].power_state = MOTOR_POWER_TIMEOUT_START;
+			}
+		}
+		ACCUMULATE_ENCODER(MOTOR_6);
+#endif
+		//**** do this last ****
+
+		R_TMR_Control(TIMER_DDA, TMR_START, 0);			// enable the DDA timer
+
+	// handle dwells
+	} else if (st_pre.move_type == MOVE_TYPE_DWELL) {
+		st_run.dda_ticks_downcount = st_pre.dda_ticks;
+//RXMOD			TIMER_DWELL.PER = st_pre.dda_period;			// load dwell timer period
+//		TIMER_DWELL.CTRLA = STEP_TIMER_ENABLE;			// enable the dwell timer
+		R_CMT_Control(TIMER_DWELL,CMT_RX_CMD_RESTART,0);
+
+	// handle synchronous commands
+	} else if (st_pre.move_type == MOVE_TYPE_COMMAND) {
+		mp_runtime_command(st_pre.bf);
+	}
+
+	// all other cases drop to here (e.g. Null moves after Mcodes skip to here)
+	st_pre.move_type = MOVE_TYPE_NULL;
+	st_pre.buffer_state = PREP_BUFFER_OWNED_BY_EXEC;	// we are done with the prep buffer - flip the flag back
+	st_request_exec_move();								// exec and prep next move
 }
 
 /***********************************************************************************

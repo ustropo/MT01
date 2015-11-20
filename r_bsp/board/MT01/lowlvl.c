@@ -73,13 +73,13 @@ Private global variables and functions
 //	/* Write the character out */
 //	E1_DBG_PORT.TX_DATA = output_char;
 //}
-
-/***********************************************************************************************************************
-* Function Name: charget
-* Description  : Gets a character on a serial port
-* Arguments    : none
-* Return Value : received character
-***********************************************************************************************************************/
+//
+///***********************************************************************************************************************
+//* Function Name: charget
+//* Description  : Gets a character on a serial port
+//* Arguments    : none
+//* Return Value : received character
+//***********************************************************************************************************************/
 //uint32_t charget (void)
 //{
 //	/* Wait for rx buffer buffer to be ready */

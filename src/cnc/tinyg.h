@@ -62,12 +62,12 @@
 
 #define __TEXT_MODE							// enables text mode	(~10Kb)
 #define __HELP_SCREENS						// enables help screens (~3.5Kb)
-#define __CANNED_TESTS 						// enables $tests 		(~12Kb)
+//#define __CANNED_TESTS 						// enables $tests 		(~12Kb)
 #define __TEST_99 							// enables diagnostic test 99 (independent of other tests)
 
 /****** DEVELOPMENT SETTINGS ******/
 
-#define __DIAGNOSTIC_PARAMETERS				// enables system diagnostic parameters (_xx) in config_app
+//#define __DIAGNOSTIC_PARAMETERS				// enables system diagnostic parameters (_xx) in config_app
 //#define __DEBUG_SETTINGS					// special settings. See settings.h
 //#define __CANNED_STARTUP					// run any canned startup moves
 

@@ -68,6 +68,7 @@ enum hwPlatform {
 #include "config.h"						// needed for the stat_t typedef
 #include "platform.h"
 #include "r_tmr_rx_if.h"
+#include "r_cmt_rx_if.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -82,6 +83,8 @@ extern "C"{
 #define MILLISECONDS_PER_TICK 1			// MS for system tick (systick * N)
 #define SYS_ID_DIGITS 12                // actual digits in system ID (up to 16)
 #define SYS_ID_LEN 16					// total length including dashes and NUL
+
+#define CMT_CH1 1
 
 /************************************************************************************
  **** R5F5631X SPECIFIC HARDWARE *************************************************
@@ -123,7 +126,7 @@ extern "C"{
 // Timer definitions. See stepper.h and other headers for setup
 
 #define TIMER_DDA			TMR_CH0		// DDA timer 	(see stepper.h)
-#define TIMER_DWELL	 		MTU_CHANNEL_1		// Dwell timer	(see stepper.h)
+#define TIMER_DWELL	 		CMT_CH1		// Dwell timer	(see stepper.h)
 #define TIMER_LOAD			TMR_CH1		// Loader timer	(see stepper.h)
 #define TIMER_EXEC			TMR_CH2		// Exec timer	(see stepper.h)
 #define TIMER_PWM1
@@ -139,7 +142,7 @@ extern "C"{
 #define MOTOR3_DIR  PORTE.PODR.BIT.B5
 #define MOTOR4_STEP PORTE.PODR.BIT.B6
 #define MOTOR4_DIR  PORTE.PODR.BIT.B7
-#define PIN_ENABLE  PORTD.PODR.BIT.B0
+#define PWMCH  		PORTA.PODR.BIT.B6
 
 #define MOTOR_FOWARD	1
 #define MOTOR_REVERSE   0

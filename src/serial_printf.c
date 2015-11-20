@@ -32,7 +32,7 @@
 * History : MM.DD.YYYY Version Description
 *         : 10.05.2010 1.00    First Release
 ******************************************************************************/
-
+#if 1
 /******************************************************************************
 Includes   <System Includes> , "Project Includes"
 *****************************************************************************/
@@ -71,7 +71,7 @@ void serial_init(void)
 void charput(uint8_t output_char)
 {
 	volatile sci_err_t err;
-	err = R_SCI_Send(Console, &output_char, 1);
+	while ((err = R_SCI_Send(Console, &output_char, 1)) == SCI_ERR_INSUFFICIENT_SPACE);
 }
 /******************************************************************************
 End of function  charput
@@ -165,3 +165,4 @@ void SerialCallback(void *p_args)
 		nop();
 	}
 }
+#endif

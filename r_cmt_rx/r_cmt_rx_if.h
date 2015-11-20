@@ -27,7 +27,8 @@
 *         : 10.11.2014 2.40    Added support for RX113.
 *         : 12.04.2014 2.41    Updated demo project.
 ***********************************************************************************************************************/
-
+#ifndef CMT_RX_IF
+#define CMT_RX_IF
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
@@ -68,4 +69,4 @@ bool R_CMT_CreateOneShot(uint32_t period_us, void (* callback)(void * pdata), ui
 bool R_CMT_Control(uint32_t channel, cmt_commands_t command, void * pdata);
 bool R_CMT_Stop(uint32_t channel);
 uint32_t  R_CMT_GetVersion(void);
-
+#endif

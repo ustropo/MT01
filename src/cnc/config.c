@@ -142,6 +142,12 @@ void config_init()
 		sr_init_status_report();
 	}
 #endif
+#ifdef __RX
+// ++++ The following code is offered until persistence is implemented.
+// ++++ Then you can use the AVR code (or something like it)
+	cfg.comm_mode = TEXT_MODE;					// initial value until EEPROM is read
+	_set_defa(nv);
+#endif
 }
 
 /*
