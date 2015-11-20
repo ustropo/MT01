@@ -50,4 +50,16 @@ extern ut_state ut_state_choose_file(ut_context* pContext);
  */
 extern const state_func_ptr states_table[STATE_NUMBER];
 
+// ***********************************************************************
+// Defines
+// ***********************************************************************
+#define MAX_FILE_PATH_SIZE 512
+#define USB_ROOT	""
+#define DEFAULT_FILE_EXTENSION	".txt"
+
+// ***********************************************************************
+// Global variables
+// ***********************************************************************
+extern char gszCurFile[MAX_FILE_PATH_SIZE];
+
 #endif /* STATES_UT_STATE_H_ */

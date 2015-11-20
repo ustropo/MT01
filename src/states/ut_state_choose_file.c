@@ -20,11 +20,9 @@
 #include <stdlib.h>
 
 // ***********************************************************************
-// Defines
+// Global variables
 // ***********************************************************************
-#define MAX_FILE_PATH_SIZE 512
-#define USB_ROOT	""
-#define DEFAULT_FILE_EXTENSION	".txt"
+char gszCurFile[MAX_FILE_PATH_SIZE];
 
 // ***********************************************************************
 // Global types
@@ -36,11 +34,6 @@ typedef enum
 	NAVIGATE_CONTINUE,
 	NAVIGATE_END
 } ut_fs_navigate;
-
-// ***********************************************************************
-// Global variables
-// ***********************************************************************
-static char gszCurDir[MAX_FILE_PATH_SIZE];
 
 // ***********************************************************************
 // Global functions
@@ -101,11 +94,11 @@ static ut_fs_navigate chooseFile()
 	filesMenu.maxItemsPerPage = MAX_ROW;
 
 	/* Open dir */
-	eRes = R_tfat_f_opendir(&st_usb_dir, gszCurDir);
+	eRes = R_tfat_f_opendir(&st_usb_dir, gszCurFile);
 	if(eRes == TFAT_FR_OK)
 	{
 		/* Check if it is on root */
-		if(strlen(gszCurDir) > 0)
+		if(strlen(gszCurFile) > 0)
 		{
 			filesMenu.items[filesMenu.numItems].text = "..";
 			filesMenu.numItems++;
@@ -147,24 +140,25 @@ static ut_fs_navigate chooseFile()
 			if(filesMenu.items[filesMenu.selectedItem].text[0] == '/')
 			{
 				/* Is a dir, recursively */
-				strcat(gszCurDir, filesMenu.items[filesMenu.selectedItem].text);
+				strcat(gszCurFile, filesMenu.items[filesMenu.selectedItem].text);
 				return NAVIGATE_CONTINUE;
 			}
 			else if(filesMenu.items[filesMenu.selectedItem].text[0] == '.')
 			{
 				/* It should rise up a level */
-				char* last = ut_strrstr(gszCurDir, "/");
+				char* last = ut_strrstr(gszCurFile, "/");
 				*last = 0;
 				return NAVIGATE_CONTINUE;
 			}
 
 			/* Is a file - end of routine */
-			strcat(gszCurDir, filesMenu.items[filesMenu.selectedItem].text);
+			strcat(gszCurFile, filesMenu.items[filesMenu.selectedItem].text);
 			return NAVIGATE_END;
 		}
 	}
 
 	/* Operation was cancelled */
+	gszCurFile[0] = 0;
 	return NAVIGATE_CANCELLED;
 }
 
@@ -185,8 +179,8 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	//char szFullPath[MAX_FILE_PATH_SIZE];
 
 	/* Root dir */
-	memset(gszCurDir, 0, sizeof(gszCurDir));
-	strcpy(gszCurDir, USB_ROOT);
+	memset(gszCurFile, 0, sizeof(gszCurFile));
+	strcpy(gszCurFile, USB_ROOT);
 
 	/* Check if usb is mounted */
 	eRes = R_tfat_f_opendir(&st_usb_dir, USB_ROOT);
