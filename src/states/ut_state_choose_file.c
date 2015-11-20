@@ -25,10 +25,21 @@
 char gszCurFile[MAX_FILE_PATH_SIZE];
 
 // ***********************************************************************
+// Internal variables
+// ***********************************************************************
+#define MAX_EXT_AVAIL	3
+static const char* gaszFileExtensions[MAX_EXT_AVAIL] =
+{
+		".g",
+		".tap",
+		".nc"
+};
+
+// ***********************************************************************
 // Global types
 // ***********************************************************************
 
-typedef enum
+typedef enum ut_fs_navigate_tag
 {
 	NAVIGATE_CANCELLED = -1,
 	NAVIGATE_CONTINUE,
@@ -65,6 +76,22 @@ static bool endsWith(const char* szWord, const char* szSuffix)
 	if(wordLen >= suffixLen)
 	{
 		return (0 == memcmp(&szWord[wordLen - suffixLen], szSuffix, suffixLen));
+	}
+
+	return false;
+}
+
+/**
+ * Checks if a word has a valid g extension
+ * @param szWord
+ * @return
+ */
+static bool validExtension(const char* szWord)
+{
+	uint8_t i;
+	for(i = 0; i < MAX_EXT_AVAIL; i++)
+	{
+		if(endsWith(szWord, gaszFileExtensions[i])) return true;
 	}
 
 	return false;
@@ -118,7 +145,7 @@ static ut_fs_navigate chooseFile()
 			{
 				sprintf(aszFiles[filesMenu.numItems], "/%.*s", MAX_COLUMN, st_usb_finfo.fname);
 			}
-			else if(endsWith(st_usb_finfo.fname, DEFAULT_FILE_EXTENSION))
+			else if(validExtension(st_usb_finfo.fname))
 			{
 				sprintf(aszFiles[filesMenu.numItems], "%.*s", MAX_COLUMN, st_usb_finfo.fname);
 			}
