@@ -58,7 +58,7 @@ extern void	usb_apl_task_switch(void);
 extern void FreeRTOSConfig(void);
 
 USB_UTR_t       msc_utr;
-void callbackcmt(void *parg);
+
 /******************************************************************************
 Function Name   : main
 Description     : Main task
@@ -82,10 +82,6 @@ void main(void)
     }
 }
 
-void callbackcmt(void *parg)
-{
-
-}
 
 void r_main()
 {

@@ -46,7 +46,7 @@
 // *** settings.h overrides ***
 
 #undef COMM_MODE
-#define COMM_MODE				JSON_MODE
+#define COMM_MODE				TEXT_MODE
 
 #undef JSON_VERBOSITY
 #define JSON_VERBOSITY 			JV_VERBOSE
