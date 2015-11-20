@@ -34,10 +34,10 @@ Includes   <System Includes> , "Project Includes"
 #include "r_usb_hmsc_config.h"
 #include "r_usb_hmsc_if.h"
 #include "serial_printf.h"
-#include "r_tmr_rx_if.h"
 #include "tinyg.h"		// #1
 #include "config.h"		// #2
 #include "hardware.h"
+#include "r_cmt_rx_if.h"
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
@@ -58,8 +58,7 @@ extern void	usb_apl_task_switch(void);
 extern void FreeRTOSConfig(void);
 
 USB_UTR_t       msc_utr;
-
-void tmr_calback(void *p_arg);
+void callbackcmt(void *parg);
 /******************************************************************************
 Function Name   : main
 Description     : Main task
@@ -69,7 +68,8 @@ Return value    : none
 void main(void)
 {
     bool ret = false;
-
+    uint32_t cmt;
+    R_CMT_CreatePeriodic(1000,callbackcmt,&cmt);
     /* Reserve the CMT0 for FreeRTOS */
     ret = R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_CMT0));
     while (false == ret) /* can't lock the CMT0 resource */
@@ -77,12 +77,16 @@ void main(void)
         while (1);
     }
     serial_init();
-    R_TMR_CreateOneShot(5,tmr_calback,TMR_CH0);
     r_main();
     vTaskStartScheduler();
     while (1)
     {
     }
+}
+
+void callbackcmt(void *parg)
+{
+
 }
 
 void r_main()
@@ -138,20 +142,6 @@ void usb_mcu_init(void)
     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
 }   /* eof usb_mcu_init() */
-
-void tmr_calback(void *p_arg)
-{
-	MOTOR1_STEP ^= 1;
-	MOTOR1_DIR ^= 1;
-	MOTOR2_STEP ^= 1;
-	MOTOR2_DIR ^= 1;
-	MOTOR3_STEP ^= 1;
-	MOTOR3_DIR ^= 1;
-	MOTOR4_STEP ^= 1;
-	MOTOR4_DIR ^= 1;
-	PIN_ENABLE ^= 1;
-}
-
 /******************************************************************************
 End  Of File
 ******************************************************************************/

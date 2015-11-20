@@ -41,29 +41,26 @@ Includes   <System Includes> , "Project Includes"
 /***********************************************************************************************************************
 Macro definitions
 ***********************************************************************************************************************/
-#define TMR_RX_NUM_CHANNELS 2
+#define TMR_RX_NUM_CHANNELS 4
 
 /***********************************************************************************************************************
 Typedef definitions
 ***********************************************************************************************************************/
 
+typedef enum{
+	TMR_PERIODIC = 0,
+	TMR_ONESHOOT
+}tmr_behavior_t;
+
 /***********************************************************************************************************************
 Private global variables and functions
 ***********************************************************************************************************************/
-/* Used to prevent having duplicate code for each channel. This only works if the channels are identical (just at
-   different locations in memory). This is easy to tell by looking in iodefine.h and seeing if the same structure
-   was used for all channels. */
-static volatile struct st_tmr0 __evenaccess * const g_tmr0_channels[TMR_RX_NUM_CHANNELS] =
-{
-    &TMR0, &TMR2
-};
+static uint8_t g_tmrbehavior[TMR_RX_NUM_CHANNELS] = {TMR_PERIODIC,TMR_PERIODIC,TMR_PERIODIC,TMR_PERIODIC};
 
-static volatile struct st_tmr1 __evenaccess * const g_tmr1_channels[TMR_RX_NUM_CHANNELS] =
-{
-    &TMR1, &TMR3
-};
-
-static void  (* g_tmr_callbacks[TMR_RX_NUM_CHANNELS*2])(void * pdata);
+static void power_on(tmr_ch_t  channel);
+static void power_off(tmr_ch_t  channel);
+static bool create(uint8_t period_us, void (* callback)(void * pdata), tmr_ch_t  channel,tmr_behavior_t behavior);
+static void  (* g_tmr_callbacks[TMR_RX_NUM_CHANNELS])(void * pdata);
 
 /***********************************************************************************************************************
 * Function Name: R_CMT_CreatePeriodic
@@ -82,7 +79,9 @@ static void  (* g_tmr_callbacks[TMR_RX_NUM_CHANNELS*2])(void * pdata);
 ***********************************************************************************************************************/
 bool R_TMR_CreatePeriodic(uint32_t frequency_hz, void (* callback)(void * pdata), tmr_ch_t  channel)
 {
-	return false;
+	tmr_behavior_t behavior = TMR_PERIODIC;
+	uint8_t period_us = (uint8_t)(1000000/frequency_hz);
+	return create(period_us, callback, channel, behavior);
 } 
 
 /***********************************************************************************************************************
@@ -101,41 +100,9 @@ bool R_TMR_CreatePeriodic(uint32_t frequency_hz, void (* callback)(void * pdata)
 *                    Invalid channel or period could not be used.
 ***********************************************************************************************************************/
 bool R_TMR_CreateOneShot(uint8_t period_us, void (* callback)(void * pdata), tmr_ch_t  channel)
-{    
-	bool res = true;
-	if (channel == TMR_CH0 || channel == TMR_CH2)
-	{
-		R_BSP_RegisterProtectDisable (BSP_REG_PROTECT_LPC_CGC_SWR);
-		MSTP(TMR0) = 0;
-		MSTP(TMR1) = 0;
-		R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
-		(*g_tmr0_channels[channel]).TCSR.BYTE = 0x00;
-		(*g_tmr0_channels[channel]).TCCR.BYTE = 0x89;
-		(*g_tmr0_channels[channel]).TCR.BYTE = 0x48;
-        /* Setup ICU registers. */
-		IR(TMR0, CMIA0)  = 0;                //Clear any previously pending interrupts
-		IPR(TMR0, CMIA0) = 5;   			 //Set interrupt priority
-		IEN(TMR0, CMIA0) = 1;                //Enable compare match interrupt
-		(*g_tmr0_channels[channel]).TCORA = 24*period_us;
-		g_tmr_callbacks[channel] = callback;
-	}
-	else if (channel == TMR_CH1 || channel == TMR_CH3)
-	{
-		R_BSP_RegisterProtectDisable (BSP_REG_PROTECT_LPC_CGC_SWR);
-		MSTP(TMR2) = 0;
-		MSTP(TMR3) = 0;
-		R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
-		(*g_tmr1_channels[channel]).TCSR.BYTE = 0x00;
-		(*g_tmr1_channels[channel]).TCCR.BYTE = 0x09;
-		(*g_tmr1_channels[channel]).TCR.BYTE = 0x48;
-		(*g_tmr1_channels[channel]).TCORA = 24*period_us;
-		g_tmr_callbacks[channel] = callback;
-	}
-	else
-	{
-		res = false;
-	}
-	return res;
+{
+	tmr_behavior_t behavior = TMR_ONESHOOT;
+	return create(period_us, callback, channel, behavior);
 }
 
 /***********************************************************************************************************************
@@ -150,7 +117,9 @@ bool R_TMR_CreateOneShot(uint8_t period_us, void (* callback)(void * pdata), tmr
 ***********************************************************************************************************************/
 bool R_TMR_Stop (tmr_ch_t channel)
 {
-	return false;
+	bool res = true;
+	power_off(channel);
+	return res;
 } 
 
 /***********************************************************************************************************************
@@ -169,8 +138,175 @@ bool R_TMR_Stop (tmr_ch_t channel)
 ***********************************************************************************************************************/
 bool R_TMR_Control(tmr_ch_t channel, tmr_commands_t command, void * pdata)
 {
-	return false;
+	switch(command)
+	{
+	case TMR_START:
+		switch(channel)
+		{
+		case TMR_CH0:
+			TMR0.TCR.BYTE = 0x48;
+			TMR0.TCNT = 0;
+			break;
+		case TMR_CH1:
+			TMR1.TCR.BYTE = 0x48;
+			TMR1.TCNT = 0;
+			break;
+		case TMR_CH2:
+			TMR2.TCR.BYTE = 0x48;
+			TMR2.TCNT = 0;
+			break;
+		case TMR_CH3:
+			TMR3.TCR.BYTE = 0x48;
+			TMR3.TCNT = 0;
+			break;
+		}
+		break;
+	case TMR_CLEAR:
+		switch(channel)
+		{
+		case TMR_CH0:
+			TMR0.TCR.BYTE = 0x08;
+			TMR0.TCNT = 0;
+			break;
+		case TMR_CH1:
+			TMR1.TCR.BYTE = 0x08;
+			TMR1.TCNT = 0;
+			break;
+		case TMR_CH2:
+			TMR2.TCR.BYTE = 0x08;
+			TMR2.TCNT = 0;
+			break;
+		case TMR_CH3:
+			TMR3.TCR.BYTE = 0x08;
+			TMR3.TCNT = 0;
+			break;
+		}
+	}
+	return true;
 } 
+
+static bool create(uint8_t period_us, void (* callback)(void * pdata), tmr_ch_t  channel,tmr_behavior_t behavior)
+{
+	bool res = true;
+	switch(channel)
+	{
+	case TMR_CH0:
+		power_on(channel);
+		TMR0.TCSR.BYTE = 0x00;
+		TMR0.TCCR.BYTE = 0x89;
+		TMR0.TCR.BYTE = 0x08;
+		TMR0.TCORA = 24*period_us;
+		g_tmr_callbacks[channel] = callback;
+		g_tmrbehavior[channel] = behavior;
+		break;
+	case TMR_CH1:
+		power_on(channel);
+		TMR1.TCSR.BYTE = 0x00;
+		TMR1.TCCR.BYTE = 0x89;
+		TMR1.TCR.BYTE = 0x08;
+		TMR1.TCORA = 24*period_us;
+		g_tmr_callbacks[channel] = callback;
+		g_tmrbehavior[channel] = behavior;
+		break;
+	case TMR_CH2:
+		power_on(channel);
+		TMR2.TCSR.BYTE = 0x00;
+		TMR2.TCCR.BYTE = 0x89;
+		TMR2.TCR.BYTE = 0x08;
+		TMR2.TCORA = 24*period_us;
+		g_tmr_callbacks[channel] = callback;
+		g_tmrbehavior[channel] = behavior;
+		break;
+	case TMR_CH3:
+		power_on(channel);
+		TMR3.TCSR.BYTE = 0x00;
+		TMR3.TCCR.BYTE = 0x89;
+		TMR3.TCR.BYTE = 0x08;
+		TMR3.TCORA = 24*period_us;
+		g_tmr_callbacks[channel] = callback;
+		g_tmrbehavior[channel] = behavior;
+		break;
+		default:
+			res = false;
+		break;
+	}
+	return res;
+}
+
+
+static void power_on(tmr_ch_t  channel)
+{
+	R_BSP_RegisterProtectDisable (BSP_REG_PROTECT_LPC_CGC_SWR);
+	switch(channel)
+	{
+		case TMR_CH0:
+			MSTP(TMR0) = 0;
+			IR(TMR0, CMIA0)  = 0;                //Clear any previously pending interrupts
+			IPR(TMR0, CMIA0) = 5;   			 //Set interrupt priority
+			IEN(TMR0, CMIA0) = 1;                //Enable compare match interrupt
+		break;
+		case TMR_CH1:
+			MSTP(TMR1) = 0;
+			IR(TMR1, CMIA1)  = 0;                //Clear any previously pending interrupts
+			IPR(TMR1, CMIA1) = 5;   			 //Set interrupt priority
+			IEN(TMR1, CMIA1) = 1;                //Enable compare match interrupt
+		break;
+		case TMR_CH2:
+			MSTP(TMR2) = 0;
+			IR(TMR2, CMIA2)  = 0;                //Clear any previously pending interrupts
+			IPR(TMR2, CMIA2) = 5;   			 //Set interrupt priority
+			IEN(TMR2, CMIA2) = 1;                //Enable compare match interrupt
+		break;
+		case TMR_CH3:
+			MSTP(TMR3) = 0;
+			IR(TMR3, CMIA3)  = 0;                //Clear any previously pending interrupts
+			IPR(TMR3, CMIA3) = 5;   			 //Set interrupt priority
+			IEN(TMR3, CMIA3) = 1;                //Enable compare match interrupt
+		break;
+		default:
+		break;
+	}
+	R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+}
+
+static void power_off(tmr_ch_t  channel)
+{
+	R_BSP_RegisterProtectDisable (BSP_REG_PROTECT_LPC_CGC_SWR);
+	switch(channel)
+	{
+	case TMR_CH0:
+		MSTP(TMR0) = 1;
+		/* Setup ICU registers. */
+		IR(TMR0, CMIA0)  = 0;                //Clear any previously pending interrupts
+		IPR(TMR0, CMIA0) = 0;   			 //Set interrupt priority
+		IEN(TMR0, CMIA0) = 0;                //Enable compare match interrupt
+		break;
+	case TMR_CH1:
+		MSTP(TMR1) = 1;
+		/* Setup ICU registers. */
+		IR(TMR1, CMIA1)  = 0;                //Clear any previously pending interrupts
+		IPR(TMR1, CMIA1) = 0;   			 //Set interrupt priority
+		IEN(TMR1, CMIA1) = 0;                //Enable compare match interrupt
+		break;
+	case TMR_CH2:
+		MSTP(TMR2) = 1;
+		/* Setup ICU registers. */
+		IR(TMR2, CMIA2)  = 0;                //Clear any previously pending interrupts
+		IPR(TMR2, CMIA2) = 0;   			 //Set interrupt priority
+		IEN(TMR2, CMIA2) = 0;                //Enable compare match interrupt
+		break;
+	case TMR_CH3:
+		MSTP(TMR3) = 1;
+		/* Setup ICU registers. */
+		IR(TMR3, CMIA3)  = 0;                //Clear any previously pending interrupts
+		IPR(TMR3, CMIA3) = 0;   			 //Set interrupt priority
+		IEN(TMR3, CMIA3) = 0;                //Enable compare match interrupt
+		break;
+	default:
+		break;
+	}
+	R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+}
 
 /***********************************************************************************************************************
 * Function Name: tmr0_isr
@@ -181,7 +317,11 @@ bool R_TMR_Control(tmr_ch_t channel, tmr_commands_t command, void * pdata)
 #pragma interrupt tmr0_isr(vect=VECT(TMR0, CMIA0))
 static void tmr0_isr (void)
 {
-	 g_tmr_callbacks[0]((void *)0);
+	if (g_tmrbehavior[TMR_CH0] == TMR_ONESHOOT)
+	{
+		R_TMR_Control(TMR_CH0, TMR_CLEAR, 0);
+	}
+	 g_tmr_callbacks[TMR_CH0]((void *)0);
 }
 
 /***********************************************************************************************************************
@@ -193,7 +333,11 @@ static void tmr0_isr (void)
 #pragma interrupt tmr1_isr(vect=VECT(TMR1, CMIA1))
 static void tmr1_isr (void)
 {
-	g_tmr_callbacks[1]((void *)1);
+	if (g_tmrbehavior[TMR_CH1] == TMR_ONESHOOT)
+	{
+		R_TMR_Control(TMR_CH1, TMR_CLEAR, 0);
+	}
+	g_tmr_callbacks[TMR_CH1]((void *)1);
 }
 
 /***********************************************************************************************************************
@@ -205,7 +349,11 @@ static void tmr1_isr (void)
 #pragma interrupt tmr2_isr(vect=VECT(TMR2, CMIA2))
 static void tmr2_isr (void)
 {
-	g_tmr_callbacks[2]((void *)2);
+	if (g_tmrbehavior[TMR_CH2] == TMR_ONESHOOT)
+	{
+		R_TMR_Control(TMR_CH2, TMR_CLEAR, 0);
+	}
+	g_tmr_callbacks[TMR_CH2]((void *)2);
 }
 
 /***********************************************************************************************************************
@@ -217,7 +365,11 @@ static void tmr2_isr (void)
 #pragma interrupt tmr3_isr(vect=VECT(TMR3, CMIA3))
 static void tmr3_isr (void)
 {
-	g_tmr_callbacks[3]((void *)3);
+	if (g_tmrbehavior[TMR_CH3] == TMR_ONESHOOT)
+	{
+		R_TMR_Control(TMR_CH3, TMR_CLEAR, 0);
+	}
+	g_tmr_callbacks[TMR_CH3]((void *)3);
 }
 
 

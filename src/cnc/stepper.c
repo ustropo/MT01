@@ -55,6 +55,8 @@ static void _set_motor_power_level(const uint8_t motor, const float power_level)
 #ifdef __RX
 void timer_dda_callback(void *pdata);
 void timer_dwell_callback(void *pdata);
+void exec_timer_num(void *pdata);
+void load_timer_num(void *pdata);
 
 #endif
 // handy macro
@@ -265,34 +267,10 @@ void stepper_init()
 #endif // __ARM
 
 #ifdef __RX
-	mtu_timer_chnl_settings_t my_timer_cfg;
-	mtu_err_t result;
-	my_timer_cfg.clock_src.source  = MTU_CLK_SRC_INTERNAL;
-	my_timer_cfg.clock_src.clock_edge  = MTU_CLK_RISING_EDGE;
-	my_timer_cfg.clear_src  = MTU_CLR_TIMER_A;
-	my_timer_cfg.timer_a.actions.do_action = MTU_ACTION_CALLBACK;
-	my_timer_cfg.timer_a.actions.output  = MTU_PIN_NO_OUTPUT;
-	my_timer_cfg.timer_a.freq  = FREQUENCY_DDA;
-	my_timer_cfg.timer_b.actions.do_action = MTU_ACTION_CALLBACK;
-	my_timer_cfg.timer_b.actions.output  = MTU_PIN_NO_OUTPUT;
-	my_timer_cfg.timer_b.freq  = FREQUENCY_DDA;
-	my_timer_cfg.timer_c.actions.do_action = MTU_ACTION_NONE;
-	my_timer_cfg.timer_d.actions.do_action = MTU_ACTION_NONE;
-	// setup DDA timer (see FOOTNOTE)
-	result = R_MTU_Timer_Open(TIMER_DDA,&my_timer_cfg,timer_dda_callback);
+    R_TMR_CreatePeriodic(FREQUENCY_DDA,timer_dda_callback,TIMER_DDA);
+    R_TMR_CreateOneShot((uint8_t)(1000000/FREQUENCY_SGI),exec_timer_num,TIMER_EXEC);
+    R_TMR_CreateOneShot((uint8_t)(1000000/FREQUENCY_SGI),load_timer_num,TIMER_LOAD);
 
-	// setup DWELL timer
-	my_timer_cfg.clock_src.source  = MTU_CLK_SRC_INTERNAL;
-	my_timer_cfg.clock_src.clock_edge  = MTU_CLK_RISING_EDGE;
-	my_timer_cfg.clear_src  = MTU_CLR_TIMER_A;
-	my_timer_cfg.timer_a.actions.do_action = MTU_ACTION_CALLBACK;
-	my_timer_cfg.timer_a.actions.output  = MTU_PIN_NO_OUTPUT;
-	my_timer_cfg.timer_a.freq  = FREQUENCY_DWELL;
-	my_timer_cfg.timer_b.actions.do_action = MTU_ACTION_NONE;
-	my_timer_cfg.timer_c.actions.do_action = MTU_ACTION_NONE;
-	my_timer_cfg.timer_d.actions.do_action = MTU_ACTION_NONE;
-	// setup DDA timer (see FOOTNOTE)
-	R_MTU_Timer_Open(TIMER_DWELL,&my_timer_cfg,timer_dwell_callback);
 
 	// setup software interrupt load timer
 
@@ -749,7 +727,12 @@ namespace Motate {	// Define timer inside Motate namespace
 #ifdef __RX
 void st_request_exec_move()
 {
-	//RXMOD
+	R_TMR_Control(TIMER_EXEC, TMR_START, 0);
+}
+
+void exec_timer_num(void *pdata)
+{								// Exec timer interrupt
+	_request_load_move();
 }
 #endif
 
@@ -804,7 +787,12 @@ namespace Motate {	// Define timer inside Motate namespace
 #ifdef __RX
 static void _request_load_move()
 {
- //RXMOD
+	R_TMR_Control(TIMER_LOAD, TMR_START, 0);
+}
+
+void load_timer_num(void *pdata)
+{								// load timer interrupt
+	_load_move();
 }
 #endif
 
@@ -824,70 +812,72 @@ static void _request_load_move()
 
 static void _load_move()
 {
-//	// Be aware that dda_ticks_downcount must equal zero for the loader to run.
-//	// So the initial load must also have this set to zero as part of initialization
-//	if (st_runtime_isbusy()) {
-//		return;													// exit if the runtime is busy
-//	}
-//	if (st_pre.buffer_state != PREP_BUFFER_OWNED_BY_LOADER) {	// if there are no moves to load...
-////		for (uint8_t motor = MOTOR_1; motor < MOTORS; motor++) {
-////			st_run.mot[motor].power_state = MOTOR_POWER_TIMEOUT_START;	// ...start motor power timeouts
-////		}
-//		return;
-//	}
-//	// handle aline loads first (most common case)
+	// Be aware that dda_ticks_downcount must equal zero for the loader to run.
+	// So the initial load must also have this set to zero as part of initialization
+	if (st_runtime_isbusy()) {
+		return;													// exit if the runtime is busy
+	}
+	if (st_pre.buffer_state != PREP_BUFFER_OWNED_BY_LOADER) {	// if there are no moves to load...
+		for (uint8_t motor = MOTOR_1; motor < MOTORS; motor++) {
+			st_run.mot[motor].power_state = MOTOR_POWER_TIMEOUT_START;	// ...start motor power timeouts
+		}
+		return;
+	}
+	// handle aline loads first (most common case)
 //	if (st_pre.move_type == MOVE_TYPE_ALINE) {
-//
-//		//**** setup the new segment ****
-//
-//		st_run.dda_ticks_downcount = st_pre.dda_ticks;
-//		st_run.dda_ticks_X_substeps = st_pre.dda_ticks_X_substeps;
-//
-//		//**** MOTOR_1 LOAD ****
-//
-//		// These sections are somewhat optimized for execution speed. The whole load operation
-//		// is supposed to take < 10 uSec (Xmega). Be careful if you mess with this.
-//
-//		// the following if() statement sets the runtime substep increment value or zeroes it
-//		if ((st_run.mot[MOTOR_1].substep_increment = st_pre.mot[MOTOR_1].substep_increment) != 0) {
-//
-//			// NB: If motor has 0 steps the following is all skipped. This ensures that state comparisons
-//			//	   always operate on the last segment actually run by this motor, regardless of how many
-//			//	   segments it may have been inactive in between.
-//
-//			// Apply accumulator correction if the time base has changed since previous segment
-//			if (st_pre.mot[MOTOR_1].accumulator_correction_flag == true) {
-//				st_pre.mot[MOTOR_1].accumulator_correction_flag = false;
-//				st_run.mot[MOTOR_1].substep_accumulator *= st_pre.mot[MOTOR_1].accumulator_correction;
-//			}
-//
-//			// Detect direction change and if so:
-//			//	- Set the direction bit in hardware.
-//			//	- Compensate for direction change by flipping substep accumulator value about its midpoint.
-//
-//			if (st_pre.mot[MOTOR_1].direction != st_pre.mot[MOTOR_1].prev_direction) {
-//				st_pre.mot[MOTOR_1].prev_direction = st_pre.mot[MOTOR_1].direction;
-//				st_run.mot[MOTOR_1].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_1].substep_accumulator);
-//				if (st_pre.mot[MOTOR_1].direction == DIRECTION_CW){
-////RXMOD				PORT_MOTOR_1_VPORT.OUT &= ~DIRECTION_BIT_bm; else
-////				PORT_MOTOR_1_VPORT.OUT |= DIRECTION_BIT_bm;
-//			}
-//			SET_ENCODER_STEP_SIGN(MOTOR_1, st_pre.mot[MOTOR_1].step_sign);
-//
-//			// Enable the stepper and start motor power management
-//			if (st_cfg.mot[MOTOR_1].power_mode != MOTOR_DISABLED) {
+
+		//**** setup the new segment ****
+
+		st_run.dda_ticks_downcount = st_pre.dda_ticks;
+		st_run.dda_ticks_X_substeps = st_pre.dda_ticks_X_substeps;
+
+		//**** MOTOR_1 LOAD ****
+
+		// These sections are somewhat optimized for execution speed. The whole load operation
+		// is supposed to take < 10 uSec (Xmega). Be careful if you mess with this.
+
+		// the following if() statement sets the runtime substep increment value or zeroes it
+		if ((st_run.mot[MOTOR_1].substep_increment = st_pre.mot[MOTOR_1].substep_increment) != 0) {
+
+			// NB: If motor has 0 steps the following is all skipped. This ensures that state comparisons
+			//	   always operate on the last segment actually run by this motor, regardless of how many
+			//	   segments it may have been inactive in between.
+
+			// Apply accumulator correction if the time base has changed since previous segment
+			if (st_pre.mot[MOTOR_1].accumulator_correction_flag == true) {
+				st_pre.mot[MOTOR_1].accumulator_correction_flag = false;
+				st_run.mot[MOTOR_1].substep_accumulator *= st_pre.mot[MOTOR_1].accumulator_correction;
+			}
+
+			// Detect direction change and if so:
+			//	- Set the direction bit in hardware.
+			//	- Compensate for direction change by flipping substep accumulator value about its midpoint.
+
+			if (st_pre.mot[MOTOR_1].direction != st_pre.mot[MOTOR_1].prev_direction) {
+				st_pre.mot[MOTOR_1].prev_direction = st_pre.mot[MOTOR_1].direction;
+				st_run.mot[MOTOR_1].substep_accumulator = -(st_run.dda_ticks_X_substeps + st_run.mot[MOTOR_1].substep_accumulator);
+				if (st_pre.mot[MOTOR_1].direction == DIRECTION_CW)
+					MOTOR1_DIR = MOTOR_REVERSE; else
+				MOTOR1_DIR = MOTOR_FOWARD;
+//RXMOD				PORT_MOTOR_1_VPORT.OUT &= ~DIRECTION_BIT_bm; else
+//				PORT_MOTOR_1_VPORT.OUT |= DIRECTION_BIT_bm;
+			}
+			SET_ENCODER_STEP_SIGN(MOTOR_1, st_pre.mot[MOTOR_1].step_sign);
+
+			// Enable the stepper and start motor power management
+			if (st_cfg.mot[MOTOR_1].power_mode != MOTOR_DISABLED) {
+//RXMOD					PORT_MOTOR_1_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;             // energize motor
+				st_run.mot[MOTOR_1].power_state = MOTOR_POWER_TIMEOUT_START;// set power management state
+			}
+
+		} else {  // Motor has 0 steps; might need to energize motor for power mode processing
+			if (st_cfg.mot[MOTOR_1].power_mode == MOTOR_POWERED_IN_CYCLE) {
 ////RXMOD					PORT_MOTOR_1_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;             // energize motor
-//				st_run.mot[MOTOR_1].power_state = MOTOR_POWER_TIMEOUT_START;// set power management state
-//			}
-//
-//		} else {  // Motor has 0 steps; might need to energize motor for power mode processing
-//			if (st_cfg.mot[MOTOR_1].power_mode == MOTOR_POWERED_IN_CYCLE) {
-////RXMOD					PORT_MOTOR_1_VPORT.OUT &= ~MOTOR_ENABLE_BIT_bm;             // energize motor
-//				st_run.mot[MOTOR_1].power_state = MOTOR_POWER_TIMEOUT_START;
-//			}
-//		}
-//		// accumulate counted steps to the step position and zero out counted steps for the segment currently being loaded
-//		ACCUMULATE_ENCODER(MOTOR_1);
+				st_run.mot[MOTOR_1].power_state = MOTOR_POWER_TIMEOUT_START;
+			}
+		}
+		// accumulate counted steps to the step position and zero out counted steps for the segment currently being loaded
+		ACCUMULATE_ENCODER(MOTOR_1);
 //
 //#if (MOTORS >= 2)	//**** MOTOR_2 LOAD ****
 //		if ((st_run.mot[MOTOR_2].substep_increment = st_pre.mot[MOTOR_2].substep_increment) != 0) {

@@ -27,7 +27,8 @@
 *         : 10.11.2014 2.40    Added support for RX113.
 *         : 12.04.2014 2.41    Updated demo project.
 ***********************************************************************************************************************/
-
+#ifndef TMR_RX_IF
+#define TMR_RX_IF
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
@@ -37,8 +38,8 @@ Includes   <System Includes> , "Project Includes"
 Macro definitions
 ***********************************************************************************************************************/
 /* Version Number of API. */
-#define CMT_RX_VERSION_MAJOR            (1)
-#define CMT_RX_VERSION_MINOR            (00)
+#define TMR_RX_VERSION_MAJOR            (1)
+#define TMR_RX_VERSION_MINOR            (00)
 
 /***********************************************************************************************************************
 Typedef definitions
@@ -49,13 +50,14 @@ typedef enum e_tmr_ch       // TMR channel numbers
 	TMR_CH1,
 	TMR_CH2,
 	TMR_CH3,
-    SCI_NUM_CH
+	TMR_NUM_CH
 } tmr_ch_t;
 
 typedef enum e_sci_comm       // TMR commands
 {
     TMR_START=0,
-    SCI_NUM_COMM
+	TMR_CLEAR,
+	TMR_NUM_COMM
 } tmr_commands_t;
 
 
@@ -71,4 +73,4 @@ bool R_TMR_CreateOneShot(uint8_t period_us, void (* callback)(void * pdata), tmr
 bool R_TMR_Control(tmr_ch_t channel, tmr_commands_t command, void * pdata);
 bool R_TMR_Stop(tmr_ch_t channel);
 uint32_t  R_TMR_GetVersion(void);
-
+#endif

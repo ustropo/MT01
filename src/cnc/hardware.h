@@ -67,7 +67,7 @@ enum hwPlatform {
 // RX specific code start here
 #include "config.h"						// needed for the stat_t typedef
 #include "platform.h"
-#include "r_mtu_rx_if.h"
+#include "r_tmr_rx_if.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -122,10 +122,10 @@ extern "C"{
 
 // Timer definitions. See stepper.h and other headers for setup
 
-#define TIMER_DDA			MTU_CHANNEL_0		// DDA timer 	(see stepper.h)
+#define TIMER_DDA			TMR_CH0		// DDA timer 	(see stepper.h)
 #define TIMER_DWELL	 		MTU_CHANNEL_1		// Dwell timer	(see stepper.h)
-#define TIMER_LOAD			MTU_CHANNEL_2		// Loader timer	(see stepper.h)
-#define TIMER_EXEC			MTU_CHANNEL_3		// Exec timer	(see stepper.h)
+#define TIMER_LOAD			TMR_CH1		// Loader timer	(see stepper.h)
+#define TIMER_EXEC			TMR_CH2		// Exec timer	(see stepper.h)
 #define TIMER_PWM1
 #define TIMER_PWM2
 
@@ -140,6 +140,11 @@ extern "C"{
 #define MOTOR4_STEP PORTE.PODR.BIT.B6
 #define MOTOR4_DIR  PORTE.PODR.BIT.B7
 #define PIN_ENABLE  PORTD.PODR.BIT.B0
+
+#define MOTOR_FOWARD	1
+#define MOTOR_REVERSE   0
+#define TRUE			1
+#define FALSE			0
 // Input pins are defined in switch.cpp
 
 /********************************
