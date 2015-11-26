@@ -33,7 +33,6 @@ Includes   <System Includes> , "Project Includes"
 #include "r_usb_basic_if.h"
 #include "r_usb_hmsc_config.h"
 #include "r_usb_hmsc_if.h"
-#include "serial_printf.h"
 #include "tinyg.h"		// #1
 #include "config.h"		// #2
 #include "hardware.h"
@@ -75,7 +74,7 @@ void main(void)
 	{
 		while (1);
 	}
-	serial_init();
+//	serial_init();
 
 	/* Initialize USB */
 	usb_main();
@@ -112,8 +111,6 @@ void usb_main()
     {
         while(1);   /* Error stop */
     }
-
-    FreeRTOSConfig();
 }
 /******************************************************************************
 End of function main()

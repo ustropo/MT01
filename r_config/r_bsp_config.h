@@ -143,7 +143,7 @@ Configuration Options
  * 0 = Use 1 stack. Disable user stack. User stack size set below will be ignored.
  * 1 = Use 2 stacks. User stack and interrupt stack will both be used.
  */
-#define BSP_CFG_USER_STACK_ENABLE       (1)
+#define BSP_CFG_USER_STACK_ENABLE       (0)
 
 /* The 'BSP_DECLARE_STACK' macro is checked so that the stack is only declared in one place (resetprg.c). Every time a 
    '#pragma stacksize' is encountered, the stack size is increased. This prevents multiplication of stack size. */
@@ -158,7 +158,7 @@ Configuration Options
  * If the interrupt stack is the only stack being used then the user will likely want to increase the default size
  * below.
  */
-#pragma stacksize si=0x1000
+#pragma stacksize si=0x400
 #endif
 
 /* Heap size in bytes.
@@ -170,7 +170,7 @@ Configuration Options
       choose 'Contents' in E2Studio. This will present a list of modules that can be included. Uncheck the box for
       stdio.h. 
 */
-#define BSP_CFG_HEAP_BYTES              (0x1200)
+#define BSP_CFG_HEAP_BYTES              (0x400)
 
 /* Initializes C input & output library functions.
    0 = Disable I/O library initialization in resetprg.c. If you are not using stdio then use this value.

@@ -23,6 +23,7 @@
 // Global variables
 // ***********************************************************************
 char gszCurFile[MAX_FILE_PATH_SIZE];
+extern TaskHandle_t  x_tn_usb_connected;
 
 // ***********************************************************************
 // Internal variables
@@ -242,7 +243,8 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		/* Navigate through folders */
 		eErr = chooseFile();
 	} while(eErr == NAVIGATE_CONTINUE);
-
+	if (eErr == NAVIGATE_END)
+    	xTaskNotifyGive( x_tn_usb_connected );
 	/* Go back to menu */
 	return STATE_MAIN_MENU;
 }

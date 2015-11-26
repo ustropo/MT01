@@ -51,7 +51,7 @@
 /******************************************************************************
 Private global variables and functions
 ******************************************************************************/
-
+TaskHandle_t  x_tn_usb_connected = NULL;
 
 #if SOCKET_IF_USE_SEMP
 xSemaphoreHandle r_socket_semaphore;
@@ -126,7 +126,9 @@ extern void usb_hmsc_StrgDriveTask(void);
 extern void hmsc_cstd_task_start( void );
 extern void keyboard_task(void);
 extern void states_task(void);
+extern void main_cnc_task(void);
 void usb_hmsc_main_task(USB_VP_INT stacd);
+
 /******************************************************************************
 Function Name   : vApplicationMallocFailedHook
 Description     : Hook function
@@ -402,7 +404,8 @@ void FreeRTOSConfig( void )
 
     /*User interface task*/
     xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task    ",  128, NULL, 2, NULL); /* keyboard_task      */
-    xTaskCreate( (pdTASK_CODE)states_task,     "states_task    ",  10*1024, NULL, 2, &task_main_handle); /* states_task      */
+    xTaskCreate( (pdTASK_CODE)states_task,     "states_task    ",  1024, NULL, 2, &task_main_handle); /* states_task      */
+    xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  1024, NULL, 2, &x_tn_usb_connected); /* CNC_task      */
 }
 
 /******************************************************************************/
