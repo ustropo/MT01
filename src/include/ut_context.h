@@ -8,31 +8,20 @@
 #ifndef STATES_UT_CONTEXT_H_
 #define STATES_UT_CONTEXT_H_
 
-#define DEFAULT_CONTEXT_DATA_LEN	512
+#define DEFAULT_CONTEXT_DATA_LEN	128
 
 typedef unsigned char  ut_tag;
 typedef unsigned char  ut_len;
 typedef unsigned char* ut_value;
 
 /**
- * Struct to handle TLV objects
+ * Used to share data among different states
  */
 typedef struct
 {
 	ut_tag tag;
 	ut_len len;
-	ut_value value;
-} ut_tlv;
-
-/**
- * Used to share data among different states
- */
-typedef struct
-{
-	const char* name;
-	unsigned int  numItems;
-	unsigned char abData[DEFAULT_CONTEXT_DATA_LEN];
-	ut_tlv object;
+	unsigned char value[DEFAULT_CONTEXT_DATA_LEN];
 } ut_context;
 
 /**

@@ -63,25 +63,6 @@ static char * ut_strrstr(char *string, char *find)
 }
 
 /**
- * Checks if a string has a given suffix
- * @param szSuffix
- * @param szWord
- * @return true if szWord ends with szSuffix
- */
-static bool endsWith(const char* szWord, const char* szSuffix)
-{
-	uint32_t wordLen = strlen(szWord);
-	uint32_t suffixLen = strlen(szSuffix);
-
-	if(wordLen >= suffixLen)
-	{
-		return (0 == memcmp(&szWord[wordLen - suffixLen], szSuffix, suffixLen));
-	}
-
-	return false;
-}
-
-/**
  * Checks if a word has a valid g extension
  * @param szWord
  * @return
@@ -89,9 +70,16 @@ static bool endsWith(const char* szWord, const char* szSuffix)
 static bool validExtension(const char* szWord)
 {
 	uint8_t i;
+	uint32_t wordLen = strlen(szWord);
+	uint32_t suffixLen = 0;
+
 	for(i = 0; i < MAX_EXT_AVAIL; i++)
 	{
-		if(endsWith(szWord, gaszFileExtensions[i])) return true;
+		suffixLen = strlen(gaszFileExtensions[i]);
+		if(wordLen >= suffixLen && memcmp(&szWord[wordLen - suffixLen], gaszFileExtensions[i], suffixLen))
+		{
+			return true;
+		}
 	}
 
 	return false;
