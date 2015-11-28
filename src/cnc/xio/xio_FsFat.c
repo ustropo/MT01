@@ -26,6 +26,7 @@
 #include <stdint.h>				//
 //#include "platform.h"
 #include "xio.h"
+#include "ut_state.h"
 
 /******************************************************************************
  * FILE CONFIGURATION RECORDS
@@ -91,7 +92,7 @@ FILE * xio_open_file(const uint8_t dev, const char *addr, const flags_t flags)
 	R_tfat_f_mount(0, &dx->gFatfs);
 
     /* Open a text file */
-    fr = R_tfat_f_open(&dx->f, "teste.nc", TFAT_FA_READ);
+    fr = R_tfat_f_open(&dx->f, gszCurFile, TFAT_FA_READ);
 
 	return(&d->file);								// return pointer to the FILE stream
 }

@@ -42,6 +42,9 @@ ut_state ut_state_splash(ut_context* pContext)
 	ut_lcd_clear(SCREEN_FOOTER_ID);
 	ut_lcd_clear(SCREEN_HEADER_ID);
 
+	/* Delay para a inicialização do Display */
+	vTaskDelay(10 / portTICK_PERIOD_MS);
+
 	for(i = 0; i < MAX_ROW; i++)
 	{
 		ut_lcd_drawString(SCREEN_MAIN_ID, i, 0, gszSplash[i], false);
@@ -49,7 +52,7 @@ ut_state ut_state_splash(ut_context* pContext)
 	ut_lcd_output();
 
 	/* Delay */
-	vTaskDelay(2500 / portTICK_PERIOD_MS);
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
 
 	/* Next state */
 	return STATE_WARNING;
