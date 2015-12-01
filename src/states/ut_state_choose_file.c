@@ -51,14 +51,24 @@ typedef enum ut_fs_navigate_tag
 // Global functions
 // ***********************************************************************
 
+/**
+ * Get first occurrence of find in string in reverse mode.
+ * It is the last occurrence of find in string.
+ *
+ * @param string	String to be searched.
+ * @param find		String to search.
+ * @return Pointer to the last occurrence.
+ */
 static char * ut_strrstr(char *string, char *find)
 {
   char *cp;
   uint32_t len = strlen(find);
-  for (cp = string + len; cp >= string; cp--)
+  for (cp = string + strlen(string); cp >= string; cp--)
   {
     if (strncmp(cp, find, len) == 0)
-        return cp;
+    {
+    	return cp;
+    }
   }
   return NULL;
 }
@@ -77,13 +87,48 @@ static bool validExtension(const char* szWord)
 	for(i = 0; i < MAX_EXT_AVAIL; i++)
 	{
 		suffixLen = strlen(gaszFileExtensions[i]);
-		if(wordLen >= suffixLen && memcmp(&szWord[wordLen - suffixLen], gaszFileExtensions[i], suffixLen))
+		if(wordLen >= suffixLen && !memcmp(&szWord[wordLen - suffixLen], gaszFileExtensions[i], suffixLen))
 		{
 			return true;
 		}
 	}
 
 	return false;
+}
+
+/**
+ * Sort array in ascending order.
+ * @param pbArray	Array to be sorted.
+ * @param iLen		Array length.
+ */
+static void sort_array(char* pbArray, int iLen)
+{
+	char tmp[MAX_COLUMN + 1];
+	char* pbStrNxt;
+	int j;
+	int i;
+
+	/* Sorting array */
+	for(i = 0; i < iLen; ++i)
+	{
+		/* Next element */
+		pbStrNxt = pbArray + (MAX_COLUMN + 1);
+		for(j = i + 1; j < iLen; ++j)
+		{
+			/* Swap */
+			if(strcmp(pbArray, pbStrNxt) > 0)
+			{
+				strncpy(tmp, pbArray, MAX_COLUMN);
+				strncpy(pbArray, pbStrNxt, MAX_COLUMN);
+				strncpy(pbStrNxt, tmp, MAX_COLUMN);
+			}
+
+			pbStrNxt += MAX_COLUMN + 1;
+		}
+
+		/* Next element */
+		pbArray += MAX_COLUMN + 1;
+	}
 }
 
 /**
@@ -98,6 +143,7 @@ static ut_fs_navigate chooseFile()
 	FILINFO st_usb_finfo;
 	FRESULT eRes;
 	ut_menu filesMenu;
+	uint8_t i;
 	char aszFiles[MENU_MAX_ITEMS][MAX_COLUMN + 1];
 
 	/* Clean */
@@ -116,8 +162,7 @@ static ut_fs_navigate chooseFile()
 		/* Check if it is on root */
 		if(strlen(gszCurFile) > 0)
 		{
-			filesMenu.items[filesMenu.numItems].text = "..";
-			filesMenu.numItems++;
+			sprintf(aszFiles[filesMenu.numItems++], "..");
 		}
 
 		/* Populate menu */
@@ -144,10 +189,15 @@ static ut_fs_navigate chooseFile()
 				continue;
 			}
 
-			filesMenu.items[filesMenu.numItems].text = aszFiles[filesMenu.numItems];
-			filesMenu.numItems++;
+			if(++filesMenu.numItems == MENU_MAX_ITEMS) { break; }
+		}
 
-			if(filesMenu.numItems == MENU_MAX_ITEMS) { break; }
+		/* Sort */
+		sort_array(aszFiles[0], filesMenu.numItems);
+		/* Fill menu */
+		for(i = 0; i < filesMenu.numItems; ++i)
+		{
+			filesMenu.items[i].text = aszFiles[i];
 		}
 
 		/* Show menu */
@@ -163,7 +213,7 @@ static ut_fs_navigate chooseFile()
 			{
 				/* It should rise up a level */
 				char* last = ut_strrstr(gszCurFile, "/");
-				*last = 0;
+				if(last != 0) *last = 0;
 				return NAVIGATE_CONTINUE;
 			}
 
@@ -192,7 +242,6 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	FATFS  st_usb_fatfs;
 	DIR	 st_usb_dir;
 	FRESULT eRes;
-	//char szFullPath[MAX_FILE_PATH_SIZE];
 
 	/* Root dir */
 	memset(gszCurFile, 0, sizeof(gszCurFile));
@@ -209,9 +258,23 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		ut_lcd_output();
 
 		/* Wait for USB to mount */
-		ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
+		ulTaskNotifyTake(pdFALSE, 20000 / portTICK_PERIOD_MS);
 		eRes = R_tfat_f_mount(0, &st_usb_fatfs);
 		eRes = R_tfat_f_opendir(&st_usb_dir, USB_ROOT);
+
+		/* If failed, show error message and return */
+		if(eRes != TFAT_FR_OK)
+		{
+			ut_lcd_clear(SCREEN_MAIN_ID);
+			ut_lcd_drawString(SCREEN_MAIN_ID, 1, 0, "NENHUM USB", false);
+			ut_lcd_drawString(SCREEN_MAIN_ID, 2, 0, "ENCONTRADO", false);
+
+			ut_lcd_output();
+
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+			return STATE_MAIN_MENU;
+		}
 	}
 
 	/* Fat is mounted */
@@ -231,8 +294,9 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		/* Navigate through folders */
 		eErr = chooseFile();
 	} while(eErr == NAVIGATE_CONTINUE);
-	if (eErr == NAVIGATE_END)
-    	xTaskNotifyGive( x_tn_usb_connected );
+
+	if (eErr == NAVIGATE_END) xTaskNotifyGive( x_tn_usb_connected );
+
 	/* Go back to menu */
 	return STATE_MAIN_MENU;
 }
