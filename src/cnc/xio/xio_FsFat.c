@@ -90,7 +90,7 @@ FILE * xio_open_file(const uint8_t dev, const char *addr, const flags_t flags)
 	xioFsfat_t *dx = (xioFsfat_t *)d->x;
 
 	R_tfat_f_mount(0, &dx->gFatfs);
-
+	fr = R_tfat_f_close(&dx->f);
     /* Open a text file */
     fr = R_tfat_f_open(&dx->f, gszCurFile, TFAT_FA_READ);
 

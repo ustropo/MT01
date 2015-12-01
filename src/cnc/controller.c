@@ -46,6 +46,11 @@
 #include "util.h"
 #include "xio.h"
 
+#ifdef FREE_RTOS_PP
+#include "FreeRTOS.h"
+#include "task.h"
+#endif
+
 #ifdef __ARM
 #include "Reset.h"
 #endif
@@ -68,6 +73,7 @@ static stat_t _system_assertions(void);
 static stat_t _sync_to_planner(void);
 static stat_t _sync_to_tx_buffer(void);
 static stat_t _command_dispatch(void);
+bool gfilerunning = false;
 
 // prep for export to other modules:
 stat_t hardware_hard_reset_handler(void);
@@ -142,7 +148,19 @@ stat_t controller_test_assertions()
 
 void controller_run()
 {
+
 	while (true) {
+	    /* Block to wait for prvTask1() to notify this task. */
+		if(!gfilerunning)
+		{
+			ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+			xio_init();
+			config_init();					// config records from eeprom 		- must be next app init
+			network_init();					// reset std devices if required	- must follow config_init()
+			planner_init();					// motion planning subsystem
+			canonical_machine_init();		// canonical machine				- must follow config_init()
+			gfilerunning = true;
+		}
 		_controller_HSM();
 	}
 }
@@ -157,6 +175,7 @@ static void _controller_HSM()
 												// Order is important:
 //RXMOD		DISPATCH(hw_hard_reset_handler());			// 1. handle hard reset requests
 //RXMOD		DISPATCH(hw_bootloader_handler());			// 2. handle requests to enter bootloader
+
 	DISPATCH(_shutdown_idler());				// 3. idle in shutdown state
 //	DISPATCH( poll_switches());					// 4. run a switch polling cycle
 	DISPATCH(_limit_switch_handler());			// 5. limit switch has been thrown

@@ -75,8 +75,10 @@ enum sectionState {
 #define JERK_MULTIPLIER         ((float)1000000)
 #define JERK_MATCH_PRECISION    ((float)1000)		// precision to which jerk must match to be considered effectively the same
 
-#define NOM_SEGMENT_USEC        ((float)5000)		// nominal segment time
-#define MIN_SEGMENT_USEC        ((float)2500)		// minimum segment time / minimum move time
+#define NOM_SEGMENT_USEC 		((float)1500)
+//#define NOM_SEGMENT_USEC        ((float)5000)		// nominal segment time
+#define MIN_SEGMENT_USEC 		((float)750)
+//#define MIN_SEGMENT_USEC        ((float)2500)		// minimum segment time / minimum move time
 #define MIN_ARC_SEGMENT_USEC    ((float)10000)		// minimum arc segment time
 
 #define NOM_SEGMENT_TIME        (NOM_SEGMENT_USEC / MICROSECONDS_PER_MINUTE)

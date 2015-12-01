@@ -80,6 +80,7 @@ typedef struct controllerSingleton {	// main TG controller struct
 } controller_t;
 
 extern controller_t cs;					// controller state structure
+extern bool gfilerunning;
 
 enum cmControllerState {				// manages startup lines
 	CONTROLLER_INITIALIZING = 0,		// controller is initializing - not ready for use
