@@ -19,6 +19,7 @@ typedef enum
 	STATE_WARNING,
 	STATE_MAIN_MENU,
 	STATE_CHOOSE_FILE,
+	STATE_CONFIG_MENU,
 	/* This should be always the last one! */
 	STATE_NUMBER
 } ut_state;
@@ -41,6 +42,7 @@ extern ut_state ut_state_splash(ut_context* pContext);
 extern ut_state ut_state_warning(ut_context* pContext);
 extern ut_state ut_state_main_menu(ut_context* pContext);
 extern ut_state ut_state_choose_file(ut_context* pContext);
+extern ut_state ut_state_config_menu(ut_context* pContext);
 
 /**
  * State map definition

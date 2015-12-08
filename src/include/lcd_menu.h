@@ -18,13 +18,28 @@
 // Typedefs
 // ***********************************************************************
 
+/**
+ * Type of menu item
+ */
+typedef enum
+{
+	ITEM_TYPE_BUTTON = 0,//!< MENU_TYPE_BUTTON
+	ITEM_TYPE_BOOL,      //!< MENU_TYPE_BOOL
+	ITEM_TYPE_INT        //!< MENU_TYPE_INT
+} ut_menu_item_type;
+
 typedef void (*ut_item_func_ptr)(uint8_t);
 
 /**
- *
+ * Menu item struct
  */
-typedef struct
+typedef struct ut_menu_item_tag
 {
+	ut_menu_item_type st_type;
+	uint8_t interval;
+	uint8_t min;
+	uint8_t max;
+	uint32_t value;
 	const char* text;
 	ut_item_func_ptr callback_func;
 } ut_menu_item;
@@ -32,7 +47,7 @@ typedef struct
 /**
  *
  */
-typedef struct
+typedef struct ut_menu_tag
 {
 	ut_menu_item items[MENU_MAX_ITEMS];
 	const char* title;
@@ -57,9 +72,5 @@ extern void ut_menu_go_down(ut_menu* menu_ptr);
 extern void ut_menu_init(ut_menu* menu_ptr);
 extern void ut_menu_show(ut_menu* menu_ptr);
 extern int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout);
-
-// ***********************************************************************
-// Add User prototypes & variables
-// ***********************************************************************
 
 #endif // __LCD_MENU
