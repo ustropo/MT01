@@ -11,7 +11,6 @@
 
 #include "ut_context.h"
 #include "ut_state.h"
-#include "ut_config.h"
 
 #include "lcd_menu.h"
 #include "lcd.h"
@@ -23,9 +22,6 @@
 // ***********************************************************************
 // Global variables
 // ***********************************************************************
-
-/* Contains machine configuration */
-ut_config_st gstBasParam;
 
 // ***********************************************************************
 // Internal variables
@@ -54,8 +50,6 @@ ut_state ut_state_config_menu(ut_context* pContext)
 
 	/* Initialize menu */
 	ut_menu_init(&config_menu);
-
-
 
 	return STATE_MAIN_MENU;
 }
