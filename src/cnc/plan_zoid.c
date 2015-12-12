@@ -140,7 +140,7 @@ void mp_calculate_trapezoid(mpBuf_t *bf)
 
 	if (bf->naiive_move_time < MIN_SEGMENT_TIME_PLUS_MARGIN) {
 		bf->cruise_velocity = bf->length / MIN_SEGMENT_TIME_PLUS_MARGIN;
-		bf->exit_velocity = max(0.0, min(bf->cruise_velocity, (bf->entry_velocity - bf->delta_vmax)));
+		bf->exit_velocity = fmaxf(0.0, fminf(bf->cruise_velocity, (bf->entry_velocity - bf->delta_vmax)));
 		bf->body_length = bf->length;
 		bf->head_length = 0;
 		bf->tail_length = 0;
@@ -220,7 +220,7 @@ void mp_calculate_trapezoid(mpBuf_t *bf)
 		if (fabs(bf->entry_velocity - bf->exit_velocity) < TRAPEZOID_VELOCITY_TOLERANCE) {
 			bf->head_length = bf->length/2;
 			bf->tail_length = bf->head_length;
-			bf->cruise_velocity = min(bf->cruise_vmax, mp_get_target_velocity(bf->entry_velocity, bf->head_length, bf));
+			bf->cruise_velocity = fminf(bf->cruise_vmax, mp_get_target_velocity(bf->entry_velocity, bf->head_length, bf));
 
 			if (bf->head_length < MIN_HEAD_LENGTH) {
 				// Convert this to a body-only move
@@ -369,10 +369,10 @@ float mp_get_target_length(const float Vi, const float Vf, const mpBuf_t *bf)
  *  OR
  *
  *      J from L, Vi, and Vf
- *      J = ((Vf - Vi) (Vi + Vf)²) / L²
+ *      J = ((Vf - Vi) (Vi + Vf)ï¿½) / Lï¿½
  *  Replacing Vf with x, and subtracting the known J:
- *      0 = ((x - Vi) (Vi + x)²) / L² - J
- *      Z(x) = ((x - Vi) (Vi + x)²) / L² - J
+ *      0 = ((x - Vi) (Vi + x)ï¿½) / Lï¿½ - J
+ *      Z(x) = ((x - Vi) (Vi + x)ï¿½) / Lï¿½ - J
  *
  *  L doesn't resolve to the value very quickly (it graphs near-vertical).
  *  So, we'll use J, which resolves in < 10 iterations, often in only two or three
@@ -386,7 +386,7 @@ float mp_get_target_length(const float Vi, const float Vf, const mpBuf_t *bf)
  *  SqrtDeltaOverJ = sqrt((x-Vi) / J)
  *  L'(x) = SqrtDeltaOverJ + (Vi + x) / (2*J) + (Vi + x) / (2*SqrtDeltaJ)
  *
- *  J'(x) = (2*Vi*x - Vi² + 3*x²) / L²
+ *  J'(x) = (2*Vi*x - Viï¿½ + 3*xï¿½) / Lï¿½
  */
 
 #define GET_VELOCITY_ITERATIONS 0		// must be 0, 1, or 2

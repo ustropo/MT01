@@ -642,7 +642,7 @@ void timer_dda_callback(void *pdata)
 	static uint8_t enableCount = 0;
 	if (enableCount == 17)
 	{
-		PWMCH ^= 1;
+		//PWMCH ^= 1;
 		enableCount = 0;
 	}
 	enableCount++;
@@ -1382,7 +1382,7 @@ stat_t st_get_pwr(nvObj_t *nv)
 
 stat_t st_set_mt(nvObj_t *nv)
 {
-	st_cfg.motor_power_timeout = min(MOTOR_TIMEOUT_SECONDS_MAX, max(nv->value, MOTOR_TIMEOUT_SECONDS_MIN));
+	st_cfg.motor_power_timeout = fminf(MOTOR_TIMEOUT_SECONDS_MAX, fmaxf(nv->value, MOTOR_TIMEOUT_SECONDS_MIN));
 	return (STAT_OK);
 }
 

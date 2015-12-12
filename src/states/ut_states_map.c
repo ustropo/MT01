@@ -18,5 +18,4 @@ const state_func_ptr states_table[STATE_NUMBER] =
 		&ut_state_warning,
 		&ut_state_main_menu,
 		&ut_state_choose_file,
-		&ut_state_config_menu
 };

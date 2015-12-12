@@ -11,6 +11,7 @@ Includes   <System Includes> , "Project Includes"
 #include "platform.h"
 #include "keyboard.h"
 #include "lcd_menu.h"
+//#include "hardware.h"
 
 
 #ifdef FREE_RTOS_PP
@@ -52,6 +53,7 @@ Return value    : none
  ******************************************************************************/
 void keyboard_task(void)
 {
+	static uint8_t keyEnable = 0;
 	uint8_t key_buf[4][3];
 	uint8_t keyPressed = 0;
 	uint32_t key = 0;
@@ -61,35 +63,42 @@ void keyboard_task(void)
 
 	while(1)
 	{
-		vTaskDelay(30 / portTICK_RATE_MS);
-		for (i = 0; i < 4; i++)
+		vTaskDelay(1 / portTICK_RATE_MS);
+		//PWMCH ^= 1;
+		PORTA.PODR.BIT.B6 ^= 1;
+		keyEnable++;
+		if (keyEnable == 30)
 		{
-			KCOL = col[i];
-			vTaskDelay(1 / portTICK_RATE_MS);
-			key_buf[i][k] = KLINE;
-			if (key_buf[i][k] != 0xFF)
+			keyEnable = 0;
+			for (i = 0; i < 4; i++)
 			{
-				if (key_buf[i][0] == key_buf[i][1])
+				KCOL = col[i];
+				vTaskDelay(1 / portTICK_RATE_MS);
+				key_buf[i][k] = KLINE;
+				if (key_buf[i][k] != 0xFF)
 				{
-					if (key_buf[i][0] == key_buf[i][2])
+					if (key_buf[i][0] == key_buf[i][1])
 					{
-						key_buf[i][0] = ~key_buf[i][0];
-						key |=(uint32_t)key_buf[i][0]<<8*i;
-						keyPressed = 1;
+						if (key_buf[i][0] == key_buf[i][2])
+						{
+							key_buf[i][0] = ~key_buf[i][0];
+							key |=(uint32_t)key_buf[i][0]<<8*i;
+							keyPressed = 1;
+						}
 					}
 				}
 			}
-		}
-		k++;
-		if (k > 2)
-		{
-			if (keyPressed == 1)
+			k++;
+			if (k > 2)
 			{
-				xQueueSend( qKeyboard, &key, 0 );
-				key = 0;
-				keyPressed = 0;
+				if (keyPressed == 1)
+				{
+					xQueueSend( qKeyboard, &key, 0 );
+					key = 0;
+					keyPressed = 0;
+				}
+				k = 0;
 			}
-			k = 0;
 		}
 	}
 }

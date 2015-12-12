@@ -403,7 +403,7 @@ void FreeRTOSConfig( void )
     xTaskCreate( (pdTASK_CODE)hmsc_cstd_task_start,     "HMSC_MAIN_TSK   ",  128, NULL, 2, NULL); /* HMSC_MAIN_TASK      */
 
     /*User interface task*/
-    xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task    ",  128, NULL, 2, NULL); /* keyboard_task      */
+    xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task    ",  128, NULL, 6, NULL); /* keyboard_task      */
     xTaskCreate( (pdTASK_CODE)states_task,     "states_task    ",  1024, NULL, 2, &task_main_handle); /* states_task      */
     xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  1024, NULL, 2, &x_tn_usb_connected); /* CNC_task      */
 }

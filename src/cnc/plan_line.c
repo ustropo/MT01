@@ -347,10 +347,10 @@ static void _calc_move_times(GCodeState_t *gms, const float axis_length[], const
 		} else { // MOTION_MODE_STRAIGHT_FEED
 			tmp_time = fabs(axis_length[axis]) / cm.a[axis].feedrate_max;
 		}
-		max_time = max(max_time, tmp_time);
+		max_time = fmaxf(max_time, tmp_time);
 
 		if (tmp_time > 0) { 	// collect minimum time if this axis is not zero
-			gms->minimum_time = min(gms->minimum_time, tmp_time);
+			gms->minimum_time = fminf(gms->minimum_time, tmp_time);
 		}
 	}
 	gms->move_time = max4(inv_time, max_time, xyz_time, abc_time);
@@ -432,7 +432,7 @@ static void _plan_block_list(mpBuf_t *bf, uint8_t *mr_flag)
 	// At the end *bp points to the buffer before the first block.
 	while ((bp = mp_get_prev_buffer(bp)) != bf) {
 		if (bp->replannable == false) { break; }
-		bp->braking_velocity = min(bp->nx->entry_vmax, bp->nx->braking_velocity) + bp->delta_vmax;
+		bp->braking_velocity = fminf(bp->nx->entry_vmax, bp->nx->braking_velocity) + bp->delta_vmax;
 	}
 
 	// forward planning pass - recomputes trapezoids in the list from the first block to the bf block.

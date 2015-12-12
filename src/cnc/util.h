@@ -44,6 +44,7 @@ using Motate::SysTickTimer;
 #endif
 #ifdef __RX
 #include <machine.h>
+#include <math.h>
 #endif
 #ifdef __cplusplus
 extern "C"{
@@ -101,6 +102,7 @@ uint32_t SysTickTimer_getValue(void);
 	  termA>termB ? termA:termB; })
 #endif
 
+
 #ifndef min
 #define min(a,b) \
 	({ __typeof__ (a) term1 = (a); \
@@ -108,13 +110,14 @@ uint32_t SysTickTimer_getValue(void);
 	   term1<term2 ? term1:term2; })
 #endif
 
+
 #ifndef avg
 #define avg(a,b) ((a+b)/2)
 #endif
 
 #ifndef EPSILON
-#define EPSILON		((float)0.00001)		// allowable rounding error for floats
-//#define EPSILON 	((float)0.000001)		// allowable rounding error for floats
+//#define EPSILON		((float)0.00001)		// allowable rounding error for floats
+#define EPSILON 	((float)0.000001)		// allowable rounding error for floats
 #endif
 
 #ifndef fp_EQ

@@ -317,7 +317,7 @@ static stat_t _compute_arc()
 							      arc_segments_for_minimum_distance,
 							      arc_segments_for_minimum_time));
 
-	arc.arc_segments = max(arc.arc_segments, 1);            //...but is at least 1 arc_segment
+	arc.arc_segments = fmaxf(arc.arc_segments, 1);            //...but is at least 1 arc_segment
  	arc.gm.move_time = arc.arc_time / arc.arc_segments;     // gcode state struct gets arc_segment_time, not arc time
 	arc.arc_segment_count = (int32_t)arc.arc_segments;
 	arc.arc_segment_theta = arc.angular_travel / arc.arc_segments;
@@ -463,10 +463,10 @@ static void _estimate_arc_time ()
 	}
 
 	// Downgrade the time if there is a rate-limiting axis
-	arc.arc_time = max(arc.arc_time, arc.planar_travel/cm.a[arc.plane_axis_0].feedrate_max);
-	arc.arc_time = max(arc.arc_time, arc.planar_travel/cm.a[arc.plane_axis_1].feedrate_max);
+	arc.arc_time = fmaxf(arc.arc_time, arc.planar_travel/cm.a[arc.plane_axis_0].feedrate_max);
+	arc.arc_time = fmaxf(arc.arc_time, arc.planar_travel/cm.a[arc.plane_axis_1].feedrate_max);
 	if (fabs(arc.linear_travel) > 0) {
-		arc.arc_time = max(arc.arc_time, fabs(arc.linear_travel/cm.a[arc.linear_axis].feedrate_max));
+		arc.arc_time = fmaxf(arc.arc_time, fabs(arc.linear_travel/cm.a[arc.linear_axis].feedrate_max));
 	}
 }
 

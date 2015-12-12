@@ -63,7 +63,7 @@
 #define M1_POLARITY				1		// 1po		0=normal, 1=reversed
 #define M1_POWER_MODE			2		// 1pm		TRUE=low power idle enabled
 
-#define M2_MOTOR_MAP			AXIS_DISABLED  // Y1 - left side of machine
+#define M2_MOTOR_MAP			AXIS_Y  // Y1 - left side of machine
 #define M2_STEP_ANGLE			1.8
 #define M2_TRAVEL_PER_REV		40.00
 #define M2_MICROSTEPS			64
@@ -103,12 +103,12 @@
 // These are relative conservative values for a well-tuned Shapeoko2 or similar XY belt / Z screw machine
 
 #define X_AXIS_MODE				AXIS_STANDARD		// xam		see canonical_machine.h cmAxisMode for valid values
-#define X_VELOCITY_MAX			3200 				// xvm		G0 max velocity in mm/min
+#define X_VELOCITY_MAX			10000 				// xvm		G0 max velocity in mm/min
 #define X_FEEDRATE_MAX			X_VELOCITY_MAX		// xfr 		G1 max feed rate in mm/min
 #define X_TRAVEL_MIN			0					// xtn		minimum travel
 #define X_TRAVEL_MAX			290					// xtm		maximum travel (travel between switches or crashes)
-#define X_JERK_MAX				1000				// xjm		yes, that's "5 billion" mm/(min^3)
-#define X_JERK_HOMING			2000				// xjh
+#define X_JERK_MAX				5000				// xjm		yes, that's "5 billion" mm/(min^3)
+#define X_JERK_HOMING			5000				// xjh
 #define X_JUNCTION_DEVIATION	JUNCTION_DEVIATION	// xjd
 #define X_SWITCH_MODE_MIN		SW_MODE_HOMING		// xsn		SW_MODE_DISABLED, SW_MODE_HOMING, SW_MODE_LIMIT, SW_MODE_HOMING_LIMIT
 #define X_SWITCH_MODE_MAX 		SW_MODE_DISABLED	// xsx		SW_MODE_DISABLED, SW_MODE_HOMING, SW_MODE_LIMIT, SW_MODE_HOMING_LIMIT
