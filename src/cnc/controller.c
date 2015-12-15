@@ -148,17 +148,14 @@ stat_t controller_test_assertions()
 
 void controller_run()
 {
-
+	xio_init();
 	while (true) {
 	    /* Block to wait for prvTask1() to notify this task. */
 		if(!gfilerunning)
 		{
 			ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
-			xio_init();
-			config_init();					// config records from eeprom 		- must be next app init
-			network_init();					// reset std devices if required	- must follow config_init()
-			planner_init();					// motion planning subsystem
-			canonical_machine_init();		// canonical machine				- must follow config_init()
+			xio_close(cs.primary_src);
+			xio_open(XIO_DEV_USBFAT,0,0);
 			gfilerunning = true;
 		}
 		_controller_HSM();
@@ -277,6 +274,8 @@ static stat_t _command_dispatch()
 		}
 		// handle end-of-file from file devices
 		if (status == STAT_EOF) {						// EOF can come from file devices only
+			gfilerunning = false;
+			xio_close(cs.primary_src);
 			if (cfg.comm_mode == TEXT_MODE) {
 				fprintf_P(stderr, PSTR("End of command file\n"));
 			} else {

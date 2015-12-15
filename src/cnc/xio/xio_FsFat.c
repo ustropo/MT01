@@ -37,6 +37,7 @@ xioFsfat_t	    ufsfat[XIO_DEV_USBFILE_COUNT];
 struct cfgFILE {
 	x_open_t x_open;			// see xio.h for typedefs
 	x_ctrl_t x_ctrl;
+	x_close_t x_close;
 	x_gets_t x_gets;
 	x_getc_t x_getc;
 	x_putc_t x_putc;
@@ -47,6 +48,7 @@ static struct cfgFILE const cfgFile[] = {
 {	// PGM config
 	xio_open_file,				// open function
 	xio_ctrl_generic, 			// ctrl function
+	xio_close_fsfat, 			// close function
 	xio_gets_fsfat,				// get string function
 	xio_getc_fsfat,				// stdio getc function
 	xio_putc_fsfat,				// stdio putc function
@@ -69,6 +71,7 @@ void xio_init_fsfat()
 		xio_open_generic(XIO_DEV_USBFILE_OFFSET + i,
 						(x_open_t)(cfgFile[i].x_open),
 						(x_ctrl_t)(cfgFile[i].x_ctrl),
+						(x_close_t)(cfgFile[i].x_close),
 						(x_gets_t)(cfgFile[i].x_gets),
 						(x_getc_t)(cfgFile[i].x_getc),
 						(x_putc_t)(cfgFile[i].x_putc),
@@ -108,6 +111,12 @@ int xio_gets_fsfat(xioDev_t *d, char *buf, const int size)
 	}
 	printf(buf);
 	return(XIO_OK);
+}
+
+void xio_close_fsfat (xioDev_t *d)
+{
+	xioFsfat_t *dx = (xioFsfat_t *)d->x;
+	R_tfat_f_close(&dx->f);
 }
 
 int xio_getc_fsfat(FILE *stream)

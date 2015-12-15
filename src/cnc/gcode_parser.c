@@ -510,7 +510,7 @@ static stat_t _execute_gcode_block()
 			cm_program_stop();
 		} else {
 			cm_program_end();
-			gfilerunning = false;
+			//gfilerunning = false;
 		}
 	}
 	return (status);

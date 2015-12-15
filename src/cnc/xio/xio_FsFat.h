@@ -83,6 +83,7 @@ FILE * xio_open_file(const uint8_t dev, const char *addr, const flags_t flags);
 int xio_gets_fsfat(xioDev_t *d, char *buf, const int size);		// read string from program memory
 int xio_getc_fsfat(FILE *stream);									// get a character from PROGMEM
 int xio_putc_fsfat(const char c, FILE *stream);
+void xio_close_fsfat (xioDev_t *d);
 // SD Card functions
 
 #endif

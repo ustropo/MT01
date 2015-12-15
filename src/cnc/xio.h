@@ -107,6 +107,7 @@ typedef struct xioDEVICE {						// common device struct (one per dev)
 	// function bindings
 	FILE *(*x_open)(const uint8_t dev, const char *addr, const flags_t flags);
 	int (*x_ctrl)(struct xioDEVICE *d, const flags_t flags);	 // set device control flags
+	void (*x_close)(struct xioDEVICE *d);
 	int (*x_gets)(struct xioDEVICE *d, char *buf, const int size);// non-blocking line reader
 	int (*x_getc)(FILE *);						// read char (stdio compatible)
 	int (*x_putc)(char, FILE *);				// write char (stdio compatible)
@@ -134,6 +135,7 @@ typedef struct xioDEVICE {						// common device struct (one per dev)
 
 typedef FILE *(*x_open_t)(const uint8_t dev, const char *addr, const flags_t flags);
 typedef int (*x_ctrl_t)(xioDev_t *d, const flags_t flags);
+typedef int (*x_close_t)(xioDev_t *d);
 typedef int (*x_gets_t)(xioDev_t *d, char *buf, const int size);
 typedef int (*x_getc_t)(FILE *);
 typedef int (*x_putc_t)(char, FILE *);
@@ -166,6 +168,7 @@ uint8_t xio_isbusy(void);
 void xio_reset_working_flags(xioDev_t *d);
 FILE *xio_open(const uint8_t dev, const char *addr, const flags_t flags);
 int xio_ctrl(const uint8_t dev, const flags_t flags);
+void xio_close(const uint8_t dev);
 int xio_gets(const uint8_t dev, char *buf, const int size);
 int xio_getc(const uint8_t dev);
 int xio_putc(const uint8_t dev, const char c);
@@ -176,6 +179,7 @@ int xio_ctrl_generic(xioDev_t *d, const flags_t flags);
 
 void xio_open_generic(uint8_t dev, x_open_t x_open,
 								   x_ctrl_t x_ctrl,
+								   x_close_t x_close,
 								   x_gets_t x_gets,
 								   x_getc_t x_getc,
 								   x_putc_t x_putc,

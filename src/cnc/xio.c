@@ -108,7 +108,7 @@ void xio_init()
 //	xio_init_file();
 
 	// open individual devices (file device opens occur at time-of-use)
-	xio_open(XIO_DEV_USBFAT,0,0);
+//	xio_open(XIO_DEV_USBFAT,0,0);
 //	xio_open(XIO_DEV_USB,  0, USB_FLAGS);
 //	xio_open(XIO_DEV_RS485,0, RS485_FLAGS);
 //	xio_open(XIO_DEV_SPI1, 0, SPI_FLAGS);
@@ -188,6 +188,7 @@ void xio_reset_working_flags(xioDev_t *d)
  */
 void xio_open_generic(uint8_t dev, x_open_t x_open,
 								   x_ctrl_t x_ctrl,
+								   x_close_t x_close,
 								   x_gets_t x_gets,
 								   x_getc_t x_getc,
 								   x_putc_t x_putc,
@@ -202,6 +203,7 @@ void xio_open_generic(uint8_t dev, x_open_t x_open,
 	// bind functions to device structure
 	d->x_open = x_open;
 	d->x_ctrl = x_ctrl;
+	d->x_close = x_close;
 	d->x_gets = x_gets;
 	d->x_getc = x_getc;	// you don't need to bind getc & putc unless you are going to use them directly
 	d->x_putc = x_putc;	// they are bound into the fdev stream struct
@@ -226,6 +228,11 @@ void xio_open_generic(uint8_t dev, x_open_t x_open,
 FILE *xio_open(uint8_t dev, const char *addr, flags_t flags)
 {
 	return (ds[dev].x_open(dev, addr, flags));
+}
+
+void xio_close(const uint8_t dev)
+{
+	ds[dev].x_close(&ds[dev]);
 }
 
 int xio_gets(const uint8_t dev, char *buf, const int size)
