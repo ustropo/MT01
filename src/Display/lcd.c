@@ -91,8 +91,13 @@ void ut_lcd_drawString(uint8_t line, uint8_t column, const char* text, uint8_t i
  * @param invert		Background color
  * @param glyph			Char
  */
-static void ut_lcd_draw_glyph(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t invert, char glyph)
+static uint8_t ut_lcd_draw_glyph(uint8_t x, uint8_t y, uint8_t h, uint8_t invert, char glyph)
 {
+	/* char width */
+	char szOnlyChar[2] = {0};
+	szOnlyChar[0] = glyph;
+	uint8_t w = u8g_GetStrWidth(&main_u8g, szOnlyChar);
+
 	/* Set background box */
 	u8g_SetColorIndex(&main_u8g, 1);
 	if(invert)
@@ -103,6 +108,8 @@ static void ut_lcd_draw_glyph(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_
 	/* Draw glyph */
 	y += main_u8g.font_calc_vref(&main_u8g);
 	u8g_draw_glyph(&main_u8g, x, y, glyph);
+	/* Return to future info */
+	return w;
 }
 
 /**
@@ -110,8 +117,7 @@ static void ut_lcd_draw_glyph(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_
  */
 void ut_lcd_output()
 {
-	uint8_t w = u8g_GetWidth(&main_u8g);
-	uint8_t row, col, x, y;
+	uint8_t row, col, x, y, index;
 	uint8_t h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 
 	u8g_prepare();
@@ -121,6 +127,8 @@ void ut_lcd_output()
 	do
 	{
 		/* Through all rows */
+		index = 0;
+		y = 0;
 		for(row = 0; row < MAX_ROW; row++)
 		{
 			x = 0;
@@ -128,9 +136,9 @@ void ut_lcd_output()
 			for(col = 0; col < MAX_COLUMN; col++)
 			{
 				/* Draw glyph */
-				ut_lcd_draw_glyph(x, y, w, h, gaboBackColor[row*col], gacChar[row*col]);
+				x += ut_lcd_draw_glyph(x, y, h, gaboBackColor[index], gacChar[index]);
 				/* Next position */
-				x += w;
+				index++;
 			}
 
 			/* Next position */

@@ -87,7 +87,7 @@ void ut_menu_show(ut_menu* menu_ptr)
 
 	/* Items */
 	uint8_t menuItem = menu_ptr->offset;
-	for(row = 0; (menuItem < menu_ptr->numItems) && row < menu_ptr->maxItemsPerPage; row++, menuItem++)
+	for(; (menuItem < menu_ptr->numItems) && row < menu_ptr->maxItemsPerPage; row++, menuItem++)
 	{
 		ut_lcd_drawString(row, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem));
 	}
