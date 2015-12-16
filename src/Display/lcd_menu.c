@@ -28,7 +28,7 @@ void ut_menu_init(ut_menu* menu_ptr)
 {
 	memset((void *)menu_ptr, 0, sizeof(ut_menu));
 
-	menu_ptr->maxItemsPerPage = MAX_ROW - 2;
+	menu_ptr->maxItemsPerPage = MAX_ROW - 1;
 	menu_ptr->boShowTitle = true;
 }
 
@@ -73,29 +73,23 @@ void ut_menu_go_down(ut_menu* menu_ptr)
 // ***********************************************************************
 void ut_menu_show(ut_menu* menu_ptr)
 {
-	uint8_t index = 0;
+	uint8_t row = 0;
 
+	ut_lcd_clear();
 	/* Title handling */
 	if(menu_ptr->boShowTitle)
 	{
-		ut_lcd_enableHeader(true);
 		/* Clear previous data */
-		ut_lcd_clear(SCREEN_HEADER_ID);
+		ut_lcd_clear();
 		/* Copy data */
-		ut_lcd_drawString(SCREEN_HEADER_ID, 0, 0, menu_ptr->title, true);
-	}
-	else
-	{
-		ut_lcd_enableHeader(false);
+		ut_lcd_drawString(row++, 0, menu_ptr->title, true);
 	}
 
-	/* Clear previous data */
-	ut_lcd_clear(SCREEN_MAIN_ID);
 	/* Items */
 	uint8_t menuItem = menu_ptr->offset;
-	for(index = 0; (menuItem < menu_ptr->numItems) && (index < menu_ptr->maxItemsPerPage); index++, menuItem++)
+	for(; (menuItem < menu_ptr->numItems) && row < menu_ptr->maxItemsPerPage; row++, menuItem++)
 	{
-		ut_lcd_drawString(SCREEN_MAIN_ID, index, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem));
+		ut_lcd_drawString(row, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem));
 	}
 
 	/* Put on screen */
