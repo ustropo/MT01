@@ -103,6 +103,7 @@ void xio_init()
 
 	// setup device types
 	xio_init_fsfat();
+	xio_init_command();
 //	xio_init_usart();
 //	xio_init_spi();
 //	xio_init_file();

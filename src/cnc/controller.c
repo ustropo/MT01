@@ -64,6 +64,15 @@ controller_t cs;		// controller state structure
 /***********************************************************************************
  **** STATICS AND LOCALS ***********************************************************
  ***********************************************************************************/
+const char jog_startxp[]= "\
+G21 G91\n\
+G01 Y390.0 F4000";
+
+const char jog_stop[]= "\
+!\n\
+%";
+
+
 
 static void _controller_HSM(void);
 static stat_t _shutdown_idler(void);
@@ -108,6 +117,11 @@ void controller_init(uint8_t std_in, uint8_t std_out, uint8_t std_err)
 	cs.state = CONTROLLER_NOT_CONNECTED;			// find USB next
 	IndicatorLed.setFrequency(100000);
 #endif
+
+#ifdef __RX
+	cs.default_src = std_in;
+	tg_set_primary_source(cs.default_src);
+#endif
 }
 
 /*
@@ -148,15 +162,24 @@ stat_t controller_test_assertions()
 
 void controller_run()
 {
+	static uint8_t count = 0;
+	controller_init(XIO_DEV_COMMAND,0,0);
 	xio_init();
 	while (true) {
 	    /* Block to wait for prvTask1() to notify this task. */
-		if(!gfilerunning)
+		if (ulTaskNotifyTake( pdTRUE, 0 ))
 		{
-			ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
 			xio_close(cs.primary_src);
-			xio_open(XIO_DEV_USBFAT,0,0);
-			gfilerunning = true;
+//			xio_open(cs.primary_src,0,0);
+			switch (count)
+			{
+				case 0: xio_open(cs.primary_src,jog_startxp,0);
+				count = 1;
+				break;
+				case 1: xio_open(cs.primary_src,jog_stop,0);
+				count = 0;
+				break;
+			}
 		}
 		_controller_HSM();
 	}
@@ -274,7 +297,7 @@ static stat_t _command_dispatch()
 		}
 		// handle end-of-file from file devices
 		if (status == STAT_EOF) {						// EOF can come from file devices only
-			gfilerunning = false;
+			//gfilerunning = false;
 			xio_close(cs.primary_src);
 			if (cfg.comm_mode == TEXT_MODE) {
 				fprintf_P(stderr, PSTR("End of command file\n"));

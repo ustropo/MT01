@@ -71,11 +71,15 @@
 
 enum xioDevNum_t {		// TYPE:	DEVICE:
 	XIO_DEV_USBFAT,
+	XIO_DEV_COMMAND,
 	XIO_DEV_COUNT		// total device count (must be last entry)
 };
 // If your change these ^, check these v
 #define XIO_DEV_USBFILE_COUNT 	1 				// # of FsFat devices
 #define XIO_DEV_USBFILE_OFFSET	0				// offset for computing indices
+
+#define XIO_DEV_COMMAND_COUNT 		1 				// # of Command devices
+#define XIO_DEV_COMMAND_OFFSET		XIO_DEV_USBFILE_COUNT	// offset for computing indicies
 
 
 // Fast accessors
@@ -135,7 +139,7 @@ typedef struct xioDEVICE {						// common device struct (one per dev)
 
 typedef FILE *(*x_open_t)(const uint8_t dev, const char *addr, const flags_t flags);
 typedef int (*x_ctrl_t)(xioDev_t *d, const flags_t flags);
-typedef int (*x_close_t)(xioDev_t *d);
+typedef void (*x_close_t)(xioDev_t *d);
 typedef int (*x_gets_t)(xioDev_t *d, char *buf, const int size);
 typedef int (*x_getc_t)(FILE *);
 typedef int (*x_putc_t)(char, FILE *);
@@ -146,9 +150,11 @@ typedef void (*x_flow_t)(xioDev_t *d);
  *************************************************************************/
 // Put all sub-includes here so only xio.h is needed elsewhere
 #include "./xio/xio_FsFat.h"
+#include "./xio/xio_Command.h"
 // Static structure allocations
 extern xioDev_t 		ds[XIO_DEV_COUNT];			// allocate top-level dev structs
 extern xioFsfat_t	    ufsfat[XIO_DEV_USBFILE_COUNT];
+extern xioCommand_t	    command[XIO_DEV_COMMAND_COUNT];
 extern struct controllerSingleton tg;		// needed by init() for default source
 
 /*************************************************************************

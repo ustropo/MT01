@@ -55,6 +55,7 @@ static void _set_motor_power_level(const uint8_t motor, const float power_level)
 #ifdef __RX
 void timer_dda_callback(void *pdata);
 void timer_dwell_callback(void *pdata);
+void timer_motorPower_callback(void *pdata);
 void exec_timer_num(void *pdata);
 void load_timer_num(void *pdata);
 
@@ -272,6 +273,7 @@ void stepper_init()
     R_TMR_CreatePeriodic(FREQUENCY_DDA,timer_dda_callback,TIMER_DDA);
     R_TMR_CreateOneShot((uint8_t)(1000000/FREQUENCY_SGI),load_timer_num,TIMER_LOAD);
     R_CMT_CreatePeriodic(FREQUENCY_DWELL,timer_dwell_callback,&cmtch);
+    R_CMT_CreatePeriodic(10000,timer_motorPower_callback,&cmtch);
     R_CMT_Control(TIMER_DWELL,CMT_RX_CMD_PAUSE,0);
 
 	// setup software interrupt load timer
@@ -1412,6 +1414,11 @@ stat_t st_set_me(nvObj_t *nv)	// Make sure this function is not part of initiali
 		_energize_motor(motor-1);     // adjust so that motor 1 is actually 0 (etc)
 	}
 	return (STAT_OK);
+}
+
+void timer_motorPower_callback(void *pdata)
+{
+	PWMCH ^= 1;
 }
 
 /***********************************************************************************

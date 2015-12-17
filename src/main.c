@@ -76,6 +76,8 @@ void main(void)
 	}
 //	serial_init();
 
+
+
 	/* Initialize USB */
 	usb_main();
 

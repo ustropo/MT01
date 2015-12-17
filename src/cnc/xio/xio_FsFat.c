@@ -32,6 +32,8 @@
  * FILE CONFIGURATION RECORDS
  ******************************************************************************/
 
+static bool fileRunning = false;
+
 xioFsfat_t	    ufsfat[XIO_DEV_USBFILE_COUNT];
 
 struct cfgFILE {
@@ -96,21 +98,25 @@ FILE * xio_open_file(const uint8_t dev, const char *addr, const flags_t flags)
 	fr = R_tfat_f_close(&dx->f);
     /* Open a text file */
     fr = R_tfat_f_open(&dx->f, gszCurFile, TFAT_FA_READ);
-
+    fileRunning = true;
 	return(&d->file);								// return pointer to the FILE stream
 }
 
 int xio_gets_fsfat(xioDev_t *d, char *buf, const int size)
 {
 	xioFsfat_t *dx = (xioFsfat_t *)d->x;
-
-	d->signal = XIO_SIG_OK;			// initialize signal
-	if (f_gets(buf, size, &dx->f) == NULL) {
-		clearerr(&d->file);
-		return (XIO_EOF);
+	if (fileRunning)
+	{
+		d->signal = XIO_SIG_OK;			// initialize signal
+		if (f_gets(buf, size, &dx->f) == NULL) {
+			clearerr(&d->file);
+			fileRunning = false;
+			return (XIO_EOF);
+		}
+		printf(buf);
+		return(XIO_OK);
 	}
-	printf(buf);
-	return(XIO_OK);
+	return(XIO_EAGAIN);
 }
 
 void xio_close_fsfat (xioDev_t *d)

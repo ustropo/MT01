@@ -65,7 +65,7 @@ void keyboard_task(void)
 	{
 		vTaskDelay(1 / portTICK_RATE_MS);
 		//PWMCH ^= 1;
-		PORTA.PODR.BIT.B6 ^= 1;
+		//PORTA.PODR.BIT.B6 ^= 1;
 		keyEnable++;
 		if (keyEnable == 30)
 		{

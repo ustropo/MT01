@@ -20,7 +20,7 @@
 // ***********************************************************************
 // Variable definitions
 // ***********************************************************************
-
+extern TaskHandle_t  x_tn_usb_connected;
 // ***********************************************************************
 // Init menu function
 // ***********************************************************************
@@ -127,6 +127,7 @@ int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout)
 
 		case KEY_UP:
 			ut_menu_go_up(menu_ptr);
+			xTaskNotifyGive( x_tn_usb_connected );
 			break;
 
 		case KEY_ENTER:
