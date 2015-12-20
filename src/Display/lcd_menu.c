@@ -172,7 +172,7 @@ int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout)
 
 		case KEY_LEFT:
 			xio_open(XIO_DEV_COMMAND,jog_startyp,0);
-		break;
+			break;
 
 		case KEY_ENTER:
 			/* Callback function, if any */
@@ -181,13 +181,15 @@ int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout)
 				menu_ptr->items[menu_ptr->selectedItem].callback_func(menu_ptr->selectedItem);
 			}
 			return menu_ptr->selectedItem;
+			break;
 
 		case KEY_ESC:
 			return -1;
+			break;
 
 		case KEY_RELEASED:
 			xio_open(XIO_DEV_COMMAND,jog_stopflush,0);
-			return -1;
+			break;
 
 		default:
 			break;
