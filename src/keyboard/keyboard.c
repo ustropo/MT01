@@ -53,9 +53,9 @@ Return value    : none
  ******************************************************************************/
 void keyboard_task(void)
 {
-	static uint8_t keyEnable = 0;
 	uint8_t key_buf[4][3];
-	uint8_t keyPressed = 0;
+	bool keyPressed = false;
+	uint8_t colPressed = 0xff;
 	uint32_t key = 0;
 	uint8_t i = 0;
 	uint8_t k = 0;
@@ -63,42 +63,44 @@ void keyboard_task(void)
 
 	while(1)
 	{
-		vTaskDelay(1 / portTICK_RATE_MS);
-		//PWMCH ^= 1;
-		//PORTA.PODR.BIT.B6 ^= 1;
-		keyEnable++;
-		if (keyEnable == 30)
+		vTaskDelay(30 / portTICK_RATE_MS);
+		for (i = 0; i < 4; i++)
 		{
-			keyEnable = 0;
-			for (i = 0; i < 4; i++)
+			KCOL = col[i];
+			vTaskDelay(1 / portTICK_RATE_MS);
+			key_buf[i][k] = KLINE;
+			if (i == colPressed)
 			{
-				KCOL = col[i];
-				vTaskDelay(1 / portTICK_RATE_MS);
-				key_buf[i][k] = KLINE;
-				if (key_buf[i][k] != 0xFF)
+				if (key_buf[colPressed][k] == 0xFF)
 				{
-					if (key_buf[i][0] == key_buf[i][1])
+					key = 0;
+					xQueueSend( qKeyboard, &key, 0 );
+					keyPressed = false;
+					colPressed = 0xFF;
+				}
+			}
+			if (key_buf[i][k] != 0xFF)
+			{
+				if (key_buf[i][0] == key_buf[i][1])
+				{
+					if (key_buf[i][0] == key_buf[i][2])
 					{
-						if (key_buf[i][0] == key_buf[i][2])
+						key_buf[i][0] = ~key_buf[i][0];
+						key |=(uint32_t)key_buf[i][0]<<8*i;
+						colPressed = i;
+						if (keyPressed == false)
 						{
-							key_buf[i][0] = ~key_buf[i][0];
-							key |=(uint32_t)key_buf[i][0]<<8*i;
-							keyPressed = 1;
+							xQueueSend( qKeyboard, &key, 0 );
 						}
+						keyPressed = true;
 					}
 				}
 			}
-			k++;
-			if (k > 2)
-			{
-				if (keyPressed == 1)
-				{
-					xQueueSend( qKeyboard, &key, 0 );
-					key = 0;
-					keyPressed = 0;
-				}
-				k = 0;
-			}
+		}
+		k++;
+		if (k > 2)
+		{
+			k = 0;
 		}
 	}
 }

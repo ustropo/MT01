@@ -51,6 +51,8 @@
 #include "task.h"
 #endif
 
+#include "keyboard.h"
+
 #ifdef __ARM
 #include "Reset.h"
 #endif
@@ -64,15 +66,6 @@ controller_t cs;		// controller state structure
 /***********************************************************************************
  **** STATICS AND LOCALS ***********************************************************
  ***********************************************************************************/
-const char jog_startxp[]= "\
-G21 G91\n\
-G01 Y390.0 F4000";
-
-const char jog_stop[]= "\
-!\n\
-%";
-
-
 
 static void _controller_HSM(void);
 static stat_t _shutdown_idler(void);
@@ -162,24 +155,15 @@ stat_t controller_test_assertions()
 
 void controller_run()
 {
-	static uint8_t count = 0;
-	controller_init(XIO_DEV_COMMAND,0,0);
 	xio_init();
+	controller_init(XIO_DEV_COMMAND,0,0);
 	while (true) {
 	    /* Block to wait for prvTask1() to notify this task. */
+
 		if (ulTaskNotifyTake( pdTRUE, 0 ))
 		{
 			xio_close(cs.primary_src);
-//			xio_open(cs.primary_src,0,0);
-			switch (count)
-			{
-				case 0: xio_open(cs.primary_src,jog_startxp,0);
-				count = 1;
-				break;
-				case 1: xio_open(cs.primary_src,jog_stop,0);
-				count = 0;
-				break;
-			}
+			xio_open(cs.primary_src,0,0);
 		}
 		_controller_HSM();
 	}

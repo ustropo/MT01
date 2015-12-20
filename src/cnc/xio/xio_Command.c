@@ -34,9 +34,6 @@
 
 xioCommand_t	    command[XIO_DEV_COMMAND_COUNT];
 
-#define PGM ds[XIO_DEV_COMMAND]				// device struct accessor
-#define PGMf command[XIO_DEV_COMMAND - XIO_DEV_COMMAND_OFFSET]	// file extended struct accessor
-
 struct cfgFILE {
 	x_open_t x_open;			// see xio.h for typedefs
 	x_ctrl_t x_ctrl;
@@ -118,9 +115,9 @@ int xio_gets_command(xioDev_t *d, char *buf, const int size)
 			return(XIO_OK);
 		}
 	}
-	*buf++ = '\n';
+	*buf = '\n';
 	dx->filebase_P = ++buffin;
-	*buf = '\0';
+	//*buf = '\0';
 	return(XIO_OK);
 }
 
