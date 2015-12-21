@@ -13,48 +13,14 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "keyboard.h"
+#include "interpreter_if.h"
 
 #include "lcd_menu.h"
 #include "lcd.h"
 
-#include "tinyg.h"				// #1
-#include "config.h"				// #2
-#include "controller.h"
-#include "xio.h"
-
 // ***********************************************************************
 // Variable definitions
 // ***********************************************************************
-
-const char jog_startxp[]= "\
-G21 G91\n\
-G01 X390.0 F7000\n\
-m30";
-
-const char jog_startxn[]= "\
-G21 G91\n\
-G01 X-390.0 F1000\n\
-m30";
-
-const char jog_startyp[]= "\
-G21 G91\n\
-G01 Y390.0 F4000\n\
-m30";
-
-const char jog_startyn[]= "\
-G21 G91\n\
-G01 Y-390.0 F4000\n\
-m30";
-
-const char jog_stopflush[]= "\
-!\n\
-%";
-
-const char jog_stop[]= "\
-!";
-
-const char jog_restart[]= "\
-~";
 
 // ***********************************************************************
 // Init menu function
@@ -155,27 +121,27 @@ int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout)
 		/* Check which key */
 		switch (keyEntry)
 		{
-
 		case KEY_DOWN:
-			xio_open(XIO_DEV_COMMAND,jog_startxn,0);
+			iif_func_down();
 			ut_menu_go_down(menu_ptr);
 			break;
 
 		case KEY_UP:
-			xio_open(XIO_DEV_COMMAND,jog_startxp,0);
+			iif_func_up();
 			ut_menu_go_up(menu_ptr);
 			break;
 
 		case KEY_RIGHT:
-			xio_open(XIO_DEV_COMMAND,jog_startyn,0);
+			iif_func_right();
 			break;
 
 		case KEY_LEFT:
-			xio_open(XIO_DEV_COMMAND,jog_startyp,0);
+			iif_func_left();
 			break;
 
 		case KEY_ENTER:
 			/* Callback function, if any */
+			iif_func_enter();
 			if(menu_ptr->items[menu_ptr->selectedItem].callback_func)
 			{
 				menu_ptr->items[menu_ptr->selectedItem].callback_func(menu_ptr->selectedItem);
@@ -184,11 +150,12 @@ int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout)
 			break;
 
 		case KEY_ESC:
+			iif_func_esc();
 			return -1;
 			break;
 
 		case KEY_RELEASED:
-			xio_open(XIO_DEV_COMMAND,jog_stopflush,0);
+			iif_func_released();
 			break;
 
 		default:

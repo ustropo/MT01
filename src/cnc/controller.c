@@ -160,11 +160,7 @@ void controller_run()
 	while (true) {
 	    /* Block to wait for prvTask1() to notify this task. */
 
-		if (ulTaskNotifyTake( pdTRUE, 0 ))
-		{
-			xio_close(cs.primary_src);
-			xio_open(cs.primary_src,0,0);
-		}
+		//ulTaskNotifyTake( pdTRUE, 0 );
 		_controller_HSM();
 	}
 }

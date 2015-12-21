@@ -11,6 +11,7 @@
 
 #include "ut_context.h"
 #include "ut_state.h"
+#include "interpreter_if.h"
 
 #include "lcd_menu.h"
 #include "lcd.h"
@@ -295,7 +296,20 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		eErr = chooseFile();
 	} while(eErr == NAVIGATE_CONTINUE);
 
-	if (eErr == NAVIGATE_END) xTaskNotifyGive( x_tn_usb_connected );
+	if (eErr == NAVIGATE_END)
+	{
+		tg_set_primary_source(XIO_DEV_USBFAT);
+		xio_close(cs.primary_src);
+		xio_open(cs.primary_src,0,0);
+		iif_func_enter = &iif_enter_filerunning;
+		iif_func_esc = &iif_esc_filerunning;
+		iif_func_down = &iif_down_filerunning;
+		iif_func_up = &iif_up_filerunning;
+		iif_func_left = &iif_left_filerunning;
+		iif_func_right = &iif_right_filerunning;
+		iif_func_released = &iif_released_filerunning;
+		xTaskNotifyGive( x_tn_usb_connected );
+	}
 
 	/* Go back to menu */
 	return STATE_MAIN_MENU;

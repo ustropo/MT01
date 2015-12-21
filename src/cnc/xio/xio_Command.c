@@ -115,9 +115,9 @@ int xio_gets_command(xioDev_t *d, char *buf, const int size)
 			return(XIO_OK);
 		}
 	}
-	*buf = '\n';
+	*buf++ = '\n';
 	dx->filebase_P = ++buffin;
-	//*buf = '\0';
+	*buf = '\0';
 	return(XIO_OK);
 }
 
