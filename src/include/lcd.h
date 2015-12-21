@@ -20,10 +20,8 @@
 #define SCREEN_FOOTER_ID	2
 
 extern void ut_lcd_init();
-extern void ut_lcd_clear(uint8_t screen_id);
-extern void ut_lcd_enableHeader(uint8_t enable);
-extern void ut_lcd_enableFooter(uint8_t enable);
-extern void ut_lcd_drawString(uint8_t screen_id, uint8_t line, uint8_t column, const char* text, uint8_t invert);
+extern void ut_lcd_clear();
+extern void ut_lcd_drawString(uint8_t line, uint8_t column, const char* text, uint8_t invert);
 extern void ut_lcd_output();
 
 #endif /* INCLUDE_LCD_H_ */

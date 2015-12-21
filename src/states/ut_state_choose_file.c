@@ -253,9 +253,8 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	if(eRes != TFAT_FR_OK)
 	{
 		/* Ask for user to insert usb */
-		ut_lcd_clear(SCREEN_HEADER_ID);
-		ut_lcd_clear(SCREEN_MAIN_ID);
-		ut_lcd_drawString(SCREEN_MAIN_ID, 1, 0, "  INSIRA USB  ", false);
+		ut_lcd_clear();
+		ut_lcd_drawString(1, 0, "  INSIRA USB  ", false);
 		ut_lcd_output();
 
 		/* Wait for USB to mount */
@@ -266,10 +265,9 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		/* If failed, show error message and return */
 		if(eRes != TFAT_FR_OK)
 		{
-			ut_lcd_clear(SCREEN_MAIN_ID);
-			ut_lcd_drawString(SCREEN_MAIN_ID, 1, 0, "NENHUM USB", false);
-			ut_lcd_drawString(SCREEN_MAIN_ID, 2, 0, "ENCONTRADO", false);
-
+			ut_lcd_clear();
+			ut_lcd_drawString(1, 0, "NENHUM USB", false);
+			ut_lcd_drawString(2, 0, "ENCONTRADO", false);
 			ut_lcd_output();
 
 			vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -279,11 +277,9 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	}
 
 	/* Fat is mounted */
-	ut_lcd_clear(SCREEN_MAIN_ID);
+	ut_lcd_clear();
 
 	/* Read */
-	ut_lcd_enableFooter(false);
-	ut_lcd_enableHeader(false);
 	ut_lcd_output();
 
 	/* Try to selected a file */

@@ -73,12 +73,12 @@ ut_state ut_state_warning(ut_context* pContext)
 	/* Loop through messages */
 	for(uiPage = 0; uiPage < WARNING_PAGES; uiPage++)
 	{
-		ut_lcd_clear(SCREEN_MAIN_ID);
+		ut_lcd_clear();
 
 		/* Write strings */
 		for(uiMsgRow = 0; uiMsgRow < MAX_ROW; uiMsgRow++)
 		{
-			ut_lcd_drawString(SCREEN_MAIN_ID, uiMsgRow, 0, gszWarningMsg[uiPage*MAX_ROW + uiMsgRow], false);
+			ut_lcd_drawString(uiMsgRow, 0, gszWarningMsg[uiPage*MAX_ROW + uiMsgRow], false);
 		}
 		/* Output */
 		ut_lcd_output();

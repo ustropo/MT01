@@ -12,29 +12,16 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct
-{
-	char invert;
-	char line[MAX_COLUMN + 1];
-} ut_frame_row;
-
-/**
- * Global types
- */
-typedef struct
-{
-	char enable_footer;
-	char enable_header;
-	ut_frame_row header;
-	ut_frame_row footer;
-	ut_frame_row buffer[MAX_ROW];
-} ut_frame_buffer;
+/* Check if background color is black/white */
+static uint8_t gaboBackColor[MAX_COLUMN * MAX_ROW];
+/* Frame buffer for lcd */
+static char gacChar[MAX_COLUMN * MAX_ROW];
 
 /**
  * Global variables
  */
 static u8g_t main_u8g;
-static ut_frame_buffer frames;
+
 
 /**
  *
@@ -55,133 +42,74 @@ void ut_lcd_init()
 	/* Prepare u8g lib */
 	u8g_InitComFn(&main_u8g, &u8g_dev_st7920_128x64_hw_spi, u8g_com_rx_hw_spi_fn);
 	u8g_prepare();
-	/* Disable all */
-	memset((void *)&frames, 0, sizeof(ut_frame_buffer));
+
+	/* Clean all */
+	ut_lcd_clear();
 }
 
 /**
  * Clear screen frame buffer
  * @param screen_id
  */
-void ut_lcd_clear(uint8_t screen_id)
+void ut_lcd_clear()
 {
-	uint8_t i = 0;
+	/* Clean all */
+	memset(gaboBackColor, 0, sizeof(gaboBackColor));
+	memset(gacChar, ' ', sizeof(gacChar));
+}
 
-	switch(screen_id)
+
+/**
+ *	Draw a string into internal buffer
+ *
+ * @param line		Line to be drawed (zero based index)
+ * @param column	Column (zero based index)
+ * @param text		String to draw.
+ * @param invert	Which color to draw (0 -> white / 1 -> black)
+ */
+void ut_lcd_drawString(uint8_t line, uint8_t column, const char* text, uint8_t invert)
+{
+	/* Check limits */
+	if(line >= MAX_ROW || column >= MAX_COLUMN) return;
+
+	/* Copy each char individually */
+	uint8_t index = line * MAX_COLUMN + column;
+	while(*text && column++ < MAX_COLUMN)
 	{
-	case SCREEN_FOOTER_ID:
-		memset(frames.footer.line, ' ', MAX_COLUMN);
-		frames.footer.line[MAX_COLUMN] = 0;
-		frames.footer.invert = false;
-		break;
-	case SCREEN_HEADER_ID:
-		memset(frames.header.line, ' ', MAX_COLUMN);
-		frames.footer.line[MAX_COLUMN] = 0;
-		frames.header.invert = false;
-		break;
-	case SCREEN_MAIN_ID:
-		for(i = 0; i < MAX_ROW; i++)
-		{
-			memset(&frames.buffer[i].line, ' ', MAX_COLUMN);
-			frames.footer.line[MAX_COLUMN] = 0;
-			frames.buffer[i].invert = false;
-		}
-		break;
+		gacChar[index] = *text++;
+		gaboBackColor[index++] = invert;
 	}
 }
 
-/**
- *
- * @param enable
- */
-void ut_lcd_enableHeader(uint8_t enable)
-{
-	frames.enable_header = enable;
-}
 
 /**
- *
- * @param enable
+ * Draw a single char into screen
+ * @param x				X position
+ * @param y				Y position
+ * @param w				Char width
+ * @param h				Char height
+ * @param invert		Background color
+ * @param glyph			Char
  */
-void ut_lcd_enableFooter(uint8_t enable)
+static uint8_t ut_lcd_draw_glyph(uint8_t x, uint8_t y, uint8_t h, uint8_t invert, char glyph)
 {
-	frames.enable_footer = enable;
-}
+	/* char width */
+	char szOnlyChar[2] = {0};
+	szOnlyChar[0] = glyph;
+	uint8_t w = u8g_GetStrWidth(&main_u8g, szOnlyChar);
 
-/**
- *
- * @param screen_id
- * @param line
- * @param column
- * @param text
- */
-void ut_lcd_drawString(uint8_t screen_id, uint8_t line, uint8_t column, const char* text, uint8_t invert)
-{
-
-	if(line >= MAX_ROW && column >= MAX_COLUMN) return;
-
-	switch(screen_id)
-	{
-	case SCREEN_MAIN_ID:
-		strncpy(&frames.buffer[line].line[column], text, MAX_COLUMN - column);
-		frames.buffer[line].invert = invert;
-		break;
-	case SCREEN_FOOTER_ID:
-		strncpy(&frames.footer.line[column], text, MAX_COLUMN - column);
-		frames.footer.invert = invert;
-		break;
-	case SCREEN_HEADER_ID:
-		strncpy(&frames.header.line[column], text, MAX_COLUMN - column);
-		frames.header.invert = invert;
-		break;
-	}
-}
-
-/**
- * Draw header
- */
-static void lcd_draw_header(uint8_t w, uint8_t h)
-{
+	/* Set background box */
 	u8g_SetColorIndex(&main_u8g, 1);
-	if(frames.header.invert)
+	if(invert)
 	{
-		u8g_DrawBox(&main_u8g, 0, 0, w, h);
+		u8g_DrawBox(&main_u8g, x, y, w, h);
 		u8g_SetColorIndex(&main_u8g, 0);
 	}
-	u8g_DrawStr(&main_u8g, 0, 0, frames.header.line);
-}
-
-/**
- *
- * @param w
- * @param h
- */
-static void lcd_draw_footer(uint8_t w, uint8_t h)
-{
-	u8g_SetColorIndex(&main_u8g, 1);
-	if(frames.footer.invert)
-	{
-		u8g_DrawBox(&main_u8g, 0, (MAX_ROW - 1) * h, w, h);
-		u8g_SetColorIndex(&main_u8g, 0);
-	}
-	u8g_DrawStr(&main_u8g, 0, (MAX_ROW - 1) * h, frames.footer.line);
-}
-
-/**
- *
- * @param line
- * @param w
- * @param h
- */
-static void lcd_draw_main(uint8_t offset, uint8_t line, uint8_t w, uint8_t h)
-{
-	u8g_SetColorIndex(&main_u8g, 1);
-	if(frames.buffer[line].invert)
-	{
-		u8g_DrawBox(&main_u8g, 0, (line + offset) * h, w, h);
-		u8g_SetColorIndex(&main_u8g, 0);
-	}
-	u8g_DrawStr(&main_u8g, 0, (line + offset) * h, frames.buffer[line].line);
+	/* Draw glyph */
+	y += main_u8g.font_calc_vref(&main_u8g);
+	u8g_draw_glyph(&main_u8g, x, y, glyph);
+	/* Return to future info */
+	return w;
 }
 
 /**
@@ -189,10 +117,7 @@ static void lcd_draw_main(uint8_t offset, uint8_t line, uint8_t w, uint8_t h)
  */
 void ut_lcd_output()
 {
-	uint8_t w = u8g_GetWidth(&main_u8g);
-	uint8_t offset = (frames.enable_header) ? 1 : 0;
-	uint8_t max = (frames.enable_footer) ? MAX_ROW - 1 : MAX_ROW;
-	uint8_t i;
+	uint8_t row, col, x, y, index;
 	uint8_t h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 
 	u8g_prepare();
@@ -201,14 +126,24 @@ void ut_lcd_output()
 	/* Picture loop */
 	do
 	{
-		/* Header */
-		if(frames.enable_header) lcd_draw_header(w, h);
+		/* Through all rows */
+		index = 0;
+		y = 0;
+		for(row = 0; row < MAX_ROW; row++)
+		{
+			x = 0;
+			/* Through all columns */
+			for(col = 0; col < MAX_COLUMN; col++)
+			{
+				/* Draw glyph */
+				x += ut_lcd_draw_glyph(x, y, h, gaboBackColor[index], gacChar[index]);
+				/* Next position */
+				index++;
+			}
 
-		/* Footer */
-		if(frames.enable_footer) lcd_draw_footer(w, h);
-
-		/* Main */
-		for(i = 0; (i + offset) < max; i++)	lcd_draw_main(offset, i, w, h);
+			/* Next position */
+			y += h;
+		}
 
 	} while(u8g_NextPage(&main_u8g));
 }
