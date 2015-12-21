@@ -72,6 +72,7 @@ void switch_init(void)
     IPR(ICU, IRQ2) = 5;            //Set interrupt priority
     IEN(ICU, IRQ2) = 1;            // Enable interrupt
     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
+    reset_switches();
 }
 
 #pragma interrupt IRQ2_isr(vect=VECT(ICU, IRQ2))
