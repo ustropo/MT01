@@ -123,6 +123,15 @@ static void _exec_spindle_control(float *value, float *flag)
 		spindle_enable_pin.clear();	// failsafe: any error causes stop
 	}
 #endif // __ARM
+#ifdef __RX
+	if (spindle_mode == SPINDLE_CW) {
+		TORCH = TRUE;
+	} else if (spindle_mode == SPINDLE_CCW) {
+		TORCH = FALSE;
+	} else {
+		TORCH = FALSE;
+	}
+#endif // __RX
 
 	// PWM spindle control
 	pwm_set_duty(PWM_1, cm_get_spindle_pwm(spindle_mode) );
