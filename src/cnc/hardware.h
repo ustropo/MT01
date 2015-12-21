@@ -145,6 +145,7 @@ extern "C"{
 #define PWMCH  		PORTA.PODR.BIT.B6
 
 #define TORCH  		PORTD.PODR.BIT.B7
+#define MATERIAL  	PORTD.PIDR.BIT.B2
 
 #define MOTOR_FOWARD	1
 #define MOTOR_REVERSE   0

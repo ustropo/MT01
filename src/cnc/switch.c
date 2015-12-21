@@ -64,8 +64,18 @@ static void _switch_isr_helper(uint8_t sw_num);
 
 void switch_init(void)
 {
-
+	R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_MPC);
+    PORTD.PMR.BYTE  = 0x40 ;
+    MPC.PD2PFS.BYTE = 0x40 ;    /* PD5 is a IRQ - HSENSE*/
+    ICU.IRQCR[2].BIT.IRQMD = 1;
+    IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
+    IPR(ICU, IRQ2) = 5;            //Set interrupt priority
+    IEN(ICU, IRQ2) = 1;            // Enable interrupt
+    R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
 }
+
+#pragma interrupt IRQ2_isr(vect=VECT(ICU, IRQ2))
+static void IRQ2_isr (void) {_switch_isr_helper(SW_MIN_Z);}
 
 /*
  * Switch closure processing routines
@@ -92,7 +102,32 @@ static void _switch_isr_helper(uint8_t sw_num)
 
 void switch_rtc_callback(void)
 {
+	for (uint8_t i=0; i < NUM_SWITCHES; i++) {
+		if (sw.mode[i] == SW_MODE_DISABLED || sw.debounce[i] == SW_IDLE)
+            continue;
 
+		if (++sw.count[i] == SW_LOCKOUT_TICKS) {		// state is either lockout or deglitching
+			sw.debounce[i] = SW_IDLE;
+            // check if the state has changed while we were in lockout...
+            uint8_t old_state = sw.state[i];
+            if(old_state != read_switch(i)) {
+                sw.debounce[i] = SW_DEGLITCHING;
+                sw.count[i] = -SW_DEGLITCH_TICKS;
+            }
+            continue;
+		}
+		if (sw.count[i] == 0) {							// trigger point
+			sw.sw_num_thrown = i;						// record number of thrown switch
+			sw.debounce[i] = SW_LOCKOUT;
+//			sw_show_switch();							// only called if __DEBUG enabled
+
+			if ((cm.cycle_state == CYCLE_HOMING) || (cm.cycle_state == CYCLE_PROBE)) {		// regardless of switch type
+				cm_request_feedhold();
+			} else if (sw.mode[i] & SW_LIMIT_BIT) {		// should be a limit switch, so fire it.
+				sw.limit_flag = true;					// triggers an emergency shutdown
+			}
+		}
+	}
 }
 
 /*
@@ -132,7 +167,14 @@ uint8_t read_switch(uint8_t sw_num)
 
 	uint8_t read = 0;
 	switch (sw_num) {
-
+//		case SW_MIN_X: { read = hw.sw_port[AXIS_X]->IN & SW_MIN_BIT_bm; break;}
+//		case SW_MAX_X: { read = hw.sw_port[AXIS_X]->IN & SW_MAX_BIT_bm; break;}
+//		case SW_MIN_Y: { read = hw.sw_port[AXIS_Y]->IN & SW_MIN_BIT_bm; break;}
+//		case SW_MAX_Y: { read = hw.sw_port[AXIS_Y]->IN & SW_MAX_BIT_bm; break;}
+		case SW_MIN_Z: { read = MATERIAL; break;}
+//		case SW_MAX_Z: { read = MATERIAL; break;}
+//		case SW_MIN_A: { read = hw.sw_port[AXIS_A]->IN & SW_MIN_BIT_bm; break;}
+//		case SW_MAX_A: { read = hw.sw_port[AXIS_A]->IN & SW_MAX_BIT_bm; break;}
 	}
 	if (sw.switch_type == SW_TYPE_NORMALLY_OPEN) {
 		sw.state[sw_num] = ((read == 0) ? SW_CLOSED : SW_OPEN);// confusing. An NO switch drives the pin LO when thrown

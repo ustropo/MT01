@@ -12,7 +12,9 @@ Includes   <System Includes> , "Project Includes"
 #include "keyboard.h"
 #include "lcd_menu.h"
 //#include "hardware.h"
-
+#include "tinyg.h"
+#include "config.h"
+#include "switch.h"
 
 #ifdef FREE_RTOS_PP
 #include "FreeRTOS.h"
@@ -64,6 +66,7 @@ void keyboard_task(void)
 	while(1)
 	{
 		vTaskDelay(30 / portTICK_RATE_MS);
+		switch_rtc_callback();					// switch debouncing
 		for (i = 0; i < 4; i++)
 		{
 			KCOL = col[i];

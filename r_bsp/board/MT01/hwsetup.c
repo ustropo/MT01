@@ -107,7 +107,7 @@ static void output_ports_configure(void)
 
      /* Port D -  CNC signals */
      PORTD.PODR.BYTE = 0x00 ;    /* All outputs low to start  	*/
-     PORTD.PDR.BYTE  = 0xF8 ;    /* PD0-PD2 inputs, PD3-PD7 outputs  */
+     PORTD.PDR.BYTE  = 0xD8 ;    /* PD0-PD2 and PD5 inputs, PD3-PD7 outputs  */
 
      /* Port E -  CNC signals*/
      PORTE.PODR.BYTE = 0x00 ;    /* All outputs low to start  */
