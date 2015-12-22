@@ -147,3 +147,12 @@ void ut_lcd_output()
 
 	} while(u8g_NextPage(&main_u8g));
 }
+
+void ut_lcd_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *bitmap)
+{
+	u8g_prepare();
+	u8g_FirstPage(&main_u8g);
+	do{
+		u8g_DrawXBMP(&main_u8g, x, y, w, h, bitmap);
+	} while(u8g_NextPage(&main_u8g));
+}

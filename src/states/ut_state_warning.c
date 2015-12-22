@@ -14,7 +14,7 @@
 #include "task.h"
 
 #define WARNING_PAGES	5
-#define PAGE_DELAY		500
+#define PAGE_DELAY		1000
 
 /**
  * Warning messages!
