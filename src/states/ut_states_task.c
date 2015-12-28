@@ -9,6 +9,7 @@
 #include "ut_context.h"
 #include "ut_state.h"
 #include "lcd.h"
+#include "interpreter_if.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -20,7 +21,7 @@ void states_task(void)
 {
 	ut_context pContext;
 	ut_state currentState = STATE_SPLASH;
-
+	iif_bind_idle();
 	/* Initialize context */
 	memset(&pContext, 0, sizeof(ut_context));
 

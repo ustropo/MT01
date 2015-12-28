@@ -34,6 +34,9 @@
 #include "encoder.h"
 #include "report.h"
 #include "util.h"
+
+#include "interpreter_if.h"
+
 /*
 #ifdef __cplusplus
 extern "C"{
@@ -181,6 +184,8 @@ stat_t mp_exec_aline(mpBuf_t *bf)
 #ifdef __JERK_EXEC
 		mr.jerk_div2 = bf->jerk/2;						// only needed by __JERK_EXEC
 #endif
+		if (bf->unit[2] != 0)
+			mp_plan_zmove_callback(bf);
 		mr.head_length = bf->head_length;
 		mr.body_length = bf->body_length;
 		mr.tail_length = bf->tail_length;
@@ -706,6 +711,18 @@ static stat_t _exec_aline_segment()
 		float segment_length = mr.segment_velocity * mr.segment_time;
 		for (i=0; i<AXES; i++) {
 			mr.gm.target[i] = mr.position[i] + (mr.unit[i] * segment_length);
+		}
+		if(zpbutton)
+		{
+			if (mr.unit[2] == 0)
+			{
+				// TODO: Interlock involving runtime_busy test
+				mr.gm.target[2] = mr.position[2] + 0.007;
+				mp_set_planner_position(2, mr.gm.target[2]);
+				mr.waypoint[SECTION_HEAD][2] = mr.gm.target[2];
+				mr.waypoint[SECTION_BODY][2] = mr.gm.target[2];
+				mr.waypoint[SECTION_TAIL][2] = mr.gm.target[2];
+			}
 		}
 	}
 

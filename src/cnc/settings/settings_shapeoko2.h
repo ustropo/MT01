@@ -118,12 +118,12 @@
 #define X_ZERO_BACKOFF			2					// xzb		mm
 
 #define Y_AXIS_MODE				AXIS_STANDARD
-#define Y_VELOCITY_MAX			3200
+#define Y_VELOCITY_MAX			10000
 #define Y_FEEDRATE_MAX			Y_VELOCITY_MAX
 #define Y_TRAVEL_MIN			0
 #define Y_TRAVEL_MAX			320
-#define Y_JERK_MAX				1000
-#define Y_JERK_HOMING			2000				// xjh
+#define Y_JERK_MAX				5000
+#define Y_JERK_HOMING			5000				// xjh
 #define Y_JUNCTION_DEVIATION	JUNCTION_DEVIATION
 #define Y_SWITCH_MODE_MIN		SW_MODE_HOMING
 #define Y_SWITCH_MODE_MAX		SW_MODE_DISABLED

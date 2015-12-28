@@ -27,13 +27,11 @@ extern iif_func_ptr iif_func_left;
 extern iif_func_ptr iif_func_right;
 extern iif_func_ptr iif_func_released;
 
-extern void iif_enter_filerunning(void);
-extern void iif_esc_filerunning(void);
-extern void iif_down_filerunning(void);
-extern void iif_up_filerunning(void);
-extern void iif_left_filerunning(void);
-extern void iif_right_filerunning(void);
-extern void iif_released_filerunning(void);
-void iif_idle(void);
+
+extern void iif_bind_filerunning(void);
+extern void iif_bind_jog(void);
+extern void iif_bind_idle(void);
+
+extern bool zpbutton;
 
 #endif /* INCLUDE_INTERPRETER_IF_H_ */

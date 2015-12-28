@@ -24,7 +24,6 @@
 // Global variables
 // ***********************************************************************
 char gszCurFile[MAX_FILE_PATH_SIZE];
-extern TaskHandle_t  x_tn_usb_connected;
 
 // ***********************************************************************
 // Internal variables
@@ -297,14 +296,7 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		tg_set_primary_source(XIO_DEV_USBFAT);
 		xio_close(cs.primary_src);
 		xio_open(cs.primary_src,0,0);
-		iif_func_enter = &iif_enter_filerunning;
-		iif_func_esc = &iif_esc_filerunning;
-		iif_func_down = &iif_down_filerunning;
-		iif_func_up = &iif_up_filerunning;
-		iif_func_left = &iif_left_filerunning;
-		iif_func_right = &iif_right_filerunning;
-		iif_func_released = &iif_released_filerunning;
-		xTaskNotifyGive( x_tn_usb_connected );
+		iif_bind_filerunning();
 	}
 
 	/* Go back to menu */
