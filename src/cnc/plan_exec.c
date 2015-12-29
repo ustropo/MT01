@@ -52,6 +52,8 @@ static stat_t _exec_aline_segment(void);
 static void _init_forward_diffs(float Vi, float Vt);
 #endif
 
+static bool zmoved = false;
+
 /*************************************************************************
  * mp_exec_move() - execute runtime functions to prep move for steppers
  *
@@ -184,8 +186,13 @@ stat_t mp_exec_aline(mpBuf_t *bf)
 #ifdef __JERK_EXEC
 		mr.jerk_div2 = bf->jerk/2;						// only needed by __JERK_EXEC
 #endif
-		if (bf->unit[2] != 0)
+		if (bf->unit[2] != 0 && zmoved)
+		{
+			bf->length = bf->length - mr.position[2];
 			mp_plan_zmove_callback(bf);
+			zmoved = false;
+		}
+
 		mr.head_length = bf->head_length;
 		mr.body_length = bf->body_length;
 		mr.tail_length = bf->tail_length;
@@ -716,12 +723,12 @@ static stat_t _exec_aline_segment()
 		{
 			if (mr.unit[2] == 0)
 			{
-				// TODO: Interlock involving runtime_busy test
 				mr.gm.target[2] = mr.position[2] + 0.007;
-				mp_set_planner_position(2, mr.gm.target[2]);
+				//mp_set_planner_position(2, mr.gm.target[2]);
 				mr.waypoint[SECTION_HEAD][2] = mr.gm.target[2];
 				mr.waypoint[SECTION_BODY][2] = mr.gm.target[2];
 				mr.waypoint[SECTION_TAIL][2] = mr.gm.target[2];
+				zmoved = true;
 			}
 		}
 	}
