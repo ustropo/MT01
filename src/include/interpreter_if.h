@@ -32,6 +32,6 @@ extern void iif_bind_filerunning(void);
 extern void iif_bind_jog(void);
 extern void iif_bind_idle(void);
 
-extern bool zpbutton;
+extern float zmove;
 
 #endif /* INCLUDE_INTERPRETER_IF_H_ */

@@ -20,9 +20,9 @@ static void iif_left_filerunning(void);
 static void iif_right_filerunning(void);
 static void iif_released_filerunning(void);
 
-bool zpbutton = false;
+float zmove = 0;
 void vTimerCallback( TimerHandle_t pxTimer );
-TimerHandle_t xTimers;
+TimerHandle_t xTimers[2];
 
 void iif_enter_filerunning(void)
 {
@@ -34,10 +34,26 @@ void iif_esc_filerunning(void)
 	cm_request_feedhold();
 }
 
-void iif_down_filerunning(void) {}
+void iif_down_filerunning(void) {
+	  xTimers[1] = xTimerCreate
+	                   (  /* Just a text name, not used by the RTOS kernel. */
+	                     "Timer 1",
+	                     /* The timer period in ticks, must be greater than 0. */
+	                     ( 100 ),
+	                     /* The timers will auto-reload themselves when they
+	                     expire. */
+	                     pdTRUE,
+	                     /* Assign each timer a unique id equal to its array
+	                     index. */
+	                     ( void * ) 1,
+	                     /* Each timer calls the same callback when it expires. */
+	                     vTimerCallback
+	                   );
+	  xTimerStart( xTimers[1], 0 );
+}
 void iif_up_filerunning(void)
 {
-	  xTimers = xTimerCreate
+	xTimers[0] = xTimerCreate
 	                   (  /* Just a text name, not used by the RTOS kernel. */
 	                     "Timer 0",
 	                     /* The timer period in ticks, must be greater than 0. */
@@ -51,14 +67,15 @@ void iif_up_filerunning(void)
 	                     /* Each timer calls the same callback when it expires. */
 	                     vTimerCallback
 	                   );
-	  xTimerStart( xTimers, 0 );
+	  xTimerStart( xTimers[0], 0 );
 }
 void iif_left_filerunning(void){}
 void iif_right_filerunning(void) {}
 void iif_released_filerunning(void)
 {
-	zpbutton = false;
-	xTimerStop(xTimers, 0 );
+	zmove = 0;
+	xTimerStop(xTimers[0], 0 );
+	xTimerStop(xTimers[1], 0 );
 }
 
 void iif_bind_filerunning(void)
@@ -74,6 +91,18 @@ void iif_bind_filerunning(void)
 
 void vTimerCallback( TimerHandle_t pxTimer )
 {
-	zpbutton = true;
-	nop();
+	long lArrayIndex;
+
+	/* Optionally do something if the pxTimer parameter is NULL. */
+	configASSERT( pxTimer );
+
+	/* Which timer expired? */
+	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
+	switch (lArrayIndex)
+	{
+		case 0: zmove = 0.007;
+		break;
+		case 1: zmove = -0.007;
+		break;
+	}
 }

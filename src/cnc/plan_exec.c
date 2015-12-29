@@ -719,11 +719,11 @@ static stat_t _exec_aline_segment()
 		for (i=0; i<AXES; i++) {
 			mr.gm.target[i] = mr.position[i] + (mr.unit[i] * segment_length);
 		}
-		if(zpbutton)
+		if(zmove != 0)
 		{
 			if (mr.unit[2] == 0)
 			{
-				mr.gm.target[2] = mr.position[2] + 0.007;
+				mr.gm.target[2] = mr.position[2] + zmove;
 				//mp_set_planner_position(2, mr.gm.target[2]);
 				mr.waypoint[SECTION_HEAD][2] = mr.gm.target[2];
 				mr.waypoint[SECTION_BODY][2] = mr.gm.target[2];
