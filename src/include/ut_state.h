@@ -22,6 +22,7 @@ typedef enum
 	STATE_CONFIG_MENU,
 	STATE_MANUAL_MODE,
 	STATE_AUTO_MODE,
+	STATE_CONFIG_VAR,
 	/* This should be always the last one! */
 	STATE_NUMBER
 } ut_state;
@@ -45,6 +46,7 @@ extern ut_state ut_state_warning(ut_context* pContext);
 extern ut_state ut_state_main_menu(ut_context* pContext);
 extern ut_state ut_state_choose_file(ut_context* pContext);
 extern ut_state ut_state_config_menu(ut_context* pContext);
+extern ut_state ut_state_config_var(ut_context* pContext);
 extern ut_state ut_state_manual_mode(ut_context* pContext);
 extern ut_state ut_state_auto_mode(ut_context* pContext);
 

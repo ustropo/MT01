@@ -33,11 +33,13 @@ static void updatePosition(const char* szTitle)
 
 	memset(text, 0, sizeof(text));
 
-	/* Should it really be cleared? */
-	ut_lcd_clear();
-
-	/* Title */
-	ut_lcd_drawString(0, 0, szTitle, false);
+	/* Display is only cleared once to improve performance */
+	if(szTitle)
+	{
+		ut_lcd_clear();
+		/* Title */
+		ut_lcd_drawString(0, 0, szTitle, false);
+	}
 
 	/* TODO: get position from machine */
 	x = mp_get_runtime_absolute_position(0);
@@ -87,7 +89,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 		}
 
 		/* Update position */
-		updatePosition(DEFAULT_MANUAL_TITLE);
+		updatePosition(NULL);
 	}
 
 	return STATE_MAIN_MENU;
@@ -124,7 +126,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		}
 
 		/* Update position */
-		updatePosition(DEFAULT_AUTO_TITLE);
+		updatePosition(NULL);
 	}
 
 		return STATE_MAIN_MENU;
