@@ -45,8 +45,8 @@ static const char* gszMainMenuTitle = "ESCOLHA UMA OPCAO:";
 static const ut_state geNextState[MAIN_MENU_NUMBER] =
 {
 	STATE_CHOOSE_FILE,
-	STATE_MAIN_MENU,
-	STATE_MAIN_MENU,
+	STATE_MANUAL_MODE,
+	STATE_AUTO_MODE,
 	STATE_MAIN_MENU,
 };
 

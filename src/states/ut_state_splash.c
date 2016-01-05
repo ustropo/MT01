@@ -75,20 +75,6 @@ static unsigned char metalique128_bits[] = {
 
 
 /**
- * Splash screen text
- */
-static const char* gszSplash[MAX_ROW] =
-{
-		/* "12345678901234567890" */
-		   "",
-		   "      METALIQUE     ",
-		   "",
-		   "     PLASMA  CNC    ",
-		   "    REVISAO  2.43   ",
-		   "",
-};
-
-/**
  * Execute a splash screen and
  * do some other initialization.
  *
@@ -97,18 +83,11 @@ static const char* gszSplash[MAX_ROW] =
  */
 ut_state ut_state_splash(ut_context* pContext)
 {
-	uint8_t i;
-
 	ut_lcd_clear();
 
 	/* Delay para a inicialização do Display */
 	vTaskDelay(10 / portTICK_PERIOD_MS);
 
-//	for(i = 0; i < MAX_ROW; i++)
-//	{
-//		ut_lcd_drawString(i, 0, gszSplash[i], false);
-//	}
-//	ut_lcd_output();
 	ut_lcd_bitmap(0,11,metalique128_width,metalique128_height,metalique128_bits);
 
 	/* Delay */

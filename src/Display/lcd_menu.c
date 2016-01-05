@@ -147,12 +147,10 @@ int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout)
 				menu_ptr->items[menu_ptr->selectedItem].callback_func(menu_ptr->selectedItem);
 			}
 			return menu_ptr->selectedItem;
-			break;
 
 		case KEY_ESC:
 			iif_func_esc();
 			return -1;
-			break;
 
 		case KEY_RELEASED:
 			iif_func_released();
