@@ -16,6 +16,8 @@
 
 #include "lcd.h"
 
+#include "planner.h"
+
 #define DEFAULT_UPDATE_TIMEOUT	1000
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMATICO"
@@ -27,7 +29,7 @@
 static void updatePosition(const char* szTitle)
 {
 	char text[MAX_COLUMN];
-	uint32_t x; uint32_t y; uint32_t z;
+	float x; float y; float z;
 
 	memset(text, 0, sizeof(text));
 
@@ -38,13 +40,15 @@ static void updatePosition(const char* szTitle)
 	ut_lcd_drawString(0, 0, szTitle, false);
 
 	/* TODO: get position from machine */
+	x = mp_get_runtime_absolute_position(0);
+	y = mp_get_runtime_absolute_position(1);
+	z = mp_get_runtime_absolute_position(2);
 
-
-	sprintf(text, "X: %10d", x);
+	sprintf(text, "X: %10.4f", x);
 	ut_lcd_drawString(2, 0, text, false);
-	sprintf(text, "Y: %10d", y);
+	sprintf(text, "Y: %10.4f", y);
 	ut_lcd_drawString(3, 0, text, false);
-	sprintf(text, "Z: %10d", z);
+	sprintf(text, "Z: %10.4f", z);
 	ut_lcd_drawString(4, 0, text, false);
 
 	/* Put it into screen */
