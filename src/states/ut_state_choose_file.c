@@ -293,10 +293,10 @@ ut_state ut_state_choose_file(ut_context* pContext)
 
 	if (eErr == NAVIGATE_END)
 	{
-		tg_set_primary_source(XIO_DEV_USBFAT);
-		xio_close(cs.primary_src);
-		xio_open(cs.primary_src,0,0);
-		iif_bind_filerunning();
+//		tg_set_primary_source(XIO_DEV_USBFAT);
+//		xio_close(cs.primary_src);
+//		xio_open(cs.primary_src,0,0);
+//		iif_bind_filerunning();
 	}
 
 	/* Go back to menu */

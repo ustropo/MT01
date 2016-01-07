@@ -17,12 +17,12 @@ static void iif_released_jog(void);
 
 const char jog_startxp[]= "\
 G21 G91\n\
-G01 X390.0 F7000\n\
+G01 X390.0 F4000\n\
 m30";
 
 const char jog_startxn[]= "\
 G21 G91\n\
-G01 X-390.0 F1000\n\
+G01 X-390.0 F4000\n\
 m30";
 
 const char jog_startyp[]= "\

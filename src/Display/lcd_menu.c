@@ -137,11 +137,6 @@ int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout)
 		case KEY_ENTER:
 			/* Callback function, if any */
 			iif_func_enter();
-			if(menu_ptr->selectedItem == 1)
-			{
-				tg_set_primary_source(XIO_DEV_COMMAND);
-				iif_bind_jog();
-			}
 			if(menu_ptr->items[menu_ptr->selectedItem].callback_func)
 			{
 				menu_ptr->items[menu_ptr->selectedItem].callback_func(menu_ptr->selectedItem);

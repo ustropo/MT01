@@ -10,6 +10,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "timers.h"
 
 #include "keyboard.h"
 #include "interpreter_if.h"
@@ -18,9 +19,12 @@
 
 #include "planner.h"
 
-#define DEFAULT_UPDATE_TIMEOUT	1000
+#define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMATICO"
+
+void vTimerUpdateCallback( TimerHandle_t pxTimer );
+TimerHandle_t TimerUpdate;
 
 /**
  * Update machine position
@@ -70,6 +74,23 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 
 	/* Clear display */
 	updatePosition(DEFAULT_MANUAL_TITLE);
+	tg_set_primary_source(XIO_DEV_COMMAND);
+	iif_bind_jog();
+	TimerUpdate = xTimerCreate
+				   (  /* Just a text name, not used by the RTOS kernel. */
+					 "Timer Update",
+					 /* The timer period in ticks, must be greater than 0. */
+					 ( 200 ),
+					 /* The timers will auto-reload themselves when they
+					 expire. */
+					 pdTRUE,
+					 /* Assign each timer a unique id equal to its array
+					 index. */
+					 ( void * ) 2,
+					 /* Each timer calls the same callback when it expires. */
+					 vTimerUpdateCallback
+				   );
+	xTimerStart( TimerUpdate, 0 );
 
 	while(true)
 	{
@@ -80,16 +101,37 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 		/* Check which key */
 		switch (keyEntry)
 		{
+		case KEY_DOWN:
+			iif_func_down();
+			break;
+
+		case KEY_UP:
+			iif_func_up();
+			break;
+
+		case KEY_RIGHT:
+			iif_func_right();
+			break;
+
+		case KEY_LEFT:
+			iif_func_left();
+			break;
+
 		case KEY_ESC:
+			xTimerStop( TimerUpdate, 0 );
+			iif_bind_idle();
 			return STATE_MAIN_MENU;
 
+		case KEY_RELEASED:
+			iif_func_released();
+			break;
 		/* TODO: operate machine - with other keys */
 		default:
 			break;
 		}
 
 		/* Update position */
-		updatePosition(NULL);
+	//	updatePosition(NULL);
 	}
 
 	return STATE_MAIN_MENU;
@@ -104,9 +146,29 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 ut_state ut_state_auto_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
+	uint8_t lstop = 0;
 
 	/* Clear display */
 	updatePosition(DEFAULT_AUTO_TITLE);
+	TimerUpdate = xTimerCreate
+				   (  /* Just a text name, not used by the RTOS kernel. */
+					 "Timer Update",
+					 /* The timer period in ticks, must be greater than 0. */
+					 ( 200 ),
+					 /* The timers will auto-reload themselves when they
+					 expire. */
+					 pdTRUE,
+					 /* Assign each timer a unique id equal to its array
+					 index. */
+					 ( void * ) 2,
+					 /* Each timer calls the same callback when it expires. */
+					 vTimerUpdateCallback
+				   );
+	xTimerStart( TimerUpdate, 0 );
+	tg_set_primary_source(XIO_DEV_USBFAT);
+	xio_close(cs.primary_src);
+	xio_open(cs.primary_src,0,0);
+	iif_bind_filerunning();
 
 	while(true)
 	{
@@ -117,19 +179,52 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		/* Check which key */
 		switch (keyEntry)
 		{
-		case KEY_ESC:
-			return STATE_MAIN_MENU;
+		case KEY_DOWN:
+			iif_func_down();
+			break;
 
-			/* TODO: operate machine in auto mode*/
+		case KEY_UP:
+			iif_func_up();
+			break;
+
+		case KEY_RIGHT:
+			iif_func_right();
+			break;
+
+		case KEY_LEFT:
+			iif_func_left();
+			break;
+
+		case KEY_ENTER:
+			if (lstop == 1)
+			{
+				iif_func_enter();
+				lstop = 0;
+			}
+			break;
+
+		case KEY_ESC:
+			xTimerStop( TimerUpdate, 0 );
+			iif_bind_idle();
+			return STATE_MAIN_MENU;
+			break;
+
+		case KEY_RELEASED:
+			iif_func_released();
+			break;
+		/* TODO: operate machine - with other keys */
 		default:
 			break;
 		}
 
 		/* Update position */
-		updatePosition(NULL);
+	//	updatePosition(NULL);
 	}
 
-		return STATE_MAIN_MENU;
-
 	return STATE_MAIN_MENU;
+}
+
+void vTimerUpdateCallback( TimerHandle_t pxTimer )
+{
+	updatePosition(NULL);
 }
