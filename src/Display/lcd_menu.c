@@ -81,20 +81,24 @@ void ut_menu_show(ut_menu* menu_ptr)
 	if(menu_ptr->boShowTitle)
 	{
 		/* Clear previous data */
-		ut_lcd_clear();
+	//	ut_lcd_clear();
+		ut_lcd_clear_str();
 		/* Copy data */
-		ut_lcd_drawString(row++, 0, menu_ptr->title, true);
+	//	ut_lcd_drawString(row++, 0, menu_ptr->title, true);
+		ut_lcd_drawStr(row++, 0, menu_ptr->title, BACKGROUND_FRAMED);
 	}
 
 	/* Items */
 	uint8_t menuItem = menu_ptr->offset;
 	for(; (menuItem < menu_ptr->numItems) && row < menu_ptr->maxItemsPerPage; row++, menuItem++)
 	{
-		ut_lcd_drawString(row, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem));
+	//	ut_lcd_drawString(row, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem));
+		ut_lcd_drawStr(row, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem));
 	}
 
 	/* Put on screen */
-	ut_lcd_output();
+	//ut_lcd_output();
+	ut_lcd_output_str();
 }
 
 /**

@@ -23,39 +23,39 @@ static const char* gszWarningMsg[MAX_ROW * WARNING_PAGES] =
 {
 		/* "12345678901234567890" */
 		   "        AVISO!      ",
-		   "",
+		   "                    ",
 		   "   SOMENTE PESSOAL  ",
 		   "    TREINADO PODE   ",
 		   "    UTILIZAR ESTE   ",
 		   "     EQUIPAMENTO.   ",
 		   /* Page 2 */
 		   "        AVISO!      ",
-		   "",
+		   "                    ",
 		   "  LEIA E ENTENDA O  ",
 		   "MANUAL DE INSTRUCOES",
 		   "  ANTES DE OPERAR.  ",
-		   "",
+		   "                    ",
 		   /* Page 3 */
 		   "        AVISO!      ",
-		   "",
+		   "                    ",
 		   "   RISCO DE DANOS,  ",
 		   " ACIDENTES E MORTES.",
 		   "  CUIDADO COM MAOS  ",
 		   "      E DEDOS.      ",
 		   /* Page 4 */
 		   "        AVISO!      ",
-		   "",
+		   "                    ",
 		   "   AO MOVIMENTAR E  ",
 		   "CORTAR, AFASTE-SE DO",
 		   "  CABECOTE E TOCHA  ",
 		   "      PLASMA.       ",
 		   /* Page 5 */
 		   "        AVISO!      ",
-		   "",
+		   "                    ",
 		   "  USE SEMPRE EPI E  ",
 		   "   LEIA O MANUAL.   ",
-		   "",
-		   "",
+		   "                    ",
+		   "                    ",
 
 };
 
@@ -78,10 +78,10 @@ ut_state ut_state_warning(ut_context* pContext)
 		/* Write strings */
 		for(uiMsgRow = 0; uiMsgRow < MAX_ROW; uiMsgRow++)
 		{
-			ut_lcd_drawString(uiMsgRow, 0, gszWarningMsg[uiPage*MAX_ROW + uiMsgRow], false);
+			ut_lcd_drawStr(uiMsgRow, 0, gszWarningMsg[uiPage*MAX_ROW + uiMsgRow], false);
 		}
 		/* Output */
-		ut_lcd_output();
+		ut_lcd_output_str();
 
 		/* Delay */
 		vTaskDelay(PAGE_DELAY / portTICK_PERIOD_MS);

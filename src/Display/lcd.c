@@ -17,6 +17,9 @@ static uint8_t gaboBackColor[MAX_COLUMN * MAX_ROW];
 /* Frame buffer for lcd */
 static char gacChar[MAX_COLUMN * MAX_ROW];
 
+static const char* gacStr[MAX_ROW];
+static uint8_t gaboBackColorStr[MAX_ROW];
+
 /**
  * Global variables
  */
@@ -58,6 +61,17 @@ void ut_lcd_clear()
 	memset(gacChar, ' ', sizeof(gacChar));
 }
 
+/**
+ * Clear screen frame buffer
+ * @param screen_id
+ */
+void ut_lcd_clear_str()
+{
+	/* Clean all */
+	memset(gaboBackColorStr, 0, sizeof(gaboBackColorStr));
+	memset(gacStr, '\n', sizeof(gacStr));
+}
+
 
 /**
  *	Draw a string into internal buffer
@@ -79,6 +93,24 @@ void ut_lcd_drawString(uint8_t line, uint8_t column, const char* text, uint8_t i
 		gacChar[index] = *text++;
 		gaboBackColor[index++] = invert;
 	}
+}
+
+/**
+ *	Draw a string into internal buffer
+ *
+ * @param line		Line to be drawed (zero based index)
+ * @param column	Column (zero based index)
+ * @param text		String to draw.
+ * @param invert	Which color to draw (0 -> white / 1 -> black)
+ */
+void ut_lcd_drawStr(uint8_t line, uint8_t column, const char* text, uint8_t invert)
+{
+	/* Check limits */
+	if(line >= MAX_ROW || column >= MAX_COLUMN) return;
+
+	/* Copy each char individually */
+	gacStr[line] = text;
+	gaboBackColorStr[line] = invert;
 }
 
 
@@ -103,11 +135,56 @@ static uint8_t ut_lcd_draw_glyph(uint8_t x, uint8_t y, uint8_t h, uint8_t invert
 	if(invert)
 	{
 		u8g_DrawBox(&main_u8g, x, y, w, h);
+		//u8g_DrawFrame(&main_u8g, x, y, w, h);
 		u8g_SetColorIndex(&main_u8g, 0);
 	}
 	/* Draw glyph */
 	y += main_u8g.font_calc_vref(&main_u8g);
 	u8g_draw_glyph(&main_u8g, x, y, glyph);
+	/* Return to future info */
+	return w;
+}
+
+/**
+ * Draw a single char into screen
+ * @param x				X position
+ * @param y				Y position
+ * @param w				Char width
+ * @param h				Char height
+ * @param invert		Background color
+ * @param glyph			Char
+ */
+static uint8_t ut_lcd_draw_str(uint8_t x, uint8_t y, uint8_t h, uint8_t invert, const char* str)
+{
+
+	uint8_t w = u8g_GetStrWidth(&main_u8g, str);
+
+	/* Set background box */
+	u8g_SetColorIndex(&main_u8g, 1);
+	switch(invert)
+	{
+	case BACKGROUND_NORMAL:
+		break;
+	case BACKGROUND_INVERTED: u8g_DrawBox(&main_u8g, x, y, w, h);
+							  u8g_SetColorIndex(&main_u8g, 0);
+		break;
+	case BACKGROUND_FRAMED: u8g_DrawFrame(&main_u8g, x, y, 128, h);
+		break;
+	}
+//	if(invert)
+//	{
+//		if (y == 0)
+//		{
+//			u8g_DrawFrame(&main_u8g, x, y, 128, h);
+//		}
+//		else
+//		{
+//			u8g_DrawBox(&main_u8g, x, y, w, h);
+//			u8g_SetColorIndex(&main_u8g, 0);
+//		}
+//	}
+	/* Draw Str */
+	u8g_DrawStr(&main_u8g, x, y, str);
 	/* Return to future info */
 	return w;
 }
@@ -140,6 +217,33 @@ void ut_lcd_output()
 				/* Next position */
 				index++;
 			}
+
+			/* Next position */
+			y += h;
+		}
+
+	} while(u8g_NextPage(&main_u8g));
+}
+
+void ut_lcd_output_str()
+{
+	uint8_t row, x, y;
+	uint8_t h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+
+	u8g_prepare();
+	u8g_FirstPage(&main_u8g);
+
+	/* Picture loop */
+	do
+	{
+		/* Through all rows */
+		y = 0;
+		for(row = 0; row < MAX_ROW; row++)
+		{
+			x = 0;
+			/* Through all columns */
+				/* Draw glyph */
+			x = ut_lcd_draw_str(x, y, h, gaboBackColorStr[row], gacStr[row]);
 
 			/* Next position */
 			y += h;

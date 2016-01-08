@@ -46,7 +46,7 @@ static char* init_names[CONFIG_MAX] =
 	"Teste disparo"
 };
 
-static const char* gszConfigMenuTitle = "ESCOLHA UMA OPCAO:";
+static const char* gszConfigMenuTitle = "  ESCOLHA UMA OPCAO:";
 
 /**
  * Initialize config array

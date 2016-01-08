@@ -19,10 +19,17 @@
 #define SCREEN_MAIN_ID		1
 #define SCREEN_FOOTER_ID	2
 
+#define BACKGROUND_NORMAL	0
+#define BACKGROUND_INVERTED	1
+#define BACKGROUND_FRAMED	2
+
 extern void ut_lcd_init();
 extern void ut_lcd_clear();
+extern void ut_lcd_clear_str();
 extern void ut_lcd_drawString(uint8_t line, uint8_t column, const char* text, uint8_t invert);
+extern void ut_lcd_drawStr(uint8_t line, uint8_t column, const char* text, uint8_t invert);
 extern void ut_lcd_output();
+extern void ut_lcd_output_str();
 extern void ut_lcd_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *bitmap);
 
 #endif /* INCLUDE_LCD_H_ */

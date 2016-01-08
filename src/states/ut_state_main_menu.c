@@ -37,7 +37,7 @@ static const char* gszMainMenuLabels[MAIN_MENU_NUMBER] =
 	"MODO AUTOMATICO",
 	"CONFIGURACAO",
 };
-static const char* gszMainMenuTitle = "ESCOLHA UMA OPCAO:";
+static const char* gszMainMenuTitle = "  ESCOLHA UMA OPCAO:";
 
 /**
  * Next states
