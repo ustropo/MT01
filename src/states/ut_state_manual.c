@@ -21,7 +21,7 @@
 
 #define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
-#define DEFAULT_AUTO_TITLE		"MODO AUTOMATICO"
+#define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
 
 void vTimerUpdateCallback( TimerHandle_t pxTimer );
 TimerHandle_t TimerUpdate;

@@ -171,18 +171,6 @@ static uint8_t ut_lcd_draw_str(uint8_t x, uint8_t y, uint8_t h, uint8_t invert, 
 	case BACKGROUND_FRAMED: u8g_DrawFrame(&main_u8g, x, y, 128, h);
 		break;
 	}
-//	if(invert)
-//	{
-//		if (y == 0)
-//		{
-//			u8g_DrawFrame(&main_u8g, x, y, 128, h);
-//		}
-//		else
-//		{
-//			u8g_DrawBox(&main_u8g, x, y, w, h);
-//			u8g_SetColorIndex(&main_u8g, 0);
-//		}
-//	}
 	/* Draw Str */
 	u8g_DrawStr(&main_u8g, x, y, str);
 	/* Return to future info */

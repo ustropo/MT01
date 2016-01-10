@@ -32,7 +32,7 @@ static const char* gszWarningMsg[MAX_ROW * WARNING_PAGES] =
 		   "        AVISO!      ",
 		   "                    ",
 		   "  LEIA E ENTENDA O  ",
-		   "MANUAL DE INSTRUCOES",
+		   "MANUAL DE INSTRUÇÕES",
 		   "  ANTES DE OPERAR.  ",
 		   "                    ",
 		   /* Page 3 */
@@ -40,7 +40,7 @@ static const char* gszWarningMsg[MAX_ROW * WARNING_PAGES] =
 		   "                    ",
 		   "   RISCO DE DANOS,  ",
 		   " ACIDENTES E MORTES.",
-		   "  CUIDADO COM MAOS  ",
+		   "  CUIDADO COM MÃOS  ",
 		   "      E DEDOS.      ",
 		   /* Page 4 */
 		   "        AVISO!      ",
