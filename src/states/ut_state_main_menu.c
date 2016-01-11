@@ -32,12 +32,12 @@ typedef enum
  */
 static const char* gszMainMenuLabels[MAIN_MENU_NUMBER] =
 {
-	"LER ARQUIVO DE CORTE",
-	"MODO MANUAL",
-	"CORTE AUTOM햀ICO",
-	"CONFIGURA플O DE CORTE",
+	" CARREGAR ARQUIVO",
+	" MODO MANUAL",
+	" CORTE AUTOM햀ICO",
+	" CONFIG. DE CORTE",
 };
-static const char* gszMainMenuTitle = "  ESCOLHA UMA OP플O:";
+static const char* gszMainMenuTitle = "ESCOLHA UMA OP플O:";
 
 /**
  * Next states

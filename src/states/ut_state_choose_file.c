@@ -23,7 +23,10 @@
 // ***********************************************************************
 // Global variables
 // ***********************************************************************
+FATFS  st_usb_fatfs;
+DIR	   st_usb_dir;
 char gszCurFile[MAX_FILE_PATH_SIZE];
+extern bool drivemountFlag;
 
 // ***********************************************************************
 // Internal variables
@@ -239,40 +242,27 @@ static ut_fs_navigate chooseFile()
  */
 ut_state ut_state_choose_file(ut_context* pContext)
 {
-	FATFS  st_usb_fatfs;
-	DIR	 st_usb_dir;
 	FRESULT eRes;
 
 	/* Root dir */
 	memset(gszCurFile, 0, sizeof(gszCurFile));
 	strcpy(gszCurFile, USB_ROOT);
 
+	if (drivemountFlag)
+	{
 	/* Check if usb is mounted */
 	eRes = R_tfat_f_opendir(&st_usb_dir, USB_ROOT);
-	if(eRes != TFAT_FR_OK)
+	}
+	else
 	{
-		/* Ask for user to insert usb */
 		ut_lcd_clear();
-		ut_lcd_drawString(1, 0, "  INSIRA USB  ", false);
+		ut_lcd_drawString(2, 5, "NENHUM USB", false);
+		ut_lcd_drawString(3, 5, "ENCONTRADO", false);
 		ut_lcd_output();
 
-		/* Wait for USB to mount */
-		ulTaskNotifyTake(pdFALSE, 20000 / portTICK_PERIOD_MS);
-		eRes = R_tfat_f_mount(0, &st_usb_fatfs);
-		eRes = R_tfat_f_opendir(&st_usb_dir, USB_ROOT);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-		/* If failed, show error message and return */
-		if(eRes != TFAT_FR_OK)
-		{
-			ut_lcd_clear();
-			ut_lcd_drawString(1, 0, "NENHUM USB", false);
-			ut_lcd_drawString(2, 0, "ENCONTRADO", false);
-			ut_lcd_output();
-
-			vTaskDelay(2000 / portTICK_PERIOD_MS);
-
-			return STATE_MAIN_MENU;
-		}
+		return STATE_MAIN_MENU;
 	}
 
 	/* Fat is mounted */

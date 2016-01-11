@@ -62,8 +62,9 @@ Section    <Section Definition> , "Data Sections"
 Private global variables and functions
 ******************************************************************************/
 uint16_t    usb_ghmsc_SmpAplProcess = USB_HMSC_WAIT;
-FATFS       usb_gFatfs;
+extern FATFS  st_usb_fatfs;
 uint8_t     usb_gBuf[512];
+bool drivemountFlag = false;
 
 const uint16_t usb_gapl_devicetpl[] =
 {
@@ -466,10 +467,10 @@ void usb_hmsc_SampleAplTask(void)
             /* Mount to the file system */
         case USB_HMSC_DRIVEMOUNT:
         	/* File system media work area memory mount. */
-        	//res = R_tfat_f_mount(0, &usb_gFatfs);
+        	res = R_tfat_f_mount(0, &st_usb_fatfs);
             /* Notify the task that the transmission is complete. */
-        	xTaskNotifyGive( task_main_handle );
-
+        //	xTaskNotifyGive( task_main_handle );
+        	drivemountFlag = true;
 //        	if( res != TFAT_FR_OK )
 //        	{
 //        		USB_PRINTF1("R_tfat_f_mount error: %d\n", res);
