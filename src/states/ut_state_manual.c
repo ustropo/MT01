@@ -50,11 +50,11 @@ static void updatePosition(const char* szTitle)
 	y = mp_get_runtime_absolute_position(1);
 	z = mp_get_runtime_absolute_position(2);
 
-	sprintf(text, "X: %10.4f", x);
+	sprintf(text, "X: %10.4f mm", x);
 	ut_lcd_drawString(2, 0, text, false);
-	sprintf(text, "Y: %10.4f", y);
+	sprintf(text, "Y: %10.4f mm", y);
 	ut_lcd_drawString(3, 0, text, false);
-	sprintf(text, "Z: %10.4f", z);
+	sprintf(text, "Z: %10.4f mm", z);
 	ut_lcd_drawString(4, 0, text, false);
 
 	/* Put it into screen */
