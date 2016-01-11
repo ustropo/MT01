@@ -20,7 +20,7 @@
 typedef enum
 {
 	MAIN_MENU_FILE = 0,	//!< MAIN_MENU_FILE
-	MAIN_MENU_MANUAL,  	//!< MAIN_MENU_MANUAL
+	MAIN_MENU_CONFIG_MANUAL,  	//!< MAIN_MENU_MANUAL
 	MAIN_MENU_AUTO,    	//!< MAIN_MENU_AUTO
 	MAIN_MENU_CONFIG,   //!< MAIN_MENU_CONFIG
 	/* Insert options before */
@@ -45,7 +45,7 @@ static const char* gszMainMenuTitle = "PRINCIPAL";
 static const ut_state geNextState[MAIN_MENU_NUMBER] =
 {
 	STATE_CHOOSE_FILE,
-	STATE_MANUAL_MODE,
+	STATE_CONFIG_MANUAL_MODE,
 	STATE_AUTO_MODE,
 	STATE_CONFIG_MENU,
 };

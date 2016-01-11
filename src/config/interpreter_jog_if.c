@@ -49,10 +49,10 @@ void iif_esc_jog(void)
 	iif_bind_idle();
 }
 
-void iif_down_jog(void) { xio_open(cs.primary_src,jog_startxp,0);}
-void iif_up_jog(void) { xio_open(cs.primary_src,jog_startxn,0);}
-void iif_left_jog(void){ xio_open(cs.primary_src,jog_startyp,0);}
-void iif_right_jog(void) { xio_open(cs.primary_src,jog_startyn,0);}
+void iif_down_jog(void) { xio_open(cs.primary_src,jog_startyp,0);}
+void iif_up_jog(void) { xio_open(cs.primary_src,jog_startyn,0);}
+void iif_left_jog(void){ xio_open(cs.primary_src,jog_startxp,0);}
+void iif_right_jog(void) { xio_open(cs.primary_src,jog_startxn,0);}
 void iif_released_jog(void) { xio_open(cs.primary_src,jog_stopflush,0);}
 
 void iif_bind_jog(void)

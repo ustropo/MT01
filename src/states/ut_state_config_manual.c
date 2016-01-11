@@ -24,6 +24,11 @@
 ut_config_var configs_manual[CONFIG_MAX];
 static bool initialized = false;
 
+static const ut_state geNextStateManual[1] =
+{
+	STATE_MANUAL_MODE
+};
+
 /* Initial values for each config variable */
 static ut_config_type init_types[CONFIG_MAX] =
 {
@@ -61,7 +66,7 @@ static void init()
 	if(initialized) return;
 
 	/* Zero all values */
-	memset(configs, 0, sizeof(configs));
+	memset(configs_manual, 0, sizeof(configs_manual));
 
 	/* Initialize all variables */
 	for(i = 0; i < CONFIG_MAX; i++)
@@ -109,5 +114,6 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 
 	/* Set selected item */
 	pContext->tag = config_menu.selectedItem;
-	return STATE_CONFIG_VAR;
+	return geNextStateManual[config_menu.selectedItem];
+	//return STATE_CONFIG_VAR;
 }
