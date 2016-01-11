@@ -18,6 +18,8 @@ static void iif_down_filerunning(void);
 static void iif_up_filerunning(void);
 static void iif_left_filerunning(void);
 static void iif_right_filerunning(void);
+static void iif_zdown_filerunning(void);
+static void iif_zup_filerunning(void);
 static void iif_released_filerunning(void);
 
 float zmove = 0;
@@ -71,6 +73,8 @@ void iif_up_filerunning(void)
 }
 void iif_left_filerunning(void){}
 void iif_right_filerunning(void) {}
+void iif_zdown_filerunning(void){}
+void iif_zup_filerunning(void){}
 void iif_released_filerunning(void)
 {
 	zmove = 0;
@@ -86,6 +90,8 @@ void iif_bind_filerunning(void)
 	iif_func_up = &iif_up_filerunning;
 	iif_func_left = &iif_left_filerunning;
 	iif_func_right = &iif_right_filerunning;
+	iif_func_zdown = &iif_zdown_filerunning;
+	iif_func_zup = &iif_zup_filerunning;
 	iif_func_released = &iif_released_filerunning;
 }
 

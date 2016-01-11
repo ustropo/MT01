@@ -25,6 +25,8 @@ extern iif_func_ptr iif_func_down;
 extern iif_func_ptr iif_func_up;
 extern iif_func_ptr iif_func_left;
 extern iif_func_ptr iif_func_right;
+extern iif_func_ptr iif_func_zdown;
+extern iif_func_ptr iif_func_zup;
 extern iif_func_ptr iif_func_released;
 
 

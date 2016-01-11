@@ -117,6 +117,14 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 			iif_func_left();
 			break;
 
+		case KEY_Z_UP:
+			iif_func_zup();
+			break;
+
+		case KEY_Z_DOWN:
+			iif_func_zdown();
+			break;
+
 		case KEY_ESC:
 			xTimerStop( TimerUpdate, 0 );
 			iif_bind_idle();
@@ -193,6 +201,14 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 
 		case KEY_LEFT:
 			iif_func_left();
+			break;
+
+		case KEY_Z_UP:
+			iif_func_zup();
+			break;
+
+		case KEY_Z_DOWN:
+			iif_func_zdown();
 			break;
 
 		case KEY_ENTER:

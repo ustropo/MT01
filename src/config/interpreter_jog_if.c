@@ -13,6 +13,8 @@ static void iif_down_jog(void);
 static void iif_up_jog(void);
 static void iif_left_jog(void);
 static void iif_right_jog(void);
+static void iif_zdown_jog(void);
+static void iif_zup_jog(void);
 static void iif_released_jog(void);
 
 const char jog_startxp[]= "\
@@ -35,6 +37,16 @@ G21 G91\n\
 G01 Y-390.0 F4000\n\
 m30";
 
+const char jog_startzp[]= "\
+G21 G91\n\
+G01 Z390.0 F4000\n\
+m30";
+
+const char jog_startzn[]= "\
+G21 G91\n\
+G01 Z-390.0 F4000\n\
+m30";
+
 const char jog_stopflush[]= "\
 !\n\
 %";
@@ -53,6 +65,8 @@ void iif_down_jog(void) { xio_open(cs.primary_src,jog_startyp,0);}
 void iif_up_jog(void) { xio_open(cs.primary_src,jog_startyn,0);}
 void iif_left_jog(void){ xio_open(cs.primary_src,jog_startxp,0);}
 void iif_right_jog(void) { xio_open(cs.primary_src,jog_startxn,0);}
+void iif_zdown_jog(void){ xio_open(cs.primary_src,jog_startzn,0);}
+void iif_zup_jog(void) { xio_open(cs.primary_src,jog_startzp,0);}
 void iif_released_jog(void) { xio_open(cs.primary_src,jog_stopflush,0);}
 
 void iif_bind_jog(void)
@@ -63,5 +77,7 @@ void iif_bind_jog(void)
 	iif_func_up = &iif_up_jog;
 	iif_func_left = &iif_left_jog;
 	iif_func_right = &iif_right_jog;
+	iif_func_zdown = &iif_zdown_jog;
+	iif_func_zup = &iif_zup_jog;
 	iif_func_released = &iif_released_jog;
 }

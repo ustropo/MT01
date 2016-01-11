@@ -25,6 +25,8 @@ Macro definitions
 #define KEY_LEFT	(0x20000000U)
 #define KEY_ESC		(0x40000U)
 #define KEY_ENTER 	(0x100000U)
+#define KEY_Z_UP 	(0x4000000U)
+#define KEY_Z_DOWN 	(0x10000000U)
 #define KEY_RELEASED (0)
 /******************************************************************************
 Section    <Section Definition> , "Data Sections"

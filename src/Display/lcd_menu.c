@@ -138,6 +138,14 @@ int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout)
 			iif_func_left();
 			break;
 
+		case KEY_Z_UP:
+			iif_func_zup();
+			break;
+
+		case KEY_Z_DOWN:
+			iif_func_zdown();
+			break;
+
 		case KEY_ENTER:
 			/* Callback function, if any */
 			iif_func_enter();
