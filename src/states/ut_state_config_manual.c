@@ -7,7 +7,7 @@
 
 #include "ut_context.h"
 #include "ut_state.h"
-#include "ut_state_config.h"
+#include "ut_state_config_manual.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -21,7 +21,7 @@
 #define DEFAULT_CONFIG_TIMEOUT	30000
 
 /* Array with all config variables */
-ut_config_var configs[CONFIG_MAX];
+ut_config_var configs_manual[CONFIG_MAX];
 static bool initialized = false;
 
 /* Initial values for each config variable */
@@ -41,12 +41,14 @@ static uint32_t init_values[CONFIG_MAX] =
 
 static char* init_names[CONFIG_MAX] =
 {
-	" JOG LENTO",
-	" JOG RÁPIDO",
-	" TESTE DISPARO"
+	" MODO MANUAL",
+	" ZERAR EIXOS",
+	" DESLOCAR PARA ZERO",
+	" JOG RÁPIDO E LENTO ",
+	" VELOCIDADES DE JOG"
 };
 
-static const char* gszConfigMenuTitle = "CONFIG. DE CORTE";
+static const char* gszConfigMenuTitle = "CONFIG. MANUAL";
 
 /**
  * Initialize config array
@@ -64,9 +66,9 @@ static void init()
 	/* Initialize all variables */
 	for(i = 0; i < CONFIG_MAX; i++)
 	{
-		configs[i].type = init_types[i];
-		configs[i].value = init_values[i];
-		configs[i].name = init_names[i];
+		configs_manual[i].type = init_types[i];
+		configs_manual[i].value = init_values[i];
+		configs_manual[i].name = init_names[i];
 	}
 
 	initialized = true;
@@ -78,7 +80,8 @@ static void init()
  * @param pContext Context object
  * @return Main menu state
  */
-ut_state ut_state_config_menu(ut_context* pContext)
+//ut_state ut_state_config_manual_menu(ut_context* pContext)
+ut_state ut_state_config_manual_menu(ut_context* pContext)
 {
 	ut_menu config_menu;
 	uint8_t i;
@@ -94,7 +97,7 @@ ut_state ut_state_config_menu(ut_context* pContext)
 	/* Items */
 	for(i = 0; i < CONFIG_MAX; i++)
 	{
-		config_menu.items[config_menu.numItems++].text = configs[i].name;
+		config_menu.items[config_menu.numItems++].text = configs_manual[i].name;
 	}
 
 	/* Show menu */

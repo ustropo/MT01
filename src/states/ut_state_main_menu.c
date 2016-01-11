@@ -37,7 +37,7 @@ static const char* gszMainMenuLabels[MAIN_MENU_NUMBER] =
 	" CORTE AUTOMÁTICO",
 	" CONFIG. DE CORTE",
 };
-static const char* gszMainMenuTitle = "ESCOLHA UMA OPÇÃO:";
+static const char* gszMainMenuTitle = "PRINCIPAL";
 
 /**
  * Next states
