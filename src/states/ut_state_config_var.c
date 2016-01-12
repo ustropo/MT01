@@ -142,5 +142,7 @@ ut_state ut_state_config_var(ut_context* pContext)
 
 	var_handlers[configsVar->type](configsVar);
 
+	configsVar->func_var(configsVar);
+
 	return stateBack;
 }

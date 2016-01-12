@@ -10,29 +10,12 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "ut_state_config_var.h"
 
 /**
  * Enum to indicate configuration variable type
  */
-typedef enum
-{
-	UT_MANUAL_CONFIG_INT = 0, //!< UT_CONFIG_INT
-	UT_MANUAL_CONFIG_BOOL,//!< UT_CONFIG_BOOL
-	UT_MANUAL_CONFIG_NULL,
-	/* This should be the last one! */
-	UT_MANUAL_CONFIG_MAX  //!< UT_CONFIG_MAX
-} ut_config_type;
 
-/**
- * Struct to hold a configuration variable
- * and how it is handled.
- */
-typedef struct
-{
-	ut_config_type type; //!< Type of configuration variable
-	uint32_t value;		 //!< Value of variable
-	const char* name;    //!< Name of the variable
-} ut_config_var;
 
 /**
  * Which configs are available
@@ -47,7 +30,5 @@ typedef enum
 	CONFIG_MANUAL_MAX           //!< CONFIG_MAX
 } ut_config_name;
 
-/* Array with all config variables */
-extern ut_config_var configs[CONFIG_MANUAL_MAX];
 
 #endif /* INCLUDE_UT_STATE_CONFIG_H_ */

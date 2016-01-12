@@ -59,7 +59,7 @@ void iif_up_filerunning(void)
 	                   (  /* Just a text name, not used by the RTOS kernel. */
 	                     "Timer 0",
 	                     /* The timer period in ticks, must be greater than 0. */
-	                     ( 100 ),
+	                     ( 1 ),
 	                     /* The timers will auto-reload themselves when they
 	                     expire. */
 	                     pdTRUE,
@@ -106,9 +106,9 @@ void vTimerCallback( TimerHandle_t pxTimer )
 	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
 	switch (lArrayIndex)
 	{
-		case 0: zmove = 0.007;
+		case 0: zmove = 0.003;
 		break;
-		case 1: zmove = -0.007;
+		case 1: zmove = -0.003;
 		break;
 	}
 }
