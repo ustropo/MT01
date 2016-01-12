@@ -16,10 +16,11 @@
  */
 typedef enum
 {
-	UT_CONFIG_INT = 0, //!< UT_CONFIG_INT
-	UT_CONFIG_BOOL,//!< UT_CONFIG_BOOL
+	UT_MANUAL_CONFIG_INT = 0, //!< UT_CONFIG_INT
+	UT_MANUAL_CONFIG_BOOL,//!< UT_CONFIG_BOOL
+	UT_MANUAL_CONFIG_NULL,
 	/* This should be the last one! */
-	UT_CONFIG_MAX  //!< UT_CONFIG_MAX
+	UT_MANUAL_CONFIG_MAX  //!< UT_CONFIG_MAX
 } ut_config_type;
 
 /**
@@ -43,10 +44,10 @@ typedef enum
 	CONFIG_DESLOCAR_ZERO,//!<
 	CONFIG_JOG_RAP_LENTO,//!<
 	CONFIG_VELOCIDADES,//!<
-	CONFIG_MAX           //!< CONFIG_MAX
+	CONFIG_MANUAL_MAX           //!< CONFIG_MAX
 } ut_config_name;
 
 /* Array with all config variables */
-extern ut_config_var configs[CONFIG_MAX];
+extern ut_config_var configs[CONFIG_MANUAL_MAX];
 
 #endif /* INCLUDE_UT_STATE_CONFIG_H_ */

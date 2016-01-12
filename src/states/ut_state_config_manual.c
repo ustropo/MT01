@@ -21,30 +21,37 @@
 #define DEFAULT_CONFIG_TIMEOUT	30000
 
 /* Array with all config variables */
-ut_config_var configs_manual[CONFIG_MAX];
+ut_config_var configs_manual[CONFIG_MANUAL_MAX];
 static bool initialized = false;
+extern ut_config_var* configsVar;
 
-static const ut_state geNextStateManual[1] =
+static const ut_state geNextStateManual[5] =
 {
-	STATE_MANUAL_MODE
+	STATE_MANUAL_MODE,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_MAIN_MENU
 };
 
 /* Initial values for each config variable */
-static ut_config_type init_types[CONFIG_MAX] =
+static ut_config_type init_types[CONFIG_MANUAL_MAX] =
 {
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_BOOL
+	UT_MANUAL_CONFIG_NULL,
+	UT_MANUAL_CONFIG_BOOL,
+	UT_MANUAL_CONFIG_BOOL,
+	UT_MANUAL_CONFIG_BOOL,
+	UT_MANUAL_CONFIG_NULL
 };
 
-static uint32_t init_values[CONFIG_MAX] =
+static uint32_t init_values[CONFIG_MANUAL_MAX] =
 {
 	700,
 	1400,
 	0
 };
 
-static char* init_names[CONFIG_MAX] =
+static char* init_names[CONFIG_MANUAL_MAX] =
 {
 	" MODO MANUAL",
 	" ZERAR EIXOS",
@@ -69,7 +76,7 @@ static void init()
 	memset(configs_manual, 0, sizeof(configs_manual));
 
 	/* Initialize all variables */
-	for(i = 0; i < CONFIG_MAX; i++)
+	for(i = 0; i < CONFIG_MANUAL_MAX; i++)
 	{
 		configs_manual[i].type = init_types[i];
 		configs_manual[i].value = init_values[i];
@@ -100,7 +107,7 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 	/* Options */
 	config_menu.title = gszConfigMenuTitle;
 	/* Items */
-	for(i = 0; i < CONFIG_MAX; i++)
+	for(i = 0; i < CONFIG_MANUAL_MAX; i++)
 	{
 		config_menu.items[config_menu.numItems++].text = configs_manual[i].name;
 	}
@@ -113,7 +120,7 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 	}
 
 	/* Set selected item */
-	pContext->tag = config_menu.selectedItem;
+	pContext->tag = STATE_CONFIG_MANUAL_MODE;
+	configsVar = &configs_manual[config_menu.selectedItem];
 	return geNextStateManual[config_menu.selectedItem];
-	//return STATE_CONFIG_VAR;
 }

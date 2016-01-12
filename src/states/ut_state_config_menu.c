@@ -23,6 +23,7 @@
 /* Array with all config variables */
 ut_config_var configs[CONFIG_MAX];
 static bool initialized = false;
+extern ut_config_var* configsVar;
 
 /* Initial values for each config variable */
 static ut_config_type init_types[CONFIG_MAX] =
@@ -105,6 +106,7 @@ ut_state ut_state_config_menu(ut_context* pContext)
 	}
 
 	/* Set selected item */
-	pContext->tag = config_menu.selectedItem;
+	pContext->tag = STATE_CONFIG_MENU;
+	configsVar = &configs[config_menu.selectedItem];
 	return STATE_CONFIG_VAR;
 }

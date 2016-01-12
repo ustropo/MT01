@@ -18,6 +18,7 @@ typedef enum
 {
 	UT_CONFIG_INT = 0, //!< UT_CONFIG_INT
 	UT_CONFIG_BOOL,//!< UT_CONFIG_BOOL
+	UT_CONFIG_NULL,
 	/* This should be the last one! */
 	UT_CONFIG_MAX  //!< UT_CONFIG_MAX
 } ut_config_type;

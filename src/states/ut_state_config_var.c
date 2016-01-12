@@ -30,6 +30,7 @@
  * @param Configuration variable object pointer.
  */
 typedef void (*ut_config_change_ptr)(ut_config_var*);
+ut_config_var* configsVar;
 
 static char* boolOptions[2] =
 {
@@ -137,16 +138,9 @@ static ut_config_change_ptr var_handlers[UT_CONFIG_MAX] =
  */
 ut_state ut_state_config_var(ut_context* pContext)
 {
-	uint8_t index = pContext->tag;
+	ut_state stateBack = (ut_state)pContext->tag;
 
-	/* Check if valid selection - this should always be
-	 * but it is always worth to be safe about it */
-	if(index < CONFIG_MAX)
-	{
-		/* Execute handler */
-		var_handlers[configs[index].type](&configs[index]);
-	}
+	var_handlers[configsVar->type](configsVar);
 
-
-	return STATE_CONFIG_MENU;
+	return stateBack;
 }
