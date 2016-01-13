@@ -24,6 +24,7 @@ typedef enum
 	STATE_AUTO_MODE,
 	STATE_CONFIG_VAR,
 	STATE_MANUAL_MODE,
+	STATE_DESLOCAZERO_MODE,
 	/* This should be always the last one! */
 	STATE_NUMBER
 } ut_state;
@@ -51,6 +52,7 @@ extern ut_state ut_state_config_manual_menu(ut_context* pContext);
 extern ut_state ut_state_config_var(ut_context* pContext);
 extern ut_state ut_state_manual_mode(ut_context* pContext);
 extern ut_state ut_state_auto_mode(ut_context* pContext);
+extern ut_state ut_state_deslocaZero_mode(ut_context* pContext);
 
 /**
  * State map definition

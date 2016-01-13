@@ -22,6 +22,7 @@
 #define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
+#define DEFAULT_DESCOLA_TITLE	"RODANDO"
 
 void vTimerUpdateCallback( TimerHandle_t pxTimer );
 TimerHandle_t TimerUpdate;
@@ -224,6 +225,82 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			iif_bind_idle();
 			return STATE_MAIN_MENU;
 			break;
+
+		case KEY_RELEASED:
+			iif_func_released();
+			break;
+		/* TODO: operate machine - with other keys */
+		default:
+			break;
+		}
+
+		/* Update position */
+	//	updatePosition(NULL);
+	}
+
+	return STATE_MAIN_MENU;
+}
+
+ut_state ut_state_deslocaZero_mode(ut_context* pContext)
+{
+	uint32_t keyEntry;
+
+	/* Clear display */
+	updatePosition(DEFAULT_DESCOLA_TITLE);
+	iif_bind_idle();
+	TimerUpdate = xTimerCreate
+				   (  /* Just a text name, not used by the RTOS kernel. */
+					 "Timer Update",
+					 /* The timer period in ticks, must be greater than 0. */
+					 ( 200 ),
+					 /* The timers will auto-reload themselves when they
+					 expire. */
+					 pdTRUE,
+					 /* Assign each timer a unique id equal to its array
+					 index. */
+					 ( void * ) 2,
+					 /* Each timer calls the same callback when it expires. */
+					 vTimerUpdateCallback
+				   );
+	xTimerStart( TimerUpdate, 0 );
+
+	while(true)
+	{
+		/* Wait for user interaction */
+		keyEntry = 0;
+		xQueueReceive( qKeyboard, &keyEntry, DEFAULT_UPDATE_TIMEOUT);
+
+		/* Check which key */
+		switch (keyEntry)
+		{
+		case KEY_DOWN:
+			iif_func_down();
+			break;
+
+		case KEY_UP:
+			iif_func_up();
+			break;
+
+		case KEY_RIGHT:
+			iif_func_right();
+			break;
+
+		case KEY_LEFT:
+			iif_func_left();
+			break;
+
+		case KEY_Z_UP:
+			iif_func_zup();
+			break;
+
+		case KEY_Z_DOWN:
+			iif_func_zdown();
+			break;
+
+		case KEY_ESC:
+			xTimerStop( TimerUpdate, 0 );
+			iif_bind_idle();
+			return STATE_CONFIG_MANUAL_MODE;
 
 		case KEY_RELEASED:
 			iif_func_released();

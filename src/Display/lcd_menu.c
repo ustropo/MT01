@@ -29,7 +29,8 @@ void ut_menu_init(ut_menu* menu_ptr)
 {
 	memset((void *)menu_ptr, 0, sizeof(ut_menu));
 
-	menu_ptr->maxItemsPerPage = MAX_ROW - 1;
+//	menu_ptr->maxItemsPerPage = MAX_ROW - 1;
+	menu_ptr->maxItemsPerPage = MAX_ROW;
 	menu_ptr->boShowTitle = true;
 }
 

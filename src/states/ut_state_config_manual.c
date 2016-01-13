@@ -148,7 +148,14 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 	}
 
 	/* Set selected item */
-	pContext->tag = STATE_CONFIG_MANUAL_MODE;
+	if(config_menu.selectedItem == 2)
+	{
+		pContext->tag = STATE_DESLOCAZERO_MODE;
+	}
+	else
+	{
+		pContext->tag = STATE_CONFIG_MANUAL_MODE;
+	}
 	configsVar = &configs_manual[config_menu.selectedItem];
 	return geNextStateManual[config_menu.selectedItem];
 }
