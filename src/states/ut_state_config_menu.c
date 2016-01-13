@@ -7,7 +7,7 @@
 
 #include "ut_context.h"
 #include "ut_state.h"
-#include "ut_state_config.h"
+#include "ut_state_config_var.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -19,6 +19,14 @@
 #include "lcd_menu.h"
 
 #define DEFAULT_CONFIG_TIMEOUT	30000
+
+typedef enum
+{
+	CONFIG_JOG_LENTO = 0,    //!< CONFIG_JOG_LENTO
+	CONFIG_JOG_RAPIDO,   //!< CONFIG_JOG_RAPIDO
+	CONFIG_TESTE_DISPARO,//!< CONFIG_TESTE_DISPARO
+	CONFIG_MAX           //!< CONFIG_MAX
+} ut_config_name;
 
 /* Array with all config variables */
 ut_config_var configs[CONFIG_MAX];

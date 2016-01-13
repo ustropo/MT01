@@ -39,15 +39,15 @@ void iif_esc_jog(void)
 }
 
 void iif_down_jog(void) {
-	sprintf(text, "G21 G91\nG01 Y390.0 F%d\nm30",velocidadeJog);
-	xio_open(cs.primary_src,text,0);
-}
-void iif_up_jog(void) {
 	sprintf(text, "G21 G91\nG01 Y-390.0 F%d\nm30",velocidadeJog);
 	xio_open(cs.primary_src,text,0);
 }
+void iif_up_jog(void) {
+	sprintf(text, "G21 G91\nG01 Y390.0 F%d\nm30",velocidadeJog);
+	xio_open(cs.primary_src,text,0);
+}
 void iif_left_jog(void){
-	sprintf(text, "G21 G91\nG01 X390.0 F%d\nm30",velocidadeJog);
+	sprintf(text, "G21 G91\nG01 X-390.0 F%d\nm30",velocidadeJog);
 	xio_open(cs.primary_src,text,0);
 }
 
@@ -57,12 +57,12 @@ void iif_right_jog(void) {
 }
 
 void iif_zdown_jog(void){
-	sprintf(text, "G21 G91\nG01 Z390.0 F%d\nm30",velocidadeJog);
+	sprintf(text, "G21 G91\nG01 Z-390.0 F%d\nm30",velocidadeJog);
 	xio_open(cs.primary_src,text,0);
 }
 
 void iif_zup_jog(void) {
-	sprintf(text, "G21 G91\nG01 Z-390.0 F%d\nm30",velocidadeJog);
+	sprintf(text, "G21 G91\nG01 Z390.0 F%d\nm30",velocidadeJog);
 	xio_open(cs.primary_src,text,0);
 }
 

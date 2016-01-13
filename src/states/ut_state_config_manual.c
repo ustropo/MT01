@@ -8,7 +8,6 @@
 #include "ut_context.h"
 #include "ut_state.h"
 #include "ut_state_config_var.h"
-#include "ut_state_config_manual.h"
 #include "interpreter_if.h"
 
 #include "FreeRTOS.h"
@@ -21,6 +20,15 @@
 #include "lcd_menu.h"
 
 #define DEFAULT_CONFIG_TIMEOUT	30000
+
+typedef enum
+{
+	CONFIG_MODO_MANUAL  = 0,    //!<
+	CONFIG_ZERAR_EIXOS,   //!<
+	CONFIG_DESLOCAR_ZERO,//!<
+	CONFIG_JOG_RAP_LENTO,//!<
+	CONFIG_MANUAL_MAX           //!< CONFIG_MAX
+} ut_config_name;
 
 const char zera_eixos[]= "\
 G21 G90\n\

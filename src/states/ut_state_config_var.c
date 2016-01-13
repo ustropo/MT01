@@ -7,6 +7,7 @@
 
 #include "ut_context.h"
 #include "ut_state.h"
+#include "ut_state_config_var.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -19,7 +20,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "ut_state_config.h"
 
 #define DEFAULT_CONFIG_VAR_TOUT	30000
 
