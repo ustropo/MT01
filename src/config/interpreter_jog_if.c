@@ -7,6 +7,10 @@
 #include "platform.h"
 #include "interpreter_if.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 static void iif_enter_jog(void);
 static void iif_esc_jog(void);
 static void iif_down_jog(void);
@@ -17,35 +21,8 @@ static void iif_zdown_jog(void);
 static void iif_zup_jog(void);
 static void iif_released_jog(void);
 
-const char jog_startxp[]= "\
-G21 G91\n\
-G01 X390.0 F4000\n\
-m30";
-
-const char jog_startxn[]= "\
-G21 G91\n\
-G01 X-390.0 F4000\n\
-m30";
-
-const char jog_startyp[]= "\
-G21 G91\n\
-G01 Y390.0 F4000\n\
-m30";
-
-const char jog_startyn[]= "\
-G21 G91\n\
-G01 Y-390.0 F4000\n\
-m30";
-
-const char jog_startzp[]= "\
-G21 G91\n\
-G01 Z390.0 F4000\n\
-m30";
-
-const char jog_startzn[]= "\
-G21 G91\n\
-G01 Z-390.0 F4000\n\
-m30";
+extern uint16_t velocidadeJog;
+char text[40];
 
 const char jog_stopflush[]= "\
 !\n\
@@ -61,12 +38,34 @@ void iif_esc_jog(void)
 	iif_bind_idle();
 }
 
-void iif_down_jog(void) { xio_open(cs.primary_src,jog_startyp,0);}
-void iif_up_jog(void) { xio_open(cs.primary_src,jog_startyn,0);}
-void iif_left_jog(void){ xio_open(cs.primary_src,jog_startxp,0);}
-void iif_right_jog(void) { xio_open(cs.primary_src,jog_startxn,0);}
-void iif_zdown_jog(void){ xio_open(cs.primary_src,jog_startzn,0);}
-void iif_zup_jog(void) { xio_open(cs.primary_src,jog_startzp,0);}
+void iif_down_jog(void) {
+	sprintf(text, "G21 G91\nG01 Y390.0 F%d\nm30",velocidadeJog);
+	xio_open(cs.primary_src,text,0);
+}
+void iif_up_jog(void) {
+	sprintf(text, "G21 G91\nG01 Y-390.0 F%d\nm30",velocidadeJog);
+	xio_open(cs.primary_src,text,0);
+}
+void iif_left_jog(void){
+	sprintf(text, "G21 G91\nG01 X390.0 F%d\nm30",velocidadeJog);
+	xio_open(cs.primary_src,text,0);
+}
+
+void iif_right_jog(void) {
+	sprintf(text, "G21 G91\nG01 X390.0 F%d\nm30",velocidadeJog);
+	xio_open(cs.primary_src,text,0);
+}
+
+void iif_zdown_jog(void){
+	sprintf(text, "G21 G91\nG01 Z390.0 F%d\nm30",velocidadeJog);
+	xio_open(cs.primary_src,text,0);
+}
+
+void iif_zup_jog(void) {
+	sprintf(text, "G21 G91\nG01 Z-390.0 F%d\nm30",velocidadeJog);
+	xio_open(cs.primary_src,text,0);
+}
+
 void iif_released_jog(void) { xio_open(cs.primary_src,jog_stopflush,0);}
 
 void iif_bind_jog(void)
