@@ -34,12 +34,13 @@ m30";
 
 static void zerar_eixos(void *var);
 static void homming_eixos(void *var);
-static void idle(void *var);
+static void veljog(void *var);
 
 /* Array with all config variables */
 ut_config_var configs_manual[CONFIG_MANUAL_MAX];
 static bool initialized = false;
 extern ut_config_var* configsVar;
+uint16_t velocidadeJog = 7500;
 
 static const ut_state geNextStateManual[5] =
 {
@@ -57,12 +58,10 @@ static ut_config_type init_types[CONFIG_MANUAL_MAX] =
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
-	UT_CONFIG_NULL
 };
 
 static uint32_t init_values[CONFIG_MANUAL_MAX] =
 {
-	0,
 	0,
 	0,
 	0,
@@ -74,17 +73,15 @@ static char* init_names[CONFIG_MANUAL_MAX] =
 	" MODO MANUAL",
 	" ZERAR EIXOS",
 	" DESLOCAR PARA ZERO",
-	" JOG RÁPIDO E LENTO ",
-	" VELOCIDADES DE JOG"
+	" JOG RÁPIDO E LENTO"
 };
 
 static var_func init_func[CONFIG_MANUAL_MAX] =
 {
-	idle,
+	0,
 	zerar_eixos,
 	homming_eixos,
-	idle,
-	idle
+	veljog,
 };
 
 static const char* gszConfigMenuTitle = "CONFIG. MANUAL";
@@ -109,6 +106,8 @@ static void init()
 		configs_manual[i].value = init_values[i];
 		configs_manual[i].name = init_names[i];
 		configs_manual[i].func_var = init_func[i];
+		configs_manual[i].currentState = STATE_CONFIG_MANUAL_MODE;
+		configs_manual[i].currentItem = i;
 	}
 
 	initialized = true;
@@ -150,11 +149,13 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 	/* Set selected item */
 	if(config_menu.selectedItem == 2)
 	{
-		pContext->tag = STATE_DESLOCAZERO_MODE;
+		pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
+		pContext->value[1] = STATE_DESLOCAZERO_MODE;
 	}
 	else
 	{
-		pContext->tag = STATE_CONFIG_MANUAL_MODE;
+		pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
+		pContext->value[1] = STATE_CONFIG_MANUAL_MODE;
 	}
 	configsVar = &configs_manual[config_menu.selectedItem];
 	return geNextStateManual[config_menu.selectedItem];
@@ -182,7 +183,15 @@ static void homming_eixos(void *var)
 	}
 }
 
-static void idle(void *var)
+static void veljog(void *var)
 {
-
+	ut_config_var *lvar = var;
+	if(lvar->value)
+	{
+		velocidadeJog = 7500;
+	}
+	else
+	{
+		velocidadeJog = 1500;
+	}
 }

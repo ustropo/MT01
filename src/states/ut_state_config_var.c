@@ -38,6 +38,12 @@ static char* boolOptions[2] =
 	"SIM"
 };
 
+static char* boolJogVel[2] =
+{
+	"LENTO",
+	"RÁPIDO"
+};
+
 
 /**
  * Config boolean variable
@@ -46,14 +52,29 @@ static char* boolOptions[2] =
  */
 void config_bool(ut_config_var* var)
 {
+	char** boolStr;
 	ut_menu menu;
 	uint8_t i;
 
 	/* Initialize */
 	ut_menu_init(&menu);
+	switch(configsVar->currentState)
+		{
+			case STATE_CONFIG_MANUAL_MODE:
+				if(configsVar->currentItem == 3)
+				{
+					boolStr = boolJogVel;
+				}
+				else
+				{
+					boolStr = boolOptions;
+				}
+			break;
+			default: boolStr = boolOptions;
+		}
 	for(i = 0; i < 2; i++)
 	{
-		menu.items[menu.numItems++].text = boolOptions[i];
+		menu.items[menu.numItems++].text = boolStr[i];
 	}
 	menu.title = var->name;
 	menu.selectedItem = var->value % 2; // Just to be sure - it is really not necessary
@@ -138,11 +159,22 @@ static ut_config_change_ptr var_handlers[UT_CONFIG_MAX] =
  */
 ut_state ut_state_config_var(ut_context* pContext)
 {
-	ut_state stateBack = (ut_state)pContext->tag;
+	ut_state stateBack = (ut_state)pContext->value[0];
 
 	var_handlers[configsVar->type](configsVar);
 
 	configsVar->func_var(configsVar);
-
+	switch(configsVar->currentState)
+	{
+		case STATE_CONFIG_MANUAL_MODE:
+			if(configsVar->currentItem == 2)
+			{
+				if(configsVar->value)
+				{
+					stateBack = (ut_state)pContext->value[1];
+				}
+			}
+		break;
+	}
 	return stateBack;
 }

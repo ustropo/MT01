@@ -106,7 +106,7 @@ ut_state ut_state_config_menu(ut_context* pContext)
 	}
 
 	/* Set selected item */
-	pContext->tag = STATE_CONFIG_MENU;
+	pContext->value[0] = STATE_CONFIG_MENU;
 	configsVar = &configs[config_menu.selectedItem];
 	return STATE_CONFIG_VAR;
 }

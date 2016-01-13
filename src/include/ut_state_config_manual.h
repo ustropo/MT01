@@ -26,7 +26,6 @@ typedef enum
 	CONFIG_ZERAR_EIXOS,   //!<
 	CONFIG_DESLOCAR_ZERO,//!<
 	CONFIG_JOG_RAP_LENTO,//!<
-	CONFIG_VELOCIDADES,//!<
 	CONFIG_MANUAL_MAX           //!< CONFIG_MAX
 } ut_config_name;
 

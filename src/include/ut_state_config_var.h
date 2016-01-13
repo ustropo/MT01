@@ -33,6 +33,8 @@ typedef struct
 	ut_config_type type; //!< Type of configuration variable
 	uint32_t value;		 //!< Value of variable
 	const char* name;    //!< Name of the variable
+	ut_state currentState;
+	uint8_t currentItem;
 	var_func func_var;
 } ut_config_var;
 
