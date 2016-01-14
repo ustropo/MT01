@@ -71,10 +71,10 @@
 
 /* I/O port C:  RSPI and peripheral I/O pins definitions */
 #define KCOL				PORTC.PDR.BYTE
-#define KC1					(0x01uL)
-#define KC2					(0x02uL)
-#define KC3					(0x08uL)
-#define KC4					(0x10uL)
+#define KC1					(0x05uL)
+#define KC2					(0x06uL)
+#define KC3					(0x0CuL)
+#define KC4					(0x14uL)
 #define LCD_CS              PORTC.PODR.BIT.B2        /* SSL 3 */
 
 /* I/O ports D & E:  LEDs */

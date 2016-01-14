@@ -223,7 +223,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		case KEY_ESC:
 			xTimerStop( TimerUpdate, 0 );
 			iif_bind_idle();
-			return STATE_MAIN_MENU;
+			return STATE_CONFIG_AUTO_MODE;
 			break;
 
 		case KEY_RELEASED:

@@ -36,7 +36,7 @@ void iif_esc_filerunning(void)
 	cm_request_feedhold();
 }
 
-void iif_down_filerunning(void) {
+void iif_zdown_filerunning(void) {
 	  xTimers[1] = xTimerCreate
 	                   (  /* Just a text name, not used by the RTOS kernel. */
 	                     "Timer 1",
@@ -53,7 +53,7 @@ void iif_down_filerunning(void) {
 	                   );
 	  xTimerStart( xTimers[1], 0 );
 }
-void iif_up_filerunning(void)
+void iif_zup_filerunning(void)
 {
 	xTimers[0] = xTimerCreate
 	                   (  /* Just a text name, not used by the RTOS kernel. */
@@ -73,8 +73,8 @@ void iif_up_filerunning(void)
 }
 void iif_left_filerunning(void){}
 void iif_right_filerunning(void) {}
-void iif_zdown_filerunning(void){}
-void iif_zup_filerunning(void){}
+void iif_down_filerunning(void){}
+void iif_up_filerunning(void){}
 void iif_released_filerunning(void)
 {
 	zmove = 0;

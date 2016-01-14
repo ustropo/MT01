@@ -144,7 +144,7 @@ uint8_t u8g_com_rx_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg
 	    	{
 	    		while(1);
 	    	}
-	    	my_setbaud_struct.bps_target = 1000000;
+	    	my_setbaud_struct.bps_target = 400000;
 	    	rspi_result = R_RSPI_Control(handle, RSPI_CMD_SET_BAUD, &my_setbaud_struct);
 	    	if (RSPI_SUCCESS != rspi_result)
 	    	{

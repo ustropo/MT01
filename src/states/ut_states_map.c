@@ -20,8 +20,9 @@ const state_func_ptr states_table[STATE_NUMBER] =
 		&ut_state_choose_file,
 		&ut_state_config_menu,
 		&ut_state_config_manual_menu,
-		&ut_state_auto_mode,
+		&ut_state_config_auto_menu,
 		&ut_state_config_var,
-		&ut_state_manual_mode, //Manual menu init - 8
-		&ut_state_deslocaZero_mode // - 9
+		&ut_state_manual_mode, //Manual menu init
+		&ut_state_deslocaZero_mode, //
+		&ut_state_auto_mode
 };

@@ -100,6 +100,7 @@ static void output_ports_configure(void)
 
      /* Port C -  LCD SPI signals && Keyboard Col */
      PORTC.PMR.BYTE  = 0x60 ;    /*  */
+
      MPC.PC5PFS.BYTE = 0x0D ;    /* PC5 is RSPCKA */
      MPC.PC6PFS.BYTE = 0x0D ;    /* PC6 is MOSIA */
      PORTC.PODR.BYTE = 0x00 ;    /* All outputs low to start */
