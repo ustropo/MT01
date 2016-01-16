@@ -59,19 +59,20 @@ void config_bool(ut_config_var* var)
 	/* Initialize */
 	ut_menu_init(&menu);
 	switch(configsVar->currentState)
+	{
+	case STATE_CONFIG_MANUAL_MODE:
+		if(configsVar->currentItem == 3)
 		{
-			case STATE_CONFIG_MANUAL_MODE:
-				if(configsVar->currentItem == 3)
-				{
-					boolStr = boolJogVel;
-				}
-				else
-				{
-					boolStr = boolOptions;
-				}
-			break;
-			default: boolStr = boolOptions;
+			boolStr = boolJogVel;
 		}
+		else
+		{
+			boolStr = boolOptions;
+		}
+		break;
+	default: boolStr = boolOptions;
+	}
+
 	for(i = 0; i < 2; i++)
 	{
 		menu.items[menu.numItems++].text = boolStr[i];
@@ -143,15 +144,25 @@ void config_int(ut_config_var* var)
 
 }
 
+/**
+ * Null handler
+ * @param var
+ */
+void config_null(ut_config_var* var)
+{
+
+}
+
 /* Default handlers for variables */
 static ut_config_change_ptr var_handlers[UT_CONFIG_MAX] =
 {
 	&config_int,
 	&config_bool,
+	&config_null
 };
 
 /**
- * This state configurates a single variable that is
+ * This state configures a single variable that is
  * shared among multiple states.
  *
  * @param pContext Context object
@@ -163,7 +174,9 @@ ut_state ut_state_config_var(ut_context* pContext)
 
 	var_handlers[configsVar->type](configsVar);
 
-	configsVar->func_var(configsVar);
+	/* Avoid null handler */
+	if(configsVar->func_var) { configsVar->func_var(configsVar); }
+
 	switch(configsVar->currentState)
 	{
 		case STATE_CONFIG_MANUAL_MODE:
