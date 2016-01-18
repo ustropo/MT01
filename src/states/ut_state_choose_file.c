@@ -39,6 +39,8 @@ static const char* gaszFileExtensions[MAX_EXT_AVAIL] =
 		".nc"
 };
 
+static const char* gszFileMenuTitle = "ESCOLHA UM ARQUIVO";
+
 // ***********************************************************************
 // Global types
 // ***********************************************************************
@@ -155,7 +157,8 @@ static ut_fs_navigate chooseFile()
 	/* Initialize menu */
 	ut_menu_init(&filesMenu);
 	/* No header */
-	filesMenu.boShowTitle = false;
+	filesMenu.title = gszFileMenuTitle;
+	filesMenu.boShowTitle = true;
 	filesMenu.maxItemsPerPage = MAX_ROW;
 
 	/* Open dir */
@@ -280,14 +283,6 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		/* Navigate through folders */
 		eErr = chooseFile();
 	} while(eErr == NAVIGATE_CONTINUE);
-
-	if (eErr == NAVIGATE_END)
-	{
-//		tg_set_primary_source(XIO_DEV_USBFAT);
-//		xio_close(cs.primary_src);
-//		xio_open(cs.primary_src,0,0);
-//		iif_bind_filerunning();
-	}
 
 	/* Go back to menu */
 	return STATE_MAIN_MENU;

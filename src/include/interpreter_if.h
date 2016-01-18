@@ -15,6 +15,7 @@
 #include "text_parser.h"
 #include "gcode_parser.h"
 #include "canonical_machine.h"
+#include "hardware.h"
 #include "xio.h"
 
 typedef void (*iif_func_ptr)(void);

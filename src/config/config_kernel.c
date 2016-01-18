@@ -406,7 +406,7 @@ void FreeRTOSConfig( void )
 
     /*User interface task*/
     xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task    ",  512, NULL, 3, NULL); /* keyboard_task      */
-    xTaskCreate( (pdTASK_CODE)states_task,     "states_task    ",  1024, NULL, 2, &task_main_handle); /* states_task      */
+    xTaskCreate( (pdTASK_CODE)states_task,     "states_task    ",  2048, NULL, 2, &task_main_handle); /* states_task      */
     xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  2048, NULL, 2, &x_tn_usb_connected); /* CNC_task      */
 }
 

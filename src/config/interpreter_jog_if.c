@@ -30,7 +30,17 @@ const char jog_stopflush[]= "\
 
 void iif_enter_jog(void)
 {
-
+	static bool torchEnable = false;
+	if(!torchEnable)
+	{
+		TORCH = TRUE;
+		torchEnable = true;
+	}
+	else
+	{
+		TORCH = FALSE;
+		torchEnable = false;
+	}
 }
 
 void iif_esc_jog(void)

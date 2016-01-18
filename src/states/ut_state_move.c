@@ -23,6 +23,7 @@
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
 #define DEFAULT_DESCOLA_TITLE	"RODANDO"
+#define DEFAULT_AVISO			"ENTER DISPARA/ESC VOLTA"
 
 void vTimerUpdateCallback( TimerHandle_t pxTimer );
 TimerHandle_t TimerUpdate;
@@ -41,25 +42,28 @@ static void updatePosition(const char* szTitle)
 	/* Display is only cleared once to improve performance */
 	if(szTitle)
 	{
-		ut_lcd_clear();
+		//ut_lcd_clear();
+		ut_lcd_clear_str();
 		/* Title */
-		ut_lcd_drawString(0, 0, szTitle, false);
+		//ut_lcd_drawString(0, 0, szTitle, false);
+		ut_lcd_drawStr(0, 0, szTitle, BACKGROUND_FRAMED,u8g_font_helvB08);
 	}
-
 	/* TODO: get position from machine */
 	x = mp_get_runtime_absolute_position(0);
 	y = mp_get_runtime_absolute_position(1);
 	z = mp_get_runtime_absolute_position(2);
 
 	sprintf(text, "X: %10.4f mm", x);
-	ut_lcd_drawString(2, 0, text, false);
+	ut_lcd_drawStr(2, 0, text, false,u8g_font_6x10);
 	sprintf(text, "Y: %10.4f mm", y);
-	ut_lcd_drawString(3, 0, text, false);
+	ut_lcd_drawStr(3, 0, text, false,u8g_font_6x10);
 	sprintf(text, "Z: %10.4f mm", z);
-	ut_lcd_drawString(4, 0, text, false);
+	ut_lcd_drawStr(4, 0, text, false,u8g_font_6x10);
+
+	ut_lcd_drawStr(5, 0, DEFAULT_AVISO, true,u8g_font_5x8);
 
 	/* Put it into screen */
-	ut_lcd_output();
+	ut_lcd_output_str();
 }
 
 /**
@@ -81,7 +85,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
-					 ( 200 ),
+					 ( 500 ),
 					 /* The timers will auto-reload themselves when they
 					 expire. */
 					 pdTRUE,
@@ -128,8 +132,12 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 
 		case KEY_ESC:
 			xTimerStop( TimerUpdate, 0 );
-			iif_bind_idle();
+			iif_func_esc();
 			return STATE_CONFIG_MANUAL_MODE;
+
+		case KEY_ENTER:
+			iif_func_enter();
+			break;
 
 		case KEY_RELEASED:
 			iif_func_released();
@@ -163,7 +171,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
-					 ( 200 ),
+					 ( 500 ),
 					 /* The timers will auto-reload themselves when they
 					 expire. */
 					 pdTRUE,
@@ -252,7 +260,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
-					 ( 200 ),
+					 ( 500 ),
 					 /* The timers will auto-reload themselves when they
 					 expire. */
 					 pdTRUE,

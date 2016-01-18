@@ -19,6 +19,7 @@ static char gacChar[MAX_COLUMN * MAX_ROW];
 
 static const char* gacStr[MAX_ROW];
 static uint8_t gaboBackColorStr[MAX_ROW];
+static const u8g_fntpgm_uint8_t *gaboFontStr[MAX_ROW];
 
 /**
  * Global variables
@@ -70,6 +71,7 @@ void ut_lcd_clear_str()
 	/* Clean all */
 	memset(gaboBackColorStr, 0, sizeof(gaboBackColorStr));
 	memset(gacStr, '\n', sizeof(gacStr));
+	memset(gaboFontStr, NULL, sizeof(gaboFontStr));
 }
 
 
@@ -103,7 +105,7 @@ void ut_lcd_drawString(uint8_t line, uint8_t column, const char* text, uint8_t i
  * @param text		String to draw.
  * @param invert	Which color to draw (0 -> white / 1 -> black)
  */
-void ut_lcd_drawStr(uint8_t line, uint8_t column, const char* text, uint8_t invert)
+void ut_lcd_drawStr(uint8_t line, uint8_t column, const char* text, uint8_t invert, const uint8_t* font)
 {
 	/* Check limits */
 	if(line >= MAX_ROW || column >= MAX_COLUMN) return;
@@ -111,6 +113,7 @@ void ut_lcd_drawStr(uint8_t line, uint8_t column, const char* text, uint8_t inve
 	/* Copy each char individually */
 	gacStr[line] = text;
 	gaboBackColorStr[line] = invert;
+	gaboFontStr[line] = (const u8g_fntpgm_uint8_t *)font;
 }
 
 
@@ -219,7 +222,11 @@ void ut_lcd_output_str()
 	uint8_t row, x, y;
 	uint8_t h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 
-	u8g_prepare();
+	u8g_SetFont(&main_u8g, gaboFontStr[0]);
+	u8g_SetFontRefHeightExtendedText(&main_u8g);
+	u8g_SetDefaultForegroundColor(&main_u8g);
+	u8g_SetFontPosTop(&main_u8g);
+	//u8g_prepare();
 	u8g_FirstPage(&main_u8g);
 
 	/* Picture loop */
@@ -229,6 +236,11 @@ void ut_lcd_output_str()
 		y = 0;
 		for(row = 0; row < MAX_ROW; row++)
 		{
+			u8g_SetFont(&main_u8g, gaboFontStr[row]);
+			u8g_SetFontRefHeightExtendedText(&main_u8g);
+			u8g_SetDefaultForegroundColor(&main_u8g);
+			u8g_SetFontPosTop(&main_u8g);
+		//	u8g_FirstPage(&main_u8g);
 			x = 0;
 			/* Through all columns */
 				/* Draw glyph */
