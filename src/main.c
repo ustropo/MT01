@@ -80,7 +80,7 @@ void main(void)
 	usb_main();
 
 	/* Initialize lcd */
-	ut_lcd_init();
+	//ut_lcd_init();
 
 	/* Initialize RTOS */
 	FreeRTOSConfig();

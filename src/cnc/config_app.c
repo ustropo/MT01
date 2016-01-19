@@ -911,6 +911,7 @@ static stat_t get_rx(nvObj_t *nv)
 	nv->valuetype = TYPE_INTEGER;
 	return (STAT_OK);
 #endif
+	return 0;
 }
 
 /* run_sx()	- send XOFF, XON --- test only

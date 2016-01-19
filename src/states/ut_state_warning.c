@@ -12,6 +12,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "u8g.h"
 
 #define WARNING_PAGES	5
 #define PAGE_DELAY		1000

@@ -16,6 +16,7 @@
 #include "interpreter_if.h"
 
 #include "lcd.h"
+#include "u8g.h"
 
 #include "planner.h"
 

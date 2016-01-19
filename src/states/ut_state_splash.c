@@ -12,6 +12,7 @@
 #include "task.h"
 
 #include "lcd.h"
+#include "ut_lcd.h"
 
 #define metalique128_width 128
 #define metalique128_height 42
@@ -83,12 +84,16 @@ static unsigned char metalique128_bits[] = {
  */
 ut_state ut_state_splash(ut_context* pContext)
 {
-	ut_lcd_clear();
+	ut_lcd_buf_init();
+	ut_lcd_buf_clear();
+	//ut_lcd_clear();
 
 	/* Delay para a inicialização do Display */
 	vTaskDelay(10 / portTICK_PERIOD_MS);
 
-	ut_lcd_bitmap(0,11,metalique128_width,metalique128_height,metalique128_bits);
+	//ut_lcd_bitmap(0,11,metalique128_width,metalique128_height,metalique128_bits);
+	ut_lcd_buf_drawImage(0,11,metalique128_width,metalique128_height,metalique128_bits);
+	ut_lcd_buf_output();
 
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
