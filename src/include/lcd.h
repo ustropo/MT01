@@ -32,5 +32,6 @@ extern void ut_lcd_drawStr(uint8_t line, uint8_t column, const char* text, uint8
 extern void ut_lcd_output();
 extern void ut_lcd_output_str();
 extern void ut_lcd_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *bitmap);
+extern void ut_lcd_output_manual_mode(bool torch,const char* title,const char* textX,const char* textY,const char* textZ);
 
 #endif /* INCLUDE_LCD_H_ */

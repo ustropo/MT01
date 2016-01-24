@@ -30,9 +30,9 @@ static u8g_t main_u8g;
 /**
  *
  */
-static void u8g_prepare(void)
+static void u8g_prepare(const uint8_t* font)
 {
-  u8g_SetFont(&main_u8g, u8g_font_6x10);
+  u8g_SetFont(&main_u8g, font);
   u8g_SetFontRefHeightExtendedText(&main_u8g);
   u8g_SetDefaultForegroundColor(&main_u8g);
   u8g_SetFontPosTop(&main_u8g);
@@ -45,7 +45,7 @@ void ut_lcd_init()
 {
 	/* Prepare u8g lib */
 	u8g_InitComFn(&main_u8g, &u8g_dev_st7920_128x64_hw_spi, u8g_com_rx_hw_spi_fn);
-	u8g_prepare();
+	u8g_prepare(u8g_font_6x10);
 
 	/* Clean all */
 	ut_lcd_clear();
@@ -189,7 +189,7 @@ void ut_lcd_output()
 	uint8_t row, col, x, y, index;
 	uint8_t h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 
-	u8g_prepare();
+	u8g_prepare(u8g_font_6x10);
 	u8g_FirstPage(&main_u8g);
 
 	/* Picture loop */
@@ -220,12 +220,10 @@ void ut_lcd_output()
 void ut_lcd_output_str()
 {
 	uint8_t row, x, y;
-	uint8_t h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+	uint8_t h;
 
-	u8g_SetFont(&main_u8g, gaboFontStr[0]);
-	u8g_SetFontRefHeightExtendedText(&main_u8g);
-	u8g_SetDefaultForegroundColor(&main_u8g);
-	u8g_SetFontPosTop(&main_u8g);
+	u8g_prepare(gaboFontStr[0]);
+	h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 	//u8g_prepare();
 	u8g_FirstPage(&main_u8g);
 
@@ -255,9 +253,97 @@ void ut_lcd_output_str()
 
 void ut_lcd_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *bitmap)
 {
-	u8g_prepare();
+	u8g_prepare(u8g_font_6x10);
 	u8g_FirstPage(&main_u8g);
 	do{
 		u8g_DrawXBMP(&main_u8g, x, y, w, h, bitmap);
+	} while(u8g_NextPage(&main_u8g));
+}
+
+#define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
+#define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
+#define DEFAULT_DESCOLA_TITLE	"RODANDO"
+#define DEFAULT_AVISO			"ENTER DISPARA/ESC VOLTA"
+#define DEFAULT_TOCHA			"TOCHA"
+#define DEFAULT_ACESA			"ACESA"
+#define DEFAULT_APAGADA			"APAGADA"
+
+#define warning_width 25
+#define warning_height 22
+static unsigned char warning_bits[] = {
+   0x00, 0x10, 0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00,
+   0x00, 0x6c, 0x00, 0x00, 0x00, 0xc6, 0x00, 0x00, 0x00, 0x82, 0x00, 0x00,
+   0x00, 0xbb, 0x01, 0x00, 0x00, 0x39, 0x01, 0x00, 0x80, 0x39, 0x03, 0x00,
+   0xc0, 0x38, 0x02, 0x00, 0xc0, 0x38, 0x04, 0x00, 0x60, 0x38, 0x0c, 0x00,
+   0x20, 0x38, 0x08, 0x00, 0x30, 0x38, 0x18, 0x00, 0x10, 0x38, 0x10, 0x00,
+   0x18, 0x00, 0x30, 0x00, 0x0c, 0x38, 0x60, 0x00, 0x0c, 0x38, 0x60, 0x00,
+   0x06, 0x38, 0xc0, 0x00, 0x02, 0x00, 0x80, 0x00, 0xff, 0xff, 0xff, 0x01,
+   0xff, 0xff, 0xff, 0x01 };
+
+void ut_lcd_output_manual_mode(bool torch,const char* title,const char* textX,const char* textY,const char* textZ)
+{
+	uint8_t row, x, y;
+	uint8_t h;
+	const char* str;
+//	u8g_prepare(u8g_font_6x10);
+	u8g_FirstPage(&main_u8g);
+	h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+	/* Picture loop */
+	do
+	{
+		/* Through all rows */
+		y = 0;
+		u8g_DrawVLine(&main_u8g, 90, 11, 43);
+		u8g_prepare(u8g_font_5x8);
+		str = DEFAULT_TOCHA;
+		u8g_DrawStr(&main_u8g, 95, 38, str);
+		if(torch)
+		{
+			str = DEFAULT_ACESA;
+			u8g_DrawXBMP(&main_u8g, 94, 13, warning_width, warning_height, warning_bits);
+			u8g_DrawStr(&main_u8g, 95, 46, str);
+		}
+		else
+		{
+			str = DEFAULT_APAGADA;
+			u8g_DrawStr(&main_u8g, 92, 46, str);
+		}
+		for(row = 0; row < MAX_ROW+1; row++)
+		{
+			x = 0;
+			switch(row)
+			{
+				case 0: str = title;
+						u8g_prepare(u8g_font_helvB08);
+						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+						u8g_DrawHLine(&main_u8g, x, h-1, 128);
+						break;
+				case 1: str = "";
+						u8g_prepare(u8g_font_5x8);
+						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+						break;
+				case 5: str = "";
+						u8g_prepare(u8g_font_5x8);
+						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) -1;
+						break;
+				case 6: str = DEFAULT_AVISO;
+						u8g_prepare(u8g_font_5x8);
+			//			h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+						u8g_DrawHLine(&main_u8g, x, y-1, 128);
+						break;
+				case 2: str = textX;
+						u8g_prepare(u8g_font_6x10);
+						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+						break;
+				case 3: str = textY;  break;
+				case 4: str = textZ;  break;
+			}
+				/* Draw glyph */
+			u8g_DrawStr(&main_u8g, x, y, str);
+
+			/* Next position */
+			y += h;
+		}
+
 	} while(u8g_NextPage(&main_u8g));
 }

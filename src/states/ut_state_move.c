@@ -19,6 +19,11 @@
 
 #include "planner.h"
 
+char textXStr[MAX_COLUMN];
+char textYStr[MAX_COLUMN];
+char textZStr[MAX_COLUMN];
+const char *gTitle;
+
 #define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
@@ -34,36 +39,25 @@ TimerHandle_t TimerUpdate;
  */
 static void updatePosition(const char* szTitle)
 {
-	char text[MAX_COLUMN];
 	float x; float y; float z;
 
-	memset(text, 0, sizeof(text));
-
 	/* Display is only cleared once to improve performance */
-	if(szTitle)
-	{
-		//ut_lcd_clear();
-		ut_lcd_clear_str();
-		/* Title */
-		//ut_lcd_drawString(0, 0, szTitle, false);
-		ut_lcd_drawStr(0, 0, szTitle, BACKGROUND_FRAMED,u8g_font_helvB08);
-	}
+
 	/* TODO: get position from machine */
 	x = mp_get_runtime_absolute_position(0);
 	y = mp_get_runtime_absolute_position(1);
 	z = mp_get_runtime_absolute_position(2);
 
-	sprintf(text, "X: %10.4f mm", x);
-	ut_lcd_drawStr(2, 0, text, false,u8g_font_6x10);
-	sprintf(text, "Y: %10.4f mm", y);
-	ut_lcd_drawStr(3, 0, text, false,u8g_font_6x10);
-	sprintf(text, "Z: %10.4f mm", z);
-	ut_lcd_drawStr(4, 0, text, false,u8g_font_6x10);
-
-	ut_lcd_drawStr(5, 0, DEFAULT_AVISO, true,u8g_font_5x8);
+	sprintf(textXStr, "X:%4.2f mm", x);
+	sprintf(textYStr, "Y:%4.2f mm", y);
+	sprintf(textZStr, "Z:%4.2f mm", z);
 
 	/* Put it into screen */
-	ut_lcd_output_str();
+	ut_lcd_output_manual_mode(TORCH,
+						   szTitle,
+			(const char *)textXStr,
+			(const char *)textYStr,
+			(const char *)textZStr);
 }
 
 /**
@@ -79,13 +73,14 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 
 	/* Clear display */
 	updatePosition(DEFAULT_MANUAL_TITLE);
+	gTitle = DEFAULT_MANUAL_TITLE;
 	tg_set_primary_source(XIO_DEV_COMMAND);
 	iif_bind_jog();
 	TimerUpdate = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
-					 ( 500 ),
+					 ( 200 ),
 					 /* The timers will auto-reload themselves when they
 					 expire. */
 					 pdTRUE,
@@ -167,11 +162,12 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 
 	/* Clear display */
 	updatePosition(DEFAULT_AUTO_TITLE);
+	gTitle = DEFAULT_AUTO_TITLE;
 	TimerUpdate = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
-					 ( 500 ),
+					 ( 200 ),
 					 /* The timers will auto-reload themselves when they
 					 expire. */
 					 pdTRUE,
@@ -255,12 +251,13 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 
 	/* Clear display */
 	updatePosition(DEFAULT_DESCOLA_TITLE);
+	gTitle = DEFAULT_DESCOLA_TITLE;
 	iif_bind_idle();
 	TimerUpdate = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
-					 ( 500 ),
+					 ( 200 ),
 					 /* The timers will auto-reload themselves when they
 					 expire. */
 					 pdTRUE,
@@ -327,5 +324,5 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 
 void vTimerUpdateCallback( TimerHandle_t pxTimer )
 {
-	updatePosition(NULL);
+	updatePosition(gTitle);
 }
