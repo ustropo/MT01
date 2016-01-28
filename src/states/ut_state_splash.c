@@ -98,6 +98,9 @@ ut_state ut_state_splash(ut_context* pContext)
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 
+	ut_lcd_buf_drawString(1, 1, "teste", true);
+	ut_lcd_buf_output();
+
 	/* Next state */
 	return STATE_WARNING;
 }

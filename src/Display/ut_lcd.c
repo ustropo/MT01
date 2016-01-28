@@ -20,6 +20,12 @@
 
 #define SCREEN_BUFFER_LEN	SCREEN_HEIGHT * (SCREEN_WIDTH + 7 ) / 8
 
+/* pointer to the start adress of the glyph, points to progmem area */
+typedef void * u8g_glyph_t;
+
+extern u8g_glyph_t u8g_GetGlyph(u8g_t *u8g, uint8_t requested_encoding);
+extern uint8_t *u8g_font_GetGlyphDataStart(const void *font, u8g_glyph_t g);
+
 /****************************************************************************************
  *  Variables
  ****************************************************************************************/
@@ -108,6 +114,57 @@ static void ut_lcd_buf_drawHImage(uint8_t x, uint8_t y, uint8_t w, const uint8_t
 	}
 }
 
+/**
+ * Draw a single char into frame buffer
+ * @param x			Left position. Max of 128.
+ * @param y			Top position.  Max of 64.
+ * @param encoding	Character.
+ */
+static void ut_lcd_buf_drawGlyph(uint8_t x, uint8_t y, const uint8_t encoding)
+{
+	  const uint8_t *data;
+	  uint8_t w, h;
+	  uint8_t i, j;
+	  uint32_t index;
+
+	  {
+	    u8g_glyph_t g = u8g_GetGlyph(&ut_u8g, encoding);
+	    if ( g == NULL  )
+	      return;
+	    data = u8g_font_GetGlyphDataStart(ut_u8g.font, g);
+	  }
+
+	  w = ut_u8g.glyph_width;
+	  h = ut_u8g.glyph_height;
+
+	  x += ut_u8g.glyph_x;
+	  y -= ut_u8g.glyph_y;
+	  y--;
+
+	  /* TODO: boundaries */
+
+	  /* now, w is reused as bytes per line */
+	  w += 7;
+	  w /= 8;
+
+	  //iy = y;
+	  y -= h;
+	  y++;
+
+	  for( j = 0; j < h; j++ )
+	  {
+	    index = x + y*SCREEN_WIDTH;
+	    for( i = 0; i < w; i++ )
+	    {
+	      ut_lcd_buf_draw8Pixel(index, *data);
+	      data++;
+	      index+=8;
+	    }
+	    y++;
+	  }
+	  return;
+}
+
 /****************************************************************************************
  *  Public functions
  ****************************************************************************************/
@@ -163,7 +220,14 @@ void ut_lcd_buf_output()
  */
 void ut_lcd_buf_drawString(uint8_t line, uint8_t column, const char* text, uint8_t invert)
 {
+	line *= 10;
+	line += ut_u8g.font_calc_vref(&ut_u8g);
 
+	while(*text)
+	{
+		ut_lcd_buf_drawGlyph(column*7, line, *text++);
+		column += 1;
+	}
 }
 
 /**
