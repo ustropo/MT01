@@ -251,12 +251,13 @@ void ut_lcd_output_str()
 	} while(u8g_NextPage(&main_u8g));
 }
 
-void ut_lcd_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *bitmap)
+void ut_lcd_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *bitmap,const char* str)
 {
-	u8g_prepare(u8g_font_6x10);
+	u8g_prepare(u8g_font_5x8);
 	u8g_FirstPage(&main_u8g);
 	do{
 		u8g_DrawXBMP(&main_u8g, x, y, w, h, bitmap);
+		u8g_DrawStr(&main_u8g, x+w-60, y+h+1, str);
 	} while(u8g_NextPage(&main_u8g));
 }
 
