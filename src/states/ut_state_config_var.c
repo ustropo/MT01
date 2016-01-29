@@ -69,15 +69,35 @@ void config_bool(ut_config_var* var)
 		{
 			boolStr = boolOptions;
 		}
+		if (configsVar->currentItem == 2)
+		{
+			menu.title = "CUIDADO! MOVIMENTO AUTOMÁTICO";
+		}
+		else
+		{
+			menu.title = var->name;
+		}
+		break;
+	case STATE_CONFIG_AUTO_MODE:
+		boolStr = boolOptions;
+		if (configsVar->currentItem == 2)
+		{
+			menu.title = "CUIDADO! MOVIMENTO AUTOMÁTICO";
+		}
+		else
+		{
+			menu.title = var->name;
+		}
 		break;
 	default: boolStr = boolOptions;
+			 menu.title = var->name;
 	}
 
 	for(i = 0; i < 2; i++)
 	{
 		menu.items[menu.numItems++].text = boolStr[i];
 	}
-	menu.title = var->name;
+
 	menu.selectedItem = var->value % 2; // Just to be sure - it is really not necessary
 
 	/* Check if user selected a valid entry */

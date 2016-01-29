@@ -23,6 +23,7 @@
 #define BACKGROUND_NORMAL	0
 #define BACKGROUND_INVERTED	1
 #define BACKGROUND_FRAMED	2
+#define BACKGROUND_FRAMED_2	3
 
 extern void ut_lcd_init();
 extern void ut_lcd_clear();
