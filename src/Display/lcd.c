@@ -267,7 +267,7 @@ void ut_lcd_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *bi
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
 #define DEFAULT_DESCOLA_TITLE	"RODANDO"
-#define DEFAULT_AVISO			"ENTER DISPARA/ESC VOLTA"
+#define DEFAULT_AVISO_MANUAL	"ENTER DISPARA/ESC VOLTA"
 #define DEFAULT_TOCHA			"TOCHA"
 #define DEFAULT_ACESA			"ACESA"
 #define DEFAULT_APAGADA			"APAGADA"
@@ -284,7 +284,7 @@ static unsigned char warning_bits[] = {
    0x06, 0x38, 0xc0, 0x00, 0x02, 0x00, 0x80, 0x00, 0xff, 0xff, 0xff, 0x01,
    0xff, 0xff, 0xff, 0x01 };
 
-void ut_lcd_output_manual_mode(bool torch,const char* title,const char* textX,const char* textY,const char* textZ)
+void ut_lcd_output_manual_mode(bool torch,const char** title,const char* textX,const char* textY,const char* textZ)
 {
 	uint8_t row, x, y;
 	uint8_t h;
@@ -317,7 +317,7 @@ void ut_lcd_output_manual_mode(bool torch,const char* title,const char* textX,co
 			x = 0;
 			switch(row)
 			{
-				case 0: str = title;
+				case 0: str = title[0];
 						u8g_prepare(u8g_font_helvB08);
 						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 						u8g_DrawHLine(&main_u8g, x, h-1, 128);
@@ -330,7 +330,7 @@ void ut_lcd_output_manual_mode(bool torch,const char* title,const char* textX,co
 						u8g_prepare(u8g_font_5x8);
 						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) -1;
 						break;
-				case 6: str = DEFAULT_AVISO;
+				case 6: str = title[1];
 						u8g_prepare(u8g_font_5x8);
 			//			h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 						u8g_DrawHLine(&main_u8g, x, y-1, 128);

@@ -22,13 +22,40 @@
 char textXStr[MAX_COLUMN];
 char textYStr[MAX_COLUMN];
 char textZStr[MAX_COLUMN];
-const char *gTitle;
+uint8_t gTitle;
+
 
 #define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
-#define DEFAULT_DESCOLA_TITLE	"DESLOCANDO PARA ZERO"
-#define DEFAULT_AVISO			"ENTER DISPARA/ESC VOLTA"
+#define DEFAULT_DESCOLA_TITLE	"DESLOCANDO"
+#define DEFAULT_AVISO_MANUAL	"ENTER DISPARA/ESC VOLTA"
+#define DEFAULT_AVISO_AUTO	    "ESC PARA A MAQUINA"
+#define DEFAULT_AVISO_DESLOCA	"ESC VOLTA"
+
+enum {
+	MANUAL = 0,
+	AUTO,
+	DESLOCA,
+};
+
+static char* gStrManual[2] =
+{
+	DEFAULT_MANUAL_TITLE,
+	DEFAULT_AVISO_MANUAL
+};
+
+static char* gStrAuto[2] =
+{
+	DEFAULT_AUTO_TITLE,
+	DEFAULT_AVISO_AUTO
+};
+
+static char* gStrDesloca[2] =
+{
+	DEFAULT_DESCOLA_TITLE,
+	DEFAULT_AVISO_DESLOCA
+};
 
 void vTimerUpdateCallback( TimerHandle_t pxTimer );
 TimerHandle_t TimerUpdate;
@@ -37,12 +64,18 @@ TimerHandle_t TimerUpdate;
  * Update machine position
  * @param szTitle
  */
-static void updatePosition(const char* szTitle)
+static void updatePosition(uint8_t menu)
 {
 	float x; float y; float z;
-
+	char **lStr;
 	/* Display is only cleared once to improve performance */
 
+	switch(menu)
+	{
+		case MANUAL: lStr = gStrManual; break;
+		case AUTO: lStr = gStrAuto; break;
+		case DESLOCA: lStr = gStrDesloca; break;
+	}
 	/* TODO: get position from machine */
 	x = mp_get_runtime_absolute_position(0);
 	y = mp_get_runtime_absolute_position(1);
@@ -54,7 +87,7 @@ static void updatePosition(const char* szTitle)
 
 	/* Put it into screen */
 	ut_lcd_output_manual_mode(TORCH,
-						   szTitle,
+			lStr,
 			(const char *)textXStr,
 			(const char *)textYStr,
 			(const char *)textZStr);
@@ -72,8 +105,8 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 	uint32_t keyEntry;
 
 	/* Clear display */
-	updatePosition(DEFAULT_MANUAL_TITLE);
-	gTitle = DEFAULT_MANUAL_TITLE;
+	updatePosition(MANUAL);
+	gTitle = MANUAL;
 	tg_set_primary_source(XIO_DEV_COMMAND);
 	iif_bind_jog();
 	TimerUpdate = xTimerCreate
@@ -161,8 +194,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	uint8_t lstop = 0;
 
 	/* Clear display */
-	updatePosition(DEFAULT_AUTO_TITLE);
-	gTitle = DEFAULT_AUTO_TITLE;
+	updatePosition(AUTO);
+	gTitle = AUTO;
 	TimerUpdate = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
@@ -250,8 +283,8 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 	uint32_t keyEntry;
 
 	/* Clear display */
-	updatePosition(DEFAULT_DESCOLA_TITLE);
-	gTitle = DEFAULT_DESCOLA_TITLE;
+	updatePosition(DESLOCA);
+	gTitle = DESLOCA;
 	iif_bind_idle();
 	TimerUpdate = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
