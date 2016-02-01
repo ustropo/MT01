@@ -23,6 +23,7 @@ char textXStr[MAX_COLUMN];
 char textYStr[MAX_COLUMN];
 char textZStr[MAX_COLUMN];
 uint8_t gTitle;
+extern uint16_t velocidadeJog;
 
 
 #define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
@@ -32,6 +33,9 @@ uint8_t gTitle;
 #define DEFAULT_AVISO_MANUAL	"ENTER DISPARA/ESC VOLTA"
 #define DEFAULT_AVISO_AUTO	    "ESC PARA A MAQUINA"
 #define DEFAULT_AVISO_DESLOCA	"ESC VOLTA"
+#define DEFAULT_LINHA1_MANUAL	"VELOCIDADE:         "
+#define DEFAULT_LINHA1_AUTO	    ""
+#define DEFAULT_LINHA1_DESLOCA	""
 
 enum {
 	MANUAL = 0,
@@ -39,22 +43,24 @@ enum {
 	DESLOCA,
 };
 
-static char* gStrManual[2] =
+static char gStrManual[3][24] =
 {
 	DEFAULT_MANUAL_TITLE,
-	DEFAULT_AVISO_MANUAL
+	DEFAULT_AVISO_MANUAL,
 };
 
-static char* gStrAuto[2] =
+static char gStrAuto[3][24] =
 {
 	DEFAULT_AUTO_TITLE,
-	DEFAULT_AVISO_AUTO
+	DEFAULT_AVISO_AUTO,
+	""
 };
 
-static char* gStrDesloca[2] =
+static char gStrDesloca[3][24] =
 {
 	DEFAULT_DESCOLA_TITLE,
-	DEFAULT_AVISO_DESLOCA
+	DEFAULT_AVISO_DESLOCA,
+	""
 };
 
 void vTimerUpdateCallback( TimerHandle_t pxTimer );
@@ -67,14 +73,24 @@ TimerHandle_t TimerUpdate;
 static void updatePosition(uint8_t menu)
 {
 	float x; float y; float z;
-	char **lStr;
+	char *lStr[3];
 	/* Display is only cleared once to improve performance */
 
 	switch(menu)
 	{
-		case MANUAL: lStr = gStrManual; break;
-		case AUTO: lStr = gStrAuto; break;
-		case DESLOCA: lStr = gStrDesloca; break;
+		case MANUAL: lStr[0] = gStrManual[0];
+					 lStr[1] = gStrManual[1];
+			         sprintf(gStrManual[2], "VEL.: %d mm/s", velocidadeJog);
+			         lStr[2] = gStrManual[2];
+			         break;
+		case AUTO:   lStr[0] = gStrAuto[0];
+		 	 	 	 lStr[1] = gStrAuto[1];
+                     lStr[2] = gStrAuto[2];
+                     break;
+		case DESLOCA: lStr[0] = gStrDesloca[0];
+					  lStr[0] = gStrDesloca[1];
+					  lStr[0] = gStrDesloca[2];
+					  break;
 	}
 	/* TODO: get position from machine */
 	x = mp_get_runtime_absolute_position(0);

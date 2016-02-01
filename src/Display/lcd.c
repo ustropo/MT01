@@ -284,7 +284,7 @@ static unsigned char warning_bits[] = {
    0x06, 0x38, 0xc0, 0x00, 0x02, 0x00, 0x80, 0x00, 0xff, 0xff, 0xff, 0x01,
    0xff, 0xff, 0xff, 0x01 };
 
-void ut_lcd_output_manual_mode(bool torch,const char** title,const char* textX,const char* textY,const char* textZ)
+void ut_lcd_output_manual_mode(bool torch,const char* title[3],const char* textX,const char* textY,const char* textZ)
 {
 	uint8_t row, x, y;
 	uint8_t h;
@@ -322,9 +322,9 @@ void ut_lcd_output_manual_mode(bool torch,const char** title,const char* textX,c
 						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 						u8g_DrawHLine(&main_u8g, x, h-1, 128);
 						break;
-				case 1: str = "";
+				case 1: str = title[2];
 						u8g_prepare(u8g_font_5x8);
-						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 3;
 						break;
 				case 5: str = "";
 						u8g_prepare(u8g_font_5x8);

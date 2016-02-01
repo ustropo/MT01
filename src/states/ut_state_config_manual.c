@@ -9,6 +9,7 @@
 #include "ut_state.h"
 #include "ut_state_config_var.h"
 #include "interpreter_if.h"
+#include "eeprom.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -48,7 +49,7 @@ static void veljog(void *var);
 ut_config_var configs_manual[CONFIG_MANUAL_MAX];
 static bool initialized = false;
 extern ut_config_var* configsVar;
-uint16_t velocidadeJog = 7500;
+uint16_t velocidadeJog;
 
 static const ut_state geNextStateManual[5] =
 {
@@ -196,10 +197,10 @@ static void veljog(void *var)
 	ut_config_var *lvar = var;
 	if(lvar->value)
 	{
-		velocidadeJog = 7500;
+		velocidadeJog = jogRapido;
 	}
 	else
 	{
-		velocidadeJog = 1500;
+		velocidadeJog = jogLento;
 	}
 }

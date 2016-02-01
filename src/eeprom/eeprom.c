@@ -1,3 +1,15 @@
+#include "platform.h"
+#include "r_vee_if.h"
+
+uint8_t alturaDeslocamento;
+uint8_t alturaPerfuracao;
+uint8_t tempoPerfuracao;
+uint8_t alturaCorte;
+uint8_t velocidadeCorte;
+uint16_t jogLento = 1500;
+uint16_t jogRapido = 7500;
+uint8_t bIHS;
+
 /***********************************************************************************************************************
 * Function Name: VEE_OperationDone_Callback
 * Description  : Callback function from VEE that signifies that VEE operation
