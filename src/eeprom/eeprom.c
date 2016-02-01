@@ -1,14 +1,20 @@
 #include "platform.h"
+#include "eeprom.h"
 #include "r_vee_if.h"
 
-uint8_t alturaDeslocamento;
-uint8_t alturaPerfuracao;
-uint8_t tempoPerfuracao;
-uint8_t alturaCorte;
-uint8_t velocidadeCorte;
-uint16_t jogLento = 1500;
-uint16_t jogRapido = 7500;
-uint8_t bIHS;
+uint32_t configVar[VAR_MAX] = {
+	1,
+	1,
+	0,
+	1,
+	10,
+	1500,
+	7500,
+	0,
+	0,
+	0,
+	0
+};
 
 /***********************************************************************************************************************
 * Function Name: VEE_OperationDone_Callback

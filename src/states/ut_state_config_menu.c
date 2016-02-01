@@ -8,6 +8,7 @@
 #include "ut_context.h"
 #include "ut_state.h"
 #include "ut_state_config_var.h"
+#include "eeprom.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -46,12 +47,12 @@ extern ut_config_var* configsVar;
 static ut_config_type init_types[CONFIG_MAX] =
 {
 	UT_CONFIG_INT,
-	UT_CONFIG_BOOL,
-	UT_CONFIG_BOOL,
-	UT_CONFIG_BOOL,
-	UT_CONFIG_BOOL,
-	UT_CONFIG_BOOL,
-	UT_CONFIG_BOOL,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
@@ -110,7 +111,7 @@ static void init()
 	for(i = 0; i < CONFIG_MAX; i++)
 	{
 		configs[i].type = init_types[i];
-		configs[i].value = init_values[i];
+		configs[i].value = &configVar[i];
 		configs[i].name = init_names[i];
 	}
 

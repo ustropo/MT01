@@ -49,7 +49,7 @@ static void veljog(void *var);
 ut_config_var configs_manual[CONFIG_MANUAL_MAX];
 static bool initialized = false;
 extern ut_config_var* configsVar;
-uint16_t velocidadeJog;
+uint32_t *velocidadeJog;
 
 static const ut_state geNextStateManual[5] =
 {
@@ -112,7 +112,7 @@ static void init()
 	for(i = 0; i < CONFIG_MANUAL_MAX; i++)
 	{
 		configs_manual[i].type = init_types[i];
-		configs_manual[i].value = init_values[i];
+		configs_manual[i].value = &init_values[i];
 		configs_manual[i].name = init_names[i];
 		configs_manual[i].func_var = init_func[i];
 		configs_manual[i].currentState = STATE_CONFIG_MANUAL_MODE;
@@ -174,7 +174,7 @@ static void zerar_eixos(void *var)
 {
 	ut_config_var *lvar = var;
 
-	if(lvar->value)
+	if(*lvar->value)
 	{
 		tg_set_primary_source(XIO_DEV_COMMAND);
 		xio_open(cs.primary_src,zera_eixos,0);
@@ -185,7 +185,7 @@ static void homming_eixos(void *var)
 {
 	ut_config_var *lvar = var;
 
-	if(lvar->value)
+	if(*lvar->value)
 	{
 		tg_set_primary_source(XIO_DEV_COMMAND);
 		xio_open(cs.primary_src,home_eixos,0);
@@ -195,12 +195,13 @@ static void homming_eixos(void *var)
 static void veljog(void *var)
 {
 	ut_config_var *lvar = var;
-	if(lvar->value)
+
+	if(*lvar->value)
 	{
-		velocidadeJog = jogRapido;
+		velocidadeJog = &configVar[VELOC_JOG_RAPIDO];
 	}
 	else
 	{
-		velocidadeJog = jogLento;
+		velocidadeJog = &configVar[VELOC_JOG_LENTO];
 	}
 }

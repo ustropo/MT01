@@ -8,14 +8,23 @@
 #ifndef INCLUDE_EEPROM_H_
 #define INCLUDE_EEPROM_H_
 
-extern uint8_t alturaDeslocamento;
-extern uint8_t alturaPerfuracao;
-extern uint8_t tempoPerfuracao;
-extern uint8_t alturaCorte;
-extern uint8_t velocidadeCorte;
-extern uint16_t jogLento;
-extern uint16_t jogRapido;
-extern uint8_t bIHS;
+typedef enum
+{
+	ALTURA_DESLOCAMENTO = 0,    //!< CONFIG_JOG_LENTO
+	ALTURA_PERFURACAO,   //!< CONFIG_JOG_RAPIDO
+	TEMPO_PERFURACAO,//!< CONFIG_TESTE_DISPARO
+	ALTURA_CORTE, // ALTURA DE CORTE
+	VELOC_CORTE, // VELOC. DE CORTE
+	VELOC_JOG_LENTO, // VELOC. DE JOG LENTO
+	VELOC_JOG_RAPIDO, // VELOC. DE JOG RÁPIDO
+	CANCELAR_IHS, // CANCELAR IHS
+	TESTE_DISPARO, //" TESTE DE DISPARO",
+	TESTE_SENSOR_CHAPA, //" TESTE SENSOR DE CHAPA",
+	TESTE_SENSOR_ARCOOK, //" TESTE SENSOR ARCO OK",
+	TESTE_EMERGENCIA, //" TESTE BOTÃO DE EMERGÊNCIA"
+	VAR_MAX           //!< CONFIG_MAX
+} var_name;
 
+extern uint32_t configVar[VAR_MAX];
 
 #endif /* INCLUDE_EEPROM_H_ */

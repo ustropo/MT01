@@ -109,7 +109,7 @@ static void init()
 	for(i = 0; i < CONFIG_AUTO_MAX; i++)
 	{
 		configs_auto[i].type = init_types[i];
-		configs_auto[i].value = init_values[i];
+		configs_auto[i].value = &init_values[i];
 		configs_auto[i].name = init_names[i];
 		configs_auto[i].func_var = init_func[i];
 		configs_auto[i].currentState = STATE_CONFIG_AUTO_MODE;

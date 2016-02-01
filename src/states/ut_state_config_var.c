@@ -8,6 +8,7 @@
 #include "ut_context.h"
 #include "ut_state.h"
 #include "ut_state_config_var.h"
+#include "eeprom.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -53,6 +54,7 @@ static char* boolJogVel[2] =
 void config_bool(ut_config_var* var)
 {
 	char** boolStr;
+	uint32_t *value;
 	ut_menu menu;
 	uint8_t i;
 
@@ -97,14 +99,14 @@ void config_bool(ut_config_var* var)
 	{
 		menu.items[menu.numItems++].text = boolStr[i];
 	}
-
-	menu.selectedItem = var->value % 2; // Just to be sure - it is really not necessary
+	value = var->value;
+	menu.selectedItem = *value % 2; // Just to be sure - it is really not necessary
 
 	/* Check if user selected a valid entry */
 	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0) return;
 
 	/* save it - TODO: ask for confirmation, maybe? */
-	var->value = menu.selectedItem;
+	*value = menu.selectedItem;
 }
 
 /**
@@ -114,7 +116,7 @@ void config_bool(ut_config_var* var)
  */
 void config_int(ut_config_var* var)
 {
-	uint32_t tmp = var->value;
+	uint32_t* tmp = var->value;
 	char szText[MAX_COLUMN];
 	uint32_t keyEntry;
 
@@ -123,7 +125,7 @@ void config_int(ut_config_var* var)
 	/* Set title */
 	ut_lcd_drawString(0, 0, var->name, true);
 	/* Set value */
-	sprintf(szText, "%10d", tmp);
+	sprintf(szText, "%10d", *tmp);
 	ut_lcd_drawString(3, 0, szText, false);
 	ut_lcd_output();
 
@@ -136,17 +138,17 @@ void config_int(ut_config_var* var)
 		{
 		case KEY_DOWN:
 			/* TODO: define a min value */
-			if(tmp > 0) tmp--;
+			if(*tmp > 0) *tmp -= 1;
 			break;
 
 		case KEY_UP:
 			/* TODO: define a max value */
-			if(tmp < 100000) tmp++;
+			if(*tmp < 100000) *tmp += 1;
 			break;
 
 		case KEY_ENTER:
 			/* Save value and exit */
-			var->value = tmp;
+		//	var->value = *tmp;
 			return;
 
 		case KEY_ESC:
@@ -157,7 +159,7 @@ void config_int(ut_config_var* var)
 		}
 
 		/* Show again */
-		sprintf(szText, "%10d", tmp);
+		sprintf(szText, "%10d", *tmp);
 		ut_lcd_drawString(3, 0, szText, false);
 		ut_lcd_output();
 	}
