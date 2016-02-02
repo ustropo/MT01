@@ -121,13 +121,14 @@ void config_int(ut_config_var* var)
 	uint32_t keyEntry;
 
 	/* Clear previous screen */
-	ut_lcd_clear();
+//	ut_lcd_clear();
 	/* Set title */
-	ut_lcd_drawString(0, 0, var->name, true);
+//	ut_lcd_drawString(0, 0, var->name, true);
 	/* Set value */
-	sprintf(szText, "%10d", *tmp);
-	ut_lcd_drawString(3, 0, szText, false);
-	ut_lcd_output();
+	sprintf(szText, "%d %s", *tmp,var->unit);
+//	ut_lcd_drawString(3, 0, szText, false);
+//	ut_lcd_output();
+	ut_lcd_output_int_var(var->name,szText);
 
 	/* Loop to increment / decrement value */
 	/* Wait for keyboard */
@@ -159,9 +160,14 @@ void config_int(ut_config_var* var)
 		}
 
 		/* Show again */
-		sprintf(szText, "%10d", *tmp);
-		ut_lcd_drawString(3, 0, szText, false);
-		ut_lcd_output();
+//		sprintf(szText, "%10d %s", *tmp,var->unit);
+//		ut_lcd_drawString(3, 0, szText, false);
+//		ut_lcd_output();
+
+		sprintf(szText, "%d %s", *tmp,var->unit);
+	//	ut_lcd_drawString(3, 0, szText, false);
+	//	ut_lcd_output();
+		ut_lcd_output_int_var(var->name,szText);
 	}
 
 }

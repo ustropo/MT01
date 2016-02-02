@@ -26,7 +26,6 @@ static const u8g_fntpgm_uint8_t *gaboFontStr[MAX_ROW];
  */
 static u8g_t main_u8g;
 
-
 /**
  *
  */
@@ -349,5 +348,21 @@ void ut_lcd_output_manual_mode(bool torch,const char* title[3],const char* textX
 			y += h;
 		}
 
+	} while(u8g_NextPage(&main_u8g));
+}
+
+void ut_lcd_output_int_var(const char* title,const char* varStr)
+{
+	uint8_t h;
+	u8g_FirstPage(&main_u8g);
+	/* Picture loop */
+	do
+	{
+		u8g_DrawFrame(&main_u8g,10, 10, 108, 44);
+		u8g_prepare(u8g_font_6x10);
+		h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+		u8g_DrawStr(&main_u8g, 6, 11, title);
+		u8g_DrawHLine(&main_u8g, 10, h+11, 108);
+		u8g_DrawStr(&main_u8g, 40, h+20, varStr);
 	} while(u8g_NextPage(&main_u8g));
 }

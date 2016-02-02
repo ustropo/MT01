@@ -78,18 +78,34 @@ static uint32_t init_values[CONFIG_MAX] =
 
 static char* init_names[CONFIG_MAX] =
 {
-	" ALTURA DESLOCAMENTO",
-	" ALTURA DE PERFURAÇÃO",
-	" TEMPO DE PERFURAÇÃO",
-	" ALTURA DE CORTE",
-	" VELOC. DE CORTE",
-	" VELOC. DE JOG LENTO",
-	" VELOC. DE JOG RÁPIDO",
+	" ALT. DESLOCAMENTO",
+	" ALT. PERFURAÇÃO",
+	" TEMPO PERFURAÇÃO",
+	" ALT. CORTE",
+	" VELOC. CORTE",
+	" VELOC. JOG LENTO",
+	" VELOC. JOG RÁPIDO",
 	" CANCELAR IHS",
 	" TESTE DE DISPARO",
 	" TESTE SENSOR DE CHAPA",
 	" TESTE SENSOR ARCO OK",
 	" TESTE BOTÃO DE EMERGÊNCIA"
+};
+
+static char* init_unit[CONFIG_MAX] =
+{
+	"mm",
+	"mm",
+	"s",
+	"mm",
+	"mm/s",
+	"mm/s",
+	"mm/s",
+	"",
+	"",
+	"",
+	"",
+	""
 };
 
 static const char* gszConfigMenuTitle = "CONFIG. DE CORTE";
@@ -113,6 +129,7 @@ static void init()
 		configs[i].type = init_types[i];
 		configs[i].value = &configVar[i];
 		configs[i].name = init_names[i];
+		configs[i].unit = init_unit[i];
 	}
 
 	initialized = true;

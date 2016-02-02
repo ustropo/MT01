@@ -32,6 +32,9 @@ typedef struct
 {
 	ut_config_type type; //!< Type of configuration variable
 	uint32_t *value;		 //!< Value of variable
+	uint32_t *valueMin;		 //!< valueMin of variable
+	uint32_t *valueMax;		 //!< valueMax of variable
+	const char* unit;    //!< unit of the variable
 	const char* name;    //!< Name of the variable
 	ut_state currentState;
 	uint8_t currentItem;
