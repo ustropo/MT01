@@ -23,7 +23,7 @@ char textXStr[MAX_COLUMN];
 char textYStr[MAX_COLUMN];
 char textZStr[MAX_COLUMN];
 uint8_t gTitle;
-extern uint32_t *velocidadeJog;
+extern float *velocidadeJog;
 
 
 #define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
@@ -80,7 +80,7 @@ static void updatePosition(uint8_t menu)
 	{
 		case MANUAL: lStr[0] = gStrManual[0];
 					 lStr[1] = gStrManual[1];
-			         sprintf(gStrManual[2], "VEL.: %d mm/s", *velocidadeJog);
+			         sprintf(gStrManual[2], "VEL.: %.0f mm/s", *velocidadeJog);
 			         lStr[2] = gStrManual[2];
 			         break;
 		case AUTO:   lStr[0] = gStrAuto[0];

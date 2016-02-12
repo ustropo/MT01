@@ -116,18 +116,13 @@ void config_bool(ut_config_var* var)
  */
 void config_int(ut_config_var* var)
 {
-	uint32_t* tmp = var->value;
+	float* tmp = var->value;
 	char szText[MAX_COLUMN];
 	uint32_t keyEntry;
 
-	/* Clear previous screen */
-//	ut_lcd_clear();
-	/* Set title */
-//	ut_lcd_drawString(0, 0, var->name, true);
-	/* Set value */
-	sprintf(szText, "%d %s", *tmp,var->unit);
-//	ut_lcd_drawString(3, 0, szText, false);
-//	ut_lcd_output();
+
+	sprintf(szText, "%.1f %s", *tmp,var->unit);
+
 	ut_lcd_output_int_var(var->name,szText);
 
 	/* Loop to increment / decrement value */
@@ -139,17 +134,16 @@ void config_int(ut_config_var* var)
 		{
 		case KEY_DOWN:
 			/* TODO: define a min value */
-			if(*tmp > 0) *tmp -= 1;
+			if(*tmp > 0) *tmp = *tmp - 1.0;
 			break;
 
 		case KEY_UP:
 			/* TODO: define a max value */
-			if(*tmp < 100000) *tmp += 1;
+			if(*tmp < 100000) *tmp = *tmp + 1.0;
 			break;
 
 		case KEY_ENTER:
-			/* Save value and exit */
-		//	var->value = *tmp;
+			eepromWriteConfig();
 			return;
 
 		case KEY_ESC:
@@ -159,14 +153,8 @@ void config_int(ut_config_var* var)
 			break;
 		}
 
-		/* Show again */
-//		sprintf(szText, "%10d %s", *tmp,var->unit);
-//		ut_lcd_drawString(3, 0, szText, false);
-//		ut_lcd_output();
+		sprintf(szText, "%.1f %s", *tmp,var->unit);
 
-		sprintf(szText, "%d %s", *tmp,var->unit);
-	//	ut_lcd_drawString(3, 0, szText, false);
-	//	ut_lcd_output();
 		ut_lcd_output_int_var(var->name,szText);
 	}
 

@@ -1,8 +1,15 @@
 #include "platform.h"
 #include "eeprom.h"
 #include "r_vee_if.h"
+#include <string.h>
 
-uint32_t configVar[VAR_MAX] = {
+//#define VEE_DEMO_ERASE_FIRST
+
+extern float *velocidadeJog;
+
+enum { READY, NOT_READY } sample_state;
+
+float configVarInit[VAR_MAX] = {
 	1,
 	1,
 	0,
@@ -16,6 +23,128 @@ uint32_t configVar[VAR_MAX] = {
 	0
 };
 
+float configVar[VAR_MAX];
+
+vee_record_t dataRecord;
+
+void eepromInit(void)
+{
+#if defined(VEE_DEMO_ERASE_FIRST)
+    uint32_t loop1;
+    uint32_t ret;
+    /* Enable data flash access. */
+    R_FlashDataAreaAccess(0xFFFF, 0xFFFF);
+
+    for (loop1 = 0; loop1 < DF_NUM_BLOCKS; loop1++)
+    {
+        /* Erase data flash. */
+        ret = R_FlashErase(BLOCK_DB0 + loop1);
+
+        /* Check for errors */
+        if(ret != FLASH_SUCCESS)
+        {
+            while(1)
+            {
+                /* Failure in erasing data flash. Something is not setup right. */
+            }
+        }
+
+        /* Wait for flash operation to finish. */
+        while(FLASH_SUCCESS != R_FlashGetStatus());
+    }
+#endif
+	R_VEE_Open();
+}
+
+void eepromInitVar(void)
+{
+	velocidadeJog = &configVar[VELOC_JOG_LENTO];
+}
+
+void eepromWriteConfig(void)
+{
+    uint32_t ret;
+    dataRecord.ID = 0;
+    dataRecord.pData = (uint8_t*)configVar;
+    dataRecord.size =sizeof(configVar);
+
+    /* Generate check for data */
+    ret = R_VEE_GenerateCheck(&dataRecord);
+    /* Check result */
+    if( ret != VEE_SUCCESS )
+    {
+        while(1)
+        {
+            /* Error */
+        }
+    }
+
+	ret = R_VEE_Write(&dataRecord);
+	/* Check result */
+	if( ret != VEE_SUCCESS )
+	{
+	    while(1)
+	    {
+	        /* Error */
+	    }
+	}
+
+	sample_state = NOT_READY;
+    while(sample_state == NOT_READY)
+       {
+           /* Wait for write to finish. When write finishes it will call the VEE_OperationDone_Callback() callback
+              function below. The user also has the option of just polling by disabling the callback functions in
+              r_vee_config.h */
+       }
+}
+
+void eepromReadConfig(void)
+{
+    uint32_t ret;
+    dataRecord.ID = 0;
+	ret = R_VEE_Read(&dataRecord);
+	/* Check result */
+	if( ret == VEE_NOT_FOUND )
+	{
+	    uint32_t loop1;
+	    uint32_t ret;
+	    /* Enable data flash access. */
+	    R_FlashDataAreaAccess(0xFFFF, 0xFFFF);
+
+	    for (loop1 = 0; loop1 < DF_NUM_BLOCKS; loop1++)
+	    {
+	        /* Erase data flash. */
+	        ret = R_FlashErase(BLOCK_DB0 + loop1);
+
+	        /* Check for errors */
+	        if(ret != FLASH_SUCCESS)
+	        {
+	            while(1)
+	            {
+	                /* Failure in erasing data flash. Something is not setup right. */
+	            }
+	        }
+
+	        /* Wait for flash operation to finish. */
+	        while(FLASH_SUCCESS != R_FlashGetStatus());
+	    }
+		memcpy(configVar,configVarInit,sizeof(configVar));
+		R_VEE_Open();
+	    eepromWriteConfig();
+		return;
+	}
+	if( ret != VEE_SUCCESS )
+	{
+	    while(1)
+	    {
+	        /* Error */
+	    }
+	}
+    R_VEE_ReleaseState();
+	memcpy(configVar,dataRecord.pData,sizeof(configVar));
+}
+
+
 /***********************************************************************************************************************
 * Function Name: VEE_OperationDone_Callback
 * Description  : Callback function from VEE that signifies that VEE operation
@@ -25,7 +154,7 @@ uint32_t configVar[VAR_MAX] = {
 ***********************************************************************************************************************/
 void VEE_OperationDone_Callback(void)
 {
-
+	sample_state = READY;
 }
 /***********************************************************************************************************************
 End of VEE_OperationDone_Callback function

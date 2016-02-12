@@ -37,6 +37,7 @@ Includes   <System Includes> , "Project Includes"
 #include "config.h"		// #2
 #include "hardware.h"
 #include "r_cmt_rx_if.h"
+#include "eeprom.h"
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
@@ -75,7 +76,9 @@ void main(void)
 		while (1);
 	}
 //	serial_init();
-
+	eepromInit();
+	eepromReadConfig();
+	eepromInitVar();
 	/* Initialize USB */
 	usb_main();
 

@@ -25,6 +25,11 @@ typedef enum
 	VAR_MAX           //!< CONFIG_MAX
 } var_name;
 
-extern uint32_t configVar[VAR_MAX];
+extern float configVar[VAR_MAX];
+
+void eepromInit(void);
+void eepromInitVar(void);
+void eepromWriteConfig(void);
+void eepromReadConfig(void);
 
 #endif /* INCLUDE_EEPROM_H_ */
