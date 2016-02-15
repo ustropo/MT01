@@ -396,13 +396,13 @@ void FreeRTOSConfig( void )
 #endif
 
     /* USB tasks */
-    xTaskCreate( (pdTASK_CODE)R_usb_hstd_HcdTask,     "USB_HCD_TSK     ",  128, NULL, 5, &task_handle1 ); /* USB_HCD_TASK   */
-    xTaskCreate( (pdTASK_CODE)R_usb_hstd_MgrTask,     "USB_MGR_TSK     ",  128, NULL, 4, &task_handle2 ); /* USB_MGR_TASK   */
-    xTaskCreate( (pdTASK_CODE)R_usb_hhub_Task,        "USB_HUB_TSK     ",  128, NULL, 3, &task_handle3 ); /* USB_HUB_TASK   */
+    xTaskCreate( (pdTASK_CODE)R_usb_hstd_HcdTask,     "USB_HCD_TSK     ",  512, NULL, 5, &task_handle1 ); /* USB_HCD_TASK   */
+    xTaskCreate( (pdTASK_CODE)R_usb_hstd_MgrTask,     "USB_MGR_TSK     ",  512, NULL, 4, &task_handle2 ); /* USB_MGR_TASK   */
+    xTaskCreate( (pdTASK_CODE)R_usb_hhub_Task,        "USB_HUB_TSK     ",  512, NULL, 3, &task_handle3 ); /* USB_HUB_TASK   */
 
-    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_Task,          "USB_HMSC_TSK    ",  128, NULL, 3, &task_handle4 ); /* USB_HMSC_TASK  */
-    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_StrgDriveTask, "USB_HSTRG_TSK   ",  128, NULL, 3, &task_handle5 ); /* USB_HSTRG_TASK */
-    xTaskCreate( (pdTASK_CODE)hmsc_cstd_task_start,     "HMSC_MAIN_TSK   ",  128, NULL, 2, NULL); /* HMSC_MAIN_TASK      */
+    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_Task,          "USB_HMSC_TSK    ",  512, NULL, 3, &task_handle4 ); /* USB_HMSC_TASK  */
+    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_StrgDriveTask, "USB_HSTRG_TSK   ",  512, NULL, 3, &task_handle5 ); /* USB_HSTRG_TASK */
+    xTaskCreate( (pdTASK_CODE)hmsc_cstd_task_start,     "HMSC_MAIN_TSK   ",  512, NULL, 2, NULL); /* HMSC_MAIN_TASK      */
 
     /*User interface task*/
     xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task    ",  512, NULL, 3, NULL); /* keyboard_task      */

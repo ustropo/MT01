@@ -24,6 +24,7 @@
 #include "spindle.h"
 #include "util.h"
 #include "xio.h"			// for char definitions
+#include "macros/macros.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -31,7 +32,9 @@ extern "C"{
 
 struct gcodeParserSingleton {	 	  // struct to manage globals
 	uint8_t modals[MODAL_GROUP_COUNT];// collects modal groups in a block
-}; struct gcodeParserSingleton gp;
+};
+
+struct gcodeParserSingleton gp;
 
 // local helper functions and macros
 static void _normalize_gcode_block(char_t *str, char_t **com, char_t **msg, uint8_t *block_delete_flag);
@@ -39,7 +42,7 @@ static stat_t _get_next_gcode_word(char **pstr, char *letter, float *value);
 static stat_t _point(float value);
 static stat_t _validate_gcode_block(void);
 static stat_t _parse_gcode_block(char_t *line);	// Parse the block into the GN/GF structs
-static stat_t _execute_gcode_block(void);		// Execute the gcode block
+
 
 //RXMOD	#define SET_MODAL(m,parm,val) ({cm.gn.parm=val; cm.gf.parm=1; gp.modals[m]+=1; break;})
 //RXMOD	#define SET_NON_MODAL(parm,val) ({cm.gn.parm=val; cm.gf.parm=1; break;})
@@ -47,6 +50,7 @@ static stat_t _execute_gcode_block(void);		// Execute the gcode block
 #define SET_MODAL(m,parm,val) cm.gn.parm=val; cm.gf.parm=1; gp.modals[m]+=1; break;
 #define SET_NON_MODAL(parm,val) cm.gn.parm=val; cm.gf.parm=1; break;
 #define EXEC_FUNC(f,v) if((uint8_t)cm.gf.v != false) { status = f(cm.gn.v);}
+
 /*
  * gc_gcode_parser() - parse a block (line) of gcode
  *
@@ -356,9 +360,11 @@ static stat_t _parse_gcode_block(char_t *buf)
 						SET_MODAL (MODAL_GROUP_M4, program_flow, PROGRAM_STOP);
 				case 2: case 30:
 						SET_MODAL (MODAL_GROUP_M4, program_flow, PROGRAM_END);
-				case 3: SET_MODAL (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
+				case 3: M3_Macro();
+						break;
 				case 4: SET_MODAL (MODAL_GROUP_M7, spindle_mode, SPINDLE_CCW);
-				case 5: SET_MODAL (MODAL_GROUP_M7, spindle_mode, SPINDLE_OFF);
+				case 5:	M5_Macro();
+						break;
 				case 6: SET_NON_MODAL (tool_change, true);
 				case 7: SET_MODAL (MODAL_GROUP_M8, mist_coolant, true);
 				case 8: SET_MODAL (MODAL_GROUP_M8, flood_coolant, true);
@@ -438,7 +444,7 @@ static stat_t _parse_gcode_block(char_t *buf)
  *	to calling the canonical functions (which do the unit conversions)
  */
 
-static stat_t _execute_gcode_block()
+stat_t _execute_gcode_block()
 {
 	stat_t status = STAT_OK;
 

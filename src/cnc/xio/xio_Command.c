@@ -28,6 +28,7 @@
 #include "xio.h"
 #include "ut_state.h"
 
+
 /******************************************************************************
  * FILE CONFIGURATION RECORDS
  ******************************************************************************/
@@ -97,7 +98,6 @@ FILE * xio_open_command(const uint8_t dev, const char *addr, const flags_t flags
 
 int xio_gets_command(xioDev_t *d, char *buf, const int size)
 {
-	static uint8_t count = 0;
 	xioCommand_t *dx = (xioCommand_t *)d->x;
 	const char *buffin = dx->filebase_P ;
 

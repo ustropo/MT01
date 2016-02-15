@@ -30,6 +30,7 @@ extern "C"{
 stat_t gc_gcode_parser(char_t *block);
 stat_t gc_get_gc(nvObj_t *nv);
 stat_t gc_run_gc(nvObj_t *nv);
+stat_t _execute_gcode_block(void);		// Execute the gcode block
 
 #ifdef __cplusplus
 }
