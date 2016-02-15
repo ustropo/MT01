@@ -36,6 +36,8 @@
 #include "plan_arc.h"
 #include "planner.h"
 #include "stepper.h"
+#include "macros/macros.h"
+
 
 #include "encoder.h"
 #include "hardware.h"
@@ -74,7 +76,6 @@ static stat_t _limit_switch_handler(void);
 static stat_t _system_assertions(void);
 static stat_t _sync_to_planner(void);
 static stat_t _sync_to_tx_buffer(void);
-static stat_t _command_dispatch(void);
 bool gfilerunning = false;
 
 // prep for export to other modules:
@@ -92,7 +93,7 @@ void controller_init(uint8_t std_in, uint8_t std_out, uint8_t std_err)
 {
 	memset(&cs, 0, sizeof(controller_t));			// clear all values, job_id's, pointers and status
 	controller_init_assertions();
-
+	macro_func_ptr = _command_dispatch;
 	cs.fw_build = TINYG_FIRMWARE_BUILD;
 	cs.fw_version = TINYG_FIRMWARE_VERSION;
 	cs.hw_platform = TINYG_HARDWARE_PLATFORM;		// NB: HW version is set from EEPROM
@@ -204,7 +205,7 @@ static void _controller_HSM()
 #ifdef __AVR
 	DISPATCH(set_baud_callback());				// perform baud rate update (must be after TX sync)
 #endif
-	DISPATCH(_command_dispatch());				// read and execute next command
+	DISPATCH(macro_func_ptr());				// read and execute next command
 	DISPATCH(_normal_idler());					// blink LEDs slowly to show everything is OK
 }
 
@@ -217,7 +218,7 @@ static void _controller_HSM()
  *	Also responsible for prompts and for flow control
  */
 
-static stat_t _command_dispatch()
+stat_t _command_dispatch()
 {
 #ifdef __AVR
 	stat_t status;

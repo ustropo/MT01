@@ -7,7 +7,11 @@
 #ifndef CNC_MACROS_MACROS_H_
 #define CNC_MACROS_MACROS_H_
 
-void M5_Macro(void);
-void M3_Macro(void);
+extern stat_t (*macro_func_ptr)(void);
+
+extern int8_t macro;
+
+stat_t M5_Macro(void);
+stat_t M3_Macro(void);
 
 #endif /* CNC_MACROS_MACROS_H_ */
