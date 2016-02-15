@@ -12,6 +12,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "timers.h"
 
 #include "lcd.h"
 #include "lcd_menu.h"
@@ -23,6 +24,11 @@
 
 
 #define DEFAULT_CONFIG_VAR_TOUT	30000
+
+static void vTimerUpdateCallback( TimerHandle_t pxTimer );
+static TimerHandle_t TimerUpdate[2];
+static uint8_t count = 0;
+static uint8_t mult = 1;
 
 /**
  * Function pointer that can change a configuration
@@ -116,14 +122,47 @@ void config_bool(ut_config_var* var)
  */
 void config_int(ut_config_var* var)
 {
-	float* tmp = var->value;
+	float *value = configsVar->value;
 	char szText[MAX_COLUMN];
 	uint32_t keyEntry;
 
-
-	sprintf(szText, "%.1f %s", *tmp,var->unit);
+	switch(var->point)
+	{
+		case 0: sprintf(szText, "%.0f %s", *value,var->unit); break;
+		case 1: sprintf(szText, "%.1f %s", *value,var->unit); break;
+	}
 
 	ut_lcd_output_int_var(var->name,szText);
+
+	TimerUpdate[0] = xTimerCreate
+				   (  /* Just a text name, not used by the RTOS kernel. */
+					 "Timer Update",
+					 /* The timer period in ticks, must be greater than 0. */
+					 ( 200 ),
+					 /* The timers will auto-reload themselves when they
+					 expire. */
+					 pdTRUE,
+					 /* Assign each timer a unique id equal to its array
+					 index. */
+					 ( void * ) 3,
+					 /* Each timer calls the same callback when it expires. */
+					 vTimerUpdateCallback
+				   );
+
+	TimerUpdate[1] = xTimerCreate
+				   (  /* Just a text name, not used by the RTOS kernel. */
+					 "Timer Update",
+					 /* The timer period in ticks, must be greater than 0. */
+					 ( 200 ),
+					 /* The timers will auto-reload themselves when they
+					 expire. */
+					 pdTRUE,
+					 /* Assign each timer a unique id equal to its array
+					 index. */
+					 ( void * ) 4,
+					 /* Each timer calls the same callback when it expires. */
+					 vTimerUpdateCallback
+				   );
 
 	/* Loop to increment / decrement value */
 	/* Wait for keyboard */
@@ -134,28 +173,37 @@ void config_int(ut_config_var* var)
 		{
 		case KEY_DOWN:
 			/* TODO: define a min value */
-			if(*tmp > 0) *tmp = *tmp - 1.0;
+			xTimerStart( TimerUpdate[0], 0 );
 			break;
 
 		case KEY_UP:
 			/* TODO: define a max value */
-			if(*tmp < 100000) *tmp = *tmp + 1.0;
+			xTimerStart( TimerUpdate[1], 0 );
 			break;
 
 		case KEY_ENTER:
 			eepromWriteConfig();
+			mult = 1;
+			count = 0;
 			return;
 
 		case KEY_ESC:
+			mult = 1;
+			count = 0;
 			return;
+
+		case KEY_RELEASED:
+			xTimerStop( TimerUpdate[0], 0 );
+			xTimerStop( TimerUpdate[1], 0 );
+			mult = 1;
+			count = 0;
+			break;
 
 		default:
 			break;
 		}
 
-		sprintf(szText, "%.1f %s", *tmp,var->unit);
 
-		ut_lcd_output_int_var(var->name,szText);
 	}
 
 }
@@ -206,4 +254,38 @@ ut_state ut_state_config_var(ut_context* pContext)
 		break;
 	}
 	return stateBack;
+}
+
+static void vTimerUpdateCallback( TimerHandle_t pxTimer )
+{
+	char szText[MAX_COLUMN];
+	long lArrayIndex;
+	float *value = configsVar->value;
+
+	/* Optionally do something if the pxTimer parameter is NULL. */
+	configASSERT( pxTimer );
+	if(count == 15)
+	{
+		mult = mult*10;
+		count = 0;
+	}
+
+	/* Which timer expired? */
+	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
+	switch (lArrayIndex)
+	{
+		case 3: if(*value > 0) *value = *value - configsVar->step*mult;
+		break;
+		case 4: if(*value < 10000) *value = *value + configsVar->step*mult;
+		break;
+	}
+
+	switch(configsVar->point)
+	{
+		case 0: sprintf(szText, "%.0f %s", *value,configsVar->unit); break;
+		case 1: sprintf(szText, "%.1f %s", *value,configsVar->unit); break;
+	}
+
+	ut_lcd_output_int_var(configsVar->name,szText);
+	count++;
 }

@@ -60,22 +60,6 @@ static ut_config_type init_types[CONFIG_MAX] =
 	UT_CONFIG_BOOL
 };
 
-static uint32_t init_values[CONFIG_MAX] =
-{
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0
-};
-
 static char* init_names[CONFIG_MAX] =
 {
 	" ALT. DESLOCAMENTO",
@@ -90,6 +74,38 @@ static char* init_names[CONFIG_MAX] =
 	" TESTE SENSOR DE CHAPA",
 	" TESTE SENSOR ARCO OK",
 	" TESTE BOTÃO DE EMERGÊNCIA"
+};
+
+static float init_step[CONFIG_MAX] =
+{
+	0.1,
+	0.1,
+	0.1,
+	0.1,
+	1,
+	1,
+	1,
+	0,
+	0,
+	0,
+	0,
+	0
+};
+
+static uint8_t init_point[CONFIG_MAX] =
+{
+	1,
+	1,
+	1,
+	1,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0
 };
 
 static char* init_unit[CONFIG_MAX] =
@@ -130,6 +146,8 @@ static void init()
 		configs[i].value = &configVar[i];
 		configs[i].name = init_names[i];
 		configs[i].unit = init_unit[i];
+		configs[i].step = init_step[i];
+		configs[i].point = init_point[i];
 	}
 
 	initialized = true;

@@ -63,8 +63,8 @@ static char gStrDesloca[3][24] =
 	""
 };
 
-void vTimerUpdateCallback( TimerHandle_t pxTimer );
-TimerHandle_t TimerUpdate;
+static void vTimerUpdateCallback( TimerHandle_t pxTimer );
+static TimerHandle_t TimerUpdate;
 
 /**
  * Update machine position
@@ -371,7 +371,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 	return STATE_MAIN_MENU;
 }
 
-void vTimerUpdateCallback( TimerHandle_t pxTimer )
+static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 {
 	updatePosition(gTitle);
 }
