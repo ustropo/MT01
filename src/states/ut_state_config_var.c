@@ -264,7 +264,7 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 
 	/* Optionally do something if the pxTimer parameter is NULL. */
 	configASSERT( pxTimer );
-	if(count == 15)
+	if(count == 10)
 	{
 		mult = mult*10;
 		count = 0;
