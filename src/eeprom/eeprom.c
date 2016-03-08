@@ -5,6 +5,7 @@
 
 //#define VEE_DEMO_ERASE_FIRST
 
+
 extern float *velocidadeJog;
 
 enum { READY, NOT_READY } sample_state;
@@ -22,6 +23,9 @@ float configVarInit[VAR_MAX] = {
 	0,
 	0
 };
+
+uint32_t configFlagsInit = 0;
+uint32_t configFlags = 0;
 
 float configVar[VAR_MAX];
 
@@ -61,12 +65,22 @@ void eepromInitVar(void)
 	velocidadeJog = &configVar[VELOC_JOG_LENTO];
 }
 
-void eepromWriteConfig(void)
+void eepromWriteConfig(uint8_t varType)
 {
     uint32_t ret;
-    dataRecord.ID = 0;
-    dataRecord.pData = (uint8_t*)configVar;
-    dataRecord.size =sizeof(configVar);
+    switch (varType)
+    {
+    	case CONFIGVAR:  dataRecord.ID = 0;
+        				 dataRecord.pData = (uint8_t*)configVar;
+        				 dataRecord.size =sizeof(configVar);
+        				 break;
+    	case CONFIGFLAG: dataRecord.ID = 1;
+						 dataRecord.pData = (uint8_t*)&configFlags;
+						 dataRecord.size =sizeof(configFlags);
+						 break;
+    	default:
+    }
+
 
     /* Generate check for data */
     ret = R_VEE_GenerateCheck(&dataRecord);
@@ -98,10 +112,16 @@ void eepromWriteConfig(void)
        }
 }
 
-void eepromReadConfig(void)
+void eepromReadConfig(uint8_t varType)
 {
     uint32_t ret;
-    dataRecord.ID = 0;
+
+    switch (varType)
+    {
+    	case CONFIGVAR: dataRecord.ID = 0; break;
+    	case CONFIGFLAG: dataRecord.ID = 1; break;
+    	default:
+    }
 	ret = R_VEE_Read(&dataRecord);
 	/* Check result */
 	if( ret == VEE_NOT_FOUND )
@@ -129,8 +149,10 @@ void eepromReadConfig(void)
 	        while(FLASH_SUCCESS != R_FlashGetStatus());
 	    }
 		memcpy(configVar,configVarInit,sizeof(configVar));
+		memcpy(&configFlags,&configFlagsInit,sizeof(configFlags));
 		R_VEE_Open();
-	    eepromWriteConfig();
+	    eepromWriteConfig(CONFIGVAR);
+	    eepromWriteConfig(CONFIGFLAG);
 		return;
 	}
 	if( ret != VEE_SUCCESS )
@@ -141,7 +163,13 @@ void eepromReadConfig(void)
 	    }
 	}
     R_VEE_ReleaseState();
-	memcpy(configVar,dataRecord.pData,sizeof(configVar));
+    switch (varType)
+    {
+    	case CONFIGVAR: memcpy(configVar,dataRecord.pData,sizeof(configVar)); break;
+    	case CONFIGFLAG: memcpy(&configFlags,dataRecord.pData,sizeof(configFlags)); break;
+    	default:
+    }
+
 }
 
 

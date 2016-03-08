@@ -143,11 +143,17 @@ static void init()
 	for(i = 0; i < CONFIG_MAX; i++)
 	{
 		configs[i].type = init_types[i];
-		configs[i].value = &configVar[i];
+		switch(i)
+		{
+			case CONFIG_CANCELAR_IHS: configs[i].value = &configFlags; break;
+			default: configs[i].value = &configVar[i];
+		}
 		configs[i].name = init_names[i];
 		configs[i].unit = init_unit[i];
 		configs[i].step = init_step[i];
 		configs[i].point = init_point[i];
+		configs[i].currentState = STATE_CONFIG_MENU;
+		configs[i].currentItem = i;
 	}
 
 	initialized = true;

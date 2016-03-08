@@ -77,7 +77,8 @@ void main(void)
 	}
 //	serial_init();
 	eepromInit();
-	eepromReadConfig();
+	eepromReadConfig(CONFIGVAR);
+	eepromReadConfig(CONFIGFLAG);
 	eepromInitVar();
 	/* Initialize USB */
 	usb_main();

@@ -63,38 +63,42 @@ void config_bool(ut_config_var* var)
 	uint32_t *value;
 	ut_menu menu;
 	uint8_t i;
+	bool Recordflag = false;
 
 	/* Initialize */
 	ut_menu_init(&menu);
 	switch(configsVar->currentState)
 	{
 	case STATE_CONFIG_MANUAL_MODE:
-		if(configsVar->currentItem == 3)
+		switch(configsVar->currentItem)
 		{
-			boolStr = boolJogVel;
-		}
-		else
-		{
-			boolStr = boolOptions;
-		}
-		if (configsVar->currentItem == 2)
-		{
-			menu.title = "CUIDADO! MOVIMENTO AUTOM햀ICO";
-		}
-		else
-		{
-			menu.title = var->name;
+			case 2:  menu.title = "CUIDADO! MOVIMENTO AUTOM햀ICO";
+			break;
+			case 3:  boolStr = boolJogVel;
+			break;
+			default: boolStr = boolOptions;
+					 menu.title = var->name;
 		}
 		break;
 	case STATE_CONFIG_AUTO_MODE:
-		boolStr = boolOptions;
-		if (configsVar->currentItem == 2)
+		switch(configsVar->currentItem)
 		{
-			menu.title = "CUIDADO! MOVIMENTO AUTOM햀ICO";
+			case 2:  menu.title = "CUIDADO! MOVIMENTO AUTOM햀ICO";
+			break;
+			default: boolStr = boolOptions;
+					 menu.title = var->name;
 		}
-		else
+		break;
+	case STATE_CONFIG_MENU:
+		switch(configsVar->currentItem)
 		{
-			menu.title = var->name;
+			case 7:  Recordflag =true;
+					 value = var->value;
+					 boolStr = boolOptions;
+					 menu.title = var->name;
+			break;
+			default: boolStr = boolOptions;
+					 menu.title = var->name;
 		}
 		break;
 	default: boolStr = boolOptions;
@@ -110,9 +114,12 @@ void config_bool(ut_config_var* var)
 
 	/* Check if user selected a valid entry */
 	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0) return;
-
-	/* save it - TODO: ask for confirmation, maybe? */
 	*value = menu.selectedItem;
+	/* save it - TODO: ask for confirmation, maybe? */
+	if(Recordflag)
+	{
+		eepromWriteConfig(CONFIGFLAG);
+	}
 }
 
 /**
@@ -182,7 +189,7 @@ void config_int(ut_config_var* var)
 			break;
 
 		case KEY_ENTER:
-			eepromWriteConfig();
+			eepromWriteConfig(CONFIGVAR);
 			mult = 1;
 			count = 0;
 			return;
