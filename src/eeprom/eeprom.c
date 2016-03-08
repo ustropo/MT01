@@ -15,7 +15,7 @@ float configVarInit[VAR_MAX] = {
 	1,
 	0,
 	1,
-	10,
+	1000,
 	1500,
 	7500,
 	0,

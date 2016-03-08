@@ -32,33 +32,44 @@ stat_t M3_Macro(void)
 
 	switch (state)
 	{
+			/* 1- CHECA SE O USUARIO CANCELOU O IHS (MODO OXICORTE), OU SE ESTÁ EM MODO SIMULAÇÃO. SE SIM, PULAR PARA PASSO 3
+			   2- PROCURA A CHAPA USANDO O G38.2 -50 COM FEEDRATE DE 800MM/MIN  */
+		case 0: if(configFlags == 0){
+					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_STRAIGHT_PROBE);
+					SET_NON_MODAL_MACRO(target[AXIS_Z], -50);
+					SET_NON_MODAL_MACRO (feed_rate, 800);
+				}
+				state++; break;
+
 				/* 3- ZERA O EIXO Z COM G28.3 Z0 (NÃO PRECISA MAIS COMPENSAR O SENSOR, MINHA MAQUINA USARÁ SISTEMA OHMICO, OFFSET=0) */
-		case 0: SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
-				SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
+		case 1: if(configFlags == 0){
+					SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
+					SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
+				}
 				state++; break;
 
 				/*4- SOBE O EIXO Z PARA "ALTURA DE PERFURAÇÃO" */
-		case 1: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+		case 2: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
 				SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_PERFURACAO]);
 				state++; break;
 
 				/*6 -DISPARA O RELE DA TOCHA */
-		case 2: SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
+		case 3: SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
 				state++; break;
 
 				/*8- DEIXA CORRER O TEMPO DE PERFURAÇÃO "TEMPO DE PERFURAÇÃO" */
-		case 3: SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+		case 4: SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
 				SET_NON_MODAL_MACRO (parameter, configVar[TEMPO_PERFURACAO]*1000);
 				state++; break;
 
 				/*9- DESCE A TOCHA USANDO G01 F800 PARA "ALTURA DE CORTE" */
-		case 4: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+		case 5: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 				SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_CORTE]);
 				SET_NON_MODAL_MACRO (feed_rate, 800);
 				state++; break;
 
 				/*10- SETA O SISTEMA COM FEEDRATE DE CORTE F "VELOC. DE CORTE” PARA OS PROXIMOS G01, G02 E G03*/
-		case 5: SET_NON_MODAL_MACRO (feed_rate, configVar[VELOC_CORTE]);
+		case 6: SET_NON_MODAL_MACRO (feed_rate, configVar[VELOC_CORTE]);
 				state++; break;
 
 		default: state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
