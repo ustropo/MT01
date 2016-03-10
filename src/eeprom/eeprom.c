@@ -92,7 +92,7 @@ void eepromWriteConfig(uint8_t varType)
             /* Error */
         }
     }
-
+	sample_state = NOT_READY;
 	ret = R_VEE_Write(&dataRecord);
 	/* Check result */
 	if( ret != VEE_SUCCESS )
@@ -103,7 +103,7 @@ void eepromWriteConfig(uint8_t varType)
 	    }
 	}
 
-	sample_state = NOT_READY;
+
     while(sample_state == NOT_READY)
        {
            /* Wait for write to finish. When write finishes it will call the VEE_OperationDone_Callback() callback

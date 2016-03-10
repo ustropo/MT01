@@ -235,7 +235,8 @@ ut_state ut_state_config_var(ut_context* pContext)
 		case STATE_CONFIG_MANUAL_MODE:
 			if(configsVar->currentItem == 2)
 			{
-				if(configsVar->value)
+				uint32_t *Flag = configsVar->value;
+				if(*Flag == 1)
 				{
 
 					ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
