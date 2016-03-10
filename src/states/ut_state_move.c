@@ -354,7 +354,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 		case KEY_ESC:
 			xTimerStop( TimerUpdate, 0 );
 			iif_bind_idle();
-			return STATE_CONFIG_MANUAL_MODE;
+			return (ut_state)pContext->value[0];
 
 		case KEY_RELEASED:
 			iif_func_released();

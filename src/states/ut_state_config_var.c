@@ -233,7 +233,21 @@ ut_state ut_state_config_var(ut_context* pContext)
 	switch(configsVar->currentState)
 	{
 		case STATE_CONFIG_MANUAL_MODE:
-			if(configsVar->currentItem == 2)
+			if(configsVar->currentItem == 2 )
+			{
+				uint32_t *Flag = configsVar->value;
+				if(*Flag == 1)
+				{
+
+					ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
+					/* Delay */
+					vTaskDelay(2000 / portTICK_PERIOD_MS);
+					stateBack = (ut_state)pContext->value[1];
+				}
+			}
+			break;
+		case STATE_CONFIG_AUTO_MODE:
+			if(configsVar->currentItem == 2 )
 			{
 				uint32_t *Flag = configsVar->value;
 				if(*Flag == 1)
