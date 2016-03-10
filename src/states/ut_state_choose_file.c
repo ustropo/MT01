@@ -258,10 +258,8 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	}
 	else
 	{
-		ut_lcd_clear();
-		ut_lcd_drawString(2, 5, "NENHUM USB", false);
-		ut_lcd_drawString(3, 5, "ENCONTRADO", false);
-		ut_lcd_output();
+		ut_lcd_output_warning("NENHUM USB\n\
+							   ENCONTRADO\n");
 
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
 

@@ -24,6 +24,7 @@ char textYStr[MAX_COLUMN];
 char textZStr[MAX_COLUMN];
 uint8_t gTitle;
 extern float *velocidadeJog;
+extern char gszCurFile[MAX_FILE_PATH_SIZE];
 
 
 #define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
@@ -208,6 +209,15 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
 	uint8_t lstop = 0;
+
+	if(gszCurFile[0] == NULL)
+	{
+		ut_lcd_output_warning("NENHUM ARQUIVO\n\
+							   CARREGADO\n");
+
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+		return STATE_CONFIG_AUTO_MODE;
+	}
 
 	/* Clear display */
 	updatePosition(AUTO);

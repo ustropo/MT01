@@ -45,6 +45,7 @@ Includes   <System Includes> , "Project Includes"
 #include "r_usb_hmsc_if.h"
 #include "r_tfat_lib.h"
 
+
 #ifdef FREE_RTOS_PP
 #include "FreeRTOS.h"
 #include "task.h"
@@ -65,6 +66,7 @@ uint16_t    usb_ghmsc_SmpAplProcess = USB_HMSC_WAIT;
 extern FATFS  st_usb_fatfs;
 uint8_t     usb_gBuf[512];
 bool drivemountFlag = false;
+
 
 const uint16_t usb_gapl_devicetpl[] =
 {
