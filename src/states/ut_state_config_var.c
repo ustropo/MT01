@@ -67,26 +67,15 @@ void config_bool(ut_config_var* var)
 
 	/* Initialize */
 	ut_menu_init(&menu);
+	boolStr = boolOptions;
 	switch(configsVar->currentState)
 	{
 	case STATE_CONFIG_MANUAL_MODE:
 		switch(configsVar->currentItem)
 		{
-			case 2:  menu.title = "CUIDADO! MOVIMENTO AUTOMÁTICO";
-			break;
 			case 3:  boolStr = boolJogVel;
 			break;
-			default: boolStr = boolOptions;
-					 menu.title = var->name;
-		}
-		break;
-	case STATE_CONFIG_AUTO_MODE:
-		switch(configsVar->currentItem)
-		{
-			case 2:  menu.title = "CUIDADO! MOVIMENTO AUTOMÁTICO";
-			break;
-			default: boolStr = boolOptions;
-					 menu.title = var->name;
+			default:
 		}
 		break;
 	case STATE_CONFIG_MENU:
@@ -94,17 +83,13 @@ void config_bool(ut_config_var* var)
 		{
 			case 7:  Recordflag =true;
 					 value = var->value;
-					 boolStr = boolOptions;
-					 menu.title = var->name;
 			break;
-			default: boolStr = boolOptions;
-					 menu.title = var->name;
+			default:
 		}
 		break;
-	default: boolStr = boolOptions;
-			 menu.title = var->name;
+	default:
 	}
-
+	 menu.title = var->name;
 	for(i = 0; i < 2; i++)
 	{
 		menu.items[menu.numItems++].text = boolStr[i];
@@ -245,9 +230,6 @@ ut_state ut_state_config_var(ut_context* pContext)
 
 	var_handlers[configsVar->type](configsVar);
 
-	/* Avoid null handler */
-	if(configsVar->func_var) { configsVar->func_var(configsVar); }
-
 	switch(configsVar->currentState)
 	{
 		case STATE_CONFIG_MANUAL_MODE:
@@ -255,11 +237,17 @@ ut_state ut_state_config_var(ut_context* pContext)
 			{
 				if(configsVar->value)
 				{
+
+					ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
+					/* Delay */
+					vTaskDelay(2000 / portTICK_PERIOD_MS);
 					stateBack = (ut_state)pContext->value[1];
 				}
 			}
 		break;
 	}
+	/* Avoid null handler */
+	if(configsVar->func_var) { configsVar->func_var(configsVar); }
 	return stateBack;
 }
 

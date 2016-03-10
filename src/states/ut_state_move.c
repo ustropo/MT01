@@ -88,8 +88,8 @@ static void updatePosition(uint8_t menu)
                      lStr[2] = gStrAuto[2];
                      break;
 		case DESLOCA: lStr[0] = gStrDesloca[0];
-					  lStr[0] = gStrDesloca[1];
-					  lStr[0] = gStrDesloca[2];
+					  lStr[1] = gStrDesloca[1];
+					  lStr[2] = gStrDesloca[2];
 					  break;
 	}
 	/* TODO: get position from machine */

@@ -35,4 +35,5 @@ extern void ut_lcd_output_str();
 extern void ut_lcd_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *bitmap,const char* str);
 extern void ut_lcd_output_manual_mode(bool torch,const char* title[3],const char* textX,const char* textY,const char* textZ);
 extern void ut_lcd_output_int_var(const char* title,const char* varStr);
+extern void ut_lcd_output_warning(const char* Str);
 #endif /* INCLUDE_LCD_H_ */

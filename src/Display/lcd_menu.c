@@ -86,20 +86,9 @@ void ut_menu_show(ut_menu* menu_ptr)
 		ut_lcd_clear_str();
 		/* Copy data */
 	//	ut_lcd_drawString(row++, 0, menu_ptr->title, true);
-		if (strlen(menu_ptr->title) > 20)
-		{
-			char *str1;
-			char *str2;
 
-			memcpy(str1,menu_ptr->title,(int)(strrchr(menu_ptr->title, ' ')-menu_ptr->title));
-			ut_lcd_drawStr(row++, 0, str1, BACKGROUND_FRAMED_2,u8g_font_helvB08);
-			str2 = strrchr(menu_ptr->title, ' ');
-			ut_lcd_drawStr(row++, 0, str2 , BACKGROUND_FRAMED_2,u8g_font_helvB08);
-		}
-		else
-		{
-			ut_lcd_drawStr(row++, 0, menu_ptr->title, BACKGROUND_FRAMED,u8g_font_helvB08);
-		}
+		ut_lcd_drawStr(row++, 0, menu_ptr->title, BACKGROUND_FRAMED,u8g_font_helvB08);
+
 	}
 
 	/* Items */

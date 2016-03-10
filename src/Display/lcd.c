@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
+static void readline(const char *message, char *line, uint8_t *counter);
 /* Check if background color is black/white */
 static uint8_t gaboBackColor[MAX_COLUMN * MAX_ROW];
 /* Frame buffer for lcd */
@@ -365,4 +366,71 @@ void ut_lcd_output_int_var(const char* title,const char* varStr)
 		u8g_DrawHLine(&main_u8g, 10, h+11, 108);
 		u8g_DrawStr(&main_u8g, 40, h+20, varStr);
 	} while(u8g_NextPage(&main_u8g));
+}
+
+void ut_lcd_output_warning(const char* Str)
+{
+	uint8_t h,hfont,x,y;
+	uint8_t lineSize;
+	uint8_t lineSizeMax = 0;
+	char line[3][21];
+	uint8_t count;
+	const char *message = Str;
+	count = 0;
+	u8g_FirstPage(&main_u8g);
+	u8g_prepare(u8g_font_helvB08);
+	hfont = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+	readline(message,line[0],&count);
+	readline(message,line[1],&count);
+	readline(message,line[2],&count);
+	h = 3*hfont;
+	if(line[2][0] == 0)
+	{
+		h -= hfont;
+		if(line[1][0] == 0)
+		{
+			h -= hfont;
+		}
+	}
+
+	/* Picture loop */
+	do
+	{
+		lineSize = u8g_GetStrWidth(&main_u8g,line[0]);
+		lineSizeMax = max(lineSizeMax,lineSize);
+		x = (128 - lineSize)/2;
+		y = (64-h)/2;
+		u8g_DrawStr(&main_u8g, x, y, line[0]);
+
+		lineSize = u8g_GetStrWidth(&main_u8g,line[1]);
+		lineSizeMax = max(lineSizeMax,lineSize);
+		x = (128 - lineSize)/2;
+		y += hfont;
+		u8g_DrawStr(&main_u8g, x, y, line[1]);
+
+		lineSize = u8g_GetStrWidth(&main_u8g,line[2]);
+		lineSizeMax = max(lineSizeMax,lineSize);
+		x = (128 - lineSize)/2;
+		y += hfont;
+		u8g_DrawStr(&main_u8g, x, y, line[2]);
+
+		x = (128 - lineSizeMax)/2;
+		y = (64-h)/2;
+		u8g_DrawFrame(&main_u8g,(x-3), (y-3), (lineSizeMax+6), (h+6));
+	} while(u8g_NextPage(&main_u8g));
+}
+
+static void readline(const char *message, char *line, uint8_t *counter){
+
+    int index = 0;
+	if(message[*counter] != '\0')
+	{
+		while(message[*counter] != '\n'){
+			line[index] = message[*counter];
+			(*counter)++;
+			index ++;
+		}
+		(*counter)++;
+	}
+	line[index] = 0;
 }
