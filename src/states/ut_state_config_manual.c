@@ -103,7 +103,13 @@ static void init()
 	uint8_t i;
 
 	/* Check if already initialized */
-	if(initialized) return;
+	if(initialized) {
+		for(i = 0; i < CONFIG_MANUAL_MAX; i++)
+		{
+			configs_manual[i].name = init_names[i];
+		}
+		return;
+	}
 
 	/* Zero all values */
 	memset(configs_manual, 0, sizeof(configs_manual));
@@ -155,18 +161,22 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 		return STATE_MAIN_MENU;
 	}
 
-	/* Set selected item */
-	if(config_menu.selectedItem == 2)
-	{
-		pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
-		pContext->value[1] = STATE_DESLOCAZERO_MODE;
-	}
-	else
-	{
-		pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
-		pContext->value[1] = STATE_CONFIG_MANUAL_MODE;
-	}
 	configsVar = &configs_manual[config_menu.selectedItem];
+	switch(config_menu.selectedItem)
+	{
+		case CONFIG_DESLOCAR_ZERO:
+			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
+			/* Delay */
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			configsVar->name = "DESEJA CONTINUAR?";
+			pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
+			pContext->value[1] = STATE_DESLOCAZERO_MODE;
+			break;
+		default:
+			pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
+			pContext->value[1] = STATE_CONFIG_MANUAL_MODE;
+	}
+
 	return geNextStateManual[config_menu.selectedItem];
 }
 

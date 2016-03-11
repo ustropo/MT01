@@ -226,6 +226,7 @@ static ut_config_change_ptr var_handlers[UT_CONFIG_MAX] =
  */
 ut_state ut_state_config_var(ut_context* pContext)
 {
+	uint32_t *Flag = configsVar->value;
 	ut_state stateBack = (ut_state)pContext->value[0];
 
 	var_handlers[configsVar->type](configsVar);
@@ -238,27 +239,30 @@ ut_state ut_state_config_var(ut_context* pContext)
 				uint32_t *Flag = configsVar->value;
 				if(*Flag == 1)
 				{
-
-					ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
-					/* Delay */
-					vTaskDelay(2000 / portTICK_PERIOD_MS);
 					stateBack = (ut_state)pContext->value[1];
 				}
 			}
 			break;
 		case STATE_CONFIG_AUTO_MODE:
-			if(configsVar->currentItem == 2 )
+			switch(configsVar->currentItem)
 			{
-				uint32_t *Flag = configsVar->value;
-				if(*Flag == 1)
-				{
-
-					ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
-					/* Delay */
-					vTaskDelay(2000 / portTICK_PERIOD_MS);
-					stateBack = (ut_state)pContext->value[1];
-				}
+				case 0:
+				case 2:
+				case 3:
+					if(*Flag == 1)
+					{
+						stateBack = (ut_state)pContext->value[1];
+					}
+					break;
 			}
+//			if(configsVar->currentItem == 2 )
+//			{
+//				uint32_t *Flag = configsVar->value;
+//				if(*Flag == 1)
+//				{
+//					stateBack = (ut_state)pContext->value[1];
+//				}
+//			}
 		break;
 	}
 	/* Avoid null handler */

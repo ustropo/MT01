@@ -21,6 +21,8 @@
 
 #define DEFAULT_CONFIG_TIMEOUT	30000
 
+extern char gszCurFile[MAX_FILE_PATH_SIZE];
+
 typedef enum
 {
 	CONFIG_RODAR_PROG  = 0,    //!<
@@ -46,17 +48,17 @@ extern ut_config_var* configsVar;
 
 static const ut_state geNextStateAuto[5] =
 {
-	STATE_AUTO_MODE,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
-	STATE_MAIN_MENU
+	STATE_CONFIG_VAR,
+	STATE_MAIN_MENU,
 };
 
 /* Initial values for each config variable */
 static ut_config_type init_types[CONFIG_AUTO_MAX] =
 {
-	UT_CONFIG_NULL,
+	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
@@ -100,7 +102,13 @@ static void init()
 	uint8_t i;
 
 	/* Check if already initialized */
-	if(initialized) return;
+	if(initialized) {
+		for(i = 0; i < CONFIG_AUTO_MAX; i++)
+		{
+			configs_auto[i].name = init_names[i];
+		}
+		return;
+	}
 
 	/* Zero all values */
 	memset(configs_auto, 0, sizeof(configs_auto));
@@ -150,27 +158,52 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 	{
 		return STATE_MAIN_MENU;
 	}
-
-	/* Set selected item */
-	if(config_menu.selectedItem == 2)
-	{
-		pContext->value[0] = STATE_CONFIG_AUTO_MODE;
-		pContext->value[1] = STATE_DESLOCAZERO_MODE;
-	}
-	else
-	{
-		pContext->value[0] = STATE_CONFIG_AUTO_MODE;
-		pContext->value[1] = STATE_CONFIG_AUTO_MODE;
-	}
 	configsVar = &configs_auto[config_menu.selectedItem];
+	switch(config_menu.selectedItem)
+	{
+		case CONFIG_RODAR_PROG:
+		case CONFIG_MODO_SIM:
+			if(gszCurFile[0] == NULL)
+			{
+				ut_lcd_output_warning("NENHUM ARQUIVO\n\
+									   CARREGADO\n");
+
+				vTaskDelay(1000 / portTICK_PERIOD_MS);
+				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
+				pContext->value[1] = STATE_CONFIG_AUTO_MODE;
+				return STATE_CONFIG_AUTO_MODE;
+			}
+			else
+			{
+				ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
+				/* Delay */
+				vTaskDelay(2000 / portTICK_PERIOD_MS);
+				configsVar->name = "DESEJA CONTINUAR?";
+				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
+				pContext->value[1] = STATE_AUTO_MODE;
+			}
+			break;
+		case CONFIG_DESLOCAR_ZERO:
+			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
+			/* Delay */
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			configsVar->name = "DESEJA CONTINUAR?";
+			pContext->value[0] = STATE_CONFIG_AUTO_MODE;
+			pContext->value[1] = STATE_DESLOCAZERO_MODE;
+			break;
+		default:
+			pContext->value[0] = STATE_CONFIG_AUTO_MODE;
+			pContext->value[1] = STATE_CONFIG_AUTO_MODE;
+	}
+
 	return geNextStateAuto[config_menu.selectedItem];
 }
 
 static void zerar_eixos(void *var)
 {
 	ut_config_var *lvar = var;
-
-	if(lvar->value)
+	uint32_t *value = lvar->value;
+	if(*value)
 	{
 		tg_set_primary_source(XIO_DEV_COMMAND);
 		xio_open(cs.primary_src,zera_eixos,0);
@@ -180,8 +213,8 @@ static void zerar_eixos(void *var)
 static void homming_eixos(void *var)
 {
 	ut_config_var *lvar = var;
-
-	if(lvar->value)
+	uint32_t *value = lvar->value;
+	if(*value)
 	{
 		tg_set_primary_source(XIO_DEV_COMMAND);
 		xio_open(cs.primary_src,home_eixos,0);
