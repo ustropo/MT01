@@ -37,6 +37,9 @@
 extern "C"{
 #endif
 
+extern bool sim;
+bool simTorch = false;
+
 static void _exec_spindle_control(float *value, float *flag);
 static void _exec_spindle_speed(float *value, float *flag);
 
@@ -125,11 +128,19 @@ static void _exec_spindle_control(float *value, float *flag)
 #endif // __ARM
 #ifdef __RX
 	if (spindle_mode == SPINDLE_CW) {
-		TORCH = TRUE;
+		if(!sim){
+			TORCH = TRUE;
+		}
+		else
+		{
+			simTorch = true;
+		}
 	} else if (spindle_mode == SPINDLE_CCW) {
 		TORCH = FALSE;
+		simTorch = false;
 	} else {
 		TORCH = FALSE;
+		simTorch = false;
 	}
 #endif // __RX
 

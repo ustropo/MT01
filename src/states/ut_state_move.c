@@ -5,6 +5,9 @@
  *      Author: Fernando
  */
 
+#include "tinyg.h"		// #1
+#include "hardware.h"
+
 #include "ut_context.h"
 #include "ut_state.h"
 
@@ -19,6 +22,8 @@
 
 #include "planner.h"
 
+bool sim = false;
+extern bool simTorch;
 char textXStr[MAX_COLUMN];
 char textYStr[MAX_COLUMN];
 char textZStr[MAX_COLUMN];
@@ -28,18 +33,24 @@ extern float *velocidadeJog;
 #define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
+#define DEFAULT_SIM_TITLE		"MODO SIMULAÇÃO"
 #define DEFAULT_DESCOLA_TITLE	"DESLOCANDO"
+
 #define DEFAULT_AVISO_MANUAL	"ENTER DISPARA/ESC VOLTA"
-#define DEFAULT_AVISO_AUTO	    "ESC PARA A MAQUINA"
+#define DEFAULT_AVISO_AUTO	    "ESC PARA A MÁQUINA"
+#define DEFAULT_AVISO_SIM	    "ESC PARAR/ENTER MODO AUTO"
 #define DEFAULT_AVISO_DESLOCA	"ESC VOLTA"
+
 #define DEFAULT_LINHA1_MANUAL	"VELOCIDADE:         "
 #define DEFAULT_LINHA1_AUTO	    ""
+#define DEFAULT_LINHA1_SIM	    ""
 #define DEFAULT_LINHA1_DESLOCA	""
 
 enum {
 	MANUAL = 0,
 	AUTO,
 	DESLOCA,
+	SIM
 };
 
 static char gStrManual[3][24] =
@@ -52,6 +63,13 @@ static char gStrAuto[3][24] =
 {
 	DEFAULT_AUTO_TITLE,
 	DEFAULT_AVISO_AUTO,
+	""
+};
+
+static char gStrSim[3][28] =
+{
+	DEFAULT_SIM_TITLE,
+	DEFAULT_AVISO_SIM,
 	""
 };
 
@@ -85,6 +103,10 @@ static void updatePosition(uint8_t menu)
 		case AUTO:   lStr[0] = gStrAuto[0];
 		 	 	 	 lStr[1] = gStrAuto[1];
                      lStr[2] = gStrAuto[2];
+                     break;
+		case SIM:    lStr[0] = gStrSim[0];
+		 	 	 	 lStr[1] = gStrSim[1];
+                     lStr[2] = gStrSim[2];
                      break;
 		case DESLOCA: lStr[0] = gStrDesloca[0];
 					  lStr[1] = gStrDesloca[1];
@@ -209,8 +231,14 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	uint8_t lstop = 0;
 
 	/* Clear display */
-	updatePosition(AUTO);
-	gTitle = AUTO;
+	if(!sim){
+		updatePosition(AUTO);
+		gTitle = AUTO;
+	}
+	else{
+		updatePosition(SIM);
+		gTitle = SIM;
+	}
 	TimerUpdate = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
@@ -265,10 +293,14 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 
 		case KEY_ENTER:
-			if (lstop == 1)
-			{
-				iif_func_enter();
-				lstop = 0;
+			/* Clear display */
+			if(sim){
+				gTitle = AUTO;
+				sim = false;
+				if (simTorch)
+				{
+					TORCH = TRUE;
+				}
 			}
 			break;
 

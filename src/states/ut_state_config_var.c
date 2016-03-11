@@ -25,6 +25,8 @@
 
 #define DEFAULT_CONFIG_VAR_TOUT	30000
 
+extern bool sim;
+
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
 static TimerHandle_t TimerUpdate[2];
 static uint8_t count = 0;
@@ -248,21 +250,24 @@ ut_state ut_state_config_var(ut_context* pContext)
 			{
 				case 0:
 				case 2:
-				case 3:
 					if(*Flag == 1)
 					{
 						stateBack = (ut_state)pContext->value[1];
+						sim = false;
+					}
+					break;
+				case 3:
+					if(*Flag == 1)
+					{
+						sim = true;
+						stateBack = (ut_state)pContext->value[1];
+					}
+					else
+					{
+						sim = false;
 					}
 					break;
 			}
-//			if(configsVar->currentItem == 2 )
-//			{
-//				uint32_t *Flag = configsVar->value;
-//				if(*Flag == 1)
-//				{
-//					stateBack = (ut_state)pContext->value[1];
-//				}
-//			}
 		break;
 	}
 	/* Avoid null handler */

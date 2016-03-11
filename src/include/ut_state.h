@@ -70,7 +70,6 @@ extern const state_func_ptr states_table[STATE_NUMBER];
 #define MAX_FILE_PATH_SIZE 256
 #define USB_ROOT	""
 #define DEFAULT_FILE_EXTENSION	".txt"
-
 // ***********************************************************************
 // Global variables
 // ***********************************************************************
