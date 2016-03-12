@@ -10,6 +10,7 @@
 #include "ut_state_config_var.h"
 #include "interpreter_if.h"
 #include "eeprom.h"
+#include "macros.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -188,6 +189,7 @@ static void zerar_eixos(void *var)
 	{
 		tg_set_primary_source(XIO_DEV_COMMAND);
 		xio_open(cs.primary_src,zera_eixos,0);
+//		macro_func_ptr = ZerarEixos_Macro();
 	}
 }
 

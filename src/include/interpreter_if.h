@@ -34,6 +34,9 @@ extern iif_func_ptr iif_func_released;
 extern void iif_bind_filerunning(void);
 extern void iif_bind_jog(void);
 extern void iif_bind_idle(void);
+extern void iif_idle(void);
+
+extern void iif_bind_filerunning_stop(bool stop);
 
 extern float zmove;
 

@@ -45,6 +45,7 @@ void iif_enter_jog(void)
 
 void iif_esc_jog(void)
 {
+	TORCH = FALSE;
 	iif_bind_idle();
 }
 

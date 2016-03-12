@@ -7,8 +7,6 @@
 #include "platform.h"
 #include "interpreter_if.h"
 
-static void iif_idle(void);
-
 const char zero_axis[]= "\
 G28.3 X0 Y0 Z0\n\
 m30";

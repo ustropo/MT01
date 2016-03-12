@@ -85,7 +85,7 @@ void iif_released_filerunning(void)
 void iif_bind_filerunning(void)
 {
 	iif_func_enter = &iif_enter_filerunning;
-	iif_func_esc = &iif_esc_filerunning;
+	iif_func_esc = &iif_idle;
 	iif_func_down = &iif_down_filerunning;
 	iif_func_up = &iif_up_filerunning;
 	iif_func_left = &iif_left_filerunning;
@@ -94,6 +94,19 @@ void iif_bind_filerunning(void)
 	iif_func_zup = &iif_zup_filerunning;
 	iif_func_released = &iif_released_filerunning;
 }
+
+void iif_bind_filerunning_stop(bool stop)
+{
+	if(stop)
+	{
+		iif_func_esc = &iif_esc_filerunning;
+	}
+	else
+	{
+		iif_func_esc =  &iif_idle;
+	}
+}
+
 
 void vTimerCallback( TimerHandle_t pxTimer )
 {

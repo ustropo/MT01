@@ -13,5 +13,6 @@ extern int8_t macro;
 
 stat_t M5_Macro(void);
 stat_t M3_Macro(void);
+stat_t ZerarEixos_Macro(void);
 
 #endif /* CNC_MACROS_MACROS_H_ */

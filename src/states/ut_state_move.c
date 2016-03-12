@@ -23,6 +23,7 @@
 #include "planner.h"
 
 bool sim = false;
+bool programEnd = false;
 extern bool simTorch;
 char textXStr[MAX_COLUMN];
 char textYStr[MAX_COLUMN];
@@ -30,21 +31,29 @@ char textZStr[MAX_COLUMN];
 uint8_t gTitle;
 extern float *velocidadeJog;
 
-#define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
-#define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
-#define DEFAULT_AUTO_TITLE		"MODO AUTOM햀ICO"
-#define DEFAULT_SIM_TITLE		"MODO SIMULA플O"
-#define DEFAULT_DESCOLA_TITLE	"DESLOCANDO"
 
-#define DEFAULT_AVISO_MANUAL	"ENTER DISPARA/ESC VOLTA"
+#define DEFAULT_AUTO_TITLE		"MODO AUTOM햀ICO"
+#define STOP_AUTO_TITLE		    "M핽UINA PARADA"
+#define DEFAULT_LINHA1_AUTO	    ""
 #define DEFAULT_AVISO_AUTO	    "ESC PARA A M핽UINA"
-#define DEFAULT_AVISO_SIM	    "ESC PARAR/ENTER MODO AUTO"
+#define STOP_AVISO_AUTO	        "ESC MENU/ENTER CONTINUA"
+
+#define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
+#define DEFAULT_LINHA1_MANUAL	"VELOCIDADE:         "
+#define DEFAULT_AVISO_MANUAL	"ENTER DISPARA/ESC VOLTA"
+
+#define DEFAULT_DESCOLA_TITLE	"DESLOCANDO"
+#define DEFAULT_LINHA1_DESLOCA	""
 #define DEFAULT_AVISO_DESLOCA	"ESC VOLTA"
 
-#define DEFAULT_LINHA1_MANUAL	"VELOCIDADE:         "
-#define DEFAULT_LINHA1_AUTO	    ""
+#define DEFAULT_SIM_TITLE		"MODO SIMULA플O"
+#define STOP_SIM_TITLE		    "M핽UINA PARADA"
 #define DEFAULT_LINHA1_SIM	    ""
-#define DEFAULT_LINHA1_DESLOCA	""
+#define DEFAULT_AVISO_SIM	    "ESC PARAR/ENTER MODO AUTO"
+#define STOP_AVISO_SIM	        "ESC MENU/ENTER CONTINUA"
+
+
+#define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
 
 enum {
 	MANUAL = 0,
@@ -122,12 +131,23 @@ static void updatePosition(uint8_t menu)
 	sprintf(textYStr, "Y:%4.2f mm", y);
 	sprintf(textZStr, "Z:%4.2f mm", z);
 
+	if(cm.machine_state == MACHINE_PROGRAM_END && !programEnd && (menu == AUTO && menu == SIM))
+	{
+		xTimerStop( TimerUpdate, 0 );
+		ut_lcd_output_warning("CORTE AUTOM햀ICO\nFINALIZADO\nPRESSIONE ESC\n");
+		/* Delay */
+		vTaskDelay(2000 / portTICK_PERIOD_MS);
+		programEnd = true;
+	}
+	else
+	{
 	/* Put it into screen */
 	ut_lcd_output_manual_mode(TORCH,
 			lStr,
 			(const char *)textXStr,
 			(const char *)textYStr,
 			(const char *)textZStr);
+	}
 }
 
 /**
@@ -209,6 +229,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 			break;
 		/* TODO: operate machine - with other keys */
 		default:
+
 			break;
 		}
 
@@ -228,8 +249,9 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 ut_state ut_state_auto_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
-	uint8_t lstop = 0;
-
+	bool lstop = false;
+	bool ltorchBuffer = false;
+	programEnd = false;
 	/* Clear display */
 	if(!sim){
 		updatePosition(AUTO);
@@ -294,20 +316,62 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 
 		case KEY_ENTER:
 			/* Clear display */
-			if(sim){
-				gTitle = AUTO;
-				sim = false;
-				if (simTorch)
-				{
-					TORCH = TRUE;
+			if(lstop)
+			{
+				lstop = false;
+				iif_bind_filerunning_stop(lstop);
+				if(gTitle == AUTO){
+					strcpy(gStrAuto[0],DEFAULT_AUTO_TITLE);
+					strcpy(gStrAuto[1],DEFAULT_AVISO_AUTO);
+				}else if(gTitle == SIM){
+					strcpy(gStrSim[0],DEFAULT_SIM_TITLE);
+					strcpy(gStrSim[1],DEFAULT_AVISO_SIM);
+				}
+				iif_func_enter();
+				TORCH = ltorchBuffer;
+			}
+			else
+			{
+				if(sim){
+					gTitle = AUTO;
+					sim = false;
+					if (simTorch)
+					{
+						TORCH = TRUE;
+					}
 				}
 			}
 			break;
 
 		case KEY_ESC:
-			xTimerStop( TimerUpdate, 0 );
-			iif_bind_idle();
-			return STATE_CONFIG_AUTO_MODE;
+			if (programEnd || lstop){
+				xTimerStop( TimerUpdate, 0 );
+				if(gTitle == AUTO){
+					strcpy(gStrAuto[0],DEFAULT_AUTO_TITLE);
+					strcpy(gStrAuto[1],DEFAULT_AVISO_AUTO);
+				}else if(gTitle == SIM){
+					strcpy(gStrSim[0],DEFAULT_SIM_TITLE);
+					strcpy(gStrSim[1],DEFAULT_AVISO_SIM);
+				}
+				cm_request_queue_flush();
+				xio_close(cs.primary_src);
+				iif_bind_idle();
+				return STATE_CONFIG_AUTO_MODE;
+			}
+			if(!lstop){
+				lstop = true;
+				iif_bind_filerunning_stop(lstop);
+				if(gTitle == AUTO){
+					strcpy(gStrAuto[0],STOP_AUTO_TITLE);
+					strcpy(gStrAuto[1],STOP_AVISO_AUTO);
+				}else if(gTitle == SIM){
+					strcpy(gStrSim[0],STOP_SIM_TITLE);
+					strcpy(gStrSim[1],STOP_AVISO_SIM);
+				}
+				ltorchBuffer = TORCH;
+				TORCH = FALSE;
+			}
+
 			break;
 
 		case KEY_RELEASED:
@@ -315,6 +379,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 		/* TODO: operate machine - with other keys */
 		default:
+			return STATE_CONFIG_AUTO_MODE;
 			break;
 		}
 
@@ -328,7 +393,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
-
+	cm_request_queue_flush();
 	/* Clear display */
 	updatePosition(DESLOCA);
 	gTitle = DESLOCA;
@@ -404,5 +469,8 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 
 static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 {
+	if(gTitle == AUTO || gTitle == SIM){
+		iif_func_esc();
+	}
 	updatePosition(gTitle);
 }

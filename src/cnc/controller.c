@@ -36,7 +36,7 @@
 #include "plan_arc.h"
 #include "planner.h"
 #include "stepper.h"
-#include "macros/macros.h"
+#include "macros.h"
 
 
 #include "encoder.h"
