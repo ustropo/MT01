@@ -24,6 +24,7 @@
 
 bool sim = false;
 bool programEnd = false;
+bool lstop = false;
 extern bool simTorch;
 char textXStr[MAX_COLUMN];
 char textYStr[MAX_COLUMN];
@@ -131,7 +132,7 @@ static void updatePosition(uint8_t menu)
 	sprintf(textYStr, "Y:%4.2f mm", y);
 	sprintf(textZStr, "Z:%4.2f mm", z);
 
-	if(cm.machine_state == MACHINE_PROGRAM_END && !programEnd && (menu == AUTO && menu == SIM))
+	if(cm.machine_state == MACHINE_PROGRAM_END && !programEnd && (menu == AUTO || menu == SIM))
 	{
 		xTimerStop( TimerUpdate, 0 );
 		ut_lcd_output_warning("CORTE AUTOMÁTICO\nFINALIZADO\nPRESSIONE ESC\n");
@@ -249,9 +250,9 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 ut_state ut_state_auto_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
-	bool lstop = false;
 	bool ltorchBuffer = false;
 	programEnd = false;
+	lstop = false;
 	/* Clear display */
 	if(!sim){
 		updatePosition(AUTO);
@@ -360,7 +361,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			}
 			if(!lstop){
 				lstop = true;
-				iif_bind_filerunning_stop(lstop);
+				//iif_bind_filerunning_stop(lstop);
+				cm_request_feedhold();
 				if(gTitle == AUTO){
 					strcpy(gStrAuto[0],STOP_AUTO_TITLE);
 					strcpy(gStrAuto[1],STOP_AVISO_AUTO);

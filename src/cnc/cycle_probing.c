@@ -35,6 +35,7 @@
 #include "util.h"
 #include "planner.h"
 
+extern bool lstop;
 /**** Probe singleton structure ****/
 
 #define MINIMUM_PROBE_TRAVEL 0.254
@@ -134,7 +135,8 @@ uint8_t cm_probe_callback(void)
 		return (STAT_NOOP);				// exit if not in a probe cycle or waiting for one
 	}
 	if (cm_get_runtime_busy() == true) { return (STAT_EAGAIN);}	// sync to planner move ends
-	return (pb.func());                                         // execute the current homing move
+	if (lstop) { return (STAT_EAGAIN);}
+    return (pb.func());                                         // execute the current homing move
 }
 
 /*
