@@ -100,7 +100,10 @@ void config_bool(ut_config_var* var)
 	menu.selectedItem = *value % 2; // Just to be sure - it is really not necessary
 
 	/* Check if user selected a valid entry */
-	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0) return;
+	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0){
+		*value = 0;
+		return;
+	}
 	*value = menu.selectedItem;
 	/* save it - TODO: ask for confirmation, maybe? */
 	if(Recordflag)
