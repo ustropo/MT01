@@ -206,9 +206,7 @@ static void zerar_eixos(void *var)
 	uint32_t *value = lvar->value;
 	if(*value)
 	{
-		tg_set_primary_source(XIO_DEV_COMMAND);
-		xio_open(cs.primary_src,zera_eixos,0);
-//		macro_func_ptr = ZerarEixos_Macro();
+		macro_func_ptr = ZerarEixos_Macro;
 	}
 }
 
@@ -218,8 +216,7 @@ static void homming_eixos(void *var)
 	uint32_t *value = lvar->value;
 	if(*value)
 	{
-		tg_set_primary_source(XIO_DEV_COMMAND);
-		xio_open(cs.primary_src,home_eixos,0);
+		macro_func_ptr = homming_Macro;
 	}
 }
 

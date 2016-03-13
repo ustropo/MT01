@@ -625,7 +625,7 @@ stat_t cm_spindle_override_enable(uint8_t flag); 				// M51
 stat_t cm_spindle_override_factor(uint8_t flag);				// M51.1
 
 void cm_message(char_t *message);								// msg to console (e.g. Gcode comments)
-
+void _probe_restore_settings();
 // Program Functions (4.3.10)
 void cm_request_feedhold(void);
 void cm_request_queue_flush(void);

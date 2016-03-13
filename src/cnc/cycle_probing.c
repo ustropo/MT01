@@ -268,7 +268,7 @@ static stat_t _probing_finish()
  * _probing_error_exit()
  */
 
-static void _probe_restore_settings()
+void _probe_restore_settings()
 {
 	mp_flush_planner(); 						// we should be stopped now, but in case of switch closure
 

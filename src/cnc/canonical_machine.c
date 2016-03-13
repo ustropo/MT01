@@ -101,6 +101,8 @@
 #include "hardware.h"
 #include "util.h"
 #include "xio.h"			// for serial queue flush
+#include "macros.h"
+#include "controller.h"
 /*
 #ifdef __cplusplus
 extern "C"{
@@ -1223,6 +1225,8 @@ stat_t cm_feedhold_sequencing_callback()
 			!cm_get_runtime_busy()) {
 			cm.queue_flush_requested = false;
 			cm_queue_flush();
+			cm.probe_state = PROBE_FAILED;
+			macro_func_ptr = _command_dispatch;
 		}
 	}
 	bool feedhold_processing =				// added feedhold processing lockout from omco fork
