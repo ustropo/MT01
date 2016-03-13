@@ -119,10 +119,11 @@ void config_bool(ut_config_var* var)
  */
 void config_int(ut_config_var* var)
 {
+	float Buffervalue;
 	float *value = configsVar->value;
 	char szText[MAX_COLUMN];
 	uint32_t keyEntry;
-
+	Buffervalue = *value;
 	switch(var->point)
 	{
 		case 0: sprintf(szText, "%.0f %s", *value,var->unit); break;
@@ -180,11 +181,16 @@ void config_int(ut_config_var* var)
 
 		case KEY_ENTER:
 			eepromWriteConfig(CONFIGVAR);
+			ut_lcd_output_warning("     VALOR     \n\
+								     SALVO     \n");
+					/* Delay */
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
 			mult = 1;
 			count = 0;
 			return;
 
 		case KEY_ESC:
+			*value = Buffervalue;
 			mult = 1;
 			count = 0;
 			return;
