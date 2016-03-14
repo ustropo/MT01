@@ -7,6 +7,8 @@
 
 #include "tinyg.h"		// #1
 #include "hardware.h"
+#include "controller.h"
+#include "macros.h"
 
 #include "ut_context.h"
 #include "ut_state.h"
@@ -112,14 +114,17 @@ static void updatePosition(uint8_t menu)
 			         break;
 		case AUTO:   lStr[0] = gStrAuto[0];
 		 	 	 	 lStr[1] = gStrAuto[1];
+			         sprintf(gStrAuto[2], "FEED.: %.0f mm/s",  mp_get_runtime_velocity());
                      lStr[2] = gStrAuto[2];
                      break;
 		case SIM:    lStr[0] = gStrSim[0];
 		 	 	 	 lStr[1] = gStrSim[1];
+			         sprintf(gStrSim[2], "FEED.: %.0f mm/s",  mp_get_runtime_velocity());
                      lStr[2] = gStrSim[2];
                      break;
 		case DESLOCA: lStr[0] = gStrDesloca[0];
 					  lStr[1] = gStrDesloca[1];
+				         sprintf(gStrDesloca[2], "FEED.: %.0f mm/s",  mp_get_runtime_velocity());
 					  lStr[2] = gStrDesloca[2];
 					  break;
 	}
@@ -354,9 +359,20 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					strcpy(gStrSim[0],DEFAULT_SIM_TITLE);
 					strcpy(gStrSim[1],DEFAULT_AVISO_SIM);
 				}
+				cm_request_feedhold();
 				cm_request_queue_flush();
 				xio_close(cs.primary_src);
+
+				cm.probe_state = PROBE_FAILED;
+				//cm_set_motion_mode(MODEL, MOTION_MODE_CANCEL_MOTION_MODE);
+				//cm_cycle_end();
+				state = 0;
+				cm.cycle_state = CYCLE_OFF;
+
+				macro_func_ptr = _command_dispatch;
 				iif_bind_idle();
+				if (programEnd)
+					return STATE_MANUAL_MODE;
 				return STATE_CONFIG_AUTO_MODE;
 			}
 			if(!lstop){

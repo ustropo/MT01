@@ -9,6 +9,12 @@
 #include "macros.h"
 #include "eeprom.h"
 
+extern float *velocidadeJog;
+
+uint8_t jogAxis;
+float jogMaxDistance;
+uint8_t state = 0;
+
 stat_t (*macro_func_ptr)(void);
 
 struct gcodeParserSingleton {	 	  // struct to manage globals
@@ -22,8 +28,6 @@ extern struct gcodeParserSingleton gp;
 
 stat_t M3_Macro(void)
 {
-
-	static uint8_t state = 0;
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -80,7 +84,6 @@ stat_t M3_Macro(void)
 
 stat_t M5_Macro(void)
 {
-	static uint8_t state = 0;
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -102,7 +105,6 @@ stat_t M5_Macro(void)
 
 stat_t ZerarEixos_Macro(void)
 {
-	static uint8_t state = 0;
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -124,7 +126,6 @@ stat_t ZerarEixos_Macro(void)
 
 stat_t homming_Macro(void)
 {
-	static uint8_t state = 0;
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -133,11 +134,47 @@ stat_t homming_Macro(void)
 
 	switch (state)
 	{
-	case 0: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
-			SET_NON_MODAL_MACRO(target[AXIS_X], 0);
-			SET_NON_MODAL_MACRO(target[AXIS_Y], 0);
-			SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_DESLOCAMENTO]);
-			state++; break;
+		case 0: SET_MODAL_MACRO (MODAL_GROUP_G6, units_mode, MILLIMETERS);
+				state++; break;
+
+		case 1: SET_MODAL_MACRO (MODAL_GROUP_G3, distance_mode, ABSOLUTE_MODE);
+				state++; break;
+
+		case 2: SET_NON_MODAL_MACRO (absolute_override, true);
+				state++; break;
+
+		case 3: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_DESLOCAMENTO]);
+				state++; break;
+
+		case 4: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_X], 0);
+				SET_NON_MODAL_MACRO(target[AXIS_Y], 0);
+				state++; break;
+
+		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+	}
+	_execute_gcode_block();
+	return (STAT_OK);
+}
+
+stat_t jog_Macro(void)
+{
+	// set initial state for new move
+	memset(&gp, 0, sizeof(gp));						// clear all parser values
+	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
+	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
+	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
+
+	switch (state)
+	{
+		case 0: SET_MODAL_MACRO (MODAL_GROUP_G3, distance_mode, INCREMENTAL_MODE);
+				state++; break;
+
+		case 1: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+				SET_NON_MODAL_MACRO(target[jogAxis], jogMaxDistance);
+				SET_NON_MODAL_MACRO (feed_rate, *velocidadeJog);
+				state++; break;
 		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
 	}
 	_execute_gcode_block();

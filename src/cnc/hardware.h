@@ -146,6 +146,7 @@ extern "C"{
 
 #define TORCH  		PORTD.PODR.BIT.B7
 #define MATERIAL  	PORTD.PIDR.BIT.B2
+#define ARCO_OK  	PORTD.PIDR.BIT.B0
 
 #define MOTOR_FOWARD	1
 #define MOTOR_REVERSE   0
