@@ -345,6 +345,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					if (simTorch)
 					{
 						TORCH = TRUE;
+						pl_arcook_start();
+						isCuttingSet(true);
 					}
 				}
 			}

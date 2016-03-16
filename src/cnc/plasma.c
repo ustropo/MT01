@@ -19,6 +19,7 @@
 static bool isCutting = false;
 TaskHandle_t xPlasmaTaskHandle;
 extern TaskHandle_t xCncTaskHandle;
+extern bool simTorch;
 
 void pl_arcook_init(void)
 {
@@ -57,13 +58,13 @@ void pl_arcook_stop(void)
 
 void pl_arcook_check(void)
 {
-	uint32_t qSend;
-
-	if (!TORCH && isCutting){
-		isCutting = false;
-		qSend = ARCO_OK_FAILED;
-		xQueueSend( qKeyboard, &qSend, 0 );
-	}
+//	uint32_t qSend;
+//
+//	if (TORCH && isCutting){
+//		isCutting = false;
+//		qSend = ARCO_OK_FAILED;
+//		xQueueSend( qKeyboard, &qSend, 0 );
+//	}
 }
 
 
@@ -102,7 +103,10 @@ void plasma_task(void)
         {
 			if (!ARCO_OK)
 			{
-				xTaskNotifyGive(xCncTaskHandle);
+				if (!simTorch)
+				{
+					xTaskNotifyGive(xCncTaskHandle);
+				}
 			}
 			else
 			{

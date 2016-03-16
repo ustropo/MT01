@@ -44,7 +44,7 @@ stat_t M3_Macro(void)
 	{
 			/* 1- CHECA SE O USUARIO CANCELOU O IHS (MODO OXICORTE), OU SE ESTÁ EM MODO SIMULAÇÃO. SE SIM, PULAR PARA PASSO 3
 			   2- PROCURA A CHAPA USANDO O G38.2 -50 COM FEEDRATE DE 800MM/MIN  */
-		case 0: if(configFlags == 0 && !sim){
+		case 0: if(configFlags == 0){
 					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_STRAIGHT_PROBE);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], -50);
 					SET_NON_MODAL_MACRO (feed_rate, 800);
@@ -52,7 +52,7 @@ stat_t M3_Macro(void)
 				state++; break;
 
 				/*  ZERA O EIXO Z COM G28.3 Z0 (NÃO PRECISA MAIS COMPENSAR O SENSOR, MINHA MAQUINA USARÁ SISTEMA OHMICO, OFFSET=0) */
-		case 1: if(configFlags == 0 && !sim){
+		case 1: if(configFlags == 0){
 					SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
 				}
