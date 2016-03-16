@@ -416,6 +416,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			iif_bind_idle();
 			pl_arcook_stop();
 			isCuttingSet(false);
+			TORCH = FALSE;
 			ut_lcd_output_warning("ERRO\nPLASMA NÃO\nTRANSFERIDO\n");
 
 			vTaskDelay(2000 / portTICK_PERIOD_MS);
