@@ -225,6 +225,9 @@ static ut_fs_navigate chooseFile()
 
 			/* Is a file - end of routine */
 			strcat(gszCurFile, filesMenu.items[filesMenu.selectedItem].text);
+			ut_lcd_output_warning("ARQUIVO\nCARREGADO\n");
+
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
 			return NAVIGATE_END;
 		}
 	}

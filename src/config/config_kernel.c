@@ -47,12 +47,14 @@
 #include "r_usb_hmsc_if.h"
 #include "r_tfat_lib.h"
 
+#include "plasma.h"
+
+extern TaskHandle_t xPlasmaTaskHandle;
+extern TaskHandle_t xCncTaskHandle;
 
 /******************************************************************************
 Private global variables and functions
 ******************************************************************************/
-TaskHandle_t  x_tn_usb_connected = NULL;
-xQueueHandle qtaskComm;
 
 #if SOCKET_IF_USE_SEMP
 xSemaphoreHandle r_socket_semaphore;
@@ -389,7 +391,6 @@ void FreeRTOSConfig( void )
     }
 
 	qKeyboard = xQueueCreate(  1, sizeof(void *) );
-	qtaskComm = xQueueCreate(  1, sizeof( uint32_t ));
     /* Task */
 #if 0
     xTaskCreate( (pdTASK_CODE)R_usb_pstd_PcdTask,     "USB_PCD_TSK     ",  512, NULL, 5, &task_handle0 ); /* USB_PCD_TASK   */
@@ -407,7 +408,8 @@ void FreeRTOSConfig( void )
     /*User interface task*/
     xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task    ",  512, NULL, 3, NULL); /* keyboard_task      */
     xTaskCreate( (pdTASK_CODE)states_task,     "states_task    ",  2048, NULL, 2, &task_main_handle); /* states_task      */
-    xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  2048, NULL, 1, &x_tn_usb_connected); /* CNC_task      */
+    xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  2048, NULL, 1, &xCncTaskHandle); /* CNC_task      */
+    xTaskCreate((pdTASK_CODE)plasma_task, "Plasma task", 512, NULL, 3, &xPlasmaTaskHandle );
 }
 
 /******************************************************************************/

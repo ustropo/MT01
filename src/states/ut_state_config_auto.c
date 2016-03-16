@@ -169,7 +169,7 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				ut_lcd_output_warning("NENHUM ARQUIVO\n\
 									   CARREGADO\n");
 
-				vTaskDelay(1000 / portTICK_PERIOD_MS);
+				vTaskDelay(2000 / portTICK_PERIOD_MS);
 				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
 				pContext->value[1] = STATE_CONFIG_AUTO_MODE;
 				return STATE_CONFIG_AUTO_MODE;

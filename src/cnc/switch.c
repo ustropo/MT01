@@ -71,22 +71,9 @@ void switch_init(void)
     IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
     IPR(ICU, IRQ2) = 5;            //Set interrupt priority
     IEN(ICU, IRQ2) = 1;            // Enable interrupt
-
-    PORTD.PMR.BYTE  = 0x41 ;
-    MPC.PD0PFS.BYTE = 0x40 ;    /* PD0 is a IRQ - ARCO_OK*/
-    ICU.IRQCR[0].BIT.IRQMD = 3;
-    IR(ICU, IRQ0)  = 0;            //Clear any previously pending interrupts
-    IPR(ICU, IRQ0) = 5;            //Set interrupt priority
-    IEN(ICU, IRQ0) = 1;            // Enable interrupt
-    R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
     reset_switches();
 }
 
-#pragma interrupt IRQ0_isr(vect=VECT(ICU, IRQ0))
-static void IRQ0_isr (void) {
-	bool teste;
-	teste = ARCO_OK;
-}
 
 #pragma interrupt IRQ2_isr(vect=VECT(ICU, IRQ2))
 static void IRQ2_isr (void) {_switch_isr_helper(SW_MIN_Z);}

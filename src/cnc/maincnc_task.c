@@ -32,9 +32,13 @@
 #include "encoder.h"
 #include "network.h"
 #include "switch.h"
+#include "plasma.h"
 #include "test.h"
 #include "pwm.h"
 #include "xio.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
 
 #ifdef __AVR
 #include <avr/interrupt.h>
@@ -84,6 +88,10 @@ MOTATE_SET_USB_SERIAL_NUMBER_STRING( {'0','0','1'} )
 Motate::SPI<kSocket4_SPISlaveSelectPinNumber> spi;
 #endif
 
+#ifdef __RX
+TaskHandle_t xCncTaskHandle;
+#endif
+
 /*
  * _system_init()
  */
@@ -123,6 +131,7 @@ static void _application_init(void)
 	stepper_init(); 				// stepper subsystem 				- must precede gpio_init()
 	encoder_init();					// virtual encoders
 	switch_init();					// switches
+	pl_arcook_init();
 //	gpio_init();					// parallel IO
 	pwm_init();						// pulse width modulation drivers	- must follow gpio_init()
 

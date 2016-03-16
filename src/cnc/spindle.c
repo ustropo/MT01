@@ -129,6 +129,7 @@ static void _exec_spindle_control(float *value, float *flag)
 #ifdef __RX
 	if (spindle_mode == SPINDLE_CW) {
 		if(!sim){
+			pl_arcook_start();
 			TORCH = TRUE;
 		}
 		else
@@ -136,9 +137,13 @@ static void _exec_spindle_control(float *value, float *flag)
 			simTorch = true;
 		}
 	} else if (spindle_mode == SPINDLE_CCW) {
+		pl_arcook_stop();
+		isCuttingSet(false);
 		TORCH = FALSE;
 		simTorch = false;
 	} else {
+		pl_arcook_stop();
+		isCuttingSet(false);
 		TORCH = FALSE;
 		simTorch = false;
 	}

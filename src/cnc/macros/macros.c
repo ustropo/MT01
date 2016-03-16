@@ -8,12 +8,17 @@
 #include "xio.h"			// for char definitions
 #include "macros.h"
 #include "eeprom.h"
+#include "plasma.h"
+
+#include "lcd.h"
+#include "keyboard.h"
 
 extern float *velocidadeJog;
 
 uint8_t jogAxis;
 float jogMaxDistance;
 uint8_t state = 0;
+extern bool sim;
 
 stat_t (*macro_func_ptr)(void);
 
@@ -28,6 +33,7 @@ extern struct gcodeParserSingleton gp;
 
 stat_t M3_Macro(void)
 {
+	uint32_t lRet = 0;
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -38,42 +44,59 @@ stat_t M3_Macro(void)
 	{
 			/* 1- CHECA SE O USUARIO CANCELOU O IHS (MODO OXICORTE), OU SE ESTÁ EM MODO SIMULAÇÃO. SE SIM, PULAR PARA PASSO 3
 			   2- PROCURA A CHAPA USANDO O G38.2 -50 COM FEEDRATE DE 800MM/MIN  */
-		case 0: if(configFlags == 0){
+		case 0: if(configFlags == 0 && !sim){
 					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_STRAIGHT_PROBE);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], -50);
 					SET_NON_MODAL_MACRO (feed_rate, 800);
 				}
 				state++; break;
 
-				/* 3- ZERA O EIXO Z COM G28.3 Z0 (NÃO PRECISA MAIS COMPENSAR O SENSOR, MINHA MAQUINA USARÁ SISTEMA OHMICO, OFFSET=0) */
-		case 1: if(configFlags == 0){
+				/*  ZERA O EIXO Z COM G28.3 Z0 (NÃO PRECISA MAIS COMPENSAR O SENSOR, MINHA MAQUINA USARÁ SISTEMA OHMICO, OFFSET=0) */
+		case 1: if(configFlags == 0 && !sim){
 					SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
 				}
 				state++; break;
 
-				/*4- SOBE O EIXO Z PARA "ALTURA DE PERFURAÇÃO" */
+				/* 3- POSICIONA O EIXO Z PARA "ALTURA DE PERFURAÇÃO" */
 		case 2: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
 				SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_PERFURACAO]);
 				state++; break;
 
-				/*6 -DISPARA O RELE DA TOCHA */
+				/* 5- CHECA SE O ESTÁ EM MODO SIMULAÇÃO, SE SIM, PULAR PARA PASSO 8. SE ESTIVER EM MODO OXICORTE, CONTINUA.
+				   6 -DISPARA O RELE DA TOCHA */
 		case 3: SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
 				state++; break;
 
+		case 4: if(configFlags == 0 && !sim){
+					uint32_t lRet;
+					lRet = ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(3000) );
+					if (lRet == pdFALSE)
+					{
+						uint32_t qSend = 0xFFFFFFFF;
+						xQueueSend( qKeyboard, &qSend, 0 );
+						return (STAT_OK);
+					}
+					else
+					{
+						isCuttingSet(true);
+					}
+				}
+				state++; break;
+
 				/*8- DEIXA CORRER O TEMPO DE PERFURAÇÃO "TEMPO DE PERFURAÇÃO" */
-		case 4: SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+		case 5: SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
 				SET_NON_MODAL_MACRO (parameter, configVar[TEMPO_PERFURACAO]*1000);
 				state++; break;
 
 				/*9- DESCE A TOCHA USANDO G01 F800 PARA "ALTURA DE CORTE" */
-		case 5: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+		case 6: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 				SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_CORTE]);
 				SET_NON_MODAL_MACRO (feed_rate, 800);
 				state++; break;
 
 				/*10- SETA O SISTEMA COM FEEDRATE DE CORTE F "VELOC. DE CORTE” PARA OS PROXIMOS G01, G02 E G03*/
-		case 6: SET_NON_MODAL_MACRO (feed_rate, configVar[VELOC_CORTE]);
+		case 7: SET_NON_MODAL_MACRO (feed_rate, configVar[VELOC_CORTE]);
 				state++; break;
 
 		default: state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);

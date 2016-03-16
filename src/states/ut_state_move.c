@@ -23,6 +23,7 @@
 #include "lcd.h"
 
 #include "planner.h"
+#include "plasma.h"
 
 bool sim = false;
 bool programEnd = false;
@@ -114,17 +115,17 @@ static void updatePosition(uint8_t menu)
 			         break;
 		case AUTO:   lStr[0] = gStrAuto[0];
 		 	 	 	 lStr[1] = gStrAuto[1];
-			         sprintf(gStrAuto[2], "FEED.: %.0f mm/s",  mp_get_runtime_velocity());
+			         sprintf(gStrAuto[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
                      lStr[2] = gStrAuto[2];
                      break;
 		case SIM:    lStr[0] = gStrSim[0];
 		 	 	 	 lStr[1] = gStrSim[1];
-			         sprintf(gStrSim[2], "FEED.: %.0f mm/s",  mp_get_runtime_velocity());
+			         sprintf(gStrSim[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
                      lStr[2] = gStrSim[2];
                      break;
 		case DESLOCA: lStr[0] = gStrDesloca[0];
 					  lStr[1] = gStrDesloca[1];
-				         sprintf(gStrDesloca[2], "FEED.: %.0f mm/s",  mp_get_runtime_velocity());
+				         sprintf(gStrDesloca[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
 					  lStr[2] = gStrDesloca[2];
 					  break;
 	}
@@ -368,7 +369,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				//cm_cycle_end();
 				state = 0;
 				cm.cycle_state = CYCLE_OFF;
-
+				pl_arcook_stop();
+				isCuttingSet(false);
 				macro_func_ptr = _command_dispatch;
 				iif_bind_idle();
 				if (programEnd)
@@ -396,7 +398,25 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			iif_func_released();
 			break;
 		/* TODO: operate machine - with other keys */
-		default:
+		case ARCO_OK_FAILED:
+			xTimerStop( TimerUpdate, 0 );
+			cm_request_feedhold();
+			cm_request_queue_flush();
+			xio_close(cs.primary_src);
+
+			cm.probe_state = PROBE_FAILED;
+			//cm_set_motion_mode(MODEL, MOTION_MODE_CANCEL_MOTION_MODE);
+			//cm_cycle_end();
+			state = 0;
+			cm.cycle_state = CYCLE_OFF;
+
+			macro_func_ptr = _command_dispatch;
+			iif_bind_idle();
+			pl_arcook_stop();
+			isCuttingSet(false);
+			ut_lcd_output_warning("ERRO\nPLASMA NÃO\nTRANSFERIDO\n");
+
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
 			return STATE_CONFIG_AUTO_MODE;
 			break;
 		}
