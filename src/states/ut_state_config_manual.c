@@ -21,7 +21,7 @@
 #include "lcd.h"
 #include "lcd_menu.h"
 
-#define DEFAULT_CONFIG_TIMEOUT	30000
+#define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
 typedef enum
 {

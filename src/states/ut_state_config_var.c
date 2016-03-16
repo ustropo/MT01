@@ -23,14 +23,14 @@
 #include <string.h>
 
 
-#define DEFAULT_CONFIG_VAR_TOUT	30000
+#define DEFAULT_CONFIG_VAR_TOUT	portMAX_DELAY
 
 extern bool sim;
 
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
 static TimerHandle_t TimerUpdate[2];
 static uint8_t count = 0;
-static uint8_t mult = 1;
+static uint16_t mult = 1;
 
 /**
  * Function pointer that can change a configuration
@@ -295,6 +295,8 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 	if(count == 10)
 	{
 		mult = mult*10;
+		if (mult > 1000)
+			mult = 1000;
 		count = 0;
 	}
 
@@ -302,9 +304,18 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
 	switch (lArrayIndex)
 	{
-		case 3: if(*value > 0) *value = *value - configsVar->step*mult;
+		case 3: if(*value > configsVar->valueMin){
+			*value = *value - configsVar->step*mult;
+		}
+		else{
+			*value = configsVar->valueMin;
+		}
 		break;
-		case 4: if(*value < 10000) *value = *value + configsVar->step*mult;
+		case 4: if(*value < configsVar->valueMax){
+			*value = *value + configsVar->step*mult;
+		}else{
+			*value = configsVar->valueMax;
+		}
 		break;
 	}
 

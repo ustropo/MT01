@@ -19,7 +19,7 @@
 #include "lcd.h"
 #include "lcd_menu.h"
 
-#define DEFAULT_CONFIG_TIMEOUT	30000
+#define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
 typedef enum
 {
@@ -65,7 +65,7 @@ static char* init_names[CONFIG_MAX] =
 	" ALT. DESLOCAMENTO",
 	" ALT. PERFURAÇÃO",
 	" TEMPO PERFURAÇÃO",
-	" ALT. CORTE",
+	" ALTURA DE CORTE",
 	" VELOC. CORTE",
 	" VELOC. JOG LENTO",
 	" VELOC. JOG RÁPIDO",
@@ -85,6 +85,38 @@ static float init_step[CONFIG_MAX] =
 	1,
 	1,
 	1,
+	0,
+	0,
+	0,
+	0,
+	0
+};
+
+static float init_max[CONFIG_MAX] =
+{
+	150,
+	30,
+	300,
+	150,
+	10000,
+	5000,
+	10000,
+	0,
+	0,
+	0,
+	0,
+	0
+};
+
+static float init_min[CONFIG_MAX] =
+{
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
 	0,
 	0,
 	0,
@@ -147,6 +179,8 @@ static void init()
 		{
 			case CONFIG_CANCELAR_IHS: configs[i].value = &configFlags; break;
 			default: configs[i].value = &configVar[i];
+					 configs[i].valueMax = init_max[i];
+					 configs[i].valueMin = init_min[i];
 		}
 		configs[i].name = init_names[i];
 		configs[i].unit = init_unit[i];

@@ -20,7 +20,7 @@
 #include "lcd.h"
 #include "lcd_menu.h"
 
-#define DEFAULT_CONFIG_TIMEOUT	30000
+#define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
 extern char gszCurFile[MAX_FILE_PATH_SIZE];
 
@@ -93,7 +93,7 @@ static var_func init_func[CONFIG_AUTO_MAX] =
 	idle
 };
 
-static const char* gszConfigMenuTitle = "CONFIG. AUTOMÁTICO";
+static const char* gszConfigMenuTitle = "CORTE AUTOMÁTICO";
 
 /**
  * Initialize config array
