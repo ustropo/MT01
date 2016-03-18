@@ -34,65 +34,24 @@
 #define LED_ON              (0)
 #define LED_OFF             (1)
 
-/* I/0 port 1 */
-
-
-/* I/0 port 2 */
-
-
-/* I/O port 3 */
-
-
-/* I/O port 4: switches and various peripherals  */
-#define SW_ACTIVE           (0)
-#define SW1                 PORT4.PIDR.BIT.B0   
-#define SW1_PMR             PORT4.PMR.BIT.B0
-#define SW1_PDR             PORT4.PDR.BIT.B0
-#define SW2                 PORT4.PIDR.BIT.B1    
-#define SW2_PMR             PORT4.PMR.BIT.B1
-#define SW2_PDR             PORT4.PDR.BIT.B1
-#define POTENTIOMETER       PORT4.PODR.BIT.B2
-#define JN1_AN3             PORT4.PODR.BIT.B3
-#define SW3                 PORT4.PIDR.BIT.B4 
-#define SW3_PMR             PORT4.PMR.BIT.B4
-#define SW3_PDR             PORT4.PDR.BIT.B4
-#define MICROPHONE          PORT4.PODR.BIT.B5
-#define AUDIO_IN_R          PORT4.PODR.BIT.B6
-#define PWMLP_IN            PORT4.PODR.BIT.B7
-
-/* I/O port 5  */
+#ifndef MODULO
 #define KLINE				PORT5.PIDR.BYTE
 
-/* I/O port A:  Extension slot (JN2) and E/N pins */
-
-
-/* I/O port B:  Ethernet I/O pins definitions */
-
-
-/* I/O port C:  RSPI and peripheral I/O pins definitions */
 #define KCOL				PORTC.PDR.BYTE
 #define KC1					(0x05uL)
 #define KC2					(0x06uL)
 #define KC3					(0x0CuL)
 #define KC4					(0x14uL)
-#define LCD_CS              PORTC.PODR.BIT.B2        /* SSL 3 */
+#define LCD_CS              PORTC.PODR.BIT.B2
+#else
+#define KLINE				PORT4.PIDR.BYTE
 
-/* I/O ports D & E:  LEDs */
-#define LED4                PORTD.PODR.BIT.B5
-#define LED5                PORTE.PODR.BIT.B3
-#define LED6                PORTD.PODR.BIT.B2     
-#define LED7                PORTE.PODR.BIT.B0
-#define LED8                PORTD.PODR.BIT.B4
-#define LED9                PORTE.PODR.BIT.B2
-#define LED10               PORTD.PODR.BIT.B1
-#define LED11               PORTD.PODR.BIT.B7
-#define LED12               PORTD.PODR.BIT.B3
-#define LED13               PORTE.PODR.BIT.B1
-#define LED14               PORTD.PODR.BIT.B0
-#define LED15               PORTD.PODR.BIT.B6
-
-/* WiFi chip select */
-#define WIFI_CS             PORTJ.PODR.BIT.B3        
+#define KCOL				PORTD.PDR.BYTE
+#define KC0					(0x01uL)
+#define KC1					(0x02uL)
+#define KC2					(0x04uL)
+#define LCD_CS              PORTC.PODR.BIT.B2
+#endif
 
 #endif /* MT01_H */
 

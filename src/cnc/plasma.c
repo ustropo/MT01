@@ -23,6 +23,7 @@ extern bool simTorch;
 
 void pl_arcook_init(void)
 {
+#ifndef MODULO
 	R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_MPC);
     PORTD.PMR.BYTE  = 0x41 ;
     MPC.PD0PFS.BYTE = 0x40 ;    /* PD0 is a IRQ - ARCO_OK*/
@@ -31,6 +32,12 @@ void pl_arcook_init(void)
     IPR(ICU, IRQ0) = 3;            //Set interrupt priority
     IEN(ICU, IRQ0) = 0;            // Enable interrupt
     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
+#else
+    ICU.IRQCR[9].BIT.IRQMD = 3;
+    IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
+    IPR(ICU, IRQ9) = 3;            //Set interrupt priority
+    IEN(ICU, IRQ9) = 0;            // Enable interrupt
+#endif
 }
 
 
@@ -68,9 +75,13 @@ void pl_arcook_check(void)
 }
 
 
-
+#ifndef MODULO
 #pragma interrupt IRQ0_isr(vect=VECT(ICU, IRQ0))
 static void IRQ0_isr (void) {
+#else
+#pragma interrupt IRQ9_isr(vect=VECT(ICU, IRQ0))
+static void IRQ9_isr (void) {
+#endif
 	    BaseType_t xHigherPriorityTaskWoken;
 
 	    xHigherPriorityTaskWoken = pdFALSE;

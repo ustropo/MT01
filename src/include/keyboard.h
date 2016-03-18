@@ -19,6 +19,7 @@ Includes   <System Includes> , "Project Includes"
 /*****************************************************************************
 Macro definitions
 ******************************************************************************/
+#ifndef MODULO
 #define KEY_UP 		(0x0004U)
 #define KEY_DOWN 	(0x0010U)
 #define KEY_RIGHT	(0x2000U)
@@ -28,6 +29,17 @@ Macro definitions
 #define KEY_Z_UP 	(0x4000000U)
 #define KEY_Z_DOWN 	(0x10000000U)
 #define KEY_RELEASED (0)
+#else
+#define KEY_UP 		(0x0004U)
+#define KEY_DOWN 	(0x0010U)
+#define KEY_RIGHT	(0x2000U)
+#define KEY_LEFT	(0x20000000U)
+#define KEY_ESC		(0x40000U)
+#define KEY_ENTER 	(0x100000U)
+#define KEY_Z_UP 	(0x4000000U)
+#define KEY_Z_DOWN 	(0x10000000U)
+#define KEY_RELEASED (0)
+#endif
 /******************************************************************************
 Section    <Section Definition> , "Data Sections"
 ******************************************************************************/
