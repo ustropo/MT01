@@ -39,8 +39,8 @@ extern float *velocidadeJog;
 #define DEFAULT_AUTO_TITLE		"MODO AUTOM햀ICO"
 #define STOP_AUTO_TITLE		    "M핽UINA PARADA"
 #define DEFAULT_LINHA1_AUTO	    ""
-#define DEFAULT_AVISO_AUTO	    "ESC PARA A M핽UINA"
-#define STOP_AVISO_AUTO	        "ESC MENU/ENTER CONTINUA"
+#define DEFAULT_AVISO_AUTO	    ""
+#define STOP_AVISO_AUTO	        ""
 
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
 #define DEFAULT_LINHA1_MANUAL	"VELOCIDADE:         "
@@ -53,8 +53,8 @@ extern float *velocidadeJog;
 #define DEFAULT_SIM_TITLE		"MODO SIMULA플O"
 #define STOP_SIM_TITLE		    "M핽UINA PARADA"
 #define DEFAULT_LINHA1_SIM	    ""
-#define DEFAULT_AVISO_SIM	    "ESC PARAR/ENTER MODO AUTO"
-#define STOP_AVISO_SIM	        "ESC MENU/ENTER CONTINUA"
+#define DEFAULT_AVISO_SIM	    ""
+#define STOP_AVISO_SIM	        ""
 
 
 #define DEFAULT_UPDATE_TIMEOUT	portMAX_DELAY
@@ -114,11 +114,13 @@ static void updatePosition(uint8_t menu)
 			         lStr[2] = gStrManual[2];
 			         break;
 		case AUTO:   lStr[0] = gStrAuto[0];
+ 	 	 	 	 	 sprintf(gStrAuto[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrAuto[1];
 			         sprintf(gStrAuto[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
                      lStr[2] = gStrAuto[2];
                      break;
 		case SIM:    lStr[0] = gStrSim[0];
+	 	 	 	 	 sprintf(gStrSim[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrSim[1];
 			         sprintf(gStrSim[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
                      lStr[2] = gStrSim[2];

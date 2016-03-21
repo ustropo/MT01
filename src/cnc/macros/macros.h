@@ -13,6 +13,7 @@ extern int8_t macro;
 extern uint8_t jogAxis;
 extern float jogMaxDistance;
 extern uint8_t state;
+extern uint32_t linenumMacro;
 
 stat_t M5_Macro(void);
 stat_t M3_Macro(void);

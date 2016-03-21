@@ -399,6 +399,7 @@ static stat_t _parse_gcode_block(char_t *buf)
 			default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
 		}
 		if(status != STAT_OK) break;
+		linenumMacro = cm.gn.linenum;
 	}
 	if ((status != STAT_OK) && (status != STAT_COMPLETE)) return (status);
 	ritorno(_validate_gcode_block());
