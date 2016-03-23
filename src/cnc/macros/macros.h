@@ -20,5 +20,6 @@ stat_t M3_Macro(void);
 stat_t ZerarEixos_Macro(void);
 stat_t homming_Macro(void);
 stat_t jog_Macro(void);
+stat_t RunningInicial_Macro(void);
 
 #endif /* CNC_MACROS_MACROS_H_ */

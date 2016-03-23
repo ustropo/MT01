@@ -151,7 +151,7 @@ Configuration Options
     /* If only 1 stack is chosen using BSP_CFG_USER_STACK_ENABLE then no RAM will be allocated for the user stack. */
     #if (BSP_CFG_USER_STACK_ENABLE == 1)
     /* User Stack size in bytes. The Renesas RX toolchain sets the stack size using the #pragma stacksize directive. */
-    #pragma stacksize su=0x1000
+    #pragma stacksize su=0x2000
     #endif
 
 /* Interrupt Stack size in bytes. The Renesas RX toolchain sets the stack size using the #pragma stacksize directive.

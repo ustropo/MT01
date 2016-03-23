@@ -24,6 +24,11 @@
 extern "C"{
 #endif
 
+typedef enum{
+	CODE_PARSER = 0,
+	LINE_PARSER
+}gc_parser_t;
+
 /*
  * Global Scope Functions
  */
@@ -31,6 +36,8 @@ stat_t gc_gcode_parser(char_t *block);
 stat_t gc_get_gc(nvObj_t *nv);
 stat_t gc_run_gc(nvObj_t *nv);
 stat_t _execute_gcode_block(void);		// Execute the gcode block
+void parse_gcode_func_selection(gc_parser_t funcSel);
+
 
 #ifdef __cplusplus
 }

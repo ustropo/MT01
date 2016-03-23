@@ -26,6 +26,7 @@ typedef enum
 	STATE_MANUAL_MODE,
 	STATE_DESLOCAZERO_MODE,
 	STATE_AUTO_MODE,
+	STATE_LINE_SELECTION,
 	/* This should be always the last one! */
 	STATE_NUMBER
 } ut_state;
@@ -55,6 +56,7 @@ extern ut_state ut_state_manual_mode(ut_context* pContext);
 extern ut_state ut_state_auto_mode(ut_context* pContext);
 extern ut_state ut_state_deslocaZero_mode(ut_context* pContext);
 extern ut_state ut_state_config_auto_menu(ut_context* pContext);
+extern ut_state ut_state_line_selection(ut_context* pContext);
 
 /**
  * State map definition

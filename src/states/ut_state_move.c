@@ -173,7 +173,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 	/* Clear display */
 	updatePosition(MANUAL);
 	gTitle = MANUAL;
-	tg_set_primary_source(XIO_DEV_COMMAND);
+//	tg_set_primary_source(XIO_DEV_COMMAND);
 	iif_bind_jog();
 	TimerUpdate = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
@@ -286,6 +286,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				   );
 	xTimerStart( TimerUpdate, 0 );
 	tg_set_primary_source(XIO_DEV_USBFAT);
+	macro_func_ptr = _command_dispatch;
 	xio_close(cs.primary_src);
 	xio_open(cs.primary_src,0,0);
 	iif_bind_filerunning();
@@ -375,7 +376,6 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				cm.cycle_state = CYCLE_OFF;
 				pl_arcook_stop();
 				isCuttingSet(false);
-				macro_func_ptr = _command_dispatch;
 				iif_bind_idle();
 				if (programEnd)
 					return STATE_MANUAL_MODE;
@@ -414,7 +414,6 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			state = 0;
 			cm.cycle_state = CYCLE_OFF;
 
-			macro_func_ptr = _command_dispatch;
 			iif_bind_idle();
 			pl_arcook_stop();
 			isCuttingSet(false);

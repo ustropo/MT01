@@ -24,5 +24,6 @@ const state_func_ptr states_table[STATE_NUMBER] =
 		&ut_state_config_var,
 		&ut_state_manual_mode, //Manual menu init
 		&ut_state_deslocaZero_mode, //
-		&ut_state_auto_mode
+		&ut_state_auto_mode,
+		&ut_state_line_selection
 };

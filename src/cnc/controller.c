@@ -94,7 +94,7 @@ void controller_init(uint8_t std_in, uint8_t std_out, uint8_t std_err)
 {
 	memset(&cs, 0, sizeof(controller_t));			// clear all values, job_id's, pointers and status
 	controller_init_assertions();
-	macro_func_ptr = _command_dispatch;
+	macro_func_ptr = command_idle;
 	cs.fw_build = TINYG_FIRMWARE_BUILD;
 	cs.fw_version = TINYG_FIRMWARE_VERSION;
 	cs.hw_platform = TINYG_HARDWARE_PLATFORM;		// NB: HW version is set from EEPROM
@@ -269,7 +269,7 @@ stat_t _command_dispatch()
 #endif // __ARM
 #ifdef __RX
 	stat_t status;
-
+	parse_gcode_func_selection(CODE_PARSER);
 	// read input line or return if not a completed line
 	// xio_gets() is a non-blocking workalike of fgets()
 	while (true) {
@@ -281,6 +281,7 @@ stat_t _command_dispatch()
 		if (status == STAT_EOF) {						// EOF can come from file devices only
 			//gfilerunning = false;
 			xio_close(cs.primary_src);
+			macro_func_ptr = command_idle;
 			if (cfg.comm_mode == TEXT_MODE) {
 				fprintf_P(stderr, PSTR("End of command file\n"));
 			} else {
@@ -478,4 +479,9 @@ stat_t _system_assertions()
 //	emergency___everybody_to_get_from_street(encoder_test_assertions());
 //	emergency___everybody_to_get_from_street(xio_test_assertions());
 	return (STAT_OK);
+}
+
+stat_t command_idle(void)
+{
+
 }

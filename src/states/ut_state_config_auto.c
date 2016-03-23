@@ -23,6 +23,7 @@
 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
 extern char gszCurFile[MAX_FILE_PATH_SIZE];
+extern uint32_t choosedLine;
 
 typedef enum
 {
@@ -53,7 +54,7 @@ static const ut_state geNextStateAuto[5] =
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
-	STATE_MAIN_MENU,
+	STATE_LINE_SELECTION,
 };
 
 /* Initial values for each config variable */
@@ -136,6 +137,7 @@ static void init()
  */
 ut_state ut_state_config_auto_menu(ut_context* pContext)
 {
+	char Str[20];
 	ut_menu config_menu;
 	uint8_t i;
 
@@ -179,6 +181,12 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
 				/* Delay */
 				vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+				sprintf(Str, "PONTO DE ENTRADA\nLINHA %d\n", choosedLine);
+				ut_lcd_output_warning(Str);
+				/* Delay */
+				vTaskDelay(2000 / portTICK_PERIOD_MS);
+
 				configsVar->name = "DESEJA CONTINUAR?";
 				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
 				pContext->value[1] = STATE_AUTO_MODE;

@@ -97,6 +97,7 @@ void controller_init_assertions(void);
 stat_t controller_test_assertions(void);
 void controller_run(void);
 stat_t _command_dispatch(void);
+stat_t command_idle(void);
 //void controller_reset(void);
 
 void tg_reset_source(void);

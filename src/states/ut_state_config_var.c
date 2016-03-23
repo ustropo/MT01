@@ -27,6 +27,7 @@
 
 extern bool sim;
 
+
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
 static TimerHandle_t TimerUpdate[2];
 static uint8_t count = 0;

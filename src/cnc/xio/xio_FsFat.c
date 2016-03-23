@@ -18,7 +18,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
+#include "tinyg.h"			// #1
+#include "config.h"			// #2
+#include "macros.h"
 
 #include <stdio.h>				// precursor for xio.h
 #include <stdbool.h>			// true and false
@@ -33,6 +35,10 @@
  ******************************************************************************/
 
 static bool fileRunning = false;
+uint32_t actualLine = 0;
+uint32_t previousLine = 0;
+uint32_t choosedLine = 0;
+uint32_t choosedLinePosition = 0;
 
 xioFsfat_t	    ufsfat[XIO_DEV_USBFILE_COUNT];
 
@@ -98,6 +104,13 @@ FILE * xio_open_file(const uint8_t dev, const char *addr, const flags_t flags)
 	fr = R_tfat_f_close(&dx->f);
     /* Open a text file */
     fr = R_tfat_f_open(&dx->f, gszCurFile, TFAT_FA_READ);
+    if (choosedLinePosition > 0)
+    {
+        R_tfat_f_lseek(&dx->f,choosedLinePosition);
+        macro_func_ptr = RunningInicial_Macro;
+        choosedLinePosition = 0;
+        choosedLine = 0;
+    }
     fileRunning = true;
 	return(&d->file);								// return pointer to the FILE stream
 }
@@ -113,6 +126,8 @@ int xio_gets_fsfat(xioDev_t *d, char *buf, const int size)
 			fileRunning = false;
 			return (XIO_EOF);
 		}
+		previousLine = actualLine;
+		actualLine = dx->f.fptr;
 		printf(buf);
 		return(XIO_OK);
 	}

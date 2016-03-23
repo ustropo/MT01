@@ -30,6 +30,9 @@
 extern "C"{
 #endif
 
+extern uint32_t lineNumEntry[100];
+extern uint16_t index;
+
 struct gcodeParserSingleton {	 	  // struct to manage globals
 	uint8_t modals[MODAL_GROUP_COUNT];// collects modal groups in a block
 };
@@ -42,6 +45,8 @@ static stat_t _get_next_gcode_word(char **pstr, char *letter, float *value);
 static stat_t _point(float value);
 static stat_t _validate_gcode_block(void);
 static stat_t _parse_gcode_block(char_t *line);	// Parse the block into the GN/GF structs
+static stat_t _parse_gcode_block_selection_line(char_t *buf);
+static stat_t (*parse_gcode_func)(char_t *buf);
 
 
 //RXMOD	#define SET_MODAL(m,parm,val) ({cm.gn.parm=val; cm.gf.parm=1; gp.modals[m]+=1; break;})
@@ -50,6 +55,16 @@ static stat_t _parse_gcode_block(char_t *line);	// Parse the block into the GN/G
 #define SET_MODAL(m,parm,val) cm.gn.parm=val; cm.gf.parm=1; gp.modals[m]+=1; break;
 #define SET_NON_MODAL(parm,val) cm.gn.parm=val; cm.gf.parm=1; break;
 #define EXEC_FUNC(f,v) if((uint8_t)cm.gf.v != false) { status = f(cm.gn.v);}
+
+void parse_gcode_func_selection(gc_parser_t funcSel)
+{
+	switch(funcSel)
+	{
+		case CODE_PARSER: parse_gcode_func = _parse_gcode_block; break;
+		case LINE_PARSER: parse_gcode_func = _parse_gcode_block_selection_line; break;
+		default: break;
+	}
+}
 
 /*
  * gc_gcode_parser() - parse a block (line) of gcode
@@ -81,7 +96,7 @@ stat_t gc_gcode_parser(char_t *block)
 		(void)cm_message(msg);				// queue the message
 	}
 
-	return(_parse_gcode_block(block));
+	return(parse_gcode_func(block));
 }
 
 /*
@@ -404,6 +419,31 @@ static stat_t _parse_gcode_block(char_t *buf)
 	if ((status != STAT_OK) && (status != STAT_COMPLETE)) return (status);
 	ritorno(_validate_gcode_block());
 	return (_execute_gcode_block());		// if successful execute the block
+}
+
+static stat_t _parse_gcode_block_selection_line(char_t *buf)
+{
+	char *pstr = (char *)buf;		// persistent pointer into gcode block for parsing words
+  	char letter;					// parsed letter, eg.g. G or X or Y
+	float value = 0;				// value parsed from letter (e.g. 2 for G2)
+	stat_t status = STAT_NOOP;
+	stat_t ret = STAT_NOOP;
+	uint32_t lineNum = 0;
+
+	// extract commands and parameters
+	while((status = _get_next_gcode_word(&pstr, &letter, &value)) == STAT_OK) {
+		switch(letter) {
+			case 'N': lineNum = value; break;
+			case 'M':
+				switch((uint8_t)value) {
+					case 5: lineNumEntry[index++] = lineNum;
+							ret = STAT_OK;
+							break;
+				}
+				break;
+		}
+	}
+	return (ret);
 }
 
 /*
