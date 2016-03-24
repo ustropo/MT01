@@ -286,9 +286,9 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				   );
 	xTimerStart( TimerUpdate, 0 );
 	tg_set_primary_source(XIO_DEV_USBFAT);
-	macro_func_ptr = _command_dispatch;
 	xio_close(cs.primary_src);
 	xio_open(cs.primary_src,0,0);
+	macro_func_ptr = _command_dispatch;
 	iif_bind_filerunning();
 
 	while(true)
@@ -377,6 +377,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				pl_arcook_stop();
 				isCuttingSet(false);
 				iif_bind_idle();
+				macro_func_ptr = command_idle;
 				if (programEnd)
 					return STATE_MANUAL_MODE;
 				return STATE_CONFIG_AUTO_MODE;
@@ -403,25 +404,30 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 		/* TODO: operate machine - with other keys */
 		case ARCO_OK_FAILED:
+//			xTimerStop( TimerUpdate, 0 );
+//			cm_request_feedhold();
+//			cm_request_queue_flush();
+//			xio_close(cs.primary_src);
+//
+//			cm.probe_state = PROBE_FAILED;
+//			state = 0;
+//			cm.cycle_state = CYCLE_OFF;
+//
+//			iif_bind_idle();
+//			pl_arcook_stop();
+//			isCuttingSet(false);
+//			TORCH = FALSE;
+//			ut_lcd_output_warning("ERRO\nPLASMA NÃO\nTRANSFERIDO\n");
+//
+//			vTaskDelay(2000 / portTICK_PERIOD_MS);
+//			macro_func_ptr = command_idle;
+//			return STATE_CONFIG_AUTO_MODE;
 			xTimerStop( TimerUpdate, 0 );
-			cm_request_feedhold();
-			cm_request_queue_flush();
-			xio_close(cs.primary_src);
-
-			cm.probe_state = PROBE_FAILED;
-			//cm_set_motion_mode(MODEL, MOTION_MODE_CANCEL_MOTION_MODE);
-			//cm_cycle_end();
-			state = 0;
-			cm.cycle_state = CYCLE_OFF;
-
-			iif_bind_idle();
-			pl_arcook_stop();
-			isCuttingSet(false);
+			ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\nPRESSIONE ESC\n");
 			TORCH = FALSE;
-			ut_lcd_output_warning("ERRO\nPLASMA NÃO\nTRANSFERIDO\n");
-
-			vTaskDelay(2000 / portTICK_PERIOD_MS);
-			return STATE_CONFIG_AUTO_MODE;
+			macro_func_ptr = command_idle;
+			uint32_t qSend = KEY_ESC;
+			xQueueSend( qKeyboard, &qSend, 0 );
 			break;
 		}
 

@@ -78,7 +78,7 @@ stat_t M3_Macro(void)
 					lRet = ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(3000) );
 					if (lRet == pdFALSE)
 					{
-						uint32_t qSend = 0xFFFFFFFF;
+						uint32_t qSend = ARCO_OK_FAILED;
 						xQueueSend( qKeyboard, &qSend, 0 );
 						return (STAT_OK);
 					}
