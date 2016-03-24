@@ -92,11 +92,11 @@ ut_state ut_state_splash(ut_context* pContext)
 	vTaskDelay(10 / portTICK_PERIOD_MS);
 
 	//ut_lcd_bitmap(0,11,metalique128_width,metalique128_height,metalique128_bits);
-	ut_lcd_buf_drawImage(0,11,metalique128_width,metalique128_height,metalique128_bits);
-	ut_lcd_buf_output();
+//	ut_lcd_buf_drawImage(0,11,metalique128_width,metalique128_height,metalique128_bits);
+//	ut_lcd_buf_output();
 
 	/* Delay */
-	vTaskDelay(2000 / portTICK_PERIOD_MS);
+	//vTaskDelay(2000 / portTICK_PERIOD_MS);
 
 	ut_lcd_buf_drawString(1, 1, "teste", true);
 	ut_lcd_buf_output();
