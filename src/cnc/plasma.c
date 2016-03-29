@@ -53,14 +53,24 @@ bool isCuttingGet(void)
 
 void pl_arcook_start(void)
 {
+#ifndef MODULO
     IR(ICU, IRQ0)  = 0;            //Clear any previously pending interrupts
     IEN(ICU, IRQ0) = 1;            // Enable interrupt
+#else
+    IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
+    IEN(ICU, IRQ9) = 1;            // Enable interrupt
+#endif
 }
 
 void pl_arcook_stop(void)
 {
+#ifndef MODULO
     IEN(ICU, IRQ0) = 0;            // Disable interrupt
     IR(ICU, IRQ0)  = 0;            //Clear any previously pending interrupts
+#else
+    IEN(ICU, IRQ9) = 0;            // Disable interrupt
+    IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
+#endif
 }
 
 void pl_arcook_check(void)
@@ -79,7 +89,7 @@ void pl_arcook_check(void)
 #pragma interrupt IRQ0_isr(vect=VECT(ICU, IRQ0))
 static void IRQ0_isr (void) {
 #else
-#pragma interrupt IRQ9_isr(vect=VECT(ICU, IRQ0))
+#pragma interrupt IRQ9_isr(vect=VECT(ICU, IRQ9))
 static void IRQ9_isr (void) {
 #endif
 	    BaseType_t xHigherPriorityTaskWoken;

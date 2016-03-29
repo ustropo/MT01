@@ -58,7 +58,9 @@ Macro definitions
 /* BCH - 01/16/2013 */
 /* 3447: External linkage is not needed for this special function as it is the function that is run out of reset. */
 /* PRQA S 3447 ++ */
-extern void PowerON_Reset_PC(void);                           
+#ifndef RELEASE
+extern void PowerON_Reset_PC(void);
+
 
 /***********************************************************************************************************************
 * Function name: excep_supervisor_inst_isr
@@ -361,7 +363,7 @@ void * const Fixed_Vectors[] =
     (void *) undefined_interrupt_source_isr,    /* 0xfffffff0  Reserved */
     (void *) undefined_interrupt_source_isr,    /* 0xfffffff4  Reserved */
     (void *) non_maskable_isr,                  /* 0xfffffff8  NMI */
-    (void *) PowerON_Reset_PC                   /* 0xfffffffc  RESET */
+	(void *)PowerON_Reset_PC
 };
 
-
+#endif

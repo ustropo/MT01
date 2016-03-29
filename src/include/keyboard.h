@@ -30,14 +30,14 @@ Macro definitions
 #define KEY_Z_DOWN 	(0x10000000U)
 #define KEY_RELEASED (0)
 #else
-#define KEY_UP 		(0x0004U)
-#define KEY_DOWN 	(0x0010U)
-#define KEY_RIGHT	(0x2000U)
-#define KEY_LEFT	(0x20000000U)
-#define KEY_ESC		(0x40000U)
-#define KEY_ENTER 	(0x100000U)
-#define KEY_Z_UP 	(0x4000000U)
-#define KEY_Z_DOWN 	(0x10000000U)
+#define KEY_UP 		(0x910000)
+#define KEY_DOWN 	(0xc10000)
+#define KEY_RIGHT	(0xa10000)
+#define KEY_LEFT	(0xa100)
+#define KEY_ESC		(0x91)
+#define KEY_ENTER 	(0xc1)
+#define KEY_Z_UP 	(0x9100)
+#define KEY_Z_DOWN 	(0xc100)
 #define KEY_RELEASED (0)
 #endif
 /******************************************************************************

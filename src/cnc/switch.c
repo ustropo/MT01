@@ -74,7 +74,7 @@ void switch_init(void)
     IEN(ICU, IRQ2) = 1;            // Enable interrupt
 	R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
 #else
-    ICU.IRQCR[2].BIT.IRQMD = 1;
+    ICU.IRQCR[2].BIT.IRQMD = 2;
     IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
     IPR(ICU, IRQ2) = 5;            //Set interrupt priority
     IEN(ICU, IRQ2) = 1;            // Enable interrupt

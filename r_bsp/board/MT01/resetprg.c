@@ -115,6 +115,8 @@ void main(void);
 static void operating_frequency_set(void);
 static void clock_source_select(void);
 
+
+
 /***********************************************************************************************************************
 * Function name: PowerON_Reset_PC
 * Description  : This function is the MCU's entry point from a power-on reset.
@@ -143,7 +145,14 @@ static void clock_source_select(void);
 * Arguments    : none
 * Return value : none
 ***********************************************************************************************************************/
-void PowerON_Reset_PC(void)
+#ifndef RELEASE   //Set in to 1 to debug UserApp by itself.
+    #pragma entry PowerON_Reset_PC
+    void PowerON_Reset_PC(void)
+#else
+    /* Reset vector is taken care of by CDC Flashloader. Just set the address for the starting point for UserApp with UserAppStartSect. */
+    //#pragma section P UserAppStartSect        // Output PowerON_Reset to PResetPRG section
+    void UserAppStart(void)
+#endif
 {
     /* Stack pointers are setup prior to calling this function - see comments above */    
     

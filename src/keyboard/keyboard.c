@@ -130,7 +130,7 @@ void keyboard_task(void)
 			key_buf[i][k] = KLINE;
 			if (i == colPressed)
 			{
-				if (key_buf[colPressed][k] == 0xFF)
+				if (key_buf[colPressed][k] == 0x7e)
 				{
 					key = 0;
 					xQueueSend( qKeyboard, &key, 0 );
@@ -138,7 +138,7 @@ void keyboard_task(void)
 					colPressed = 0xFF;
 				}
 			}
-			if (key_buf[i][k] != 0xFF)
+			if (key_buf[i][k] != 0x7e)
 			{
 				if (key_buf[i][0] == key_buf[i][1])
 				{

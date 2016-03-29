@@ -143,7 +143,7 @@ Configuration Options
  * 0 = Use 1 stack. Disable user stack. User stack size set below will be ignored.
  * 1 = Use 2 stacks. User stack and interrupt stack will both be used.
  */
-#define BSP_CFG_USER_STACK_ENABLE       (0)
+#define BSP_CFG_USER_STACK_ENABLE       (1)
 
 /* The 'BSP_DECLARE_STACK' macro is checked so that the stack is only declared in one place (resetprg.c). Every time a 
    '#pragma stacksize' is encountered, the stack size is increased. This prevents multiplication of stack size. */

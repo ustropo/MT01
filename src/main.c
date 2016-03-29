@@ -45,6 +45,32 @@ Includes   <System Includes> , "Project Includes"
 #include "semphr.h"
 #include "lcd.h"
 
+#ifdef RELEASE
+
+/* For HMSC Flashloader */
+#define USERAPP_SECURITY_CODE   0x55AA55AA
+
+void UserAppStart(void);
+/*******************************************************************************
+    APPLICATION INTERFACE HEADER
+    The purpose of the header is for an external application to be able to read
+    certain values from known addresses.
+    - Start address of UserApp.
+    - Security code must match what PCDC Flashloader expects.
+    - For revision purposes of applications etc.
+    - Do not change the order of these variables!
+*******************************************************************************/
+#pragma section C app_start
+
+/* START ADDRESS of user application header data    - Appheader address + 0x00. */
+const uint32_t  userapp_entry_addr =    (uint32_t)  UserAppStart;
+                                            /*      - Appheader address + 0x04. */
+const uint32_t  userapp_sec_code =      (uint32_t)  USERAPP_SECURITY_CODE;
+
+/* USER APP SW ID (Not used by default.)            - Appheader address + 0x08. */
+const uint32_t  userapp_id_code =                    0x00000001;
+/*******************************************************************************/
+#endif
 
 #define USB_HOST_USBIP_NUM  USB_USBIP_0
 

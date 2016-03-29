@@ -53,7 +53,6 @@ static void output_ports_configure(void)
 	/* Unlock MPC registers to enable writing to them. */
 	R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_MPC);
 
-	MSTP(EDMAC) = 0 ;                   /* Power up ethernet block */
 #ifndef MODULO
 	/* Port 0 - not used*/
 	PORT0.PODR.BYTE = 0x00 ;    /* All outputs low to start */
