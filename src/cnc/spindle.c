@@ -32,6 +32,8 @@
 #include "planner.h"
 #include "hardware.h"
 #include "pwm.h"
+#include "eeprom.h"
+#include "plasma.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -128,7 +130,7 @@ static void _exec_spindle_control(float *value, float *flag)
 #endif // __ARM
 #ifdef __RX
 	if (spindle_mode == SPINDLE_CW) {
-		if(!sim){
+		if(!sim && configFlags == 0){
 			pl_arcook_start();
 			TORCH = TRUE;
 		}

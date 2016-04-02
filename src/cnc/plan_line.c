@@ -330,14 +330,25 @@ static void _calc_move_times(GCodeState_t *gms, const float axis_length[], const
 	if (gms->motion_mode != MOTION_MODE_STRAIGHT_TRAVERSE) {
 		if (gms->feed_rate_mode == INVERSE_TIME_MODE) {
 			inv_time = gms->feed_rate;	// NB: feed rate was un-inverted to minutes by cm_set_feed_rate()
+            // inject feed rate override here for inverse time moves
+            if (cm.gmx.feed_rate_override_enable) {
+                inv_time /=  cm.gmx.feed_rate_override_factor;
+            }
 			gms->feed_rate_mode = UNITS_PER_MINUTE_MODE;
 		} else {
+            // inject feed rate override here
+            float feed_rate;
+            if(cm.gmx.feed_rate_override_enable)
+            	feed_rate = gms->feed_rate * cm.gmx.feed_rate_override_factor;
+            else
+            	feed_rate = gms->feed_rate;
+
 			// compute length of linear move in millimeters. Feed rate is provided as mm/min
-			xyz_time = sqrt(axis_square[AXIS_X] + axis_square[AXIS_Y] + axis_square[AXIS_Z]) / gms->feed_rate;
+			xyz_time = sqrt(axis_square[AXIS_X] + axis_square[AXIS_Y] + axis_square[AXIS_Z]) / feed_rate;
 
 			// if no linear axes, compute length of multi-axis rotary move in degrees. Feed rate is provided as degrees/min
 			if (fp_ZERO(xyz_time)) {
-				abc_time = sqrt(axis_square[AXIS_A] + axis_square[AXIS_B] + axis_square[AXIS_C]) / gms->feed_rate;
+				abc_time = sqrt(axis_square[AXIS_A] + axis_square[AXIS_B] + axis_square[AXIS_C]) / feed_rate;
 			}
 		}
 	}
@@ -768,6 +779,28 @@ stat_t mp_end_hold()
 stat_t mp_plan_zmove_callback(mpBuf_t *bf)
 {
 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
+	_reset_replannable_list();				// make it replan all the blocks
+	_plan_block_list(bf, &mr_flag);
+	return (STAT_OK);
+}
+
+stat_t mp_plan_feedrateoverride_callback(mpBuf_t *bf)
+{
+	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
+
+	if (bf == NULL) return (STAT_ERROR);
+	mpBuf_t *bp = bf;
+	do {
+		switch(bp->gm.motion_mode)
+		{
+			case MOTION_MODE_STRAIGHT_FEED:
+			case MOTION_MODE_CW_ARC:
+			case MOTION_MODE_CCW_ARC:
+				bp->cruise_vmax = bp->cruise_vmax*cm.gmx.feed_rate_override_factor;
+				break;
+			default:
+		}
+	} while (((bp = mp_get_next_buffer(bp)) != bf) && (bp->move_state != MOVE_OFF));
 	_reset_replannable_list();				// make it replan all the blocks
 	_plan_block_list(bf, &mr_flag);
 	return (STAT_OK);

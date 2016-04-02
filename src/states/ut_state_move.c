@@ -261,6 +261,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	bool ltorchBuffer = false;
 	programEnd = false;
 	lstop = false;
+	cm.gmx.feed_rate_override_enable = true;
+	cm.gmx.feed_rate_override_factor = 1;
 	/* Clear display */
 	if(!sim){
 		updatePosition(AUTO);

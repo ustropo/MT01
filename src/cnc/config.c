@@ -438,16 +438,16 @@ index_t nv_get_index(const char_t *group, const char_t *token)
 	index_t index_max = nv_index_max();
 
 	for (i=0; i < index_max; i++) {
-//	RXMOD	if ((c = GET_TOKEN_BYTE(token[0])) != str[0]) {	continue; }					// 1st character mismatch
-//		if ((c = GET_TOKEN_BYTE(token[1])) == NUL) { if (str[1] == NUL) return(i);}	// one character match
-//		if (c != str[1]) continue;													// 2nd character mismatch
-//		if ((c = GET_TOKEN_BYTE(token[2])) == NUL) { if (str[2] == NUL) return(i);}	// two character match
-//		if (c != str[2]) continue;													// 3rd character mismatch
-//		if ((c = GET_TOKEN_BYTE(token[3])) == NUL) { if (str[3] == NUL) return(i);}	// three character match
-//		if (c != str[3]) continue;													// 4th character mismatch
-//		if ((c = GET_TOKEN_BYTE(token[4])) == NUL) { if (str[4] == NUL) return(i);}	// four character match
-//		if (c != str[4]) continue;													// 5th character mismatch
-//		return (i);																	// five character match
+		if ((c = GET_TOKEN_BYTE(token[0])) != str[0]) {	continue; }					// 1st character mismatch
+		if ((c = GET_TOKEN_BYTE(token[1])) == NUL) { if (str[1] == NUL) return(i);}	// one character match
+		if (c != str[1]) continue;													// 2nd character mismatch
+		if ((c = GET_TOKEN_BYTE(token[2])) == NUL) { if (str[2] == NUL) return(i);}	// two character match
+		if (c != str[2]) continue;													// 3rd character mismatch
+		if ((c = GET_TOKEN_BYTE(token[3])) == NUL) { if (str[3] == NUL) return(i);}	// three character match
+		if (c != str[3]) continue;													// 4th character mismatch
+		if ((c = GET_TOKEN_BYTE(token[4])) == NUL) { if (str[4] == NUL) return(i);}	// four character match
+		if (c != str[4]) continue;													// 5th character mismatch
+		return (i);																	// five character match
 	}
 	return (NO_MATCH);
 }

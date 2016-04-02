@@ -238,3 +238,26 @@ stat_t RunningInicial_Macro(void)
 	_execute_gcode_block();
 	return (STAT_OK);
 }
+
+stat_t G10_Macro(void)
+{
+	// set initial state for new move
+	memset(&gp, 0, sizeof(gp));						// clear all parser values
+	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
+	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
+	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
+
+	switch (state)
+	{
+		case 0: SET_MODAL_MACRO (MODAL_GROUP_G0, next_action, NEXT_ACTION_SET_COORD_DATA);
+				SET_NON_MODAL_MACRO (parameter, 1);
+				SET_NON_MODAL_MACRO (target[AXIS_X], 0);
+				SET_NON_MODAL_MACRO (target[AXIS_Y], 0);
+				SET_NON_MODAL_MACRO (target[AXIS_Z], 0);
+				state++; break;
+
+		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+	}
+	_execute_gcode_block();
+	return (STAT_OK);
+}

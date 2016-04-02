@@ -14,7 +14,7 @@
 #include "text_parser.h"
 #include "keyboard.h"
 
-#define DEBOUNCE_COUNT 3
+#define DEBOUNCE_COUNT 15
 
 static bool isCutting = false;
 TaskHandle_t xPlasmaTaskHandle;

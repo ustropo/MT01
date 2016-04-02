@@ -4,6 +4,11 @@
  *  Created on: 22/12/2015
  *      Author: leocafonso
  */
+#include "tinyg.h"
+#include "config.h"
+#include "canonical_machine.h"
+#include "plan_arc.h"
+#include "planner.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -23,6 +28,7 @@ static void iif_zup_filerunning(void);
 static void iif_released_filerunning(void);
 
 float zmove = 0;
+float feedratepercent = 0.05;
 void vTimerCallback( TimerHandle_t pxTimer );
 TimerHandle_t xTimers[2];
 
@@ -73,8 +79,35 @@ void iif_zup_filerunning(void)
 }
 void iif_left_filerunning(void){}
 void iif_right_filerunning(void) {}
-void iif_down_filerunning(void){}
-void iif_up_filerunning(void){}
+void iif_down_filerunning(void)
+{
+//	cm_request_feedhold();
+//	cm.gmx.feed_rate_override_enable = true;
+//	cm.gmx.feed_rate_override_factor -= feedratepercent;
+//	cm_request_cycle_start();
+	cm_request_feedhold();
+	cm.gmx.feed_rate_override_factor -= feedratepercent;
+	mp_plan_feedrateoverride_callback(mp_get_run_buffer());
+	cm_request_cycle_start();
+}
+void iif_up_filerunning(void)
+{
+
+//	cm_request_feedhold();
+//	cm.gmx.feed_rate_override_enable = true;
+//	cm.gmx.feed_rate_override_factor += feedratepercent;
+//	cm_request_cycle_start();
+	mpBuf_t *bf = mp_get_run_buffer();
+	if (bf->gm.motion_mode == MOTION_MODE_STRAIGHT_FEED ||
+		bf->gm.motion_mode == MOTION_MODE_CW_ARC ||
+		bf->gm.motion_mode == MOTION_MODE_CCW_ARC)
+	{
+		cm_request_feedhold();
+		cm.gmx.feed_rate_override_factor += feedratepercent;
+		mp_plan_feedrateoverride_callback(mp_get_run_buffer());
+		cm_request_cycle_start();
+	}
+}
 void iif_released_filerunning(void)
 {
 	zmove = 0;

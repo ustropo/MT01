@@ -198,7 +198,7 @@ typedef char char_t;			// In the ARM/GCC++ version char_t is typedef'd to uint8_
 #define GET_TABLE_BYTE(a)  cfgArray[nv->index].a	// get byte value from cfgArray
 #define GET_TABLE_FLOAT(a) cfgArray[nv->index].a	// get byte value from cfgArray
 //RXMOD #define GET_TOKEN_BYTE(i,a) (char_t)cfgArray[i].a	// get token byte value from cfgArray
-#define GET_TOKEN_BYTE(i) (char_t)cfgArray[i]
+#define GET_TOKEN_BYTE(a) (char_t)cfgArray[i].a
 
 #define GET_TOKEN_STRING(i,a) cfgArray[(index_t)i].a
 //#define GET_TOKEN_STRING(i,a) (char_t)cfgArray[i].token)// populate the token string given the index

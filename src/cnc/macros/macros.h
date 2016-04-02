@@ -17,6 +17,7 @@ extern uint32_t linenumMacro;
 
 stat_t M5_Macro(void);
 stat_t M3_Macro(void);
+stat_t G10_Macro(void);
 stat_t ZerarEixos_Macro(void);
 stat_t homming_Macro(void);
 stat_t jog_Macro(void);

@@ -544,6 +544,7 @@ static stat_t _exec_aline_body()
 		mr.gm.move_time = mr.body_length / mr.cruise_velocity;
 		mr.segments = ceil(uSec(mr.gm.move_time) / NOM_SEGMENT_USEC);
 		mr.segment_time = mr.gm.move_time / mr.segments;
+//		mr.segment_velocity = mr.cruise_velocity * cm.gmx.feed_rate_override_factor;
 		mr.segment_velocity = mr.cruise_velocity;
 		mr.segment_count = (uint32_t)mr.segments;
 		if (mr.segment_time < MIN_SEGMENT_TIME)
