@@ -197,7 +197,7 @@ const cfgItem_t cfgArray[] PROGMEM = {
 //	{ "", "sx",  _f0, 0, tx_print_nul, run_sx,  run_sx ,  (float *)&cs.null, 0 },	// send XOFF, XON test
 
 	{ "", "test",_f0, 0, tx_print_nul, help_test, run_test, (float *)&cs.null,0 },	// run tests, print test help screen
-	{ "", "defa",_f0, 0, tx_print_nul, help_defa, set_defaults,(float *)&cs.null,0 },	// set/print defaults / help screen
+//	{ "", "defa",_f0, 0, tx_print_nul, help_defa, set_defaults,(float *)&cs.null,0 },	// set/print defaults / help screen
 //	RXMOD{ "", "boot",_f0, 0, tx_print_nul, help_boot_loader,hw_run_boot, (float *)&cs.null,0 },
 
 #ifdef __HELP_SCREENS

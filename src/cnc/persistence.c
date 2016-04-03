@@ -90,8 +90,12 @@ stat_t read_persistent_value(nvObj_t *nv)
 #ifdef __RX
 stat_t read_persistent_value(nvObj_t *nv)
 {
-	nv->value = 0;
+
+	nvm.address = nvm.profile_base + (nv->index * NVM_VALUE_LEN);
+	//(void)EEPROM_ReadBytes(nvm.address, nvm.byte_array, NVM_VALUE_LEN);
+	memcpy(&nv->value, &nvm.byte_array, NVM_VALUE_LEN);
 	return (STAT_OK);
+
 }
 #endif // __ARM
 
@@ -155,7 +159,6 @@ stat_t write_persistent_value(nvObj_t *nv)
 	//	(void)EEPROM_WriteBytes(nvm.address, nvm.byte_array, NVM_VALUE_LEN);
 	}
 	nv->value =nvm.tmp_value;		// always restore value
-	return (STAT_OK);
 	return (STAT_OK);
 }
 #endif // __ARM

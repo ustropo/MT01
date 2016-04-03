@@ -94,7 +94,7 @@ void controller_init(uint8_t std_in, uint8_t std_out, uint8_t std_err)
 {
 	memset(&cs, 0, sizeof(controller_t));			// clear all values, job_id's, pointers and status
 	controller_init_assertions();
-	macro_func_ptr = command_idle;
+	macro_func_ptr = ZerarPeca_Macro;
 	cs.fw_build = TINYG_FIRMWARE_BUILD;
 	cs.fw_version = TINYG_FIRMWARE_VERSION;
 	cs.hw_platform = TINYG_HARDWARE_PLATFORM;		// NB: HW version is set from EEPROM

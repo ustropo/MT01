@@ -35,11 +35,7 @@ typedef enum
 	CONFIG_AUTO_MAX           //!< CONFIG_MAX
 } ut_config_name;
 
-extern const char zera_eixos[];
-
-extern const char home_eixos[];
-
-static void zerar_eixos(void *var);
+static void zerar_peca(void *var);
 static void homming_eixos(void *var);
 static void idle(void *var);
 
@@ -79,7 +75,7 @@ static uint32_t init_values[CONFIG_AUTO_MAX] =
 static char* init_names[CONFIG_AUTO_MAX] =
 {
 	" RODAR PROGRAMA",
-	" ZERAR EIXOS",
+	" ZERAR PEÇA",
 	" DESLOCAR PARA ZERO",
 	" MODO SIMULADO",
 	" SELECIONAR LINHA"
@@ -88,7 +84,7 @@ static char* init_names[CONFIG_AUTO_MAX] =
 static var_func init_func[CONFIG_AUTO_MAX] =
 {
 	idle,
-	zerar_eixos,
+	zerar_peca,
 	homming_eixos,
 	idle,
 	idle
@@ -208,13 +204,13 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 	return geNextStateAuto[config_menu.selectedItem];
 }
 
-static void zerar_eixos(void *var)
+static void zerar_peca(void *var)
 {
 	ut_config_var *lvar = var;
 	uint32_t *value = lvar->value;
 	if(*value)
 	{
-		macro_func_ptr = ZerarEixos_Macro;
+		macro_func_ptr = ZerarPeca_Macro;
 	}
 }
 

@@ -223,8 +223,8 @@
 #define G54_B_OFFSET 0
 #define G54_C_OFFSET 0
 
-#define G55_X_OFFSET (X_TRAVEL_MAX/2)	// set g55 to middle of table
-#define G55_Y_OFFSET (Y_TRAVEL_MAX/2)
+#define G55_X_OFFSET 0	// set g55 to middle of table
+#define G55_Y_OFFSET 0
 #define G55_Z_OFFSET 0
 #define G55_A_OFFSET 0
 #define G55_B_OFFSET 0

@@ -3,6 +3,7 @@
 #include "controller.h"
 #include "gcode_parser.h"
 #include "canonical_machine.h"
+#include "planner.h"
 #include "spindle.h"
 #include "util.h"
 #include "xio.h"			// for char definitions
@@ -136,7 +137,7 @@ stat_t M5_Macro(void)
 	return (STAT_OK);
 }
 
-stat_t ZerarEixos_Macro(void)
+stat_t ZerarMaquina_Macro(void)
 {
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
@@ -152,6 +153,27 @@ stat_t ZerarEixos_Macro(void)
 				SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
 				state++; break;
 		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+	}
+	_execute_gcode_block();
+	return (STAT_OK);
+}
+
+stat_t ZerarPeca_Macro(void)
+{
+	// set initial state for new move
+	memset(&gp, 0, sizeof(gp));						// clear all parser values
+	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
+	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
+	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
+
+	switch (state)
+	{
+		case 0: SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
+				SET_NON_MODAL_MACRO(target[AXIS_X], zeroPiece[AXIS_X]);
+				SET_NON_MODAL_MACRO(target[AXIS_Y], zeroPiece[AXIS_Y]);
+				SET_NON_MODAL_MACRO(target[AXIS_Z], zeroPiece[AXIS_Z]);
+				state++; break;
+		default:state = 0; macro_func_ptr = command_idle; return (STAT_OK);
 	}
 	_execute_gcode_block();
 	return (STAT_OK);
@@ -251,11 +273,25 @@ stat_t G10_Macro(void)
 	{
 		case 0: SET_MODAL_MACRO (MODAL_GROUP_G0, next_action, NEXT_ACTION_SET_COORD_DATA);
 				SET_NON_MODAL_MACRO (parameter, 1);
-				SET_NON_MODAL_MACRO (target[AXIS_X], 0);
-				SET_NON_MODAL_MACRO (target[AXIS_Y], 0);
+				SET_NON_MODAL_MACRO (target[AXIS_X], mp_get_runtime_absolute_position(AXIS_X));
+				SET_NON_MODAL_MACRO (target[AXIS_Y], mp_get_runtime_absolute_position(AXIS_Y));
 				SET_NON_MODAL_MACRO (target[AXIS_Z], 0);
 				state++; break;
 
+		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+	}
+	_execute_gcode_block();
+	return (STAT_OK);
+}
+
+stat_t feedRateOverride_Macro(void)
+{
+	switch (state)
+	{
+		case 0: cm_request_feedhold();
+				state++; break;
+		case 1: cm_request_cycle_start();
+				state++; break;
 		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
 	}
 	_execute_gcode_block();

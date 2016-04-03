@@ -38,6 +38,7 @@
 #include "hardware.h"
 #include "text_parser.h"
 #include "util.h"
+#include "lcd.h"
 
 /**** Allocate structures ****/
 
@@ -1418,7 +1419,10 @@ stat_t st_set_me(nvObj_t *nv)	// Make sure this function is not part of initiali
 
 void timer_motorPower_callback(void *pdata)
 {
-	PWMCH ^= 1;
+	if(!EMERGENCIA)
+	{
+		PWMCH ^= 1;
+	}
 }
 
 /***********************************************************************************

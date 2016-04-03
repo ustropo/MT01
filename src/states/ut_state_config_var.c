@@ -76,7 +76,7 @@ void config_bool(ut_config_var* var)
 	case STATE_CONFIG_MANUAL_MODE:
 		switch(configsVar->currentItem)
 		{
-			case 3:  boolStr = boolJogVel;
+			case 4:  boolStr = boolJogVel;
 			break;
 			default:
 		}
@@ -246,7 +246,7 @@ ut_state ut_state_config_var(ut_context* pContext)
 	switch(configsVar->currentState)
 	{
 		case STATE_CONFIG_MANUAL_MODE:
-			if(configsVar->currentItem == 2 )
+			if(configsVar->currentItem == 3 )
 			{
 				uint32_t *Flag = configsVar->value;
 				if(*Flag == 1)

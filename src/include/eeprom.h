@@ -27,10 +27,12 @@ typedef enum
 
 enum{
 	CONFIGVAR = 0,
-	CONFIGFLAG
+	CONFIGFLAG,
+	ZEROPIECE
 };
 
 extern float configVar[VAR_MAX];
+extern float zeroPiece[3];
 extern uint32_t configFlags;
 
 void eepromInit(void);

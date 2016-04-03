@@ -29,6 +29,9 @@ uint32_t configFlags = 0;
 
 float configVar[VAR_MAX];
 
+float zeroPieceInit[3] = {0,0,0};
+float zeroPiece[3];
+
 vee_record_t dataRecord;
 
 void eepromInit(void)
@@ -70,13 +73,17 @@ void eepromWriteConfig(uint8_t varType)
     uint32_t ret;
     switch (varType)
     {
-    	case CONFIGVAR:  dataRecord.ID = 0;
+    	case CONFIGVAR:  dataRecord.ID = CONFIGVAR;
         				 dataRecord.pData = (uint8_t*)configVar;
         				 dataRecord.size =sizeof(configVar);
         				 break;
-    	case CONFIGFLAG: dataRecord.ID = 1;
+    	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG;
 						 dataRecord.pData = (uint8_t*)&configFlags;
 						 dataRecord.size =sizeof(configFlags);
+						 break;
+    	case ZEROPIECE:  dataRecord.ID = ZEROPIECE;
+						 dataRecord.pData = (uint8_t*)&zeroPiece;
+						 dataRecord.size =sizeof(zeroPiece);
 						 break;
     	default:
     }
@@ -118,8 +125,9 @@ void eepromReadConfig(uint8_t varType)
 
     switch (varType)
     {
-    	case CONFIGVAR: dataRecord.ID = 0; break;
-    	case CONFIGFLAG: dataRecord.ID = 1; break;
+    	case CONFIGVAR: dataRecord.ID = CONFIGVAR; break;
+    	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG; break;
+    	case ZEROPIECE: dataRecord.ID = ZEROPIECE; break;
     	default:
     }
 	ret = R_VEE_Read(&dataRecord);
@@ -150,9 +158,11 @@ void eepromReadConfig(uint8_t varType)
 	    }
 		memcpy(configVar,configVarInit,sizeof(configVar));
 		memcpy(&configFlags,&configFlagsInit,sizeof(configFlags));
+		memcpy(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece));
 		R_VEE_Open();
 	    eepromWriteConfig(CONFIGVAR);
 	    eepromWriteConfig(CONFIGFLAG);
+	    eepromWriteConfig(ZEROPIECE);
 		return;
 	}
 	if( ret != VEE_SUCCESS )
@@ -167,6 +177,7 @@ void eepromReadConfig(uint8_t varType)
     {
     	case CONFIGVAR: memcpy(configVar,dataRecord.pData,sizeof(configVar)); break;
     	case CONFIGFLAG: memcpy(&configFlags,dataRecord.pData,sizeof(configFlags)); break;
+    	case ZEROPIECE: memcpy(&zeroPiece,dataRecord.pData,sizeof(zeroPiece)); break;
     	default:
     }
 

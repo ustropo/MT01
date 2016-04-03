@@ -105,6 +105,7 @@ void main(void)
 	eepromInit();
 	eepromReadConfig(CONFIGVAR);
 	eepromReadConfig(CONFIGFLAG);
+	eepromReadConfig(ZEROPIECE);
 	eepromInitVar();
 	/* Initialize USB */
 	usb_main();

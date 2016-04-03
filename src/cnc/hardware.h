@@ -161,6 +161,7 @@ extern "C"{
 #define TORCH  		PORT2.PODR.BIT.B3
 #define MATERIAL  	PORT1.PIDR.BIT.B2
 #define ARCO_OK  	PORT2.PIDR.BIT.B1
+#define EMERGENCIA  PORT2.PIDR.BIT.B0
 #endif
 
 #define MOTOR_FOWARD	1

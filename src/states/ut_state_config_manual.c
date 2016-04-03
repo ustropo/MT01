@@ -5,6 +5,10 @@
  *      Author: Fernando
  */
 
+#include "tinyg.h"		// #1
+#include "hardware.h"
+#include "planner.h"
+
 #include "ut_context.h"
 #include "ut_state.h"
 #include "ut_state_config_var.h"
@@ -26,23 +30,15 @@
 typedef enum
 {
 	CONFIG_MODO_MANUAL  = 0,    //!<
-	CONFIG_ZERAR_EIXOS,   //!<
+	CONFIG_ZERAR_MAQUINA,   //!<
+	CONFIG_ZERAR_PECA,   //!<
 	CONFIG_DESLOCAR_ZERO,//!<
 	CONFIG_JOG_RAP_LENTO,//!<
 	CONFIG_MANUAL_MAX           //!< CONFIG_MAX
 } ut_config_name;
 
-const char zera_eixos[]= "\
-G21 G90\n\
-G28.3 X0 Y0 Z0\n\
-m30";
-
-const char home_eixos[]= "\
-G21 G90\n\
-G00 X0 Y0 Z20\n\
-m30";
-
-static void zerar_eixos(void *var);
+static void zerar_maquina(void *var);
+static void zerar_peca(void *var);
 static void homming_eixos(void *var);
 static void veljog(void *var);
 
@@ -52,9 +48,10 @@ static bool initialized = false;
 extern ut_config_var* configsVar;
 float *velocidadeJog;
 
-static const ut_state geNextStateManual[5] =
+static const ut_state geNextStateManual[6] =
 {
 	STATE_MANUAL_MODE,
+	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
@@ -68,10 +65,12 @@ static ut_config_type init_types[CONFIG_MANUAL_MAX] =
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
+	UT_CONFIG_BOOL
 };
 
 static uint32_t init_values[CONFIG_MANUAL_MAX] =
 {
+	0,
 	0,
 	0,
 	0,
@@ -81,7 +80,8 @@ static uint32_t init_values[CONFIG_MANUAL_MAX] =
 static char* init_names[CONFIG_MANUAL_MAX] =
 {
 	" MODO MANUAL",
-	" ZERAR EIXOS",
+	" ZERAR MÁQUINA",
+	" ZERAR PEÇA",
 	" DESLOCAR PARA ZERO",
 	" JOG RÁPIDO E LENTO"
 };
@@ -89,7 +89,8 @@ static char* init_names[CONFIG_MANUAL_MAX] =
 static var_func init_func[CONFIG_MANUAL_MAX] =
 {
 	0,
-	zerar_eixos,
+	zerar_maquina,
+	zerar_peca,
 	homming_eixos,
 	veljog,
 };
@@ -181,13 +182,27 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 	return geNextStateManual[config_menu.selectedItem];
 }
 
-static void zerar_eixos(void *var)
+static void zerar_maquina(void *var)
 {
 	ut_config_var *lvar = var;
 	uint32_t *value = lvar->value;
 	if(*value)
 	{
-		macro_func_ptr = ZerarEixos_Macro;
+		macro_func_ptr = ZerarMaquina_Macro;
+	}
+}
+
+static void zerar_peca(void *var)
+{
+	ut_config_var *lvar = var;
+	uint32_t *value = lvar->value;
+	if(*value)
+	{
+		zeroPiece[AXIS_X] = -mp_get_runtime_absolute_position(AXIS_X);
+		zeroPiece[AXIS_Y] = -mp_get_runtime_absolute_position(AXIS_Y);
+		zeroPiece[AXIS_Z] = 0;
+		eepromWriteConfig(ZEROPIECE);
+		macro_func_ptr = ZerarMaquina_Macro;
 	}
 }
 
