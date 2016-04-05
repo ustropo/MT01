@@ -121,6 +121,9 @@ static unsigned char easymax_bits[] = {
  */
 ut_state ut_state_splash(ut_context* pContext)
 {
+	if(SYSTEM.RSTSR2.BIT.IWDTRF)
+		return STATE_MAIN_MENU;
+
 	ut_lcd_clear();
 
 	/* Delay para a inicialização do Display */

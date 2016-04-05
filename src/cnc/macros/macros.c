@@ -203,8 +203,16 @@ stat_t homming_Macro(void)
 				state++; break;
 
 		case 4: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_X], zeroPiece[AXIS_X]);
+				SET_NON_MODAL_MACRO(target[AXIS_Y], zeroPiece[AXIS_Y]);
+				state++; break;
+
+		case 5: SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
 				SET_NON_MODAL_MACRO(target[AXIS_X], 0);
 				SET_NON_MODAL_MACRO(target[AXIS_Y], 0);
+				zeroPiece[AXIS_X] = 0;
+				zeroPiece[AXIS_Y] = 0;
+//				SET_NON_MODAL_MACRO(target[AXIS_Z], zeroPiece[AXIS_Z]);
 				state++; break;
 
 		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);

@@ -13,11 +13,17 @@
 #include "canonical_machine.h"
 #include "text_parser.h"
 #include "keyboard.h"
+#include "lcd.h"
 
 #define DEBOUNCE_COUNT 15
 
+void timer_motorPower_callback(void *pdata);
+void emergencia_task(void);
+
+static uint32_t timerch;
 static bool isCutting = false;
 TaskHandle_t xPlasmaTaskHandle;
+TaskHandle_t xEmergenciaTaskHandle;
 extern TaskHandle_t xCncTaskHandle;
 extern bool simTorch;
 
@@ -38,6 +44,12 @@ void pl_arcook_init(void)
     IPR(ICU, IRQ9) = 3;            //Set interrupt priority
     IEN(ICU, IRQ9) = 0;            // Enable interrupt
 #endif
+}
+
+void pl_emergencia_init(void)
+{
+    xTaskCreate((pdTASK_CODE)emergencia_task, "Emergencia task", 512, NULL, 6, &xEmergenciaTaskHandle );
+    R_CMT_CreatePeriodic(10000,timer_motorPower_callback,&timerch);
 }
 
 
@@ -135,5 +147,38 @@ void plasma_task(void)
 				xQueueSend( qKeyboard, &qSend, 0 );
 			}
         }
+	}
+}
+
+void emergencia_task(void)
+{
+	while(1)
+	{
+        ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+        TORCH = FALSE;
+        while(EMERGENCIA)
+        {
+            ut_lcd_output_warning("SISTEMA INOPERANTE\nMODO DE EMERGÊNCIA\n");
+			IWDT.IWDTRR = 0x00u;
+			IWDT.IWDTRR = 0xFFu;
+        }
+    	R_BSP_InterruptsDisable();
+        while(1){}
+	}
+}
+
+void timer_motorPower_callback(void *pdata)
+{
+    BaseType_t xHigherPriorityTaskWoken;
+	if(!EMERGENCIA)
+	{
+		PWMCH ^= 1;
+	}
+	else
+	{
+		R_CMT_Control(timerch,CMT_RX_CMD_PAUSE,0);
+		xHigherPriorityTaskWoken = pdFALSE;
+	    vTaskNotifyGiveFromISR( xEmergenciaTaskHandle, &xHigherPriorityTaskWoken );
+	    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 	}
 }

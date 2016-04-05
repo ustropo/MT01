@@ -47,6 +47,7 @@ ut_config_var configs_manual[CONFIG_MANUAL_MAX];
 static bool initialized = false;
 extern ut_config_var* configsVar;
 float *velocidadeJog;
+float zeroPiecebuffer[3] = {0,0,0};
 
 static const ut_state geNextStateManual[6] =
 {
@@ -188,6 +189,10 @@ static void zerar_maquina(void *var)
 	uint32_t *value = lvar->value;
 	if(*value)
 	{
+		zeroPiecebuffer[AXIS_X] = 0;
+		zeroPiecebuffer[AXIS_Y] = 0;
+		zeroPiecebuffer[AXIS_Z] = 0;
+		eepromReadConfig(ZEROPIECE);
 		macro_func_ptr = ZerarMaquina_Macro;
 	}
 }
@@ -198,11 +203,18 @@ static void zerar_peca(void *var)
 	uint32_t *value = lvar->value;
 	if(*value)
 	{
-		zeroPiece[AXIS_X] = -mp_get_runtime_absolute_position(AXIS_X);
-		zeroPiece[AXIS_Y] = -mp_get_runtime_absolute_position(AXIS_Y);
+		zeroPiecebuffer[AXIS_X] += mp_get_runtime_absolute_position(AXIS_X);
+		zeroPiecebuffer[AXIS_Y] += mp_get_runtime_absolute_position(AXIS_Y);
+		zeroPiecebuffer[AXIS_Z] = 0;
+
+		zeroPiece[AXIS_X] = zeroPiecebuffer[AXIS_X];
+		zeroPiece[AXIS_Y] = zeroPiecebuffer[AXIS_Y];
 		zeroPiece[AXIS_Z] = 0;
 		eepromWriteConfig(ZEROPIECE);
 		macro_func_ptr = ZerarMaquina_Macro;
+		zeroPiece[AXIS_X] = 0;
+		zeroPiece[AXIS_Y] = 0;
+		zeroPiece[AXIS_Z] = 0;
 	}
 }
 

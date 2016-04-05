@@ -6,6 +6,7 @@
  */
 
 #include "FreeRTOS.h"
+#include "semphr.h"
 
 #include "u8g.h"
 #include "lcd.h"
@@ -26,6 +27,7 @@ static const u8g_fntpgm_uint8_t *gaboFontStr[MAX_ROW];
  * Global variables
  */
 static u8g_t main_u8g;
+xSemaphoreHandle rspi_semaphore = 0;
 
 /**
  *
@@ -46,7 +48,7 @@ void ut_lcd_init()
 	/* Prepare u8g lib */
 	u8g_InitComFn(&main_u8g, &u8g_dev_st7920_128x64_hw_spi, u8g_com_rx_hw_spi_fn);
 	u8g_prepare(u8g_font_6x10);
-
+	rspi_semaphore = xSemaphoreCreateMutex();
 	/* Clean all */
 	ut_lcd_clear();
 }
@@ -159,7 +161,6 @@ static uint8_t ut_lcd_draw_glyph(uint8_t x, uint8_t y, uint8_t h, uint8_t invert
  */
 static uint8_t ut_lcd_draw_str(uint8_t x, uint8_t y, uint8_t h, uint8_t invert, const char* str)
 {
-
 	uint8_t w = u8g_GetStrWidth(&main_u8g, str);
 
 	/* Set background box */
@@ -191,7 +192,7 @@ void ut_lcd_output()
 {
 	uint8_t row, col, x, y, index;
 	uint8_t h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
-
+	xSemaphoreTake(rspi_semaphore, portMAX_DELAY);
 	u8g_prepare(u8g_font_6x10);
 	u8g_FirstPage(&main_u8g);
 
@@ -218,13 +219,14 @@ void ut_lcd_output()
 		}
 
 	} while(u8g_NextPage(&main_u8g));
+	xSemaphoreGive(rspi_semaphore);
 }
 
 void ut_lcd_output_str()
 {
 	uint8_t row, x, y;
 	uint8_t h;
-
+	xSemaphoreTake(rspi_semaphore, portMAX_DELAY);
 	u8g_prepare(gaboFontStr[0]);
 	h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 	//u8g_prepare();
@@ -252,16 +254,19 @@ void ut_lcd_output_str()
 		}
 
 	} while(u8g_NextPage(&main_u8g));
+	xSemaphoreGive(rspi_semaphore);
 }
 
 void ut_lcd_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *bitmap,const char* str)
 {
+	xSemaphoreTake(rspi_semaphore, portMAX_DELAY);
 	u8g_prepare(u8g_font_5x8);
 	u8g_FirstPage(&main_u8g);
 	do{
 		u8g_DrawXBMP(&main_u8g, x, y, w, h, bitmap);
 		u8g_DrawStr(&main_u8g, x+w-60, y+h+1, str);
 	} while(u8g_NextPage(&main_u8g));
+	xSemaphoreGive(rspi_semaphore);
 }
 
 #define DEFAULT_MANUAL_TITLE	"MODO MANUAL"
@@ -290,6 +295,7 @@ void ut_lcd_output_manual_mode(bool torch,const char* title[3],const char* textX
 	uint8_t h;
 	const char* str;
 //	u8g_prepare(u8g_font_6x10);
+	xSemaphoreTake(rspi_semaphore, portMAX_DELAY);
 	u8g_FirstPage(&main_u8g);
 	h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 	/* Picture loop */
@@ -350,11 +356,13 @@ void ut_lcd_output_manual_mode(bool torch,const char* title[3],const char* textX
 		}
 
 	} while(u8g_NextPage(&main_u8g));
+	xSemaphoreGive(rspi_semaphore);
 }
 
 void ut_lcd_output_int_var(const char* title,const char* varStr)
 {
 	uint8_t h;
+	xSemaphoreTake(rspi_semaphore, portMAX_DELAY);
 	u8g_FirstPage(&main_u8g);
 	/* Picture loop */
 	do
@@ -366,6 +374,7 @@ void ut_lcd_output_int_var(const char* title,const char* varStr)
 		u8g_DrawHLine(&main_u8g, 10, h+11, 108);
 		u8g_DrawStr(&main_u8g, 40, h+20, varStr);
 	} while(u8g_NextPage(&main_u8g));
+	xSemaphoreGive(rspi_semaphore);
 }
 
 void ut_lcd_output_warning(const char* Str)
@@ -377,6 +386,7 @@ void ut_lcd_output_warning(const char* Str)
 	uint8_t count;
 	const char *message = Str;
 	count = 0;
+	xSemaphoreTake(rspi_semaphore, portMAX_DELAY);
 	u8g_FirstPage(&main_u8g);
 	u8g_prepare(u8g_font_helvB08);
 	hfont = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
@@ -418,6 +428,7 @@ void ut_lcd_output_warning(const char* Str)
 		y = (64-h)/2;
 		u8g_DrawFrame(&main_u8g,(x-3), (y-3), (lineSizeMax+6), (h+6));
 	} while(u8g_NextPage(&main_u8g));
+	xSemaphoreGive(rspi_semaphore);
 }
 
 static void readline(const char *message, char *line, uint8_t *counter){
