@@ -167,6 +167,12 @@ stat_t mp_exec_aline(mpBuf_t *bf)
 		if (cm.hold_state == FEEDHOLD_HOLD)
             return (STAT_NOOP);	                        // stops here if holding
 
+		if (bf->unit[2] != 0 && zmoved)
+		{
+			mp_plan_zmove_callback(bf,zmovedlenght);
+			zmovedlenght = 0;
+			zmoved = false;
+		}
 		// initialization to process the new incoming bf buffer (Gcode block)
 		memcpy(&mr.gm, &(bf->gm), sizeof(GCodeState_t));// copy in the gcode model state
 		bf->replannable = false;
@@ -179,13 +185,7 @@ stat_t mp_exec_aline(mpBuf_t *bf)
 			if (mp_free_run_buffer()) cm_cycle_end();	// free buffer & end cycle if planner is empty
 			return (STAT_NOOP);
 		}
-		if (bf->unit[2] != 0 && zmoved)
-		{
-			bf->length = bf->length - zmovedlenght;
-			zmovedlenght = 0;
-			mp_plan_zmove_callback(bf);
-			zmoved = false;
-		}
+
 		bf->move_state = MOVE_RUN;
 		mr.move_state = MOVE_RUN;
 		mr.section = SECTION_HEAD;

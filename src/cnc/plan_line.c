@@ -776,10 +776,11 @@ stat_t mp_end_hold()
 	return (STAT_OK);
 }
 
-stat_t mp_plan_zmove_callback(mpBuf_t *bf)
+stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
 {
 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
-	_reset_replannable_list();				// make it replan all the blocks
+	bf->length = fabs(mr.gm.target[AXIS_Z] - bf->gm.target[AXIS_Z]);
+	bf->replannable = 1;
 	_plan_block_list(bf, &mr_flag);
 	return (STAT_OK);
 }

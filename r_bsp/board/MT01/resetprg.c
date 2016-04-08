@@ -438,15 +438,6 @@ static void operating_frequency_set (void)
     /* Protect on. */
     SYSTEM.PRCR.WORD = 0xA500;
 
-    R_BSP_RegisterProtectDisable (BSP_REG_PROTECT_CGC);  // Protect off
-
-    SYSTEM.ILOCOCR.BYTE = 0x00;     // turn on IWDTCLK
-    while (SYSTEM.ILOCOCR.BYTE == 0x01)
-    {
-        // wait until the clock is stable
-    }
-
-    R_BSP_RegisterProtectEnable (BSP_REG_PROTECT_CGC);  // Protect on
 }
 
 /***********************************************************************************************************************
