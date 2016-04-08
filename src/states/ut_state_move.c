@@ -289,8 +289,9 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	xTimerStart( TimerUpdate, 0 );
 	tg_set_primary_source(XIO_DEV_USBFAT);
 	xio_close(cs.primary_src);
-	xio_open(cs.primary_src,0,0);
 	macro_func_ptr = _command_dispatch;
+	xio_open(cs.primary_src,0,0);
+
 	iif_bind_filerunning();
 
 	while(true)
@@ -411,7 +412,6 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			xTimerStop( TimerUpdate, 0 );
 			ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\nPRESSIONE ESC\n");
 			TORCH = FALSE;
-			macro_func_ptr = command_idle;
 			uint32_t qSend = KEY_ESC;
 			xQueueSend( qKeyboard, &qSend, 0 );
 			break;

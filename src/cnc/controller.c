@@ -281,7 +281,7 @@ stat_t _command_dispatch()
 		if (status == STAT_EOF) {						// EOF can come from file devices only
 			//gfilerunning = false;
 			xio_close(cs.primary_src);
-			macro_func_ptr = command_idle;
+//			macro_func_ptr = command_idle;
 			if (cfg.comm_mode == TEXT_MODE) {
 				fprintf_P(stderr, PSTR("End of command file\n"));
 			} else {
