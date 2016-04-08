@@ -58,21 +58,21 @@ void iif_down_jog(void) {
 //	sprintf(text, "G21 G91\nG01 Y-390.0 F%.0f\nm30",*velocidadeJog);
 //	xio_open(cs.primary_src,text,0);
 	jogAxis = AXIS_Y;
-	jogMaxDistance = -1000;
+	jogMaxDistance = -100000;
 	macro_func_ptr = jog_Macro;
 }
 void iif_up_jog(void) {
 //	sprintf(text, "G21 G91\nG01 Y390.0 F%.0f\nm30",*velocidadeJog);
 //	xio_open(cs.primary_src,text,0);
 	jogAxis = AXIS_Y;
-	jogMaxDistance = 1000;
+	jogMaxDistance = 100000;
 	macro_func_ptr = jog_Macro;
 }
 void iif_left_jog(void){
 //	sprintf(text, "G21 G91\nG01 X-390.0 F%.0f\nm30",*velocidadeJog);
 //	xio_open(cs.primary_src,text,0);
 	jogAxis = AXIS_X;
-	jogMaxDistance = -1000;
+	jogMaxDistance = -100000;
 	macro_func_ptr = jog_Macro;
 }
 
@@ -80,7 +80,7 @@ void iif_right_jog(void) {
 //	sprintf(text, "G21 G91\nG01 X390.0 F%.0f\nm30",*velocidadeJog);
 //	xio_open(cs.primary_src,text,0);
 	jogAxis = AXIS_X;
-	jogMaxDistance = 1000;
+	jogMaxDistance = 100000;
 	macro_func_ptr = jog_Macro;
 }
 
@@ -88,7 +88,7 @@ void iif_zdown_jog(void){
 //	sprintf(text, "G21 G91\nG01 Z-390.0 F%.0f\nm30",*velocidadeJog);
 //	xio_open(cs.primary_src,text,0);
 	jogAxis = AXIS_Z;
-	jogMaxDistance = -1000;
+	jogMaxDistance = -100000;
 	macro_func_ptr = jog_Macro;
 }
 
@@ -96,7 +96,7 @@ void iif_zup_jog(void) {
 //	sprintf(text, "G21 G91\nG01 Z390.0 F%.0f\nm30",*velocidadeJog);
 //	xio_open(cs.primary_src,text,0);
 	jogAxis = AXIS_Z;
-	jogMaxDistance = 1000;
+	jogMaxDistance = 100000;
 	macro_func_ptr = jog_Macro;
 }
 

@@ -38,6 +38,7 @@ Includes   <System Includes> , "Project Includes"
 #include "r_usb_hmsc_if.h"
 #include "r_tfat_lib.h"
 #include "ut_state.h"
+#include "keyboard.h"
 
 extern bool drivemountFlag;
 extern char gszCurFile[MAX_FILE_PATH_SIZE];
@@ -769,6 +770,12 @@ void R_usb_hmsc_DriveClose(USB_UTR_t *ptr, uint16_t addr, uint16_t data2)
     R_tfat_f_mount(0, NULL);
 	drivemountFlag = false;
    	gszCurFile[0] = NULL;
+   	if(currentState == STATE_AUTO_MODE)
+   	{
+   		uint32_t key;
+		key = USB_DETACHED;
+		xQueueSend( qKeyboard, &key, 0 );
+   	}
 }   /* eof R_usb_hmsc_DriveClose() */
 
 /******************************************************************************

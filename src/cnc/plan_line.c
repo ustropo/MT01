@@ -332,13 +332,14 @@ static void _calc_move_times(GCodeState_t *gms, const float axis_length[], const
 			inv_time = gms->feed_rate;	// NB: feed rate was un-inverted to minutes by cm_set_feed_rate()
             // inject feed rate override here for inverse time moves
             if (cm.gmx.feed_rate_override_enable) {
-                inv_time /=  cm.gmx.feed_rate_override_factor;
+            	if(axis_length[AXIS_Z] == 0)
+            		inv_time /=  cm.gmx.feed_rate_override_factor;
             }
 			gms->feed_rate_mode = UNITS_PER_MINUTE_MODE;
 		} else {
             // inject feed rate override here
             float feed_rate;
-            if(cm.gmx.feed_rate_override_enable)
+            if(cm.gmx.feed_rate_override_enable && axis_length[AXIS_Z] == 0)
             	feed_rate = gms->feed_rate * cm.gmx.feed_rate_override_factor;
             else
             	feed_rate = gms->feed_rate;
@@ -797,9 +798,12 @@ stat_t mp_plan_feedrateoverride_callback(mpBuf_t *bf)
 			case MOTION_MODE_STRAIGHT_FEED:
 			case MOTION_MODE_CW_ARC:
 			case MOTION_MODE_CCW_ARC:
-				bp->cruise_vmax = bp->gm.feed_rate*cm.gmx.feed_rate_override_factor;
-				bp->exit_vmax = bp->cruise_vmax;
-				bp->cruise_velocity = bp->cruise_vmax;
+				if (bp->unit[AXIS_Z] == 0)
+				{
+					bp->cruise_vmax = bp->gm.feed_rate*cm.gmx.feed_rate_override_factor;
+					bp->exit_vmax = bp->cruise_vmax;
+					bp->cruise_velocity = bp->cruise_vmax;
+				}
 				break;
 			default:
 		}

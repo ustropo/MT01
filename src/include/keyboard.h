@@ -40,6 +40,8 @@ Macro definitions
 #define KEY_Z_DOWN 	(0xc100)
 #define KEY_RELEASED (0)
 #endif
+
+#define USB_DETACHED (0x55555555)
 /******************************************************************************
 Section    <Section Definition> , "Data Sections"
 ******************************************************************************/

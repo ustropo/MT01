@@ -379,6 +379,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				pl_arcook_stop();
 				isCuttingSet(false);
 				iif_bind_idle();
+				cm.gmx.feed_rate_override_enable = true;
+				cm.gmx.feed_rate_override_factor = 1;
 				macro_func_ptr = command_idle;
 				if (programEnd)
 					return STATE_MANUAL_MODE;
@@ -406,24 +408,6 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 		/* TODO: operate machine - with other keys */
 		case ARCO_OK_FAILED:
-//			xTimerStop( TimerUpdate, 0 );
-//			cm_request_feedhold();
-//			cm_request_queue_flush();
-//			xio_close(cs.primary_src);
-//
-//			cm.probe_state = PROBE_FAILED;
-//			state = 0;
-//			cm.cycle_state = CYCLE_OFF;
-//
-//			iif_bind_idle();
-//			pl_arcook_stop();
-//			isCuttingSet(false);
-//			TORCH = FALSE;
-//			ut_lcd_output_warning("ERRO\nPLASMA NÃO\nTRANSFERIDO\n");
-//
-//			vTaskDelay(2000 / portTICK_PERIOD_MS);
-//			macro_func_ptr = command_idle;
-//			return STATE_CONFIG_AUTO_MODE;
 			xTimerStop( TimerUpdate, 0 );
 			ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\nPRESSIONE ESC\n");
 			TORCH = FALSE;
@@ -431,7 +415,29 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			uint32_t qSend = KEY_ESC;
 			xQueueSend( qKeyboard, &qSend, 0 );
 			break;
+
+		case USB_DETACHED:
+			xTimerStop( TimerUpdate, 0 );
+			cm_request_feedhold();
+			cm_request_queue_flush();
+			xio_close(cs.primary_src);
+			cm.probe_state = PROBE_FAILED;
+			state = 0;
+			cm.cycle_state = CYCLE_OFF;
+			pl_arcook_stop();
+			isCuttingSet(false);
+			iif_bind_idle();
+			TORCH = FALSE;
+			cm.gmx.feed_rate_override_enable = true;
+			cm.gmx.feed_rate_override_factor = 1;
+			macro_func_ptr = command_idle;
+			ut_lcd_output_warning("PEN DRIVE\nDESCONECTADO\n");
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			return STATE_CONFIG_AUTO_MODE;
+		break;
 		}
+
+
 
 		/* Update position */
 	//	updatePosition(NULL);

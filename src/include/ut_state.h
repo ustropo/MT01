@@ -76,5 +76,6 @@ extern const state_func_ptr states_table[STATE_NUMBER];
 // Global variables
 // ***********************************************************************
 extern char gszCurFile[MAX_FILE_PATH_SIZE];
+extern ut_state currentState;
 
 #endif /* STATES_UT_STATE_H_ */

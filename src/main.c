@@ -94,7 +94,7 @@ Return value    : none
 ******************************************************************************/
 void main(void)
 {
-	bool ret = false;
+ 	bool ret = false;
 	/* Reserve the CMT0 for FreeRTOS */
 	ret = R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_CMT0));
 	while (false == ret) /* can't lock the CMT0 resource */

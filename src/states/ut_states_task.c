@@ -14,13 +14,14 @@
 #include <string.h>
 #include <stdio.h>
 
+ut_state currentState = STATE_SPLASH;
+
 /**
  * Execute state machine.
  */
 void states_task(void)
 {
 	ut_context pContext;
-	ut_state currentState = STATE_SPLASH;
 	iif_bind_idle();
 	/* Initialize context */
 	memset(&pContext, 0, sizeof(ut_context));
