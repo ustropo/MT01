@@ -54,6 +54,12 @@ static char* boolJogVel[2] =
 	"RÁPIDO"
 };
 
+static char* boolJogMaq[2] =
+{
+	"PLASMA",
+	"OXICORTE"
+};
+
 
 /**
  * Config boolean variable
@@ -86,6 +92,7 @@ void config_bool(ut_config_var* var)
 		{
 			case 7:  Recordflag =true;
 					 value = var->value;
+					 boolStr = boolJogMaq;
 			break;
 			default:
 		}

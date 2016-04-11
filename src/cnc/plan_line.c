@@ -790,27 +790,29 @@ stat_t mp_plan_feedrateoverride_callback(mpBuf_t *bf)
 {
 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
 
-	if (bf == NULL) return (STAT_ERROR);
-	mpBuf_t *bp = bf;
-	do {
-		switch(bp->gm.motion_mode)
-		{
-			case MOTION_MODE_STRAIGHT_FEED:
-			case MOTION_MODE_CW_ARC:
-			case MOTION_MODE_CCW_ARC:
-				if (bp->unit[AXIS_Z] == 0)
-				{
-					bp->cruise_vmax = bp->gm.feed_rate*cm.gmx.feed_rate_override_factor;
-					bp->exit_vmax = bp->cruise_vmax;
-					bp->cruise_velocity = bp->cruise_vmax;
-				}
-				break;
-			default:
-		}
-	} while (((bp = mp_get_next_buffer(bp)) != bf));
+//	if (bf == NULL) return (STAT_ERROR);
+//	mpBuf_t *bp = bf;
+//	do {
+//		switch(bp->gm.motion_mode)
+//		{
+//			case MOTION_MODE_STRAIGHT_FEED:
+//			case MOTION_MODE_CW_ARC:
+//			case MOTION_MODE_CCW_ARC:
+//				if (bp->unit[AXIS_Z] == 0)
+//				{
+//					bp->cruise_vmax = bp->gm.feed_rate*cm.gmx.feed_rate_override_factor;
+//					bp->exit_vmax = bp->cruise_vmax;
+//					bp->cruise_velocity = bp->cruise_vmax;
+//				}
+//				break;
+//			default:
+//		}
+//	} while (((bp = mp_get_next_buffer(bp)) != bf));
 	mr.segment_velocity = mr.gm.feed_rate*cm.gmx.feed_rate_override_factor;
-	_reset_replannable_list();				// make it replan all the blocks
-	_plan_block_list(bf, &mr_flag);
+	mr.exit_velocity = mr.exit_velocity*cm.gmx.feed_rate_override_factor;
+	mr.entry_velocity = mr.entry_velocity*cm.gmx.feed_rate_override_factor;
+//	_reset_replannable_list();				// make it replan all the blocks
+//	_plan_block_list(bf, &mr_flag);
 	return (STAT_OK);
 }
 

@@ -307,7 +307,7 @@ void ut_lcd_output_manual_mode(bool torch,const char* title[3],const char* textX
 		u8g_prepare(u8g_font_5x8);
 		str = DEFAULT_TOCHA;
 		u8g_DrawStr(&main_u8g, 95, 38, str);
-		if(torch)
+		if(!torch)
 		{
 			str = DEFAULT_ACESA;
 			u8g_DrawXBMP(&main_u8g, 94, 13, warning_width, warning_height, warning_bits);

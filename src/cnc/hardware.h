@@ -166,8 +166,8 @@ extern "C"{
 
 #define MOTOR_FOWARD	1
 #define MOTOR_REVERSE   0
-#define TRUE			1
-#define FALSE			0
+#define TRUE			0
+#define FALSE			1
 // Input pins are defined in switch.cpp
 
 /********************************

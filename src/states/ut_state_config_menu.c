@@ -32,9 +32,6 @@ typedef enum
 	CONFIG_VELOC_JOG_RAPIDO, // VELOC. DE JOG RÁPIDO
 	CONFIG_CANCELAR_IHS, // CANCELAR IHS
 	CONFIG_TESTE_DISPARO, //" TESTE DE DISPARO",
-	CONFIG_TESTE_SENSOR_CHAPA, //" TESTE SENSOR DE CHAPA",
-	CONFIG_TESTE_SENSOR_ARCOOK, //" TESTE SENSOR ARCO OK",
-	CONFIG_TESTE_EMERGENCIA, //" TESTE BOTÃO DE EMERGÊNCIA"
 	CONFIG_MAX           //!< CONFIG_MAX
 } ut_config_name;
 
@@ -54,9 +51,6 @@ static ut_config_type init_types[CONFIG_MAX] =
 	UT_CONFIG_INT,
 	UT_CONFIG_INT,
 	UT_CONFIG_BOOL,
-	UT_CONFIG_BOOL,
-	UT_CONFIG_BOOL,
-	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL
 };
 
@@ -69,11 +63,8 @@ static char* init_names[CONFIG_MAX] =
 	" VELOC. CORTE",
 	" VELOC. JOG LENTO",
 	" VELOC. JOG RÁPIDO",
-	" CANCELAR IHS",
+	" MODO MÁQUINA",
 	" TESTE DE DISPARO",
-	" TESTE SENSOR DE CHAPA",
-	" TESTE SENSOR ARCO OK",
-	" TESTE BOTÃO DE EMERGÊNCIA"
 };
 
 static float init_step[CONFIG_MAX] =
@@ -85,9 +76,6 @@ static float init_step[CONFIG_MAX] =
 	1,
 	1,
 	1,
-	0,
-	0,
-	0,
 	0,
 	0
 };
@@ -102,17 +90,11 @@ static float init_max[CONFIG_MAX] =
 	5000,
 	10000,
 	0,
-	0,
-	0,
-	0,
 	0
 };
 
 static float init_min[CONFIG_MAX] =
 {
-	0,
-	0,
-	0,
 	0,
 	0,
 	0,
@@ -134,9 +116,6 @@ static uint8_t init_point[CONFIG_MAX] =
 	0,
 	0,
 	0,
-	0,
-	0,
-	0,
 	0
 };
 
@@ -149,9 +128,6 @@ static char* init_unit[CONFIG_MAX] =
 	"mm/s",
 	"mm/s",
 	"mm/s",
-	"",
-	"",
-	"",
 	"",
 	""
 };

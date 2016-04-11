@@ -133,7 +133,7 @@ static void output_ports_configure(void)
 	PORT2.PMR.BYTE = 0x02;
 //	MPC.P20PFS.BYTE = 0x40; /* IRQ8 - Emergencia */
 	MPC.P21PFS.BYTE = 0x40; /* IRQ9 - Arco Ok */
-	PORT2.PODR.BYTE = 0x00 ;    /* All outputs low to start */
+	PORT2.PODR.BYTE = 0x08 ;    /* All outputs low to start except TORCH*/
 	PORT2.PDR.BYTE  = 0xFE ;    /* All outputs - Emergencia (Input)  */
 
 	/* Port 3 - JTAG, DA0(MTIOC0C), DA1(MTIOC0D) */

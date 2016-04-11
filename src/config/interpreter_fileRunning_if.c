@@ -48,7 +48,7 @@ void iif_zdown_filerunning(void) {
 	                   (  /* Just a text name, not used by the RTOS kernel. */
 	                     "Timer 1",
 	                     /* The timer period in ticks, must be greater than 0. */
-	                     ( 100 ),
+	                     ( 1 ),
 	                     /* The timers will auto-reload themselves when they
 	                     expire. */
 	                     pdTRUE,
@@ -92,8 +92,11 @@ void iif_down_filerunning(void)
 		bf->gm.motion_mode == MOTION_MODE_CCW_ARC)
 	{
 	//	cm_request_feedhold();
-		cm.gmx.feed_rate_override_factor -= feedratepercent;
-		mp_plan_feedrateoverride_callback(mp_get_run_buffer());
+		if(mr.section == SECTION_BODY)
+		{
+			cm.gmx.feed_rate_override_factor -= feedratepercent;
+			mp_plan_feedrateoverride_callback(mp_get_run_buffer());
+		}
 	//	cm_request_cycle_start();
 	}
 }
@@ -110,8 +113,11 @@ void iif_up_filerunning(void)
 		bf->gm.motion_mode == MOTION_MODE_CCW_ARC)
 	{
 	//	cm_request_feedhold();
-		cm.gmx.feed_rate_override_factor += feedratepercent;
-		mp_plan_feedrateoverride_callback(mp_get_run_buffer());
+		if(mr.section == SECTION_BODY)
+		{
+			cm.gmx.feed_rate_override_factor += feedratepercent;
+			mp_plan_feedrateoverride_callback(mp_get_run_buffer());
+		}
 	//	cm_request_cycle_start();
 	}
 }
@@ -159,9 +165,9 @@ void vTimerCallback( TimerHandle_t pxTimer )
 	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
 	switch (lArrayIndex)
 	{
-		case 0: zmove = 0.003;
+		case 0: zmove = 0.03;
 		break;
-		case 1: zmove = -0.003;
+		case 1: zmove = -0.03;
 		break;
 	}
 }

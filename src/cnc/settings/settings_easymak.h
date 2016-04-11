@@ -84,7 +84,7 @@
 #define X_VELOCITY_MAX			10000 				// xvm		G0 max velocity in mm/min
 #define X_FEEDRATE_MAX			X_VELOCITY_MAX		// xfr 		G1 max feed rate in mm/min
 #define X_TRAVEL_MIN			0					// xtn		minimum travel
-#define X_TRAVEL_MAX			290					// xtm		maximum travel (travel between switches or crashes)
+#define X_TRAVEL_MAX			3000					// xtm		maximum travel (travel between switches or crashes)
 #define X_JERK_MAX				4000				// xjm		yes, that's "5 billion" mm/(min^3)
 #define X_JERK_HOMING			4000				// xjh
 #define X_JUNCTION_DEVIATION	JUNCTION_DEVIATION	// xjd
@@ -99,7 +99,7 @@
 #define Y_VELOCITY_MAX			10000
 #define Y_FEEDRATE_MAX			Y_VELOCITY_MAX
 #define Y_TRAVEL_MIN			0
-#define Y_TRAVEL_MAX			320
+#define Y_TRAVEL_MAX			1500
 #define Y_JERK_MAX				4000
 #define Y_JERK_HOMING			4000				// xjh
 #define Y_JUNCTION_DEVIATION	JUNCTION_DEVIATION
@@ -223,8 +223,8 @@
 #define G54_B_OFFSET 0
 #define G54_C_OFFSET 0
 
-#define G55_X_OFFSET 0	// set g55 to middle of table
-#define G55_Y_OFFSET 0
+#define G55_X_OFFSET X_TRAVEL_MAX/2	// set g55 to middle of table
+#define G55_Y_OFFSET Y_TRAVEL_MAX/2
 #define G55_Z_OFFSET 0
 #define G55_A_OFFSET 0
 #define G55_B_OFFSET 0
