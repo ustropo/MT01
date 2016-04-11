@@ -136,9 +136,6 @@ static void updatePosition(uint8_t menu)
 	y = mp_get_runtime_absolute_position(1);
 	z = mp_get_runtime_absolute_position(2);
 
-//	sprintf(textXStr, "X:%4.2f mm", x);
-//	sprintf(textYStr, "Y:%4.2f mm", y);
-//	sprintf(textZStr, "Z:%4.2f mm", z);
 	sprintf(textXStr, "%4.2f mm", x);
 	sprintf(textYStr, "%4.2f mm", y);
 	sprintf(textZStr, "%4.2f mm", z);
@@ -261,6 +258,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 ut_state ut_state_auto_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
+	bool arco = false;
 	bool ltorchBuffer = false;
 	programEnd = false;
 	lstop = false;
@@ -332,7 +330,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 
 		case KEY_ENTER:
 			/* Clear display */
-			if(lstop)
+			if(lstop && !arco)
 			{
 				lstop = false;
 				iif_bind_filerunning_stop(lstop);
@@ -412,11 +410,18 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 		/* TODO: operate machine - with other keys */
 		case ARCO_OK_FAILED:
-			xTimerStop( TimerUpdate, 0 );
-			ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\nPRESSIONE ESC\n");
-			TORCH = FALSE;
-			uint32_t qSend = KEY_ESC;
-			xQueueSend( qKeyboard, &qSend, 0 );
+			if(!arco)
+			{
+				pl_arcook_stop();
+				xTimerStop( TimerUpdate, 0 );
+				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
+				TORCH = FALSE;
+				vTaskDelay(2000 / portTICK_PERIOD_MS);
+				xTimerStart( TimerUpdate, 0 );
+				uint32_t qSend = KEY_ESC;
+				xQueueSend( qKeyboard, &qSend, 0 );
+				arco = true;
+			}
 			break;
 
 		case USB_DETACHED:
