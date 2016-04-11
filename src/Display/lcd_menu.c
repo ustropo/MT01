@@ -101,7 +101,7 @@ void ut_menu_show(ut_menu* menu_ptr)
 
 	/* Put on screen */
 	//ut_lcd_output();
-	ut_lcd_output_str();
+	ut_lcd_output_str(menu_ptr->currentState);
 }
 
 /**

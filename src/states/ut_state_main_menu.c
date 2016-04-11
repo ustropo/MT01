@@ -68,6 +68,7 @@ ut_state ut_state_main_menu(ut_context* pContext)
 
 	/* Options */
 	main_menu.title = gszMainMenuTitle;
+	main_menu.currentState = STATE_MAIN_MENU;
 	/* Items */
 	for(i = 0; i < MAIN_MENU_NUMBER; i++)
 	{

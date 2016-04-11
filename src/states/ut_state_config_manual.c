@@ -148,9 +148,10 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 
 	/* Initialize menu */
 	ut_menu_init(&config_menu);
-
+	config_menu.currentState = STATE_CONFIG_MANUAL_MODE;
 	/* Options */
 	config_menu.title = gszConfigMenuTitle;
+
 	/* Items */
 	for(i = 0; i < CONFIG_MANUAL_MAX; i++)
 	{

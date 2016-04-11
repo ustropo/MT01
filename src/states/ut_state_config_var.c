@@ -100,6 +100,7 @@ void config_bool(ut_config_var* var)
 	default:
 	}
 	 menu.title = var->name;
+	 menu.currentState = STATE_CONFIG_VAR;
 	for(i = 0; i < 2; i++)
 	{
 		menu.items[menu.numItems++].text = boolStr[i];

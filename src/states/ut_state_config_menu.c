@@ -188,6 +188,7 @@ ut_state ut_state_config_menu(ut_context* pContext)
 
 	/* Options */
 	config_menu.title = gszConfigMenuTitle;
+	config_menu.currentState = STATE_CONFIG_MENU;
 //	config_menu.offset = 1;
 	/* Items */
 	for(i = 0; i < CONFIG_MAX; i++)

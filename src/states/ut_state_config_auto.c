@@ -145,6 +145,7 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 
 	/* Options */
 	config_menu.title = gszConfigMenuTitle;
+	config_menu.currentState = STATE_CONFIG_AUTO_MODE;
 	/* Items */
 	for(i = 0; i < CONFIG_AUTO_MAX; i++)
 	{

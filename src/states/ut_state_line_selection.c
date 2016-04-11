@@ -81,6 +81,7 @@ ut_state ut_state_line_selection(ut_context* pContext)
 		ut_menu_init(&config_line);
 		/* Options */
 		config_line.title = gszConfigMenuTitle;
+		config_line.currentState = STATE_LINE_SELECTION;
 		index = 0;
 		memset(lineNumEntry,0xFFFFFFFF,sizeof(lineNumEntry));
 		parse_gcode_func_selection(LINE_PARSER);

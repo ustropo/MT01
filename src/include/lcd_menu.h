@@ -7,6 +7,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "ut_state.h"
 
 // ***********************************************************************
 // Macros
@@ -56,6 +57,7 @@ typedef struct ut_menu_tag
 	uint8_t offset;
 	uint8_t maxItemsPerPage;
 	uint8_t boShowTitle;
+	ut_state currentState;
 } ut_menu;
 
 // ***********************************************************************

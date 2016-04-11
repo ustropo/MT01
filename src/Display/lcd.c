@@ -12,6 +12,8 @@
 #include "lcd.h"
 #include <stdio.h>
 #include <string.h>
+#include "ut_state.h"
+#include "eeprom.h"
 
 static void readline(const char *message, char *line, uint8_t *counter);
 /* Check if background color is black/white */
@@ -216,13 +218,14 @@ void ut_lcd_output()
 
 			/* Next position */
 			y += h;
+
 		}
 
 	} while(u8g_NextPage(&main_u8g));
 	xSemaphoreGive(rspi_semaphore);
 }
 
-void ut_lcd_output_str()
+void ut_lcd_output_str(ut_state state)
 {
 	uint8_t row, x, y;
 	uint8_t h;
@@ -239,6 +242,7 @@ void ut_lcd_output_str()
 		y = 0;
 		for(row = 0; row < MAX_ROW; row++)
 		{
+			u8g_prepare(u8g_font_6x10);
 			u8g_SetFont(&main_u8g, gaboFontStr[row]);
 			u8g_SetFontRefHeightExtendedText(&main_u8g);
 			u8g_SetDefaultForegroundColor(&main_u8g);
@@ -251,6 +255,15 @@ void ut_lcd_output_str()
 
 			/* Next position */
 			y += h;
+			if (state == STATE_MAIN_MENU)
+			{
+				u8g_prepare(u8g_font_5x8);
+				u8g_DrawHLine(&main_u8g, x, 55, 128);
+				if(configFlags)
+					u8g_DrawStr(&main_u8g, 85, 56, "OXICORTE");
+				else
+					u8g_DrawStr(&main_u8g, 85, 56, "PLASMA");
+			}
 		}
 
 	} while(u8g_NextPage(&main_u8g));
