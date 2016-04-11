@@ -136,9 +136,12 @@ static void updatePosition(uint8_t menu)
 	y = mp_get_runtime_absolute_position(1);
 	z = mp_get_runtime_absolute_position(2);
 
-	sprintf(textXStr, "X:%4.2f mm", x);
-	sprintf(textYStr, "Y:%4.2f mm", y);
-	sprintf(textZStr, "Z:%4.2f mm", z);
+//	sprintf(textXStr, "X:%4.2f mm", x);
+//	sprintf(textYStr, "Y:%4.2f mm", y);
+//	sprintf(textZStr, "Z:%4.2f mm", z);
+	sprintf(textXStr, "%4.2f mm", x);
+	sprintf(textYStr, "%4.2f mm", y);
+	sprintf(textZStr, "%4.2f mm", z);
 
 	if(cm.machine_state == MACHINE_PROGRAM_END && !programEnd && (menu == AUTO || menu == SIM))
 	{

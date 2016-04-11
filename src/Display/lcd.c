@@ -354,12 +354,25 @@ void ut_lcd_output_manual_mode(bool torch,const char* title[3],const char* textX
 			//			h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 						u8g_DrawHLine(&main_u8g, x, y-1, 128);
 						break;
-				case 2: str = textX;
+				case 2: u8g_prepare(u8g_font_helvB08);
+						u8g_DrawStr(&main_u8g, x, y, "X:");
+						str = textX;
+						x = 12;
 						u8g_prepare(u8g_font_6x10);
 						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 						break;
-				case 3: str = textY;  break;
-				case 4: str = textZ;  break;
+				case 3: u8g_prepare(u8g_font_helvB08);
+						u8g_DrawStr(&main_u8g, x, y, "Y:");
+						u8g_prepare(u8g_font_6x10);
+						str = textY;
+						x = 12;
+						break;
+				case 4: u8g_prepare(u8g_font_helvB08);
+						u8g_DrawStr(&main_u8g, x, y, "Z:");
+						u8g_prepare(u8g_font_6x10);
+						str = textZ;
+						x = 12;
+						break;
 			}
 				/* Draw glyph */
 			u8g_DrawStr(&main_u8g, x, y, str);
