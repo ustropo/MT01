@@ -47,7 +47,7 @@ ut_config_var configs_manual[CONFIG_MANUAL_MAX];
 static bool initialized = false;
 extern ut_config_var* configsVar;
 float *velocidadeJog;
-float zeroPiecebuffer[3] = {0,0,0};
+static float zeroPiecebuffer[3] = {0,0,0};
 
 static const ut_state geNextStateManual[6] =
 {
@@ -175,6 +175,14 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 			configsVar->name = "DESEJA CONTINUAR?";
 			pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
 			pContext->value[1] = STATE_DESLOCAZERO_MODE;
+			break;
+		case CONFIG_ZERAR_MAQUINA:
+			ut_lcd_output_warning("DEVE ESTAR NOS\nLIMITES FISICOS\nX0 E Y0\n");
+			/* Delay */
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			configsVar->name = "ZERAR A MÁQUINA?";
+			pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
+			pContext->value[1] = STATE_CONFIG_MANUAL_MODE;
 			break;
 		default:
 			pContext->value[0] = STATE_CONFIG_MANUAL_MODE;

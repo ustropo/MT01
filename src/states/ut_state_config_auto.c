@@ -5,10 +5,15 @@
  *      Author: Fernando
  */
 
+#include "tinyg.h"		// #1
+#include "hardware.h"
+#include "planner.h"
+
 #include "ut_context.h"
 #include "ut_state.h"
 #include "ut_state_config_var.h"
 #include "interpreter_if.h"
+#include "eeprom.h"
 #include "macros.h"
 
 #include "FreeRTOS.h"
@@ -24,6 +29,7 @@
 
 extern char gszCurFile[MAX_FILE_PATH_SIZE];
 extern uint32_t choosedLine;
+static float zeroPiecebuffer[3] = {0,0,0};
 
 typedef enum
 {
@@ -211,7 +217,18 @@ static void zerar_peca(void *var)
 	uint32_t *value = lvar->value;
 	if(*value)
 	{
-		macro_func_ptr = ZerarPeca_Macro;
+		zeroPiecebuffer[AXIS_X] += mp_get_runtime_absolute_position(AXIS_X);
+		zeroPiecebuffer[AXIS_Y] += mp_get_runtime_absolute_position(AXIS_Y);
+		zeroPiecebuffer[AXIS_Z] = 0;
+
+		zeroPiece[AXIS_X] = zeroPiecebuffer[AXIS_X];
+		zeroPiece[AXIS_Y] = zeroPiecebuffer[AXIS_Y];
+		zeroPiece[AXIS_Z] = 0;
+		eepromWriteConfig(ZEROPIECE);
+		macro_func_ptr = ZerarMaquina_Macro;
+		zeroPiece[AXIS_X] = 0;
+		zeroPiece[AXIS_Y] = 0;
+		zeroPiece[AXIS_Z] = 0;
 	}
 }
 
