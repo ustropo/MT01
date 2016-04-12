@@ -29,6 +29,7 @@ extern iif_func_ptr iif_func_right;
 extern iif_func_ptr iif_func_zdown;
 extern iif_func_ptr iif_func_zup;
 extern iif_func_ptr iif_func_released;
+extern iif_func_ptr iif_func_cycleStop;
 
 
 extern void iif_bind_filerunning(void);

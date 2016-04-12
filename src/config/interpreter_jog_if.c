@@ -117,4 +117,5 @@ void iif_bind_jog(void)
 	iif_func_zdown = &iif_zdown_jog;
 	iif_func_zup = &iif_zup_jog;
 	iif_func_released = &iif_released_jog;
+	iif_func_cycleStop = &iif_idle;
 }

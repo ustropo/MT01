@@ -461,7 +461,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 	/* Clear display */
 	updatePosition(DESLOCA);
 	gTitle = DESLOCA;
-	iif_bind_idle();
+	iif_bind_deslocar();
 	TimerUpdate = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",

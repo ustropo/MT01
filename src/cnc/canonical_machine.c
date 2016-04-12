@@ -103,6 +103,8 @@
 #include "xio.h"			// for serial queue flush
 #include "macros.h"
 #include "controller.h"
+
+#include "interpreter_if.h"
 /*
 #ifdef __cplusplus
 extern "C"{
@@ -1322,6 +1324,9 @@ static void _exec_program_finalize(float *value, float *flag)
 		cm_set_feed_rate_mode(UNITS_PER_MINUTE_MODE);	// G94
 	//	cm_set_motion_mode(MOTION_MODE_STRAIGHT_FEED);	// NIST specifies G1, but we cancel motion mode. Safer.
 		cm_set_motion_mode(MODEL, MOTION_MODE_CANCEL_MOTION_MODE);
+	}
+	if (cm.machine_state == MACHINE_PROGRAM_STOP) {
+		iif_func_cycleStop();
 	}
 	sr_request_status_report(SR_IMMEDIATE_REQUEST);		// request a final status report (not unfiltered)
 }

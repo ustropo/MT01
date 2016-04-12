@@ -26,6 +26,7 @@ iif_func_ptr iif_func_right;
 iif_func_ptr iif_func_zdown;
 iif_func_ptr iif_func_zup;
 iif_func_ptr iif_func_released;
+iif_func_ptr iif_func_cycleStop;
 
 
 void iif_idle(void) {}
@@ -41,6 +42,7 @@ void iif_bind_idle(void)
 	iif_func_zdown = &iif_idle;
 	iif_func_zup = &iif_idle;
 	iif_func_released = &iif_idle;
+	iif_func_cycleStop = &iif_idle;
 }
 
 

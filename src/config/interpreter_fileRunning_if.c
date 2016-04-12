@@ -139,6 +139,7 @@ void iif_bind_filerunning(void)
 	iif_func_zdown = &iif_zdown_filerunning;
 	iif_func_zup = &iif_zup_filerunning;
 	iif_func_released = &iif_released_filerunning;
+	iif_func_cycleStop = &iif_idle;
 }
 
 void iif_bind_filerunning_stop(bool stop)
