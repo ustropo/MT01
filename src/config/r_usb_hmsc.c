@@ -43,7 +43,7 @@ Includes   <System Includes> , "Project Includes"
 #include "platform.h"
 #include "r_usb_basic_if.h"
 #include "r_usb_hmsc_if.h"
-#include "r_tfat_lib.h"
+#include "ff.h"
 
 
 #ifdef FREE_RTOS_PP
@@ -469,7 +469,7 @@ void usb_hmsc_SampleAplTask(void)
             /* Mount to the file system */
         case USB_HMSC_DRIVEMOUNT:
         	/* File system media work area memory mount. */
-        	res = R_tfat_f_mount(0, &st_usb_fatfs);
+        	res = f_mount(&st_usb_fatfs,"",NULL);
             /* Notify the task that the transmission is complete. */
         //	xTaskNotifyGive( task_main_handle );
         	drivemountFlag = true;

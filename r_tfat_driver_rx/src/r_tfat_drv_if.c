@@ -452,9 +452,9 @@ static uint8_t check_use_usb_mini(uint8_t drive)
 * Arguments     : uint8_t  drive        : Physical drive number for FIT module
 * Return value  : Status of the memory medium
 ******************************************************************************/
-DSTATUS R_tfat_disk_initialize(uint8_t drive)
+DSTATUS disk_initialize(uint8_t drive)
 {
-    DSTATUS ret = TFAT_RES_PARERR;
+    DSTATUS ret = RES_PARERR;
 
 #if (TFAT_USB_DRIVE_NUM > 0)
     if ( check_use_usb(drive) )
@@ -490,14 +490,14 @@ DSTATUS R_tfat_disk_initialize(uint8_t drive)
 *               : uint8_t sector_count   : Number of sectors to read
 * Return value  : Result of function execution
 ******************************************************************************/
-DRESULT R_tfat_disk_read (
+DRESULT disk_read (
     uint8_t drive,          /* Physical drive number             */
     uint8_t* buffer,        /* Pointer to the read data buffer   */
     uint32_t sector_number, /* Start sector number               */
     uint8_t sector_count    /* Number of sectors to read         */
 )
 {
-    DRESULT ret = TFAT_RES_PARERR;
+    DRESULT ret = RES_PARERR;
 
 #if (TFAT_USB_DRIVE_NUM > 0)
     if ( check_use_usb(drive) )
@@ -533,14 +533,14 @@ DRESULT R_tfat_disk_read (
 *               : uint8_t        sector_count  : Number of sectors to write
 * Return value  : Result of function execution
 ******************************************************************************/
-DRESULT R_tfat_disk_write (
+DRESULT disk_write (
     uint8_t drive,           /* Physical drive number           */
     const uint8_t* buffer,   /* Pointer to the write data       */
     uint32_t sector_number,  /* Sector number to write          */
     uint8_t sector_count     /* Number of sectors to write      */
 )
 {
-    DRESULT ret = TFAT_RES_PARERR;
+    DRESULT ret = RES_PARERR;
 
 #if (TFAT_USB_DRIVE_NUM > 0)
     if ( check_use_usb(drive) )
@@ -575,13 +575,13 @@ DRESULT R_tfat_disk_write (
 *               : void*   buffer  : Data transfer buffer
 * Return value  : Result of function execution
 ******************************************************************************/
-DRESULT R_tfat_disk_ioctl (
+DRESULT disk_ioctl (
     uint8_t drive,           /* Drive number             */
     uint8_t command,         /* Control command code     */
     void* buffer             /* Data transfer buffer     */
 )
 {
-    DRESULT ret = TFAT_RES_PARERR;
+    DRESULT ret = RES_PARERR;
 
 #if (TFAT_USB_DRIVE_NUM > 0)
     if ( check_use_usb(drive) )
@@ -614,11 +614,11 @@ DRESULT R_tfat_disk_ioctl (
 * Arguments     : uint8_t drive : Physical drive number
 * Return value  : Status of the disk
 ******************************************************************************/
-DSTATUS R_tfat_disk_status (
+DSTATUS disk_status (
     uint8_t drive             /* Physical drive number    */
 )
 {
-    DSTATUS ret = TFAT_RES_PARERR;
+    DSTATUS ret = RES_PARERR;
 
 #if (TFAT_USB_DRIVE_NUM > 0)
     if ( check_use_usb(drive) )
@@ -653,7 +653,7 @@ DSTATUS R_tfat_disk_status (
 *               :    is used by the FAT library to get the current date
                 :    and time during file manipulations.
 ******************************************************************************/
-uint32_t R_tfat_get_fattime (void)
+uint32_t get_fattime (void)
 {
     uint32_t tmr;
 
@@ -687,7 +687,7 @@ DRESULT R_tfat_drv_change_alloc(TFAT_DRV_NUM tfat_drv, uint8_t dev_type, uint8_t
 {
     if ( TFAT_DRIVE_ALLOC_NUM_MAX <= tfat_drv )
     {
-        return TFAT_RES_ERROR;
+        return RES_ERROR;
     }
 
 #if (TFAT_USB_DRIVE_NUM > 0)
@@ -734,7 +734,7 @@ DRESULT R_tfat_drv_change_alloc(TFAT_DRV_NUM tfat_drv, uint8_t dev_type, uint8_t
     drive_alloc_tbl[tfat_drv][0] = dev_type;
     drive_alloc_tbl[tfat_drv][1] = dev_drv_num;
 
-    return TFAT_RES_OK;
+    return RES_OK;
 }
 
 /*******************************************************************************

@@ -37,7 +37,9 @@
 Includes   <System Includes> , "Project Includes"
 *******************************************************************************/
 #include <stdint.h>
-#include "r_tfat_lib.h"
+//#include "r_tfat_lib.h"
+#include "ff.h"
+#include "diskio.h"
 
 /*******************************************************************************
 Macro definitions

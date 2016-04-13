@@ -41,7 +41,9 @@ Includes   <System Includes> , "Project Includes"
 
 #include "r_usb_basic_if.h"
 #include "r_usb_hatapi_define.h"    /* Peripheral ATAPI Device extern */
-#include "r_tfat_lib.h"             /* TFAT define */
+//#include "r_tfat_lib.h"             /* TFAT define */
+#include "ff.h"
+#include "diskio.h"
 
 #include "r_usb_hmsc_extern.h"
 #include "r_usb_hmsc_api.h"
@@ -72,7 +74,7 @@ USB_UTR_t tfat_ptr;
 ******************************************************************************/
 DSTATUS R_tfat_usb_disk_initialize(uint8_t pdrv)
 {
-    return  TFAT_RES_OK;
+    return  RES_OK;
 }
 
 /******************************************************************************
@@ -105,7 +107,7 @@ DRESULT R_tfat_usb_disk_read (
     R_usb_hstd_DeviceInformation(&tfat_ptr, tfat_ptr.keyword, (uint16_t *)res);         /* Get device connect state */
     if ( USB_DETACHED == res[1] )    /* Check detach */
     {
-        return TFAT_RES_ERROR;
+        return RES_ERROR;
     }
 
     /* read function */
@@ -125,7 +127,7 @@ DRESULT R_tfat_usb_disk_read (
             R_usb_hstd_DeviceInformation(&tfat_ptr, tfat_ptr.keyword, (uint16_t *)res); /* Get device connect state */
             if (USB_DETACHED == res[1])
             {
-            	return TFAT_RES_ERROR;
+            	return RES_ERROR;
             }
             err = R_USB_TRCV_MSG(USB_TFAT_MBX, (USB_MSG_t**)&mess, (uint16_t)0);     /* Receive read complete msg */
 #endif /* FREE_RTOS_PP */
@@ -162,9 +164,9 @@ DRESULT R_tfat_usb_disk_read (
 
     if ( err != USB_OK )
     {
-        return TFAT_RES_ERROR;
+        return RES_ERROR;
     }
-    return TFAT_RES_OK;
+    return RES_OK;
 }
 
 /******************************************************************************
@@ -196,7 +198,7 @@ DRESULT R_tfat_usb_disk_write (
     R_usb_hstd_DeviceInformation(&tfat_ptr, tfat_ptr.keyword, (uint16_t *)res);         /* Get device connect state */
     if ( USB_DETACHED == res[1] )    /* Check detach */
     {
-        return TFAT_RES_ERROR;
+        return RES_ERROR;
     }
 
     /* write function */
@@ -216,7 +218,7 @@ DRESULT R_tfat_usb_disk_write (
 		R_usb_hstd_DeviceInformation(&tfat_ptr, tfat_ptr.keyword, (uint16_t *)res); /* Get device connect state */
 		if( USB_DETACHED == res[1] )
 		{
-			return TFAT_RES_ERROR;
+			return RES_ERROR;
 		}
 		err = R_USB_TRCV_MSG(USB_TFAT_MBX, (USB_MSG_t**)&mess, (uint16_t)0 );    /* Receive write complete msg */
 #endif
@@ -251,9 +253,9 @@ DRESULT R_tfat_usb_disk_write (
 
     if ( err != USB_OK )
     {
-        return TFAT_RES_ERROR;
+        return RES_ERROR;
     }
-    return TFAT_RES_OK;
+    return RES_OK;
 }
 
 /******************************************************************************
@@ -275,7 +277,7 @@ DRESULT R_tfat_usb_disk_ioctl (
     /*  Please put the code for R_tfat_disk_ioctl driver interface
          function over here.  */
     /*  Please refer the application note for details.  */
-    return TFAT_RES_OK;
+    return RES_OK;
 }
 
 /******************************************************************************
@@ -293,7 +295,7 @@ DSTATUS R_tfat_usb_disk_status (
     /*  Please put the code for R_tfat_disk_status driver interface
          function over here.  */
     /*  Please refer the application note for details.  */
-    return TFAT_RES_OK;
+    return RES_OK;
 }
 
 /******************************************************************************

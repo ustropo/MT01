@@ -61,7 +61,7 @@
 /* 
  * FILE DEVICE CONFIGS 
  */
-#include "r_tfat_lib.h"
+#include "ff.h"
 
 /* 
  * FILE device extended control structure 

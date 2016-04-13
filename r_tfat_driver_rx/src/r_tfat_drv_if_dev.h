@@ -37,7 +37,8 @@
 Includes   <System Includes> , "Project Includes"
 *******************************************************************************/
 #include "r_tfat_driver_rx_config.h"
-#include "r_tfat_lib.h"
+#include "ff.h"
+#include "diskio.h"
 
 /*******************************************************************************
 Macro definitions

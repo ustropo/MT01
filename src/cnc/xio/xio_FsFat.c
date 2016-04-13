@@ -100,13 +100,13 @@ FILE * xio_open_file(const uint8_t dev, const char *addr, const flags_t flags)
 	d->x = &ufsfat[dev - XIO_DEV_USBFILE_OFFSET];			// bind extended struct to device
 	xioFsfat_t *dx = (xioFsfat_t *)d->x;
 
-	R_tfat_f_mount(0, &dx->gFatfs);
-	fr = R_tfat_f_close(&dx->f);
+	f_mount(&dx->gFatfs,"",0);
+	fr = f_close(&dx->f);
     /* Open a text file */
-    fr = R_tfat_f_open(&dx->f, gszCurFile, TFAT_FA_READ);
+    fr = f_open(&dx->f, gszCurFile, FA_READ);
     if (choosedLinePosition > 0)
     {
-        R_tfat_f_lseek(&dx->f,choosedLinePosition);
+        f_lseek(&dx->f,choosedLinePosition);
         macro_func_ptr = RunningInicial_Macro;
         choosedLinePosition = 0;
         choosedLine = 0;
@@ -137,7 +137,7 @@ int xio_gets_fsfat(xioDev_t *d, char *buf, const int size)
 void xio_close_fsfat (xioDev_t *d)
 {
 	xioFsfat_t *dx = (xioFsfat_t *)d->x;
-	R_tfat_f_close(&dx->f);
+	f_close(&dx->f);
 }
 
 int xio_getc_fsfat(FILE *stream)

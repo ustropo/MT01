@@ -7,7 +7,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include "r_tfat_lib.h"
+#include "ff.h"
 
 #include "ut_context.h"
 #include "ut_state.h"
@@ -136,6 +136,11 @@ static void sort_array(char* pbArray, int iLen)
 	}
 }
 
+DIR	 st_usb_dir;
+FILINFO st_usb_finfo;
+#if _USE_LFN
+char Lfname[_MAX_LFN + 1];
+#endif
 /**
  * Scan files in a given directory and returns the selection.
  * If the selection is a directory, it does it recursively
@@ -144,13 +149,16 @@ static void sort_array(char* pbArray, int iLen)
  */
 static ut_fs_navigate chooseFile()
 {
-	DIR	 st_usb_dir;
-	FILINFO st_usb_finfo;
+
 	FRESULT eRes;
 	ut_menu filesMenu;
 	uint8_t i;
+	char *fn;
 	char aszFiles[MENU_MAX_ITEMS][MAX_COLUMN + 1];
-
+#if _USE_LFN
+	st_usb_finfo.lfname = Lfname;
+	st_usb_finfo.lfsize = sizeof Lfname;
+#endif
 	/* Clean */
 	memset(aszFiles, 0, MENU_MAX_ITEMS * (MAX_COLUMN + 1));
 
@@ -162,8 +170,8 @@ static ut_fs_navigate chooseFile()
 	filesMenu.maxItemsPerPage = MAX_ROW;
 
 	/* Open dir */
-	eRes = R_tfat_f_opendir(&st_usb_dir, gszCurFile);
-	if(eRes == TFAT_FR_OK)
+	eRes = f_opendir(&st_usb_dir, gszCurFile);
+	if(eRes == FR_OK)
 	{
 		/* Check if it is on root */
 		if(strlen(gszCurFile) > 0)
@@ -174,20 +182,25 @@ static ut_fs_navigate chooseFile()
 		/* Populate menu */
 		while(true)
 		{
-			eRes = R_tfat_f_readdir(&st_usb_dir, &st_usb_finfo);
+			eRes = f_readdir(&st_usb_dir, &st_usb_finfo);
 			/* Check for end of dir */
-			if(eRes != TFAT_FR_OK || st_usb_finfo.fname[0] == 0) { break; }
+			if(eRes != FR_OK || st_usb_finfo.fname[0] == 0) { break; }
 			if(st_usb_finfo.fname[0] == '.') { continue; } /* Ignore dot entry */
-			if(strstr(st_usb_finfo.fname, "SYSTEM")) { continue; }
-
+#if _USE_LFN
+            fn = *st_usb_finfo.lfname ? st_usb_finfo.lfname : st_usb_finfo.fname;
+			if(strstr(fn, "System")) { continue; }
+#else
+            fn = st_usb_finfo.fname;
+			if(strstr(fn, "SYSTEM")) { continue; }
+#endif
 			/* Copy to menu */
-			if(st_usb_finfo.fattrib & TFAT_AM_DIR)
+			if(st_usb_finfo.fattrib & AM_DIR)
 			{
-				sprintf(aszFiles[filesMenu.numItems], "/%.*s", MAX_COLUMN, st_usb_finfo.fname);
+				sprintf(aszFiles[filesMenu.numItems], "/%.*s", MAX_COLUMN, fn);
 			}
-			else if(validExtension(st_usb_finfo.fname))
+			else if(validExtension(fn))
 			{
-				sprintf(aszFiles[filesMenu.numItems], "%.*s", MAX_COLUMN, st_usb_finfo.fname);
+				sprintf(aszFiles[filesMenu.numItems], "%.*s", MAX_COLUMN, fn);
 			}
 			else
 			{
@@ -257,7 +270,7 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	if (drivemountFlag)
 	{
 	/* Check if usb is mounted */
-	eRes = R_tfat_f_opendir(&st_usb_dir, USB_ROOT);
+	eRes = f_opendir(&st_usb_dir, USB_ROOT);
 	}
 	else
 	{
