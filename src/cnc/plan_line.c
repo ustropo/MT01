@@ -780,7 +780,23 @@ stat_t mp_end_hold()
 stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
 {
 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
-	bf->length = fabs(mr.gm.target[AXIS_Z] - bf->gm.target[AXIS_Z]);
+	float value;
+	value = mr.gm.target[AXIS_Z] - bf->gm.target[AXIS_Z];
+	if(bf->unit[AXIS_Z] > 0)
+	{
+		if(value>0)
+		{
+			bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+		}
+	}
+	else
+	{
+		if(value<0)
+		{
+			bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+		}
+	}
+	bf->length =fabs(value);
 	bf->replannable = 1;
 	_plan_block_list(bf, &mr_flag);
 	return (STAT_OK);

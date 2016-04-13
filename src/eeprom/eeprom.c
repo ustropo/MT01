@@ -3,7 +3,7 @@
 #include "r_vee_if.h"
 #include <string.h>
 
-#define VEE_DEMO_ERASE_FIRST
+//#define VEE_DEMO_ERASE_FIRST
 
 
 extern float *velocidadeJog;
