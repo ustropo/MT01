@@ -23,15 +23,16 @@
 
 typedef enum
 {
-	CONFIG_ALTURA_DESLOCAMENTO = 0,    //!< CONFIG_JOG_LENTO
+	CONFIG_CANCELAR_IHS = 0, // CANCELAR IHS
+	CONFIG_ALTURA_DESLOCAMENTO,    //!< CONFIG_JOG_LENTO
 	CONFIG_ALTURA_PERFURACAO,   //!< CONFIG_JOG_RAPIDO
 	CONFIG_TEMPO_PERFURACAO,//!< CONFIG_TESTE_DISPARO
 	CONFIG_ALTURA_CORTE, // ALTURA DE CORTE
 	CONFIG_VELOC_CORTE, // VELOC. DE CORTE
 	CONFIG_VELOC_JOG_LENTO, // VELOC. DE JOG LENTO
 	CONFIG_VELOC_JOG_RAPIDO, // VELOC. DE JOG RÁPIDO
-	CONFIG_CANCELAR_IHS, // CANCELAR IHS
-	CONFIG_TESTE_DISPARO, //" TESTE DE DISPARO",
+	CONFIG_TENSAO_THC, //" TENSÃO THC",
+	CONFIG_DELAY_THC, //" DELAY THC",
 	CONFIG_MAX           //!< CONFIG_MAX
 } ut_config_name;
 
@@ -43,19 +44,21 @@ extern ut_config_var* configsVar;
 /* Initial values for each config variable */
 static ut_config_type init_types[CONFIG_MAX] =
 {
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
 	UT_CONFIG_BOOL,
-	UT_CONFIG_BOOL
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT
 };
 
 static char* init_names[CONFIG_MAX] =
 {
+	" MODO MÁQUINA",
 	" ALT. DESLOCAMENTO",
 	" ALT. PERFURAÇÃO",
 	" TEMPO PERFURAÇÃO",
@@ -63,25 +66,27 @@ static char* init_names[CONFIG_MAX] =
 	" VELOC. CORTE",
 	" VELOC. JOG LENTO",
 	" VELOC. JOG RÁPIDO",
-	" MODO MÁQUINA",
-	" TESTE DE DISPARO",
+	" TENSÃO THC",
+	" DELAY THC"
 };
 
 static float init_step[CONFIG_MAX] =
 {
-	0.1,
-	0.1,
-	0.1,
-	0.1,
-	1,
-	1,
-	1,
 	0,
-	0
+	0.1,
+	0.1,
+	0.1,
+	0.1,
+	1,
+	1,
+	1,
+	1,
+	0.1
 };
 
 static float init_max[CONFIG_MAX] =
 {
+	0,
 	150,
 	30,
 	300,
@@ -89,12 +94,13 @@ static float init_max[CONFIG_MAX] =
 	10000,
 	5000,
 	10000,
-	0,
-	0
+	300,
+	5
 };
 
 static float init_min[CONFIG_MAX] =
 {
+	0,
 	0,
 	0,
 	0,
@@ -108,6 +114,7 @@ static float init_min[CONFIG_MAX] =
 
 static uint8_t init_point[CONFIG_MAX] =
 {
+	0,
 	1,
 	1,
 	1,
@@ -116,11 +123,12 @@ static uint8_t init_point[CONFIG_MAX] =
 	0,
 	0,
 	0,
-	0
+	1
 };
 
 static char* init_unit[CONFIG_MAX] =
 {
+	"",
 	"mm",
 	"mm",
 	"s",
@@ -128,8 +136,8 @@ static char* init_unit[CONFIG_MAX] =
 	"mm/s",
 	"mm/s",
 	"mm/s",
-	"",
-	""
+	"V",
+	"s"
 };
 
 static const char* gszConfigMenuTitle = "CONFIG. DE CORTE";

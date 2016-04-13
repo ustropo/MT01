@@ -24,6 +24,7 @@
 
 #include "planner.h"
 #include "plasma.h"
+#include "eeprom.h"
 
 bool sim = false;
 bool programEnd = false;
@@ -72,10 +73,12 @@ static char gStrManual[3][24] =
 	DEFAULT_AVISO_MANUAL,
 };
 
-static char gStrAuto[3][24] =
+static char gStrAuto[5][24] =
 {
 	DEFAULT_AUTO_TITLE,
 	DEFAULT_AVISO_AUTO,
+	"",
+	"",
 	""
 };
 
@@ -103,7 +106,7 @@ static TimerHandle_t TimerUpdate;
 static void updatePosition(uint8_t menu)
 {
 	float x; float y; float z;
-	char *lStr[3];
+	char *lStr[6];
 	/* Display is only cleared once to improve performance */
 
 	switch(menu)
@@ -118,6 +121,10 @@ static void updatePosition(uint8_t menu)
 		 	 	 	 lStr[1] = gStrAuto[1];
 			         sprintf(gStrAuto[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
                      lStr[2] = gStrAuto[2];
+                     lStr[3] = "AOK";
+			         sprintf(gStrAuto[4], "THC SET: %.0f V",  configVar[TENSAO_THC]);
+                     lStr[4] = gStrAuto[4];
+                     lStr[5] = "THC REAL: --- V";
                      break;
 		case SIM:    lStr[0] = gStrSim[0];
 	 	 	 	 	 sprintf(gStrSim[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
@@ -127,7 +134,7 @@ static void updatePosition(uint8_t menu)
                      break;
 		case DESLOCA: lStr[0] = gStrDesloca[0];
 					  lStr[1] = gStrDesloca[1];
-				         sprintf(gStrDesloca[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
+				      sprintf(gStrDesloca[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
 					  lStr[2] = gStrDesloca[2];
 					  break;
 	}
@@ -150,12 +157,21 @@ static void updatePosition(uint8_t menu)
 	}
 	else
 	{
-	/* Put it into screen */
-	ut_lcd_output_manual_mode(TORCH,
-			lStr,
-			(const char *)textXStr,
-			(const char *)textYStr,
-			(const char *)textZStr);
+		/* Put it into screen */
+		if(configFlags || sim){
+			ut_lcd_output_mov_mode(TORCH,
+					lStr,
+					(const char *)textXStr,
+					(const char *)textYStr,
+					(const char *)textZStr);
+		}
+		else{
+			ut_lcd_output_plasma_mode(TORCH,
+					lStr,
+					(const char *)textXStr,
+					(const char *)textYStr,
+					(const char *)textZStr);
+		}
 	}
 }
 

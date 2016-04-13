@@ -170,15 +170,11 @@ void emergencia_task(void)
 void timer_motorPower_callback(void *pdata)
 {
     BaseType_t xHigherPriorityTaskWoken;
-	if(!EMERGENCIA)
+	PWMCH ^= 1;
+	if(EMERGENCIA)
 	{
-		PWMCH ^= 1;
-	}
-	else
-	{
-		R_CMT_Control(timerch,CMT_RX_CMD_PAUSE,0);
 		xHigherPriorityTaskWoken = pdFALSE;
-	    vTaskNotifyGiveFromISR( xEmergenciaTaskHandle, &xHigherPriorityTaskWoken );
-	    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+		vTaskNotifyGiveFromISR( xEmergenciaTaskHandle, &xHigherPriorityTaskWoken );
+		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 	}
 }

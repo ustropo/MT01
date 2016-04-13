@@ -90,7 +90,7 @@ void config_bool(ut_config_var* var)
 	case STATE_CONFIG_MENU:
 		switch(configsVar->currentItem)
 		{
-			case 7:  Recordflag =true;
+			case 0:  Recordflag =true;
 					 value = var->value;
 					 boolStr = boolJogMaq;
 			break;

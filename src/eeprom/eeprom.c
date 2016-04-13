@@ -3,7 +3,7 @@
 #include "r_vee_if.h"
 #include <string.h>
 
-//#define VEE_DEMO_ERASE_FIRST
+#define VEE_DEMO_ERASE_FIRST
 
 
 extern float *velocidadeJog;
@@ -11,17 +11,16 @@ extern float *velocidadeJog;
 enum { READY, NOT_READY } sample_state;
 
 float configVarInit[VAR_MAX] = {
-	1,
-	1,
 	0,
+	15,
+	5,
+	1.5,
 	1,
-	1000,
+	5000,
 	1500,
 	7500,
-	0,
-	0,
-	0,
-	0
+	150,
+	2,
 };
 
 uint32_t configFlagsInit = 0;
