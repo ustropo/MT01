@@ -166,8 +166,8 @@ static ut_fs_navigate chooseFile()
 	ut_menu_init(&filesMenu);
 	/* No header */
 	filesMenu.title = gszFileMenuTitle;
-	filesMenu.boShowTitle = true;
-	filesMenu.maxItemsPerPage = MAX_ROW;
+//	filesMenu.boShowTitle = true;
+//	filesMenu.maxItemsPerPage = MAX_ROW;
 
 	/* Open dir */
 	eRes = f_opendir(&st_usb_dir, gszCurFile);

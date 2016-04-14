@@ -29,8 +29,8 @@ void ut_menu_init(ut_menu* menu_ptr)
 {
 	memset((void *)menu_ptr, 0, sizeof(ut_menu));
 
-//	menu_ptr->maxItemsPerPage = MAX_ROW - 1;
-	menu_ptr->maxItemsPerPage = MAX_ROW;
+	menu_ptr->maxItemsPerPage = MAX_ROW - 1;
+//	menu_ptr->maxItemsPerPage = MAX_ROW;
 	menu_ptr->boShowTitle = true;
 }
 
@@ -59,7 +59,7 @@ void ut_menu_go_down(ut_menu* menu_ptr)
 	if(menu_ptr->selectedItem < (menu_ptr->numItems - 1))
 	{
 		/* Last screen position and selected item */
-		if((menu_ptr->selectedItem == (menu_ptr->offset + menu_ptr->maxItemsPerPage - 2)) &&
+		if((menu_ptr->selectedItem == (menu_ptr->offset + menu_ptr->maxItemsPerPage - 1)) &&
 				((menu_ptr->offset + menu_ptr->maxItemsPerPage) < menu_ptr->numItems))
 		{
 			menu_ptr->offset++;
@@ -93,7 +93,7 @@ void ut_menu_show(ut_menu* menu_ptr)
 
 	/* Items */
 	uint8_t menuItem = menu_ptr->offset;
-	for(; (menuItem < menu_ptr->numItems) && row < menu_ptr->maxItemsPerPage; row++, menuItem++)
+	for(; (menuItem < menu_ptr->numItems) && (row < (menu_ptr->maxItemsPerPage+1)); row++, menuItem++)
 	{
 	//	ut_lcd_drawString(row, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem));
 		ut_lcd_drawStr(row, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem),u8g_font_6x10);
