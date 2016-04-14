@@ -87,11 +87,11 @@ static float init_step[CONFIG_MAX] =
 static float init_max[CONFIG_MAX] =
 {
 	0,
-	150,
-	30,
-	300,
-	150,
-	10000,
+	50,
+	50,
+	60,
+	50,
+	6000,
 	5000,
 	10000,
 	300,
@@ -101,13 +101,13 @@ static float init_max[CONFIG_MAX] =
 static float init_min[CONFIG_MAX] =
 {
 	0,
+	1,
+	1,
 	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
+	1,
+	10,
+	10,
+	10,
 	0,
 	0
 };

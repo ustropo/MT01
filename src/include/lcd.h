@@ -14,7 +14,7 @@
 #include "u8g.h"
 
 #define MAX_ROW	6
-#define MAX_COLUMN	255
+#define MAX_COLUMN	20
 
 #define SCREEN_HEADER_ID	0
 #define SCREEN_MAIN_ID		1

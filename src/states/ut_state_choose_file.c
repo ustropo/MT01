@@ -32,6 +32,7 @@ extern bool drivemountFlag;
 // Internal variables
 // ***********************************************************************
 #define MAX_EXT_AVAIL	3
+#define MAX_PATH_LENGHT 255
 static const char* gaszFileExtensions[MAX_EXT_AVAIL] =
 {
 		".g",
@@ -108,7 +109,7 @@ static bool validExtension(const char* szWord)
  */
 static void sort_array(char* pbArray, int iLen)
 {
-	char tmp[MAX_COLUMN + 1];
+	char tmp[MAX_PATH_LENGHT + 1];
 	char* pbStrNxt;
 	int j;
 	int i;
@@ -117,22 +118,22 @@ static void sort_array(char* pbArray, int iLen)
 	for(i = 0; i < iLen; ++i)
 	{
 		/* Next element */
-		pbStrNxt = pbArray + (MAX_COLUMN + 1);
+		pbStrNxt = pbArray + (MAX_PATH_LENGHT + 1);
 		for(j = i + 1; j < iLen; ++j)
 		{
 			/* Swap */
 			if(strcmp(pbArray, pbStrNxt) > 0)
 			{
-				strncpy(tmp, pbArray, MAX_COLUMN);
-				strncpy(pbArray, pbStrNxt, MAX_COLUMN);
-				strncpy(pbStrNxt, tmp, MAX_COLUMN);
+				strncpy(tmp, pbArray, MAX_PATH_LENGHT);
+				strncpy(pbArray, pbStrNxt, MAX_PATH_LENGHT);
+				strncpy(pbStrNxt, tmp, MAX_PATH_LENGHT);
 			}
 
-			pbStrNxt += MAX_COLUMN + 1;
+			pbStrNxt += MAX_PATH_LENGHT + 1;
 		}
 
 		/* Next element */
-		pbArray += MAX_COLUMN + 1;
+		pbArray += MAX_PATH_LENGHT + 1;
 	}
 }
 
@@ -154,13 +155,13 @@ static ut_fs_navigate chooseFile()
 	ut_menu filesMenu;
 	uint8_t i;
 	char *fn;
-	char aszFiles[MENU_MAX_ITEMS][MAX_COLUMN + 1];
+	char aszFiles[MENU_MAX_ITEMS][MAX_PATH_LENGHT + 1];
 #if _USE_LFN
 	st_usb_finfo.lfname = Lfname;
 	st_usb_finfo.lfsize = sizeof Lfname;
 #endif
 	/* Clean */
-	memset(aszFiles, 0, MENU_MAX_ITEMS * (MAX_COLUMN + 1));
+	memset(aszFiles, 0, MENU_MAX_ITEMS * (MAX_PATH_LENGHT + 1));
 
 	/* Initialize menu */
 	ut_menu_init(&filesMenu);
@@ -196,11 +197,11 @@ static ut_fs_navigate chooseFile()
 			/* Copy to menu */
 			if(st_usb_finfo.fattrib & AM_DIR)
 			{
-				sprintf(aszFiles[filesMenu.numItems], "/%.*s", MAX_COLUMN, fn);
+				sprintf(aszFiles[filesMenu.numItems], "/%.*s", MAX_PATH_LENGHT, fn);
 			}
 			else if(validExtension(fn))
 			{
-				sprintf(aszFiles[filesMenu.numItems], "%.*s", MAX_COLUMN, fn);
+				sprintf(aszFiles[filesMenu.numItems], "%.*s", MAX_PATH_LENGHT, fn);
 			}
 			else
 			{

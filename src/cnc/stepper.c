@@ -640,13 +640,7 @@ MOTATE_TIMER_INTERRUPT(dda_timer_num)
 void timer_dda_callback(void *pdata)
 {
 	static bool flag_dda = 1;
-	static uint8_t enableCount = 0;
-	if (enableCount == 17)
-	{
-		//PWMCH ^= 1;
-		enableCount = 0;
-	}
-	enableCount++;
+
 	flag_dda ^= 1;
 	if (!flag_dda)
 	{
@@ -1223,7 +1217,7 @@ void st_prep_dwell(float microseconds)
 {
 	st_pre.move_type = MOVE_TYPE_DWELL;
 	st_pre.dda_period = _f_to_period(FREQUENCY_DWELL);
-	st_pre.dda_ticks = (uint32_t)((microseconds/1000000000) * FREQUENCY_DWELL);
+	st_pre.dda_ticks = (uint32_t)((microseconds/1000) * FREQUENCY_DWELL);
 	// Seconds st_pre.dda_ticks = (uint32_t)((microseconds/1000000) * FREQUENCY_DWELL);
 	st_pre.buffer_state = PREP_BUFFER_OWNED_BY_LOADER;	// signal that prep buffer is ready
 }
