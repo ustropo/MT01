@@ -129,7 +129,6 @@ static void _application_init(void)
 
 	// do these next
 	stepper_init(); 				// stepper subsystem 				- must precede gpio_init()
-	pl_emergencia_init();
 	encoder_init();					// virtual encoders
 	switch_init();					// switches
 	pl_arcook_init();

@@ -12,6 +12,8 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "keyboard.h"
+#include "plasma.h"
 
 #define WARNING_PAGES	5
 #define PAGE_DELAY		1000
@@ -68,6 +70,7 @@ static const char* gszWarningMsg[MAX_ROW * WARNING_PAGES] =
  */
 ut_state ut_state_warning(ut_context* pContext)
 {
+	uint32_t keyEntry = 0;
 	uint8_t uiPage = 0, uiMsgRow = 0;
 
 	/* Loop through messages */
@@ -86,6 +89,10 @@ ut_state ut_state_warning(ut_context* pContext)
 		/* Delay */
 		vTaskDelay(PAGE_DELAY / portTICK_PERIOD_MS);
 	}
-
+	ut_lcd_output_warning("MODO DE EMERGENCIA\nZERO MÁQUINA\nNÃO REFERENCIADO\n");
+	while(keyEntry != KEY_ESC){
+		xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
+	}
+	pl_emergencia_init();
 	return STATE_MAIN_MENU;
 }

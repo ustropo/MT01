@@ -290,7 +290,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
 	ltorchBuffer = false;
-	bool arco = false;
+	uint32_t arco = 0;
 	programEnd = false;
 	lstop = false;
 	cm.gmx.feed_rate_override_enable = true;
@@ -420,7 +420,17 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				return STATE_CONFIG_AUTO_MODE;
 			}
 			if(!lstop){
-				warm_stop();
+				if(arco == ARCO_OK_FAILED)
+				{
+					arco = ARCO_OK_OFF;
+					lstop = true;
+					xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
+				}
+				else
+				{
+					lstop = true;
+					warm_stop();
+				}
 			}
 
 			break;
@@ -435,11 +445,10 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				pl_arcook_stop();
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 				TORCH = FALSE;
-				arco = true;
+				arco = ARCO_OK_FAILED;
+				lstop = false;
 				warm_stop();
 				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
-				vTaskDelay(2000 / portTICK_PERIOD_MS);
-				xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 			}
 			break;
 
@@ -560,7 +569,7 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 
 static void warm_stop(void)
 {
-	lstop = true;
+
 	//iif_bind_filerunning_stop(lstop);
 	cm_request_feedhold();
 	if(gTitle == AUTO){
