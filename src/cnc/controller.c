@@ -187,7 +187,6 @@ static void _controller_HSM()
 	DISPATCH(_system_assertions());				// 7. system integrity assertions
 
 //----- planner hierarchy for gcode and cycles ---------------------------------------//
-	pl_arcook_check();
 	DISPATCH(st_motor_power_callback());		// stepper motor power sequencing
 //	DISPATCH(switch_debounce_callback());		// debounce switches
 	DISPATCH(sr_status_report_callback());		// conditionally send status report

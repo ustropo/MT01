@@ -302,7 +302,7 @@ static unsigned char warning_bits[] = {
    0x06, 0x38, 0xc0, 0x00, 0x02, 0x00, 0x80, 0x00, 0xff, 0xff, 0xff, 0x01,
    0xff, 0xff, 0xff, 0x01 };
 
-void ut_lcd_output_mov_mode(bool torch,const char* title[3],const char* textX,const char* textY,const char* textZ)
+void ut_lcd_output_mov_mode(bool torch,const char* title[4],const char* textX,const char* textY,const char* textZ)
 {
 	uint8_t row, x, y;
 	uint8_t h;
@@ -325,7 +325,7 @@ void ut_lcd_output_mov_mode(bool torch,const char* title[3],const char* textX,co
 			str = DEFAULT_ACESA;
 			u8g_DrawXBMP(&main_u8g, 94, 13, warning_width, warning_height, warning_bits);
 			u8g_DrawStr(&main_u8g, 95, 46, str);
-			u8g_DrawStr(&main_u8g, 112, 12, "AOK");
+			u8g_DrawStr(&main_u8g, 112, 12, title[3]);
 		}
 		else
 		{

@@ -67,10 +67,12 @@ enum {
 	SIM
 };
 
-static char gStrManual[3][24] =
+static char gStrManual[4][24] =
 {
 	DEFAULT_MANUAL_TITLE,
 	DEFAULT_AVISO_MANUAL,
+	"",
+	""
 };
 
 static char gStrAuto[5][24] =
@@ -82,22 +84,29 @@ static char gStrAuto[5][24] =
 	""
 };
 
-static char gStrSim[3][28] =
+static char gStrSim[4][28] =
 {
 	DEFAULT_SIM_TITLE,
 	DEFAULT_AVISO_SIM,
+	"",
 	""
 };
 
-static char gStrDesloca[3][24] =
+static char gStrDesloca[4][24] =
 {
 	DEFAULT_DESCOLA_TITLE,
 	DEFAULT_AVISO_DESLOCA,
+	"",
 	""
 };
 
+
+
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
+static void warm_stop(void);
+
 static TimerHandle_t TimerUpdate;
+static bool ltorchBuffer = false;
 
 /**
  * Update machine position
@@ -115,13 +124,20 @@ static void updatePosition(uint8_t menu)
 					 lStr[1] = gStrManual[1];
 			         sprintf(gStrManual[2], "VEL.: %.0f mm/s", *velocidadeJog);
 			         lStr[2] = gStrManual[2];
+                     if (arcoOkGet())
+                    	 lStr[3] = "AOK";
+                     else
+                    	 lStr[3] = "";
 			         break;
 		case AUTO:   lStr[0] = gStrAuto[0];
  	 	 	 	 	 sprintf(gStrAuto[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrAuto[1];
 			         sprintf(gStrAuto[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
                      lStr[2] = gStrAuto[2];
-                     lStr[3] = "AOK";
+                     if (arcoOkGet())
+                    	 lStr[3] = "AOK";
+                     else
+                    	 lStr[3] = "";
 			         sprintf(gStrAuto[4], "THC SET: %.0f V",  configVar[TENSAO_THC]);
                      lStr[4] = gStrAuto[4];
                      lStr[5] = "THC REAL: --- V";
@@ -274,8 +290,8 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 ut_state ut_state_auto_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
+	ltorchBuffer = false;
 	bool arco = false;
-	bool ltorchBuffer = false;
 	programEnd = false;
 	lstop = false;
 	cm.gmx.feed_rate_override_enable = true;
@@ -405,18 +421,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				return STATE_CONFIG_AUTO_MODE;
 			}
 			if(!lstop){
-				lstop = true;
-				//iif_bind_filerunning_stop(lstop);
-				cm_request_feedhold();
-				if(gTitle == AUTO){
-					strcpy(gStrAuto[0],STOP_AUTO_TITLE);
-					strcpy(gStrAuto[1],STOP_AVISO_AUTO);
-				}else if(gTitle == SIM){
-					strcpy(gStrSim[0],STOP_SIM_TITLE);
-					strcpy(gStrSim[1],STOP_AVISO_SIM);
-				}
-				ltorchBuffer = TORCH;
-				TORCH = FALSE;
+				warm_stop();
 			}
 
 			break;
@@ -430,13 +435,12 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			{
 				pl_arcook_stop();
 				xTimerStop( TimerUpdate, 0 );
-				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
 				TORCH = FALSE;
+				arco = true;
+				warm_stop();
+				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
 				vTaskDelay(2000 / portTICK_PERIOD_MS);
 				xTimerStart( TimerUpdate, 0 );
-				uint32_t qSend = KEY_ESC;
-				xQueueSend( qKeyboard, &qSend, 0 );
-				arco = true;
 			}
 			break;
 
@@ -553,4 +557,20 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 		iif_func_esc();
 	}
 	updatePosition(gTitle);
+}
+
+static void warm_stop(void)
+{
+	lstop = true;
+	//iif_bind_filerunning_stop(lstop);
+	cm_request_feedhold();
+	if(gTitle == AUTO){
+		strcpy(gStrAuto[0],STOP_AUTO_TITLE);
+		strcpy(gStrAuto[1],STOP_AVISO_AUTO);
+	}else if(gTitle == SIM){
+		strcpy(gStrSim[0],STOP_SIM_TITLE);
+		strcpy(gStrSim[1],STOP_AVISO_SIM);
+	}
+	ltorchBuffer = TORCH;
+	TORCH = FALSE;
 }

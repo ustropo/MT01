@@ -16,12 +16,15 @@
 #include "lcd.h"
 
 #define DEBOUNCE_COUNT 15
+#define ARCOOK_DELAY_COUNT 33
+
 
 void timer_motorPower_callback(void *pdata);
 void emergencia_task(void);
 
 static uint32_t timerch;
 static bool isCutting = false;
+static bool arcoOk = false;
 TaskHandle_t xPlasmaTaskHandle;
 TaskHandle_t xEmergenciaTaskHandle;
 extern TaskHandle_t xCncTaskHandle;
@@ -43,6 +46,7 @@ void pl_arcook_init(void)
     IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
     IPR(ICU, IRQ9) = 3;            //Set interrupt priority
     IEN(ICU, IRQ9) = 0;            // Enable interrupt
+	xTaskCreate((pdTASK_CODE)plasma_task, "Plasma task", 512, NULL, 3, &xPlasmaTaskHandle );
 #endif
 }
 
@@ -50,17 +54,6 @@ void pl_emergencia_init(void)
 {
     xTaskCreate((pdTASK_CODE)emergencia_task, "Emergencia task", 512, NULL, 6, &xEmergenciaTaskHandle );
     R_CMT_CreatePeriodic(10000,timer_motorPower_callback,&timerch);
-}
-
-
-void isCuttingSet(bool state)
-{
-	isCutting = state;
-}
-
-bool isCuttingGet(void)
-{
-	return isCutting;
 }
 
 void pl_arcook_start(void)
@@ -71,6 +64,7 @@ void pl_arcook_start(void)
 #else
     IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
     IEN(ICU, IRQ9) = 1;            // Enable interrupt
+	arcoOkSet(false);
 #endif
 }
 
@@ -82,20 +76,9 @@ void pl_arcook_stop(void)
 #else
     IEN(ICU, IRQ9) = 0;            // Disable interrupt
     IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
+	arcoOkSet(false);
 #endif
 }
-
-void pl_arcook_check(void)
-{
-//	uint32_t qSend;
-//
-//	if (TORCH && isCutting){
-//		isCutting = false;
-//		qSend = ARCO_OK_FAILED;
-//		xQueueSend( qKeyboard, &qSend, 0 );
-//	}
-}
-
 
 #ifndef MODULO
 #pragma interrupt IRQ0_isr(vect=VECT(ICU, IRQ0))
@@ -122,6 +105,7 @@ void plasma_task(void)
 
 	while(1)
 	{
+		arcoOkSet(false);
         ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
         debounce = 0;
         for(uint8_t i = 0; i < DEBOUNCE_COUNT; i++){
@@ -141,11 +125,26 @@ void plasma_task(void)
 					xTaskNotifyGive(xCncTaskHandle);
 				}
 			}
-			else
-			{
-				qSend = ARCO_OK_FAILED;
-				xQueueSend( qKeyboard, &qSend, 0 );
-			}
+            debounce = 0;
+        	do
+        	{
+				if(ARCO_OK)
+				{
+					debounce++;
+					arcoOkSet(false);
+				}
+				else
+				{
+					debounce = 0;
+		        	arcoOkSet(true);
+				}
+				vTaskDelay(pdMS_TO_TICKS(10));
+        	}while(debounce != ARCOOK_DELAY_COUNT && isCutting);
+        	if (isCutting)
+        	{
+        		qSend = ARCO_OK_FAILED;
+        		xQueueSend( qKeyboard, &qSend, 0 );
+        	}
         }
 	}
 }
@@ -177,4 +176,24 @@ void timer_motorPower_callback(void *pdata)
 		vTaskNotifyGiveFromISR( xEmergenciaTaskHandle, &xHigherPriorityTaskWoken );
 		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 	}
+}
+
+void isCuttingSet(bool state)
+{
+	isCutting = state;
+}
+
+bool isCuttingGet(void)
+{
+	return isCutting;
+}
+
+void arcoOkSet(bool state)
+{
+	arcoOk = state;
+}
+
+bool arcoOkGet(void)
+{
+	return arcoOk;
 }

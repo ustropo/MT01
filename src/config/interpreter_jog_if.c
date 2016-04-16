@@ -8,7 +8,9 @@
 #include "platform.h"
 #include "interpreter_if.h"
 #include "controller.h"
+#include "spindle.h"
 #include "macros.h"
+#include "plasma.h"
 
 
 #include <stdlib.h>
@@ -37,19 +39,23 @@ void iif_enter_jog(void)
 	static bool torchEnable = false;
 	if(!torchEnable)
 	{
-		TORCH = TRUE;
+		cm_spindle_control(SPINDLE_CW);
+		isCuttingSet(true);
+		//TORCH = TRUE;
 		torchEnable = true;
 	}
 	else
 	{
-		TORCH = FALSE;
+		cm_spindle_control(SPINDLE_OFF);
+		isCuttingSet(false);
+		//TORCH = FALSE;
 		torchEnable = false;
 	}
 }
 
 void iif_esc_jog(void)
 {
-	TORCH = FALSE;
+	cm_spindle_control(SPINDLE_OFF);
 	iif_bind_idle();
 	macro_func_ptr = _command_dispatch;
 }
