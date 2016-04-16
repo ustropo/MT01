@@ -13,6 +13,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
+#include "config_SwTimers.h"
 
 #include "lcd.h"
 #include "lcd_menu.h"
@@ -141,7 +142,7 @@ void config_int(ut_config_var* var)
 
 	ut_lcd_output_int_var(var->name,szText);
 
-	TimerUpdate[0] = xTimerCreate
+	swTimers[DOWN_CONFIGVAR_TIMER]= xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
@@ -151,12 +152,12 @@ void config_int(ut_config_var* var)
 					 pdTRUE,
 					 /* Assign each timer a unique id equal to its array
 					 index. */
-					 ( void * ) 3,
+					 ( void * ) DOWN_CONFIGVAR_TIMER,
 					 /* Each timer calls the same callback when it expires. */
 					 vTimerUpdateCallback
 				   );
 
-	TimerUpdate[1] = xTimerCreate
+	swTimers[UP_CONFIGVAR_TIMER] = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
@@ -166,7 +167,7 @@ void config_int(ut_config_var* var)
 					 pdTRUE,
 					 /* Assign each timer a unique id equal to its array
 					 index. */
-					 ( void * ) 4,
+					 ( void * ) UP_CONFIGVAR_TIMER,
 					 /* Each timer calls the same callback when it expires. */
 					 vTimerUpdateCallback
 				   );
@@ -180,12 +181,12 @@ void config_int(ut_config_var* var)
 		{
 		case KEY_DOWN:
 			/* TODO: define a min value */
-			xTimerStart( TimerUpdate[0], 0 );
+			xTimerStart( swTimers[DOWN_CONFIGVAR_TIMER], 0 );
 			break;
 
 		case KEY_UP:
 			/* TODO: define a max value */
-			xTimerStart( TimerUpdate[1], 0 );
+			xTimerStart( swTimers[UP_CONFIGVAR_TIMER], 0 );
 			break;
 
 		case KEY_ENTER:
@@ -205,8 +206,8 @@ void config_int(ut_config_var* var)
 			return;
 
 		case KEY_RELEASED:
-			xTimerStop( TimerUpdate[0], 0 );
-			xTimerStop( TimerUpdate[1], 0 );
+			xTimerStop( swTimers[DOWN_CONFIGVAR_TIMER], 0 );
+			xTimerStop( swTimers[UP_CONFIGVAR_TIMER], 0 );
 			mult = 1;
 			count = 0;
 			break;
@@ -313,14 +314,14 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
 	switch (lArrayIndex)
 	{
-		case 3: if(*value > configsVar->valueMin){
+		case DOWN_CONFIGVAR_TIMER: if(*value > configsVar->valueMin){
 			*value = *value - configsVar->step*mult;
 		}
 		else{
 			*value = configsVar->valueMin;
 		}
 		break;
-		case 4: if(*value < configsVar->valueMax){
+		case UP_CONFIGVAR_TIMER: if(*value < configsVar->valueMax){
 			*value = *value + configsVar->step*mult;
 		}else{
 			*value = configsVar->valueMax;

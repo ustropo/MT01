@@ -38,6 +38,7 @@ Includes   <System Includes> , "Project Includes"
 #include "hardware.h"
 #include "r_cmt_rx_if.h"
 #include "eeprom.h"
+#include "config_SwTimers.h"
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
@@ -85,6 +86,7 @@ extern void	usb_apl_task_switch(void);
 extern void FreeRTOSConfig(void);
 
 USB_UTR_t       msc_utr;
+TimerHandle_t swTimers[TIMER_SIZE];
 
 /******************************************************************************
 Function Name   : main

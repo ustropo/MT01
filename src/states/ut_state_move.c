@@ -16,6 +16,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
+#include "config_SwTimers.h"
 
 #include "keyboard.h"
 #include "interpreter_if.h"
@@ -104,8 +105,6 @@ static char gStrDesloca[4][24] =
 
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
 static void warm_stop(void);
-
-static TimerHandle_t TimerUpdate;
 static bool ltorchBuffer = false;
 
 /**
@@ -165,7 +164,7 @@ static void updatePosition(uint8_t menu)
 
 	if(cm.machine_state == MACHINE_PROGRAM_END && !programEnd && (menu == AUTO || menu == SIM))
 	{
-		xTimerStop( TimerUpdate, 0 );
+		xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 		ut_lcd_output_warning("CORTE AUTOMÁTICO\nFINALIZADO\nPRESSIONE ESC\n");
 		/* Delay */
 		vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -207,7 +206,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 	gTitle = MANUAL;
 //	tg_set_primary_source(XIO_DEV_COMMAND);
 	iif_bind_jog();
-	TimerUpdate = xTimerCreate
+	swTimers[AUTO_MENU_TIMER] = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
@@ -217,11 +216,11 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 					 pdTRUE,
 					 /* Assign each timer a unique id equal to its array
 					 index. */
-					 ( void * ) 2,
+					 ( void * ) AUTO_MENU_TIMER,
 					 /* Each timer calls the same callback when it expires. */
 					 vTimerUpdateCallback
 				   );
-	xTimerStart( TimerUpdate, 0 );
+	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 
 	while(true)
 	{
@@ -257,7 +256,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 			break;
 
 		case KEY_ESC:
-			xTimerStop( TimerUpdate, 0 );
+			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 			iif_func_esc();
 			return STATE_CONFIG_MANUAL_MODE;
 
@@ -305,7 +304,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		updatePosition(SIM);
 		gTitle = SIM;
 	}
-	TimerUpdate = xTimerCreate
+	swTimers[AUTO_MENU_TIMER] = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
@@ -315,11 +314,11 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					 pdTRUE,
 					 /* Assign each timer a unique id equal to its array
 					 index. */
-					 ( void * ) 2,
+					 ( void * ) AUTO_MENU_TIMER,
 					 /* Each timer calls the same callback when it expires. */
 					 vTimerUpdateCallback
 				   );
-	xTimerStart( TimerUpdate, 0 );
+	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 	tg_set_primary_source(XIO_DEV_USBFAT);
 	xio_close(cs.primary_src);
 	macro_func_ptr = _command_dispatch;
@@ -393,7 +392,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 
 		case KEY_ESC:
 			if (programEnd || lstop){
-				xTimerStop( TimerUpdate, 0 );
+				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 				if(gTitle == AUTO){
 					strcpy(gStrAuto[0],DEFAULT_AUTO_TITLE);
 					strcpy(gStrAuto[1],DEFAULT_AVISO_AUTO);
@@ -434,18 +433,18 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			if(!arco)
 			{
 				pl_arcook_stop();
-				xTimerStop( TimerUpdate, 0 );
+				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 				TORCH = FALSE;
 				arco = true;
 				warm_stop();
 				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
 				vTaskDelay(2000 / portTICK_PERIOD_MS);
-				xTimerStart( TimerUpdate, 0 );
+				xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 			}
 			break;
 
 		case USB_DETACHED:
-			xTimerStop( TimerUpdate, 0 );
+			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 			cm_request_feedhold();
 			cm_request_queue_flush();
 			xio_close(cs.primary_src);
@@ -482,7 +481,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 	updatePosition(DESLOCA);
 	gTitle = DESLOCA;
 	iif_bind_deslocar();
-	TimerUpdate = xTimerCreate
+	swTimers[AUTO_MENU_TIMER] = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
@@ -492,11 +491,11 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 					 pdTRUE,
 					 /* Assign each timer a unique id equal to its array
 					 index. */
-					 ( void * ) 2,
+					 ( void * ) AUTO_MENU_TIMER,
 					 /* Each timer calls the same callback when it expires. */
 					 vTimerUpdateCallback
 				   );
-	xTimerStart( TimerUpdate, 0 );
+	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 
 	while(true)
 	{
@@ -532,7 +531,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 			break;
 
 		case KEY_ESC:
-			xTimerStop( TimerUpdate, 0 );
+			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 			iif_bind_idle();
 			return (ut_state)pContext->value[0];
 

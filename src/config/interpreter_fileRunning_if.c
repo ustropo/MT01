@@ -14,6 +14,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
+#include "config_SwTimers.h"
 
 #include "platform.h"
 #include "interpreter_if.h"
@@ -34,7 +35,7 @@ static void iif_released_filerunning(void);
 float zmove = 0;
 float feedratepercent = 0.05;
 void vTimerCallback( TimerHandle_t pxTimer );
-TimerHandle_t xTimers[2];
+void vTimerCallbackVelocity( TimerHandle_t pxTimer );
 
 void iif_enter_filerunning(void)
 {
@@ -47,80 +48,63 @@ void iif_esc_filerunning(void)
 }
 
 void iif_zdown_filerunning(void) {
-	  xTimers[1] = xTimerCreate
-	                   (  /* Just a text name, not used by the RTOS kernel. */
-	                     "Timer 1",
-	                     /* The timer period in ticks, must be greater than 0. */
-	                     ( 100 ),
-	                     /* The timers will auto-reload themselves when they
-	                     expire. */
-	                     pdTRUE,
-	                     /* Assign each timer a unique id equal to its array
-	                     index. */
-	                     ( void * ) 1,
-	                     /* Each timer calls the same callback when it expires. */
-	                     vTimerCallback
-	                   );
-	  xTimerStart( xTimers[1], 0 );
+
+	  xTimerStart( swTimers[ZDOWN_FILERUNNING_TIMER], 0 );
 }
 void iif_zup_filerunning(void)
 {
-	xTimers[0] = xTimerCreate
-	                   (  /* Just a text name, not used by the RTOS kernel. */
-	                     "Timer 0",
-	                     /* The timer period in ticks, must be greater than 0. */
-	                     ( 100 ),
-	                     /* The timers will auto-reload themselves when they
-	                     expire. */
-	                     pdTRUE,
-	                     /* Assign each timer a unique id equal to its array
-	                     index. */
-	                     ( void * ) 0,
-	                     /* Each timer calls the same callback when it expires. */
-	                     vTimerCallback
-	                   );
-	  xTimerStart( xTimers[0], 0 );
+	  xTimerStart( swTimers[ZUP_FILERUNNING_TIMER], 0 );
 }
 void iif_left_filerunning(void){}
 void iif_right_filerunning(void) {}
 void iif_down_filerunning(void)
 {
-	mpBuf_t *bf = mp_get_run_buffer();
-	if (bf->gm.motion_mode == MOTION_MODE_STRAIGHT_FEED ||
-		bf->gm.motion_mode == MOTION_MODE_CW_ARC ||
-		bf->gm.motion_mode == MOTION_MODE_CCW_ARC)
-	{
-		if(mr.section == SECTION_BODY)
-		{
-			cm.gmx.feed_rate_override_factor += feedratepercent;
-			mp_plan_feedrateoverride_callback(mp_get_run_buffer());
-		}
-	}
+	  xTimerStart( swTimers[DOWN_FILERUNNING_TIMER], 0 );
 }
 void iif_up_filerunning(void)
 {
-	mpBuf_t *bf = mp_get_run_buffer();
-	if (bf->gm.motion_mode == MOTION_MODE_STRAIGHT_FEED ||
-		bf->gm.motion_mode == MOTION_MODE_CW_ARC ||
-		bf->gm.motion_mode == MOTION_MODE_CCW_ARC)
-	{
-		if(mr.section == SECTION_BODY)
-		{
-			cm.gmx.feed_rate_override_factor += feedratepercent;
-			mp_plan_feedrateoverride_callback(mp_get_run_buffer());
-		}
-	}
+	  xTimerStart( swTimers[UP_FILERUNNING_TIMER], 0 );
 }
 
 void iif_released_filerunning(void)
 {
 	zmove = 0;
-	xTimerStop(xTimers[0], 0 );
-	xTimerStop(xTimers[1], 0 );
+	xTimerStop(swTimers[ZDOWN_FILERUNNING_TIMER], 0 );
+	xTimerStop(swTimers[ZUP_FILERUNNING_TIMER], 0 );
+	xTimerStop(swTimers[DOWN_FILERUNNING_TIMER], 0 );
+	xTimerStop(swTimers[UP_FILERUNNING_TIMER], 0 );
 }
 
 void iif_bind_filerunning(void)
 {
+	swTimers[ZUP_FILERUNNING_TIMER] = xTimerCreate
+	                   ( "Timer 1",
+	                     ( 100 ),
+	                     pdTRUE,
+	                     ( void * ) ZUP_FILERUNNING_TIMER,
+	                     vTimerCallback
+	                   );
+	swTimers[ZDOWN_FILERUNNING_TIMER] = xTimerCreate
+	                   ( "Timer 1",
+	                     ( 100 ),
+	                     pdTRUE,
+	                     ( void * ) ZDOWN_FILERUNNING_TIMER,
+	                     vTimerCallback
+	                   );
+	swTimers[DOWN_FILERUNNING_TIMER] = xTimerCreate
+	                   ( "Timer 1",
+	                     ( 500 ),
+	                     pdTRUE,
+	                     ( void * ) DOWN_FILERUNNING_TIMER,
+						 vTimerCallbackVelocity
+	                   );
+	swTimers[UP_FILERUNNING_TIMER] = xTimerCreate
+	                   ( "Timer 1",
+	                     ( 500 ),
+	                     pdTRUE,
+	                     ( void * ) UP_FILERUNNING_TIMER,
+						 vTimerCallbackVelocity
+	                   );
 	iif_func_enter = &iif_enter_filerunning;
 	iif_func_esc = &iif_idle;
 	iif_func_down = &iif_down_filerunning;
@@ -158,9 +142,9 @@ void vTimerCallback( TimerHandle_t pxTimer )
 	if (configFlags || sim){
 		switch (lArrayIndex)
 		{
-			case 0: zmove = 0.01;
+			case ZUP_FILERUNNING_TIMER: zmove = 0.01;
 			break;
-			case 1: zmove = -0.01;
+			case ZDOWN_FILERUNNING_TIMER: zmove = -0.01;
 			break;
 		}
 	}
@@ -168,10 +152,37 @@ void vTimerCallback( TimerHandle_t pxTimer )
 	{
 		switch (lArrayIndex)
 		{
-			case 0: configVar[TENSAO_THC] += 1;
+			case ZUP_FILERUNNING_TIMER: configVar[TENSAO_THC] += 1;
 			break;
-			case 1: configVar[TENSAO_THC] -= 1;
+			case ZDOWN_FILERUNNING_TIMER: configVar[TENSAO_THC] -= 1;
 			break;
 		}
 	}
+}
+
+void vTimerCallbackVelocity( TimerHandle_t pxTimer )
+{
+	long lArrayIndex;
+	mpBuf_t *bf = mp_get_run_buffer();
+	/* Optionally do something if the pxTimer parameter is NULL. */
+	configASSERT( pxTimer );
+	if (bf->gm.motion_mode == MOTION_MODE_STRAIGHT_FEED ||
+		bf->gm.motion_mode == MOTION_MODE_CW_ARC ||
+		bf->gm.motion_mode == MOTION_MODE_CCW_ARC)
+	{
+		if(mr.section == SECTION_BODY)
+		{
+			/* Which timer expired? */
+			lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
+			switch (lArrayIndex)
+			{
+				case DOWN_FILERUNNING_TIMER: cm.gmx.feed_rate_override_factor -= feedratepercent;
+				break;
+				case UP_FILERUNNING_TIMER: cm.gmx.feed_rate_override_factor += feedratepercent;
+				break;
+			}
+			mp_plan_feedrateoverride_callback(mp_get_run_buffer());
+		}
+	}
+
 }
