@@ -34,6 +34,7 @@
 #include "stepper.h"
 #include "report.h"
 #include "util.h"
+#include "eeprom.h"
 
 // aline planner routines / feedhold planning
 //static void _calc_move_times(GCodeState_t *gms, const float position[]);
@@ -781,24 +782,27 @@ stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
 {
 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
 	float value;
-	value = mr.gm.target[AXIS_Z] - bf->gm.target[AXIS_Z];
-	if(bf->unit[AXIS_Z] > 0)
-	{
-		if(value>0)
+	if (configVar[CANCELAR_IHS]){
+		value = mr.gm.target[AXIS_Z] - bf->gm.target[AXIS_Z];
+		if(bf->unit[AXIS_Z] > 0)
 		{
-			bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+			if(value>0)
+			{
+				bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+			}
 		}
-	}
-	else
-	{
-		if(value<0)
+		else
 		{
-			bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+			if(value<0)
+			{
+				bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+			}
 		}
+		bf->length =fabs(value);
 	}
-	bf->length =fabs(value);
-	bf->replannable = 1;
-	_plan_block_list(bf, &mr_flag);
+		bf->replannable = 1;
+		_plan_block_list(bf, &mr_flag);
+
 	return (STAT_OK);
 }
 
