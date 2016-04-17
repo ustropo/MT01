@@ -132,6 +132,7 @@ static void _application_init(void)
 	encoder_init();					// virtual encoders
 	switch_init();					// switches
 	pl_arcook_init();
+	pl_thc_init();
 //	gpio_init();					// parallel IO
 	pwm_init();						// pulse width modulation drivers	- must follow gpio_init()
 

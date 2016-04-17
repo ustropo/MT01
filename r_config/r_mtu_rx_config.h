@@ -44,27 +44,27 @@ Configuration Options
 
 /* Enable the MTU channels to use in this build. (0) = not used. (1) = used. */
 #define MTU_CFG_USE_CH0  (1)
-#define MTU_CFG_USE_CH1  (1)
-#define MTU_CFG_USE_CH2  (1)
+#define MTU_CFG_USE_CH1  (0)
+#define MTU_CFG_USE_CH2  (0)
 #ifndef BSP_MCU_RX110
-#define MTU_CFG_USE_CH3  (1)
-#define MTU_CFG_USE_CH4  (1)
+#define MTU_CFG_USE_CH3  (0)
+#define MTU_CFG_USE_CH4  (0)
 #endif
 
 /* Code for unused MTU functions can be excluded from the build to reduce size. (0) = not used. (1) = used. */
 #define MTU_CFG_USE_TIMER   (1)
-#define MTU_CFG_USE_CAPTURE (1)
-#define MTU_CFG_USE_PWM     (1)
+#define MTU_CFG_USE_CAPTURE (0)
+#define MTU_CFG_USE_PWM     (0)
 
 /* Set interrupt priority levels for each channel present.
  * Priority is shared by all interrupt sources in a channel.
  * Values must be in the range 0 (interrupt disabled) to 15 (highest)*/
 #define MTU_IR_PRIORITY_CHAN0 (3)
-#define MTU_IR_PRIORITY_CHAN1 (3)
-#define MTU_IR_PRIORITY_CHAN2 (3)
-#define MTU_IR_PRIORITY_CHAN3 (3)
-#define MTU_IR_PRIORITY_CHAN4 (3)
-#define MTU_IR_PRIORITY_CHAN5 (3)
+#define MTU_IR_PRIORITY_CHAN1 (0)
+#define MTU_IR_PRIORITY_CHAN2 (0)
+#define MTU_IR_PRIORITY_CHAN3 (0)
+#define MTU_IR_PRIORITY_CHAN4 (0)
+#define MTU_IR_PRIORITY_CHAN5 (0)
 
 /* Set the MTU input capture noise filter clock for each channels to used for input capture.
  * See r_mtu_timer_rx_if.h for allowable selections. The following settings are default and

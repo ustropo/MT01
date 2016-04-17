@@ -139,7 +139,14 @@ static void updatePosition(uint8_t menu)
                     	 lStr[3] = "";
 			         sprintf(gStrAuto[4], "THC SET: %.0f V",  configVar[TENSAO_THC]);
                      lStr[4] = gStrAuto[4];
-                     lStr[5] = "THC REAL: --- V";
+                     if(isCuttingGet()){
+    			         sprintf(gStrAuto[5], "THC REAL: %.0f V",  THC_real);
+                         lStr[5] = gStrAuto[5];
+                     }
+                     else
+                     {
+                    	 lStr[5] = "THC REAL: --- V";
+                     }
                      break;
 		case SIM:    lStr[0] = gStrSim[0];
 	 	 	 	 	 sprintf(gStrSim[1], "LINHA: %d",  cm_get_linenum(RUNTIME));

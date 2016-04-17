@@ -15,10 +15,14 @@
 #include "keyboard.h"
 #include "lcd.h"
 
+#include "platform.h"
+#include "r_s12ad_rx_if.h"
+#include "r_mtu_rx_if.h"
+
 #define DEBOUNCE_COUNT 15
 #define ARCOOK_DELAY_COUNT 33
 
-
+void thc_interrupt(void *p_args);
 void timer_motorPower_callback(void *pdata);
 void emergencia_task(void);
 
@@ -29,6 +33,10 @@ TaskHandle_t xPlasmaTaskHandle;
 TaskHandle_t xEmergenciaTaskHandle;
 extern TaskHandle_t xCncTaskHandle;
 extern bool simTorch;
+volatile uint16_t    data;
+float THC_real;
+float THC_err;
+float THC_integral;
 
 void pl_arcook_init(void)
 {
@@ -46,8 +54,75 @@ void pl_arcook_init(void)
     IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
     IPR(ICU, IRQ9) = 3;            //Set interrupt priority
     IEN(ICU, IRQ9) = 0;            // Enable interrupt
+
 	xTaskCreate((pdTASK_CODE)plasma_task, "Plasma task", 512, NULL, 3, &xPlasmaTaskHandle );
 #endif
+}
+
+void pl_thc_init(void)
+{
+    adc_cfg_t config;
+    adc_ch_cfg_t ch_cfg;
+    /*
+    mtu_timer_chnl_settings_t plasma_timer_cfg;
+    mtu_err_t result;
+
+    plasma_timer_cfg.clock_src.source  = MTU_CLK_SRC_INTERNAL;
+    plasma_timer_cfg.clock_src.clock_edge  = MTU_CLK_RISING_EDGE;
+    plasma_timer_cfg.clear_src  = MTU_CLR_TIMER_A;
+    plasma_timer_cfg.timer_a.actions.do_action = (mtu_actions_t)(MTU_ACTION_TRIGGER_ADC | MTU_ACTION_INTERRUPT | MTU_ACTION_REPEAT) ;
+    plasma_timer_cfg.timer_a.actions.output  = MTU_PIN_NO_OUTPUT;
+    plasma_timer_cfg.timer_a.freq  = 5000;
+    plasma_timer_cfg.timer_b.actions.do_action = MTU_ACTION_NONE;
+    plasma_timer_cfg.timer_b.actions.output  = MTU_PIN_NO_OUTPUT;
+    plasma_timer_cfg.timer_c.actions.do_action = MTU_ACTION_NONE;
+    plasma_timer_cfg.timer_d.actions.do_action = MTU_ACTION_NONE;
+    result = R_MTU_Timer_Open(MTU_CHANNEL_0, &plasma_timer_cfg, FIT_NO_FUNC);
+
+    config.trigger = ADC_TRIG_SYNC_TRG0AN_0;
+    config.priority = 3;
+    config.add_cnt = ADC_ADD_OFF;
+    config.alignment = ADC_ALIGN_RIGHT;
+    config.clearing = ADC_CLEAR_AFTER_READ_ON;
+    config.conv_speed = ADC_CONVERT_SPEED_PCLK;
+    R_ADC_Open(ADC_MODE_SS_ONE_CH, &config, thc_interrupt);
+
+    ch_cfg.chan_mask = ADC_MASK_CH3;
+    R_ADC_Control(ADC_CMD_ENABLE_CHANS, &ch_cfg);
+    R_ADC_Control(ADC_CMD_ENABLE_INT, NULL);
+    R_ADC_Control(ADC_CMD_ENABLE_TRIG, NULL);
+
+    result = R_MTU_Control(MTU_CHANNEL_0, MTU_CMD_START, FIT_NO_PTR);
+    */
+    config.trigger = ADC_TRIG_SOFTWARE;
+    config.priority = 0;
+    config.add_cnt = ADC_ADD_OFF;
+    config.alignment = ADC_ALIGN_RIGHT;
+    config.clearing = ADC_CLEAR_AFTER_READ_ON;
+    config.conv_speed = ADC_CONVERT_SPEED_PCLK;
+    R_ADC_Open(ADC_MODE_SS_ONE_CH, &config, FIT_NO_FUNC);
+
+    ch_cfg.chan_mask = ADC_MASK_CH3;
+    R_ADC_Control(ADC_CMD_ENABLE_CHANS, &ch_cfg);
+}
+
+void pl_thc_read(float *thcValue)
+{
+	uint16_t u16thc_read;
+	uint16_t u16thc_sum = 0;
+	uint16_t u16thc_value;
+	for(uint8_t i = 0; i < 8;i++){
+		/* CAUSE SOFTWARE TRIGGER */
+		R_ADC_Control(ADC_CMD_SCAN_NOW, NULL);
+		/* WAIT FOR SCAN TO COMPLETE */
+		while (R_ADC_Control(ADC_CMD_CHECK_SCAN_DONE, NULL) == ADC_ERR_SCAN_NOT_DONE)
+		nop();
+		/* READ RESULT */
+		R_ADC_Read(ADC_REG_CH3, &u16thc_read);
+		u16thc_sum += u16thc_read;
+	}
+	u16thc_value = u16thc_sum/8;
+	*thcValue = (float)(((float)300/4095)*u16thc_value);
 }
 
 void pl_emergencia_init(void)
@@ -176,6 +251,11 @@ void timer_motorPower_callback(void *pdata)
 		vTaskNotifyGiveFromISR( xEmergenciaTaskHandle, &xHigherPriorityTaskWoken );
 		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 	}
+}
+
+void thc_interrupt(void *p_args)
+{
+    R_ADC_Read(ADC_REG_CH3, &data);
 }
 
 void isCuttingSet(bool state)

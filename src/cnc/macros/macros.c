@@ -47,18 +47,22 @@ stat_t M3_Macro(void)
 			/* 1- CHECA SE O USUARIO CANCELOU O IHS (MODO OXICORTE), OU SE ESTÁ EM MODO SIMULAÇÃO. SE SIM, PULAR PARA PASSO 3
 			   2- PROCURA A CHAPA USANDO O G38.2 -50 COM FEEDRATE DE 800MM/MIN  */
 		case 0: if(configFlags == 0){
+#ifndef THC_TESTE
 					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_STRAIGHT_PROBE);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], -50);
 					SET_NON_MODAL_MACRO (feed_rate, 800);
+#endif
 				}
 				state++; break;
 
 				/*  ZERA O EIXO Z COM G28.3 Z0 (NÃO PRECISA MAIS COMPENSAR O SENSOR, MINHA MAQUINA USARÁ SISTEMA OHMICO, OFFSET=0) */
 		case 1: if(configFlags == 0){
+
 					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
+
 				}
 				state++; break;
 
@@ -76,7 +80,11 @@ stat_t M3_Macro(void)
 
 		case 4: if(configFlags == 0 && !sim){
 					uint32_t lRet;
+#ifndef THC_TESTE
 					lRet = ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(3000) );
+#else
+					lRet = ulTaskNotifyTake( pdTRUE, portMAX_DELAY);
+#endif
 					if (lRet == pdFALSE)
 					{
 						uint32_t qSend = ARCO_OK_FAILED;

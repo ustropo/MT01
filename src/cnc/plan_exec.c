@@ -36,6 +36,8 @@
 #include "util.h"
 
 #include "interpreter_if.h"
+#include "eeprom.h"
+#include "plasma.h"
 
 /*
 #ifdef __cplusplus
@@ -706,6 +708,7 @@ static stat_t _exec_aline_tail()
 
 static stat_t _exec_aline_segment()
 {
+
 	uint8_t i;
 	float travel_steps[MOTORS];
 
@@ -721,6 +724,20 @@ static stat_t _exec_aline_segment()
 		float segment_length = mr.segment_velocity * mr.segment_time;
 		for (i=0; i<AXES; i++) {
 			mr.gm.target[i] = mr.position[i] + (mr.unit[i] * segment_length);
+		}
+		if(!configFlags && isCuttingGet()){
+			pl_thc_read(&THC_real);
+			THC_err = configVar[TENSAO_THC] - THC_real;
+			THC_integral += THC_err;
+			zmove = (KP * THC_err) + (KI * THC_integral);
+			if (fabs(zmove) > 0.02)
+			{
+				if(zmove > 0)
+					zmove = 0.02;
+				else if(zmove < 0)
+					zmove = -0.02;
+			}
+			//if(THC_err<)
 		}
 		if(zmove != 0)
 		{
