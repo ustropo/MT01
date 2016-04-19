@@ -14,6 +14,7 @@
 #include "text_parser.h"
 #include "keyboard.h"
 #include "lcd.h"
+#include "eeprom.h"
 
 #include "platform.h"
 #include "r_s12ad_rx_if.h"
@@ -21,6 +22,10 @@
 
 #define DEBOUNCE_COUNT 15
 #define ARCOOK_DELAY_COUNT 33
+
+#define THC_VMIN 20
+#define KI 0.0000001
+#define KP 0.0004
 
 void thc_interrupt(void *p_args);
 void timer_motorPower_callback(void *pdata);
@@ -123,6 +128,26 @@ void pl_thc_read(float *thcValue)
 	}
 	u16thc_value = u16thc_sum/8;
 	*thcValue = (float)(((float)300/4095)*u16thc_value);
+}
+
+float pl_thc_pid(void)
+{
+	float result = 0;
+	pl_thc_read(&THC_real);
+	if(THC_real > THC_VMIN)
+	{
+		THC_err = configVar[TENSAO_THC] - THC_real;
+		THC_integral += THC_err;
+		result = (KP * THC_err) + (KI * THC_integral);
+		if (fabs(result) > 0.02)
+		{
+			if(result > 0)
+				result = 0.02;
+			else if(result < 0)
+				result = -0.02;
+		}
+	}
+	return result;
 }
 
 void pl_emergencia_init(void)
@@ -276,4 +301,9 @@ void arcoOkSet(bool state)
 bool arcoOkGet(void)
 {
 	return arcoOk;
+}
+
+float THC_realGet(void)
+{
+	return THC_real;
 }

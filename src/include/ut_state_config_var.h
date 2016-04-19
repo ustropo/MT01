@@ -9,6 +9,12 @@
 #define INCLUDE_UT_STATE_CONFIG_VAR_H_
 
 #include "platform.h"
+#include "ut_state.h"
+
+#define THC_VMAX 300
+#define THC_VMIN 0
+#define MOTOR_VMAX 10000
+#define MOTOR_VMIN 10
 
 /**
  * Enum to indicate configuration variable type

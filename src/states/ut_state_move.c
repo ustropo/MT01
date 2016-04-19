@@ -140,7 +140,7 @@ static void updatePosition(uint8_t menu)
 			         sprintf(gStrAuto[4], "THC SET: %.0f V",  configVar[TENSAO_THC]);
                      lStr[4] = gStrAuto[4];
                      if(isCuttingGet()){
-    			         sprintf(gStrAuto[5], "THC REAL: %.0f V",  THC_real);
+    			         sprintf(gStrAuto[5], "THC REAL: %.0f V",  THC_realGet());
                          lStr[5] = gStrAuto[5];
                      }
                      else

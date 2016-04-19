@@ -726,18 +726,10 @@ static stat_t _exec_aline_segment()
 			mr.gm.target[i] = mr.position[i] + (mr.unit[i] * segment_length);
 		}
 		if(!configFlags && isCuttingGet()){
-			pl_thc_read(&THC_real);
-			THC_err = configVar[TENSAO_THC] - THC_real;
-			THC_integral += THC_err;
-			zmove = (KP * THC_err) + (KI * THC_integral);
-			if (fabs(zmove) > 0.02)
-			{
-				if(zmove > 0)
-					zmove = 0.02;
-				else if(zmove < 0)
-					zmove = -0.02;
-			}
-			//if(THC_err<)
+			zmove = pl_thc_pid();
+		}
+		if(!configFlags && !isCuttingGet()){
+			zmove = 0;
 		}
 		if(zmove != 0)
 		{

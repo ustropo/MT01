@@ -438,8 +438,8 @@ void ut_lcd_output_plasma_mode(bool torch,const char* title[6],const char* textX
 				case 6: str = title[1];
 						u8g_prepare(u8g_font_4x6r);
 
-						u8g_DrawStr(&main_u8g, (u8g_GetStrWidth(&main_u8g,str) + 30), y-5, title[4]);
-						u8g_DrawStr(&main_u8g, (u8g_GetStrWidth(&main_u8g,str) + 30), y+2, title[5]);
+						u8g_DrawStr(&main_u8g, (u8g_GetStrWidth(&main_u8g,str) + 25), y-5, title[4]);
+						u8g_DrawStr(&main_u8g, (u8g_GetStrWidth(&main_u8g,str) + 25), y+2, title[5]);
 			//			h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 						u8g_prepare(u8g_font_5x8);
 						u8g_DrawHLine(&main_u8g, x, y-6, 128);

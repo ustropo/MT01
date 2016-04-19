@@ -91,10 +91,10 @@ static float init_max[CONFIG_MAX] =
 	50,
 	60,
 	50,
-	6000,
+	MOTOR_VMAX,
 	5000,
-	10000,
-	300,
+	MOTOR_VMAX,
+	THC_VMAX,
 	5
 };
 
@@ -105,10 +105,10 @@ static float init_min[CONFIG_MAX] =
 	1,
 	0,
 	1,
-	10,
-	10,
-	10,
-	0,
+	MOTOR_VMIN,
+	MOTOR_VMIN,
+	MOTOR_VMIN,
+	THC_VMIN,
 	0
 };
 

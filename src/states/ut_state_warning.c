@@ -90,7 +90,7 @@ ut_state ut_state_warning(ut_context* pContext)
 		vTaskDelay(PAGE_DELAY / portTICK_PERIOD_MS);
 	}
 	ut_lcd_output_warning("MODO DE EMERGENCIA\nZERO MÁQUINA\nNÃO REFERENCIADO\n");
-	while(keyEntry != KEY_ESC){
+	while(keyEntry != KEY_ENTER){
 		xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
 	}
 	pl_emergencia_init();

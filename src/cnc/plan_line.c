@@ -35,6 +35,7 @@
 #include "report.h"
 #include "util.h"
 #include "eeprom.h"
+#include "settings.h"
 
 // aline planner routines / feedhold planning
 //static void _calc_move_times(GCodeState_t *gms, const float position[]);
@@ -340,10 +341,17 @@ static void _calc_move_times(GCodeState_t *gms, const float axis_length[], const
 		} else {
             // inject feed rate override here
             float feed_rate;
-            if(cm.gmx.feed_rate_override_enable && axis_length[AXIS_Z] == 0)
+            if(cm.gmx.feed_rate_override_enable && axis_length[AXIS_Z] == 0){
             	feed_rate = gms->feed_rate * cm.gmx.feed_rate_override_factor;
+            	if(feed_rate > X_FEEDRATE_MAX)
+            		feed_rate = X_FEEDRATE_MAX;
+            	if(feed_rate < 10)
+            		feed_rate = 10;
+            }
             else
+            {
             	feed_rate = gms->feed_rate;
+            }
 
 			// compute length of linear move in millimeters. Feed rate is provided as mm/min
 			xyz_time = sqrt(axis_square[AXIS_X] + axis_square[AXIS_Y] + axis_square[AXIS_Z]) / feed_rate;
@@ -829,6 +837,10 @@ stat_t mp_plan_feedrateoverride_callback(mpBuf_t *bf)
 //		}
 //	} while (((bp = mp_get_next_buffer(bp)) != bf));
 	mr.segment_velocity = mr.gm.feed_rate*cm.gmx.feed_rate_override_factor;
+	if(mr.segment_velocity > X_FEEDRATE_MAX)
+		mr.segment_velocity = X_FEEDRATE_MAX;
+	if(mr.segment_velocity < 10)
+		mr.segment_velocity = 10;
 	mr.exit_velocity = mr.exit_velocity*cm.gmx.feed_rate_override_factor;
 	mr.entry_velocity = mr.entry_velocity*cm.gmx.feed_rate_override_factor;
 //	_reset_replannable_list();				// make it replan all the blocks

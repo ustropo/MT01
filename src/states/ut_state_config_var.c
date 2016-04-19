@@ -314,18 +314,21 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
 	switch (lArrayIndex)
 	{
-		case DOWN_CONFIGVAR_TIMER: if(*value > configsVar->valueMin){
-			*value = *value - configsVar->step*mult;
-		}
-		else{
-			*value = configsVar->valueMin;
-		}
+		case DOWN_CONFIGVAR_TIMER:
+			if(*value > configsVar->valueMin){
+				*value = *value - configsVar->step*mult;
+			}
+			if(*value < configsVar->valueMin){
+				*value = configsVar->valueMin;
+			}
 		break;
-		case UP_CONFIGVAR_TIMER: if(*value < configsVar->valueMax){
+		case UP_CONFIGVAR_TIMER:
+			if(*value < configsVar->valueMax){
 			*value = *value + configsVar->step*mult;
-		}else{
+			}
+			if(*value > configsVar->valueMax){
 			*value = configsVar->valueMax;
-		}
+			}
 		break;
 	}
 
