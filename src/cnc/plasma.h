@@ -19,6 +19,7 @@ void pl_arcook_start(void);
 void pl_arcook_stop(void);
 void pl_emergencia_init(void);
 void plasma_task(void);
+void delay_thcStartStop(bool state);
 
 /*Setter and getters*/
 void isCuttingSet(bool state);
@@ -26,5 +27,7 @@ bool isCuttingGet(void);
 void arcoOkSet(bool state);
 bool arcoOkGet(void);
 float THC_realGet(void);
+void delay_thcSet(uint16_t state);
+uint16_t delay_thcGet(void);
 
 #endif /* CNC_PLASMA_H_ */

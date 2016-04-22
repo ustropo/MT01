@@ -24,8 +24,12 @@
 #define ARCOOK_DELAY_COUNT 33
 
 #define THC_VMIN 20
-#define KI 0.0000001
-#define KP 0.0004
+/* Lento */
+#define KI 0.000000125
+#define KP 0.00025
+/* Rapido */
+//#define KI 0.0000005
+//#define KP 0.001
 
 void thc_interrupt(void *p_args);
 void timer_motorPower_callback(void *pdata);
@@ -34,6 +38,8 @@ void emergencia_task(void);
 static uint32_t timerch;
 static bool isCutting = false;
 static bool arcoOk = false;
+static uint16_t delay_thc = 0;
+static uint16_t delay_thcStart = false;
 TaskHandle_t xPlasmaTaskHandle;
 TaskHandle_t xEmergenciaTaskHandle;
 extern TaskHandle_t xCncTaskHandle;
@@ -270,6 +276,17 @@ void timer_motorPower_callback(void *pdata)
 {
     BaseType_t xHigherPriorityTaskWoken;
 	PWMCH ^= 1;
+	if(delay_thcStart){
+		if (delay_thc == 0xFFFF)
+		{
+			delay_thc = 0xFFFF;
+		}
+		else
+		{
+			delay_thc++;
+		}
+	}
+
 	if(EMERGENCIA)
 	{
 		xHigherPriorityTaskWoken = pdFALSE;
@@ -283,9 +300,19 @@ void thc_interrupt(void *p_args)
     R_ADC_Read(ADC_REG_CH3, &data);
 }
 
+void delay_thcStartStop(bool state)
+{
+	delay_thcStart = state;
+	delay_thc = 0;
+}
+
 void isCuttingSet(bool state)
 {
 	isCutting = state;
+	if(state == false)
+	{
+		delay_thcStartStop(false);
+	}
 }
 
 bool isCuttingGet(void)
@@ -307,3 +334,14 @@ float THC_realGet(void)
 {
 	return THC_real;
 }
+
+void delay_thcSet(uint16_t state)
+{
+	delay_thc = state;
+}
+
+uint16_t delay_thcGet(void)
+{
+	return delay_thc;
+}
+

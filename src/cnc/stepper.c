@@ -39,6 +39,7 @@
 #include "text_parser.h"
 #include "util.h"
 #include "lcd.h"
+#include "plasma.h"
 
 /**** Allocate structures ****/
 
@@ -270,7 +271,7 @@ void stepper_init()
 #ifdef __RX
 	uint32_t cmtch = TIMER_DWELL;
     R_TMR_CreateOneShot((uint8_t)(1000000/FREQUENCY_SGI),exec_timer_num,TIMER_EXEC);
-    R_TMR_CreatePeriodic(FREQUENCY_DDA,timer_dda_callback,TIMER_DDA);
+    R_TMR_CreatePeriodic(2*FREQUENCY_DDA,timer_dda_callback,TIMER_DDA);
     R_TMR_CreateOneShot((uint8_t)(1000000/FREQUENCY_SGI),load_timer_num,TIMER_LOAD);
     R_CMT_CreatePeriodic(FREQUENCY_DWELL,timer_dwell_callback,&cmtch);
     R_CMT_Control(TIMER_DWELL,CMT_RX_CMD_PAUSE,0);
@@ -713,6 +714,7 @@ void timer_dwell_callback(void *pdata)
 	if (--st_run.dda_ticks_downcount == 0) {
 		//TIMER_DWELL.CTRLA = STEP_TIMER_DISABLE;			// disable DWELL timer
 		R_CMT_Control(TIMER_DWELL,CMT_RX_CMD_PAUSE,0);
+		delay_thcStartStop(true);
 		_load_move();
 	}
 }

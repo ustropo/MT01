@@ -17,7 +17,7 @@
 // ***> NOTE: The init message must be a single line with no CRs or LFs
 #define INIT_MESSAGE "Initializing configs to Shapeoko2 500mm profile"
 
-#define JUNCTION_DEVIATION		0.01	// default value, in mm - smaller is faster
+#define JUNCTION_DEVIATION		0.2	// default value, in mm - smaller is faster
 #define JUNCTION_ACCELERATION	2000000	// 2 million - centripetal acceleration around corners
 
 // *** settings.h overrides ***
@@ -36,7 +36,7 @@
 
 #define M1_MOTOR_MAP			AXIS_Z
 #define M1_STEP_ANGLE			1.8
-#define M1_TRAVEL_PER_REV		3
+#define M1_TRAVEL_PER_REV		4
 #define M1_MICROSTEPS			64
 #define M1_POLARITY				1
 #define M1_POWER_MODE			2
@@ -85,8 +85,8 @@
 #define X_FEEDRATE_MAX			X_VELOCITY_MAX		// xfr 		G1 max feed rate in mm/min
 #define X_TRAVEL_MIN			0					// xtn		minimum travel
 #define X_TRAVEL_MAX			3000					// xtm		maximum travel (travel between switches or crashes)
-#define X_JERK_MAX				4000				// xjm		yes, that's "5 billion" mm/(min^3)
-#define X_JERK_HOMING			4000				// xjh
+#define X_JERK_MAX				500				// xjm		yes, that's "5 billion" mm/(min^3)
+#define X_JERK_HOMING			500				// xjh
 #define X_JUNCTION_DEVIATION	JUNCTION_DEVIATION	// xjd
 #define X_SWITCH_MODE_MIN		SW_MODE_HOMING		// xsn		SW_MODE_DISABLED, SW_MODE_HOMING, SW_MODE_LIMIT, SW_MODE_HOMING_LIMIT
 #define X_SWITCH_MODE_MAX 		SW_MODE_DISABLED	// xsx		SW_MODE_DISABLED, SW_MODE_HOMING, SW_MODE_LIMIT, SW_MODE_HOMING_LIMIT
@@ -100,8 +100,8 @@
 #define Y_FEEDRATE_MAX			Y_VELOCITY_MAX
 #define Y_TRAVEL_MIN			0
 #define Y_TRAVEL_MAX			1500
-#define Y_JERK_MAX				4000
-#define Y_JERK_HOMING			4000				// xjh
+#define Y_JERK_MAX				500
+#define Y_JERK_HOMING			500				// xjh
 #define Y_JUNCTION_DEVIATION	JUNCTION_DEVIATION
 #define Y_SWITCH_MODE_MIN		SW_MODE_HOMING
 #define Y_SWITCH_MODE_MAX		SW_MODE_DISABLED
@@ -111,13 +111,13 @@
 #define Y_ZERO_BACKOFF			2
 
 #define Z_AXIS_MODE				AXIS_STANDARD
-#define Z_VELOCITY_MAX			1000
+#define Z_VELOCITY_MAX			1200
 #define Z_FEEDRATE_MAX			Z_VELOCITY_MAX
 #define Z_TRAVEL_MAX			0
 #define Z_TRAVEL_MIN			-120                // this is approximate as Z depth depends on tooling
                                                     // value must be large enough to guarantee return to Zmax during homing
-#define Z_JERK_MAX				5000					// 50,000,000
-#define Z_JERK_HOMING			5000
+#define Z_JERK_MAX				6000					// 50,000,000
+#define Z_JERK_HOMING			6000
 #define Z_JUNCTION_DEVIATION	JUNCTION_DEVIATION
 #define Z_SWITCH_MODE_MIN		SW_MODE_DISABLED
 #define Z_SWITCH_MODE_MAX		SW_MODE_HOMING

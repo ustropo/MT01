@@ -131,8 +131,9 @@ static void _exec_spindle_control(float *value, float *flag)
 #ifdef __RX
 	if (spindle_mode == SPINDLE_CW) {
 		if(!sim){
-			if (configFlags == 0)
+			if (configFlags == 0){
 				pl_arcook_start();
+			}
 			TORCH = TRUE;
 		}
 		else

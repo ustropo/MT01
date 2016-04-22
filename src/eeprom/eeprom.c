@@ -64,7 +64,7 @@ void eepromInit(void)
 
 void eepromInitVar(void)
 {
-	velocidadeJog = &configVar[VELOC_JOG_LENTO];
+	velocidadeJog = &configVar[VELOC_JOG_RAPIDO];
 }
 
 void eepromWriteConfig(uint8_t varType)

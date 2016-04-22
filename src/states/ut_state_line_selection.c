@@ -79,6 +79,8 @@ ut_state ut_state_line_selection(ut_context* pContext)
 	{
 		/* Initialize menu */
 		ut_menu_init(&config_line);
+		choosedLinePosition = 0;
+		choosedLine = 0;
 		/* Options */
 		config_line.title = gszConfigMenuTitle;
 		config_line.currentState = STATE_LINE_SELECTION;
