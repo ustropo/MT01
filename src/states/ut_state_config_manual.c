@@ -30,10 +30,10 @@
 typedef enum
 {
 	CONFIG_MODO_MANUAL  = 0,    //!<
-	CONFIG_ZERAR_MAQUINA,   //!<
+	CONFIG_JOG_RAP_LENTO,//!<
 	CONFIG_ZERAR_PECA,   //!<
 	CONFIG_DESLOCAR_ZERO,//!<
-	CONFIG_JOG_RAP_LENTO,//!<
+	CONFIG_ZERAR_MAQUINA,   //!<
 	CONFIG_MANUAL_MAX           //!< CONFIG_MAX
 } ut_config_name;
 
@@ -82,19 +82,19 @@ static uint32_t init_values[CONFIG_MANUAL_MAX] =
 static char* init_names[CONFIG_MANUAL_MAX] =
 {
 	" MODO MANUAL",
-	" ZERAR MÁQUINA",
+	" JOG RÁPIDO E LENTO",
 	" ZERAR PEÇA",
 	" DESLOCAR - ZERO PEÇA",
-	" JOG RÁPIDO E LENTO"
+	" ZERAR MÁQUINA",
 };
 
 static var_func init_func[CONFIG_MANUAL_MAX] =
 {
 	0,
-	zerar_maquina,
+	veljog,
 	zerar_peca,
 	homming_eixos,
-	veljog,
+	zerar_maquina,
 };
 
 static const char* gszConfigMenuTitle = "CONFIG. MANUAL";

@@ -83,7 +83,7 @@ void config_bool(ut_config_var* var)
 	case STATE_CONFIG_MANUAL_MODE:
 		switch(configsVar->currentItem)
 		{
-			case 4:  boolStr = boolJogVel;
+			case 1:  boolStr = boolJogVel;
 			break;
 			default:
 		}
