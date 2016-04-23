@@ -82,7 +82,7 @@ static char* init_names[CONFIG_AUTO_MAX] =
 {
 	" RODAR PROGRAMA",
 	" ZERAR PEÇA",
-	" DESLOCAR PARA ZERO",
+	" DESLOCAR - ZERO PEÇA",
 	" MODO SIMULADO",
 	" SELECIONAR LINHA"
 };

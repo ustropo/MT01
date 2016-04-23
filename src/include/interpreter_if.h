@@ -34,6 +34,7 @@ extern iif_func_ptr iif_func_cycleStop;
 
 extern void iif_bind_filerunning(void);
 extern void iif_bind_jog(void);
+extern void iif_bind_deslocar(void);
 extern void iif_bind_idle(void);
 extern void iif_idle(void);
 

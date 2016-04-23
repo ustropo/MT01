@@ -27,6 +27,7 @@
 #include "plasma.h"
 #include "eeprom.h"
 
+extern TaskHandle_t xCncTaskHandle;
 bool sim = false;
 bool programEnd = false;
 bool lstop = false;
@@ -36,6 +37,7 @@ char textYStr[MAX_COLUMN];
 char textZStr[MAX_COLUMN];
 uint8_t gTitle;
 extern float *velocidadeJog;
+extern bool intepreterRunning;
 
 
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
@@ -76,7 +78,7 @@ static char gStrManual[4][24] =
 	""
 };
 
-static char gStrAuto[5][24] =
+static char gStrAuto[6][24] =
 {
 	DEFAULT_AUTO_TITLE,
 	DEFAULT_AVISO_AUTO,
@@ -131,7 +133,7 @@ static void updatePosition(uint8_t menu)
 		case AUTO:   lStr[0] = gStrAuto[0];
  	 	 	 	 	 sprintf(gStrAuto[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrAuto[1];
-			         sprintf(gStrAuto[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
+			         sprintf(gStrAuto[2], "VEL.: %.0f mm/min",  mp_get_runtime_velocity());
                      lStr[2] = gStrAuto[2];
                      if (arcoOkGet())
                     	 lStr[3] = "AOK";
@@ -151,12 +153,12 @@ static void updatePosition(uint8_t menu)
 		case SIM:    lStr[0] = gStrSim[0];
 	 	 	 	 	 sprintf(gStrSim[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrSim[1];
-			         sprintf(gStrSim[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
+			         sprintf(gStrSim[2], "VEL.: %.0f mm/min",  mp_get_runtime_velocity());
                      lStr[2] = gStrSim[2];
                      break;
 		case DESLOCA: lStr[0] = gStrDesloca[0];
 					  lStr[1] = gStrDesloca[1];
-				      sprintf(gStrDesloca[2], "VEL.: %.0f mm/s",  mp_get_runtime_velocity());
+				      sprintf(gStrDesloca[2], "VEL.: %.0f mm/min",  mp_get_runtime_velocity());
 					  lStr[2] = gStrDesloca[2];
 					  break;
 	}
@@ -228,6 +230,8 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 					 vTimerUpdateCallback
 				   );
 	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
+	xTaskNotifyGive(xCncTaskHandle);
+	intepreterRunning = true;
 
 	while(true)
 	{
@@ -265,6 +269,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 		case KEY_ESC:
 			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 			iif_func_esc();
+			intepreterRunning = false;
 			return STATE_CONFIG_MANUAL_MODE;
 
 		case KEY_ENTER:
@@ -298,10 +303,12 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	uint32_t keyEntry;
 	ltorchBuffer = false;
 	uint32_t arco = 0;
-	programEnd = false;
+
 	lstop = false;
 	cm.gmx.feed_rate_override_enable = true;
 	cm.gmx.feed_rate_override_factor = 1;
+	programEnd = false;
+	cm.machine_state = MACHINE_READY;
 	/* Clear display */
 	if(!sim){
 		updatePosition(AUTO);
@@ -311,6 +318,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		updatePosition(SIM);
 		gTitle = SIM;
 	}
+
+	if (swTimers[AUTO_MENU_TIMER] == NULL){
 	swTimers[AUTO_MENU_TIMER] = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
@@ -325,14 +334,14 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					 /* Each timer calls the same callback when it expires. */
 					 vTimerUpdateCallback
 				   );
+	}
 	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 	tg_set_primary_source(XIO_DEV_USBFAT);
 	xio_close(cs.primary_src);
 	macro_func_ptr = _command_dispatch;
 	xio_open(cs.primary_src,0,0);
-
+	xTaskNotifyGive(xCncTaskHandle);
 	iif_bind_filerunning();
-
 	while(true)
 	{
 		/* Wait for user interaction */
@@ -422,6 +431,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				cm.gmx.feed_rate_override_enable = true;
 				cm.gmx.feed_rate_override_factor = 1;
 				macro_func_ptr = command_idle;
+				intepreterRunning = false;
+				sim = false;
 				if (programEnd)
 					return STATE_MANUAL_MODE;
 				return STATE_CONFIG_AUTO_MODE;
@@ -451,6 +462,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			{
 				pl_arcook_stop();
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+				state = 0;
+				macro_func_ptr = command_idle;
 				TORCH = FALSE;
 				arco = ARCO_OK_FAILED;
 				lstop = false;
@@ -512,7 +525,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 					 vTimerUpdateCallback
 				   );
 	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
-
+	xTaskNotifyGive(xCncTaskHandle);
 	while(true)
 	{
 		/* Wait for user interaction */
@@ -549,6 +562,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 		case KEY_ESC:
 			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 			iif_bind_idle();
+			intepreterRunning = false;
 			return (ut_state)pContext->value[0];
 
 		case KEY_RELEASED:

@@ -37,6 +37,7 @@ typedef enum
 	CONFIG_MANUAL_MAX           //!< CONFIG_MAX
 } ut_config_name;
 
+extern TaskHandle_t xCncTaskHandle;
 static void zerar_maquina(void *var);
 static void zerar_peca(void *var);
 static void homming_eixos(void *var);
@@ -83,7 +84,7 @@ static char* init_names[CONFIG_MANUAL_MAX] =
 	" MODO MANUAL",
 	" ZERAR MÁQUINA",
 	" ZERAR PEÇA",
-	" DESLOCAR PARA ZERO",
+	" DESLOCAR - ZERO PEÇA",
 	" JOG RÁPIDO E LENTO"
 };
 
@@ -202,6 +203,7 @@ static void zerar_maquina(void *var)
 		zeroPiecebuffer[AXIS_Y] = 0;
 		zeroPiecebuffer[AXIS_Z] = 0;
 		eepromReadConfig(ZEROPIECE);
+		xTaskNotifyGive(xCncTaskHandle);
 		macro_func_ptr = ZerarMaquina_Macro;
 	}
 }
@@ -220,6 +222,7 @@ static void zerar_peca(void *var)
 		zeroPiece[AXIS_Y] = zeroPiecebuffer[AXIS_Y];
 		zeroPiece[AXIS_Z] = 0;
 		eepromWriteConfig(ZEROPIECE);
+		xTaskNotifyGive(xCncTaskHandle);
 		macro_func_ptr = ZerarMaquina_Macro;
 		zeroPiece[AXIS_X] = 0;
 		zeroPiece[AXIS_Y] = 0;

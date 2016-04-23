@@ -7,9 +7,13 @@
 
 #ifndef CNC_PLASMA_H_
 #define CNC_PLASMA_H_
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 
 #define ARCO_OK_FAILED  0xFFFFFFFF
 #define ARCO_OK_OFF     0xFFFFFFFE
+extern SemaphoreHandle_t xArcoOkSync;
 
 void pl_arcook_init(void);
 void pl_thc_init(void);

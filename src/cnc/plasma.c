@@ -6,6 +6,7 @@
  */
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
 #include "tinyg.h"
 #include "config.h"
 #include "plasma.h"
@@ -42,6 +43,7 @@ static uint16_t delay_thc = 0;
 static uint16_t delay_thcStart = false;
 TaskHandle_t xPlasmaTaskHandle;
 TaskHandle_t xEmergenciaTaskHandle;
+SemaphoreHandle_t xArcoOkSync;
 extern TaskHandle_t xCncTaskHandle;
 extern bool simTorch;
 volatile uint16_t    data;
@@ -67,6 +69,8 @@ void pl_arcook_init(void)
     IEN(ICU, IRQ9) = 0;            // Enable interrupt
 
 	xTaskCreate((pdTASK_CODE)plasma_task, "Plasma task", 512, NULL, 3, &xPlasmaTaskHandle );
+    /* Attempt to create a semaphore. */
+	xArcoOkSync = xSemaphoreCreateBinary();
 #endif
 }
 
@@ -228,7 +232,8 @@ void plasma_task(void)
 			{
 				if (!simTorch)
 				{
-					xTaskNotifyGive(xCncTaskHandle);
+					//xTaskNotifyGive(xCncTaskHandle);
+					xSemaphoreGive( xArcoOkSync );
 				}
 			}
             debounce = 0;

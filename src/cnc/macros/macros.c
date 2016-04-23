@@ -21,6 +21,7 @@ float jogMaxDistance;
 uint8_t state = 0;
 uint32_t linenumMacro;
 extern bool sim;
+extern bool intepreterRunning;
 
 stat_t (*macro_func_ptr)(void);
 
@@ -81,7 +82,9 @@ stat_t M3_Macro(void)
 		case 4: if(configFlags == 0 && !sim){
 					uint32_t lRet;
 #ifndef THC_TESTE
-					lRet = ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(3000) );
+					//lRet = ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(3000) );
+					lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
+
 #else
 					lRet = ulTaskNotifyTake( pdTRUE, portMAX_DELAY);
 #endif
@@ -89,6 +92,7 @@ stat_t M3_Macro(void)
 					{
 						uint32_t qSend = ARCO_OK_FAILED;
 						xQueueSend( qKeyboard, &qSend, 0 );
+	//					state = 8;
 						return (STAT_OK);
 					}
 					else
@@ -152,7 +156,7 @@ stat_t ZerarMaquina_Macro(void)
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
 	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
 	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
-
+	intepreterRunning = true;
 	switch (state)
 	{
 		case 0: SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
@@ -160,7 +164,7 @@ stat_t ZerarMaquina_Macro(void)
 				SET_NON_MODAL_MACRO(target[AXIS_Y], 0);
 				SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
 				state++; break;
-		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+		default:state = 0; 	intepreterRunning = false; macro_func_ptr = command_idle; return (STAT_OK);
 	}
 	_execute_gcode_block();
 	return (STAT_OK);
@@ -173,7 +177,7 @@ stat_t ZerarPeca_Macro(void)
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
 	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
 	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
-
+	intepreterRunning = true;
 	switch (state)
 	{
 		case 0: SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
@@ -181,7 +185,7 @@ stat_t ZerarPeca_Macro(void)
 				SET_NON_MODAL_MACRO(target[AXIS_Y], zeroPiece[AXIS_Y]);
 				SET_NON_MODAL_MACRO(target[AXIS_Z], zeroPiece[AXIS_Z]);
 				state++; break;
-		default:state = 0; macro_func_ptr = command_idle; return (STAT_OK);
+		default:state = 0; 	intepreterRunning = false; macro_func_ptr = command_idle; return (STAT_OK);
 	}
 	_execute_gcode_block();
 	return (STAT_OK);
@@ -223,7 +227,10 @@ stat_t homming_Macro(void)
 //				SET_NON_MODAL_MACRO(target[AXIS_Z], zeroPiece[AXIS_Z]);
 				state++; break;
 
-		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+		case 6: SET_MODAL_MACRO (MODAL_GROUP_M4, program_flow, PROGRAM_END);
+				state++; break;
+
+		default:state = 0; macro_func_ptr = command_idle; return (STAT_OK);
 	}
 	_execute_gcode_block();
 	return (STAT_OK);
@@ -246,7 +253,7 @@ stat_t jog_Macro(void)
 				SET_NON_MODAL_MACRO(target[jogAxis], jogMaxDistance);
 				SET_NON_MODAL_MACRO (feed_rate, *velocidadeJog);
 				state++; break;
-		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+		default:state = 0; macro_func_ptr = command_idle; return (STAT_OK);
 	}
 	_execute_gcode_block();
 	return (STAT_OK);

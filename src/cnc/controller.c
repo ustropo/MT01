@@ -77,7 +77,8 @@ static stat_t _limit_switch_handler(void);
 static stat_t _system_assertions(void);
 static stat_t _sync_to_planner(void);
 static stat_t _sync_to_tx_buffer(void);
-bool gfilerunning = false;
+bool intepreterRunning = false;
+
 
 // prep for export to other modules:
 stat_t hardware_hard_reset_handler(void);
@@ -162,8 +163,11 @@ void controller_run()
 	while (true) {
 	    /* Block to wait for prvTask1() to notify this task. */
 
-		//ulTaskNotifyTake( pdTRUE, 0 );
-		_controller_HSM();
+		ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+		intepreterRunning = true;
+		while(intepreterRunning)
+			_controller_HSM();
+//		vTaskDelay(10 / portTICK_PERIOD_MS);
 	}
 }
 
@@ -279,6 +283,7 @@ stat_t _command_dispatch()
 		// handle end-of-file from file devices
 		if (status == STAT_EOF) {						// EOF can come from file devices only
 			//gfilerunning = false;
+			intepreterRunning = false;
 			xio_close(cs.primary_src);
 //			macro_func_ptr = command_idle;
 			if (cfg.comm_mode == TEXT_MODE) {
