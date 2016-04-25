@@ -155,7 +155,8 @@ static void clock_source_select(void);
 #endif
 {
     /* Stack pointers are setup prior to calling this function - see comments above */    
-    
+	PORT2.PODR.BYTE = 0x08 ;    /* All outputs low to start except TORCH*/
+	PORT2.PDR.BYTE  = 0xFE ;    /* All outputs - Emergencia (Input)  */
     /* Initialize the MCU processor word */
 #if __RENESAS_VERSION__ >= 0x01010000    
     set_intb((void *)__sectop("C$VECT"));

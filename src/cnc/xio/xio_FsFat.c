@@ -95,15 +95,14 @@ void xio_init_fsfat()
  */
 FILE * xio_open_file(const uint8_t dev, const char *addr, const flags_t flags)
 {
-    FRESULT fr;    /* FatFs return code */
 	xioDev_t *d = (xioDev_t *)&ds[dev];
 	d->x = &ufsfat[dev - XIO_DEV_USBFILE_OFFSET];			// bind extended struct to device
 	xioFsfat_t *dx = (xioFsfat_t *)d->x;
 
 	f_mount(&dx->gFatfs,"",0);
-	fr = f_close(&dx->f);
+	f_close(&dx->f);
     /* Open a text file */
-    fr = f_open(&dx->f, gszCurFile, FA_READ);
+    f_open(&dx->f, gszCurFile, FA_READ);
     if (choosedLinePosition > 0)
     {
         f_lseek(&dx->f,choosedLinePosition);

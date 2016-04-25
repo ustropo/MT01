@@ -405,7 +405,7 @@ uint16_t json_serialize(nvObj_t *nv, char_t *out_buf, uint16_t size)
 				need_a_comma = false;
 			}
 		}
-		if (str >= str_max) { return (-1);}		// signal buffer overrun
+		if (str >= str_max) { return (uint16_t)(-1);}		// signal buffer overrun
 		if ((nv = nv->nx) == NULL) { break;}	// end of the list
 
 		while (nv->depth < prev_depth--) {		// iterate the closing curlies
@@ -418,7 +418,7 @@ uint16_t json_serialize(nvObj_t *nv, char_t *out_buf, uint16_t size)
 	// closing curlies and NEWLINE
 	while (prev_depth-- > initial_depth) { *str++ = '}';}
 	str += sprintf((char *)str, "}\n");	// using sprintf for this last one ensures a NUL termination
-	if (str > out_buf + size) { return (-1);}
+	if (str > out_buf + size) { return (uint16_t)(-1);}
 	return (str - out_buf);
 #endif
 }

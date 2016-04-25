@@ -775,8 +775,7 @@ stat_t mp_end_hold()
 {
 	if (cm.hold_state == FEEDHOLD_END_HOLD) {
 		cm.hold_state = FEEDHOLD_OFF;
-		mpBuf_t *bf;
-		if ((bf = mp_get_run_buffer()) == NULL) {	// NULL means nothing's running
+		if ((mp_get_run_buffer()) == NULL) {	// NULL means nothing's running
 			cm_set_motion_state(MOTION_STOP);
 			return (STAT_NOOP);
 		}
@@ -816,7 +815,7 @@ stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
 
 stat_t mp_plan_feedrateoverride_callback(mpBuf_t *bf)
 {
-	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
+//	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
 
 //	if (bf == NULL) return (STAT_ERROR);
 //	mpBuf_t *bp = bf;

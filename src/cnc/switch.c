@@ -171,7 +171,7 @@ void reset_switches()
  */
 uint8_t read_switch(uint8_t sw_num)
 {
-	if ((sw_num < 0) || (sw_num >= NUM_SWITCHES)) return (SW_DISABLED);
+	if (sw_num >= NUM_SWITCHES) return (uint8_t)(SW_DISABLED);
 
 	uint8_t read = 0;
 	switch (sw_num) {

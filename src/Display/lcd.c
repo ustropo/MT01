@@ -302,7 +302,7 @@ static unsigned char warning_bits[] = {
    0x06, 0x38, 0xc0, 0x00, 0x02, 0x00, 0x80, 0x00, 0xff, 0xff, 0xff, 0x01,
    0xff, 0xff, 0xff, 0x01 };
 
-void ut_lcd_output_mov_mode(bool torch,const char* title[6],const char* textX,const char* textY,const char* textZ)
+void ut_lcd_output_mov_mode(bool torch, char* title[6],const char* textX,const char* textY,const char* textZ)
 {
 	uint8_t row, x, y;
 	uint8_t h;
@@ -386,7 +386,7 @@ void ut_lcd_output_mov_mode(bool torch,const char* title[6],const char* textX,co
 	xSemaphoreGive(rspi_semaphore);
 }
 
-void ut_lcd_output_plasma_mode(bool torch,const char* title[6],const char* textX,const char* textY,const char* textZ)
+void ut_lcd_output_plasma_mode(bool torch, char* title[6],const char* textX,const char* textY,const char* textZ)
 {
 	uint8_t row, x, y;
 	uint8_t h;

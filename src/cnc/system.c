@@ -56,7 +56,7 @@ void sys_port_bindings(float hw_version)
 
 uint8_t sys_read_calibration_byte(uint8_t index)
 { 
-
+	return 0;
 }
 
 /*

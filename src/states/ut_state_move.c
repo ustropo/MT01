@@ -472,7 +472,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			}
 			break;
 
-		case USB_DETACHED:
+		case USB_DISCONNECTED:
 			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 			cm_request_feedhold();
 			cm_request_queue_flush();

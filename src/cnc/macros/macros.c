@@ -36,7 +36,6 @@ extern struct gcodeParserSingleton gp;
 
 stat_t M3_Macro(void)
 {
-	uint32_t lRet = 0;
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags

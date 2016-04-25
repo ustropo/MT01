@@ -41,7 +41,6 @@
 //#define U8G_I2C_WITH_NO_ACK
 
 static uint8_t u8g_i2c_err_code;
-static uint8_t u8g_i2c_opt;		/* U8G_I2C_OPT_NO_ACK, SAM: U8G_I2C_OPT_DEV_1 */
 /*
   position values
     1: start condition

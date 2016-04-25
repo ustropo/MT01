@@ -215,6 +215,9 @@ char_t *pstr2str(const char *pgm_string)
 #ifdef __ARM
 	return ((char_t *)pgm_string);
 #endif
+#ifdef __RX
+	return ((char_t *)pgm_string);
+#endif
 }
 
 /*

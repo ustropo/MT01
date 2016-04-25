@@ -38,7 +38,7 @@
 #define M1_STEP_ANGLE			1.8
 #define M1_TRAVEL_PER_REV		4
 #define M1_MICROSTEPS			64
-#define M1_POLARITY				1
+#define M1_POLARITY				0
 #define M1_POWER_MODE			2
 
 #define M2_MOTOR_MAP			AXIS_Y  // Y1 - left side of machine
@@ -48,18 +48,18 @@
 #define M2_POLARITY				0
 #define M2_POWER_MODE			2
 
-#define M3_MOTOR_MAP			AXIS_Y  // Y2 - right sif of machine
+#define M3_MOTOR_MAP			AXIS_X  // Y2 - right sif of machine
 #define M3_STEP_ANGLE			1.8
 #define M3_TRAVEL_PER_REV		TRAVELXY
 #define M3_MICROSTEPS			64
-#define M3_POLARITY				1
+#define M3_POLARITY				0
 #define M3_POWER_MODE			2
 
 #define M4_MOTOR_MAP			AXIS_X
 #define M4_STEP_ANGLE			1.8
 #define M4_TRAVEL_PER_REV		TRAVELXY
 #define M4_MICROSTEPS			64
-#define M4_POLARITY				1
+#define M4_POLARITY				0
 #define M4_POWER_MODE			2
 
 #define M5_MOTOR_MAP			AXIS_DISABLED

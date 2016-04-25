@@ -71,7 +71,6 @@ static stat_t _do_all(nvObj_t *nv);			// print all parameters
 static stat_t set_ec(nvObj_t *nv);			// expand CRLF on TX output
 static stat_t set_ee(nvObj_t *nv);			// enable character echo
 static stat_t set_ex(nvObj_t *nv);			// enable XON/XOFF and RTS/CTS flow control
-static stat_t set_baud(nvObj_t *nv);		// set USB baud rate
 static stat_t get_rx(nvObj_t *nv);			// get bytes in RX buffer
 //static stat_t run_sx(nvObj_t *nv);		// send XOFF, XON
 
@@ -911,6 +910,7 @@ static stat_t get_rx(nvObj_t *nv)
 	nv->valuetype = TYPE_INTEGER;
 	return (STAT_OK);
 #endif
+	return (STAT_OK);
 }
 
 /* run_sx()	- send XOFF, XON --- test only
@@ -931,30 +931,6 @@ static stat_t run_sx(nvObj_t *nv)
  *	Then it waits for the TX buffer to empty (so the message is sent)
  *	Then it performs the callback to apply the new baud rate
  */
-static const char msg_baud0[] PROGMEM = "0";
-static const char msg_baud1[] PROGMEM = "9600";
-static const char msg_baud2[] PROGMEM = "19200";
-static const char msg_baud3[] PROGMEM = "38400";
-static const char msg_baud4[] PROGMEM = "57600";
-static const char msg_baud5[] PROGMEM = "115200";
-static const char msg_baud6[] PROGMEM = "230400";
-static const char *const msg_baud[] PROGMEM = { msg_baud0, msg_baud1, msg_baud2, msg_baud3, msg_baud4, msg_baud5, msg_baud6 };
-
-static stat_t set_baud(nvObj_t *nv)
-{
-	uint8_t baud = (uint8_t)nv->value;
-	if ((baud < 1) || (baud > 6)) {
-		nv_add_conditional_message((const char_t *)"*** WARNING *** Unsupported baud rate specified");
-//		nv_add_conditional_message(PSTR("*** WARNING *** Unsupported baud rate specified"));
-		return (STAT_INPUT_VALUE_RANGE_ERROR);
-	}
-	cfg.usb_baud_rate = baud;
-	cfg.usb_baud_flag = true;
-	char_t message[NV_MESSAGE_LEN];
-	sprintf_P(message, PSTR("*** NOTICE *** Resetting baud rate to %s"),GET_TEXT_ITEM(msg_baud, baud));
-	nv_add_conditional_message(message);
-	return (STAT_OK);
-}
 
 stat_t set_baud_callback(void)
 {

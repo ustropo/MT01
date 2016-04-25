@@ -432,7 +432,6 @@ void usb_hmsc_SampleAplTask(void)
 {
     USB_UTR_t       *mess;
     USB_ER_t        err;
-    FRESULT         res;
     USB_CLSINFO_t   *mes;
     uint16_t        addr;
 
@@ -469,7 +468,7 @@ void usb_hmsc_SampleAplTask(void)
             /* Mount to the file system */
         case USB_HMSC_DRIVEMOUNT:
         	/* File system media work area memory mount. */
-        	res = f_mount(&st_usb_fatfs,"",NULL);
+        	f_mount(&st_usb_fatfs,"",NULL);
             /* Notify the task that the transmission is complete. */
         //	xTaskNotifyGive( task_main_handle );
         	drivemountFlag = true;

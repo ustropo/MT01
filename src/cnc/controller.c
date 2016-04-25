@@ -487,5 +487,5 @@ stat_t _system_assertions()
 
 stat_t command_idle(void)
 {
-
+	return (STAT_OK);
 }

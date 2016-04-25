@@ -262,8 +262,6 @@ static ut_fs_navigate chooseFile()
  */
 ut_state ut_state_choose_file(ut_context* pContext)
 {
-	FRESULT eRes;
-
 	/* Root dir */
 	memset(gszCurFile, 0, sizeof(gszCurFile));
 	strcpy(gszCurFile, USB_ROOT);
@@ -271,7 +269,7 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	if (drivemountFlag)
 	{
 	/* Check if usb is mounted */
-	eRes = f_opendir(&st_usb_dir, USB_ROOT);
+		f_opendir(&st_usb_dir, USB_ROOT);
 	}
 	else
 	{

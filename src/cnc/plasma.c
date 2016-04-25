@@ -32,7 +32,6 @@
 //#define KI 0.0000005
 //#define KP 0.001
 
-void thc_interrupt(void *p_args);
 void timer_motorPower_callback(void *pdata);
 void emergencia_task(void);
 
@@ -44,7 +43,6 @@ static uint16_t delay_thcStart = false;
 TaskHandle_t xPlasmaTaskHandle;
 TaskHandle_t xEmergenciaTaskHandle;
 SemaphoreHandle_t xArcoOkSync;
-extern TaskHandle_t xCncTaskHandle;
 extern bool simTorch;
 volatile uint16_t    data;
 float THC_real;
@@ -298,11 +296,6 @@ void timer_motorPower_callback(void *pdata)
 		vTaskNotifyGiveFromISR( xEmergenciaTaskHandle, &xHigherPriorityTaskWoken );
 		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 	}
-}
-
-void thc_interrupt(void *p_args)
-{
-    R_ADC_Read(ADC_REG_CH3, &data);
 }
 
 void delay_thcStartStop(bool state)

@@ -773,7 +773,7 @@ void R_usb_hmsc_DriveClose(USB_UTR_t *ptr, uint16_t addr, uint16_t data2)
    	if(currentState == STATE_AUTO_MODE)
    	{
    		uint32_t key;
-		key = USB_DETACHED;
+		key = USB_DISCONNECTED;
 		xQueueSend( qKeyboard, &key, 0 );
    	}
 }   /* eof R_usb_hmsc_DriveClose() */

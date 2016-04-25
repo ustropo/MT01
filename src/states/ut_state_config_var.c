@@ -30,7 +30,6 @@ extern bool sim;
 
 
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
-static TimerHandle_t TimerUpdate[2];
 static uint8_t count = 0;
 static uint16_t mult = 1;
 
@@ -85,7 +84,7 @@ void config_bool(ut_config_var* var)
 		{
 			case 1:  boolStr = boolJogVel;
 			break;
-			default:
+			default: break;
 		}
 		break;
 	case STATE_CONFIG_MENU:
@@ -95,10 +94,10 @@ void config_bool(ut_config_var* var)
 					 value = var->value;
 					 boolStr = boolJogMaq;
 			break;
-			default:
+			default: break;
 		}
 		break;
-	default:
+	default: break;
 	}
 	 menu.title = var->name;
 	 menu.currentState = STATE_CONFIG_VAR;

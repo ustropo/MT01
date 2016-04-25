@@ -84,7 +84,7 @@ void eepromWriteConfig(uint8_t varType)
 						 dataRecord.pData = (uint8_t*)&zeroPiece;
 						 dataRecord.size =sizeof(zeroPiece);
 						 break;
-    	default:
+    	default:		 break;
     }
 
 
@@ -127,7 +127,7 @@ void eepromReadConfig(uint8_t varType)
     	case CONFIGVAR: dataRecord.ID = CONFIGVAR; break;
     	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG; break;
     	case ZEROPIECE: dataRecord.ID = ZEROPIECE; break;
-    	default:
+    	default: break;
     }
 	ret = R_VEE_Read(&dataRecord);
 	/* Check result */
@@ -177,7 +177,7 @@ void eepromReadConfig(uint8_t varType)
     	case CONFIGVAR: memcpy(configVar,dataRecord.pData,sizeof(configVar)); break;
     	case CONFIGFLAG: memcpy(&configFlags,dataRecord.pData,sizeof(configFlags)); break;
     	case ZEROPIECE: memcpy(&zeroPiece,dataRecord.pData,sizeof(zeroPiece)); break;
-    	default:
+    	default: break;
     }
 
 }

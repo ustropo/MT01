@@ -426,12 +426,11 @@ static stat_t _parse_gcode_block_selection_line(char_t *buf)
 	char *pstr = (char *)buf;		// persistent pointer into gcode block for parsing words
   	char letter;					// parsed letter, eg.g. G or X or Y
 	float value = 0;				// value parsed from letter (e.g. 2 for G2)
-	stat_t status = STAT_NOOP;
 	stat_t ret = STAT_NOOP;
 	uint32_t lineNum = 0;
 
 	// extract commands and parameters
-	while((status = _get_next_gcode_word(&pstr, &letter, &value)) == STAT_OK) {
+	while(_get_next_gcode_word(&pstr, &letter, &value) == STAT_OK) {
 		switch(letter) {
 			case 'N': lineNum = value; break;
 			case 'M':
