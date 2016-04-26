@@ -283,7 +283,6 @@ stat_t _command_dispatch()
 		// handle end-of-file from file devices
 		if (status == STAT_EOF) {						// EOF can come from file devices only
 			//gfilerunning = false;
-			intepreterRunning = false;
 			xio_close(cs.primary_src);
 //			macro_func_ptr = command_idle;
 			if (cfg.comm_mode == TEXT_MODE) {

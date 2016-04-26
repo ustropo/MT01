@@ -180,6 +180,7 @@ static void updatePosition(uint8_t menu)
 		/* Delay */
 		vTaskDelay(2000 / portTICK_PERIOD_MS);
 		currentLine = 0;
+		intepreterRunning = false;
 		programEnd = true;
 	}
 	else

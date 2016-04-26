@@ -156,9 +156,15 @@ float pl_thc_pid(void)
 			if (fabs(result) > 0.02)
 			{
 				if(result > 0)
+				{
 					result = 0.02;
+					THC_integral = 0;
+				}
 				else if(result < 0)
+				{
 					result = -0.02;
+					THC_integral = 0;
+				}
 			}
 		}
 	}
