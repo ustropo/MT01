@@ -27,6 +27,7 @@
 
 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
+extern TaskHandle_t xCncTaskHandle;
 extern char gszCurFile[MAX_FILE_PATH_SIZE];
 extern uint32_t choosedLine;
 static float zeroPiecebuffer[3] = {0,0,0};
@@ -224,6 +225,7 @@ static void zerar_peca(void *var)
 		zeroPiece[AXIS_X] = zeroPiecebuffer[AXIS_X];
 		zeroPiece[AXIS_Y] = zeroPiecebuffer[AXIS_Y];
 		zeroPiece[AXIS_Z] = 0;
+		xTaskNotifyGive(xCncTaskHandle);
 		eepromWriteConfig(ZEROPIECE);
 		macro_func_ptr = ZerarMaquina_Macro;
 		zeroPiece[AXIS_X] = 0;

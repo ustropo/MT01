@@ -131,6 +131,7 @@ static void updatePosition(uint8_t menu)
                     	 lStr[3] = "";
 			         break;
 		case AUTO:   lStr[0] = gStrAuto[0];
+					 currentLine = cm_get_linenum(RUNTIME);
  	 	 	 	 	 sprintf(gStrAuto[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrAuto[1];
 			         sprintf(gStrAuto[2], "VEL.: %.0f mm/min",  mp_get_runtime_velocity());
@@ -151,6 +152,7 @@ static void updatePosition(uint8_t menu)
                      }
                      break;
 		case SIM:    lStr[0] = gStrSim[0];
+		 	 	 	 currentLine = cm_get_linenum(RUNTIME);
 	 	 	 	 	 sprintf(gStrSim[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrSim[1];
 			         sprintf(gStrSim[2], "VEL.: %.0f mm/min",  mp_get_runtime_velocity());
@@ -177,6 +179,7 @@ static void updatePosition(uint8_t menu)
 		ut_lcd_output_warning("CORTE AUTOMÁTICO\nFINALIZADO\nPRESSIONE ESC\n");
 		/* Delay */
 		vTaskDelay(2000 / portTICK_PERIOD_MS);
+		currentLine = 0;
 		programEnd = true;
 	}
 	else
@@ -433,6 +436,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				macro_func_ptr = command_idle;
 				intepreterRunning = false;
 				sim = false;
+				currentLine = 0;
 				if (programEnd)
 					return STATE_MANUAL_MODE;
 				return STATE_CONFIG_AUTO_MODE;

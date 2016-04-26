@@ -324,8 +324,8 @@ Configuration Options
    b3:b2   IWDTTOPS - IWDT Timeout Period Select - (0=1024 cycles, 1=4096, 2=8192, 3=16384)
    b1      IWDTSTRT - IWDT Start Mode Select - (0=auto-start after reset, halt after reset)
    b0      Reserved (set to 1) */
-//#define BSP_CFG_OFS0_REG_VALUE  (0xFFFFFF25)
-#define BSP_CFG_OFS0_REG_VALUE  (0xFFFFFFFF)
+#define BSP_CFG_OFS0_REG_VALUE  (0xFFFFFF25)
+//#define BSP_CFG_OFS0_REG_VALUE  (0xFFFFFFFF)
 
 /* Configure whether voltage detection 0 circuit and HOCO are enabled after reset. 
    OFS1 - Option Function Select Register 1 

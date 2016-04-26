@@ -5,6 +5,8 @@
  *      Author: Fernando
  */
 
+#include <stdio.h>
+#include <string.h>
 #include "ut_context.h"
 #include "ut_state.h"
 
@@ -12,6 +14,10 @@
 #include "task.h"
 
 #include "lcd.h"
+#include "keyboard.h"
+#include "plasma.h"
+
+char Str[50];
 
 #define metalique128_width 128
 #define metalique128_height 42
@@ -121,11 +127,25 @@ static unsigned char easymax_bits[] = {
  */
 ut_state ut_state_splash(ut_context* pContext)
 {
+	uint32_t keyEntry = 0;
     IWDT.IWDTRR = 0x00u;
     IWDT.IWDTRR = 0xFFu;
-	if(SYSTEM.RSTSR2.BIT.IWDTRF)
+	if(SYSTEM.RSTSR2.BIT.IWDTRF){
+		pl_emergencia_init();
+    	if (currentLine == 0)
+    		strcpy(Str,"MODO DE EMERG NCIA\n");
+    	else
+    		sprintf(Str,"MODO DE EMERG NCIA\nPARADO LINHA\n%d\n",currentLine);
+    	ut_lcd_output_warning(Str);
+		while(keyEntry != KEY_ENTER){
+			IWDT.IWDTRR = 0x00u;
+			IWDT.IWDTRR = 0xFFu;
+			xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
+		}
+		currentLine = 0;
 		return STATE_MAIN_MENU;
-
+	}
+	currentLine = 0;
 	ut_lcd_clear();
 
 	/* Delay para a inicializa√ß√£o do Display */

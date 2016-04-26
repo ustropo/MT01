@@ -14,6 +14,7 @@
 #define ARCO_OK_FAILED  0xFFFFFFFF
 #define ARCO_OK_OFF     0xFFFFFFFE
 extern SemaphoreHandle_t xArcoOkSync;
+extern uint32_t currentLine;
 
 void pl_arcook_init(void);
 void pl_thc_init(void);

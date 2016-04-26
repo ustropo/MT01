@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NUM_ENTRIES 20
+#define NUM_ENTRIES 2000
 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
 // ***********************************************************************
@@ -78,6 +78,8 @@ ut_state ut_state_line_selection(ut_context* pContext)
 	else
 	{
 		/* Initialize menu */
+		ut_lcd_output_warning("LENDO ARQUIVO\n");
+		iif_bind_line_selection();
 		ut_menu_init(&config_line);
 		choosedLinePosition = 0;
 		choosedLine = 0;
@@ -120,12 +122,13 @@ ut_state ut_state_line_selection(ut_context* pContext)
 		config_line.selectedItem = 0;
 		if(ut_menu_browse(&config_line, DEFAULT_CONFIG_TIMEOUT) < 0)
 		{
+			iif_bind_idle();
 			return STATE_MAIN_MENU;
 		}
 		choosedLinePosition = config_line.items[config_line.selectedItem].value;
 		choosedLine = lineNumEntry[config_line.selectedItem];
 	}
-
+	iif_bind_idle();
 	/* Go back to menu */
 	return STATE_CONFIG_AUTO_MODE;
 }

@@ -126,7 +126,7 @@ extern "C"{
 // Timer definitions. See stepper.h and other headers for setup
 
 #define TIMER_DDA			TMR_CH0		// DDA timer 	(see stepper.h)
-#define TIMER_DWELL	 		CMT_CH1		// Dwell timer	(see stepper.h)
+//#define TIMER_DWELL	 		CMT_CH1		// Dwell timer	(see stepper.h)
 #define TIMER_LOAD			TMR_CH1		// Loader timer	(see stepper.h)
 #define TIMER_EXEC			TMR_CH2		// Exec timer	(see stepper.h)
 #define TIMER_PWM1
@@ -169,7 +169,8 @@ extern "C"{
 #define TRUE			0
 #define FALSE			1
 // Input pins are defined in switch.cpp
-
+extern uint32_t timerDwell;
+extern uint32_t timerEmergencia;
 /********************************
  * Function Prototypes (Common) *
  ********************************/

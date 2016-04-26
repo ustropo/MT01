@@ -726,9 +726,7 @@ static stat_t _exec_aline_segment()
 			mr.gm.target[i] = mr.position[i] + (mr.unit[i] * segment_length);
 		}
 		if(!configFlags && isCuttingGet()){
-			if(delay_thcGet() > (uint16_t)(configVar[DELAY_THC]*10000)){
-				zmove = pl_thc_pid();
-			}
+			zmove = pl_thc_pid();
 		}
 		if(!configFlags && !isCuttingGet()){
 			zmove = 0;
