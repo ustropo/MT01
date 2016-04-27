@@ -121,7 +121,7 @@ void keyboard_task(void)
 
 	while(1)
 	{
-		vTaskDelay(15 / portTICK_RATE_MS);
+		vTaskDelay(30 / portTICK_RATE_MS);
         IWDT.IWDTRR = 0x00u;
         IWDT.IWDTRR = 0xFFu;
 		switch_rtc_callback();					// switch debouncing

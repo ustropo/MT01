@@ -118,7 +118,7 @@ int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout)
 	ut_menu_show(menu_ptr);
 
 	/* Wait for keyboard */
-	while(xQueueReceive( qKeyboard, &keyEntry, timeout ))
+	while(xQueueReceive( qKeyboard, &keyEntry, timeout ) && menu_ptr->selectedItem < menu_ptr->numItems)
 	{
 		/* Check which key */
 		switch (keyEntry)
@@ -175,5 +175,5 @@ int8_t ut_menu_browse(ut_menu* menu_ptr, uint32_t timeout)
 	}
 
 	/* Timeout */
-	return -1;
+	return -2;
 }

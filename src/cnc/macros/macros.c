@@ -102,9 +102,15 @@ stat_t M3_Macro(void)
 				state++; break;
 
 				/*8- DEIXA CORRER O TEMPO DE PERFURAÇÃO "TEMPO DE PERFURAÇÃO" */
-		case 5: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-				SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
-				SET_NON_MODAL_MACRO (parameter, configVar[TEMPO_PERFURACAO]*1000);
+		case 5: if(configVar[TEMPO_PERFURACAO] > 0){
+					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+					SET_NON_MODAL_MACRO (parameter, configVar[TEMPO_PERFURACAO]*1000);
+				}
+				else
+				{
+					delay_thcStartStop(true);
+				}
 				state++; break;
 
 				/*9- DESCE A TOCHA USANDO G01 F800 PARA "ALTURA DE CORTE" */

@@ -94,6 +94,8 @@ void config_bool(ut_config_var* var)
 					 value = var->value;
 					 boolStr = boolJogMaq;
 			break;
+			case 10:  boolStr = boolJogVel;
+			break;
 			default: break;
 		}
 		break;

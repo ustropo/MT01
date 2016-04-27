@@ -30,6 +30,9 @@
 #define THC_VMIN 20
 #define THC_HISTERESE 2
 #define THC_PORCENTAGE 0.2
+#define THC_RAPIDO 0.005
+#define THC_LENTO  0.001
+
 /* Lento */
 #define KI 0.000000125
 #define KP 0.00025
@@ -149,6 +152,15 @@ void pl_thc_read(float *thcValue)
 float pl_thc_pid(void)
 {
 	float result = 0;
+	float THCVel = 0;
+	if(configTHCVel)
+	{
+		THCVel = THC_RAPIDO;
+	}
+	else
+	{
+		THCVel = THC_LENTO;
+	}
 	pl_thc_read(&THC_real);
 	if(delay_thcGet() > (uint16_t)(configVar[DELAY_THC]*10000)){
 		if(THC_real > THC_VMIN)
@@ -173,11 +185,11 @@ float pl_thc_pid(void)
 			THC_err = configVar[TENSAO_THC] - THC_real;
 			if(THC_err > THC_HISTERESE)
 			{
-				result = 0.005;
+				result = THCVel;
 			}
 			if(THC_err < -THC_HISTERESE)
 			{
-				result = -0.005;
+				result = -THCVel;
 			}
 			if(THC_err >= -THC_HISTERESE && THC_err <= THC_HISTERESE)
 			{

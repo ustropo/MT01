@@ -25,6 +25,7 @@ float configVarInit[VAR_MAX] = {
 
 uint32_t configFlagsInit = 0;
 uint32_t configFlags = 0;
+uint32_t configTHCVel = 1;
 
 float configVar[VAR_MAX];
 

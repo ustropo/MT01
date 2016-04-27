@@ -84,7 +84,10 @@ void switch_init(void)
 
 #pragma interrupt IRQ2_isr(vect=VECT(ICU, IRQ2))
 static void IRQ2_isr (void) {
-	_switch_isr_helper(SW_MIN_Z);
+//	_switch_isr_helper(SW_MIN_Z);
+	if ((cm.cycle_state == CYCLE_HOMING) || (cm.cycle_state == CYCLE_PROBE)) {		// regardless of switch type
+		cm_request_feedhold();
+	}
 }
 
 /*

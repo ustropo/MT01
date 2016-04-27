@@ -32,6 +32,7 @@ enum{
 extern float configVar[VAR_MAX];
 extern float zeroPiece[3];
 extern uint32_t configFlags;
+extern uint32_t configTHCVel;
 
 void eepromInit(void);
 void eepromInitVar(void);

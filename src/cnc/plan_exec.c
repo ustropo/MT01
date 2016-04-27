@@ -733,7 +733,7 @@ static stat_t _exec_aline_segment()
 		}
 		if(zmove != 0)
 		{
-			if (mr.unit[2] == 0)
+			if (fp_ZERO(mr.unit[2]))
 			{
 				mr.gm.target[2] += zmove;
 				zmovedlenght += zmove;

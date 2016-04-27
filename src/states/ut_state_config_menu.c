@@ -33,6 +33,7 @@ typedef enum
 	CONFIG_VELOC_JOG_RAPIDO, // VELOC. DE JOG RÁPIDO
 	CONFIG_TENSAO_THC, //" TENSÃO THC",
 	CONFIG_DELAY_THC, //" DELAY THC",
+	CONFIG_VEL_THC, //" VEL THC",
 	CONFIG_MAX           //!< CONFIG_MAX
 } ut_config_name;
 
@@ -53,7 +54,8 @@ static ut_config_type init_types[CONFIG_MAX] =
 	UT_CONFIG_INT,
 	UT_CONFIG_INT,
 	UT_CONFIG_INT,
-	UT_CONFIG_INT
+	UT_CONFIG_INT,
+	UT_CONFIG_BOOL
 };
 
 static char* init_names[CONFIG_MAX] =
@@ -67,7 +69,8 @@ static char* init_names[CONFIG_MAX] =
 	" VELOC. JOG LENTO",
 	" VELOC. JOG RÁPIDO",
 	" TENSÃO THC",
-	" DELAY THC"
+	" DELAY THC",
+	" VELOCIDADE THC"
 };
 
 static float init_step[CONFIG_MAX] =
@@ -81,7 +84,8 @@ static float init_step[CONFIG_MAX] =
 	1,
 	1,
 	1,
-	0.1
+	0.1,
+	0
 };
 
 static float init_max[CONFIG_MAX] =
@@ -95,7 +99,8 @@ static float init_max[CONFIG_MAX] =
 	5000,
 	MOTOR_VMAX,
 	THC_VMAX,
-	5
+	5,
+	0
 };
 
 static float init_min[CONFIG_MAX] =
@@ -109,6 +114,7 @@ static float init_min[CONFIG_MAX] =
 	MOTOR_VMIN,
 	MOTOR_VMIN,
 	THC_VMIN,
+	0,
 	0
 };
 
@@ -123,7 +129,8 @@ static uint8_t init_point[CONFIG_MAX] =
 	0,
 	0,
 	0,
-	1
+	1,
+	0
 };
 
 static char* init_unit[CONFIG_MAX] =
@@ -137,7 +144,8 @@ static char* init_unit[CONFIG_MAX] =
 	"mm/min",
 	"mm/min",
 	"V",
-	"s"
+	"s",
+	""
 };
 
 static const char* gszConfigMenuTitle = "CONFIG. DE CORTE";
@@ -162,6 +170,7 @@ static void init()
 		switch(i)
 		{
 			case CONFIG_CANCELAR_IHS: configs[i].value = &configFlags; break;
+			case CONFIG_VEL_THC: configs[i].value = &configTHCVel; break;
 			default: configs[i].value = &configVar[i];
 					 configs[i].valueMax = init_max[i];
 					 configs[i].valueMin = init_min[i];
