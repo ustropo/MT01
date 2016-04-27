@@ -52,9 +52,9 @@ typedef struct ut_menu_tag
 {
 	ut_menu_item items[MENU_MAX_ITEMS];
 	const char* title;
-	uint8_t selectedItem;
-	uint8_t numItems;
-	uint8_t offset;
+	uint16_t selectedItem;
+	uint16_t numItems;
+	uint16_t offset;
 	uint8_t maxItemsPerPage;
 	uint8_t boShowTitle;
 	ut_state currentState;

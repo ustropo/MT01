@@ -51,7 +51,7 @@ stat_t M3_Macro(void)
 					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_STRAIGHT_PROBE);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], -50);
-					SET_NON_MODAL_MACRO (feed_rate, 1000);
+					SET_NON_MODAL_MACRO (feed_rate, 800);
 #endif
 				}
 				state++; break;

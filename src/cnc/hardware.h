@@ -170,7 +170,7 @@ extern "C"{
 #define FALSE			1
 // Input pins are defined in switch.cpp
 extern uint32_t timerDwell;
-extern uint32_t timerEmergencia;
+extern uint32_t timerMotorPower;
 /********************************
  * Function Prototypes (Common) *
  ********************************/

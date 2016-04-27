@@ -9,6 +9,7 @@
 #include "semphr.h"
 #include "tinyg.h"
 #include "config.h"
+#include "controller.h"
 #include "plasma.h"
 #include "hardware.h"
 #include "switch.h"
@@ -27,6 +28,8 @@
 #define ARCOOK_DELAY_COUNT 33
 
 #define THC_VMIN 20
+#define THC_HISTERESE 2
+#define THC_PORCENTAGE 0.2
 /* Lento */
 #define KI 0.000000125
 #define KP 0.00025
@@ -149,7 +152,7 @@ float pl_thc_pid(void)
 	pl_thc_read(&THC_real);
 	if(delay_thcGet() > (uint16_t)(configVar[DELAY_THC]*10000)){
 		if(THC_real > THC_VMIN)
-		{
+		{/*
 			THC_err = configVar[TENSAO_THC] - THC_real;
 			THC_integral += THC_err;
 			result = (KP * THC_err) + (KI * THC_integral);
@@ -166,6 +169,24 @@ float pl_thc_pid(void)
 					THC_integral = 0;
 				}
 			}
+			*/
+			THC_err = configVar[TENSAO_THC] - THC_real;
+			if(THC_err > THC_HISTERESE)
+			{
+				result = 0.005;
+			}
+			if(THC_err < -THC_HISTERESE)
+			{
+				result = -0.005;
+			}
+			if(THC_err >= -THC_HISTERESE && THC_err <= THC_HISTERESE)
+			{
+				result = 0;
+			}
+			if(fabs(THC_err) > configVar[TENSAO_THC]*THC_PORCENTAGE)
+			{
+				result = 0;
+			}
 		}
 	}
 	return result;
@@ -173,15 +194,14 @@ float pl_thc_pid(void)
 
 void pl_emergencia_init(void)
 {
-    xTaskCreate((pdTASK_CODE)emergencia_task, "Emergencia task", 1024, NULL, 3, NULL );
-    if (R_CMT_CreatePeriodic(10000,timer_motorPower_callback,&timerEmergencia) == false)
-    {
-    	while(1)
-    	{
-			IWDT.IWDTRR = 0x00u;
-			IWDT.IWDTRR = 0xFFu;
-    	}
-    }
+    ICU.IRQCR[8].BIT.IRQMD = 2;
+    IR(ICU, IRQ8)  = 0;            //Clear any previously pending interrupts
+    IPR(ICU, IRQ8) = 3;            //Set interrupt priority
+    IEN(ICU, IRQ8) = 0;            // Enable interrupt
+    IR(ICU, IRQ8)  = 0;            //Clear any previously pending interrupts
+    IEN(ICU, IRQ8) = 1;            // Enable interrupt
+    xTaskCreate((pdTASK_CODE)emergencia_task, "Emergencia task", 256, NULL, 3, &xEmergenciaTaskHandle );
+    R_CMT_CreatePeriodic(10000,timer_motorPower_callback,&timerMotorPower);
 }
 
 void pl_arcook_start(void)
@@ -223,6 +243,17 @@ static void IRQ9_isr (void) {
 
 	    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
+}
+
+#pragma interrupt IRQ8_isr(vect=VECT(ICU, IRQ8))
+static void IRQ8_isr (void) {
+    BaseType_t xHigherPriorityTaskWoken;
+
+    xHigherPriorityTaskWoken = pdFALSE;
+
+    vTaskNotifyGiveFromISR( xEmergenciaTaskHandle, &xHigherPriorityTaskWoken );
+
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
 void plasma_task(void)
@@ -281,39 +312,20 @@ void plasma_task(void)
 void emergencia_task(void)
 {
 	uint8_t emergencyCount = 0;
-	uint8_t resetCount = 0;
 	while(1)
 	{
-		vTaskDelay(10 / portTICK_PERIOD_MS);
-		switch_rtc_callback();					// switch debouncing
-		if(EMERGENCIA)
+		ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+		while(EMERGENCIA)
 		{
+			vTaskDelay(10 / portTICK_PERIOD_MS);
 			emergencyCount++;
-		}
-		else
-		{
-			emergencyCount = 0;
-		}
-        while(emergencyCount == 8)
-        {
-			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
-            ut_lcd_output_warning("SISTEMA INOPERANTE\nMODO DE EMERGÊNCIA\n");
-			IWDT.IWDTRR = 0x00u;
-			IWDT.IWDTRR = 0xFFu;
-			if(!EMERGENCIA)
+			while(emergencyCount == 5)
 			{
-				resetCount++;
-			}
-			else
-			{
-				resetCount = 0;
-			}
-			while(resetCount == 8)
-			{
+				cm_spindle_control(SPINDLE_OFF);
 				R_BSP_InterruptsDisable();
 				while(1){}
 			}
-        }
+		}
 	}
 }
 
@@ -330,13 +342,6 @@ void timer_motorPower_callback(void *pdata)
 			delay_thc++;
 		}
 	}
-
-//	if(EMERGENCIA)
-//	{
-//		xHigherPriorityTaskWoken = pdFALSE;
-//		vTaskNotifyGiveFromISR( xEmergenciaTaskHandle, &xHigherPriorityTaskWoken );
-//		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-//	}
 }
 
 void delay_thcStartStop(bool state)

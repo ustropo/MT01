@@ -133,9 +133,9 @@ static char* init_unit[CONFIG_MAX] =
 	"mm",
 	"s",
 	"mm",
-	"mm/s",
-	"mm/s",
-	"mm/s",
+	"mm/min",
+	"mm/min",
+	"mm/min",
 	"V",
 	"s"
 };

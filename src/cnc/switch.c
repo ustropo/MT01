@@ -83,7 +83,9 @@ void switch_init(void)
 }
 
 #pragma interrupt IRQ2_isr(vect=VECT(ICU, IRQ2))
-static void IRQ2_isr (void) {_switch_isr_helper(SW_MIN_Z);}
+static void IRQ2_isr (void) {
+	_switch_isr_helper(SW_MIN_Z);
+}
 
 /*
  * Switch closure processing routines

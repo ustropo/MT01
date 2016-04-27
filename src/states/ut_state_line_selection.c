@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NUM_ENTRIES 2000
+#define NUM_ENTRIES 20
 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
 // ***********************************************************************

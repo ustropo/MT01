@@ -80,14 +80,14 @@ void iif_bind_filerunning(void)
 {
 	swTimers[ZUP_FILERUNNING_TIMER] = xTimerCreate
 	                   ( "Timer 1",
-	                     ( 100 ),
+	                     ( 500 ),
 	                     pdTRUE,
 	                     ( void * ) ZUP_FILERUNNING_TIMER,
 	                     vTimerCallback
 	                   );
 	swTimers[ZDOWN_FILERUNNING_TIMER] = xTimerCreate
 	                   ( "Timer 1",
-	                     ( 100 ),
+	                     ( 500 ),
 	                     pdTRUE,
 	                     ( void * ) ZDOWN_FILERUNNING_TIMER,
 	                     vTimerCallback

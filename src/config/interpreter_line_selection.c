@@ -35,7 +35,7 @@ void iif_bind_line_selection(void)
 	timeNum = NONE;
 	swTimers[LINE_SELECTION_TIMER] = xTimerCreate
 	                   ( "Timer 1",
-	                     ( 400 ),
+	                     ( 250 ),
 	                     pdTRUE,
 	                     ( void * ) LINE_SELECTION_TIMER,
 						 vTimerLineCallback

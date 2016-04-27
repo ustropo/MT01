@@ -130,8 +130,8 @@ static void output_ports_configure(void)
 	PORT1.PDR.BYTE  = 0xFF ;  /* All  unused pins are outputs */
 
 	/* Port 2 - Plasma - Emergencia (IRQ8), Arco OK (IRQ9), PWM Chp (P22), Tocha (P23)  */
-	PORT2.PMR.BYTE = 0x02;
-//	MPC.P20PFS.BYTE = 0x40; /* IRQ8 - Emergencia */
+	PORT2.PMR.BYTE = 0x03;
+	MPC.P20PFS.BYTE = 0x40; /* IRQ8 - Emergencia */
 	MPC.P21PFS.BYTE = 0x40; /* IRQ9 - Arco Ok */
 	PORT2.PODR.BYTE = 0x08 ;    /* All outputs low to start except TORCH*/
 	PORT2.PDR.BYTE  = 0xFE ;    /* All outputs - Emergencia (Input)  */

@@ -45,7 +45,7 @@ extern "C"{
 #endif
 
 uint32_t timerDwell;
-uint32_t timerEmergencia;
+uint32_t timerMotorPower;
 /*
 uint32_t timerLoad;
  * _port_bindings  - bind XMEGA ports to hardware - these changed at board revision 7
