@@ -80,18 +80,13 @@ stat_t M3_Macro(void)
 
 		case 4: if(configFlags == 0 && !sim){
 					uint32_t lRet;
-#ifndef THC_TESTE
 					//lRet = ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(3000) );
+					pl_arcook_start();
 					lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
-
-#else
-					lRet = ulTaskNotifyTake( pdTRUE, portMAX_DELAY);
-#endif
 					if (lRet == pdFALSE)
 					{
 						uint32_t qSend = ARCO_OK_FAILED;
 						xQueueSend( qKeyboard, &qSend, 0 );
-	//					state = 8;
 						return (STAT_OK);
 					}
 					else

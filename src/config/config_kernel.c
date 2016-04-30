@@ -396,18 +396,25 @@ void FreeRTOSConfig( void )
 #endif
 
     /* USB tasks */
-    xTaskCreate( (pdTASK_CODE)R_usb_hstd_HcdTask,     "USB_HCD_TSK     ",  128, NULL, 5, &task_handle1 ); /* USB_HCD_TASK   */
-    xTaskCreate( (pdTASK_CODE)R_usb_hstd_MgrTask,     "USB_MGR_TSK     ",  128, NULL, 4, &task_handle2 ); /* USB_MGR_TASK   */
-    xTaskCreate( (pdTASK_CODE)R_usb_hhub_Task,        "USB_HUB_TSK     ",  128, NULL, 3, &task_handle3 ); /* USB_HUB_TASK   */
+//    xTaskCreate( (pdTASK_CODE)R_usb_hstd_HcdTask,     "USB_HCD_TSK     ",  128, NULL, 5, &task_handle1 ); /* USB_HCD_TASK   */
+//    xTaskCreate( (pdTASK_CODE)R_usb_hstd_MgrTask,     "USB_MGR_TSK     ",  128, NULL, 4, &task_handle2 ); /* USB_MGR_TASK   */
+//    xTaskCreate( (pdTASK_CODE)R_usb_hhub_Task,        "USB_HUB_TSK     ",  128, NULL, 3, &task_handle3 ); /* USB_HUB_TASK   */
+//
+//    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_Task,          "USB_HMSC_TSK    ",  128, NULL, 3, &task_handle4 ); /* USB_HMSC_TASK  */
+//    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_StrgDriveTask, "USB_HSTRG_TSK   ",  128, NULL, 3, &task_handle5 ); /* USB_HSTRG_TASK */
+//    xTaskCreate( (pdTASK_CODE)hmsc_cstd_task_start,     "HMSC_MAIN_TSK   ",  128, NULL, 2, NULL); /* HMSC_MAIN_TASK      */
 
-    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_Task,          "USB_HMSC_TSK    ",  128, NULL, 3, &task_handle4 ); /* USB_HMSC_TASK  */
-    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_StrgDriveTask, "USB_HSTRG_TSK   ",  128, NULL, 3, &task_handle5 ); /* USB_HSTRG_TASK */
-    xTaskCreate( (pdTASK_CODE)hmsc_cstd_task_start,     "HMSC_MAIN_TSK   ",  128, NULL, 2, NULL); /* HMSC_MAIN_TASK      */
+    xTaskCreate( (pdTASK_CODE)R_usb_hstd_HcdTask,     "USB_HCD_TSK     ",  128, NULL, 6, &task_handle1 ); /* USB_HCD_TASK   */
+    xTaskCreate( (pdTASK_CODE)R_usb_hstd_MgrTask,     "USB_MGR_TSK     ",  128, NULL, 5, &task_handle2 ); /* USB_MGR_TASK   */
+    xTaskCreate( (pdTASK_CODE)R_usb_hhub_Task,        "USB_HUB_TSK     ",  128, NULL, 4, &task_handle3 ); /* USB_HUB_TASK   */
 
+    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_Task,          "USB_HMSC_TSK    ",  128, NULL, 4, &task_handle4 ); /* USB_HMSC_TASK  */
+    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_StrgDriveTask, "USB_HSTRG_TSK   ",  128, NULL, 4, &task_handle5 ); /* USB_HSTRG_TASK */
+    xTaskCreate( (pdTASK_CODE)hmsc_cstd_task_start,     "HMSC_MAIN_TSK   ",  128, NULL, 3, NULL); /* HMSC_MAIN_TASK      */
     /*User interface task*/
-    xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task    ",  512, NULL, 3, NULL); /* keyboard_task      */
-    xTaskCreate( (pdTASK_CODE)states_task,     "states_task    ",  2048, NULL, 2, &task_main_handle); /* states_task      */
-    xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  2048, NULL, 2, &xCncTaskHandle); /* CNC_task      */
+    xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task    ",  512, NULL, 2, NULL); /* keyboard_task      */
+    xTaskCreate( (pdTASK_CODE)states_task,     "states_task    ",  2048, NULL, 1, &task_main_handle); /* states_task      */
+    xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  2048, NULL, 1, &xCncTaskHandle); /* CNC_task      */
 
 }
 

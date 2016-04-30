@@ -465,11 +465,11 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		case ARCO_OK_FAILED:
 			if(!arco)
 			{
-				pl_arcook_stop();
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 				state = 0;
 				macro_func_ptr = command_idle;
 				TORCH = FALSE;
+				pl_arcook_stop();
 				arco = ARCO_OK_FAILED;
 				lstop = false;
 				warm_stop();
@@ -605,6 +605,7 @@ static void warm_stop(void)
 		strcpy(gStrSim[0],STOP_SIM_TITLE);
 		strcpy(gStrSim[1],STOP_AVISO_SIM);
 	}
+	pl_arcook_stop();
 	ltorchBuffer = TORCH;
 	TORCH = FALSE;
 }

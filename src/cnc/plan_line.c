@@ -789,7 +789,7 @@ stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
 {
 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
 	float value;
-	if (configVar[CANCELAR_IHS]){
+	if (!configFlags){
 		value = mr.gm.target[AXIS_Z] - bf->gm.target[AXIS_Z];
 		if(bf->unit[AXIS_Z] > 0)
 		{

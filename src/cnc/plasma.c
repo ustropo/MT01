@@ -50,6 +50,7 @@ static uint16_t delay_thcStart = false;
 TaskHandle_t xPlasmaTaskHandle;
 TaskHandle_t xEmergenciaTaskHandle;
 SemaphoreHandle_t xArcoOkSync;
+bool ArcoOktaskIdle = false;
 extern bool simTorch;
 volatile uint16_t    data;
 float THC_real;
@@ -72,10 +73,10 @@ void pl_arcook_init(void)
     IEN(ICU, IRQ0) = 0;            // Enable interrupt
     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
 #else
-    ICU.IRQCR[9].BIT.IRQMD = 3;
-    IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
-    IPR(ICU, IRQ9) = 3;            //Set interrupt priority
-    IEN(ICU, IRQ9) = 0;            // Enable interrupt
+//    ICU.IRQCR[9].BIT.IRQMD = 1;    // Borda de descida
+//    IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
+//    IPR(ICU, IRQ9) = 3;            //Set interrupt priority
+//    IEN(ICU, IRQ9) = 0;            // Enable interrupt
 
 	xTaskCreate((pdTASK_CODE)plasma_task, "Plasma task", 512, NULL, 3, &xPlasmaTaskHandle );
     /* Attempt to create a semaphore. */
@@ -222,8 +223,11 @@ void pl_arcook_start(void)
     IR(ICU, IRQ0)  = 0;            //Clear any previously pending interrupts
     IEN(ICU, IRQ0) = 1;            // Enable interrupt
 #else
-    IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
-    IEN(ICU, IRQ9) = 1;            // Enable interrupt
+
+//	IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
+//	IEN(ICU, IRQ9) = 1;            // Enable interrupt
+//	xSemaphoreTake( xArcoOkSync, 0 );
+    xTaskNotifyGive( xPlasmaTaskHandle);
 	arcoOkSet(false);
 #endif
 }
@@ -234,8 +238,10 @@ void pl_arcook_stop(void)
     IEN(ICU, IRQ0) = 0;            // Disable interrupt
     IR(ICU, IRQ0)  = 0;            //Clear any previously pending interrupts
 #else
-    IEN(ICU, IRQ9) = 0;            // Disable interrupt
-    IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
+//    IEN(ICU, IRQ9) = 0;            // Disable interrupt
+//    IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
+//    xTaskNotifyGive( xPlasmaTaskHandle);
+    ArcoOktaskIdle = false;
 	arcoOkSet(false);
 #endif
 }
@@ -247,13 +253,16 @@ static void IRQ0_isr (void) {
 #pragma interrupt IRQ9_isr(vect=VECT(ICU, IRQ9))
 static void IRQ9_isr (void) {
 #endif
-	    BaseType_t xHigherPriorityTaskWoken;
-
-	    xHigherPriorityTaskWoken = pdFALSE;
-
-	    vTaskNotifyGiveFromISR( xPlasmaTaskHandle, &xHigherPriorityTaskWoken );
-
-	    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+//	    BaseType_t xHigherPriorityTaskWoken;
+//
+//	    xHigherPriorityTaskWoken = pdFALSE;
+//
+//	    vTaskNotifyGiveFromISR( xPlasmaTaskHandle, &xHigherPriorityTaskWoken );
+//
+//	    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+//
+//        IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
+//        IEN(ICU, IRQ9) = 0;            // Enable interrupt
 
 }
 
@@ -278,46 +287,48 @@ void plasma_task(void)
 	{
 		arcoOkSet(false);
         ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+        ArcoOktaskIdle = true;
         debounce = 0;
-        for(uint8_t i = 0; i < DEBOUNCE_COUNT; i++){
-        	pinState = ARCO_OK;
-            vTaskDelay(pdMS_TO_TICKS(10));
-            if(pinState == ARCO_OK)
-            {
-            	debounce++;
-            }
-        }
-        if(debounce == DEBOUNCE_COUNT)
+        while(ArcoOktaskIdle)
         {
-			if (!ARCO_OK)
+			pinState = ARCO_OK;
+			vTaskDelay(pdMS_TO_TICKS(10));
+			if(pinState == ARCO_OK)
 			{
-				if (!simTorch)
+				debounce++;
+			}
+			if(debounce == DEBOUNCE_COUNT)
+			{
+				if (!ARCO_OK)
 				{
-					//xTaskNotifyGive(xCncTaskHandle);
-					xSemaphoreGive( xArcoOkSync );
+					if (!simTorch)
+					{
+						//xTaskNotifyGive(xCncTaskHandle);
+						xSemaphoreGive( xArcoOkSync );
+					}
+				}
+				debounce = 0;
+				do
+				{
+					if(ARCO_OK)
+					{
+						debounce++;
+						arcoOkSet(false);
+					}
+					else
+					{
+						debounce = 0;
+						arcoOkSet(true);
+					}
+					vTaskDelay(pdMS_TO_TICKS(10));
+				}while(debounce != ARCOOK_DELAY_COUNT && isCutting && ArcoOktaskIdle);
+				if (isCutting && ArcoOktaskIdle)
+				{
+					qSend = ARCO_OK_FAILED;
+					xQueueSend( qKeyboard, &qSend, 0 );
 				}
 			}
-            debounce = 0;
-        	do
-        	{
-				if(ARCO_OK)
-				{
-					debounce++;
-					arcoOkSet(false);
-				}
-				else
-				{
-					debounce = 0;
-		        	arcoOkSet(true);
-				}
-				vTaskDelay(pdMS_TO_TICKS(10));
-        	}while(debounce != ARCOOK_DELAY_COUNT && isCutting);
-        	if (isCutting)
-        	{
-        		qSend = ARCO_OK_FAILED;
-        		xQueueSend( qKeyboard, &qSend, 0 );
-        	}
-        }
+		}
 	}
 }
 

@@ -17,8 +17,8 @@
 // ***> NOTE: The init message must be a single line with no CRs or LFs
 #define INIT_MESSAGE "Initializing configs to Shapeoko2 500mm profile"
 
-#define JUNCTION_DEVIATION		0.1	// default value, in mm - smaller is faster
-#define JUNCTION_ACCELERATION	2000000	// 2 million - centripetal acceleration around corners
+#define JUNCTION_DEVIATION		0.03// default value, in mm - smaller is faster
+#define JUNCTION_ACCELERATION	1500000	// 2 million - centripetal acceleration around corners
 
 // *** settings.h overrides ***
 
