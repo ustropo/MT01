@@ -42,6 +42,7 @@ Macro definitions
 #endif
 
 #define USB_DISCONNECTED (0x55555555)
+#define EMERGENCIA_SIGNAL (0xAAAAAAAA)
 /******************************************************************************
 Section    <Section Definition> , "Data Sections"
 ******************************************************************************/

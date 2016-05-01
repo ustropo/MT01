@@ -17,7 +17,7 @@
 #include "keyboard.h"
 #include "plasma.h"
 
-char Str[50];
+static char Str[50];
 
 #define metalique128_width 128
 #define metalique128_height 42

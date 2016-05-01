@@ -11,6 +11,7 @@
 #include "config.h"
 #include "controller.h"
 #include "plasma.h"
+#include "spindle.h"
 #include "hardware.h"
 #include "switch.h"
 #include "canonical_machine.h"
@@ -19,6 +20,7 @@
 #include "lcd.h"
 #include "eeprom.h"
 #include "config_SwTimers.h"
+#include "macros.h"
 
 #include "platform.h"
 #include "r_s12ad_rx_if.h"
@@ -42,6 +44,10 @@
 
 void timer_motorPower_callback(void *pdata);
 void emergencia_task(void);
+extern void warm_stop(void);
+
+extern bool simTorch;
+extern bool lstop;
 
 static bool isCutting = false;
 static bool arcoOk = false;
@@ -49,13 +55,14 @@ static uint16_t delay_thc = 0;
 static uint16_t delay_thcStart = false;
 TaskHandle_t xPlasmaTaskHandle;
 TaskHandle_t xEmergenciaTaskHandle;
+bool emergenciaFlag = false;
 SemaphoreHandle_t xArcoOkSync;
 bool ArcoOktaskIdle = false;
-extern bool simTorch;
 volatile uint16_t    data;
 float THC_real;
 float THC_err;
 float THC_integral;
+static char Str[50];
 
 #pragma section B NOINIT
 uint32_t currentLine;
@@ -334,19 +341,46 @@ void plasma_task(void)
 
 void emergencia_task(void)
 {
+	uint32_t keyEntry = 0;
 	uint8_t emergencyCount = 0;
+	bool realease = false;
 	while(1)
 	{
+		emergenciaFlag = false;
+		realease = false;
+	    IR(ICU, IRQ8)  = 0;            //Clear any previously pending interrupts
+	    IEN(ICU, IRQ8) = 1;            // Enable interrupt
 		ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
-		while(EMERGENCIA)
+	    IR(ICU, IRQ8)  = 0;            //Clear any previously pending interrupts
+	    IEN(ICU, IRQ8) = 0;            // Enable interrupt
+		while(EMERGENCIA && !realease)
 		{
 			vTaskDelay(10 / portTICK_PERIOD_MS);
 			emergencyCount++;
-			while(emergencyCount == 5)
+			if(emergencyCount == 5)
 			{
+				emergenciaFlag = true;
+				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 				cm_spindle_control(SPINDLE_OFF);
-				R_BSP_InterruptsDisable();
-				while(1){}
+	    		lstop = true;
+				warm_stop();
+		    	if (currentLine == 0){
+		    		strcpy(Str,"MODO DE EMERGÊNCIA\n");
+		    	}
+		    	else
+		    	{
+		    		sprintf(Str,"MODO DE EMERGÊNCIA\nPARADO LINHA\n%d\n",currentLine);
+		    	}
+		    	ut_lcd_output_warning(Str);
+				while(keyEntry != KEY_ENTER){
+					IWDT.IWDTRR = 0x00u;
+					IWDT.IWDTRR = 0xFFu;
+					xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
+				}
+				keyEntry = EMERGENCIA_SIGNAL;
+				xQueueSend( qKeyboard, &keyEntry, 0 );
+				realease = true;
+				emergencyCount = 0;
 			}
 		}
 	}

@@ -106,7 +106,7 @@ static char gStrDesloca[4][24] =
 
 
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
-static void warm_stop(void);
+void warm_stop(void);
 static bool ltorchBuffer = false;
 
 /**
@@ -282,6 +282,10 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 
 		case KEY_RELEASED:
 			iif_func_released();
+			break;
+
+		case EMERGENCIA_SIGNAL:
+			xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 			break;
 		/* TODO: operate machine - with other keys */
 		default:
@@ -496,6 +500,20 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			vTaskDelay(2000 / portTICK_PERIOD_MS);
 			return STATE_CONFIG_AUTO_MODE;
 		break;
+
+		case EMERGENCIA_SIGNAL:
+			if(!sim){
+				updatePosition(AUTO);
+				gTitle = AUTO;
+			}
+			else{
+				updatePosition(SIM);
+				gTitle = SIM;
+			}
+			xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
+			break;
+
+		default: break;
 		}
 
 
@@ -573,7 +591,11 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 		case KEY_RELEASED:
 			iif_func_released();
 			break;
-		/* TODO: operate machine - with other keys */
+
+		case EMERGENCIA_SIGNAL:
+			xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
+			break;
+
 		default:
 			break;
 		}
@@ -593,7 +615,7 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 	updatePosition(gTitle);
 }
 
-static void warm_stop(void)
+void warm_stop(void)
 {
 
 	//iif_bind_filerunning_stop(lstop);

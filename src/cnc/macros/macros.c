@@ -15,6 +15,7 @@
 #include "keyboard.h"
 
 extern float *velocidadeJog;
+extern bool emergenciaFlag;
 
 uint8_t jogAxis;
 float jogMaxDistance;
@@ -83,6 +84,11 @@ stat_t M3_Macro(void)
 					//lRet = ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(3000) );
 					pl_arcook_start();
 					lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
+//					if(emergenciaFlag){
+//						state = 0;
+//						macro_func_ptr = command_idle;
+//						return (STAT_OK);
+//					}
 					if (lRet == pdFALSE)
 					{
 						uint32_t qSend = ARCO_OK_FAILED;
