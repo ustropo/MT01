@@ -287,6 +287,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 		case EMERGENCIA_SIGNAL:
 			xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 			break;
+
 		/* TODO: operate machine - with other keys */
 		default:
 

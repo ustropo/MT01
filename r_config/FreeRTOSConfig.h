@@ -106,7 +106,7 @@
 #define configUSE_APPLICATION_TASK_TAG	0
 #define configUSE_QUEUE_SETS			1
 #define configUSE_COUNTING_SEMAPHORES	1
-#define configMAX_PRIORITIES			( 7 )
+#define configMAX_PRIORITIES			( 8 )
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 
 /* Software timer definitions. */
