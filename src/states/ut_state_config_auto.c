@@ -15,6 +15,7 @@
 #include "interpreter_if.h"
 #include "eeprom.h"
 #include "macros.h"
+#include "state_functions.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -57,7 +58,7 @@ static const ut_state geNextStateAuto[5] =
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
-	STATE_LINE_SELECTION,
+	STATE_CONFIG_VAR,
 };
 
 /* Initial values for each config variable */
@@ -67,7 +68,7 @@ static ut_config_type init_types[CONFIG_AUTO_MAX] =
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
-	UT_CONFIG_NULL
+	UT_CONFIG_INT
 };
 
 static uint32_t init_values[CONFIG_AUTO_MAX] =
@@ -114,7 +115,6 @@ static void init()
 		}
 		return;
 	}
-
 	/* Zero all values */
 	memset(configs_auto, 0, sizeof(configs_auto));
 
@@ -128,8 +128,12 @@ static void init()
 		configs_auto[i].currentState = STATE_CONFIG_AUTO_MODE;
 		configs_auto[i].currentItem = i;
 	}
-
-	initialized = true;
+	configs_auto[CONFIG_SELECIONAR_LINHA].unit = "";
+	configs_auto[CONFIG_SELECIONAR_LINHA].step = 1;
+	configs_auto[CONFIG_SELECIONAR_LINHA].valueMax = 100000;
+	configs_auto[CONFIG_SELECIONAR_LINHA].valueMin = 0;
+	configs_auto[CONFIG_SELECIONAR_LINHA].value = &selecionarLinhas;
+	initialized = false;
 }
 
 /**
@@ -203,6 +207,29 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 			configsVar->name = "DESEJA CONTINUAR?";
 			pContext->value[0] = STATE_CONFIG_AUTO_MODE;
 			pContext->value[1] = STATE_DESLOCAZERO_MODE;
+			break;
+		case CONFIG_SELECIONAR_LINHA:
+			if(gszCurFile[0] == NULL)
+			{
+				ut_lcd_output_warning("NENHUM ARQUIVO\n\
+									   CARREGADO\n");
+
+				vTaskDelay(2000 / portTICK_PERIOD_MS);
+				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
+				pContext->value[1] = STATE_CONFIG_AUTO_MODE;
+				return STATE_CONFIG_AUTO_MODE;
+			}
+			else
+			{
+				configsVar->valueMax = (float)selecionarlinhasMax();
+				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
+				pContext->value[1] = STATE_CONFIG_AUTO_MODE;
+				if (configsVar->valueMax < 1){
+					ut_lcd_output_warning("FORMATO NÃO\nRECONHECIDO\n");
+					vTaskDelay(2000 / portTICK_PERIOD_MS);
+					return STATE_CONFIG_AUTO_MODE;
+				}
+			}
 			break;
 		default:
 			pContext->value[0] = STATE_CONFIG_AUTO_MODE;

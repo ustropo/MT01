@@ -14,6 +14,7 @@
 #include "task.h"
 #include "timers.h"
 #include "config_SwTimers.h"
+#include "state_functions.h"
 
 #include "lcd.h"
 #include "lcd_menu.h"
@@ -79,6 +80,14 @@ void config_bool(ut_config_var* var)
 	boolStr = boolOptions;
 	switch(configsVar->currentState)
 	{
+	case STATE_CONFIG_AUTO_MODE:
+		switch(configsVar->currentItem)
+		{
+			case 4:  boolStr = selecionarLinhatexto();
+			break;
+			default: break;
+		}
+		break;
 	case STATE_CONFIG_MANUAL_MODE:
 		switch(configsVar->currentItem)
 		{
@@ -191,11 +200,17 @@ void config_int(ut_config_var* var)
 			break;
 
 		case KEY_ENTER:
-			eepromWriteConfig(CONFIGVAR);
-			ut_lcd_output_warning("     VALOR     \n\
-								     SALVO     \n");
-					/* Delay */
-			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			if (configsVar->currentState == STATE_CONFIG_MENU){
+				eepromWriteConfig(CONFIGVAR);
+				ut_lcd_output_warning("     VALOR     \n\
+										 SALVO     \n");
+						/* Delay */
+				vTaskDelay(2000 / portTICK_PERIOD_MS);
+			}
+			else
+			{
+				selecionarlinhas();
+			}
 			mult = 1;
 			count = 0;
 			return;
@@ -285,6 +300,17 @@ ut_state ut_state_config_var(ut_context* pContext)
 					else
 					{
 						sim = false;
+					}
+					break;
+				case 4:
+					if(configsVar->type == UT_CONFIG_BOOL){
+					var_handlers[configsVar->type](configsVar);
+					linhaSelecionada(*Flag);
+					}
+					else
+					{
+						ut_lcd_output_warning("NENHUM PONTO\nDE ENTRADA\nENCONTRADO\n");
+						vTaskDelay(2000 / portTICK_PERIOD_MS);
 					}
 					break;
 			}

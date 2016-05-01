@@ -30,8 +30,9 @@
 extern "C"{
 #endif
 
-extern uint32_t lineNumEntry[100];
-extern uint16_t index;
+extern uint32_t currentLineSel;
+extern uint32_t LineM5;
+extern float selecionarLinhas;
 
 struct gcodeParserSingleton {	 	  // struct to manage globals
 	uint8_t modals[MODAL_GROUP_COUNT];// collects modal groups in a block
@@ -423,6 +424,7 @@ static stat_t _parse_gcode_block(char_t *buf)
 
 static stat_t _parse_gcode_block_selection_line(char_t *buf)
 {
+	static bool next = false;
 	char *pstr = (char *)buf;		// persistent pointer into gcode block for parsing words
   	char letter;					// parsed letter, eg.g. G or X or Y
 	float value = 0;				// value parsed from letter (e.g. 2 for G2)
@@ -432,11 +434,23 @@ static stat_t _parse_gcode_block_selection_line(char_t *buf)
 	// extract commands and parameters
 	while(_get_next_gcode_word(&pstr, &letter, &value) == STAT_OK) {
 		switch(letter) {
-			case 'N': lineNum = value; break;
+			case 'N':
+				lineNum = value;
+				currentLineSel = lineNum;
+				if (lineNum == (uint32_t)selecionarLinhas)
+				{
+					next = true;
+				}
+			break;
 			case 'M':
 				switch((uint8_t)value) {
-					case 5: lineNumEntry[index++] = lineNum;
+					case 5: LineM5 = lineNum;
 							ret = STAT_OK;
+							if(next)
+							{
+								ret = STAT_COMPLETE;
+								next = false;
+							}
 							break;
 				}
 				break;
