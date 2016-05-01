@@ -36,6 +36,7 @@ float selecionarLinhas = 0;
 uint32_t LineM5 = 0;
 uint32_t currentLineSel = 0;
 static char strLinhas[2][20];
+char** pstrLinhas;
 
 uint32_t selecionarlinhasMax(void)
 {
@@ -107,12 +108,11 @@ void selecionarlinhas(void)
 
 char** selecionarLinhatexto(void)
 {
-	char** str;
 	sprintf(strLinhas[0], "ENTRADA LINHA %d", lineEntries[0]);
 	sprintf(strLinhas[1], "ENTRADA LINHA %d", lineEntries[1]);
-	str[0] = strLinhas[0];
-	str[1] = strLinhas[1];
-	return str;
+	pstrLinhas[0] = strLinhas[0];
+	pstrLinhas[1] = strLinhas[1];
+	return pstrLinhas;
 }
 
 void linhaSelecionada(uint32_t flag)

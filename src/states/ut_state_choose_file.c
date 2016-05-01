@@ -27,6 +27,9 @@ FATFS  st_usb_fatfs;
 DIR	   st_usb_dir;
 char gszCurFile[MAX_FILE_PATH_SIZE];
 extern bool drivemountFlag;
+extern uint32_t choosedLine;
+extern uint32_t choosedLinePosition;
+extern uint32_t currentLineSel;
 
 // ***********************************************************************
 // Internal variables
@@ -281,6 +284,9 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		return STATE_MAIN_MENU;
 	}
 
+	choosedLine = 0;
+	choosedLinePosition = 0;
+	currentLineSel = 0;
 	/* Fat is mounted */
 	ut_lcd_clear();
 

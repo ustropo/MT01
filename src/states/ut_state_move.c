@@ -123,7 +123,7 @@ static void updatePosition(uint8_t menu)
 	{
 		case MANUAL: lStr[0] = gStrManual[0];
 					 lStr[1] = gStrManual[1];
-			         sprintf(gStrManual[2], "VEL.: %.0f mm/s", *velocidadeJog);
+			         sprintf(gStrManual[2], "VEL.: %.0f mm/min", *velocidadeJog);
 			         lStr[2] = gStrManual[2];
                      if (arcoOkGet())
                     	 lStr[3] = "AOK";

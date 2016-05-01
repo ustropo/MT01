@@ -54,6 +54,7 @@ static stat_t _exec_aline_segment(void);
 static void _init_forward_diffs(float Vi, float Vt);
 #endif
 
+extern bool sim;
 static bool zmoved = false;
 static float zmovedlenght = 0;
 
@@ -728,7 +729,7 @@ static stat_t _exec_aline_segment()
 		if(!configFlags && isCuttingGet()){
 			zmove = pl_thc_pid();
 		}
-		if(!configFlags && !isCuttingGet()){
+		if(!configFlags && !isCuttingGet() && !sim){
 			zmove = 0;
 		}
 		if(zmove != 0)
