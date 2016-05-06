@@ -77,17 +77,18 @@ void switch_init(void)
     ICU.IRQCR[2].BIT.IRQMD = 2;
     IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
     IPR(ICU, IRQ2) = 5;            //Set interrupt priority
-    IEN(ICU, IRQ2) = 1;            // Enable interrupt
+    IEN(ICU, IRQ2) = 0;            // Enable interrupt
 #endif
     reset_switches();
 }
 
 #pragma interrupt IRQ2_isr(vect=VECT(ICU, IRQ2))
 static void IRQ2_isr (void) {
-//	_switch_isr_helper(SW_MIN_Z);
-	if ((cm.cycle_state == CYCLE_HOMING) || (cm.cycle_state == CYCLE_PROBE)) {		// regardless of switch type
-		cm_request_feedhold();
-	}
+	_switch_isr_helper(SW_MIN_Z);
+//	if ((cm.cycle_state == CYCLE_HOMING) || (cm.cycle_state == CYCLE_PROBE)) {		// regardless of switch type
+//		cm_request_feedhold();
+//	    IEN(ICU, IRQ2) = 0;            // Disable interrupt
+//	}
 }
 
 /*
