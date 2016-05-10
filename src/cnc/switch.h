@@ -174,6 +174,8 @@ typedef struct swSwitchArray {					// array of switches
 	switch_t s[SW_PAIRS][SW_POSITIONS];
 } switches_t;
 
+extern bool zinhibitor;
+
 /****************************************************************************************
  * Function prototypes
  */

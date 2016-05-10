@@ -130,21 +130,21 @@ ut_state ut_state_splash(ut_context* pContext)
 	uint32_t keyEntry = 0;
     IWDT.IWDTRR = 0x00u;
     IWDT.IWDTRR = 0xFFu;
-	if(SYSTEM.RSTSR2.BIT.IWDTRF){
-		pl_emergencia_init();
-    	if (currentLine == 0)
-    		strcpy(Str,"MODO DE EMERGÊNCIA\n");
-    	else
-    		sprintf(Str,"MODO DE EMERGÊNCIA\nPARADO LINHA\n%d\n",currentLine);
-    	ut_lcd_output_warning(Str);
-		while(keyEntry != KEY_ENTER){
-			IWDT.IWDTRR = 0x00u;
-			IWDT.IWDTRR = 0xFFu;
-			xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
-		}
-		currentLine = 0;
-		return STATE_MAIN_MENU;
-	}
+//	if(SYSTEM.RSTSR2.BIT.IWDTRF){
+//		pl_emergencia_init();
+//    	if (currentLine == 0)
+//    		strcpy(Str,"MODO DE EMERGÊNCIA\n");
+//    	else
+//    		sprintf(Str,"MODO DE EMERGÊNCIA\nPARADO LINHA\n%d\n",currentLine);
+//    	ut_lcd_output_warning(Str);
+//		while(keyEntry != KEY_ENTER){
+//			IWDT.IWDTRR = 0x00u;
+//			IWDT.IWDTRR = 0xFFu;
+//			xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
+//		}
+//		currentLine = 0;
+//		return STATE_MAIN_MENU;
+//	}
 	currentLine = 0;
 	ut_lcd_clear();
 
@@ -156,7 +156,7 @@ ut_state ut_state_splash(ut_context* pContext)
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 
-	ut_lcd_bitmap(0,11,easymax_width,easymax_height,easymax_bits,"Versão 1.0.0");
+	ut_lcd_bitmap(0,11,easymax_width,easymax_height,easymax_bits,"Versão 1.0.1");
 
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);

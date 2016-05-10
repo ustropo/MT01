@@ -40,6 +40,7 @@
 #include "util.h"
 #include "lcd.h"
 #include "plasma.h"
+#include "switch.h"
 
 /**** Allocate structures ****/
 
@@ -645,7 +646,9 @@ void timer_dda_callback(void *pdata)
 	if (!flag_dda)
 	{
 		if ((st_run.mot[MOTOR_1].substep_accumulator += st_run.mot[MOTOR_1].substep_increment) > 0) {
-			MOTOR1_STEP = TRUE;		// turn step bit on
+			if(!zinhibitor){
+				MOTOR1_STEP = TRUE;		// turn step bit on
+			}
 			st_run.mot[MOTOR_1].substep_accumulator -= st_run.dda_ticks_X_substeps;
 			INCREMENT_ENCODER(MOTOR_1);
 		}

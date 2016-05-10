@@ -47,6 +47,7 @@
 #include "text_parser.h"
 
 struct swStruct sw;
+bool zinhibitor = false;
 
 static void _switch_isr_helper(uint8_t sw_num);
 
@@ -84,11 +85,12 @@ void switch_init(void)
 
 #pragma interrupt IRQ2_isr(vect=VECT(ICU, IRQ2))
 static void IRQ2_isr (void) {
-	_switch_isr_helper(SW_MIN_Z);
-//	if ((cm.cycle_state == CYCLE_HOMING) || (cm.cycle_state == CYCLE_PROBE)) {		// regardless of switch type
-//		cm_request_feedhold();
-//	    IEN(ICU, IRQ2) = 0;            // Disable interrupt
-//	}
+//	_switch_isr_helper(SW_MIN_Z);
+	if ((cm.cycle_state == CYCLE_HOMING) || (cm.cycle_state == CYCLE_PROBE)) {		// regardless of switch type
+		zinhibitor = true;
+		cm_request_feedhold();
+	    IEN(ICU, IRQ2) = 0;            // Disable interrupt
+	}
 }
 
 /*

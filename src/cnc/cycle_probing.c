@@ -35,6 +35,7 @@
 #include "util.h"
 #include "planner.h"
 #include "hardware.h"
+#include "switch.h"
 
 extern bool lstop;
 /**** Probe singleton structure ****/
@@ -218,16 +219,17 @@ static stat_t _probing_start()
 {
 	// initial probe state, don't probe if we're already contacted!
 #ifndef __NEW_SWITCHES
-    IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
-    IEN(ICU, IRQ2) = 1;            // Enable interrupt
+
 	int8_t probe = sw.state[pb.probe_switch];
 #else
 	int8_t probe = read_switch(pb.probe_switch_axis, pb.probe_switch_position);
 #endif
 
-    if( probe==SW_OPEN ) {
-        ritorno(cm_straight_feed(pb.target, pb.flags));
-    }
+//    if( probe==SW_OPEN ) {
+    IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
+    IEN(ICU, IRQ2) = 1;            // Enable interrupt
+    ritorno(cm_straight_feed(pb.target, pb.flags));
+//    }
 	return (_set_pb_func(_probing_finish));
 }
 
@@ -302,6 +304,7 @@ void _probe_restore_settings()
 static stat_t _probing_finalize_exit()
 {
 	_probe_restore_settings();
+	zinhibitor = false;
 	return (STAT_OK);
 }
 
