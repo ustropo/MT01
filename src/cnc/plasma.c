@@ -355,9 +355,9 @@ void emergencia_task(void)
 	    IEN(ICU, IRQ8) = 0;            // Enable interrupt
 		while(EMERGENCIA && !realease)
 		{
-			vTaskDelay(10 / portTICK_PERIOD_MS);
+			vTaskDelay(1 / portTICK_PERIOD_MS);
 			emergencyCount++;
-			if(emergencyCount == 5)
+			if(emergencyCount == 200)
 			{
 				emergenciaFlag = true;
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
