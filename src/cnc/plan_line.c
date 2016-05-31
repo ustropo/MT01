@@ -333,12 +333,15 @@ static void _calc_move_times(GCodeState_t *gms, const float axis_length[], const
 		if (gms->feed_rate_mode == INVERSE_TIME_MODE) {
 			inv_time = gms->feed_rate;	// NB: feed rate was un-inverted to minutes by cm_set_feed_rate()
             // inject feed rate override here for inverse time moves
+#ifdef VEL_CHANGE
             if (cm.gmx.feed_rate_override_enable) {
             	if(axis_length[AXIS_Z] == 0)
             		inv_time /=  cm.gmx.feed_rate_override_factor;
             }
+#endif
 			gms->feed_rate_mode = UNITS_PER_MINUTE_MODE;
 		} else {
+#ifdef VEL_CHANGE
             // inject feed rate override here
             float feed_rate;
             if(cm.gmx.feed_rate_override_enable && axis_length[AXIS_Z] == 0){
@@ -352,6 +355,9 @@ static void _calc_move_times(GCodeState_t *gms, const float axis_length[], const
             {
             	feed_rate = gms->feed_rate;
             }
+#else
+            float feed_rate = gms->feed_rate;
+#endif
 
 			// compute length of linear move in millimeters. Feed rate is provided as mm/min
 			xyz_time = sqrt(axis_square[AXIS_X] + axis_square[AXIS_Y] + axis_square[AXIS_Z]) / feed_rate;
@@ -812,9 +818,10 @@ stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
 
 	return (STAT_OK);
 }
-
+#ifdef VEL_CHANGE
 stat_t mp_plan_feedrateoverride_callback(mpBuf_t *bf)
 {
+
 //	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
 
 //	if (bf == NULL) return (STAT_ERROR);
@@ -846,5 +853,5 @@ stat_t mp_plan_feedrateoverride_callback(mpBuf_t *bf)
 //	_plan_block_list(bf, &mr_flag);
 	return (STAT_OK);
 }
-
+#endif
 

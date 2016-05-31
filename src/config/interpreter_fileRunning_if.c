@@ -60,11 +60,15 @@ void iif_left_filerunning(void){}
 void iif_right_filerunning(void) {}
 void iif_down_filerunning(void)
 {
+#ifdef VEL_CHANGE
 	  xTimerStart( swTimers[DOWN_FILERUNNING_TIMER], 0 );
+#endif
 }
 void iif_up_filerunning(void)
 {
+#ifdef VEL_CHANGE
 	  xTimerStart( swTimers[UP_FILERUNNING_TIMER], 0 );
+#endif
 }
 
 void iif_released_filerunning(void)
@@ -72,8 +76,10 @@ void iif_released_filerunning(void)
 	zmove = 0;
 	xTimerStop(swTimers[ZDOWN_FILERUNNING_TIMER], 0 );
 	xTimerStop(swTimers[ZUP_FILERUNNING_TIMER], 0 );
+#ifdef VEL_CHANGE
 	xTimerStop(swTimers[DOWN_FILERUNNING_TIMER], 0 );
 	xTimerStop(swTimers[UP_FILERUNNING_TIMER], 0 );
+#endif
 }
 
 void iif_bind_filerunning(void)
@@ -92,6 +98,7 @@ void iif_bind_filerunning(void)
 	                     ( void * ) ZDOWN_FILERUNNING_TIMER,
 	                     vTimerCallback
 	                   );
+#ifdef VEL_CHANGE
 	swTimers[DOWN_FILERUNNING_TIMER] = xTimerCreate
 	                   ( "Timer 1",
 	                     ( 500 ),
@@ -106,6 +113,7 @@ void iif_bind_filerunning(void)
 	                     ( void * ) UP_FILERUNNING_TIMER,
 						 vTimerCallbackVelocity
 	                   );
+#endif
 	iif_func_enter = &iif_enter_filerunning;
 	iif_func_esc = &iif_idle;
 	iif_func_down = &iif_down_filerunning;
@@ -165,6 +173,7 @@ void vTimerCallback( TimerHandle_t pxTimer )
 	}
 }
 
+#ifdef VEL_CHANGE
 void vTimerCallbackVelocity( TimerHandle_t pxTimer )
 {
 	long lArrayIndex;
@@ -191,3 +200,4 @@ void vTimerCallbackVelocity( TimerHandle_t pxTimer )
 	}
 
 }
+#endif
