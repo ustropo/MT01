@@ -33,6 +33,11 @@ static void iif_zdown_filerunning(void);
 static void iif_zup_filerunning(void);
 static void iif_released_filerunning(void);
 
+static void iif_enter_warning(void);
+static void iif_esc_warning(void);
+static void iif_down_warning(void);
+static void iif_up_warning(void);
+
 float zmove = 0;
 float feedratepercent = 0.05;
 void vTimerCallback( TimerHandle_t pxTimer );
@@ -136,6 +141,37 @@ void iif_bind_filerunning_stop(bool stop)
 	{
 		iif_func_esc =  &iif_idle;
 	}
+}
+
+void iif_bind_warning(void)
+{
+	iif_func_enter = &iif_enter_warning;
+	iif_func_esc = &iif_esc_warning;
+	iif_func_down = &iif_down_warning;
+	iif_func_up = &iif_up_warning;
+	iif_func_left = &iif_idle;
+	iif_func_right = &iif_idle;
+	iif_func_zdown = &iif_idle;
+	iif_func_zup = &iif_idle;
+	iif_func_released = &iif_idle;
+	iif_func_cycleStop = &iif_idle;
+}
+
+static void iif_enter_warning(void)
+{
+
+}
+static void iif_esc_warning(void)
+{
+
+}
+static void iif_down_warning(void)
+{
+
+}
+static void iif_up_warning(void)
+{
+
 }
 
 

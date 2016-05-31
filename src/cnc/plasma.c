@@ -372,7 +372,7 @@ void emergencia_task(void)
 		    		sprintf(Str,"MODO DE EMERGÊNCIA\nPARADO LINHA\n%d\n",currentLine);
 		    	}
 		    	ut_lcd_output_warning(Str);
-				while(keyEntry != KEY_ENTER){
+				while(keyEntry != KEY_ESC){
 					IWDT.IWDTRR = 0x00u;
 					IWDT.IWDTRR = 0xFFu;
 					xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );

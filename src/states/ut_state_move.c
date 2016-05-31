@@ -41,7 +41,7 @@ extern bool intepreterRunning;
 
 
 #define DEFAULT_AUTO_TITLE		"MODO AUTOM햀ICO"
-#define STOP_AUTO_TITLE		    "M핽UINA PARADA"
+#define STOP_AUTO_TITLE		    "M핽UINA PAUSADA"
 #define DEFAULT_LINHA1_AUTO	    ""
 #define DEFAULT_AVISO_AUTO	    ""
 #define STOP_AVISO_AUTO	        ""
@@ -55,7 +55,7 @@ extern bool intepreterRunning;
 #define DEFAULT_AVISO_DESLOCA	"ESC VOLTA"
 
 #define DEFAULT_SIM_TITLE		"MODO SIMULA플O"
-#define STOP_SIM_TITLE		    "M핽UINA PARADA"
+#define STOP_SIM_TITLE		    "M핽UINA PAUSADA"
 #define DEFAULT_LINHA1_SIM	    ""
 #define DEFAULT_AVISO_SIM	    ""
 #define STOP_AVISO_SIM	        ""
@@ -179,7 +179,7 @@ static void updatePosition(uint8_t menu)
 		xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 		ut_lcd_output_warning("CORTE AUTOM햀ICO\nFINALIZADO\nPRESSIONE ESC\n");
 		/* Delay */
-		vTaskDelay(2000 / portTICK_PERIOD_MS);
+	//	vTaskDelay(2000 / portTICK_PERIOD_MS);
 		currentLine = 0;
 		intepreterRunning = false;
 		programEnd = true;

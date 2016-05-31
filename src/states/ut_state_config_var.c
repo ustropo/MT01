@@ -332,8 +332,8 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 	if(count == 10)
 	{
 		mult = mult*10;
-		if (mult > 1000)
-			mult = 1000;
+		if (mult > 100)
+			mult = 100;
 		count = 0;
 	}
 
