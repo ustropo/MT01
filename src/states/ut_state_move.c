@@ -108,6 +108,7 @@ static char gStrDesloca[4][24] =
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
 void warm_stop(void);
 static bool ltorchBuffer = false;
+extern bool zinhibitor;
 
 /**
  * Update machine position
@@ -443,6 +444,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				intepreterRunning = false;
 				sim = false;
 				currentLine = 0;
+				zinhibitor = false;
 				if (programEnd)
 					return STATE_MANUAL_MODE;
 				return STATE_CONFIG_AUTO_MODE;
