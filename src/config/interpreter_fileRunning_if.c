@@ -184,7 +184,7 @@ void vTimerCallback( TimerHandle_t pxTimer )
 
 	/* Which timer expired? */
 	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
-	if (configFlags || sim){
+	if (configFlags[MODOMAQUINA] || sim){
 		switch (lArrayIndex)
 		{
 			case ZUP_FILERUNNING_TIMER: zmove = 0.01;

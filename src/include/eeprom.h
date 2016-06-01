@@ -23,6 +23,13 @@ typedef enum
 	VAR_MAX           //!< CONFIG_MAX
 } var_name;
 
+typedef enum
+{
+	MODOMAQUINA = 0,
+	VEL_THC,
+	FLAG_MAX           //!< CONFIG_MAX
+} flag_name;
+
 enum{
 	CONFIGVAR = 0,
 	CONFIGFLAG,
@@ -31,7 +38,7 @@ enum{
 
 extern float configVar[VAR_MAX];
 extern float zeroPiece[3];
-extern uint32_t configFlags;
+extern uint32_t configFlags[FLAG_MAX];
 extern uint32_t configTHCVel;
 
 

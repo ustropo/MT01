@@ -169,8 +169,8 @@ static void init()
 		configs[i].type = init_types[i];
 		switch(i)
 		{
-			case CONFIG_CANCELAR_IHS: configs[i].value = &configFlags; break;
-			case CONFIG_VEL_THC: configs[i].value = &configTHCVel; break;
+			case CONFIG_CANCELAR_IHS: configs[i].value = &configFlags[MODOMAQUINA]; break;
+			case CONFIG_VEL_THC: configs[i].value = &configFlags[VEL_THC]; break;
 			default: configs[i].value = &configVar[i];
 					 configs[i].valueMax = init_max[i];
 					 configs[i].valueMin = init_min[i];

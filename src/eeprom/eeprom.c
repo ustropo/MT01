@@ -23,9 +23,8 @@ float configVarInit[VAR_MAX] = {
 	2,
 };
 
-uint32_t configFlagsInit = 0;
-uint32_t configFlags = 0;
-uint32_t configTHCVel = 1;
+uint32_t configFlagsInit[FLAG_MAX] = {0,1};
+uint32_t configFlags[FLAG_MAX];
 
 float configVar[VAR_MAX];
 
@@ -78,7 +77,7 @@ void eepromWriteConfig(uint8_t varType)
         				 dataRecord.size =sizeof(configVar);
         				 break;
     	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG;
-						 dataRecord.pData = (uint8_t*)&configFlags;
+						 dataRecord.pData = (uint8_t*)configFlags;
 						 dataRecord.size =sizeof(configFlags);
 						 break;
     	case ZEROPIECE:  dataRecord.ID = ZEROPIECE;

@@ -161,7 +161,7 @@ float pl_thc_pid(void)
 {
 	float result = 0;
 	float THCVel = 0;
-	if(configTHCVel)
+	if(configFlags[VEL_THC])
 	{
 		THCVel = THC_RAPIDO;
 	}

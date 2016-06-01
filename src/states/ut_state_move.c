@@ -189,7 +189,7 @@ static void updatePosition(uint8_t menu)
 	else
 	{
 		/* Put it into screen */
-		if(configFlags || sim || menu == MANUAL || menu == DESLOCA){
+		if(configFlags[MODOMAQUINA] || sim || menu == MANUAL || menu == DESLOCA){
 			ut_lcd_output_mov_mode(TORCH,
 					lStr,
 					(const char *)textXStr,

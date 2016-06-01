@@ -194,6 +194,24 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				ut_lcd_output_warning(Str);
 				/* Delay */
 				vTaskDelay(2000 / portTICK_PERIOD_MS);
+				if(configFlags[MODOMAQUINA] == 0)
+				{
+					if(configFlags[VEL_THC] == 0)
+						sprintf(Str, "VEL. CORTE: %.0f\nTENSÃO THC: %.0f V\nVEL. THC: LENTO\n",
+								configVar[VELOC_CORTE],
+								configVar[TENSAO_THC]);
+					else
+						sprintf(Str, "VEL. CORTE: %.0f\nTENSÃO THC: %.0f V\nVEL. THC: RÁPIDO\n",
+								configVar[VELOC_CORTE],
+								configVar[TENSAO_THC]);
+				}
+				else
+				{
+					sprintf(Str, "VEL. CORTE: %.0f\n",configVar[VELOC_CORTE]);
+				}
+				ut_lcd_output_warning(Str);
+				/* Delay */
+				vTaskDelay(2500 / portTICK_PERIOD_MS);
 
 				configsVar->name = "DESEJA CONTINUAR?";
 				pContext->value[0] = STATE_CONFIG_AUTO_MODE;

@@ -726,10 +726,10 @@ static stat_t _exec_aline_segment()
 		for (i=0; i<AXES; i++) {
 			mr.gm.target[i] = mr.position[i] + (mr.unit[i] * segment_length);
 		}
-		if(!configFlags && isCuttingGet()){
+		if(!configFlags[MODOMAQUINA] && isCuttingGet()){
 			zmove = pl_thc_pid();
 		}
-		if(!configFlags && !isCuttingGet() && !sim){
+		if(!configFlags[MODOMAQUINA] && !isCuttingGet() && !sim){
 			zmove = 0;
 		}
 		if(zmove != 0)
