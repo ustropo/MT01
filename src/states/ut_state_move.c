@@ -12,6 +12,7 @@
 
 #include "ut_context.h"
 #include "ut_state.h"
+#include "ut_state_config_var.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -38,6 +39,7 @@ char textZStr[MAX_COLUMN];
 uint8_t gTitle;
 extern float *velocidadeJog;
 extern bool intepreterRunning;
+extern ut_config_var* configsVar;
 
 
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
@@ -418,36 +420,53 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 
 		case KEY_ESC:
 			if (programEnd || lstop){
-				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
-				if(gTitle == AUTO){
-					strcpy(gStrAuto[0],DEFAULT_AUTO_TITLE);
-					strcpy(gStrAuto[1],DEFAULT_AVISO_AUTO);
-				}else if(gTitle == SIM){
-					strcpy(gStrSim[0],DEFAULT_SIM_TITLE);
-					strcpy(gStrSim[1],DEFAULT_AVISO_SIM);
+				uint32_t *value = configsVar->value;
+				if(!programEnd){
+					cm_request_feedhold();
+					xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+					configsVar->type = UT_CONFIG_BOOL;
+					configsVar->name = "DESEJA SAIR?";
+					pContext->value[0] = STATE_CONFIG_AUTO_MODE;
+					ut_state_config_var(pContext);
 				}
-				cm_request_feedhold();
-				cm_request_queue_flush();
-				xio_close(cs.primary_src);
+				if(*value || programEnd){
+//					xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+					if(gTitle == AUTO){
+						strcpy(gStrAuto[0],DEFAULT_AUTO_TITLE);
+						strcpy(gStrAuto[1],DEFAULT_AVISO_AUTO);
+					}else if(gTitle == SIM){
+						strcpy(gStrSim[0],DEFAULT_SIM_TITLE);
+						strcpy(gStrSim[1],DEFAULT_AVISO_SIM);
+					}
+					cm_request_feedhold();
+					cm_request_queue_flush();
+					xio_close(cs.primary_src);
 
-				cm.probe_state = PROBE_FAILED;
-				//cm_set_motion_mode(MODEL, MOTION_MODE_CANCEL_MOTION_MODE);
-				//cm_cycle_end();
-				state = 0;
-				cm.cycle_state = CYCLE_OFF;
-				pl_arcook_stop();
-				isCuttingSet(false);
-				iif_bind_idle();
-				cm.gmx.feed_rate_override_enable = true;
-				cm.gmx.feed_rate_override_factor = 1;
-				macro_func_ptr = command_idle;
-				intepreterRunning = false;
-				sim = false;
-				currentLine = 0;
-				zinhibitor = false;
-				if (programEnd)
-					return STATE_MANUAL_MODE;
-				return STATE_CONFIG_AUTO_MODE;
+					cm.probe_state = PROBE_FAILED;
+					//cm_set_motion_mode(MODEL, MOTION_MODE_CANCEL_MOTION_MODE);
+					//cm_cycle_end();
+					state = 0;
+					cm.cycle_state = CYCLE_OFF;
+					pl_arcook_stop();
+					isCuttingSet(false);
+					iif_bind_idle();
+					cm.gmx.feed_rate_override_enable = true;
+					cm.gmx.feed_rate_override_factor = 1;
+					macro_func_ptr = command_idle;
+					intepreterRunning = false;
+					sim = false;
+					currentLine = 0;
+					zinhibitor = false;
+					if (programEnd)
+						return STATE_MANUAL_MODE;
+					return STATE_CONFIG_AUTO_MODE;
+				}
+				else
+				{
+					xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
+					warm_stop();
+				}
+
 			}
 			if(!lstop){
 				if(arco == ARCO_OK_FAILED)
