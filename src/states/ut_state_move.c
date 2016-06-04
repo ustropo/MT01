@@ -424,9 +424,9 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				if(!programEnd){
 					cm_request_feedhold();
 					xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+					configsVar->currentState = STATE_AUTO_MODE;
 					configsVar->type = UT_CONFIG_BOOL;
 					configsVar->name = "DESEJA SAIR?";
-					pContext->value[0] = STATE_CONFIG_AUTO_MODE;
 					ut_state_config_var(pContext);
 				}
 				if(*value || programEnd){
