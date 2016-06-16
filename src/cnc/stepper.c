@@ -47,7 +47,7 @@
 stConfig_t st_cfg;
 stPrepSingleton_t st_pre;
 static stRunSingleton_t st_run;
-
+bool isDwell = false;
 /**** Setup local functions ****/
 
 static void _load_move(void);
@@ -714,6 +714,7 @@ MOTATE_TIMER_INTERRUPT(dwell_timer_num)
 void timer_dwell_callback(void *pdata)
 {								// DWELL timer interrupt
 	if (--st_run.dda_ticks_downcount == 0) {
+		isDwell = false;
 		//TIMER_DWELL.CTRLA = STEP_TIMER_DISABLE;			// disable DWELL timer
 		R_CMT_Control(timerDwell,CMT_RX_CMD_PAUSE,0);
 		delay_thcStartStop(true);
@@ -1074,10 +1075,12 @@ static void _load_move()
 
 	// handle dwells
 	} else if (st_pre.move_type == MOVE_TYPE_DWELL) {
+		isDwell = true;
 		st_run.dda_ticks_downcount = st_pre.dda_ticks;
 //RXMOD			TIMER_DWELL.PER = st_pre.dda_period;			// load dwell timer period
 //		TIMER_DWELL.CTRLA = STEP_TIMER_ENABLE;			// enable the dwell timer
-		R_CMT_Control(timerDwell,CMT_RX_CMD_RESTART,0);
+//		R_CMT_Control(timerDwell,CMT_RX_CMD_RESTART,0);
+		st_command_dwell(DWELL_START);
 
 	// handle synchronous commands
 	} else if (st_pre.move_type == MOVE_TYPE_COMMAND) {
@@ -1411,6 +1414,18 @@ stat_t st_set_me(nvObj_t *nv)	// Make sure this function is not part of initiali
 		_energize_motor(motor-1);     // adjust so that motor 1 is actually 0 (etc)
 	}
 	return (STAT_OK);
+}
+
+void st_command_dwell(st_dwell_command com)
+{
+	switch(com)
+	{
+		case DWELL_START: 	R_CMT_Control(timerDwell,CMT_RX_CMD_RESTART,0);	break;
+		case DWELL_PAUSE: 	R_CMT_Control(timerDwell,CMT_RX_CMD_PAUSE,0);	break;
+		case DWELL_RESTART: R_CMT_Control(timerDwell,CMT_RX_CMD_RESUME,0);  break;
+		case DWELL_EXIT: 	st_run.dda_ticks_downcount = 1; 				break;
+		default: break;
+	}
 }
 
 

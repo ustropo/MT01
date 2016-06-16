@@ -9,6 +9,8 @@
 #include "hardware.h"
 #include "controller.h"
 #include "macros.h"
+#include "stepper.h"
+#include "spindle.h"
 
 #include "ut_context.h"
 #include "ut_state.h"
@@ -388,7 +390,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 
 		case KEY_ENTER:
-			/* Clear display */
+
+
 			if(lstop && !arco)
 			{
 				lstop = false;
@@ -400,11 +403,19 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					strcpy(gStrSim[0],DEFAULT_SIM_TITLE);
 					strcpy(gStrSim[1],DEFAULT_AVISO_SIM);
 				}
+				if(isDwell == true)
+				{
+					st_command_dwell(DWELL_RESTART);
+				}
 				iif_func_enter();
 				TORCH = ltorchBuffer;
 			}
 			else
 			{
+				if(isDwell == true)
+				{
+					st_command_dwell(DWELL_EXIT);
+				}
 				if(sim){
 					gTitle = AUTO;
 					sim = false;
@@ -441,7 +452,12 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					cm_request_feedhold();
 					cm_request_queue_flush();
 					xio_close(cs.primary_src);
-
+					if(isDwell == true)
+					{
+						st_command_dwell(DWELL_RESTART);
+						st_command_dwell(DWELL_EXIT);
+						cm.motion_state = MOTION_STOP;
+					}
 					cm.probe_state = PROBE_FAILED;
 					//cm_set_motion_mode(MODEL, MOTION_MODE_CANCEL_MOTION_MODE);
 					//cm_cycle_end();
@@ -452,6 +468,11 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					iif_bind_idle();
 					cm.gmx.feed_rate_override_enable = true;
 					cm.gmx.feed_rate_override_factor = 1;
+					while(cm.queue_flush_requested == true && !programEnd)
+					{
+
+					}
+					TORCH = FALSE;
 					macro_func_ptr = command_idle;
 					intepreterRunning = false;
 					sim = false;
@@ -650,6 +671,10 @@ void warm_stop(void)
 		strcpy(gStrSim[1],STOP_AVISO_SIM);
 	}
 	pl_arcook_stop();
+	if(isDwell == true)
+	{
+		st_command_dwell(DWELL_PAUSE);
+	}
 	ltorchBuffer = TORCH;
 	TORCH = FALSE;
 }

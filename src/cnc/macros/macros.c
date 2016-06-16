@@ -75,20 +75,17 @@ stat_t M3_Macro(void)
 
 				/* 5- CHECA SE O ESTÁ EM MODO SIMULAÇÃO, SE SIM, PULAR PARA PASSO 8. SE ESTIVER EM MODO OXICORTE, CONTINUA.
 				   6 -DISPARA O RELE DA TOCHA */
-		case 3: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-				SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
-				state++; break;
+		case 3: if(configFlags[MODOMAQUINA] == 0){
+					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
+				}
+				state++;
+				break;
 
 		case 4: if(configFlags[MODOMAQUINA] == 0 && !sim){
 					uint32_t lRet;
-					//lRet = ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(3000) );
 					pl_arcook_start();
 					lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
-//					if(emergenciaFlag){
-//						state = 0;
-//						macro_func_ptr = command_idle;
-//						return (STAT_OK);
-//					}
 					if (lRet == pdFALSE)
 					{
 						uint32_t qSend = ARCO_OK_FAILED;
@@ -114,15 +111,22 @@ stat_t M3_Macro(void)
 				}
 				state++; break;
 
+		case 6: if(configFlags[MODOMAQUINA] == 1){
+					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
+				}
+				state++;
+				break;
+
 				/*9- DESCE A TOCHA USANDO G01 F800 PARA "ALTURA DE CORTE" */
-		case 6: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+		case 7: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 				SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 				SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_CORTE]);
 				SET_NON_MODAL_MACRO (feed_rate, 800);
 				state++; break;
 
 				/*10- SETA O SISTEMA COM FEEDRATE DE CORTE F "VELOC. DE CORTE” PARA OS PROXIMOS G01, G02 E G03*/
-		case 7: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+		case 8: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 				SET_NON_MODAL_MACRO (feed_rate, configVar[VELOC_CORTE]);
 				state++; break;
 

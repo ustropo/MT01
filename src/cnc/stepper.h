@@ -411,8 +411,18 @@ typedef struct stPrepSingleton {
 	uint16_t magic_end;
 } stPrepSingleton_t;
 
+// Dwell commands
+typedef enum{
+	DWELL_START = 0,
+	DWELL_PAUSE,
+	DWELL_RESTART,
+	DWELL_EXIT
+}st_dwell_command;
+
+
 extern stConfig_t st_cfg;				// config struct is exposed. The rest are private
 extern stPrepSingleton_t st_pre;		// only used by config_app diagnostics
+extern bool isDwell;
 
 /**** FUNCTION PROTOTYPES ****/
 
@@ -436,6 +446,7 @@ void st_prep_null(void);
 void st_prep_command(void *bf);		// use a void pointer since we don't know about mpBuf_t yet)
 void st_prep_dwell(float microseconds);
 stat_t st_prep_line(float travel_steps[], float following_error[], float segment_time);
+void st_command_dwell(st_dwell_command com);
 
 stat_t st_set_sa(nvObj_t *nv);
 stat_t st_set_tr(nvObj_t *nv);

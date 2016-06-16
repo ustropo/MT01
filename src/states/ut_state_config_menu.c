@@ -58,12 +58,27 @@ static ut_config_type init_types[CONFIG_MAX] =
 	UT_CONFIG_BOOL
 };
 
-static char* init_names[CONFIG_MAX] =
+static char* init_names_plasma[CONFIG_MAX] =
 {
 	" MODO MÁQUINA",
 	" ALT. DESLOCAMENTO",
 	" ALT. PERFURAÇÃO",
 	" TEMPO PERFURAÇÃO",
+	" ALTURA DE CORTE",
+	" VELOC. CORTE",
+	" VELOC. JOG LENTO",
+	" VELOC. JOG RÁPIDO",
+	" TENSÃO THC",
+	" DELAY THC",
+	" VELOCIDADE THC"
+};
+
+static char* init_names_oxi[CONFIG_MAX] =
+{
+	" MODO MÁQUINA",
+	" ALT. DESLOCAMENTO",
+	" ALT. PERFURAÇÃO",
+	" TEMPO AQUECIMENTO",
 	" ALTURA DE CORTE",
 	" VELOC. CORTE",
 	" VELOC. JOG LENTO",
@@ -157,9 +172,6 @@ static void init()
 {
 	uint8_t i;
 
-	/* Check if already initialized */
-	if(initialized) return;
-
 	/* Zero all values */
 	memset(configs, 0, sizeof(configs));
 
@@ -175,15 +187,20 @@ static void init()
 					 configs[i].valueMax = init_max[i];
 					 configs[i].valueMin = init_min[i];
 		}
-		configs[i].name = init_names[i];
+		if(configFlags[MODOMAQUINA] == 0)
+		{
+			configs[i].name = init_names_plasma[i];
+		}
+		else
+		{
+			configs[i].name = init_names_oxi[i];
+		}
 		configs[i].unit = init_unit[i];
 		configs[i].step = init_step[i];
 		configs[i].point = init_point[i];
 		configs[i].currentState = STATE_CONFIG_MENU;
 		configs[i].currentItem = i;
 	}
-
-	initialized = true;
 }
 
 /**
