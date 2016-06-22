@@ -33,16 +33,6 @@ extern char gszCurFile[MAX_FILE_PATH_SIZE];
 extern uint32_t choosedLine;
 static float zeroPiecebuffer[3] = {0,0,0};
 
-typedef enum
-{
-	CONFIG_RODAR_PROG  = 0,    //!<
-	CONFIG_ZERAR_EIXOS,   //!<
-	CONFIG_DESLOCAR_ZERO,//!<
-	CONFIG_MODO_SIM,//!<
-	CONFIG_SELECIONAR_LINHA,//!<
-	CONFIG_AUTO_MAX           //!< CONFIG_MAX
-} ut_config_name;
-
 static void zerar_peca(void *var);
 static void homming_eixos(void *var);
 static void idle(void *var);
@@ -50,7 +40,6 @@ static void idle(void *var);
 /* Array with all config variables */
 ut_config_var configs_auto[CONFIG_AUTO_MAX];
 static bool initialized = false;
-extern ut_config_var* configsVar;
 
 static const ut_state geNextStateAuto[5] =
 {
@@ -128,11 +117,11 @@ static void init()
 		configs_auto[i].currentState = STATE_CONFIG_AUTO_MODE;
 		configs_auto[i].currentItem = i;
 	}
-	configs_auto[CONFIG_SELECIONAR_LINHA].unit = "";
-	configs_auto[CONFIG_SELECIONAR_LINHA].step = 1;
-	configs_auto[CONFIG_SELECIONAR_LINHA].valueMax = 100000;
-	configs_auto[CONFIG_SELECIONAR_LINHA].valueMin = 0;
-	configs_auto[CONFIG_SELECIONAR_LINHA].value = &selecionarLinhas;
+	configs_auto[CONFIG_AUTO_SELECIONAR_LINHA].unit = "";
+	configs_auto[CONFIG_AUTO_SELECIONAR_LINHA].step = 1;
+	configs_auto[CONFIG_AUTO_SELECIONAR_LINHA].valueMax = 100000;
+	configs_auto[CONFIG_AUTO_SELECIONAR_LINHA].valueMin = 0;
+	configs_auto[CONFIG_AUTO_SELECIONAR_LINHA].value = &selecionarLinhas;
 	initialized = false;
 }
 
@@ -172,8 +161,8 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 	configsVar = &configs_auto[config_menu.selectedItem];
 	switch(config_menu.selectedItem)
 	{
-		case CONFIG_RODAR_PROG:
-		case CONFIG_MODO_SIM:
+		case CONFIG_AUTO_RODAR_PROG:
+		case CONFIG_AUTO_MODO_SIM:
 			if(gszCurFile[0] == NULL)
 			{
 				ut_lcd_output_warning("NENHUM ARQUIVO\n\
@@ -194,20 +183,20 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				ut_lcd_output_warning(Str);
 				/* Delay */
 				vTaskDelay(2000 / portTICK_PERIOD_MS);
-				if(configFlags[MODOMAQUINA] == 0)
+				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 				{
 					if(configFlags[VEL_THC] == 0)
 						sprintf(Str, "VEL. CORTE: %.0f\nTENSÃO THC: %.0f V\nVEL. THC: LENTO\n",
-								configVar[VELOC_CORTE],
-								configVar[TENSAO_THC]);
+								configVarPl[PL_CONFIG_VELOC_CORTE],
+								configVarPl[PL_CONFIG_TENSAO_THC]);
 					else
 						sprintf(Str, "VEL. CORTE: %.0f\nTENSÃO THC: %.0f V\nVEL. THC: RÁPIDO\n",
-								configVar[VELOC_CORTE],
-								configVar[TENSAO_THC]);
+								configVarPl[PL_CONFIG_VELOC_CORTE],
+								configVarPl[PL_CONFIG_TENSAO_THC]);
 				}
 				else
 				{
-					sprintf(Str, "VEL. CORTE: %.0f\n",configVar[VELOC_CORTE]);
+					sprintf(Str, "VEL. CORTE: %.0f\n",configVarOx[OX_CONFIG_VELOC_CORTE]);
 				}
 				ut_lcd_output_warning(Str);
 				/* Delay */
@@ -218,7 +207,7 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				pContext->value[1] = STATE_AUTO_MODE;
 			}
 			break;
-		case CONFIG_DESLOCAR_ZERO:
+		case CONFIG_AUTO_DESLOCAR_ZERO:
 			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
 			/* Delay */
 			vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -226,7 +215,7 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 			pContext->value[0] = STATE_CONFIG_AUTO_MODE;
 			pContext->value[1] = STATE_DESLOCAZERO_MODE;
 			break;
-		case CONFIG_SELECIONAR_LINHA:
+		case CONFIG_AUTO_SELECIONAR_LINHA:
 			if(gszCurFile[0] == NULL)
 			{
 				ut_lcd_output_warning("NENHUM ARQUIVO\n\

@@ -105,12 +105,15 @@ void main(void)
 	}
     IWDT.IWDTRR = 0x00u;
     IWDT.IWDTRR = 0xFFu;
-//	serial_init();
+
+ /* Inicialização das variaveis EEPROM */
 	eepromInit();
-	eepromReadConfig(CONFIGVAR);
+	eepromReadConfig(CONFIGVAR_OX);
+	eepromReadConfig(CONFIGVAR_PL);
+	eepromReadConfig(CONFIGVAR_JOG);
 	eepromReadConfig(CONFIGFLAG);
 	eepromReadConfig(ZEROPIECE);
-	eepromInitVar();
+
 	/* Initialize USB */
 	usb_main();
 

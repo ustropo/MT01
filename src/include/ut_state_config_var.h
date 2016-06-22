@@ -12,7 +12,7 @@
 #include "ut_state.h"
 
 #define THC_VMAX 300
-#define THC_VMIN 0
+#define THC_VMIN 20
 #define MOTOR_VMAX 10000
 #define MOTOR_VMIN 10
 

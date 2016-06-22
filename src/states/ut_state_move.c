@@ -41,8 +41,6 @@ char textZStr[MAX_COLUMN];
 uint8_t gTitle;
 extern float *velocidadeJog;
 extern bool intepreterRunning;
-extern ut_config_var* configsVar;
-
 
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
 #define STOP_AUTO_TITLE		    "MÁQUINA PAUSADA"
@@ -145,7 +143,7 @@ static void updatePosition(uint8_t menu)
                     	 lStr[3] = "AOK";
                      else
                     	 lStr[3] = "";
-			         sprintf(gStrAuto[4], "THC SET: %.0f V",  configVar[TENSAO_THC]);
+			         sprintf(gStrAuto[4], "THC SET: %.0f V",  configVarPl[PL_CONFIG_TENSAO_THC]);
                      lStr[4] = gStrAuto[4];
                      if(isCuttingGet()){
     			         sprintf(gStrAuto[5], "THC REAL: %.0f V",  THC_realGet());

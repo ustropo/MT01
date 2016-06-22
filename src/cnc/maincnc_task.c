@@ -36,6 +36,7 @@
 #include "test.h"
 #include "pwm.h"
 #include "xio.h"
+#include "macros.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -135,7 +136,7 @@ static void _application_init(void)
 	pl_thc_init();
 //	gpio_init();					// parallel IO
 	pwm_init();						// pulse width modulation drivers	- must follow gpio_init()
-
+	macroInitVar();
 //RXMOD	controller_init(STD_IN, STD_OUT, STD_ERR);// must be first app init; reqs xio_init()
 	config_init();					// config records from eeprom 		- must be next app init
 	network_init();					// reset std devices if required	- must follow config_init()

@@ -14,8 +14,14 @@
 #include "lcd.h"
 #include "keyboard.h"
 
-extern float *velocidadeJog;
-extern bool emergenciaFlag;
+static float altura_perfuracao;
+static float altura_deslocamento;
+static float altura_corte;
+static float vel_corte;
+static float tempo_perfuracao;
+static float tempo_aquecimento;
+
+float *velocidadeJog;
 
 uint8_t jogAxis;
 float jogMaxDistance;
@@ -37,6 +43,27 @@ extern struct gcodeParserSingleton gp;
 
 stat_t M3_Macro(void)
 {
+	float tempo;
+
+	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+	{
+		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
+		altura_deslocamento	= 	configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
+		vel_corte			= 	configVarPl[PL_CONFIG_VELOC_CORTE];
+		tempo_perfuracao	= 	configVarPl[PL_CONFIG_TEMPO_PERFURACAO];
+		tempo_aquecimento	= 	0;
+	}
+	else
+	{
+		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
+		altura_deslocamento	= 	configVarOx[OX_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
+		vel_corte			= 	configVarOx[OX_CONFIG_VELOC_CORTE];
+		tempo_perfuracao	= 	configVarOx[OX_CONFIG_TEMPO_PERFURACAO];
+		tempo_aquecimento	= 	configVarOx[OX_CONFIG_TEMPO_AQUECIMENTO];
+	}
+
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -47,18 +74,16 @@ stat_t M3_Macro(void)
 	{
 			/* 1- CHECA SE O USUARIO CANCELOU O IHS (MODO OXICORTE), OU SE ESTÁ EM MODO SIMULAÇÃO. SE SIM, PULAR PARA PASSO 3
 			   2- PROCURA A CHAPA USANDO O G38.2 -50 COM FEEDRATE DE 800MM/MIN  */
-		case 0: if(configFlags[MODOMAQUINA] == 0){
-#ifndef THC_TESTE
+		case 0: if(configFlags[MODOMAQUINA] == MODO_PLASMA){
 					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_STRAIGHT_PROBE);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], -50);
 					SET_NON_MODAL_MACRO (feed_rate, 800);
-#endif
 				}
 				state++; break;
 
 				/*  ZERA O EIXO Z COM G28.3 Z0 (NÃO PRECISA MAIS COMPENSAR O SENSOR, MINHA MAQUINA USARÁ SISTEMA OHMICO, OFFSET=0) */
-		case 1: if(configFlags[MODOMAQUINA] == 0){
+		case 1: if(configFlags[MODOMAQUINA] == MODO_PLASMA){
 
 					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
@@ -70,19 +95,19 @@ stat_t M3_Macro(void)
 				/* 3- POSICIONA O EIXO Z PARA "ALTURA DE PERFURAÇÃO" */
 		case 2: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 				SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
-				SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_PERFURACAO]);
+				SET_NON_MODAL_MACRO(target[AXIS_Z], altura_perfuracao);
 				state++; break;
 
 				/* 5- CHECA SE O ESTÁ EM MODO SIMULAÇÃO, SE SIM, PULAR PARA PASSO 8. SE ESTIVER EM MODO OXICORTE, CONTINUA.
 				   6 -DISPARA O RELE DA TOCHA */
-		case 3: if(configFlags[MODOMAQUINA] == 0){
+		case 3: if(configFlags[MODOMAQUINA] == MODO_PLASMA){
 					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
 				}
 				state++;
 				break;
 
-		case 4: if(configFlags[MODOMAQUINA] == 0 && !sim){
+		case 4: if(configFlags[MODOMAQUINA] == MODO_PLASMA && !sim){
 					uint32_t lRet;
 					pl_arcook_start();
 					lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
@@ -100,10 +125,15 @@ stat_t M3_Macro(void)
 				state++; break;
 
 				/*8- DEIXA CORRER O TEMPO DE PERFURAÇÃO "TEMPO DE PERFURAÇÃO" */
-		case 5: if(configVar[TEMPO_PERFURACAO] > 0){
+		case 5: if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+					tempo = tempo_perfuracao;
+				else
+					tempo = tempo_aquecimento;
+
+			    if (tempo > 0){
 					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
-					SET_NON_MODAL_MACRO (parameter, configVar[TEMPO_PERFURACAO]*1000);
+					SET_NON_MODAL_MACRO (parameter, tempo*1000);
 				}
 				else
 				{
@@ -111,23 +141,36 @@ stat_t M3_Macro(void)
 				}
 				state++; break;
 
-		case 6: if(configFlags[MODOMAQUINA] == 1){
+		case 6: if(configFlags[MODOMAQUINA] == MODO_OXICORTE){
 					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
 				}
 				state++;
 				break;
 
+		case 7: if(configFlags[MODOMAQUINA] == MODO_OXICORTE){
+					if(tempo_perfuracao > 0){
+						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+						SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+						SET_NON_MODAL_MACRO (parameter, tempo_perfuracao*1000);
+					}
+					else
+					{
+						delay_thcStartStop(true);
+					}
+				}
+				state++; break;
+
 				/*9- DESCE A TOCHA USANDO G01 F800 PARA "ALTURA DE CORTE" */
-		case 7: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+		case 8: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 				SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
-				SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_CORTE]);
+				SET_NON_MODAL_MACRO(target[AXIS_Z], altura_corte);
 				SET_NON_MODAL_MACRO (feed_rate, 800);
 				state++; break;
 
 				/*10- SETA O SISTEMA COM FEEDRATE DE CORTE F "VELOC. DE CORTE” PARA OS PROXIMOS G01, G02 E G03*/
-		case 8: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-				SET_NON_MODAL_MACRO (feed_rate, configVar[VELOC_CORTE]);
+		case 9: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+				SET_NON_MODAL_MACRO (feed_rate, vel_corte);
 				state++; break;
 
 		default: state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
@@ -138,6 +181,25 @@ stat_t M3_Macro(void)
 
 stat_t M5_Macro(void)
 {
+	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+	{
+		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
+		altura_deslocamento	= 	configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
+		vel_corte			= 	configVarPl[PL_CONFIG_VELOC_CORTE];
+		tempo_perfuracao	= 	configVarPl[PL_CONFIG_TEMPO_PERFURACAO];
+		tempo_aquecimento	= 	0;
+	}
+	else
+	{
+		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
+		altura_deslocamento	= 	configVarOx[OX_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
+		vel_corte			= 	configVarOx[OX_CONFIG_VELOC_CORTE];
+		tempo_perfuracao	= 	configVarOx[OX_CONFIG_TEMPO_PERFURACAO];
+		tempo_aquecimento	= 	configVarOx[OX_CONFIG_TEMPO_AQUECIMENTO];
+	}
+
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -151,7 +213,13 @@ stat_t M5_Macro(void)
 				state++; break;
 		case 1: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 				SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
-				SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_DESLOCAMENTO]);
+				if (configFlags[MODOMAQUINA] == MODO_PLASMA){
+					SET_NON_MODAL_MACRO(target[AXIS_Z], altura_deslocamento);
+				}
+				else
+				{
+
+				}
 				state++; break;
 		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
 	}
@@ -203,6 +271,25 @@ stat_t ZerarPeca_Macro(void)
 
 stat_t homming_Macro(void)
 {
+	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+	{
+		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
+		altura_deslocamento	= 	configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
+		vel_corte			= 	configVarPl[PL_CONFIG_VELOC_CORTE];
+		tempo_perfuracao	= 	configVarPl[PL_CONFIG_TEMPO_PERFURACAO];
+		tempo_aquecimento	= 	0;
+	}
+	else
+	{
+		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
+		altura_deslocamento	= 	configVarOx[OX_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
+		vel_corte			= 	configVarOx[OX_CONFIG_VELOC_CORTE];
+		tempo_perfuracao	= 	configVarOx[OX_CONFIG_TEMPO_PERFURACAO];
+		tempo_aquecimento	= 	configVarOx[OX_CONFIG_TEMPO_AQUECIMENTO];
+	}
+
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -221,7 +308,7 @@ stat_t homming_Macro(void)
 				state++; break;
 
 		case 3: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
-				SET_NON_MODAL_MACRO(target[AXIS_Z], configVar[ALTURA_DESLOCAMENTO]);
+				SET_NON_MODAL_MACRO(target[AXIS_Z], altura_deslocamento);
 				state++; break;
 
 		case 4: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
@@ -329,4 +416,9 @@ stat_t feedRateOverride_Macro(void)
 	}
 	_execute_gcode_block();
 	return (STAT_OK);
+}
+
+void macroInitVar(void)
+{
+	velocidadeJog = &configVarJog[JOG_RAPIDO];
 }

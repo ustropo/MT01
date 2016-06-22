@@ -5,28 +5,40 @@
 
 //#define VEE_DEMO_ERASE_FIRST
 
-
-extern float *velocidadeJog;
-
 enum { READY, NOT_READY } sample_state;
 
-float configVarInit[VAR_MAX] = {
-	0,
-	15,
-	5,
-	1.5,
-	1,
-	5000,
-	1500,
-	7500,
-	150,
-	2,
+/*! configVarOxInit - Constante inicial de parametrização para Oxicorte */
+const float configVarOxInit[OX_CONFIG_MAX] = {
+	15,                              //!< Altura de deslocamento
+	5,                               //!< Altura de perfuração
+	1,                               //!< Altura de corte
+	5000,                            //!< Velocidade de corte
+	3,                               //!< Tempo de aquecimento
+	2                                //!< Tempo de Perfuração
+};
+
+/*! configVarPlInit - Constante inicial de parametrização para Plasma */
+const float configVarPlInit[PL_CONFIG_MAX] = {
+	15,                              //!< Altura de deslocamento
+	5,                               //!< Altura de perfuração
+	1,                               //!< Altura de corte
+	5000,                            //!< Velocidade de corte
+	1,                               //!< Tempo de Perfuração
+	150                              //!< Tensao do THC
+};
+
+/*! configVarJogInit - Constante inicial de velocidade de jog*/
+const float configVarJogInit[JOG_MAX] = {
+	7500,                              //!< Velocidade inicial de jog rapido
+	1500,                              //!< Velocidade inicial de jog lento
 };
 
 uint32_t configFlagsInit[FLAG_MAX] = {0,1};
 uint32_t configFlags[FLAG_MAX];
 
-float configVar[VAR_MAX];
+float configVarOx[OX_CONFIG_MAX];
+float configVarPl[PL_CONFIG_MAX];
+float configVarJog[JOG_MAX];
 
 float zeroPieceInit[3] = {0,0,0};
 float zeroPiece[3];
@@ -62,19 +74,22 @@ void eepromInit(void)
 	R_VEE_Open();
 }
 
-void eepromInitVar(void)
-{
-	velocidadeJog = &configVar[VELOC_JOG_RAPIDO];
-}
-
 void eepromWriteConfig(uint8_t varType)
 {
     uint32_t ret;
     switch (varType)
     {
-    	case CONFIGVAR:  dataRecord.ID = CONFIGVAR;
-        				 dataRecord.pData = (uint8_t*)configVar;
-        				 dataRecord.size =sizeof(configVar);
+    	case CONFIGVAR_OX:  dataRecord.ID = CONFIGVAR_OX;
+        				 dataRecord.pData = (uint8_t*)configVarOx;
+        				 dataRecord.size =sizeof(configVarOx);
+        				 break;
+    	case CONFIGVAR_PL:  dataRecord.ID = CONFIGVAR_PL;
+        				 dataRecord.pData = (uint8_t*)configVarPl;
+        				 dataRecord.size =sizeof(configVarPl);
+        				 break;
+    	case CONFIGVAR_JOG:  dataRecord.ID = CONFIGVAR_JOG;
+        				 dataRecord.pData = (uint8_t*)configVarJog;
+        				 dataRecord.size =sizeof(configVarJog);
         				 break;
     	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG;
 						 dataRecord.pData = (uint8_t*)configFlags;
@@ -124,7 +139,9 @@ void eepromReadConfig(uint8_t varType)
 
     switch (varType)
     {
-    	case CONFIGVAR: dataRecord.ID = CONFIGVAR; break;
+    	case CONFIGVAR_OX: dataRecord.ID = CONFIGVAR_OX; break;
+    	case CONFIGVAR_PL: dataRecord.ID = CONFIGVAR_PL; break;
+    	case CONFIGVAR_JOG: dataRecord.ID = CONFIGVAR_JOG; break;
     	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG; break;
     	case ZEROPIECE: dataRecord.ID = ZEROPIECE; break;
     	default: break;
@@ -155,11 +172,15 @@ void eepromReadConfig(uint8_t varType)
 	        /* Wait for flash operation to finish. */
 	        while(FLASH_SUCCESS != R_FlashGetStatus());
 	    }
-		memcpy(configVar,configVarInit,sizeof(configVar));
+		memcpy(configVarOx,configVarOxInit,sizeof(configVarOx));
+		memcpy(configVarPl,configVarPlInit,sizeof(configVarPl));
+		memcpy(configVarJog,configVarJogInit,sizeof(configVarJog));
 		memcpy(&configFlags,&configFlagsInit,sizeof(configFlags));
 		memcpy(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece));
 		R_VEE_Open();
-	    eepromWriteConfig(CONFIGVAR);
+	    eepromWriteConfig(CONFIGVAR_OX);
+	    eepromWriteConfig(CONFIGVAR_PL);
+	    eepromWriteConfig(CONFIGVAR_JOG);
 	    eepromWriteConfig(CONFIGFLAG);
 	    eepromWriteConfig(ZEROPIECE);
 		return;
@@ -174,7 +195,9 @@ void eepromReadConfig(uint8_t varType)
     R_VEE_ReleaseState();
     switch (varType)
     {
-    	case CONFIGVAR: memcpy(configVar,dataRecord.pData,sizeof(configVar)); break;
+    	case CONFIGVAR_OX: memcpy(configVarOx,dataRecord.pData,sizeof(configVarOx)); break;
+    	case CONFIGVAR_PL: memcpy(configVarPl,dataRecord.pData,sizeof(configVarPl)); break;
+    	case CONFIGVAR_JOG: memcpy(configVarJog,dataRecord.pData,sizeof(configVarJog)); break;
     	case CONFIGFLAG: memcpy(&configFlags,dataRecord.pData,sizeof(configFlags)); break;
     	case ZEROPIECE: memcpy(&zeroPiece,dataRecord.pData,sizeof(zeroPiece)); break;
     	default: break;

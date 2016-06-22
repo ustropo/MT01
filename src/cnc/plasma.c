@@ -21,6 +21,7 @@
 #include "eeprom.h"
 #include "config_SwTimers.h"
 #include "macros.h"
+#include "ut_state_config_var.h"
 
 #include "platform.h"
 #include "r_s12ad_rx_if.h"
@@ -29,7 +30,6 @@
 #define DEBOUNCE_COUNT 15
 #define ARCOOK_DELAY_COUNT 33
 
-#define THC_VMIN 20
 #define THC_HISTERESE 2
 #define THC_PORCENTAGE 0.2
 #define THC_RAPIDO 0.005
@@ -161,16 +161,19 @@ float pl_thc_pid(void)
 {
 	float result = 0;
 	float THCVel = 0;
-	if(configFlags[VEL_THC])
+	uint16_t delay_thc;
+	if(configVarPl[PL_CONFIG_VELOC_CORTE] > 2000)
 	{
 		THCVel = THC_RAPIDO;
+		delay_thc = 3000; /* 0.3s*/
 	}
 	else
 	{
 		THCVel = THC_LENTO;
+		delay_thc = 10000; /* 1s*/
 	}
 	pl_thc_read(&THC_real);
-	if(delay_thcGet() > (uint16_t)(configVar[DELAY_THC]*10000)){
+	if(delay_thcGet() > delay_thc){
 		if(THC_real > THC_VMIN)
 		{/*
 			THC_err = configVar[TENSAO_THC] - THC_real;
@@ -190,7 +193,7 @@ float pl_thc_pid(void)
 				}
 			}
 			*/
-			THC_err = configVar[TENSAO_THC] - THC_real;
+			THC_err = configVarPl[PL_CONFIG_TENSAO_THC] - THC_real;
 			if(THC_err > THC_HISTERESE)
 			{
 				result = THCVel;
@@ -203,7 +206,7 @@ float pl_thc_pid(void)
 			{
 				result = 0;
 			}
-			if(fabs(THC_err) > configVar[TENSAO_THC]*THC_PORCENTAGE)
+			if(fabs(THC_err) > configVarPl[PL_CONFIG_TENSAO_THC]*THC_PORCENTAGE)
 			{
 				result = 0;
 			}

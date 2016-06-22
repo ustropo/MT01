@@ -27,33 +27,20 @@
 
 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
-typedef enum
-{
-	CONFIG_MODO_MANUAL  = 0,    //!<
-	CONFIG_JOG_RAP_LENTO,//!<
-	CONFIG_ZERAR_PECA,   //!<
-	CONFIG_DESLOCAR_ZERO,//!<
-	CONFIG_ZERAR_MAQUINA,   //!<
-	CONFIG_MANUAL_MAX           //!< CONFIG_MAX
-} ut_config_name;
-
 extern TaskHandle_t xCncTaskHandle;
 static void zerar_maquina(void *var);
 static void zerar_peca(void *var);
 static void homming_eixos(void *var);
-static void veljog(void *var);
 
 /* Array with all config variables */
 ut_config_var configs_manual[CONFIG_MANUAL_MAX];
-static bool initialized = false;
-extern ut_config_var* configsVar;
-float *velocidadeJog;
+static bool initialized = false;;
 static float zeroPiecebuffer[3] = {0,0,0};
 
 static const ut_state geNextStateManual[6] =
 {
 	STATE_MANUAL_MODE,
-	STATE_CONFIG_VAR,
+	STATE_CONFIG_JOG,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
@@ -82,7 +69,7 @@ static uint32_t init_values[CONFIG_MANUAL_MAX] =
 static char* init_names[CONFIG_MANUAL_MAX] =
 {
 	" MODO MANUAL",
-	" JOG RÁPIDO E LENTO",
+	" CONFIG. JOG",
 	" ZERAR PEÇA",
 	" DESLOCAR - ZERO PEÇA",
 	" ZERAR MÁQUINA",
@@ -91,7 +78,7 @@ static char* init_names[CONFIG_MANUAL_MAX] =
 static var_func init_func[CONFIG_MANUAL_MAX] =
 {
 	0,
-	veljog,
+	0,
 	zerar_peca,
 	homming_eixos,
 	zerar_maquina,
@@ -169,7 +156,7 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 	configsVar = &configs_manual[config_menu.selectedItem];
 	switch(config_menu.selectedItem)
 	{
-		case CONFIG_DESLOCAR_ZERO:
+		case CONFIG_MANUAL_DESLOCAR_ZERO:
 			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
 			/* Delay */
 			vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -177,7 +164,7 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 			pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
 			pContext->value[1] = STATE_DESLOCAZERO_MODE;
 			break;
-		case CONFIG_ZERAR_MAQUINA:
+		case CONFIG_MANUAL_ZERAR_MAQUINA:
 			ut_lcd_output_warning("DEVE ESTAR NOS\nLIMITES FISICOS\nX0 E Y0\n");
 			/* Delay */
 			vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -237,19 +224,5 @@ static void homming_eixos(void *var)
 	if(*value)
 	{
 		macro_func_ptr = homming_Macro;
-	}
-}
-
-static void veljog(void *var)
-{
-	ut_config_var *lvar = var;
-	uint32_t *value = lvar->value;
-	if(*value)
-	{
-		velocidadeJog = &configVar[VELOC_JOG_RAPIDO];
-	}
-	else
-	{
-		velocidadeJog = &configVar[VELOC_JOG_LENTO];
 	}
 }

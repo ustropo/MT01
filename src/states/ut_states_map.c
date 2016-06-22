@@ -14,16 +14,18 @@
  */
 const state_func_ptr states_table[STATE_NUMBER] =
 {
-		&ut_state_splash,
-		&ut_state_warning,
-		&ut_state_main_menu,
-		&ut_state_choose_file,
-		&ut_state_config_menu,
-		&ut_state_config_manual_menu,
-		&ut_state_config_auto_menu,
-		&ut_state_config_var,
-		&ut_state_manual_mode, //Manual menu init
-		&ut_state_deslocaZero_mode, //
-		&ut_state_auto_mode,
-		&ut_state_line_selection
+		&ut_state_splash,						//!< Funçao da tela de entrada
+		&ut_state_warning,                      //!< Funçao da tela de warnings
+		&ut_state_main_menu,                    //!< Funçao da tela de principal
+		&ut_state_choose_file,                  //!< Funçao da tela de escolha de arquivos
+		&ut_state_config_menu_ox,               //!< Funçao da tela de configuração de corte - Oxicorte
+		&ut_state_config_menu_pl,               //!< Funçao da tela de configuração de corte - Plasma
+		&ut_state_config_manual_menu,           //!< Funçao da tela do menu de corte manual
+		&ut_state_config_jog,          			//!< Funçao da tela da configuraçao de jog
+		&ut_state_config_auto_menu,             //!< Funçao da tela do menu de corte automatico
+		&ut_state_config_var,                   //!< Funçao da tela de manipulação de variaveis
+		&ut_state_manual_mode,                  //!< Funçao da tela de corte manual
+		&ut_state_deslocaZero_mode,             //!< Funçao da tela de deslocar para zero
+		&ut_state_auto_mode,                    //!< Funçao da tela de corte automatico
+		&ut_state_line_selection                //!< Funçao da tela de selecionar linhas
 };

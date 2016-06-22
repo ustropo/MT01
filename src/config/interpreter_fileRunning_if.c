@@ -197,13 +197,13 @@ void vTimerCallback( TimerHandle_t pxTimer )
 	{
 		switch (lArrayIndex)
 		{
-			case ZUP_FILERUNNING_TIMER: configVar[TENSAO_THC] += 1;
-										if(configVar[TENSAO_THC] > THC_VMAX)
-											configVar[TENSAO_THC] = THC_VMAX;
+			case ZUP_FILERUNNING_TIMER: configVarPl[PL_CONFIG_TENSAO_THC] += 1;
+										if(configVarPl[PL_CONFIG_TENSAO_THC] > THC_VMAX)
+											configVarPl[PL_CONFIG_TENSAO_THC] = THC_VMAX;
 			break;
-			case ZDOWN_FILERUNNING_TIMER: configVar[TENSAO_THC] -= 1;
-										  if(configVar[TENSAO_THC] < THC_VMIN)
-											 configVar[TENSAO_THC] = THC_VMIN;
+			case ZDOWN_FILERUNNING_TIMER: configVarPl[PL_CONFIG_TENSAO_THC] -= 1;
+										  if(configVarPl[PL_CONFIG_TENSAO_THC] < THC_VMIN)
+											  configVarPl[PL_CONFIG_TENSAO_THC] = THC_VMIN;
 			break;
 		}
 	}

@@ -277,7 +277,7 @@ void ut_lcd_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *bi
 	u8g_FirstPage(&main_u8g);
 	do{
 		u8g_DrawXBMP(&main_u8g, x, y, w, h, bitmap);
-		u8g_DrawStr(&main_u8g, x+w-60, y+h+1, str);
+		u8g_DrawStr(&main_u8g, x+w-80, y+h+1, str);
 	} while(u8g_NextPage(&main_u8g));
 	xSemaphoreGive(rspi_semaphore);
 }

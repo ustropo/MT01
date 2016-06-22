@@ -15,21 +15,86 @@
  */
 typedef enum
 {
-	STATE_SPLASH = 0,
-	STATE_WARNING,
-	STATE_MAIN_MENU,
-	STATE_CHOOSE_FILE,
-	STATE_CONFIG_MENU,
-	STATE_CONFIG_MANUAL_MODE,
-	STATE_CONFIG_AUTO_MODE,
-	STATE_CONFIG_VAR,
-	STATE_MANUAL_MODE,
-	STATE_DESLOCAZERO_MODE,
-	STATE_AUTO_MODE,
-	STATE_LINE_SELECTION,
+	STATE_SPLASH = 0,                         //!< Funçao da tela de entrada
+	STATE_WARNING,                            //!< Funçao da tela de warnings
+	STATE_MAIN_MENU,                          //!< Funçao da tela de principal
+	STATE_CHOOSE_FILE,                        //!< Funçao da tela de escolha de arquivos
+	STATE_CONFIG_MENU_OX,                     //!< Funçao da tela de configuração de corte - Oxicorte
+	STATE_CONFIG_MENU_PL,                     //!< Funçao da tela de configuração de corte - Plasma
+	STATE_CONFIG_MANUAL_MODE,                 //!< Funçao da tela do menu de corte manual
+	STATE_CONFIG_JOG,                 		  //!< Funçao da tela da configuraçao de jog
+	STATE_CONFIG_AUTO_MODE,                   //!< Funçao da tela do menu de corte automatico
+	STATE_CONFIG_VAR,                         //!< Funçao da tela de manipulação de variaveis
+	STATE_MANUAL_MODE,                        //!< Funçao da tela de corte manual
+	STATE_DESLOCAZERO_MODE,                   //!< Funçao da tela de deslocar para zero
+	STATE_AUTO_MODE,                          //!< Funçao da tela de corte automatico
+	STATE_LINE_SELECTION,                     //!< Funçao da tela de selecionar linhas
 	/* This should be always the last one! */
 	STATE_NUMBER
 } ut_state;
+
+typedef enum
+{
+	CONFIG_AUTO_RODAR_PROG  = 0,
+	CONFIG_AUTO_ZERAR_EIXOS,
+	CONFIG_AUTO_DESLOCAR_ZERO,
+	CONFIG_AUTO_MODO_SIM,
+	CONFIG_AUTO_SELECIONAR_LINHA,
+	CONFIG_AUTO_MAX
+} ut_config_auto_name;
+
+typedef enum
+{
+	CONFIG_MANUAL_MODO_MANUAL  = 0,
+	CONFIG_MANUAL_JOG_RAP_LENTO,
+	CONFIG_MANUAL_ZERAR_PECA,
+	CONFIG_MANUAL_DESLOCAR_ZERO,
+	CONFIG_MANUAL_ZERAR_MAQUINA,
+	CONFIG_MANUAL_MAX
+} ut_config_manual_name;
+
+/**
+ *
+ */
+typedef enum
+{
+	MAIN_MENU_FILE = 0,
+	MAIN_MENU_CONFIG_MANUAL,
+	MAIN_MENU_AUTO,
+	MAIN_MENU_CONFIG,
+	MAIN_MENU_MODOMAQUINA,
+	MAIN_MENU_NUMBER
+} main_menu_options;
+
+typedef enum
+{
+	CONFIG_JOG_RAP_LENTO = 0,
+	CONFIG_JOG_RAPIDO,
+	CONFIG_JOG_LENTO,
+	CONFIG_JOG_MAX
+} ut_config_jog_name;
+
+typedef enum
+{
+	OX_CONFIG_ALTURA_DESLOCAMENTO,    	//!< Altura de deslocamento
+	OX_CONFIG_ALTURA_PERFURACAO,   		//!< Altura de perfuração
+	OX_CONFIG_ALTURA_CORTE, 			//!< Altura de corte
+	OX_CONFIG_VELOC_CORTE, 				//!< Velocidade de corte
+	OX_CONFIG_TEMPO_AQUECIMENTO,		//!< Tempo de aquecimento
+	OX_CONFIG_TEMPO_PERFURACAO,			//!< Tempo de Perfuração
+	OX_CONFIG_MAX          				//!< CONFIG_MAX
+} ut_config_name_ox;
+
+typedef enum
+{
+	PL_CONFIG_ALTURA_DESLOCAMENTO,    //!< Altura de deslocamento
+	PL_CONFIG_ALTURA_PERFURACAO,      //!< Altura de perfuração
+	PL_CONFIG_ALTURA_CORTE,           //!< Altura de corte
+	PL_CONFIG_VELOC_CORTE,            //!< Velocidade de corte
+	PL_CONFIG_TEMPO_PERFURACAO,       //!< Tempo de Perfuração
+	PL_CONFIG_TENSAO_THC,             //!< Tensao do THC
+	PL_CONFIG_MAX        			  //!< CONFIG_MAX
+} ut_config_name_pl;
 
 /**
  * Function pointer to a state execution.
@@ -49,8 +114,10 @@ extern ut_state ut_state_splash(ut_context* pContext);
 extern ut_state ut_state_warning(ut_context* pContext);
 extern ut_state ut_state_main_menu(ut_context* pContext);
 extern ut_state ut_state_choose_file(ut_context* pContext);
-extern ut_state ut_state_config_menu(ut_context* pContext);
+extern ut_state ut_state_config_menu_ox(ut_context* pContext);
+extern ut_state ut_state_config_menu_pl(ut_context* pContext);
 extern ut_state ut_state_config_manual_menu(ut_context* pContext);
+extern ut_state ut_state_config_jog(ut_context* pContext);
 extern ut_state ut_state_config_var(ut_context* pContext);
 extern ut_state ut_state_manual_mode(ut_context* pContext);
 extern ut_state ut_state_auto_mode(ut_context* pContext);

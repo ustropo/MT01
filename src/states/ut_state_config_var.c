@@ -80,37 +80,38 @@ void config_bool(ut_config_var* var)
 	boolStr = boolOptions;
 	switch(configsVar->currentState)
 	{
-	case STATE_CONFIG_AUTO_MODE:
-		switch(configsVar->currentItem)
-		{
-			case 4:  boolStr = selecionarLinhatexto();
+		case STATE_MAIN_MENU:
+			switch(configsVar->currentItem)
+			{
+				case MAIN_MENU_MODOMAQUINA:
+					Recordflag =true;
+					value = var->value;
+					boolStr = boolJogMaq;
+					break;
+				default: break;
+			}
 			break;
-			default: break;
-		}
-		break;
-	case STATE_CONFIG_MANUAL_MODE:
-		switch(configsVar->currentItem)
-		{
-			case 1:  boolStr = boolJogVel;
+		case STATE_CONFIG_AUTO_MODE:
+			switch(configsVar->currentItem)
+			{
+				case CONFIG_AUTO_SELECIONAR_LINHA:
+					boolStr = selecionarLinhatexto();
+				break;
+				default: break;
+			}
 			break;
-			default: break;
-		}
-		break;
-	case STATE_CONFIG_MENU:
-		switch(configsVar->currentItem)
-		{
-			case 0:  Recordflag =true;
-					 value = var->value;
-					 boolStr = boolJogMaq;
+		case STATE_CONFIG_JOG:
+			switch(configsVar->currentItem)
+			{
+				case CONFIG_JOG_RAP_LENTO:
+					Recordflag =true;
+					value = var->value;
+					boolStr = boolJogVel;
+				break;
+				default: break;
+			}
 			break;
-			case 10: Recordflag =true;
-					 value = var->value;
-					 boolStr = boolJogVel;
-			break;
-			default: break;
-		}
-		break;
-	default: break;
+		default: break;
 	}
 	 menu.title = var->name;
 	 menu.currentState = STATE_CONFIG_VAR;
@@ -202,16 +203,33 @@ void config_int(ut_config_var* var)
 			break;
 
 		case KEY_ENTER:
-			if (configsVar->currentState == STATE_CONFIG_MENU){
-				eepromWriteConfig(CONFIGVAR);
-				ut_lcd_output_warning("     VALOR     \n\
-										 SALVO     \n");
-						/* Delay */
-				vTaskDelay(2000 / portTICK_PERIOD_MS);
-			}
-			else
+			switch(configsVar->currentState)
 			{
-				selecionarlinhas();
+				case STATE_CONFIG_JOG:
+					eepromWriteConfig(CONFIGVAR_JOG);
+					ut_lcd_output_warning("     VALOR     \n\
+											 SALVO     \n");
+							/* Delay */
+					vTaskDelay(2000 / portTICK_PERIOD_MS);
+					break;
+				case STATE_CONFIG_MENU_OX:
+					eepromWriteConfig(CONFIGVAR_OX);
+					ut_lcd_output_warning("     VALOR     \n\
+											 SALVO     \n");
+							/* Delay */
+					vTaskDelay(2000 / portTICK_PERIOD_MS);
+					break;
+				case STATE_CONFIG_MENU_PL:
+					eepromWriteConfig(CONFIGVAR_PL);
+					ut_lcd_output_warning("     VALOR     \n\
+											 SALVO     \n");
+							/* Delay */
+					vTaskDelay(2000 / portTICK_PERIOD_MS);
+					break;
+				case STATE_CONFIG_AUTO_MODE:
+					selecionarlinhas();
+					break;
+
 			}
 			mult = 1;
 			count = 0;
@@ -273,7 +291,7 @@ ut_state ut_state_config_var(ut_context* pContext)
 	switch(configsVar->currentState)
 	{
 		case STATE_CONFIG_MANUAL_MODE:
-			if(configsVar->currentItem == 3 )
+			if(configsVar->currentItem == CONFIG_MANUAL_DESLOCAR_ZERO )
 			{
 				uint32_t *Flag = configsVar->value;
 				if(*Flag == 1)
@@ -285,15 +303,15 @@ ut_state ut_state_config_var(ut_context* pContext)
 		case STATE_CONFIG_AUTO_MODE:
 			switch(configsVar->currentItem)
 			{
-				case 0:
-				case 2:
+				case CONFIG_AUTO_RODAR_PROG:
+				case CONFIG_AUTO_DESLOCAR_ZERO:
 					if(*Flag == 1)
 					{
 						stateBack = (ut_state)pContext->value[1];
 						sim = false;
 					}
 					break;
-				case 3:
+				case CONFIG_AUTO_MODO_SIM:
 					if(*Flag == 1)
 					{
 						sim = true;
@@ -304,7 +322,7 @@ ut_state ut_state_config_var(ut_context* pContext)
 						sim = false;
 					}
 					break;
-				case 4:
+				case CONFIG_AUTO_SELECIONAR_LINHA:
 					if(configsVar->type == UT_CONFIG_BOOL){
 					var_handlers[configsVar->type](configsVar);
 					linhaSelecionada(*Flag);

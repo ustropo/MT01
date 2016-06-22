@@ -9,6 +9,7 @@
 #include <string.h>
 #include "ut_context.h"
 #include "ut_state.h"
+#include "settings.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -156,7 +157,7 @@ ut_state ut_state_splash(ut_context* pContext)
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 
-	ut_lcd_bitmap(0,11,easymax_width,easymax_height,easymax_bits,"Versão 1.0.2");
+	ut_lcd_bitmap(0,11,easymax_width,easymax_height,easymax_bits,MT01_VERSION);
 
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
