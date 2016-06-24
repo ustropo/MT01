@@ -187,6 +187,17 @@ Stepper<kSocket6_StepPinNumber,
 /************************************************************************************
  **** CODE **************************************************************************
  ************************************************************************************/
+void restart_stepper()
+{
+	memset(&st_run, 0, sizeof(st_run));			// clear all values, pointers and status
+	stepper_init_assertions();
+    R_TMR_CreateOneShot((uint8_t)(1000000/FREQUENCY_SGI),exec_timer_num,TIMER_EXEC);
+    R_TMR_CreatePeriodic(2*FREQUENCY_DDA,timer_dda_callback,TIMER_DDA);
+    R_TMR_CreateOneShot((uint8_t)(1000000/FREQUENCY_SGI),load_timer_num,TIMER_LOAD);
+    R_CMT_CreatePeriodic(FREQUENCY_DWELL,timer_dwell_callback,&timerDwell);
+    R_CMT_Control(timerDwell,CMT_RX_CMD_PAUSE,0);
+	st_pre.buffer_state = PREP_BUFFER_OWNED_BY_EXEC;
+}
 /*
  * stepper_init() - initialize stepper motor subsystem
  *

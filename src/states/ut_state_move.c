@@ -216,7 +216,7 @@ static void updatePosition(uint8_t menu)
 ut_state ut_state_manual_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
-	stepper_init();
+	restart_stepper();
 	/* Clear display */
 	updatePosition(MANUAL);
 	gTitle = MANUAL;
@@ -315,7 +315,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	uint32_t keyEntry;
 	ltorchBuffer = false;
 	uint32_t arco = 0;
-	stepper_init();
+//	stepper_init();
+	restart_stepper();
 	if (configFlags[MODOMAQUINA] == MODO_PLASMA)
 		eepromReadConfig(CONFIGVAR_PL);
 	else
@@ -575,7 +576,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
-	stepper_init();
+//	stepper_init();
+	restart_stepper();
 	cm_request_queue_flush();
 	/* Clear display */
 	updatePosition(DESLOCA);

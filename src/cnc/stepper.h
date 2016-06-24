@@ -428,6 +428,7 @@ extern bool isDwell;
 /**** FUNCTION PROTOTYPES ****/
 
 void stepper_init(void);
+void restart_stepper();
 void stepper_init_assertions(void);
 stat_t stepper_test_assertions(void);
 
