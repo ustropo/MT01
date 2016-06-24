@@ -51,9 +51,9 @@ static ut_config_type init_types[CONFIG_JOG_MAX] =
 
 static char* init_names[CONFIG_JOG_MAX] =
 {
-	" JOG RÁPIDO E LENTO",
-	" CONFIG JOG RÁPIDO",
-	" CONFIG JOG LENTO"
+	" JOG RÁPIDO OU LENTO",
+	" VELOC. JOG RÁPIDO",
+	" VELOC. JOG LENTO"
 };
 
 static var_func init_func[CONFIG_JOG_MAX] =

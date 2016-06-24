@@ -316,6 +316,10 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	ltorchBuffer = false;
 	uint32_t arco = 0;
 	stepper_init();
+	if (configFlags[MODOMAQUINA] == MODO_PLASMA)
+		eepromReadConfig(CONFIGVAR_PL);
+	else
+		eepromReadConfig(CONFIGVAR_OX);
 	lstop = false;
 	cm.gmx.feed_rate_override_enable = true;
 	cm.gmx.feed_rate_override_factor = 1;

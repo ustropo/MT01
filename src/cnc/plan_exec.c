@@ -737,6 +737,11 @@ static stat_t _exec_aline_segment()
 			if (fp_ZERO(mr.unit[2]))
 			{
 				mr.gm.target[2] += zmove;
+				/* Se a correçao do THC fizer o target do eixo Z maior que a altura de deslocamento
+				 * a altura de deslocamento será igual a correção*/
+				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+					configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO] = fmax(mr.gm.target[2],configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO]);
+
 				zmovedlenght += zmove;
 				//mp_set_planner_position(2, mr.gm.target[2]);
 				mr.waypoint[SECTION_HEAD][2] = mr.gm.target[2];

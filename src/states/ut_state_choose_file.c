@@ -304,5 +304,5 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	} while(eErr == NAVIGATE_CONTINUE);
 
 	/* Go back to menu */
-	return STATE_MAIN_MENU;
+	return pContext->value[0];
 }

@@ -69,7 +69,7 @@ static uint32_t init_values[CONFIG_MANUAL_MAX] =
 static char* init_names[CONFIG_MANUAL_MAX] =
 {
 	" MODO MANUAL",
-	" CONFIG. JOG",
+	" VELOCIDADE DE JOG",
 	" ZERAR PEÇA",
 	" DESLOCAR - ZERO PEÇA",
 	" ZERAR MÁQUINA",
