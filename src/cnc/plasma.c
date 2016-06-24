@@ -175,24 +175,7 @@ float pl_thc_pid(void)
 	pl_thc_read(&THC_real);
 	if(delay_thcGet() > delay_thc){
 		if(THC_real > THC_VMIN)
-		{/*
-			THC_err = configVar[TENSAO_THC] - THC_real;
-			THC_integral += THC_err;
-			result = (KP * THC_err) + (KI * THC_integral);
-			if (fabs(result) > 0.02)
-			{
-				if(result > 0)
-				{
-					result = 0.02;
-					THC_integral = 0;
-				}
-				else if(result < 0)
-				{
-					result = -0.02;
-					THC_integral = 0;
-				}
-			}
-			*/
+		{
 			THC_err = configVarPl[PL_CONFIG_TENSAO_THC] - THC_real;
 			if(THC_err > THC_HISTERESE)
 			{

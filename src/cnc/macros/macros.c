@@ -213,13 +213,7 @@ stat_t M5_Macro(void)
 				state++; break;
 		case 1: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 				SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
-				if (configFlags[MODOMAQUINA] == MODO_PLASMA){
-					SET_NON_MODAL_MACRO(target[AXIS_Z], altura_deslocamento);
-				}
-				else
-				{
-
-				}
+				SET_NON_MODAL_MACRO(target[AXIS_Z], altura_deslocamento);
 				state++; break;
 		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
 	}

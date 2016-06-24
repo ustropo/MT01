@@ -17,7 +17,7 @@
 // ***> NOTE: The init message must be a single line with no CRs or LFs
 #define INIT_MESSAGE "Initializing configs to Shapeoko2 500mm profile"
 
-#define MT01_VERSION "Versão 1.1.0.001"
+#define MT01_VERSION "Versão 1.1.0.004"
 
 //#define JUNCTION_DEVIATION		0.03// default value, in mm - smaller is faster
 //#define JUNCTION_ACCELERATION	1500000	// 2 million - centripetal acceleration around corners
@@ -81,6 +81,7 @@
 #define M6_POLARITY				0
 #define M6_POWER_MODE			MOTOR_POWER_MODE
 
+#define Z_STEP_PULSE (M1_TRAVEL_PER_REV*M1_STEP_ANGLE)/(360*M1_MICROSTEPS)
 // *** axis settings ***
 
 // These are relative conservative values for a well-tuned Shapeoko2 or similar XY belt / Z screw machine

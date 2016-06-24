@@ -55,7 +55,7 @@ static void _init_forward_diffs(float Vi, float Vt);
 #endif
 
 extern bool sim;
-static bool zmoved = false;
+bool zmoved = false;
 static float zmovedlenght = 0;
 
 /*************************************************************************

@@ -41,6 +41,7 @@
 #include "lcd.h"
 #include "plasma.h"
 #include "switch.h"
+#include "settings.h"
 
 /**** Allocate structures ****/
 
@@ -48,6 +49,8 @@ stConfig_t st_cfg;
 stPrepSingleton_t st_pre;
 static stRunSingleton_t st_run;
 bool isDwell = false;
+extern bool zmoved;
+extern float zmove;
 /**** Setup local functions ****/
 
 static void _load_move(void);
@@ -712,9 +715,41 @@ MOTATE_TIMER_INTERRUPT(dwell_timer_num)
 
 #ifdef __RX
 void timer_dwell_callback(void *pdata)
-{								// DWELL timer interrupt
+{
+	static uint32_t refresh = 0;
+	static float step = 0;
+	if(zmove<0)
+	{
+		MOTOR1_DIR = MOTOR_FOWARD;
+	}
+	else
+	{
+		MOTOR1_DIR = MOTOR_REVERSE;
+	}
+	if(zmove != 0){
+		step += Z_STEP_PULSE;
+		MOTOR1_STEP = !MOTOR1_STEP;		// turn step bit on
+	}
+
+	refresh += 1;
+	if(refresh == 1000){
+		if (MOTOR1_DIR == MOTOR_FOWARD)
+			mr.gm.target[AXIS_Z] -= step;
+		else
+			mr.gm.target[AXIS_Z] += step;
+
+		mp_set_runtime_position(AXIS_Z,mr.gm.target[AXIS_Z]);
+		zmoved = true;
+		refresh = 0;
+		step = 0;
+	}
 	if (--st_run.dda_ticks_downcount == 0) {
 		isDwell = false;
+		refresh = 0;
+		step = 0;
+		if (st_pre.mot[MOTOR_1].direction == DIRECTION_CW)
+			MOTOR1_DIR = MOTOR_REVERSE; else
+		MOTOR1_DIR = MOTOR_FOWARD;
 		//TIMER_DWELL.CTRLA = STEP_TIMER_DISABLE;			// disable DWELL timer
 		R_CMT_Control(timerDwell,CMT_RX_CMD_PAUSE,0);
 		delay_thcStartStop(true);
@@ -1424,6 +1459,7 @@ void st_command_dwell(st_dwell_command com)
 		case DWELL_PAUSE: 	R_CMT_Control(timerDwell,CMT_RX_CMD_PAUSE,0);	break;
 		case DWELL_RESTART: R_CMT_Control(timerDwell,CMT_RX_CMD_RESUME,0);  break;
 		case DWELL_EXIT: 	st_run.dda_ticks_downcount = 1; 				break;
+		case DWELL_ZERO: 	st_run.dda_ticks_downcount = 0; 				break;
 		default: break;
 	}
 }

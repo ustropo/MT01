@@ -185,14 +185,9 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				vTaskDelay(2000 / portTICK_PERIOD_MS);
 				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 				{
-					if(configFlags[VEL_THC] == 0)
-						sprintf(Str, "VEL. CORTE: %.0f\nTENSÃO THC: %.0f V\nVEL. THC: LENTO\n",
-								configVarPl[PL_CONFIG_VELOC_CORTE],
-								configVarPl[PL_CONFIG_TENSAO_THC]);
-					else
-						sprintf(Str, "VEL. CORTE: %.0f\nTENSÃO THC: %.0f V\nVEL. THC: RÁPIDO\n",
-								configVarPl[PL_CONFIG_VELOC_CORTE],
-								configVarPl[PL_CONFIG_TENSAO_THC]);
+					sprintf(Str, "VEL. CORTE: %.0f\nTENSÃO THC: %.0f V\n",
+							configVarPl[PL_CONFIG_VELOC_CORTE],
+							configVarPl[PL_CONFIG_TENSAO_THC]);
 				}
 				else
 				{

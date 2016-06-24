@@ -416,7 +416,8 @@ typedef enum{
 	DWELL_START = 0,
 	DWELL_PAUSE,
 	DWELL_RESTART,
-	DWELL_EXIT
+	DWELL_EXIT,
+	DWELL_ZERO
 }st_dwell_command;
 
 

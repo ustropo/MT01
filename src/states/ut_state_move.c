@@ -216,7 +216,7 @@ static void updatePosition(uint8_t menu)
 ut_state ut_state_manual_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
-
+	stepper_init();
 	/* Clear display */
 	updatePosition(MANUAL);
 	gTitle = MANUAL;
@@ -315,7 +315,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	uint32_t keyEntry;
 	ltorchBuffer = false;
 	uint32_t arco = 0;
-
+	stepper_init();
 	lstop = false;
 	cm.gmx.feed_rate_override_enable = true;
 	cm.gmx.feed_rate_override_factor = 1;
@@ -452,13 +452,15 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					xio_close(cs.primary_src);
 					if(isDwell == true)
 					{
-						st_command_dwell(DWELL_RESTART);
-						st_command_dwell(DWELL_EXIT);
+//						st_command_dwell(DWELL_EXIT);
+//						st_command_dwell(DWELL_RESTART);
+						st_command_dwell(DWELL_ZERO);
+//						while(!st_runtime_isbusy());
+						cm.queue_flush_requested = false;
+						cm_queue_flush();
 						cm.motion_state = MOTION_STOP;
 					}
 					cm.probe_state = PROBE_FAILED;
-					//cm_set_motion_mode(MODEL, MOTION_MODE_CANCEL_MOTION_MODE);
-					//cm_cycle_end();
 					state = 0;
 					cm.cycle_state = CYCLE_OFF;
 					pl_arcook_stop();
@@ -569,6 +571,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
+	stepper_init();
 	cm_request_queue_flush();
 	/* Clear display */
 	updatePosition(DESLOCA);
