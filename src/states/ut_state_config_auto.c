@@ -72,18 +72,18 @@ static uint32_t init_values[CONFIG_AUTO_MAX] =
 static char* init_names[CONFIG_AUTO_MAX] =
 {
 	" RODAR PROGRAMA",
-	" ZERAR PEÇA",
+	" RODAR SIMULADO",
 	" DESLOCAR - ZERO PEÇA",
-	" MODO SIMULADO",
+	" ZERAR PEÇA",
 	" SELECIONAR LINHA"
 };
 
 static var_func init_func[CONFIG_AUTO_MAX] =
 {
 	idle,
-	zerar_peca,
-	homming_eixos,
 	idle,
+	homming_eixos,
+	zerar_peca,
 	idle
 };
 
