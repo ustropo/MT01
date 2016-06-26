@@ -449,6 +449,8 @@ void st_prep_command(void *bf);		// use a void pointer since we don't know about
 void st_prep_dwell(float microseconds);
 stat_t st_prep_line(float travel_steps[], float following_error[], float segment_time);
 void st_command_dwell(st_dwell_command com);
+float st_get_dwell_elapsed_time(void);
+void st_set_dwell_elapsed_time(float time);
 
 stat_t st_set_sa(nvObj_t *nv);
 stat_t st_set_tr(nvObj_t *nv);

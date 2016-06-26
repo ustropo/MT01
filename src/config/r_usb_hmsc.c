@@ -116,7 +116,6 @@ extern USB_UTR_t    tfat_ptr;
 
 /*** File System Interface for HMSC ***/
 extern void     R_usb_hmsc_DriveClose(USB_UTR_t *ptr, uint16_t addr, uint16_t data2);
-extern xTaskHandle task_main_handle;
 /*****************************************************************************
 Enumerated Types
 ******************************************************************************/

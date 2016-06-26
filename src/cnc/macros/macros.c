@@ -125,10 +125,15 @@ stat_t M3_Macro(void)
 				state++; break;
 
 				/*8- DEIXA CORRER O TEMPO DE PERFURAÇÃO "TEMPO DE PERFURAÇÃO" */
-		case 5: if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+		case 5: if(configFlags[MODOMAQUINA] == MODO_PLASMA){
 					tempo = tempo_perfuracao;
-				else
-					tempo = tempo_aquecimento;
+				}
+				else{
+					if(!sim)
+						tempo = tempo_aquecimento;
+					else
+						tempo = 0;
+				}
 
 			    if (tempo > 0){
 					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);

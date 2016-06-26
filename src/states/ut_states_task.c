@@ -26,6 +26,9 @@ void states_task(void)
 	/* Initialize context */
 	memset(&pContext, 0, sizeof(ut_context));
 
+	/* Initialize lcd */
+	ut_lcd_init();
+
 	/* Run machine */
 	while(currentState < STATE_NUMBER)
 	{

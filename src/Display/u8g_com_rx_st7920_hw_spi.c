@@ -48,9 +48,12 @@
 #include "platform.h"
 #include "u8g.h"
 #include "r_rspi_rx_if.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 static rspi_handle_t handle;
-static uint8_t g_rspi_callbackend = 0;
+volatile uint8_t g_rspi_callbackend = 0;
+extern xTaskHandle task_main_handle;
 
 static void rspi_callback(void *p_arg);
 
@@ -65,6 +68,7 @@ static uint8_t u8g_rx_st7920_hw_spi_shift_out(u8g_t *u8g, uint8_t val)
 	R_RSPI_Write(handle,command,&val,sizeof(val));
 	while(!g_rspi_callbackend);
 	g_rspi_callbackend = 0;
+//	ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
 
   return  0;
 }
@@ -138,13 +142,13 @@ uint8_t u8g_com_rx_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg
 	    case U8G_COM_MSG_INIT:
 	    	my_config.gpio_ssl = RSPI_IF_MODE_3WIRE;
 	    	my_config.master_slave_mode = RSPI_MS_MODE_MASTER;
-	    	my_config.bps_target = 400000; // Bit rate in bits-per-second.
+	    	my_config.bps_target = 1000000; // Bit rate in bits-per-second.
 	    	rspi_result = R_RSPI_Open(chan, &my_config, rspi_callback, &handle );
 	    	if (RSPI_SUCCESS != rspi_result)
 	    	{
 	    		while(1);
 	    	}
-	    	my_setbaud_struct.bps_target = 400000;
+	    	my_setbaud_struct.bps_target = 1000000;
 	    	rspi_result = R_RSPI_Control(handle, RSPI_CMD_SET_BAUD, &my_setbaud_struct);
 	    	if (RSPI_SUCCESS != rspi_result)
 	    	{
@@ -198,6 +202,13 @@ uint8_t u8g_com_rx_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg
 void rspi_callback(void *p_arg)
 {
 	g_rspi_callbackend = 1;
+//    BaseType_t xHigherPriorityTaskWoken;
+//
+//    xHigherPriorityTaskWoken = pdFALSE;
+//
+//    vTaskNotifyGiveFromISR( task_main_handle, &xHigherPriorityTaskWoken );
+//
+//    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
 

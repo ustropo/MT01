@@ -121,7 +121,7 @@ static void updatePosition(uint8_t menu)
 	float x; float y; float z;
 	char *lStr[6];
 	/* Display is only cleared once to improve performance */
-
+	lStr[4] = "";
 	switch(menu)
 	{
 		case MANUAL: lStr[0] = gStrManual[0];
@@ -139,19 +139,30 @@ static void updatePosition(uint8_t menu)
 		 	 	 	 lStr[1] = gStrAuto[1];
 			         sprintf(gStrAuto[2], "VEL.: %.0f mm/min",  mp_get_runtime_velocity());
                      lStr[2] = gStrAuto[2];
-                     if (arcoOkGet())
-                    	 lStr[3] = "AOK";
-                     else
-                    	 lStr[3] = "";
-			         sprintf(gStrAuto[4], "THC SET: %.0f V",  configVarPl[PL_CONFIG_TENSAO_THC]);
-                     lStr[4] = gStrAuto[4];
-                     if(isCuttingGet()){
-    			         sprintf(gStrAuto[5], "THC REAL: %.0f V",  THC_realGet());
-                         lStr[5] = gStrAuto[5];
+
+						 if (arcoOkGet())
+							 lStr[3] = "AOK";
+						 else
+							 lStr[3] = "";
+					 if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+					 {
+						 sprintf(gStrAuto[4], "THC SET: %.0f V",  configVarPl[PL_CONFIG_TENSAO_THC]);
+						 lStr[4] = gStrAuto[4];
+						 if(isCuttingGet()){
+							 sprintf(gStrAuto[5], "THC REAL: %.0f V",  THC_realGet());
+							 lStr[5] = gStrAuto[5];
+						 }
+						 else
+						 {
+							 lStr[5] = "THC REAL: --- V";
+						 }
                      }
                      else
                      {
-                    	 lStr[5] = "THC REAL: --- V";
+                    	 if(isDwell){
+        			         sprintf(gStrAuto[4], "T: %.0f s",  st_get_dwell_elapsed_time());
+                    		 lStr[4] = gStrAuto[4];
+                    	 }
                      }
                      break;
 		case SIM:    lStr[0] = gStrSim[0];
@@ -425,8 +436,10 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					if (simTorch)
 					{
 						TORCH = TRUE;
-						pl_arcook_start();
-						isCuttingSet(true);
+						if(configFlags[MODOMAQUINA] == MODO_PLASMA){
+							pl_arcook_start();
+							isCuttingSet(true);
+						}
 					}
 				}
 			}
@@ -460,6 +473,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 //						st_command_dwell(DWELL_EXIT);
 //						st_command_dwell(DWELL_RESTART);
 						st_command_dwell(DWELL_ZERO);
+						mr.move_state = MOVE_OFF;
 //						while(!st_runtime_isbusy());
 						cm.queue_flush_requested = false;
 						cm_queue_flush();

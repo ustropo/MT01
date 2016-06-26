@@ -10,6 +10,7 @@
 #include "plan_arc.h"
 #include "planner.h"
 #include "macros.h"
+#include "stepper.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -61,8 +62,24 @@ void iif_zup_filerunning(void)
 {
 	  xTimerStart( swTimers[ZUP_FILERUNNING_TIMER], 0 );
 }
-void iif_left_filerunning(void){}
-void iif_right_filerunning(void) {}
+void iif_left_filerunning(void)
+{
+	if(configFlags[MODOMAQUINA] == MODO_OXICORTE)
+	{
+		if(isDwell)
+			st_set_dwell_elapsed_time(-1);
+	}
+
+}
+void iif_right_filerunning(void)
+{
+	if(configFlags[MODOMAQUINA] == MODO_OXICORTE)
+	{
+		if(isDwell)
+			st_set_dwell_elapsed_time(1);
+	}
+}
+
 void iif_down_filerunning(void)
 {
 #ifdef VEL_CHANGE

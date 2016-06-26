@@ -1475,6 +1475,24 @@ void st_command_dwell(st_dwell_command com)
 	}
 }
 
+float st_get_dwell_elapsed_time(void)
+{
+	return st_run.dda_ticks_downcount/FREQUENCY_DWELL;
+}
+
+void st_set_dwell_elapsed_time(float time)
+{
+	int32_t timeElapsed;
+	timeElapsed = st_run.dda_ticks_downcount + time*FREQUENCY_DWELL;
+	if(timeElapsed < 0){
+		st_run.dda_ticks_downcount = 0;
+	}
+	else
+	{
+		st_run.dda_ticks_downcount = timeElapsed;
+	}
+}
+
 
 
 /***********************************************************************************

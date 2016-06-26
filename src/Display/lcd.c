@@ -352,7 +352,7 @@ void ut_lcd_output_mov_mode(bool torch, char* title[6],const char* textX,const c
 						break;
 				case 6: str = title[1];
 						u8g_prepare(u8g_font_5x8);
-			//			h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+						u8g_DrawStr(&main_u8g, (u8g_GetStrWidth(&main_u8g,str) + 25), y, title[4]);
 						u8g_DrawHLine(&main_u8g, x, y-1, 128);
 						break;
 				case 2: u8g_prepare(u8g_font_helvB08);

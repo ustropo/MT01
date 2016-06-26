@@ -343,7 +343,7 @@ void emergencia_task(void)
 		{
 			vTaskDelay(1 / portTICK_PERIOD_MS);
 			emergencyCount++;
-			if(emergencyCount == 200)
+			if(emergencyCount == 100)
 			{
 				emergenciaFlag = true;
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
@@ -358,7 +358,7 @@ void emergencia_task(void)
 		    		sprintf(Str,"MODO DE EMERGÊNCIA\nPARADO LINHA\n%d\n",currentLine);
 		    	}
 		    	ut_lcd_output_warning(Str);
-				while(keyEntry != KEY_ESC){
+				while(keyEntry != KEY_ENTER){
 					IWDT.IWDTRR = 0x00u;
 					IWDT.IWDTRR = 0xFFu;
 					xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );

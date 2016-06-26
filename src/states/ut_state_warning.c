@@ -90,9 +90,14 @@ ut_state ut_state_warning(ut_context* pContext)
 		vTaskDelay(PAGE_DELAY / portTICK_PERIOD_MS);
 	}
 	ut_lcd_output_warning("MODO DE EMERGENCIA\nZERO MÁQUINA\nNÃO REFERENCIADO\n");
-	while(keyEntry != KEY_ENTER){
+	vTaskDelay(PAGE_DELAY / portTICK_PERIOD_MS);
+	ut_lcd_output_warning("ZERAR A MÁQUINA?\nENTER = SIM\nESC = NÃO\n");
+	while(keyEntry != KEY_ENTER && keyEntry != KEY_ESC){
 		xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
 	}
 	pl_emergencia_init();
-	return STATE_MAIN_MENU;
+		if(keyEntry == KEY_ENTER)
+			return STATE_MANUAL_MODE;
+		else
+			return STATE_MAIN_MENU;
 }

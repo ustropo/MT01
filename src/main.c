@@ -117,9 +117,6 @@ void main(void)
 	/* Initialize USB */
 	usb_main();
 
-	/* Initialize lcd */
-	ut_lcd_init();
-
 	/* Initialize RTOS */
 	FreeRTOSConfig();
 
