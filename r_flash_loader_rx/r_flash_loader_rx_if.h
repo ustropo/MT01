@@ -17,42 +17,40 @@
 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* File Name    : yrdkrx63n.h
-* H/W Platform : YRDKRX63N
-* Description  : Board specific definitions for the RDKRX63N.
+* File Name    : r_flash_loader_if.h
+* Version      : 3.00
+* Description  : Functions for using Flash Loader state machine. 
+************************************************************************************************************************
+* History : DD.MM.YYYY Version Description           
+*         : 22.03.2012 3.00    First Release  (Was not present in past FL versions)          
 ***********************************************************************************************************************/
+
+#ifndef FLASH_LOADER_IF_HEADER_FILE
+#define FLASH_LOADER_IF_HEADER_FILE
+
 /***********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 30.11.2011 1.00     First Release
+Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
+/* Fixed width integer support. */
+#include <stdint.h>
+/* bool support */
+#include <stdbool.h>
+/* Used for configuring the Flash Loader code */
+#include "r_flash_loader_rx_config.h"
 
-#ifndef MT01_H
-#define MT01_H
+/***********************************************************************************************************************
+Macro definitions
+***********************************************************************************************************************/
+/* Version Number of API. */
+#define FLASH_LOADER_RX_VERSION_MAJOR           (3)
+#define FLASH_LOADER_RX_VERSION_MINOR           (0)
 
+/***********************************************************************************************************************
+Public Functions
+***********************************************************************************************************************/
+void     R_FL_DownloaderInit(void);
+void     R_FL_StateMachine(void);
+uint32_t R_FL_GetVersion(void);
 
-/* Local defines */
-#define LED_ON              (0)
-#define LED_OFF             (1)
-
-#ifndef MODULO
-#define KLINE				PORT5.PIDR.BYTE
-
-#define KCOL				PORTC.PDR.BYTE
-#define KC1					(0x05uL)
-#define KC2					(0x06uL)
-#define KC3					(0x0CuL)
-#define KC4					(0x14uL)
-#define LCD_CS              PORTC.PODR.BIT.B2
-#else
-#define KLINE				PORT4.PIDR.BYTE
-
-#define KCOL				PORTD.PDR.BYTE
-#define KC0					(0x01uL)
-#define KC1					(0x02uL)
-#define KC2					(0x04uL)
-#define LCD_CS              PORTC.PODR.BIT.B2
-#define SPIFLASH_CS 		PORTE.PODR.BIT.B0
-#endif
-
-#endif /* MT01_H */
+#endif /* FLASH_LOADER_IF_HEADER_FILE */
 

@@ -248,6 +248,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 					 vTimerUpdateCallback
 				   );
 	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
+	macro_func_ptr = command_idle;
 	xTaskNotifyGive(xCncTaskHandle);
 	intepreterRunning = true;
 
@@ -479,7 +480,6 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 						cm_queue_flush();
 						cm.motion_state = MOTION_STOP;
 					}
-					cm.probe_state = PROBE_FAILED;
 					state = 0;
 					cm.cycle_state = CYCLE_OFF;
 					pl_arcook_stop();
@@ -491,6 +491,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					{
 
 					}
+					cm.probe_state = PROBE_FAILED;
 					TORCH = FALSE;
 					macro_func_ptr = command_idle;
 					intepreterRunning = false;

@@ -17,50 +17,68 @@
 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* File Name    : r_bsp.h
-* H/W Platform : RDKRX63N 
-* Description  : Has the header files that should be included for this platform.
+* File Name	   : r_spi_flash_m25p16.h
+* Description  : This header file has specifics for M25P16 series SPI flashes.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 13.01.2012 1.00     First Release
-*         : 12.03.2012 1.10     Added locking.h and r_bsp_config.h #includes. Removed sbrk.h since heap size is not
-*                               defined in r_bsp_config.h.
-*         : 26.06.2012 1.20     Relocated mcu_info.h to the 'mcu' folder.
-*         : 16.07.2012 1.30     Added vecttbl.h include. 
-*         : 24.09.2012 1.40     Added test for C99 compliant compiler. Updated includes for v1.0 spec.
-*         : 17.01.2013 1.50     Added #include for lowsrc.h.
-*         : 07.05.2013 1.60     Added #include for r_bsp_common.h, cpu.h, and mcu_init.h.
-*         : 19.06.2013 1.70     Moved C99 includes (stdint.h, stdbool.h, stddef.h) to r_bsp_common.h.
+* History : DD.MM.YYYY Version Description           
+*         : 20.04.2012 1.00    First Release            
 ***********************************************************************************************************************/
-
-#ifndef BSP_BOARD_MT01
-#define BSP_BOARD_MT01
-
-/* Make sure that no other platforms have already been defined. Do not touch this! */
-#ifdef  PLATFORM_DEFINED
-#error  "Error - Multiple platforms defined in platform.h!"
-#else
-#define PLATFORM_DEFINED
-#endif
 
 /***********************************************************************************************************************
-INCLUDE APPROPRIATE MCU AND BOARD FILES
+Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
-#include    "mcu/all/r_bsp_common.h"
-#include    "r_bsp_config.h"
-#include    "mcu/rx63n/register_access/iodefine.h"
-#include    "mcu/rx63n/mcu_info.h"
-#include    "mcu/rx63n/mcu_locks.h"
-#include    "mcu/rx63n/locking.h"
-#include    "mcu/rx63n/cpu.h"
-#include    "mcu/rx63n/mcu_init.h"
-#include    "mcu/rx63n/mcu_interrupts.h"
-#include    "board/MT01/mt01.h"
-#include    "board/MT01/hwsetup.h"
-#include    "board/MT01/lowsrc.h"
-#include    "board/MT01/vecttbl.h"
 
-#endif /* BSP_BOARD_RDKRX63N */
+/***********************************************************************************************************************
+Macro definitions
+***********************************************************************************************************************/
+/* Write protect bit mask. If WP is bit 0 then it would be 0x01. If it is bit 7 it would be 0x80. */
+#define SF_WP_BIT_MASK                  (0x80)
+
+/* 'Write in progress' bit mask. */
+#define SF_WIP_BIT_MASK                 (0x01)
+
+/****************SPI FLASH COMMANDS****************/
+/* Write Enable command */
+#define SF_CMD_WRITE_ENABLE             (0x06)
+
+/* Write SPI flash status register command. */
+#define SF_CMD_WRITE_STATUS_REG         (0x01)
+
+/* Read status register command. */
+#define SF_CMD_READ_STATUS_REG          (0x05)
+
+/* Read ID command. */
+#define SF_CMD_READ_ID                  (0x9F)
+
+/* Erase size options. */
+/* Sector erase command. */
+#define SF_CMD_ERASE_SECTOR             (0xD8)
+/* Erase all of memory. */
+#define SF_CMD_ERASE_BULK               (0xC7)
+
+/* Page program command. */
+#define SF_CMD_PAGE_PROGRAM             (0x02)
+
+/* Read command. */
+#define SF_CMD_READ                     (0x03)
+
+/****************MEMORY SPECIFICS****************/
+/* Minimum erase size. */
+#define SF_MEM_MIN_ERASE_BYTES          (0x10000)    //M25P16 has 64KB erase sectors
+
+/* Maximum bytes to program with one program command. */
+#define SF_MEM_MAX_PROGRAM_BYTES        (256)
+
+/***********************************************************************************************************************
+Typedef definitions
+***********************************************************************************************************************/
+/* This typedef lists the available erase options. Most SPI flashes have multiple options but the minimum options are 
+   usually a sector and bulk erase. */
+typedef enum
+{
+    SF_ERASE_SECTOR = 0,
+    SF_ERASE_BULK
+} sf_erase_sizes_t;
 
 

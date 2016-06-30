@@ -176,6 +176,10 @@ static void output_ports_configure(void)
 	PORTD.PDR.BYTE  = 0xFF ;    /* All outputs*/
 
 	/* Port E -  CNC signals*/
+    PORTE.PMR.BYTE  = 0x0E ;    /* All GPIO for now */
+    MPC.PE1PFS.BYTE = 0x0E ;    /* PE1 is RSPCKB */
+    MPC.PE2PFS.BYTE = 0x0E ;    /* PE2 is MOSIB */
+    MPC.PE3PFS.BYTE = 0x0D ;    /* PE3 is MISOB */
 	PORTE.PODR.BYTE = 0x00 ;    /* All outputs low to start  */
 	PORTE.PDR.BYTE  = 0xFF ;    /* All outputs*/
 

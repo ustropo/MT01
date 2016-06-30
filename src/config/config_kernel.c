@@ -41,10 +41,12 @@
 #include "queue.h"
 #include "semphr.h"
 
+
 #include "ut_state.h"
 
 #include "r_usb_basic_if.h"
 #include "r_usb_hmsc_if.h"
+#include "r_flash_loader_rx_if.h"
 #include "ff.h"
 
 #include "plasma.h"

@@ -17,42 +17,36 @@
 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* File Name    : yrdkrx63n.h
-* H/W Platform : YRDKRX63N
-* Description  : Board specific definitions for the RDKRX63N.
+* File Name	   : r_crc_rx_if.h
+* Description  : Uses the RX CRC peripheral
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 30.11.2011 1.00     First Release
+* History : DD.MM.YYYY Version Description           
+*         : 28.02.2012 1.00    First Release            
+*         : 10.05.2012 1.10    Updated to be compliant with FIT Module Spec v0.7
+*         : 13.02.2013 1.20    Updated to be compliant with FIT Module Spec v1.02. Changed API for R_CMT_Compute() 
+*                              because existing API had no way of informing user if lock was not able to be obtained.
 ***********************************************************************************************************************/
 
-#ifndef MT01_H
-#define MT01_H
+/***********************************************************************************************************************
+Macro definitions
+***********************************************************************************************************************/
+/* Version Number of API. */
+#define CRC_RX_VERSION_MAJOR           (1)
+#define CRC_RX_VERSION_MINOR           (20)
 
+/***********************************************************************************************************************
+Typedef definitions
+***********************************************************************************************************************/
 
-/* Local defines */
-#define LED_ON              (0)
-#define LED_OFF             (1)
+/***********************************************************************************************************************
+Exported global variables
+***********************************************************************************************************************/
 
-#ifndef MODULO
-#define KLINE				PORT5.PIDR.BYTE
-
-#define KCOL				PORTC.PDR.BYTE
-#define KC1					(0x05uL)
-#define KC2					(0x06uL)
-#define KC3					(0x0CuL)
-#define KC4					(0x14uL)
-#define LCD_CS              PORTC.PODR.BIT.B2
-#else
-#define KLINE				PORT4.PIDR.BYTE
-
-#define KCOL				PORTD.PDR.BYTE
-#define KC0					(0x01uL)
-#define KC1					(0x02uL)
-#define KC2					(0x04uL)
-#define LCD_CS              PORTC.PODR.BIT.B2
-#define SPIFLASH_CS 		PORTE.PODR.BIT.B0
-#endif
-
-#endif /* MT01_H */
+/***********************************************************************************************************************
+Exported global functions (to be accessed by other files)
+***********************************************************************************************************************/
+void     R_CRC_Init(void);
+bool     R_CRC_Compute(uint16_t seed, uint8_t * data, uint32_t data_bytes, uint16_t * const crc_out);
+uint32_t R_CRC_GetVersion(void);
 

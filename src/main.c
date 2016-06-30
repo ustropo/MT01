@@ -39,6 +39,8 @@ Includes   <System Includes> , "Project Includes"
 #include "r_cmt_rx_if.h"
 #include "eeprom.h"
 #include "config_SwTimers.h"
+/* Flash Loader project includes. */
+#include "r_fl_includes.h"
 
 /* Kernel includes. */
 #include "FreeRTOS.h"

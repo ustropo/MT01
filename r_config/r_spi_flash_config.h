@@ -17,50 +17,48 @@
 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* File Name    : r_bsp.h
-* H/W Platform : RDKRX63N 
-* Description  : Has the header files that should be included for this platform.
+* File Name    : r_spi_flash_config.c
+* Description  : Configures the SPI Flash package. 
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 13.01.2012 1.00     First Release
-*         : 12.03.2012 1.10     Added locking.h and r_bsp_config.h #includes. Removed sbrk.h since heap size is not
-*                               defined in r_bsp_config.h.
-*         : 26.06.2012 1.20     Relocated mcu_info.h to the 'mcu' folder.
-*         : 16.07.2012 1.30     Added vecttbl.h include. 
-*         : 24.09.2012 1.40     Added test for C99 compliant compiler. Updated includes for v1.0 spec.
-*         : 17.01.2013 1.50     Added #include for lowsrc.h.
-*         : 07.05.2013 1.60     Added #include for r_bsp_common.h, cpu.h, and mcu_init.h.
-*         : 19.06.2013 1.70     Moved C99 includes (stdint.h, stdbool.h, stddef.h) to r_bsp_common.h.
+* History : DD.MM.YYYY Version Description           
+*         : 29.02.2012 1.00    First Release            
+*         : 20.04.2012 1.10    Added support for Numonyx M25P16 SPI flash.
+*         : 10.05.2012 1.20    Updated to be compliant with FIT Module Spec v0.7
+*         : 13.02.2013 1.30    Updated to be compliant with FIT Module Spec v1.02
 ***********************************************************************************************************************/
+#ifndef SPI_FLASH_CONFIG_HEADER_FILE
+#define SPI_FLASH_CONFIG_HEADER_FILE
 
-#ifndef BSP_BOARD_MT01
-#define BSP_BOARD_MT01
-
-/* Make sure that no other platforms have already been defined. Do not touch this! */
-#ifdef  PLATFORM_DEFINED
-#error  "Error - Multiple platforms defined in platform.h!"
+/***********************************************************************************************************************
+Configuration Options
+***********************************************************************************************************************/
+/* Which SPI flash is chosen is decided by the header file that is included below. You may only choose 1 chip at a 
+   time. If you're developing on a RSK/RDK that already has a SPI flash on it then you will not need to modify this file
+   because the appropriate SPI flash is automatically chosen below. If you are using your own board then put a #include
+   in the #else ... #endif below for the SPI flash you are using. If your SPI flash is not listed then please copy one 
+   of the already defined header files in the 'src/chips' directory, rename it for your chip, modify the macros for the 
+   specifics of your chip and add an include path to it here. 
+   For quick reference here are the SPI flashes that are used and automatically chosen for Renesas boards.
+   Numonyx P5Q PCM - RDKRX62N, RDKRX63N
+   SST 25 Series - RSKRX62N, RSKRX63N
+   */
+#if   defined(BSP_BOARD_RDKRX62N) || defined(BSP_BOARD_RDKRX63N)
+/* Numonyx P5Q PCM. */
+#include "src/chips/r_spi_flash_sst25.h"
+#elif defined(BSP_BOARD_RSKRX62N) || defined(BSP_BOARD_RSKRX63N)
+/* SST 25 Series. */
+#include "src/chips/r_spi_flash_sst25.h"
+#elif defined(BSP_BOARD_RSKRX210)
+/* Numonyx M25P16. The RSKRX210 does not come with this SPI flash installed. An expansion board was used which came 
+   with a M25P16 installed which is why it is shown here. */
+#include "src/chips/r_spi_flash_m25p16.h"
 #else
-#define PLATFORM_DEFINED
+/* If your board or SPI flash is not shown above then you will need to add an include to the header file for your
+   SPI flash here. */
+#include "src/chips/r_spi_flash_sst25.h"
 #endif
 
-/***********************************************************************************************************************
-INCLUDE APPROPRIATE MCU AND BOARD FILES
-***********************************************************************************************************************/
-#include    "mcu/all/r_bsp_common.h"
-#include    "r_bsp_config.h"
-#include    "mcu/rx63n/register_access/iodefine.h"
-#include    "mcu/rx63n/mcu_info.h"
-#include    "mcu/rx63n/mcu_locks.h"
-#include    "mcu/rx63n/locking.h"
-#include    "mcu/rx63n/cpu.h"
-#include    "mcu/rx63n/mcu_init.h"
-#include    "mcu/rx63n/mcu_interrupts.h"
-#include    "board/MT01/mt01.h"
-#include    "board/MT01/hwsetup.h"
-#include    "board/MT01/lowsrc.h"
-#include    "board/MT01/vecttbl.h"
-
-#endif /* BSP_BOARD_RDKRX63N */
+#endif /* SPI_FLASH_CONFIG_HEADER_FILE */
 
 

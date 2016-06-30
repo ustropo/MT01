@@ -10,6 +10,7 @@
 #include "ut_context.h"
 #include "ut_state.h"
 #include "settings.h"
+#include "r_fl_globals.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -17,8 +18,11 @@
 #include "lcd.h"
 #include "keyboard.h"
 #include "plasma.h"
+#include "r_flash_loader_rx_if.h"
 
-static char Str[50];
+static char Str[40];
+/* Holds current app header. */
+
 
 #define metalique128_width 128
 #define metalique128_height 42
@@ -131,21 +135,6 @@ ut_state ut_state_splash(ut_context* pContext)
 	uint32_t keyEntry = 0;
     IWDT.IWDTRR = 0x00u;
     IWDT.IWDTRR = 0xFFu;
-//	if(SYSTEM.RSTSR2.BIT.IWDTRF){
-//		pl_emergencia_init();
-//    	if (currentLine == 0)
-//    		strcpy(Str,"MODO DE EMERGÊNCIA\n");
-//    	else
-//    		sprintf(Str,"MODO DE EMERGÊNCIA\nPARADO LINHA\n%d\n",currentLine);
-//    	ut_lcd_output_warning(Str);
-//		while(keyEntry != KEY_ENTER){
-//			IWDT.IWDTRR = 0x00u;
-//			IWDT.IWDTRR = 0xFFu;
-//			xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
-//		}
-//		currentLine = 0;
-//		return STATE_MAIN_MENU;
-//	}
 	currentLine = 0;
 	ut_lcd_clear();
 
@@ -154,13 +143,22 @@ ut_state ut_state_splash(ut_context* pContext)
 
 	ut_lcd_bitmap(0,11,metalique128_width,metalique128_height,metalique128_bits,"\n");
 
-	/* Delay */
-	vTaskDelay(2000 / portTICK_PERIOD_MS);
-
-	ut_lcd_bitmap(0,11,easymax_width,easymax_height,easymax_bits,MT01_VERSION);
 
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
+	/* Initialize pointer to current app's load image header */
+	g_app_header = (fl_image_header_t *)__sectop("APPHEADER_1");
+	sprintf(Str, "Versão:%d.%d.%d.%03d", g_app_header->version_major,
+								g_app_header->version_middle,
+								g_app_header->version_minor,
+								g_app_header->version_comp);
+
+	ut_lcd_bitmap(0,11,easymax_width,easymax_height,easymax_bits,Str);
+
+	/* Delay */
+	vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+	R_FL_StateMachine();
 
 	/* Next state */
 	return STATE_WARNING;

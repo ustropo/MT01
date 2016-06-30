@@ -17,42 +17,34 @@
 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* File Name    : yrdkrx63n.h
-* H/W Platform : YRDKRX63N
-* Description  : Board specific definitions for the RDKRX63N.
+* File Name    : r_crc_rx_config.c
+* Description  : Configures the CRC code.
+************************************************************************************************************************
+* History : DD.MM.YYYY Version Description           
+*         : 28.02.2012 1.00    First Release            
+*         : 10.05.2012 1.10    Updated to be compliant with FIT Module Spec v0.7
+*         : 13.02.2013 1.20    Updated to be compliant with FIT Module Spec v1.02
 ***********************************************************************************************************************/
+#ifndef CRC_CONFIG_HEADER_FILE
+#define CRC_CONFIG_HEADER_FILE
+
 /***********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 30.11.2011 1.00     First Release
+Configuration Options
 ***********************************************************************************************************************/
+/* Determines which polynomial is used for CRC calculation. Only choose one option below.
+*/
+/* X^8 + X^2 + X + 1 - CRC-8-CCITT */
+//#define CRC_CFG_POLY_X8_X2_X_1          (1)
+/* X^16 + X^15 + X^2 + 1 - CRC-16, CRC-16-IBM, CRC-16-ANSI */
+//#define CRC_CFG_POLY_X16_X15_X2_1       (1)
+/* X^16 + X^12 + X^5 + 1 - CRC-16-CCITT */
+#define CRC_CFG_POLY_X16_X12_X5_1       (1)
 
-#ifndef MT01_H
-#define MT01_H
+/* These macro determine whether MSB-first or LSB-first communication is being used. Only choose one of these options.
+*/
+//#define CRC_CFG_LSB_FIRST               (1)
+#define CRC_CFG_MSB_FIRST               (1)
 
+#endif /* CRC_CONFIG_HEADER_FILE */
 
-/* Local defines */
-#define LED_ON              (0)
-#define LED_OFF             (1)
-
-#ifndef MODULO
-#define KLINE				PORT5.PIDR.BYTE
-
-#define KCOL				PORTC.PDR.BYTE
-#define KC1					(0x05uL)
-#define KC2					(0x06uL)
-#define KC3					(0x0CuL)
-#define KC4					(0x14uL)
-#define LCD_CS              PORTC.PODR.BIT.B2
-#else
-#define KLINE				PORT4.PIDR.BYTE
-
-#define KCOL				PORTD.PDR.BYTE
-#define KC0					(0x01uL)
-#define KC1					(0x02uL)
-#define KC2					(0x04uL)
-#define LCD_CS              PORTC.PODR.BIT.B2
-#define SPIFLASH_CS 		PORTE.PODR.BIT.B0
-#endif
-
-#endif /* MT01_H */
 
