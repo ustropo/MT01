@@ -7,14 +7,16 @@
 #ifndef CNC_MACROS_MACROS_H_
 #define CNC_MACROS_MACROS_H_
 
-extern stat_t (*macro_func_ptr)(void);
+#include "eeprom.h"
 
+extern stat_t (*macro_func_ptr)(void);
 extern int8_t macro;
 extern uint8_t jogAxis;
 extern float jogMaxDistance;
 extern uint8_t state;
 extern uint32_t linenumMacro;
 extern float *velocidadeJog;
+extern ut_config_name_ox tempoDwell;
 
 stat_t M5_Macro(void);
 stat_t M3_Macro(void);

@@ -71,7 +71,7 @@ rspi_chnl_settings_t spiflash_config =
 {
 	.gpio_ssl = RSPI_IF_MODE_3WIRE,
 	.master_slave_mode = RSPI_MS_MODE_MASTER,
-	.bps_target = 8000000,
+	.bps_target = 24000000,
 };
 
 rspi_cmd_baud_t spiflash_setbaud;

@@ -28,14 +28,8 @@
 
 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
-extern TaskHandle_t xCncTaskHandle;
 extern char gszCurFile[MAX_FILE_PATH_SIZE];
 extern uint32_t choosedLine;
-static float zeroPiecebuffer[3] = {0,0,0};
-
-static void zerar_peca(void *var);
-static void homming_eixos(void *var);
-static void idle(void *var);
 
 /* Array with all config variables */
 ut_config_var configs_auto[CONFIG_AUTO_MAX];
@@ -239,41 +233,4 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 	}
 
 	return geNextStateAuto[config_menu.selectedItem];
-}
-
-static void zerar_peca(void *var)
-{
-	ut_config_var *lvar = var;
-	uint32_t *value = lvar->value;
-	if(*value)
-	{
-		zeroPiecebuffer[AXIS_X] += mp_get_runtime_absolute_position(AXIS_X);
-		zeroPiecebuffer[AXIS_Y] += mp_get_runtime_absolute_position(AXIS_Y);
-		zeroPiecebuffer[AXIS_Z] = 0;
-
-		zeroPiece[AXIS_X] = zeroPiecebuffer[AXIS_X];
-		zeroPiece[AXIS_Y] = zeroPiecebuffer[AXIS_Y];
-		zeroPiece[AXIS_Z] = 0;
-		xTaskNotifyGive(xCncTaskHandle);
-		eepromWriteConfig(ZEROPIECE);
-		macro_func_ptr = ZerarMaquina_Macro;
-		zeroPiece[AXIS_X] = 0;
-		zeroPiece[AXIS_Y] = 0;
-		zeroPiece[AXIS_Z] = 0;
-	}
-}
-
-static void homming_eixos(void *var)
-{
-	ut_config_var *lvar = var;
-	uint32_t *value = lvar->value;
-	if(*value)
-	{
-		macro_func_ptr = homming_Macro;
-	}
-}
-
-static void idle(void *var)
-{
-
 }

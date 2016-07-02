@@ -68,6 +68,7 @@ void iif_left_filerunning(void)
 	{
 		if(isDwell)
 			st_set_dwell_elapsed_time(-1);
+			configVarOx[tempoDwell] -= 1;
 	}
 
 }
@@ -77,6 +78,7 @@ void iif_right_filerunning(void)
 	{
 		if(isDwell)
 			st_set_dwell_elapsed_time(1);
+			configVarOx[tempoDwell] += 1;
 	}
 }
 

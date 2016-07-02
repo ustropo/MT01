@@ -18,6 +18,7 @@
 #include "ut_state_config_var.h"
 #include "interpreter_if.h"
 #include "state_functions.h"
+#include "eeprom.h"
 
 #include "lcd_menu.h"
 #include "lcd.h"
@@ -30,6 +31,8 @@ extern uint32_t actualLine;
 extern uint32_t previousLine;
 extern uint32_t choosedLine;
 extern uint32_t choosedLinePosition;
+extern TaskHandle_t xCncTaskHandle;
+
 uint32_t lineEntries[2];
 uint32_t LinePositionEntries[2];
 float selecionarLinhas = 0;
@@ -37,6 +40,8 @@ uint32_t LineM5 = 0;
 uint32_t currentLineSel = 0;
 static char strLinhas[2][20];
 char** pstrLinhas;
+
+static float zeroPiecebuffer[3] = {0,0,0};
 
 uint32_t selecionarlinhasMax(void)
 {
@@ -128,3 +133,56 @@ void linhaSelecionada(uint32_t flag)
 		choosedLinePosition = LinePositionEntries[0];
 	}
 }
+
+void zerar_maquina(void *var)
+{
+	ut_config_var *lvar = var;
+	uint32_t *value = lvar->value;
+	if(*value)
+	{
+		zeroPiecebuffer[AXIS_X] = 0;
+		zeroPiecebuffer[AXIS_Y] = 0;
+		zeroPiecebuffer[AXIS_Z] = 0;
+		eepromReadConfig(ZEROPIECE);
+		xTaskNotifyGive(xCncTaskHandle);
+		macro_func_ptr = ZerarMaquina_Macro;
+	}
+}
+
+void zerar_peca(void *var)
+{
+	ut_config_var *lvar = var;
+	uint32_t *value = lvar->value;
+	if(*value)
+	{
+		zeroPiecebuffer[AXIS_X] += mp_get_runtime_absolute_position(AXIS_X);
+		zeroPiecebuffer[AXIS_Y] += mp_get_runtime_absolute_position(AXIS_Y);
+		zeroPiecebuffer[AXIS_Z] = 0;
+
+		zeroPiece[AXIS_X] = zeroPiecebuffer[AXIS_X];
+		zeroPiece[AXIS_Y] = zeroPiecebuffer[AXIS_Y];
+		zeroPiece[AXIS_Z] = 0;
+		eepromWriteConfig(ZEROPIECE);
+		xTaskNotifyGive(xCncTaskHandle);
+		macro_func_ptr = ZerarMaquina_Macro;
+		zeroPiece[AXIS_X] = 0;
+		zeroPiece[AXIS_Y] = 0;
+		zeroPiece[AXIS_Z] = 0;
+	}
+}
+
+void homming_eixos(void *var)
+{
+	ut_config_var *lvar = var;
+	uint32_t *value = lvar->value;
+	if(*value)
+	{
+		macro_func_ptr = homming_Macro;
+	}
+}
+
+void idle(void *var)
+{
+
+}
+

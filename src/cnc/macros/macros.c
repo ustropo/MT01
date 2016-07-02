@@ -23,6 +23,7 @@ static float tempo_aquecimento;
 
 float *velocidadeJog;
 
+ut_config_name_ox tempoDwell;
 uint8_t jogAxis;
 float jogMaxDistance;
 uint8_t state = 0;
@@ -129,10 +130,13 @@ stat_t M3_Macro(void)
 					tempo = tempo_perfuracao;
 				}
 				else{
-					if(!sim)
+					if(!sim){
 						tempo = tempo_aquecimento;
+					}
 					else
+					{
 						tempo = 0;
+					}
 				}
 
 			    if (tempo > 0){

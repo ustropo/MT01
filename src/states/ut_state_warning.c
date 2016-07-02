@@ -7,6 +7,8 @@
 
 #include "ut_context.h"
 #include "ut_state.h"
+#include "ut_state_config_var.h"
+#include "state_functions.h"
 
 #include "lcd.h"
 
@@ -96,8 +98,18 @@ ut_state ut_state_warning(ut_context* pContext)
 		xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
 	}
 	pl_emergencia_init();
-		if(keyEntry == KEY_ENTER)
-			return STATE_MANUAL_MODE;
-		else
-			return STATE_MAIN_MENU;
+	if(keyEntry == KEY_ENTER)
+	{
+		ut_lcd_output_warning("DEVE ESTAR NOS\nLIMITES FISICOS\nX0 E Y0\n");
+		/* Delay */
+		vTaskDelay(2000 / portTICK_PERIOD_MS);
+		configsVar->func_var = zerar_maquina;
+		configsVar->type = UT_CONFIG_BOOL;
+		configsVar->currentState = STATE_WARNING;
+		configsVar->name = "ZERAR A MÁQUINA?";
+		pContext->value[0] = STATE_MAIN_MENU;
+		pContext->value[1] = STATE_MAIN_MENU;
+		return STATE_CONFIG_VAR;
+	}
+	return STATE_MAIN_MENU;
 }

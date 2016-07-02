@@ -43,6 +43,9 @@
 #include "switch.h"
 #include "settings.h"
 
+#include "macros.h"
+#include "eeprom.h"
+
 /**** Allocate structures ****/
 
 stConfig_t st_cfg;
@@ -1268,9 +1271,17 @@ void st_prep_command(void *bf)
 
 void st_prep_dwell(float microseconds)
 {
+	float seconds;
+	seconds = (microseconds/1000);
 	st_pre.move_type = MOVE_TYPE_DWELL;
 	st_pre.dda_period = _f_to_period(FREQUENCY_DWELL);
 	st_pre.dda_ticks = (uint32_t)((microseconds/1000) * FREQUENCY_DWELL);
+	if (configFlags[MODOMAQUINA] == MODO_OXICORTE){
+		if (seconds == configVarOx[OX_CONFIG_TEMPO_AQUECIMENTO])
+			tempoDwell = OX_CONFIG_TEMPO_AQUECIMENTO;
+		else if(seconds == configVarOx[OX_CONFIG_TEMPO_PERFURACAO])
+			tempoDwell = OX_CONFIG_TEMPO_PERFURACAO;
+	}
 	// Seconds st_pre.dda_ticks = (uint32_t)((microseconds/1000000) * FREQUENCY_DWELL);
 	st_pre.buffer_state = PREP_BUFFER_OWNED_BY_LOADER;	// signal that prep buffer is ready
 }

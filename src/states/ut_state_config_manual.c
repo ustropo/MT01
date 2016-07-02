@@ -15,6 +15,7 @@
 #include "interpreter_if.h"
 #include "eeprom.h"
 #include "macros.h"
+#include "state_functions.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -28,9 +29,6 @@
 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
 extern TaskHandle_t xCncTaskHandle;
-static void zerar_maquina(void *var);
-static void zerar_peca(void *var);
-static void homming_eixos(void *var);
 
 /* Array with all config variables */
 ut_config_var configs_manual[CONFIG_MANUAL_MAX];
@@ -178,51 +176,4 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 	}
 
 	return geNextStateManual[config_menu.selectedItem];
-}
-
-static void zerar_maquina(void *var)
-{
-	ut_config_var *lvar = var;
-	uint32_t *value = lvar->value;
-	if(*value)
-	{
-		zeroPiecebuffer[AXIS_X] = 0;
-		zeroPiecebuffer[AXIS_Y] = 0;
-		zeroPiecebuffer[AXIS_Z] = 0;
-		eepromReadConfig(ZEROPIECE);
-		xTaskNotifyGive(xCncTaskHandle);
-		macro_func_ptr = ZerarMaquina_Macro;
-	}
-}
-
-static void zerar_peca(void *var)
-{
-	ut_config_var *lvar = var;
-	uint32_t *value = lvar->value;
-	if(*value)
-	{
-		zeroPiecebuffer[AXIS_X] += mp_get_runtime_absolute_position(AXIS_X);
-		zeroPiecebuffer[AXIS_Y] += mp_get_runtime_absolute_position(AXIS_Y);
-		zeroPiecebuffer[AXIS_Z] = 0;
-
-		zeroPiece[AXIS_X] = zeroPiecebuffer[AXIS_X];
-		zeroPiece[AXIS_Y] = zeroPiecebuffer[AXIS_Y];
-		zeroPiece[AXIS_Z] = 0;
-		eepromWriteConfig(ZEROPIECE);
-		xTaskNotifyGive(xCncTaskHandle);
-		macro_func_ptr = ZerarMaquina_Macro;
-		zeroPiece[AXIS_X] = 0;
-		zeroPiece[AXIS_Y] = 0;
-		zeroPiece[AXIS_Z] = 0;
-	}
-}
-
-static void homming_eixos(void *var)
-{
-	ut_config_var *lvar = var;
-	uint32_t *value = lvar->value;
-	if(*value)
-	{
-		macro_func_ptr = homming_Macro;
-	}
 }
