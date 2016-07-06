@@ -45,34 +45,10 @@ Includes   <System Includes> , "Project Includes"
 #include "r_rspi_rx_if.h"
 /* Configuration for this package. */
 #include "r_spi_flash_config.h"
-/* Header file for this package. */
+
 #include "r_spi_flash_if.h"
 
-/***********************************************************************************************************************
-Macro definitions
-***********************************************************************************************************************/
-#define RSPI_POOLING		while(!g_transfer_complete); \
-							g_transfer_complete = false;
-/* Processor ID for locking RSPI channel. */
-#define SF_PID          (0x11111111)
-static void spiflash_callback(void * pdata);
 volatile bool g_transfer_complete = false;
-static rspi_handle_t spiflash_handle;
-rspi_command_word_t spiflash_command =
-{
-	.cpha = RSPI_SPCMD_CPHA_SAMPLE_ODD,
-	.cpol = RSPI_SPCMD_CPOL_IDLE_LO,
-	.bit_order = RSPI_SPCMD_ORDER_MSB_FIRST,
-	.bit_length = RSPI_SPCMD_BIT_LENGTH_8,
-	.br_div = RSPI_SPCMD_BR_DIV_1,
-};
-
-rspi_chnl_settings_t spiflash_config =
-{
-	.gpio_ssl = RSPI_IF_MODE_3WIRE,
-	.master_slave_mode = RSPI_MS_MODE_MASTER,
-	.bps_target = 8000000,
-};
 
 rspi_cmd_baud_t spiflash_setbaud;
 rspi_err_t spiflash_result;
@@ -89,6 +65,11 @@ static bool    sf_lock_channel(uint8_t channel);
 static bool    sf_unlock_channel(uint8_t channel);
 static uint8_t sf_read_status (uint8_t channel);
 
+static bool RSPI1_SendReceive( uint8_t const *pSrc, uint8_t *pDest, uint16_t usBytes);
+static bool RSPI1_Read( uint8_t *pDest, uint16_t usBytes);
+static bool RSPI1_Write( const uint8_t *pSrc,int16_t usBytes);
+static bool RSPI1_rx_buffer_full (void);
+
 /***********************************************************************************************************************
 * Function Name: sf_write_enable
 * Description  : Sets Write Enable Latch bit
@@ -104,8 +85,7 @@ static void sf_write_enable (uint8_t channel)
     /* Initialize peripheral for SPI */
     sf_open(channel);
     
-	R_RSPI_Write(spiflash_handle,spiflash_command,&val,sizeof(val));
-	RSPI_POOLING
+    RSPI1_Write(&val,sizeof(val));
     /* Close peripheral for SPI */
     sf_close(channel);  
 }
@@ -133,8 +113,8 @@ static void sf_write_protect (uint8_t channel)
     /* This section writes data.  The first character is the write command */
     val[0] = SF_CMD_WRITE_STATUS_REG;
     val[1] = SF_WP_BIT_MASK;
-	R_RSPI_Write(spiflash_handle,spiflash_command,&val,sizeof(val));
-	RSPI_POOLING
+    RSPI1_Write(&val,sizeof(val));
+
     /* Close peripheral for SPI */
     sf_close(channel);  
 }
@@ -161,8 +141,8 @@ static void sf_write_unprotect (uint8_t channel)
     /* This section writes data.  The first character is the write command */
     val[0] = SF_CMD_WRITE_STATUS_REG;
     val[1] = 0x0;
-	R_RSPI_Write(spiflash_handle,spiflash_command,&val,sizeof(val));
-	RSPI_POOLING
+    RSPI1_Write(&val,sizeof(val));
+
     /* Close peripheral for SPI */
     sf_close(channel);
   
@@ -170,8 +150,61 @@ static void sf_write_unprotect (uint8_t channel)
 
 void R_SF_Init(uint8_t channel)
 {
+	bool lock;
     /* Initialize peripherals used for talking to SPI flash */
-	R_RSPI_Open(channel, &spiflash_config, spiflash_callback, &spiflash_handle);
+	//R_RSPI_Open(channel, &spiflash_config, spiflash_callback, &spiflash_handle);
+	/* Get the looking */
+    if(R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_RSPI1)))
+    {
+		R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+		MSTP(RSPI1) = 0; /* Init peripheral */
+		R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+        IPR(RSPI1, SPRI1) = 3;
+        IEN(RSPI1, SPRI1) = 0;
+        IEN(RSPI1, SPTI1) = 0;
+        IR(RSPI1, SPRI1) = 0 ;
+
+        RSPI1.SPCR.BYTE = 0x00; /*Clock synchronous operation; Master mode*/
+        /* Set RSPI bit rate (SPBR) */
+        /* -Set baud rate to 24Mbps (48MHz / (2 * (0 + 1) * 2^0) ) = 24Mbps */
+        RSPI1.SPBR = 0;
+
+        /* Set RSPI data control register (SPDCR) */
+        /* -SPDR is accessed in longwords (32 bits)
+           -Transfer 1 frame at a time */
+        RSPI1.SPDCR.BYTE = 0x20;
+
+        /* Set RSPI control register 2 (SPCR2) */
+        /* -Disable Idle interrupt */
+        RSPI1.SPCR2.BYTE = 0x00;
+
+        /* Set RSPI command register 0 (SPCMD0) */
+        /* -MSB first
+           -8 bits data length
+           -SSL0 (handled manually)
+           -Use bit rate % 1
+            */
+        RSPI1.SPCMD0.WORD = 0x0400;
+
+        /* Set RSPI control register (SPCR) */
+        /* -Clock synchronous operation (3-wire)
+           -Full duplex operation
+           -Master mode
+           -SPTI and SPRI enabled in RSPI (have to check ICU also)
+           -Enable RSPI function */
+        RSPI1.SPCR.BYTE = 0xE9;
+
+
+//        DMAC0.DMCNT.BIT.DTE = 0;
+//        ICU.DMRSR0 = 43; /*RSPI1 RX*/
+//        ICU.DMRSR1 = 44; /*RSPI1 TX*/
+//
+//        DMAC0.DMTMD.WORD = 0x0001;
+//        DMAC0.DMAMD.WORD =0x4040;
+//
+//        DMAC1.DMTMD.WORD = 0x0001;
+//        DMAC1.DMAMD.WORD =0x8040;
+    }
 }
 
 /***********************************************************************************************************************
@@ -224,8 +257,7 @@ bool R_SF_Erase (uint8_t channel, const uint32_t address, const sf_erase_sizes_t
         val[2] = (uint8_t)(address >>  8);
         val[3] = (uint8_t)(address >>  0);
 
-    	R_RSPI_Write(spiflash_handle,spiflash_command,&val,sizeof(val));
-    	RSPI_POOLING
+        RSPI1_Write(&val,sizeof(val));
     }
     else if(size == SF_ERASE_BULK)
     {
@@ -233,8 +265,7 @@ bool R_SF_Erase (uint8_t channel, const uint32_t address, const sf_erase_sizes_t
         val[0] = SF_CMD_ERASE_BULK;
 
         /* bulk erase is one byte command */
-    	R_RSPI_Write(spiflash_handle,spiflash_command,&val,1);
-    	RSPI_POOLING
+        RSPI1_Write(&val,1);
     }
     else if (size == SF_ERASE_BLOCK)
     {
@@ -246,8 +277,7 @@ bool R_SF_Erase (uint8_t channel, const uint32_t address, const sf_erase_sizes_t
         val[2] = (uint8_t)(address >>  8);
         val[3] = (uint8_t)(address >>  0);
 
-    	R_RSPI_Write(spiflash_handle,spiflash_command,&val,sizeof(val));
-    	RSPI_POOLING
+        RSPI1_Write(&val,sizeof(val));
     }
     else
     {
@@ -343,11 +373,11 @@ bool R_SF_WriteData (uint8_t channel, uint32_t address, uint8_t * data, uint32_t
         val[1] = (uint8_t)(address >> 16);
         val[2] = (uint8_t)(address >>  8);
         val[3] = (uint8_t)(address >>  0);
-    	R_RSPI_Write(spiflash_handle,spiflash_command,&val,sizeof(val));
-    	RSPI_POOLING
+        RSPI1_Write(&val,sizeof(val));
+
         /* Write data buffer to the flash */
-       	R_RSPI_Write(spiflash_handle,spiflash_command,(uint8_t *)data,bytes_to_write);
-    	RSPI_POOLING
+        RSPI1_Write((uint8_t *)data,bytes_to_write);
+
         /* Close peripheral for SPI */
         sf_close(channel);
 
@@ -410,11 +440,11 @@ bool R_SF_ReadData (uint8_t channel, const uint32_t address, uint8_t * data, con
     val[1] = (uint8_t)(address >> 16);
     val[2] = (uint8_t)(address >>  8);
     val[3] = (uint8_t)(address >>  0);
-	R_RSPI_Write(spiflash_handle,spiflash_command,&val,sizeof(val));
-	RSPI_POOLING
+    RSPI1_Write(&val,sizeof(val));
+
     /* Read data. */
-    R_RSPI_Read(spiflash_handle,spiflash_command,data,size);
-	RSPI_POOLING
+	RSPI1_Read(data,size);
+
     /* Close peripheral for SPI */
     sf_close(channel);
 
@@ -485,11 +515,11 @@ bool R_SF_ReadID (uint8_t channel, uint8_t * data, uint32_t size)
     val = SF_CMD_READ_ID;
     
     /* Send command. */
-	R_RSPI_Write(spiflash_handle,spiflash_command,&val,sizeof(val));
-	RSPI_POOLING
+    RSPI1_Write(&val,sizeof(val));
+
     /* Read data. */
-    R_RSPI_Read(spiflash_handle,spiflash_command,data,size);
-	RSPI_POOLING
+	RSPI1_Read(data,size);
+
     /* Close peripheral for SPI */
     sf_close(channel);
 
@@ -579,15 +609,185 @@ static uint8_t sf_read_status (uint8_t channel)
     val = SF_CMD_READ_STATUS_REG;
     
     /* Send command. */
-	R_RSPI_Write(spiflash_handle,spiflash_command,&val,sizeof(val));
-	RSPI_POOLING
+    RSPI1_Write(&val,sizeof(val));
+
     /* Read register. */
-    R_RSPI_Read(spiflash_handle,spiflash_command,&val,sizeof(val));
-	RSPI_POOLING
+	RSPI1_Read(&val,sizeof(val));
+
     /* close peripheral for SPI */
     sf_close(channel);
 
     return val;
+}
+
+/***********************************************************************************************************************
+* Function Name: RSPI1_SendReceive
+* Description  : Performs SPI transfers. Can read and write at the same time.
+* Arguments    :
+*                pSrc -
+*                    pointer to data buffer with data to be transmitted.
+*                    If NULL, const 0xFF as source.
+*                pDest -
+*                    pointer to location to put the received data (can be same as pSrc if desired).
+*                    If NULL, receive data discarded.
+*                usBytes -
+*                    number of bytes to be sent/received
+* Return Value : true -
+*                    Operation completed.
+*                false -
+*                    This task did lock the RSPI fist.
+***********************************************************************************************************************/
+static bool RSPI1_SendReceive( uint8_t const *pSrc,
+                        uint8_t *pDest,
+                        uint16_t usBytes)
+{
+    uint16_t byte_count;
+    volatile uint32_t temp;
+
+    for (byte_count = 0; byte_count < usBytes; byte_count++)
+    {
+        /* Ensure transmit register is empty */
+        while (RSPI1.SPSR.BIT.IDLNF) ;
+
+        /* If just reading then transmit 0xFF */
+        RSPI1.SPDR.LONG = (pSrc == NULL) ? 0xFF : pSrc[byte_count];
+
+        while (false == RSPI1_rx_buffer_full())
+        {
+            /* Transfer is complete when a byte has been shifted in (full duplex) */
+        }
+
+        /* Read received data.  If transmit only, then ignore it */
+        if (pDest == NULL)
+        {
+            temp = RSPI1.SPDR.LONG;
+        }
+        else
+        {
+            pDest[byte_count] = (uint8_t) (RSPI1.SPDR.LONG & 0xFF);
+        }
+
+    }
+
+    return true;
+}
+
+/***********************************************************************************************************************
+* Function Name: R_RSPI_Read
+* Description  : Reads data using RSPI
+* Arguments    : channel -
+*                    Which channel to use
+*                pDest -
+*                    Pointer to location to put the received data.
+*                    Returned value will be incremented by number of bytes received.
+*                usBytes -
+*                    number of bytes to be received
+*                pid -
+*                    Unique task ID. Used to make sure tasks don't step on each other.
+* Return Value : true -
+*                    Operation completed.
+*                false -
+*                    This task did lock the RSPI fist.
+***********************************************************************************************************************/
+static bool RSPI1_Read( uint8_t *pDest,
+                 uint16_t usBytes)
+{
+    uint16_t byte_count;
+    volatile uint32_t temp;
+
+    for (byte_count = 0; byte_count < usBytes; byte_count++)
+    {
+        /* Ensure transmit register is empty */
+        while (RSPI1.SPSR.BIT.IDLNF) ;
+
+        /* If just reading then transmit 0xFF */
+        RSPI1.SPDR.LONG = 0xFFFFFFFF ;
+
+        while (false == RSPI1_rx_buffer_full())
+        {
+            /* Transfer is complete when a byte has been shifted in (full duplex) */
+        }
+
+        /* Read received data.  If transmit only, then ignore it */
+        pDest[byte_count] = (uint8_t) (RSPI1.SPDR.LONG & 0xFF);
+    }
+
+    return true;
+}
+
+
+/***********************************************************************************************************************
+* Function Name: R_RSPI_Write
+* Description  : Write to a SPI device
+* Arguments    : channel -
+*                    Which channel to use
+*                pSrc -
+*                    Pointer to data buffer with data to be transmitted.
+*                    Returned value will be incremented by number of attempted writes.
+*                usBytes -
+*                    Number of bytes to be sent
+*                pid -
+*                    Unique task ID. Used to make sure tasks don't step on each other.
+* Return Value : true -
+*                    Operation completed.
+*                false -
+*                    This task did lock the RSPI fist.
+***********************************************************************************************************************/
+static bool RSPI1_Write( const uint8_t *pSrc,
+                  uint16_t usBytes)
+{
+    uint16_t byte_count;
+    volatile uint32_t temp;
+
+    for (byte_count = 0; byte_count < usBytes; byte_count++)
+    {
+        /* Ensure transmit register is empty */
+        while (RSPI1.SPSR.BIT.IDLNF) ;
+
+        /* If just reading then transmit 0xFF */
+        RSPI1.SPDR.LONG = pSrc[byte_count];
+
+        while (false == RSPI1_rx_buffer_full())
+        {
+            /* Transfer is complete when a byte has been shifted in (full duplex) */
+        }
+
+        /* Read received data.  If transmit only, then ignore it */
+        temp = RSPI1.SPDR.LONG;
+    }
+//    DMAC0.DMSAR = (uint32_t *)&RSPI1.SPDR.LONG;
+//    DMAC0.DMDAR = (uint32_t *)pSrc;
+//    DMAC0.DMCRA = usBytes;
+//
+//    DMAC1.DMSAR = (uint32_t *)pSrc;
+//    DMAC1.DMDAR = (uint32_t *)&RSPI1.SPDR.LONG;
+//    DMAC1.DMCRA = usBytes;
+//    temp1 = RSPI1.SPDR.LONG;
+    return true;
+}
+
+/***********************************************************************************************************************
+* Function Name: rspi_rx_buffer_full
+* Description  : Returns whether the receive buffer full flag is set for a RSPI channel. Clear flag after read.
+* Arguments    : channel -
+*                    Which channel to use.
+* Return Value : true -
+*                    Flag is set.
+*                false -
+*                    Flag is not set.
+***********************************************************************************************************************/
+static bool RSPI1_rx_buffer_full (void)
+{
+    bool flag_set = false;
+
+        if (1 == IR(RSPI1, SPRI1))
+        {
+            /* Clear bit. */
+            IR(RSPI1, SPRI1) = 0;
+
+            flag_set = true;
+        }
+    return flag_set;
 }
 
 /***********************************************************************************************************************
@@ -603,11 +803,6 @@ uint32_t R_SF_GetVersion (void)
 {
     /* These version macros are defined in r_spi_flash_if.h. */
     return ((((uint32_t)SPI_FLASH_VERSION_MAJOR) << 16) | (uint32_t)SPI_FLASH_VERSION_MINOR);
-}
-
-static void spiflash_callback(void * pdata)
-{
-	g_transfer_complete = true;
 }
 
 

@@ -71,7 +71,7 @@ Macro definitions
 #define SF_MEM_MIN_ERASE_BYTES          (0x1000)    //SST25 has 4KB erase sectors
 
 /* Maximum bytes to program with one program command. */
-#define SF_MEM_MAX_PROGRAM_BYTES        (1)
+#define SF_MEM_MAX_PROGRAM_BYTES        (256)
 
 /***********************************************************************************************************************
 Typedef definitions
