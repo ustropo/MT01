@@ -46,6 +46,12 @@ stat_t M3_Macro(void)
 {
 	float tempo;
 
+	// set initial state for new move
+	memset(&gp, 0, sizeof(gp));						// clear all parser values
+	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
+	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
+	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
+
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
@@ -54,6 +60,84 @@ stat_t M3_Macro(void)
 		vel_corte			= 	configVarPl[PL_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarPl[PL_CONFIG_TEMPO_PERFURACAO];
 		tempo_aquecimento	= 	0;
+		switch (state)
+		{
+				/*   1- Procura chapa. G38.2 -50 COM FEEDRATE DE 800MM/MIN  */
+			case 0: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_STRAIGHT_PROBE);
+					SET_NON_MODAL_MACRO(target[AXIS_Z], -50);
+					SET_NON_MODAL_MACRO (feed_rate, 800);
+					state++; break;
+
+				/*  2- Zera o eixo Z com G28.3 Z0*/
+			case 1: if(configFlags[MODOMAQUINA] == MODO_PLASMA){
+
+						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+						SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
+						SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
+
+					}
+					state++; break;
+
+					/* 3- Posiciona o eixo Z para "ALTURA DE PERFURAÇÃO" */
+			case 2: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+					SET_NON_MODAL_MACRO(target[AXIS_Z], altura_perfuracao);
+					state++; break;
+
+					/* 4- CHECA SE O ESTÁ EM MODO SIMULAÇÃO, SE SIM, PULAR PARA PASSO 8. SE ESTIVER EM MODO OXICORTE, CONTINUA.
+					   4 -Dispara a tocha */
+			case 3:	SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
+					state++;
+					break;
+
+					/*  5 -Espera o arco OK */
+			case 4: if(!sim)
+					{
+						uint32_t lRet;
+						pl_arcook_start();
+						lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
+						if (lRet == pdFALSE)
+						{
+							uint32_t qSend = ARCO_OK_FAILED;
+							xQueueSend( qKeyboard, &qSend, 0 );
+							return (STAT_OK);
+						}
+						else
+						{
+							isCuttingSet(true);
+						}
+					}
+					state++; break;
+
+					/*6- Dwell do "TEMPO DE PERFURAÇÃO" */
+			case 5:	if (tempo_perfuracao > 0){
+						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+						SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+						SET_NON_MODAL_MACRO (parameter, tempo_perfuracao*1000);
+					}
+					else
+					{
+						delay_thcStartStop(true);
+					}
+					state++; break;
+
+
+					/*7- Desce para a "ALTURA DE CORTE" com feedrate de 800*/
+			case 6: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+					SET_NON_MODAL_MACRO(target[AXIS_Z], altura_corte);
+					SET_NON_MODAL_MACRO (feed_rate, 800);
+					state++; break;
+
+					/*8- Seta o sistema com o feedrate de corte "VELOC. DE CORTE" */
+			case 7: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_NON_MODAL_MACRO (feed_rate, vel_corte);
+					state++; break;
+
+			default: state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+		}
 	}
 	else
 	{
@@ -63,126 +147,77 @@ stat_t M3_Macro(void)
 		vel_corte			= 	configVarOx[OX_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarOx[OX_CONFIG_TEMPO_PERFURACAO];
 		tempo_aquecimento	= 	configVarOx[OX_CONFIG_TEMPO_AQUECIMENTO];
-	}
+		switch (state)
+		{
+					/* 1- Posiciona o eixo Z para "ALTURA DE AQUECIMENTO = ALTURA DE CORTE" */
+			case 0: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+					SET_NON_MODAL_MACRO(target[AXIS_Z], altura_corte);
+					state++; break;
 
-	// set initial state for new move
-	memset(&gp, 0, sizeof(gp));						// clear all parser values
-	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
-	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
-	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
-
-	switch (state)
-	{
-			/* 1- CHECA SE O USUARIO CANCELOU O IHS (MODO OXICORTE), OU SE ESTÁ EM MODO SIMULAÇÃO. SE SIM, PULAR PARA PASSO 3
-			   2- PROCURA A CHAPA USANDO O G38.2 -50 COM FEEDRATE DE 800MM/MIN  */
-		case 0: if(configFlags[MODOMAQUINA] == MODO_PLASMA){
-					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_STRAIGHT_PROBE);
-					SET_NON_MODAL_MACRO(target[AXIS_Z], -50);
-					SET_NON_MODAL_MACRO (feed_rate, 800);
-				}
-				state++; break;
-
-				/*  ZERA O EIXO Z COM G28.3 Z0 (NÃO PRECISA MAIS COMPENSAR O SENSOR, MINHA MAQUINA USARÁ SISTEMA OHMICO, OFFSET=0) */
-		case 1: if(configFlags[MODOMAQUINA] == MODO_PLASMA){
-
-					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-					SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
-					SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
-
-				}
-				state++; break;
-
-				/* 3- POSICIONA O EIXO Z PARA "ALTURA DE PERFURAÇÃO" */
-		case 2: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-				SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
-				SET_NON_MODAL_MACRO(target[AXIS_Z], altura_perfuracao);
-				state++; break;
-
-				/* 5- CHECA SE O ESTÁ EM MODO SIMULAÇÃO, SE SIM, PULAR PARA PASSO 8. SE ESTIVER EM MODO OXICORTE, CONTINUA.
-				   6 -DISPARA O RELE DA TOCHA */
-		case 3: if(configFlags[MODOMAQUINA] == MODO_PLASMA){
-					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-					SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
-				}
-				state++;
-				break;
-
-		case 4: if(configFlags[MODOMAQUINA] == MODO_PLASMA && !sim){
-					uint32_t lRet;
-					pl_arcook_start();
-					lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
-					if (lRet == pdFALSE)
+					/*2- Dwell do "TEMPO DE AQUECIMENTO". Pula se estiver em simulação */
+			case 1: if(!sim)
 					{
-						uint32_t qSend = ARCO_OK_FAILED;
-						xQueueSend( qKeyboard, &qSend, 0 );
-						return (STAT_OK);
-					}
-					else
-					{
-						isCuttingSet(true);
-					}
-				}
-				state++; break;
-
-				/*8- DEIXA CORRER O TEMPO DE PERFURAÇÃO "TEMPO DE PERFURAÇÃO" */
-		case 5: if(configFlags[MODOMAQUINA] == MODO_PLASMA){
-					tempo = tempo_perfuracao;
-				}
-				else{
-					if(!sim){
 						tempo = tempo_aquecimento;
 					}
 					else
 					{
 						tempo = 0;
 					}
-				}
 
-			    if (tempo > 0){
-					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
-					SET_NON_MODAL_MACRO (parameter, tempo*1000);
-				}
-				else
-				{
-					delay_thcStartStop(true);
-				}
-				state++; break;
-
-		case 6: if(configFlags[MODOMAQUINA] == MODO_OXICORTE){
-					SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-					SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
-				}
-				state++;
-				break;
-
-		case 7: if(configFlags[MODOMAQUINA] == MODO_OXICORTE){
-					if(tempo_perfuracao > 0){
+				    if (tempo > 0){
 						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 						SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
-						SET_NON_MODAL_MACRO (parameter, tempo_perfuracao*1000);
+						SET_NON_MODAL_MACRO (parameter, tempo*1000);
 					}
 					else
 					{
 						delay_thcStartStop(true);
 					}
-				}
-				state++; break;
+					state++; break;
 
-				/*9- DESCE A TOCHA USANDO G01 F800 PARA "ALTURA DE CORTE" */
-		case 8: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-				SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
-				SET_NON_MODAL_MACRO(target[AXIS_Z], altura_corte);
-				SET_NON_MODAL_MACRO (feed_rate, 800);
-				state++; break;
+					/*3- Sobe para "ALTURA DE PERFURAÇÃO" */
+			case 2:	SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+					SET_NON_MODAL_MACRO(target[AXIS_Z], altura_perfuracao);
+					state++; break;
 
-				/*10- SETA O SISTEMA COM FEEDRATE DE CORTE F "VELOC. DE CORTE” PARA OS PROXIMOS G01, G02 E G03*/
-		case 9: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-				SET_NON_MODAL_MACRO (feed_rate, vel_corte);
-				state++; break;
+					/*4- Liga a tocha */
+			case 3: if(configFlags[MODOMAQUINA] == MODO_OXICORTE){
+						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+						SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_CW);
+					}
+					state++;
+					break;
 
-		default: state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+					/*5- Dwell do "TEMPO DE PERFURAÇÃO" */
+			case 4: if(configFlags[MODOMAQUINA] == MODO_OXICORTE){
+						if(tempo_perfuracao > 0){
+							SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+							SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+							SET_NON_MODAL_MACRO (parameter, tempo_perfuracao*1000);
+						}
+						else
+						{
+							delay_thcStartStop(true);
+						}
+					}
+					state++; break;
+
+					/*6- Desce para a "ALTURA DE CORTE" com feedrate de 800*/
+			case 5: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+					SET_NON_MODAL_MACRO(target[AXIS_Z], altura_corte);
+					SET_NON_MODAL_MACRO (feed_rate, 800);
+					state++; break;
+
+					/*7- Seta o sistema com o feedrate de corte "VELOC. DE CORTE" */
+			case 6: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_NON_MODAL_MACRO (feed_rate, vel_corte);
+					state++; break;
+
+			default: state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+		}
 	}
 	_execute_gcode_block();
 	return (STAT_OK);

@@ -8,6 +8,7 @@
 #include "config.h"			// #2
 #include "gcode_parser.h"
 #include "macros.h"
+#include "planner.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
