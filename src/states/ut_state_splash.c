@@ -15,14 +15,20 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "r_usb_basic_if.h"
+
 #include "lcd.h"
 #include "keyboard.h"
 #include "plasma.h"
 #include "r_flash_loader_rx_if.h"
+#include "fsystem_spi.h"
+#include "spiffs_hw.h"
+#include "spiffs.h"
+
 
 static char Str[40];
 /* Holds current app header. */
-
+extern USB_UTR_t       msc_utr;
 
 #define metalique128_width 128
 #define metalique128_height 42
@@ -132,7 +138,6 @@ static unsigned char easymax_bits[] = {
  */
 ut_state ut_state_splash(ut_context* pContext)
 {
-	uint32_t keyEntry = 0;
     IWDT.IWDTRR = 0x00u;
     IWDT.IWDTRR = 0xFFu;
 	currentLine = 0;
@@ -159,6 +164,14 @@ ut_state ut_state_splash(ut_context* pContext)
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 
 	R_FL_StateMachine();
+
+    R_USB_Close( (usb_ip_t)msc_utr.ip );
+
+    if(spiffs_init() == SPIFFS_ERR_NOT_A_FS)
+    {
+		ut_lcd_output_warning("PREPARANDO\nDISPOSITIVO...\n");
+    	spiffs_format();
+    }
 
 	/* Next state */
 	return STATE_WARNING;

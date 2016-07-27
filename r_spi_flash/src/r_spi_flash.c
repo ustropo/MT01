@@ -67,7 +67,7 @@ static uint8_t sf_read_status (uint8_t channel);
 
 static bool RSPI1_SendReceive( uint8_t const *pSrc, uint8_t *pDest, uint16_t usBytes);
 static bool RSPI1_Read( uint8_t *pDest, uint16_t usBytes);
-static bool RSPI1_Write( const uint8_t *pSrc,int16_t usBytes);
+static bool RSPI1_Write( const uint8_t *pSrc, uint16_t usBytes);
 static bool RSPI1_rx_buffer_full (void);
 
 /***********************************************************************************************************************
@@ -113,7 +113,7 @@ static void sf_write_protect (uint8_t channel)
     /* This section writes data.  The first character is the write command */
     val[0] = SF_CMD_WRITE_STATUS_REG;
     val[1] = SF_WP_BIT_MASK;
-    RSPI1_Write(&val,sizeof(val));
+    RSPI1_Write(val,sizeof(val));
 
     /* Close peripheral for SPI */
     sf_close(channel);  
@@ -141,7 +141,7 @@ static void sf_write_unprotect (uint8_t channel)
     /* This section writes data.  The first character is the write command */
     val[0] = SF_CMD_WRITE_STATUS_REG;
     val[1] = 0x0;
-    RSPI1_Write(&val,sizeof(val));
+    RSPI1_Write(val,sizeof(val));
 
     /* Close peripheral for SPI */
     sf_close(channel);
@@ -156,6 +156,7 @@ void R_SF_Init(uint8_t channel)
 	/* Get the looking */
     if(R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_RSPI1)))
     {
+    	sf_close(1);
 		R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
 		MSTP(RSPI1) = 0; /* Init peripheral */
 		R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
@@ -257,7 +258,7 @@ bool R_SF_Erase (uint8_t channel, const uint32_t address, const sf_erase_sizes_t
         val[2] = (uint8_t)(address >>  8);
         val[3] = (uint8_t)(address >>  0);
 
-        RSPI1_Write(&val,sizeof(val));
+        RSPI1_Write(val,sizeof(val));
     }
     else if(size == SF_ERASE_BULK)
     {
@@ -265,7 +266,7 @@ bool R_SF_Erase (uint8_t channel, const uint32_t address, const sf_erase_sizes_t
         val[0] = SF_CMD_ERASE_BULK;
 
         /* bulk erase is one byte command */
-        RSPI1_Write(&val,1);
+        RSPI1_Write(val,1);
     }
     else if (size == SF_ERASE_BLOCK)
     {
@@ -277,7 +278,7 @@ bool R_SF_Erase (uint8_t channel, const uint32_t address, const sf_erase_sizes_t
         val[2] = (uint8_t)(address >>  8);
         val[3] = (uint8_t)(address >>  0);
 
-        RSPI1_Write(&val,sizeof(val));
+        RSPI1_Write(val,sizeof(val));
     }
     else
     {
@@ -440,7 +441,7 @@ bool R_SF_ReadData (uint8_t channel, const uint32_t address, uint8_t * data, con
     val[1] = (uint8_t)(address >> 16);
     val[2] = (uint8_t)(address >>  8);
     val[3] = (uint8_t)(address >>  0);
-    RSPI1_Write(&val,sizeof(val));
+    RSPI1_Write(val,sizeof(val));
 
     /* Read data. */
 	RSPI1_Read(data,size);
@@ -733,8 +734,7 @@ static bool RSPI1_Read( uint8_t *pDest,
 *                false -
 *                    This task did lock the RSPI fist.
 ***********************************************************************************************************************/
-static bool RSPI1_Write( const uint8_t *pSrc,
-                  uint16_t usBytes)
+static bool RSPI1_Write( const uint8_t *pSrc, uint16_t usBytes)
 {
     uint16_t byte_count;
     volatile uint32_t temp;

@@ -365,7 +365,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				   );
 	}
 	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
-	tg_set_primary_source(XIO_DEV_USBFAT);
+	tg_set_primary_source(CNC_MEDIA);
 	xio_close(cs.primary_src);
 	macro_func_ptr = _command_dispatch;
 	xio_open(cs.primary_src,0,0);

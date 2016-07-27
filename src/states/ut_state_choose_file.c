@@ -9,12 +9,18 @@
 #include "task.h"
 #include "ff.h"
 
+#include "r_usb_basic_if.h"
+
 #include "ut_context.h"
 #include "ut_state.h"
 #include "interpreter_if.h"
+#include "xio.h"
 
 #include "lcd_menu.h"
 #include "lcd.h"
+#include "fsystem_spi.h"
+#include "spiffs_hw.h"
+#include "spiffs.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -26,10 +32,12 @@
 FATFS  st_usb_fatfs;
 DIR	   st_usb_dir;
 char gszCurFile[MAX_FILE_PATH_SIZE];
+char buff[MAX_FILE_PATH_SIZE];
 extern bool drivemountFlag;
 extern uint32_t choosedLine;
 extern uint32_t choosedLinePosition;
 extern uint32_t currentLineSel;
+extern USB_UTR_t       msc_utr;
 
 // ***********************************************************************
 // Internal variables
@@ -44,6 +52,10 @@ static const char* gaszFileExtensions[MAX_EXT_AVAIL] =
 };
 
 static const char* gszFileMenuTitle = "ESCOLHA UM ARQUIVO";
+/* current file header */
+fs_image_header_t *g_fs_cur_header;
+/* next file header */
+fs_image_header_t g_fs_next_header;
 
 // ***********************************************************************
 // Global types
@@ -153,12 +165,18 @@ char Lfname[_MAX_LFN + 1];
  */
 static ut_fs_navigate chooseFile()
 {
-
+	FIL File;
 	FRESULT eRes;
 	ut_menu filesMenu;
 	uint8_t i;
+	spiffs_DIR sf_dir;
+	struct spiffs_dirent e;
+	struct spiffs_dirent *pe = &e;
+	s32_t err;
+
 	char *fn;
 	char aszFiles[MENU_MAX_ITEMS][MAX_PATH_LENGHT + 1];
+
 #if _USE_LFN
 	st_usb_finfo.lfname = Lfname;
 	st_usb_finfo.lfsize = sizeof Lfname;
@@ -242,10 +260,38 @@ static ut_fs_navigate chooseFile()
 
 			/* Is a file - end of routine */
 			strcat(gszCurFile, filesMenu.items[filesMenu.selectedItem].text);
-			ut_lcd_output_warning("ARQUIVO\nCARREGADO\n");
 
-			vTaskDelay(2000 / portTICK_PERIOD_MS);
-			return NAVIGATE_END;
+			f_open(&File,gszCurFile,FA_READ);
+
+			ut_lcd_output_warning("CARREGANDO...\n");
+
+			spiffs_file *fd = &uspiffs[0].f;
+			spiffs *fs = &uspiffs[0].gSPIFFS;
+
+			SPIFFS_opendir(fs, "/", &sf_dir);
+			pe = SPIFFS_readdir(&sf_dir, pe);
+			*fd = SPIFFS_open_by_dirent(fs, pe, SPIFFS_RDWR, 0);
+			if(*fd != SPIFFS_ERR_IS_FREE)
+			{
+				err = SPIFFS_fremove(fs, *fd);
+			}
+			*fd = SPIFFS_open(fs, gszCurFile, SPIFFS_CREAT | SPIFFS_RDWR | SPIFFS_DIRECT, 0);
+			void *temp = NULL;
+			uint32_t remain;
+
+
+			temp = pvPortMalloc( FS_PAGE_SIZE );
+			while(!f_eof(&File))
+			{
+				f_read(&File,temp,FS_PAGE_SIZE,(UINT *)&remain);
+				err = SPIFFS_write(fs, *fd, (u8_t *)temp, FS_PAGE_SIZE);
+			}
+
+			vPortFree(temp);
+			f_close(&File);
+		    SPIFFS_close(fs, *fd);
+
+		    return NAVIGATE_END;
 		}
 	}
 
@@ -268,7 +314,10 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	/* Root dir */
 	memset(gszCurFile, 0, sizeof(gszCurFile));
 	strcpy(gszCurFile, USB_ROOT);
+    R_USB_Open( (usb_ip_t)msc_utr.ip );
 
+	vTaskDelay(500 / portTICK_PERIOD_MS);
+	/* Check if usb is mounted */
 	if (drivemountFlag)
 	{
 	/* Check if usb is mounted */
@@ -276,6 +325,7 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	}
 	else
 	{
+	    R_USB_Close( (usb_ip_t)msc_utr.ip );
 		ut_lcd_output_warning("NENHUM USB\n\
 							   ENCONTRADO\n");
 
@@ -302,7 +352,7 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		/* Navigate through folders */
 		eErr = chooseFile();
 	} while(eErr == NAVIGATE_CONTINUE);
-
+    R_USB_Close( (usb_ip_t)msc_utr.ip );
 	/* Go back to menu */
 	return pContext->value[0];
 }

@@ -185,6 +185,9 @@ typedef char char_t;			// In the ARM/GCC++ version char_t is typedef'd to uint8_
  * RX Compatibility *
  *********************/
 #ifdef __RX
+
+#define CNC_MEDIA 	XIO_DEV_SPIFFS
+
 								// Use macros to fake out AVR's PROGMEM and other AVRisms.
 #define PROGMEM					// ignore PROGMEM declarations in ARM/GCC++
 #define PSTR (const char *)		// AVR macro is: PSTR(s) ((const PROGMEM char *)(s))

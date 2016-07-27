@@ -159,7 +159,7 @@ stat_t controller_test_assertions()
 void controller_run()
 {
 	xio_init();
-	controller_init(XIO_DEV_USBFAT,0,0);
+	controller_init(CNC_MEDIA,0,0);
 	while (true) {
 	    /* Block to wait for prvTask1() to notify this task. */
 

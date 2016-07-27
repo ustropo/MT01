@@ -157,7 +157,8 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 	{
 		case CONFIG_AUTO_RODAR_PROG:
 		case CONFIG_AUTO_MODO_SIM:
-			if(gszCurFile[0] == NULL)
+			if(0)
+			//if(gszCurFile[0] == NULL)
 			{
 				ut_lcd_output_warning("NENHUM ARQUIVO\n\
 									   CARREGADO\n");
