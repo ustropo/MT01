@@ -39,10 +39,10 @@ uint8_t* SPIFFS_spi_gets (uint8_t* buff, int len, xioSPIFFS_t *fs);
  ******************************************************************************/
 
 static bool fileRunning = false;
-//uint32_t actualLine = 0;
-//uint32_t previousLine = 0;
-//uint32_t choosedLine = 0;
-//uint32_t choosedLinePosition = 0;
+uint32_t actualLine = 0;
+uint32_t previousLine = 0;
+uint32_t choosedLine = 0;
+uint32_t choosedLinePosition = 0;
 
 xioSPIFFS_t	    uspiffs[XIO_DEV_SPIFFS_COUNT];
 
@@ -112,13 +112,13 @@ FILE * xio_open_spiffs(const uint8_t dev, const char *addr, const flags_t flags)
 	SPIFFS_opendir(&dx->gSPIFFS, "/", &sf_dir);
 	pe = SPIFFS_readdir(&sf_dir, pe);
     dx->f = SPIFFS_open_by_dirent(&dx->gSPIFFS, pe, SPIFFS_RDONLY, 0);
-//    if (choosedLinePosition > 0)
-//    {
-//        f_lseek(&dx->f,choosedLinePosition);
-//        macro_func_ptr = RunningInicial_Macro;
-//        choosedLinePosition = 0;
-//        choosedLine = 0;
-//    }
+    if (choosedLinePosition > 0)
+    {
+    	SPIFFS_lseek(&dx->gSPIFFS, dx->f, choosedLinePosition, SPIFFS_SEEK_SET);
+        macro_func_ptr = RunningInicial_Macro;
+        choosedLinePosition = 0;
+        choosedLine = 0;
+    }
     fileRunning = true;
 	return(&d->file);								// return pointer to the FILE stream
 }
@@ -133,8 +133,8 @@ int xio_gets_spiffs(xioDev_t *d, char *buf, const int size)
 			fileRunning = false;
 			return (XIO_EOF);
 		}
-//		previousLine = actualLine;
-//		actualLine = dx->f.fptr;
+		previousLine = actualLine;
+		actualLine = SPIFFS_tell(&dx->gSPIFFS, dx->f);
 //		printf(buf);
 		return(XIO_OK);
 	}
@@ -174,7 +174,7 @@ uint8_t* SPIFFS_spi_gets (
 
 	while (n < len - 1) {	/* Read characters until buffer gets filled */
 		res = SPIFFS_read(&fs->gSPIFFS, fs->f, s, 1);
-		if(res == 0) break;
+		if(res <= 0) break;
 		c = s[0];
 		if (_USE_STRFUNC == 2 && c == '\r') continue;	/* Strip '\r' */
 		*p++ = c;

@@ -47,6 +47,9 @@ static float zeroPiecebuffer[3] = {0,0,0};
 uint32_t selecionarlinhasMax(void)
 {
 	stat_t status;
+	s32_t res;
+	s32_t i;
+	char s;
 	ut_lcd_output_warning("LENDO ARQUIVO\n");
 //	iif_bind_line_selection();
 	choosedLinePosition = 0;
@@ -55,20 +58,33 @@ uint32_t selecionarlinhasMax(void)
 	LineM5 = 0;
 	parse_gcode_func_selection(LINE_PARSER);
 	macro_func_ptr = command_idle;
-	selecionarLinhas = 100000;
+	selecionarLinhas = 1000000;
 	xio_close(cs.primary_src);
 	xio_open(cs.primary_src,0,0);
+	i = 0;
 	while (true) {
+		i++;
+		res = SPIFFS_lseek(&uspiffs[0].gSPIFFS, uspiffs[0].f, -i, SPIFFS_SEEK_END);
+		res = SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, &s, 1);
+		if (s == 'N')
+			break;
+	}
+	i++;
+	res = SPIFFS_lseek(&uspiffs[0].gSPIFFS, uspiffs[0].f, -i, SPIFFS_SEEK_END);
+	while(true)
+	{
 		if ((status = xio_gets(cs.primary_src, cs.in_buf, sizeof(cs.in_buf))) == STAT_OK) {
 			cs.bufp = cs.in_buf;
 		}
-		// handle end-of-file from file devices
+
 		if (status == STAT_EOF) {						// EOF can come from file devices only
 			xio_close(cs.primary_src);
 			break;
 		}
+
 		gc_gcode_parser(cs.bufp);
 	}
+
 	selecionarLinhas = 0;
 	return currentLineSel;
 }

@@ -218,9 +218,9 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 			}
 			else
 			{
-				configsVar->valueMax = (float)selecionarlinhasMax();
 				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
 				pContext->value[1] = STATE_CONFIG_AUTO_MODE;
+				configsVar->valueMax = (float)selecionarlinhasMax();
 				if (configsVar->valueMax < 1){
 					ut_lcd_output_warning("FORMATO NÃO\nRECONHECIDO\nSEM NÚMERO LINHA\n");
 					vTaskDelay(2000 / portTICK_PERIOD_MS);

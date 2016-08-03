@@ -35,10 +35,10 @@
  ******************************************************************************/
 
 static bool fileRunning = false;
-uint32_t actualLine = 0;
-uint32_t previousLine = 0;
-uint32_t choosedLine = 0;
-uint32_t choosedLinePosition = 0;
+extern uint32_t actualLine;
+extern uint32_t previousLine;
+extern uint32_t choosedLine;
+extern uint32_t choosedLinePosition;
 
 xioFsfat_t	    ufsfat[XIO_DEV_USBFILE_COUNT];
 
