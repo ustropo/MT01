@@ -45,6 +45,8 @@ extern xQueueHandle* mbox_table[];
 extern xQueueHandle* mpl_table[];
 
 extern void FreeRTOSConfig(void);
+extern void UsbTaskDelete(void);
+extern void UsbTaskCreate(void);
 extern xSemaphoreHandle semaphore_table[];
 /******************************************************************************
 End  Of File

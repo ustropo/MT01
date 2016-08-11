@@ -66,6 +66,7 @@ uint16_t    usb_ghmsc_SmpAplProcess = USB_HMSC_WAIT;
 extern FATFS  st_usb_fatfs;
 uint8_t     usb_gBuf[512];
 bool drivemountFlag = false;
+SemaphoreHandle_t xUsbMount;
 
 
 const uint16_t usb_gapl_devicetpl[] =
@@ -163,6 +164,8 @@ Return value    : none
 ******************************************************************************/
 void hmsc_cstd_task_start( void )
 {
+	xUsbMount = xSemaphoreCreateBinary();
+
     /* Start the Idle task. */
     usb_cstd_IdleTaskStart();
 
@@ -471,6 +474,7 @@ void usb_hmsc_SampleAplTask(void)
             /* Notify the task that the transmission is complete. */
         //	xTaskNotifyGive( task_main_handle );
         	drivemountFlag = true;
+//    		xSemaphoreGive( xUsbMount );
 //        	if( res != TFAT_FR_OK )
 //        	{
 //        		USB_PRINTF1("R_tfat_f_mount error: %d\n", res);

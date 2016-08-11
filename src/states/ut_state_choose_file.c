@@ -8,8 +8,10 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "ff.h"
+#include "config_kernel.h"
 
 #include "r_usb_basic_if.h"
+#include "r_usb_hmsc.h"
 
 #include "ut_context.h"
 #include "ut_state.h"
@@ -311,14 +313,16 @@ static ut_fs_navigate chooseFile()
  */
 ut_state ut_state_choose_file(ut_context* pContext)
 {
+	usb_err_t res;
 	/* Root dir */
 	memset(gszCurFile, 0, sizeof(gszCurFile));
 	strcpy(gszCurFile, USB_ROOT);
-    R_USB_Open( (usb_ip_t)msc_utr.ip );
+	res = R_USB_Open( (usb_ip_t)msc_utr.ip );
+	vTaskDelay(600 / portTICK_PERIOD_MS);
 
-	vTaskDelay(500 / portTICK_PERIOD_MS);
 	/* Check if usb is mounted */
 	if (drivemountFlag)
+  //  if( xSemaphoreTake( xUsbMount, 100 / portTICK_PERIOD_MS ) == pdTRUE )
 	{
 	/* Check if usb is mounted */
 		f_opendir(&st_usb_dir, USB_ROOT);
@@ -326,6 +330,8 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	else
 	{
 	    R_USB_Close( (usb_ip_t)msc_utr.ip );
+//	    R_usb_hmsc_Release((usb_ip_t)msc_utr.ip );
+//		UsbTaskDelete();
 		ut_lcd_output_warning("NENHUM USB\n\
 							   ENCONTRADO\n");
 
@@ -353,6 +359,8 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		eErr = chooseFile();
 	} while(eErr == NAVIGATE_CONTINUE);
     R_USB_Close( (usb_ip_t)msc_utr.ip );
+//    R_usb_hmsc_Release((usb_ip_t)msc_utr.ip );
+//	UsbTaskDelete();
 	/* Go back to menu */
 	return pContext->value[0];
 }

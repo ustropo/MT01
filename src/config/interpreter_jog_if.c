@@ -55,7 +55,13 @@ void iif_enter_jog(void)
 
 void iif_esc_jog(void)
 {
-	cm_spindle_control(SPINDLE_OFF);
+	TORCH = FALSE;
+	cm_request_feedhold();
+	cm_request_queue_flush();
+	while(cm.queue_flush_requested == true)
+	{
+
+	}
 	iif_bind_idle();
 	macro_func_ptr = _command_dispatch;
 }

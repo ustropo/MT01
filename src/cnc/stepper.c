@@ -1493,10 +1493,10 @@ float st_get_dwell_elapsed_time(void)
 
 void st_set_dwell_elapsed_time(float time)
 {
-	int32_t timeElapsed;
-	timeElapsed = st_run.dda_ticks_downcount + time*FREQUENCY_DWELL;
-	if(timeElapsed < 0){
-		st_run.dda_ticks_downcount = 0;
+	float timeElapsed;
+	timeElapsed = (int32_t)st_run.dda_ticks_downcount + (int32_t)time*FREQUENCY_DWELL;
+	if(timeElapsed <= 0){
+		st_run.dda_ticks_downcount = 1;
 	}
 	else
 	{

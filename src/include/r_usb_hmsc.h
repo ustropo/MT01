@@ -46,6 +46,7 @@ Includes   <System Includes> , "Project Includes"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "semphr.h"
 #include "platform.h"
 #include "r_usb_ckernelid.h"
 
@@ -71,6 +72,7 @@ Private global variables and functions
 External variables and functions
 ******************************************************************************/
 extern xQueueHandle qKeyboard;
+extern SemaphoreHandle_t xUsbMount;
 /*****************************************************************************
 Enumerated Types
 ******************************************************************************/
