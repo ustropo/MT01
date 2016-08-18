@@ -286,7 +286,7 @@ static ut_fs_navigate chooseFile()
 			while(!f_eof(&File))
 			{
 				f_read(&File,temp,FS_PAGE_SIZE,(UINT *)&remain);
-				err = SPIFFS_write(fs, *fd, (u8_t *)temp, FS_PAGE_SIZE);
+				err = SPIFFS_write(fs, *fd, (u8_t *)temp, remain);
 			}
 
 			vPortFree(temp);
