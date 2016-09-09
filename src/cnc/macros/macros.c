@@ -30,6 +30,7 @@ uint8_t state = 0;
 uint32_t linenumMacro;
 extern bool sim;
 extern bool intepreterRunning;
+extern float zeroPiecebuffer[3];
 
 stat_t (*macro_func_ptr)(void);
 
@@ -357,6 +358,8 @@ stat_t homming_Macro(void)
 		case 5: SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
 				SET_NON_MODAL_MACRO(target[AXIS_X], 0);
 				SET_NON_MODAL_MACRO(target[AXIS_Y], 0);
+				zeroPiecebuffer[AXIS_X] = zeroPiece[AXIS_X];
+				zeroPiecebuffer[AXIS_Y] = zeroPiece[AXIS_Y];
 				zeroPiece[AXIS_X] = 0;
 				zeroPiece[AXIS_Y] = 0;
 //				SET_NON_MODAL_MACRO(target[AXIS_Z], zeroPiece[AXIS_Z]);

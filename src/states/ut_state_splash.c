@@ -165,7 +165,7 @@ ut_state ut_state_splash(ut_context* pContext)
 
 	R_FL_StateMachine();
 
-    R_USB_Close( (usb_ip_t)msc_utr.ip );
+ //   R_USB_Close( (usb_ip_t)msc_utr.ip );
 
     if(spiffs_init() == SPIFFS_ERR_NOT_A_FS)
     {

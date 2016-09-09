@@ -42,7 +42,7 @@ uint32_t currentLineSel = 0;
 static char strLinhas[2][20];
 char** pstrLinhas;
 
-static float zeroPiecebuffer[3] = {0,0,0};
+float zeroPiecebuffer[3] = {0,0,0};
 
 uint32_t selecionarlinhasMax(void)
 {
@@ -67,9 +67,13 @@ uint32_t selecionarlinhasMax(void)
 		res = SPIFFS_lseek(&uspiffs[0].gSPIFFS, uspiffs[0].f, -i, SPIFFS_SEEK_END);
 		res = SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, &s, 1);
 		if (s == 'N')
-			break;
+		{	SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, &s, 1);
+			if(isdigit(s))
+				break;
+		}
+
 	}
-	i++;
+	i+=2;
 	res = SPIFFS_lseek(&uspiffs[0].gSPIFFS, uspiffs[0].f, -i, SPIFFS_SEEK_END);
 	while(true)
 	{

@@ -317,8 +317,8 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	/* Root dir */
 	memset(gszCurFile, 0, sizeof(gszCurFile));
 	strcpy(gszCurFile, USB_ROOT);
-	res = R_USB_Open( (usb_ip_t)msc_utr.ip );
-	vTaskDelay(600 / portTICK_PERIOD_MS);
+//	res = R_USB_Open( (usb_ip_t)msc_utr.ip );
+//	vTaskDelay(600 / portTICK_PERIOD_MS);
 
 	/* Check if usb is mounted */
 	if (drivemountFlag)
@@ -329,7 +329,7 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	}
 	else
 	{
-	    R_USB_Close( (usb_ip_t)msc_utr.ip );
+//	    R_USB_Close( (usb_ip_t)msc_utr.ip );
 //	    R_usb_hmsc_Release((usb_ip_t)msc_utr.ip );
 //		UsbTaskDelete();
 		ut_lcd_output_warning("NENHUM USB\n\
@@ -358,7 +358,7 @@ ut_state ut_state_choose_file(ut_context* pContext)
 		/* Navigate through folders */
 		eErr = chooseFile();
 	} while(eErr == NAVIGATE_CONTINUE);
-    R_USB_Close( (usb_ip_t)msc_utr.ip );
+ //   R_USB_Close( (usb_ip_t)msc_utr.ip );
 //    R_usb_hmsc_Release((usb_ip_t)msc_utr.ip );
 //	UsbTaskDelete();
 	/* Go back to menu */

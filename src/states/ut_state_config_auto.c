@@ -180,12 +180,14 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				vTaskDelay(2000 / portTICK_PERIOD_MS);
 				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 				{
+					eepromReadConfig(CONFIGVAR_PL);
 					sprintf(Str, "VEL. CORTE: %.0f\nTENSÃO THC: %.0f V\n",
 							configVarPl[PL_CONFIG_VELOC_CORTE],
 							configVarPl[PL_CONFIG_TENSAO_THC]);
 				}
 				else
 				{
+					eepromReadConfig(CONFIGVAR_OX);
 					sprintf(Str, "VEL. CORTE: %.0f\n",configVarOx[OX_CONFIG_VELOC_CORTE]);
 				}
 				ut_lcd_output_warning(Str);

@@ -35,6 +35,7 @@
 #define THC_RAPIDO 0.005
 #define THC_LENTO  0.001
 #define THC_MULT  0.000001428
+#define THC_DELAY_MULT  0.000001428
 #define THC_MAX 0.01
 
 
@@ -167,19 +168,17 @@ float pl_thc_pid(void)
 	uint16_t delay_thc;
 	/* velocidade do THC proporcinal a velocidade de feddrate */
 	THCVel = configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MULT;
+	/* reta do delay inversamente proporcinal a velocidade de feddrate */
+	delay_thc = (uint16_t)(17500 - configVarPl[PL_CONFIG_VELOC_CORTE]*5);
 	/* limite maximo da velocidade do THC */
 	if(THCVel > THC_MAX)
 	{
 		THCVel = THC_MAX;
 	}
-	/* calculo para o delay do THC */
-	if(configVarPl[PL_CONFIG_VELOC_CORTE] > 2000)
+	/* limite minimo do delay do THC */
+	if(delay_thc < 0)
 	{
-		delay_thc = 3000; /* 0.3s*/
-	}
-	else
-	{
-		delay_thc = 10000; /* 1s*/
+		delay_thc = 0;
 	}
 	pl_thc_read(&THC_real);
 	if(delay_thcGet() > delay_thc){
@@ -367,7 +366,7 @@ void emergencia_task(void)
 		    		sprintf(Str,"MODO DE EMERGÊNCIA\nPARADO LINHA\n%d\n",currentLine);
 		    	}
 		    	ut_lcd_output_warning(Str);
-				while(keyEntry != KEY_ENTER){
+				while(keyEntry != KEY_ESC){
 					IWDT.IWDTRR = 0x00u;
 					IWDT.IWDTRR = 0xFFu;
 					xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
