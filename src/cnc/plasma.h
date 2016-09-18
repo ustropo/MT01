@@ -13,6 +13,7 @@
 
 #define ARCO_OK_FAILED  0xFFFFFFFF
 #define ARCO_OK_OFF     0xFFFFFFFE
+#define MATERIAL_FAILED 0xFFFFFFFD
 extern SemaphoreHandle_t xArcoOkSync;
 extern uint32_t currentLine;
 

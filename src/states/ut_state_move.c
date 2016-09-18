@@ -405,10 +405,13 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 
 		case KEY_ENTER:
-
-
-			if(lstop && !arco)
+			if(lstop)
 			{
+				if (arco == ARCO_OK_OFF)
+				{
+					arco = 0;
+					macro_func_ptr = M3_Macro;
+				}
 				lstop = false;
 				iif_bind_filerunning_stop(lstop);
 				if(gTitle == AUTO){
@@ -529,18 +532,29 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			iif_func_released();
 			break;
 		/* TODO: operate machine - with other keys */
+		case MATERIAL_FAILED:
+			if(!arco)
+			{
+				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+				ut_lcd_output_warning("FALHA SENSOR\nMATERIAL\n");
+				TORCH = FALSE;
+				arco = ARCO_OK_FAILED;
+				lstop = false;
+				warm_stop();
+				state = 0;
+			}
+			break;
 		case ARCO_OK_FAILED:
 			if(!arco)
 			{
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
-				state = 0;
-				macro_func_ptr = command_idle;
+				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
 				TORCH = FALSE;
 				pl_arcook_stop();
 				arco = ARCO_OK_FAILED;
 				lstop = false;
 				warm_stop();
-				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
+				ltorchBuffer = TRUE;
 			}
 			break;
 
@@ -696,6 +710,10 @@ void warm_stop(void)
 	if(isDwell == true)
 	{
 		st_command_dwell(DWELL_PAUSE);
+	}
+	while(cm.feedhold_requested == true)
+	{
+
 	}
 	ltorchBuffer = TORCH;
 	TORCH = FALSE;

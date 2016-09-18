@@ -96,13 +96,14 @@ stat_t M3_Macro(void)
 					/*  5 -Espera o arco OK */
 			case 4: if(!sim)
 					{
-						uint32_t lRet;
+						uint32_t lRet = pdFALSE;
 						pl_arcook_start();
 						lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
 						if (lRet == pdFALSE)
 						{
 							uint32_t qSend = ARCO_OK_FAILED;
 							xQueueSend( qKeyboard, &qSend, 0 );
+							macro_func_ptr = command_idle;
 							return (STAT_OK);
 						}
 						else

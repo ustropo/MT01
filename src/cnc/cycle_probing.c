@@ -36,6 +36,10 @@
 #include "planner.h"
 #include "hardware.h"
 #include "switch.h"
+#include "macros.h"
+#include "plasma.h"
+#include "controller.h"
+#include "keyboard.h"
 
 extern bool lstop;
 /**** Probe singleton structure ****/
@@ -225,11 +229,18 @@ static stat_t _probing_start()
 	int8_t probe = read_switch(pb.probe_switch_axis, pb.probe_switch_position);
 #endif
 
-//    if( probe==SW_OPEN ) {
-    IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
-    IEN(ICU, IRQ2) = 1;            // Enable interrupt
-    ritorno(cm_straight_feed(pb.target, pb.flags));
-//    }
+	if(!MATERIAL)
+	{
+	    IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
+	    IEN(ICU, IRQ2) = 1;            // Enable interrupt
+	    ritorno(cm_straight_feed(pb.target, pb.flags));
+	}
+	else
+	{
+		uint32_t qSend = MATERIAL_FAILED;
+		xQueueSend( qKeyboard, &qSend, 0 );
+		macro_func_ptr = command_idle;
+	}
 	return (_set_pb_func(_probing_finish));
 }
 
