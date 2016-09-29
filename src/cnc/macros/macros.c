@@ -23,6 +23,7 @@ static float tempo_aquecimento;
 
 float *velocidadeJog;
 
+bool marca_furo;
 ut_config_name_ox tempoDwell;
 uint8_t jogAxis;
 float jogMaxDistance;
@@ -113,7 +114,11 @@ stat_t M3_Macro(void)
 					state++; break;
 
 					/*6- Dwell do "TEMPO DE PERFURAÇÃO" */
-			case 5:	if (tempo_perfuracao > 0){
+			case 5:	if (marca_furo == true)
+					{
+						tempo_perfuracao = 0.1;
+					}
+					if (tempo_perfuracao > 0){
 						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 						SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
 						SET_NON_MODAL_MACRO (parameter, tempo_perfuracao*1000);

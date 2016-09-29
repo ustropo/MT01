@@ -377,8 +377,11 @@ static stat_t _parse_gcode_block(char_t *buf)
 				case 2: case 30:
 						SET_MODAL (MODAL_GROUP_M4, program_flow, PROGRAM_END);
 				case 3: macro_func_ptr = M3_Macro;
+						marca_furo = false;
 						break;
-				case 4: SET_MODAL (MODAL_GROUP_M7, spindle_mode, SPINDLE_CCW);
+				case 4: macro_func_ptr = M3_Macro;
+						marca_furo = true;
+						break;
 				case 5:	macro_func_ptr = M5_Macro;
 						break;
 				case 6: SET_NON_MODAL (tool_change, true);

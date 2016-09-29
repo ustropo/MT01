@@ -17,6 +17,7 @@ extern uint8_t state;
 extern uint32_t linenumMacro;
 extern float *velocidadeJog;
 extern ut_config_name_ox tempoDwell;
+extern bool marca_furo;
 
 stat_t M5_Macro(void);
 stat_t M3_Macro(void);
