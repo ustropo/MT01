@@ -35,8 +35,9 @@ extern uint32_t choosedLine;
 ut_config_var configs_auto[CONFIG_AUTO_MAX];
 static bool initialized = false;
 
-static const ut_state geNextStateAuto[5] =
+static const ut_state geNextStateAuto[CONFIG_AUTO_MAX] =
 {
+	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
@@ -51,11 +52,13 @@ static ut_config_type init_types[CONFIG_AUTO_MAX] =
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
-	UT_CONFIG_INT
+	UT_CONFIG_INT,
+	UT_CONFIG_BOOL
 };
 
 static uint32_t init_values[CONFIG_AUTO_MAX] =
 {
+	0,
 	0,
 	0,
 	0,
@@ -69,7 +72,8 @@ static char* init_names[CONFIG_AUTO_MAX] =
 	" RODAR SIMULADO",
 	" DESLOCAR - ZERO PEÇA",
 	" ZERAR PEÇA",
-	" SELECIONAR LINHA"
+	" SELECIONAR LINHA",
+	" TESTAR - TAM. PEÇA"
 };
 
 static var_func init_func[CONFIG_AUTO_MAX] =
@@ -78,7 +82,8 @@ static var_func init_func[CONFIG_AUTO_MAX] =
 	idle,
 	homming_eixos,
 	zerar_peca,
-	idle
+	idle,
+	testar_peca
 };
 
 static const char* gszConfigMenuTitle = "CORTE AUTOMÁTICO";
@@ -229,6 +234,14 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 					return STATE_CONFIG_AUTO_MODE;
 				}
 			}
+			break;
+		case CONFIG_AUTO_TESTAR_TAMANHO_PECA:
+			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
+			/* Delay */
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			configsVar->name = "DESEJA CONTINUAR?";
+			pContext->value[0] = STATE_CONFIG_AUTO_MODE;
+			pContext->value[1] = STATE_DESLOCAZERO_MODE;
 			break;
 		default:
 			pContext->value[0] = STATE_CONFIG_AUTO_MODE;

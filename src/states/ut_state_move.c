@@ -614,6 +614,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 				   );
 	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 	xTaskNotifyGive(xCncTaskHandle);
+	lstop = false;
 	while(true)
 	{
 		/* Wait for user interaction */
@@ -643,15 +644,47 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 			iif_func_zup();
 			break;
 
+
 		case KEY_Z_DOWN:
 			iif_func_zdown();
 			break;
-
+		case KEY_ENTER:
+				if(lstop)
+				{
+					lstop = false;
+					iif_bind_filerunning_stop(lstop);
+					strcpy(gStrAuto[0],DEFAULT_DESCOLA_TITLE);
+					strcpy(gStrAuto[1],DEFAULT_AVISO_DESLOCA);
+					cm_request_cycle_start();
+				}
+				break;
 		case KEY_ESC:
-			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
-			iif_bind_idle();
-			intepreterRunning = false;
-			return (ut_state)pContext->value[0];
+//			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+//			iif_bind_idle();
+//			intepreterRunning = false;
+//			return (ut_state)pContext->value[0];
+			if (cm.machine_state == MACHINE_PROGRAM_END || lstop){
+				uint32_t *value = configsVar->value;
+				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+				if(cm.machine_state != MACHINE_PROGRAM_END){
+					cm_request_feedhold();
+					configsVar->currentState = STATE_AUTO_MODE;
+					configsVar->type = UT_CONFIG_BOOL;
+					configsVar->name = "DESEJA SAIR?";
+					ut_state_config_var(pContext);
+				}
+				if(*value || cm.machine_state == MACHINE_PROGRAM_END){
+					iif_bind_idle();
+					macro_func_ptr = command_idle;
+					intepreterRunning = false;
+					return (ut_state)pContext->value[0];
+				}
+			}
+			if(!lstop){
+				lstop = true;
+				warm_stop();
+			}
+			break;
 
 		case KEY_RELEASED:
 			iif_func_released();

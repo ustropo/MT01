@@ -202,6 +202,42 @@ void homming_eixos(void *var)
 	}
 }
 
+void testar_peca(void *var)
+{
+	char s;
+	char *str;
+	char num[50];
+	float numf;
+	macro_func_ptr = command_idle;
+	xio_close(cs.primary_src);
+	xio_open(cs.primary_src,0,0);
+	while (true) {
+		SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, &s, 1);
+		if (s == 'M')
+		{
+			SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, num, 2);
+			numf = strtof(num,&str);
+			if (numf == 98.0f)
+			{
+				break;
+			}
+		}
+	}
+	while (true) {
+		SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, &s, 1);
+		if (s == '(')
+		{
+			SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, num, 50);
+			Xcord = strtof(num,&str);
+			Ycord = strtof(++str,NULL);
+			xio_close(cs.primary_src);
+			xTaskNotifyGive(xCncTaskHandle);
+			macro_func_ptr = limit_test;
+			break;
+		}
+	}
+}
+
 void idle(void *var)
 {
 

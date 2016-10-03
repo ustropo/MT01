@@ -305,6 +305,7 @@ ut_state ut_state_config_var(ut_context* pContext)
 			{
 				case CONFIG_AUTO_RODAR_PROG:
 				case CONFIG_AUTO_DESLOCAR_ZERO:
+				case CONFIG_AUTO_TESTAR_TAMANHO_PECA:
 					if(*Flag == 1)
 					{
 						stateBack = (ut_state)pContext->value[1];
