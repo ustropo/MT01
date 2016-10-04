@@ -297,16 +297,8 @@ stat_t M4_Macro(void)
 			case 5:	delay_thcStartStop(true);
 					state++; break;
 
-
-					/*7- Desce para a "ALTURA DE CORTE" com feedrate de 800*/
-			case 6: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-					SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
-					SET_NON_MODAL_MACRO(target[AXIS_Z], altura_corte);
-					SET_NON_MODAL_MACRO (feed_rate, 800);
-					state++; break;
-
 					/*8- Seta o sistema com o feedrate de corte "VELOC. DE CORTE" */
-			case 7: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+			case 6: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_NON_MODAL_MACRO (feed_rate, vel_corte);
 					state++; break;
 
