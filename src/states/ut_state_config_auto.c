@@ -73,7 +73,7 @@ static char* init_names[CONFIG_AUTO_MAX] =
 	" DESLOCAR - ZERO PEÇA",
 	" ZERAR PEÇA",
 	" SELECIONAR LINHA",
-	" TESTAR - TAM. PEÇA"
+	" LIMITES DO DESENHO"
 };
 
 static var_func init_func[CONFIG_AUTO_MAX] =
