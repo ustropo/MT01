@@ -410,7 +410,19 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				if (arco == ARCO_OK_OFF)
 				{
 					arco = 0;
-					macro_func_ptr = M3_Macro;
+					if(isCuttingGet())
+					{
+						state = 0;
+						isCuttingSet(false);
+						isCuttingSet(true);
+						pl_arcook_start();
+						cm_set_feed_rate(configVarPl[PL_CONFIG_VELOC_CORTE]);
+						macro_func_ptr = _command_dispatch;
+					}
+					else
+					{
+						macro_func_ptr = M3_Macro;
+					}
 				}
 				lstop = false;
 				iif_bind_filerunning_stop(lstop);

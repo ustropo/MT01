@@ -326,6 +326,7 @@ void plasma_task(void)
 				if (isCutting && ArcoOktaskIdle)
 				{
 					qSend = ARCO_OK_FAILED;
+					macro_func_ptr = command_idle;
 					xQueueSend( qKeyboard, &qSend, 0 );
 				}
 			}
