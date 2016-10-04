@@ -1,3 +1,7 @@
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+
 #include "tinyg.h"			// #1
 #include "config.h"			// #2
 #include "controller.h"
@@ -31,6 +35,7 @@ uint32_t linenumMacro;
 extern bool sim;
 extern bool intepreterRunning;
 extern float zeroPiecebuffer[3];
+bool xMacroArcoOkSync = false;
 
 stat_t (*macro_func_ptr)(void);
 
@@ -443,6 +448,44 @@ stat_t G10_Macro(void)
 		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
 	}
 	_execute_gcode_block();
+	return (STAT_OK);
+}
+
+stat_t arcoOK_Macro(void)
+{
+	uint32_t lRet = pdFALSE;
+	// set initial state for new move
+//	memset(&gp, 0, sizeof(gp));						// clear all parser values
+//	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
+//	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
+//	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
+	if (xMacroArcoOkSync == true)
+	{
+		switch (state)
+		{
+			case 0:	pl_arcook_start();
+					lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
+					if (lRet == pdFALSE)
+					{
+						uint32_t qSend = ARCO_OK_FAILED;
+						xQueueSend( qKeyboard, &qSend, 0 );
+						macro_func_ptr = command_idle;
+						xMacroArcoOkSync = false;
+						isCuttingSet(true);
+						return (STAT_OK);
+					}
+					else
+					{
+						cm_request_cycle_start();
+						isCuttingSet(true);
+					}
+					state++;
+					break;
+			default:xMacroArcoOkSync = false; state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+					break;
+		}
+		_execute_gcode_block();
+	}
 	return (STAT_OK);
 }
 

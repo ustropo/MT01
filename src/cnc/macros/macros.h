@@ -17,6 +17,7 @@ extern uint8_t state;
 extern uint32_t linenumMacro;
 extern float *velocidadeJog;
 extern ut_config_name_ox tempoDwell;
+extern bool xMacroArcoOkSync;
 
 stat_t M5_Macro(void);
 stat_t M3_Macro(void);
@@ -27,6 +28,7 @@ stat_t homming_Macro(void);
 stat_t jog_Macro(void);
 stat_t RunningInicial_Macro(void);
 stat_t feedRateOverride_Macro(void);
+stat_t arcoOK_Macro(void);
 void macroInitVar(void);
 
 #endif /* CNC_MACROS_MACROS_H_ */

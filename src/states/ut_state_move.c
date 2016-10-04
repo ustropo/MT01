@@ -407,23 +407,6 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		case KEY_ENTER:
 			if(lstop)
 			{
-				if (arco == ARCO_OK_OFF)
-				{
-					arco = 0;
-					if(isCuttingGet())
-					{
-						state = 0;
-						isCuttingSet(false);
-						isCuttingSet(true);
-						pl_arcook_start();
-						cm_set_feed_rate(configVarPl[PL_CONFIG_VELOC_CORTE]);
-						macro_func_ptr = _command_dispatch;
-					}
-					else
-					{
-						macro_func_ptr = M3_Macro;
-					}
-				}
 				lstop = false;
 				iif_bind_filerunning_stop(lstop);
 				if(gTitle == AUTO){
@@ -437,7 +420,27 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				{
 					st_command_dwell(DWELL_RESTART);
 				}
-				iif_func_enter();
+				if (arco == ARCO_OK_OFF)
+				{
+					arco = 0;
+					if(isCuttingGet())
+					{
+						state = 0;
+						isCuttingSet(false);
+//						isCuttingSet(true);
+//						pl_arcook_start();
+				//		cm_set_feed_rate(configVarPl[PL_CONFIG_VELOC_CORTE]);
+						xMacroArcoOkSync = true;
+					}
+					else
+					{
+						macro_func_ptr = M3_Macro;
+						iif_func_enter();
+					}
+				}
+				else{
+					iif_func_enter();
+				}
 				TORCH = ltorchBuffer;
 			}
 			else
