@@ -551,7 +551,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			if(!arco)
 			{
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
-				ut_lcd_output_warning("CHECAR SENSOR\OHMICO\n");
+				ut_lcd_output_warning("CHECAR SENSOR\nOHMICO\n");
 				TORCH = FALSE;
 				arco = ARCO_OK_FAILED;
 				lstop = false;
