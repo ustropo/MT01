@@ -26,7 +26,7 @@ static float tempo_perfuracao;
 static float tempo_aquecimento;
 
 float *velocidadeJog;
-
+float Xcord,Ycord;
 ut_config_name_ox tempoDwell;
 uint8_t jogAxis;
 float jogMaxDistance;
@@ -587,6 +587,73 @@ stat_t feedRateOverride_Macro(void)
 		case 1: cm_request_cycle_start();
 				state++; break;
 		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+	}
+	_execute_gcode_block();
+	return (STAT_OK);
+}
+
+stat_t limit_test(void)
+{
+	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+	{
+		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
+		altura_deslocamento	= 	configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
+		vel_corte			= 	configVarPl[PL_CONFIG_VELOC_CORTE];
+		tempo_perfuracao	= 	configVarPl[PL_CONFIG_TEMPO_PERFURACAO];
+		tempo_aquecimento	= 	0;
+	}
+	else
+	{
+		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
+		altura_deslocamento	= 	configVarOx[OX_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
+		vel_corte			= 	configVarOx[OX_CONFIG_VELOC_CORTE];
+		tempo_perfuracao	= 	configVarOx[OX_CONFIG_TEMPO_PERFURACAO];
+		tempo_aquecimento	= 	configVarOx[OX_CONFIG_TEMPO_AQUECIMENTO];
+	}
+
+	// set initial state for new move
+	memset(&gp, 0, sizeof(gp));						// clear all parser values
+	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
+	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
+	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
+
+	switch (state)
+	{
+		case 0: SET_MODAL_MACRO (MODAL_GROUP_G6, units_mode, MILLIMETERS);
+				state++; break;
+
+		case 1: SET_MODAL_MACRO (MODAL_GROUP_G3, distance_mode, ABSOLUTE_MODE);
+				state++; break;
+
+		case 2: SET_NON_MODAL_MACRO (absolute_override, true);
+				state++; break;
+
+		case 3: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_Z], altura_deslocamento);
+				state++; break;
+
+		case 4: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_X], Xcord);
+				state++; break;
+
+		case 5: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_Y], Ycord);
+				state++; break;
+
+		case 6: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_X], 0);
+				state++; break;
+
+		case 7: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_Y], 0);
+				state++; break;
+
+		case 8: SET_MODAL_MACRO (MODAL_GROUP_M4, program_flow, PROGRAM_END);
+				state++; break;
+
+		default:state = 0; macro_func_ptr = command_idle; return (STAT_OK);
 	}
 	_execute_gcode_block();
 	return (STAT_OK);
