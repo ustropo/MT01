@@ -34,8 +34,7 @@
 #define THC_PORCENTAGE 0.2
 #define THC_RAPIDO 0.005
 #define THC_LENTO  0.001
-#define THC_MULT  0.000001428
-#define THC_DELAY_MULT  0.000001428
+#define THC_MULT  (0.000001428*1.15)
 #define THC_MAX 0.01
 
 
