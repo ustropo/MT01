@@ -42,13 +42,11 @@ static const ut_state geNextStateAuto[CONFIG_AUTO_MAX] =
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
 };
 
 /* Initial values for each config variable */
 static ut_config_type init_types[CONFIG_AUTO_MAX] =
 {
-	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
 	UT_CONFIG_BOOL,
@@ -62,7 +60,6 @@ static uint32_t init_values[CONFIG_AUTO_MAX] =
 	0,
 	0,
 	0,
-	0,
 	0
 };
 
@@ -71,7 +68,6 @@ static char* init_names[CONFIG_AUTO_MAX] =
 	" RODAR PROGRAMA",
 	" RODAR SIMULADO",
 	" DESLOCAR - ZERO PEÇA",
-	" ZERAR PEÇA",
 	" SELECIONAR LINHA",
 	" LIMITES DO DESENHO"
 };
@@ -81,7 +77,6 @@ static var_func init_func[CONFIG_AUTO_MAX] =
 	idle,
 	idle,
 	homming_eixos,
-	zerar_peca,
 	idle,
 	testar_peca
 };
