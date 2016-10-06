@@ -20,7 +20,7 @@
 //#define JUNCTION_DEVIATION		0.03// default value, in mm - smaller is faster
 //#define JUNCTION_ACCELERATION	1500000	// 2 million - centripetal acceleration around corners
 
-#define JUNCTION_DEVIATION		0.2// default value, in mm - smaller is faster
+#define JUNCTION_DEVIATION		0.02// default value, in mm - smaller is faster
 #define JUNCTION_ACCELERATION	160000	// 2 million - centripetal acceleration around corners
 
 // *** settings.h overrides ***
@@ -36,11 +36,12 @@
 
 // *** motor settings ***
 #define TRAVELX	75.3982236862
-#define TRAVELY	75.3982236862/3.222222
+#define TRAVELY	75.3982236862
+#define TRAVELZ	75.3982236862
 
 #define M1_MOTOR_MAP			AXIS_Z
 #define M1_STEP_ANGLE			1.8
-#define M1_TRAVEL_PER_REV		4
+#define M1_TRAVEL_PER_REV		TRAVELZ
 #define M1_MICROSTEPS			64
 #define M1_POLARITY				0
 #define M1_POWER_MODE			2
@@ -86,12 +87,12 @@
 // These are relative conservative values for a well-tuned Shapeoko2 or similar XY belt / Z screw machine
 
 #define X_AXIS_MODE				AXIS_STANDARD		// xam		see canonical_machine.h cmAxisMode for valid values
-#define X_VELOCITY_MAX			10000 				// xvm		G0 max velocity in mm/min
+#define X_VELOCITY_MAX			5000 				// xvm		G0 max velocity in mm/min
 #define X_FEEDRATE_MAX			X_VELOCITY_MAX		// xfr 		G1 max feed rate in mm/min
 #define X_TRAVEL_MIN			0					// xtn		minimum travel
 #define X_TRAVEL_MAX			3000					// xtm		maximum travel (travel between switches or crashes)
-#define X_JERK_MAX				400				// xjm		yes, that's "5 billion" mm/(min^3)
-#define X_JERK_HOMING			400				// xjh
+#define X_JERK_MAX				200				// xjm		yes, that's "5 billion" mm/(min^3)
+#define X_JERK_HOMING			200				// xjh
 #define X_JUNCTION_DEVIATION	JUNCTION_DEVIATION	// xjd
 #define X_SWITCH_MODE_MIN		SW_MODE_HOMING		// xsn		SW_MODE_DISABLED, SW_MODE_HOMING, SW_MODE_LIMIT, SW_MODE_HOMING_LIMIT
 #define X_SWITCH_MODE_MAX 		SW_MODE_DISABLED	// xsx		SW_MODE_DISABLED, SW_MODE_HOMING, SW_MODE_LIMIT, SW_MODE_HOMING_LIMIT
@@ -101,12 +102,12 @@
 #define X_ZERO_BACKOFF			2					// xzb		mm
 
 #define Y_AXIS_MODE				AXIS_STANDARD
-#define Y_VELOCITY_MAX			10000
+#define Y_VELOCITY_MAX			5000
 #define Y_FEEDRATE_MAX			Y_VELOCITY_MAX
 #define Y_TRAVEL_MIN			0
 #define Y_TRAVEL_MAX			1500
-#define Y_JERK_MAX				400
-#define Y_JERK_HOMING			400				// xjh
+#define Y_JERK_MAX				200
+#define Y_JERK_HOMING			200				// xjh
 #define Y_JUNCTION_DEVIATION	JUNCTION_DEVIATION
 #define Y_SWITCH_MODE_MIN		SW_MODE_HOMING
 #define Y_SWITCH_MODE_MAX		SW_MODE_DISABLED
@@ -116,13 +117,13 @@
 #define Y_ZERO_BACKOFF			2
 
 #define Z_AXIS_MODE				AXIS_STANDARD
-#define Z_VELOCITY_MAX			1200
+#define Z_VELOCITY_MAX			700
 #define Z_FEEDRATE_MAX			Z_VELOCITY_MAX
 #define Z_TRAVEL_MAX			0
 #define Z_TRAVEL_MIN			-120                // this is approximate as Z depth depends on tooling
                                                     // value must be large enough to guarantee return to Zmax during homing
-#define Z_JERK_MAX				6000					// 50,000,000
-#define Z_JERK_HOMING			6000
+#define Z_JERK_MAX				1000					// 50,000,000
+#define Z_JERK_HOMING			1000
 #define Z_JUNCTION_DEVIATION	JUNCTION_DEVIATION
 #define Z_SWITCH_MODE_MIN		SW_MODE_DISABLED
 #define Z_SWITCH_MODE_MAX		SW_MODE_HOMING
