@@ -20,6 +20,7 @@ extern ut_config_name_ox tempoDwell;
 extern bool xMacroArcoOkSync;
 
 stat_t M5_Macro(void);
+stat_t M4_Macro(void);
 stat_t M3_Macro(void);
 stat_t G10_Macro(void);
 stat_t ZerarMaquina_Macro(void);
