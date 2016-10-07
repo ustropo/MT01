@@ -128,8 +128,12 @@ static void init()
 ut_state ut_state_config_auto_menu(ut_context* pContext)
 {
 	char Str[20];
+	void *temp = NULL;
+	char *pstr;
 	ut_menu config_menu;
 	uint8_t i;
+	spiffs_stat fileStat;
+	uint8_t uiMsgRow = 0;
 
 	/* Initialize variables */
 	init();
@@ -157,9 +161,10 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 	{
 		case CONFIG_AUTO_RODAR_PROG:
 		case CONFIG_AUTO_MODO_SIM:
-			if(0)
-			//if(gszCurFile[0] == NULL)
+			xio_open(cs.primary_src,0,0);
+			if(uspiffs[0].f < 0)
 			{
+				xio_close(cs.primary_src);
 				ut_lcd_output_warning("NENHUM ARQUIVO\n\
 									   CARREGADO\n");
 
@@ -178,19 +183,37 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				ut_lcd_output_warning(Str);
 				/* Delay */
 				vTaskDelay(2000 / portTICK_PERIOD_MS);
+				SPIFFS_fstat(&uspiffs[0].gSPIFFS, uspiffs[0].f, &fileStat);
+
+				ut_lcd_clear();
+
+				temp = pvPortMalloc( 20*MAX_ROW);
+				memset(temp,NULL,20*MAX_ROW);
+				pstr = temp;
+				snprintf(&pstr[20*1],20, "NOME:%s",fileStat.name);
+				xio_close(cs.primary_src);
 				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 				{
 					eepromReadConfig(CONFIGVAR_PL);
-					sprintf(Str, "VEL. CORTE: %.0f\nTENSÃO THC: %.0f V\n",
-							configVarPl[PL_CONFIG_VELOC_CORTE],
-							configVarPl[PL_CONFIG_TENSAO_THC]);
+					snprintf(&pstr[0],20, "    MODO PLASMA     ");
+					snprintf(&pstr[20*2],20, "VEL. CORTE: %.0f mm/min",configVarPl[PL_CONFIG_VELOC_CORTE]);
+					snprintf(&pstr[20*3],20, "TENSÃO THC: %.0f V",configVarPl[PL_CONFIG_TENSAO_THC]);
 				}
 				else
 				{
+					snprintf(&pstr[0],20, "      MODO OXI      ");
 					eepromReadConfig(CONFIGVAR_OX);
-					sprintf(Str, "VEL. CORTE: %.0f\n",configVarOx[OX_CONFIG_VELOC_CORTE]);
+					snprintf(&pstr[20*2],20, "VEL. CORTE: %.0f mm/min",configVarPl[OX_CONFIG_VELOC_CORTE]);
 				}
-				ut_lcd_output_warning(Str);
+				ut_lcd_drawStr(0, 0, &pstr[0], BACKGROUND_FRAMED,u8g_font_helvB08);
+				for(uiMsgRow = 1; uiMsgRow < MAX_ROW; uiMsgRow++)
+				{
+					ut_lcd_drawStr(uiMsgRow, 0, &pstr[uiMsgRow*20], false,u8g_font_6x10);
+				}
+				/* Output */
+				ut_lcd_output_str();
+
+				vPortFree(temp);
 				/* Delay */
 				vTaskDelay(2500 / portTICK_PERIOD_MS);
 
