@@ -24,6 +24,7 @@ typedef enum
 	STATE_CONFIG_MANUAL_MODE,                 //!< Funçao da tela do menu de corte manual
 	STATE_CONFIG_JOG,                 		  //!< Funçao da tela da configuraçao de jog
 	STATE_CONFIG_AUTO_MODE,                   //!< Funçao da tela do menu de corte automatico
+	STATE_CONFIG_MAQUINA,                     //!< Funçao da tela de da configuraçao da maquina
 	STATE_CONFIG_VAR,                         //!< Funçao da tela de manipulação de variaveis
 	STATE_MANUAL_MODE,                        //!< Funçao da tela de corte manual
 	STATE_DESLOCAZERO_MODE,                   //!< Funçao da tela de deslocar para zero
@@ -76,7 +77,6 @@ typedef enum
 
 typedef enum
 {
-	OX_CONFIG_ALTURA_DESLOCAMENTO,    	//!< Altura de deslocamento
 	OX_CONFIG_ALTURA_PERFURACAO,   		//!< Altura de perfuração
 	OX_CONFIG_ALTURA_CORTE, 			//!< Altura de corte
 	OX_CONFIG_VELOC_CORTE, 				//!< Velocidade de corte
@@ -87,7 +87,6 @@ typedef enum
 
 typedef enum
 {
-	PL_CONFIG_ALTURA_DESLOCAMENTO,    //!< Altura de deslocamento
 	PL_CONFIG_ALTURA_PERFURACAO,      //!< Altura de perfuração
 	PL_CONFIG_ALTURA_CORTE,           //!< Altura de corte
 	PL_CONFIG_VELOC_CORTE,            //!< Velocidade de corte
@@ -95,6 +94,13 @@ typedef enum
 	PL_CONFIG_TENSAO_THC,             //!< Tensao do THC
 	PL_CONFIG_MAX        			  //!< CONFIG_MAX
 } ut_config_name_pl;
+
+typedef enum
+{
+	CFG_MAQUINA_ALT_DESLOCAMENTO,     //!< Altura de deslocamento
+	CFG_MAQUINA_MODOMAQUINA,          //!< Modo da maquina
+	CFG_MAQUINA_MAX        			  //!< CONFIG_MAX
+} ut_config_maquina;
 
 /**
  * Function pointer to a state execution.
@@ -121,6 +127,7 @@ extern ut_state ut_state_config_jog(ut_context* pContext);
 extern ut_state ut_state_config_var(ut_context* pContext);
 extern ut_state ut_state_manual_mode(ut_context* pContext);
 extern ut_state ut_state_auto_mode(ut_context* pContext);
+extern ut_state ut_state_config_maquina(ut_context* pContext);
 extern ut_state ut_state_deslocaZero_mode(ut_context* pContext);
 extern ut_state ut_state_config_auto_menu(ut_context* pContext);
 extern ut_state ut_state_line_selection(ut_context* pContext);

@@ -23,7 +23,8 @@ enum{
 	CONFIGVAR_PL,        //!< Indice da variavel EEPROM para plasma   (configVarPl)
 	CONFIGVAR_JOG,       //!< Indice da variavel EEPROM para jog      (configVarJog)
 	CONFIGFLAG,          //!< Indice da variavel EEPROM para flags    (configFlags)
-	ZEROPIECE			 //!< Indice da variavel EEPROM para zero peça  (zeroPiece)
+	ZEROPIECE,			 //!< Indice da variavel EEPROM para zero peça  (zeroPiece)
+	CONFIGVAR_MAQ,       //!< Indice da variavel EEPROM para config maquina      (configVarMaq)
 };
 
 enum{
@@ -40,6 +41,7 @@ enum{
 extern float configVarOx[OX_CONFIG_MAX];
 extern float configVarPl[PL_CONFIG_MAX];
 extern float configVarJog[JOG_MAX];
+extern float configVarMaq[CFG_MAQUINA_MAX - 1]; // retirado o modo maquina
 extern float zeroPiece[3];
 extern uint32_t configFlags[FLAG_MAX];
 extern uint32_t configTHCVel;
@@ -48,5 +50,6 @@ extern uint32_t configTHCVel;
 void eepromInit(void);
 void eepromWriteConfig(uint8_t varType);
 void eepromReadConfig(uint8_t varType);
+void eepromConsistencyCheck(void);
 
 #endif /* INCLUDE_EEPROM_H_ */

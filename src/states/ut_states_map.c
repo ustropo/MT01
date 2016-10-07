@@ -23,6 +23,7 @@ const state_func_ptr states_table[STATE_NUMBER] =
 		&ut_state_config_manual_menu,           //!< Funçao da tela do menu de corte manual
 		&ut_state_config_jog,          			//!< Funçao da tela da configuraçao de jog
 		&ut_state_config_auto_menu,             //!< Funçao da tela do menu de corte automatico
+		&ut_state_config_maquina,				//!< Funçao da tela de da configuraçao da maquina
 		&ut_state_config_var,                   //!< Funçao da tela de manipulação de variaveis
 		&ut_state_manual_mode,                  //!< Funçao da tela de corte manual
 		&ut_state_deslocaZero_mode,             //!< Funçao da tela de deslocar para zero

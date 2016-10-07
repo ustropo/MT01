@@ -5,11 +5,12 @@
 
 //#define VEE_DEMO_ERASE_FIRST
 
+static void eepromFormat(void);
+
 enum { READY, NOT_READY } sample_state;
 
 /*! configVarOxInit - Constante inicial de parametrização para Oxicorte */
 const float configVarOxInit[OX_CONFIG_MAX] = {
-	15,                              //!< Altura de deslocamento
 	5,                               //!< Altura de perfuração
 	1,                               //!< Altura de corte
 	5000,                            //!< Velocidade de corte
@@ -19,7 +20,6 @@ const float configVarOxInit[OX_CONFIG_MAX] = {
 
 /*! configVarPlInit - Constante inicial de parametrização para Plasma */
 const float configVarPlInit[PL_CONFIG_MAX] = {
-	15,                              //!< Altura de deslocamento
 	5,                               //!< Altura de perfuração
 	1,                               //!< Altura de corte
 	5000,                            //!< Velocidade de corte
@@ -33,11 +33,17 @@ const float configVarJogInit[JOG_MAX] = {
 	1500,                              //!< Velocidade inicial de jog lento
 };
 
+/*! configVarJogInit - Constante inicial de config de maquina*/
+const float configVarMaqInit[CFG_MAQUINA_MAX - 1] = {
+	15,                               //!< Altura de deslocamento
+};
+
 uint32_t configFlagsInit[FLAG_MAX] = {0,1};
 uint32_t configFlags[FLAG_MAX];
 
 float configVarOx[OX_CONFIG_MAX];
 float configVarPl[PL_CONFIG_MAX];
+float configVarMaq[CFG_MAQUINA_MAX - 1]; // retirado o modo maquina
 float configVarJog[JOG_MAX];
 
 float zeroPieceInit[3] = {0,0,0};
@@ -48,30 +54,16 @@ vee_record_t dataRecord;
 void eepromInit(void)
 {
 #if defined(VEE_DEMO_ERASE_FIRST)
-    uint32_t loop1;
-    uint32_t ret;
-    /* Enable data flash access. */
-    R_FlashDataAreaAccess(0xFFFF, 0xFFFF);
-
-    for (loop1 = 0; loop1 < DF_NUM_BLOCKS; loop1++)
-    {
-        /* Erase data flash. */
-        ret = R_FlashErase(BLOCK_DB0 + loop1);
-
-        /* Check for errors */
-        if(ret != FLASH_SUCCESS)
-        {
-            while(1)
-            {
-                /* Failure in erasing data flash. Something is not setup right. */
-            }
-        }
-
-        /* Wait for flash operation to finish. */
-        while(FLASH_SUCCESS != R_FlashGetStatus());
-    }
-#endif
+	eepromFormat();
+#else
 	R_VEE_Open();
+	eepromReadConfig(CONFIGVAR_OX);
+	eepromReadConfig(CONFIGVAR_PL);
+	eepromReadConfig(CONFIGVAR_JOG);
+	eepromReadConfig(CONFIGVAR_MAQ);
+	eepromReadConfig(CONFIGFLAG);
+	eepromReadConfig(ZEROPIECE);
+#endif
 }
 
 void eepromWriteConfig(uint8_t varType)
@@ -90,6 +82,10 @@ void eepromWriteConfig(uint8_t varType)
     	case CONFIGVAR_JOG:  dataRecord.ID = CONFIGVAR_JOG;
         				 dataRecord.pData = (uint8_t*)configVarJog;
         				 dataRecord.size =sizeof(configVarJog);
+        				 break;
+    	case CONFIGVAR_MAQ:  dataRecord.ID = CONFIGVAR_MAQ;
+        				 dataRecord.pData = (uint8_t*)configVarMaq;
+        				 dataRecord.size =sizeof(configVarMaq);
         				 break;
     	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG;
 						 dataRecord.pData = (uint8_t*)configFlags;
@@ -142,6 +138,7 @@ void eepromReadConfig(uint8_t varType)
     	case CONFIGVAR_OX: dataRecord.ID = CONFIGVAR_OX; break;
     	case CONFIGVAR_PL: dataRecord.ID = CONFIGVAR_PL; break;
     	case CONFIGVAR_JOG: dataRecord.ID = CONFIGVAR_JOG; break;
+    	case CONFIGVAR_MAQ: dataRecord.ID = CONFIGVAR_MAQ; break;
     	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG; break;
     	case ZEROPIECE: dataRecord.ID = ZEROPIECE; break;
     	default: break;
@@ -150,40 +147,7 @@ void eepromReadConfig(uint8_t varType)
 	/* Check result */
 	if( ret == VEE_NOT_FOUND )
 	{
-	    uint32_t loop1;
-	    uint32_t ret;
-	    /* Enable data flash access. */
-	    R_FlashDataAreaAccess(0xFFFF, 0xFFFF);
-
-	    for (loop1 = 0; loop1 < DF_NUM_BLOCKS; loop1++)
-	    {
-	        /* Erase data flash. */
-	        ret = R_FlashErase(BLOCK_DB0 + loop1);
-
-	        /* Check for errors */
-	        if(ret != FLASH_SUCCESS)
-	        {
-	            while(1)
-	            {
-	                /* Failure in erasing data flash. Something is not setup right. */
-	            }
-	        }
-
-	        /* Wait for flash operation to finish. */
-	        while(FLASH_SUCCESS != R_FlashGetStatus());
-	    }
-		memcpy(configVarOx,configVarOxInit,sizeof(configVarOx));
-		memcpy(configVarPl,configVarPlInit,sizeof(configVarPl));
-		memcpy(configVarJog,configVarJogInit,sizeof(configVarJog));
-		memcpy(&configFlags,&configFlagsInit,sizeof(configFlags));
-		memcpy(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece));
-		R_VEE_Open();
-	    eepromWriteConfig(CONFIGVAR_OX);
-	    eepromWriteConfig(CONFIGVAR_PL);
-	    eepromWriteConfig(CONFIGVAR_JOG);
-	    eepromWriteConfig(CONFIGFLAG);
-	    eepromWriteConfig(ZEROPIECE);
-		return;
+		eepromFormat();
 	}
 	if( ret != VEE_SUCCESS )
 	{
@@ -198,13 +162,12 @@ void eepromReadConfig(uint8_t varType)
     	case CONFIGVAR_OX: memcpy(configVarOx,dataRecord.pData,sizeof(configVarOx)); break;
     	case CONFIGVAR_PL: memcpy(configVarPl,dataRecord.pData,sizeof(configVarPl)); break;
     	case CONFIGVAR_JOG: memcpy(configVarJog,dataRecord.pData,sizeof(configVarJog)); break;
+    	case CONFIGVAR_MAQ: memcpy(configVarMaq,dataRecord.pData,sizeof(configVarMaq)); break;
     	case CONFIGFLAG: memcpy(&configFlags,dataRecord.pData,sizeof(configFlags)); break;
     	case ZEROPIECE: memcpy(&zeroPiece,dataRecord.pData,sizeof(zeroPiece)); break;
     	default: break;
     }
-
 }
-
 
 /***********************************************************************************************************************
 * Function Name: VEE_OperationDone_Callback
@@ -220,6 +183,65 @@ void VEE_OperationDone_Callback(void)
 /***********************************************************************************************************************
 End of VEE_OperationDone_Callback function
 ***********************************************************************************************************************/
+
+void eepromConsistencyCheck(void)
+{
+	uint8_t i;
+	for (i = 0; i < OX_CONFIG_MAX; i++)
+	{
+		if (configVarOx[i] > ox_init_max[i] || configVarOx[i] < ox_init_min[i])
+		{
+			eepromFormat();
+		}
+	}
+	for (i = 0; i < PL_CONFIG_MAX; i++)
+	{
+		if (configVarPl[i] > pl_init_max[i] || configVarPl[i] < pl_init_min[i])
+		{
+			eepromFormat();
+		}
+	}
+}
+
+static void eepromFormat(void)
+{
+
+		uint32_t loop1;
+		uint32_t ret;
+		/* Enable data flash access. */
+		R_FlashDataAreaAccess(0xFFFF, 0xFFFF);
+
+		for (loop1 = 0; loop1 < DF_NUM_BLOCKS; loop1++)
+		{
+			/* Erase data flash. */
+			ret = R_FlashErase(BLOCK_DB0 + loop1);
+
+			/* Check for errors */
+			if(ret != FLASH_SUCCESS)
+			{
+				while(1)
+				{
+					/* Failure in erasing data flash. Something is not setup right. */
+				}
+			}
+
+			/* Wait for flash operation to finish. */
+			while(FLASH_SUCCESS != R_FlashGetStatus());
+		}
+		memcpy(configVarOx,configVarOxInit,sizeof(configVarOx));
+		memcpy(configVarPl,configVarPlInit,sizeof(configVarPl));
+		memcpy(configVarJog,configVarJogInit,sizeof(configVarJog));
+		memcpy(&configFlags,&configFlagsInit,sizeof(configFlags));
+		memcpy(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece));
+		memcpy(configVarMaq,configVarMaqInit,sizeof(configVarMaq));
+		R_VEE_Open();
+		eepromWriteConfig(CONFIGVAR_OX);
+		eepromWriteConfig(CONFIGVAR_PL);
+		eepromWriteConfig(CONFIGVAR_JOG);
+		eepromWriteConfig(CONFIGVAR_MAQ);
+		eepromWriteConfig(CONFIGFLAG);
+		eepromWriteConfig(ZEROPIECE);
+}
 
 /***********************************************************************************************************************
 * Function Name: FlashError

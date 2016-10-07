@@ -80,10 +80,10 @@ void config_bool(ut_config_var* var)
 	boolStr = boolOptions;
 	switch(configsVar->currentState)
 	{
-		case STATE_MAIN_MENU:
+		case STATE_CONFIG_MAQUINA:
 			switch(configsVar->currentItem)
 			{
-				case MAIN_MENU_MODOMAQUINA:
+				case CFG_MAQUINA_MODOMAQUINA:
 					Recordflag =true;
 					value = var->value;
 					boolStr = boolJogMaq;
@@ -221,6 +221,13 @@ void config_int(ut_config_var* var)
 					break;
 				case STATE_CONFIG_MENU_PL:
 					eepromWriteConfig(CONFIGVAR_PL);
+					ut_lcd_output_warning("     VALOR     \n\
+											 SALVO     \n");
+							/* Delay */
+					vTaskDelay(2000 / portTICK_PERIOD_MS);
+					break;
+				case STATE_CONFIG_MAQUINA:
+					eepromWriteConfig(CONFIGVAR_MAQ);
 					ut_lcd_output_warning("     VALOR     \n\
 											 SALVO     \n");
 							/* Delay */

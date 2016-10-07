@@ -32,7 +32,7 @@ extern TaskHandle_t xCncTaskHandle;
 
 /* Array with all config variables */
 ut_config_var configs_manual[CONFIG_MANUAL_MAX];
-static bool initialized = false;;
+static bool initialized = false;
 static float zeroPiecebuffer[3] = {0,0,0};
 
 static const ut_state geNextStateManual[6] =

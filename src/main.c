@@ -110,11 +110,7 @@ void main(void)
 
  /* Inicialização das variaveis EEPROM */
 	eepromInit();
-	eepromReadConfig(CONFIGVAR_OX);
-	eepromReadConfig(CONFIGVAR_PL);
-	eepromReadConfig(CONFIGVAR_JOG);
-	eepromReadConfig(CONFIGFLAG);
-	eepromReadConfig(ZEROPIECE);
+	eepromConsistencyCheck();
 
 	/* Initialize USB */
 	usb_main();

@@ -61,7 +61,7 @@ stat_t M3_Macro(void)
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
-		altura_deslocamento	= 	configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
 		vel_corte			= 	configVarPl[PL_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarPl[PL_CONFIG_TEMPO_PERFURACAO];
@@ -149,7 +149,7 @@ stat_t M3_Macro(void)
 	else
 	{
 		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
-		altura_deslocamento	= 	configVarOx[OX_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
 		vel_corte			= 	configVarOx[OX_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarOx[OX_CONFIG_TEMPO_PERFURACAO];
@@ -243,7 +243,7 @@ stat_t M4_Macro(void)
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
-		altura_deslocamento	= 	configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
 		vel_corte			= 	configVarPl[PL_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarPl[PL_CONFIG_TEMPO_PERFURACAO];
@@ -324,7 +324,7 @@ stat_t M5_Macro(void)
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
-		altura_deslocamento	= 	configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
 		vel_corte			= 	configVarPl[PL_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarPl[PL_CONFIG_TEMPO_PERFURACAO];
@@ -333,7 +333,7 @@ stat_t M5_Macro(void)
 	else
 	{
 		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
-		altura_deslocamento	= 	configVarOx[OX_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
 		vel_corte			= 	configVarOx[OX_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarOx[OX_CONFIG_TEMPO_PERFURACAO];
@@ -408,7 +408,7 @@ stat_t homming_Macro(void)
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
-		altura_deslocamento	= 	configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
 		vel_corte			= 	configVarPl[PL_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarPl[PL_CONFIG_TEMPO_PERFURACAO];
@@ -417,7 +417,7 @@ stat_t homming_Macro(void)
 	else
 	{
 		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
-		altura_deslocamento	= 	configVarOx[OX_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
 		vel_corte			= 	configVarOx[OX_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarOx[OX_CONFIG_TEMPO_PERFURACAO];
@@ -597,7 +597,7 @@ stat_t limit_test(void)
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
-		altura_deslocamento	= 	configVarPl[PL_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
 		vel_corte			= 	configVarPl[PL_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarPl[PL_CONFIG_TEMPO_PERFURACAO];
@@ -606,7 +606,7 @@ stat_t limit_test(void)
 	else
 	{
 		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
-		altura_deslocamento	= 	configVarOx[OX_CONFIG_ALTURA_DESLOCAMENTO];
+		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
 		vel_corte			= 	configVarOx[OX_CONFIG_VELOC_CORTE];
 		tempo_perfuracao	= 	configVarOx[OX_CONFIG_TEMPO_PERFURACAO];

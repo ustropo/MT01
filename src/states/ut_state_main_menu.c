@@ -30,7 +30,7 @@ static const char* gszMainMenuLabels[MAIN_MENU_NUMBER] =
 	" MODO MANUAL",
 	" CORTE AUTOMÁTICO",
 	" CONFIG. DE CORTE",
-	" MODO MÁQUINA"
+	" CONFIG. DE MÁQUINA"
 };
 static const char* gszMainMenuTitle = "PRINCIPAL";
 
@@ -43,7 +43,7 @@ static const ut_state geNextState[MAIN_MENU_NUMBER] =
 	STATE_CONFIG_MANUAL_MODE,
 	STATE_CONFIG_AUTO_MODE,
 	STATE_CONFIG_MENU_PL,
-	STATE_CONFIG_VAR,
+	STATE_CONFIG_MAQUINA,
 };
 
 ut_config_var configs_main;

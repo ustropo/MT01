@@ -17,7 +17,6 @@ ut_config_var configsPl[PL_CONFIG_MAX];
 /* Initial values for each config variable */
 ut_config_type pl_init_types[PL_CONFIG_MAX] =
 {
-	UT_CONFIG_INT,                           //!< Altura de deslocamento
 	UT_CONFIG_INT,                           //!< Altura de perfuração
 	UT_CONFIG_INT,                           //!< Altura de corte
 	UT_CONFIG_INT,                           //!< Velocidade de corte
@@ -27,7 +26,6 @@ ut_config_type pl_init_types[PL_CONFIG_MAX] =
 
 char* pl_init_names[PL_CONFIG_MAX] =
 {
-	" ALT. DESLOCAMENTO",                    //!< Altura de deslocamento
 	" ALT. PERFURAÇÃO",                      //!< Altura de perfuração
 	" ALTURA DE CORTE",                      //!< Altura de corte
 	" VELOC. CORTE",                  		 //!< Velocidade de corte
@@ -37,7 +35,6 @@ char* pl_init_names[PL_CONFIG_MAX] =
 
 float pl_init_max[PL_CONFIG_MAX] =
 {
-	50,                                      //!< Altura de deslocamento
 	50,                                      //!< Altura de perfuração
 	50,                                      //!< Altura de corte
 	MOTOR_VMAX,                              //!< Velocidade de corte
@@ -47,7 +44,6 @@ float pl_init_max[PL_CONFIG_MAX] =
 
 float pl_init_min[PL_CONFIG_MAX] =
 {
-	1,                                       //!< Altura de deslocamento
 	1,                                       //!< Altura de perfuração
 	1,                                       //!< Altura de corte
 	MOTOR_VMIN,                              //!< Velocidade de corte
@@ -57,7 +53,6 @@ float pl_init_min[PL_CONFIG_MAX] =
 
 float pl_init_step[PL_CONFIG_MAX] =
 {
-	0.1,                                     //!< Altura de deslocamento
 	0.1,                                     //!< Altura de perfuração
 	0.1,                                     //!< Altura de corte
 	1,                                       //!< Velocidade de corte
@@ -67,7 +62,6 @@ float pl_init_step[PL_CONFIG_MAX] =
 
 uint8_t pl_init_point[PL_CONFIG_MAX] =
 {
-	1,                                       //!< Altura de deslocamento
 	1,                                       //!< Altura de perfuração
 	1,                                       //!< Altura de corte
 	0,                                       //!< Velocidade de corte
@@ -77,7 +71,6 @@ uint8_t pl_init_point[PL_CONFIG_MAX] =
 
 char* pl_init_unit[PL_CONFIG_MAX] =
 {
-	"mm",                                   //!< Altura de deslocamento  //!< Altura de deslocamento
 	"mm",                                   //!< Altura de perfuração    //!< Altura de perfuração
 	"mm",                                   //!< Altura de corte         //!< Altura de corte
 	"mm/min",                               //!< Velocidade de corte     //!< Velocidade de corte
