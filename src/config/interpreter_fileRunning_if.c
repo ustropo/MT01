@@ -64,22 +64,12 @@ void iif_zup_filerunning(void)
 }
 void iif_left_filerunning(void)
 {
-	if(configFlags[MODOMAQUINA] == MODO_OXICORTE)
-	{
-		if(isDwell)
-			st_set_dwell_elapsed_time(-1);
-			configVarOx[tempoDwell] -= 1;
-	}
+	xTimerStart( swTimers[LEFT_FILERUNNING_TIMER], 0 );
 
 }
 void iif_right_filerunning(void)
 {
-	if(configFlags[MODOMAQUINA] == MODO_OXICORTE)
-	{
-		if(isDwell)
-			st_set_dwell_elapsed_time(1);
-			configVarOx[tempoDwell] += 1;
-	}
+	xTimerStart( swTimers[RIGHT_FILERUNNING_TIMER], 0 );
 }
 
 void iif_down_filerunning(void)
@@ -100,6 +90,8 @@ void iif_released_filerunning(void)
 	zmove = 0;
 	xTimerStop(swTimers[ZDOWN_FILERUNNING_TIMER], 0 );
 	xTimerStop(swTimers[ZUP_FILERUNNING_TIMER], 0 );
+	xTimerStop(swTimers[LEFT_FILERUNNING_TIMER], 0 );
+	xTimerStop(swTimers[RIGHT_FILERUNNING_TIMER], 0 );
 #ifdef VEL_CHANGE
 	xTimerStop(swTimers[DOWN_FILERUNNING_TIMER], 0 );
 	xTimerStop(swTimers[UP_FILERUNNING_TIMER], 0 );
@@ -120,6 +112,20 @@ void iif_bind_filerunning(void)
 	                     ( 500 ),
 	                     pdTRUE,
 	                     ( void * ) ZDOWN_FILERUNNING_TIMER,
+	                     vTimerCallback
+	                   );
+	swTimers[RIGHT_FILERUNNING_TIMER] = xTimerCreate
+	                   ( "Timer 1",
+	                     ( 500 ),
+	                     pdTRUE,
+	                     ( void * ) RIGHT_FILERUNNING_TIMER,
+	                     vTimerCallback
+	                   );
+	swTimers[LEFT_FILERUNNING_TIMER] = xTimerCreate
+	                   ( "Timer 1",
+	                     ( 500 ),
+	                     pdTRUE,
+	                     ( void * ) LEFT_FILERUNNING_TIMER,
 	                     vTimerCallback
 	                   );
 #ifdef VEL_CHANGE
@@ -203,7 +209,28 @@ void vTimerCallback( TimerHandle_t pxTimer )
 
 	/* Which timer expired? */
 	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
-	if (configFlags[MODOMAQUINA] || sim){
+	if(configFlags[MODOMAQUINA] == MODO_OXICORTE)
+	{
+		switch (lArrayIndex)
+		{
+			case RIGHT_FILERUNNING_TIMER:
+				if(isDwell)
+				{
+					st_set_dwell_elapsed_time(1);
+					configVarOx[tempoDwell] += 1;
+				}
+			break;
+			case LEFT_FILERUNNING_TIMER:
+				if(isDwell)
+				{
+					st_set_dwell_elapsed_time(-1);
+					configVarOx[tempoDwell] -= 1;
+				}
+			break;
+		}
+	}
+
+	if (configFlags[MODOMAQUINA] == MODO_OXICORTE || sim){
 		switch (lArrayIndex)
 		{
 			case ZUP_FILERUNNING_TIMER: zmove = 0.01;
