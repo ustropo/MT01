@@ -25,6 +25,7 @@ enum{
 	CONFIGFLAG,          //!< Indice da variavel EEPROM para flags    (configFlags)
 	ZEROPIECE,			 //!< Indice da variavel EEPROM para zero peça  (zeroPiece)
 	CONFIGVAR_MAQ,       //!< Indice da variavel EEPROM para config maquina      (configVarMaq)
+	CONFIGVAR_PAR_MAQ,   //!< Indice da variavel EEPROM para config parametros maquina      (configVarParMaq)
 };
 
 enum{
@@ -42,6 +43,7 @@ extern float configVarOx[OX_CONFIG_MAX];
 extern float configVarPl[PL_CONFIG_MAX];
 extern float configVarJog[JOG_MAX];
 extern float configVarMaq[CFG_MAQUINA_MAX - 1]; // retirado o modo maquina
+extern float configVarParMaq[CFG_PAR_MAQ_MAX];
 extern float zeroPiece[3];
 extern uint32_t configFlags[FLAG_MAX];
 extern uint32_t configTHCVel;

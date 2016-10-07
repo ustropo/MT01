@@ -204,6 +204,7 @@ void homming_eixos(void *var)
 
 void testar_peca(void *var)
 {
+	uint16_t i = 0;
 	char s;
 	char *str;
 	char num[50];
@@ -213,6 +214,13 @@ void testar_peca(void *var)
 	xio_open(cs.primary_src,0,0);
 	while (true) {
 		SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, &s, 1);
+		i++;
+		if (i > 1000)
+		{
+			ut_lcd_output_warning("ARQUIVO\nSEM INFO\nDE LIMITES\n");
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			return;
+		}
 		if (s == 'M')
 		{
 			SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, num, 2);

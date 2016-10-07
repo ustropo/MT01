@@ -233,6 +233,14 @@ void config_int(ut_config_var* var)
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
 					break;
+				case STATE_CONFIG_PARAMETROS_MAQ:
+					eepromWriteConfig(CONFIGVAR_PAR_MAQ);
+					ut_lcd_output_warning("     VALOR     \n\
+											 SALVO     \n");
+					config_init();
+							/* Delay */
+					vTaskDelay(2000 / portTICK_PERIOD_MS);
+					break;
 				case STATE_CONFIG_AUTO_MODE:
 					selecionarlinhas();
 					break;

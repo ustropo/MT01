@@ -44,6 +44,7 @@ uint32_t configFlags[FLAG_MAX];
 float configVarOx[OX_CONFIG_MAX];
 float configVarPl[PL_CONFIG_MAX];
 float configVarMaq[CFG_MAQUINA_MAX - 1]; // retirado o modo maquina
+float configVarParMaq[CFG_PAR_MAQ_MAX];
 float configVarJog[JOG_MAX];
 
 float zeroPieceInit[3] = {0,0,0};
@@ -61,6 +62,7 @@ void eepromInit(void)
 	eepromReadConfig(CONFIGVAR_PL);
 	eepromReadConfig(CONFIGVAR_JOG);
 	eepromReadConfig(CONFIGVAR_MAQ);
+	eepromReadConfig(CONFIGVAR_PAR_MAQ);
 	eepromReadConfig(CONFIGFLAG);
 	eepromReadConfig(ZEROPIECE);
 #endif
@@ -86,6 +88,10 @@ void eepromWriteConfig(uint8_t varType)
     	case CONFIGVAR_MAQ:  dataRecord.ID = CONFIGVAR_MAQ;
         				 dataRecord.pData = (uint8_t*)configVarMaq;
         				 dataRecord.size =sizeof(configVarMaq);
+        				 break;
+    	case CONFIGVAR_PAR_MAQ:  dataRecord.ID = CONFIGVAR_PAR_MAQ;
+        				 dataRecord.pData = (uint8_t*)configVarParMaq;
+        				 dataRecord.size =sizeof(configVarParMaq);
         				 break;
     	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG;
 						 dataRecord.pData = (uint8_t*)configFlags;
@@ -139,6 +145,7 @@ void eepromReadConfig(uint8_t varType)
     	case CONFIGVAR_PL: dataRecord.ID = CONFIGVAR_PL; break;
     	case CONFIGVAR_JOG: dataRecord.ID = CONFIGVAR_JOG; break;
     	case CONFIGVAR_MAQ: dataRecord.ID = CONFIGVAR_MAQ; break;
+    	case CONFIGVAR_PAR_MAQ: dataRecord.ID = CONFIGVAR_PAR_MAQ; break;
     	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG; break;
     	case ZEROPIECE: dataRecord.ID = ZEROPIECE; break;
     	default: break;
@@ -163,6 +170,7 @@ void eepromReadConfig(uint8_t varType)
     	case CONFIGVAR_PL: memcpy(configVarPl,dataRecord.pData,sizeof(configVarPl)); break;
     	case CONFIGVAR_JOG: memcpy(configVarJog,dataRecord.pData,sizeof(configVarJog)); break;
     	case CONFIGVAR_MAQ: memcpy(configVarMaq,dataRecord.pData,sizeof(configVarMaq)); break;
+    	case CONFIGVAR_PAR_MAQ: memcpy(configVarParMaq,dataRecord.pData,sizeof(configVarParMaq)); break;
     	case CONFIGFLAG: memcpy(&configFlags,dataRecord.pData,sizeof(configFlags)); break;
     	case ZEROPIECE: memcpy(&zeroPiece,dataRecord.pData,sizeof(zeroPiece)); break;
     	default: break;
@@ -239,6 +247,7 @@ static void eepromFormat(void)
 		eepromWriteConfig(CONFIGVAR_PL);
 		eepromWriteConfig(CONFIGVAR_JOG);
 		eepromWriteConfig(CONFIGVAR_MAQ);
+		eepromWriteConfig(CONFIGVAR_PAR_MAQ);
 		eepromWriteConfig(CONFIGFLAG);
 		eepromWriteConfig(ZEROPIECE);
 }
