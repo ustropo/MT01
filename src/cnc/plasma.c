@@ -357,7 +357,7 @@ void emergencia_task(void)
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 				cm_spindle_control(SPINDLE_OFF);
 	    		lstop = true;
-				warm_stop();
+		//		warm_stop();
 		    	if (currentLine == 0){
 		    		strcpy(Str,"MODO DE EMERGÊNCIA\n");
 		    	}
@@ -367,8 +367,7 @@ void emergencia_task(void)
 		    	}
 		    	ut_lcd_output_warning(Str);
 				while(keyEntry != KEY_ESC){
-					IWDT.IWDTRR = 0x00u;
-					IWDT.IWDTRR = 0xFFu;
+					WDT_FEED
 					xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
 				}
 				keyEntry = EMERGENCIA_SIGNAL;

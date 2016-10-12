@@ -138,8 +138,7 @@ static unsigned char easymax_bits[] = {
  */
 ut_state ut_state_splash(ut_context* pContext)
 {
-    IWDT.IWDTRR = 0x00u;
-    IWDT.IWDTRR = 0xFFu;
+	WDT_FEED
 	currentLine = 0;
 	ut_lcd_clear();
 

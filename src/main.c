@@ -105,8 +105,7 @@ void main(void)
 	{
 		while (1);
 	}
-    IWDT.IWDTRR = 0x00u;
-    IWDT.IWDTRR = 0xFFu;
+	WDT_FEED
 
  /* Inicialização das variaveis EEPROM */
 	eepromInit();

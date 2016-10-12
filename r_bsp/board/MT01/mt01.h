@@ -52,6 +52,9 @@
 #define KC2					(0x04uL)
 #define LCD_CS              PORTC.PODR.BIT.B2
 #define SPIFLASH_CS 		PORTE.PODR.BIT.B0
+
+#define WDT_FEED       IWDT.IWDTRR = 0x00u; \
+    				   IWDT.IWDTRR = 0xFFu;
 #endif
 
 #endif /* MT01_H */

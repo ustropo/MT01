@@ -186,8 +186,7 @@ void R_FL_StateMachine(void)
 			ut_lcd_output_str();
 
 			while(keyEntry != KEY_ENTER && keyEntry != KEY_ESC){
-			    IWDT.IWDTRR = 0x00u;
-			    IWDT.IWDTRR = 0xFFu;
+				WDT_FEED
 				xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
 			}
 			if(keyEntry == KEY_ESC){
@@ -208,8 +207,7 @@ void R_FL_StateMachine(void)
 					ut_lcd_output_warning(gszCarMsg[chargeIndex]);
 				    fl_mem_erase(address, FL_MEM_ERASE_BLOCK);
 				}
-			    IWDT.IWDTRR = 0x00u;
-			    IWDT.IWDTRR = 0xFFu;
+				WDT_FEED
 		   }
 			res = f_close(&file);
 			res = f_open(&file, "MT01_proj.bin", FA_WRITE);

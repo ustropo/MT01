@@ -602,6 +602,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		break;
 
 		case EMERGENCIA_SIGNAL:
+			warm_stop();
 			if(!sim){
 				updatePosition(AUTO);
 				gTitle = AUTO;
@@ -769,7 +770,7 @@ void warm_stop(void)
 	}
 	while(cm.feedhold_requested == true)
 	{
-
+		WDT_FEED
 	}
 	ltorchBuffer = TORCH;
 	TORCH = FALSE;
