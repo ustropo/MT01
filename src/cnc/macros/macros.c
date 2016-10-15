@@ -635,22 +635,47 @@ stat_t limit_test(void)
 				state++; break;
 
 		case 4: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
-				SET_NON_MODAL_MACRO(target[AXIS_X], Xcord);
-				state++; break;
-
-		case 5: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
-				SET_NON_MODAL_MACRO(target[AXIS_Y], Ycord);
-				state++; break;
-
-		case 6: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
 				SET_NON_MODAL_MACRO(target[AXIS_X], 0);
-				state++; break;
-
-		case 7: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
 				SET_NON_MODAL_MACRO(target[AXIS_Y], 0);
 				state++; break;
 
-		case 8: SET_MODAL_MACRO (MODAL_GROUP_M4, program_flow, PROGRAM_END);
+		case 5: SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+				SET_NON_MODAL_MACRO (parameter, 1000);
+				state++; break;
+
+		case 6: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_X], Xcord);
+				state++; break;
+
+		case 7: SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+				SET_NON_MODAL_MACRO (parameter, 1000);
+				state++; break;
+
+		case 8: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_Y], Ycord);
+				state++; break;
+
+		case 9: SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+				SET_NON_MODAL_MACRO (parameter, 1000);
+				state++; break;
+
+		case 10: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_X], 0);
+				state++; break;
+
+		case 11: SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+				SET_NON_MODAL_MACRO (parameter, 1000);
+				state++; break;
+
+		case 12: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_Y], 0);
+				state++; break;
+
+		case 13: SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
+				SET_NON_MODAL_MACRO (parameter, 1000);
+				state++; break;
+
+		case 14: SET_MODAL_MACRO (MODAL_GROUP_M4, program_flow, PROGRAM_END);
 				state++; break;
 
 		default:state = 0; macro_func_ptr = command_idle; return (STAT_OK);
