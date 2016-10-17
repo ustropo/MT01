@@ -116,14 +116,14 @@ void iif_bind_filerunning(void)
 	                   );
 	swTimers[RIGHT_FILERUNNING_TIMER] = xTimerCreate
 	                   ( "Timer 1",
-	                     ( 500 ),
+	                     ( 150 ),
 	                     pdTRUE,
 	                     ( void * ) RIGHT_FILERUNNING_TIMER,
 	                     vTimerCallback
 	                   );
 	swTimers[LEFT_FILERUNNING_TIMER] = xTimerCreate
 	                   ( "Timer 1",
-	                     ( 500 ),
+	                     ( 150 ),
 	                     pdTRUE,
 	                     ( void * ) LEFT_FILERUNNING_TIMER,
 	                     vTimerCallback

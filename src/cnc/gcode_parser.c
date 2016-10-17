@@ -445,6 +445,7 @@ static stat_t _parse_gcode_block_selection_line(char_t *buf)
 			break;
 			case 'M':
 				switch((uint8_t)value) {
+					case 4:
 					case 5: LineM5 = lineNum;
 							ret = STAT_OK;
 							if(next)

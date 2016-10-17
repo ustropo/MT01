@@ -484,11 +484,11 @@ void ut_lcd_output_int_var(const char* title,const char* varStr)
 	/* Picture loop */
 	do
 	{
-		u8g_DrawFrame(&main_u8g,10, 10, 108, 44);
+		u8g_DrawFrame(&main_u8g,10, 10, 113, 44);
 		u8g_prepare(u8g_font_6x10);
 		h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 		u8g_DrawStr(&main_u8g, 6, 11, title);
-		u8g_DrawHLine(&main_u8g, 10, h+11, 108);
+		u8g_DrawHLine(&main_u8g, 10, h+11, 113);
 		u8g_DrawStr(&main_u8g, 40, h+20, varStr);
 	} while(u8g_NextPage(&main_u8g));
 	xSemaphoreGive(rspi_semaphore);
