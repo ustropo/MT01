@@ -531,7 +531,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				else
 				{
 					xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
-					warm_stop();
+			//		warm_stop();
 				}
 
 			}
