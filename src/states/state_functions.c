@@ -21,6 +21,8 @@
 #include "state_functions.h"
 #include "eeprom.h"
 
+#include "keyboard.h"
+
 #include "lcd_menu.h"
 #include "lcd.h"
 
@@ -209,42 +211,67 @@ void testar_peca(void *var)
 	char *str;
 	char num[50];
 	float numf;
-	macro_func_ptr = command_idle;
-	xio_close(cs.primary_src);
-	xio_open(cs.primary_src,0,0);
-	while (true) {
-		SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, &s, 1);
-		i++;
-		if (i > 1000)
-		{
-			ut_lcd_output_warning("ARQUIVO\nSEM INFO\nDE LIMITES\n");
-			vTaskDelay(2000 / portTICK_PERIOD_MS);
-			return;
-		}
-		if (s == 'M')
-		{
-			SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, num, 2);
-			numf = strtof(num,&str);
-			if (numf == 98.0f)
+
+	ut_config_var *lvar = var;
+	uint32_t *value = lvar->value;
+	if(*value)
+	{
+		macro_func_ptr = command_idle;
+		xio_close(cs.primary_src);
+		xio_open(cs.primary_src,0,0);
+		while (true) {
+			SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, &s, 1);
+			i++;
+			if (i > 1000)
 			{
+				ut_lcd_output_warning("ARQUIVO\nSEM INFO\nDE LIMITES\n");
+				vTaskDelay(2000 / portTICK_PERIOD_MS);
+				return;
+			}
+			if (s == 'M')
+			{
+				SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, num, 2);
+				numf = strtof(num,&str);
+				if (numf == 98.0f)
+				{
+					break;
+				}
+			}
+		}
+		while (true) {
+			SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, &s, 1);
+			if (s == '(')
+			{
+				SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, num, 50);
+				Xcord = strtof(num,&str);
+				Ycord = strtof(++str,NULL);
+				xio_close(cs.primary_src);
+				xTaskNotifyGive(xCncTaskHandle);
+				macro_func_ptr = limit_test;
 				break;
 			}
 		}
 	}
-	while (true) {
-		SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, &s, 1);
-		if (s == '(')
-		{
-			SPIFFS_read(&uspiffs[0].gSPIFFS, uspiffs[0].f, num, 50);
-			Xcord = strtof(num,&str);
-			Ycord = strtof(++str,NULL);
-			xio_close(cs.primary_src);
-			xTaskNotifyGive(xCncTaskHandle);
-			macro_func_ptr = limit_test;
-			break;
-		}
-	}
 }
+
+uint32_t delay_esc(uint32_t timems)
+{
+	uint32_t lret;
+	uint32_t i;
+	uint32_t keyEntry = 0xFFFFFFFF;
+	i = 0;
+	xQueueReset(qKeyboard);
+	do{
+
+		lret = xQueueReceive( qKeyboard, &keyEntry, 1 / portTICK_PERIOD_MS );
+		if(lret == pdFAIL)
+		{
+			i++;
+		}
+	}while(i < timems && keyEntry != KEY_ESC);
+	return keyEntry;
+}
+
 
 void idle(void *var)
 {

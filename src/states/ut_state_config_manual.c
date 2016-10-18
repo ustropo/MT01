@@ -19,6 +19,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "keyboard.h"
 
 #include "keyboard.h"
 #include "interpreter_if.h"
@@ -156,16 +157,28 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 	{
 		case CONFIG_MANUAL_DESLOCAR_ZERO:
 			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
-			/* Delay */
-			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			if(delay_esc(2000) == KEY_ESC)
+			{
+				xio_close(cs.primary_src);
+				ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+				/* Delay */
+				vTaskDelay(1000 / portTICK_PERIOD_MS);
+				return STATE_CONFIG_AUTO_MODE;
+			}
 			configsVar->name = "DESEJA CONTINUAR?";
 			pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
 			pContext->value[1] = STATE_DESLOCAZERO_MODE;
 			break;
 		case CONFIG_MANUAL_ZERAR_MAQUINA:
 			ut_lcd_output_warning("DEVE ESTAR NOS\nLIMITES FISICOS\nX0 E Y0\n");
-			/* Delay */
-			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			if(delay_esc(2000) == KEY_ESC)
+			{
+				xio_close(cs.primary_src);
+				ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+				/* Delay */
+				vTaskDelay(1000 / portTICK_PERIOD_MS);
+				return STATE_CONFIG_AUTO_MODE;
+			}
 			configsVar->name = "ZERAR A MÁQUINA?";
 			pContext->value[0] = STATE_CONFIG_MANUAL_MODE;
 			pContext->value[1] = STATE_CONFIG_MANUAL_MODE;

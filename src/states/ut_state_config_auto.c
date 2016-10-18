@@ -175,14 +175,30 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 			}
 			else
 			{
+
 				ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
-				/* Delay */
-				vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+				if(delay_esc(2000) == KEY_ESC)
+				{
+					xio_close(cs.primary_src);
+					ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+					/* Delay */
+					vTaskDelay(1000 / portTICK_PERIOD_MS);
+					return STATE_CONFIG_AUTO_MODE;
+				}
 
 				sprintf(Str, "PONTO DE ENTRADA\nLINHA %d\n", choosedLine);
 				ut_lcd_output_warning(Str);
-				/* Delay */
-				vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+				if(delay_esc(2000) == KEY_ESC)
+				{
+					xio_close(cs.primary_src);
+					ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+					/* Delay */
+					vTaskDelay(1000 / portTICK_PERIOD_MS);
+					return STATE_CONFIG_AUTO_MODE;
+				}
+
 				SPIFFS_fstat(&uspiffs[0].gSPIFFS, uspiffs[0].f, &fileStat);
 
 				ut_lcd_clear();
@@ -191,7 +207,6 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				memset(temp,NULL,20*MAX_ROW);
 				pstr = temp;
 				snprintf(&pstr[20*1],20, "NOME:%s",fileStat.name);
-				xio_close(cs.primary_src);
 				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 				{
 					eepromReadConfig(CONFIGVAR_PL);
@@ -214,9 +229,17 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				ut_lcd_output_str();
 
 				vPortFree(temp);
-				/* Delay */
-				vTaskDelay(2500 / portTICK_PERIOD_MS);
 
+				if(delay_esc(2500) == KEY_ESC)
+				{
+					xio_close(cs.primary_src);
+					ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+					/* Delay */
+					vTaskDelay(1000 / portTICK_PERIOD_MS);
+					return STATE_CONFIG_AUTO_MODE;
+				}
+
+				xio_close(cs.primary_src);
 				configsVar->name = "DESEJA CONTINUAR?";
 				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
 				pContext->value[1] = STATE_AUTO_MODE;
@@ -224,8 +247,14 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 			break;
 		case CONFIG_AUTO_DESLOCAR_ZERO:
 			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
-			/* Delay */
-			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			if(delay_esc(2000) == KEY_ESC)
+			{
+				xio_close(cs.primary_src);
+				ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+				/* Delay */
+				vTaskDelay(1000 / portTICK_PERIOD_MS);
+				return STATE_CONFIG_AUTO_MODE;
+			}
 			configsVar->name = "DESEJA CONTINUAR?";
 			pContext->value[0] = STATE_CONFIG_AUTO_MODE;
 			pContext->value[1] = STATE_DESLOCAZERO_MODE;
@@ -235,8 +264,14 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 			{
 				ut_lcd_output_warning("NENHUM ARQUIVO\n\
 									   CARREGADO\n");
-
-				vTaskDelay(2000 / portTICK_PERIOD_MS);
+				if(delay_esc(2000) == KEY_ESC)
+				{
+					xio_close(cs.primary_src);
+					ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+					/* Delay */
+					vTaskDelay(1000 / portTICK_PERIOD_MS);
+					return STATE_CONFIG_AUTO_MODE;
+				}
 				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
 				pContext->value[1] = STATE_CONFIG_AUTO_MODE;
 				return STATE_CONFIG_AUTO_MODE;
@@ -255,8 +290,14 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 			break;
 		case CONFIG_AUTO_TESTAR_TAMANHO_PECA:
 			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
-			/* Delay */
-			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			if(delay_esc(2000) == KEY_ESC)
+			{
+				xio_close(cs.primary_src);
+				ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+				/* Delay */
+				vTaskDelay(1000 / portTICK_PERIOD_MS);
+				return STATE_CONFIG_AUTO_MODE;
+			}
 			configsVar->name = "DESEJA CONTINUAR?";
 			pContext->value[0] = STATE_CONFIG_AUTO_MODE;
 			pContext->value[1] = STATE_DESLOCAZERO_MODE;

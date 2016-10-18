@@ -392,7 +392,7 @@ void FreeRTOSConfig( void )
         }
     }
 
-	qKeyboard = xQueueCreate(  1, sizeof(void *) );
+	qKeyboard = xQueueCreate(1, sizeof(uint32_t));
     /* Task */
 #if 0
     xTaskCreate( (pdTASK_CODE)R_usb_pstd_PcdTask,     "USB_PCD_TSK     ",  512, NULL, 5, &task_handle0 ); /* USB_PCD_TASK   */

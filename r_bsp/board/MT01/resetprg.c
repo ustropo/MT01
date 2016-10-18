@@ -147,7 +147,8 @@ static void clock_source_select(void);
 ***********************************************************************************************************************/
 #ifndef RELEASE   //Set in to 1 to debug UserApp by itself.
     #pragma entry PowerON_Reset_PC
-    void PowerON_Reset_PC(void)
+
+void PowerON_Reset_PC(void)
 #else
     /* Reset vector is taken care of by CDC Flashloader. Just set the address for the starting point for UserApp with UserAppStartSect. */
     //#pragma section P UserAppStartSect        // Output PowerON_Reset to PResetPRG section

@@ -20,6 +20,7 @@ void zerar_maquina(void *var);
 void zerar_peca(void *var);
 void homming_eixos(void *var);
 void testar_peca(void *var);
+uint32_t delay_esc(uint32_t timems);
 void idle(void *var);
 
 #endif /* INCLUDE_STATE_FUNCTIONS_H_ */
