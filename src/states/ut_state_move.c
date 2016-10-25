@@ -109,7 +109,7 @@ static char gStrDesloca[4][24] =
 
 
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
-void warm_stop(void);
+void warm_stop(uint8_t flag);
 static bool ltorchBuffer = false;
 extern bool zinhibitor;
 
@@ -530,7 +530,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				else
 				{
 					xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
-			//		warm_stop();
+					warm_stop(1);
 				}
 
 			}
@@ -544,7 +544,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				else
 				{
 					lstop = true;
-					warm_stop();
+					warm_stop(0);
 				}
 			}
 
@@ -562,7 +562,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				TORCH = FALSE;
 				arco = ARCO_OK_FAILED;
 				lstop = false;
-				warm_stop();
+				warm_stop(0);
 				state = 0;
 			}
 			break;
@@ -575,13 +575,13 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				pl_arcook_stop();
 				arco = ARCO_OK_FAILED;
 				lstop = false;
-				warm_stop();
+				warm_stop(0);
 				ltorchBuffer = TRUE;
 			}
 			break;
 
 		case EMERGENCIA_SIGNAL:
-			warm_stop();
+			warm_stop(0);
 			if(!sim){
 				updatePosition(AUTO);
 				gTitle = AUTO;
@@ -699,7 +699,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 			}
 			if(!lstop){
 				lstop = true;
-				warm_stop();
+				warm_stop(0);
 			}
 			break;
 
@@ -730,7 +730,7 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 	updatePosition(gTitle);
 }
 
-void warm_stop(void)
+void warm_stop(uint8_t flag)
 {
 
 	//iif_bind_filerunning_stop(lstop);
@@ -751,6 +751,9 @@ void warm_stop(void)
 	{
 		WDT_FEED
 	}
-	ltorchBuffer = TORCH;
-	TORCH = FALSE;
+	if (flag == 0)
+	{
+		ltorchBuffer = TORCH;
+		TORCH = FALSE;
+	}
 }
