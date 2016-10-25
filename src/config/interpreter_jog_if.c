@@ -71,37 +71,36 @@ void iif_esc_jog(void)
 }
 
 void iif_down_jog(void) {
-	//JogkeyPressed |= 0x01;
+	macro_func_ptr = jog_Macro;
 }
 void iif_up_jog(void) {
-	//JogkeyPressed |= 0x02;
+	macro_func_ptr = jog_Macro;
 }
 void iif_left_jog(void){
-	//JogkeyPressed |= 0x04;
+	macro_func_ptr = jog_Macro;
 }
 
 void iif_right_jog(void) {
-	//JogkeyPressed |= 0x08;
+	macro_func_ptr = jog_Macro;
 }
 
 void iif_zdown_jog(void){
-	//JogkeyPressed |= 0x10;
+	macro_func_ptr = jog_Macro;
 }
 
 void iif_zup_jog(void) {
-	//JogkeyPressed |= 0x20;
+	macro_func_ptr = jog_Macro;
 }
 
 void iif_released_jog(void) {
 	cm_request_feedhold();
 	cm_request_queue_flush();
-//	JogkeyPressed = 0;
-	//xio_open(cs.primary_src,jog_stopflush,0);
+	macro_func_ptr = _command_dispatch;
 }
 
 void iif_bind_jog(void)
 {
-	R_CMT_CreatePeriodic(10000,timerJogCallback,&timerIif);
+	R_CMT_CreatePeriodic(1000,timerJogCallback,&timerIif);
 	JogkeyPressed = 0;
 	iif_func_enter = &iif_enter_jog;
 	iif_func_esc = &iif_esc_jog;
@@ -119,22 +118,22 @@ void timerJogCallback (void *p_arg)
 {
 	if ((JogkeyPressed & KEY_DOWN) == KEY_DOWN)
 	{
-		jogMaxDistance[AXIS_Y] = -1;
+		jogMaxDistance[AXIS_Y] = -(*velocidadeJog*0.00015 - 0.125);
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_UP) == KEY_UP)
 	{
-		jogMaxDistance[AXIS_Y] = 1;
+		jogMaxDistance[AXIS_Y] = (*velocidadeJog*0.00015 - 0.125);
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_LEFT) == KEY_LEFT)
 	{
-		jogMaxDistance[AXIS_X] = -1;
+		jogMaxDistance[AXIS_X] = -(*velocidadeJog*0.00015 - 0.125);
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_RIGHT) == KEY_RIGHT)
 	{
-		jogMaxDistance[AXIS_X] = 1;
+		jogMaxDistance[AXIS_X] = (*velocidadeJog*0.00015 - 0.125);
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_Z_DOWN) == KEY_Z_DOWN)
