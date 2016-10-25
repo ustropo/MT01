@@ -11,8 +11,7 @@
 
 extern stat_t (*macro_func_ptr)(void);
 extern int8_t macro;
-extern uint8_t jogAxis;
-extern float jogMaxDistance;
+extern float jogMaxDistance[3];
 extern uint8_t state;
 extern uint32_t linenumMacro;
 extern float *velocidadeJog;

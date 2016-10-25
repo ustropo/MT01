@@ -30,7 +30,7 @@ extern iif_func_ptr iif_func_zdown;
 extern iif_func_ptr iif_func_zup;
 extern iif_func_ptr iif_func_released;
 extern iif_func_ptr iif_func_cycleStop;
-
+extern uint32_t timerIif;
 
 extern void iif_bind_filerunning(void);
 extern void iif_bind_jog(void);
@@ -42,5 +42,6 @@ extern void iif_idle(void);
 extern void iif_bind_filerunning_stop(bool stop);
 
 extern float zmove;
+extern uint32_t JogkeyPressed;
 
 #endif /* INCLUDE_INTERPRETER_IF_H_ */

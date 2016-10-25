@@ -257,43 +257,44 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 		/* Wait for user interaction */
 		keyEntry = 0;
 		xQueueReceive( qKeyboard, &keyEntry, DEFAULT_UPDATE_TIMEOUT);
+		JogkeyPressed = keyEntry;
+		if ((keyEntry & KEY_DOWN) == KEY_DOWN)
+		{
+			iif_func_down();
+		}
+		if ((keyEntry & KEY_UP) == KEY_UP)
+		{
+			iif_func_up();
+		}
+		if ((keyEntry & KEY_RIGHT) == KEY_RIGHT)
+		{
+			iif_func_right();
+		}
+		if ((keyEntry & KEY_LEFT) == KEY_LEFT)
+		{
+			iif_func_left();
+		}
+		if ((keyEntry & KEY_Z_UP) == KEY_Z_UP)
+		{
+			iif_func_zup();
+		}
+		if ((keyEntry & KEY_Z_DOWN) == KEY_Z_DOWN)
+		{
+			iif_func_zdown();
+		}
+		if ((keyEntry & KEY_ENTER) == KEY_ENTER)
+		{
+			iif_func_enter();
+		}
 
 		/* Check which key */
 		switch (keyEntry)
 		{
-		case KEY_DOWN:
-			iif_func_down();
-			break;
-
-		case KEY_UP:
-			iif_func_up();
-			break;
-
-		case KEY_RIGHT:
-			iif_func_right();
-			break;
-
-		case KEY_LEFT:
-			iif_func_left();
-			break;
-
-		case KEY_Z_UP:
-			iif_func_zup();
-			break;
-
-		case KEY_Z_DOWN:
-			iif_func_zdown();
-			break;
-
 		case KEY_ESC:
 			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 			iif_func_esc();
 			intepreterRunning = false;
 			return STATE_CONFIG_MANUAL_MODE;
-
-		case KEY_ENTER:
-			iif_func_enter();
-			break;
 
 		case KEY_RELEASED:
 			iif_func_released();
@@ -308,9 +309,6 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 
 			break;
 		}
-
-		/* Update position */
-	//	updatePosition(NULL);
 	}
 
 	return STATE_MAIN_MENU;

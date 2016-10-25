@@ -109,12 +109,13 @@ void keyboard_task(void)
 	}
 }
 #else
+
 void keyboard_task(void)
 {
 	uint8_t key_buf[3][3];
-	bool keyPressed = false;
 	uint8_t colPressed = 0xff;
 	uint32_t key = 0;
+	uint32_t key_old = 0;
 	uint8_t i = 0;
 	uint8_t k = 0;
 	uint8_t col[3] = {KC0,KC1,KC2};
@@ -128,31 +129,30 @@ void keyboard_task(void)
 		{
 			KCOL = col[i];
 			vTaskDelay(1 / portTICK_RATE_MS);
-			key_buf[i][k] = KLINE;
+			key_buf[i][k] = (~(KLINE | 0x81)>>4) & 0x0F;
 			if (i == colPressed)
 			{
-				if (key_buf[colPressed][k] == 0x7e)
+				if (key_buf[colPressed][k] == 0x00)
 				{
 					key = 0;
+					key_old = 0;
 					xQueueSend( qKeyboard, &key, 0 );
-					keyPressed = false;
 					colPressed = 0xFF;
 				}
 			}
-			if (key_buf[i][k] != 0x7e)
+			if (key_buf[i][k] != 0x00)
 			{
 				if (key_buf[i][0] == key_buf[i][1])
 				{
 					if (key_buf[i][0] == key_buf[i][2])
 					{
-						key_buf[i][0] = ~key_buf[i][0];
-						key |=(uint32_t)key_buf[i][0]<<8*i;
+						key = key_buf[2][1] << 8 | key_buf[1][1] << 4 | key_buf[0][1];
 						colPressed = i;
-						if (keyPressed == false)
+						if (key != key_old)
 						{
 							xQueueSend( qKeyboard, &key, 0 );
 						}
-						keyPressed = true;
+						key_old = key;
 					}
 				}
 			}

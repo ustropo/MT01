@@ -27,7 +27,7 @@ iif_func_ptr iif_func_zdown;
 iif_func_ptr iif_func_zup;
 iif_func_ptr iif_func_released;
 iif_func_ptr iif_func_cycleStop;
-
+uint32_t timerIif;
 
 void iif_idle(void) {}
 

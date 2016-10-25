@@ -11,6 +11,7 @@
 #include "spindle.h"
 #include "macros.h"
 #include "plasma.h"
+#include "keyboard.h"
 
 
 #include <stdlib.h>
@@ -29,26 +30,28 @@ static void iif_released_jog(void);
 
 extern float *velocidadeJog;
 char text[40];
-
+uint32_t JogkeyPressed;
 const char jog_stopflush[]= "\
 !\n\
 %";
+
+void timerJogCallback (void *p_arg);
 
 void iif_enter_jog(void)
 {
 	static bool torchEnable = false;
 	if(!torchEnable)
 	{
-		cm_spindle_control(SPINDLE_CW);
+	//	cm_spindle_control(SPINDLE_CW);
 		isCuttingSet(true);
-		//TORCH = TRUE;
+		TORCH = TRUE;
 		torchEnable = true;
 	}
 	else
 	{
-		cm_spindle_control(SPINDLE_OFF);
+	//	cm_spindle_control(SPINDLE_OFF);
 		isCuttingSet(false);
-		//TORCH = FALSE;
+		TORCH = FALSE;
 		torchEnable = false;
 	}
 }
@@ -63,63 +66,43 @@ void iif_esc_jog(void)
 
 	}
 	iif_bind_idle();
+	JogkeyPressed = 0;
 	macro_func_ptr = _command_dispatch;
 }
 
 void iif_down_jog(void) {
-//	sprintf(text, "G21 G91\nG01 Y-390.0 F%.0f\nm30",*velocidadeJog);
-//	xio_open(cs.primary_src,text,0);
-	jogAxis = AXIS_Y;
-	jogMaxDistance = -100000;
-	macro_func_ptr = jog_Macro;
+	//JogkeyPressed |= 0x01;
 }
 void iif_up_jog(void) {
-//	sprintf(text, "G21 G91\nG01 Y390.0 F%.0f\nm30",*velocidadeJog);
-//	xio_open(cs.primary_src,text,0);
-	jogAxis = AXIS_Y;
-	jogMaxDistance = 100000;
-	macro_func_ptr = jog_Macro;
+	//JogkeyPressed |= 0x02;
 }
 void iif_left_jog(void){
-//	sprintf(text, "G21 G91\nG01 X-390.0 F%.0f\nm30",*velocidadeJog);
-//	xio_open(cs.primary_src,text,0);
-	jogAxis = AXIS_X;
-	jogMaxDistance = -100000;
-	macro_func_ptr = jog_Macro;
+	//JogkeyPressed |= 0x04;
 }
 
 void iif_right_jog(void) {
-//	sprintf(text, "G21 G91\nG01 X390.0 F%.0f\nm30",*velocidadeJog);
-//	xio_open(cs.primary_src,text,0);
-	jogAxis = AXIS_X;
-	jogMaxDistance = 100000;
-	macro_func_ptr = jog_Macro;
+	//JogkeyPressed |= 0x08;
 }
 
 void iif_zdown_jog(void){
-//	sprintf(text, "G21 G91\nG01 Z-390.0 F%.0f\nm30",*velocidadeJog);
-//	xio_open(cs.primary_src,text,0);
-	jogAxis = AXIS_Z;
-	jogMaxDistance = -100000;
-	macro_func_ptr = jog_Macro;
+	//JogkeyPressed |= 0x10;
 }
 
 void iif_zup_jog(void) {
-//	sprintf(text, "G21 G91\nG01 Z390.0 F%.0f\nm30",*velocidadeJog);
-//	xio_open(cs.primary_src,text,0);
-	jogAxis = AXIS_Z;
-	jogMaxDistance = 100000;
-	macro_func_ptr = jog_Macro;
+	//JogkeyPressed |= 0x20;
 }
 
 void iif_released_jog(void) {
 	cm_request_feedhold();
 	cm_request_queue_flush();
+//	JogkeyPressed = 0;
 	//xio_open(cs.primary_src,jog_stopflush,0);
 }
 
 void iif_bind_jog(void)
 {
+	R_CMT_CreatePeriodic(10000,timerJogCallback,&timerIif);
+	JogkeyPressed = 0;
 	iif_func_enter = &iif_enter_jog;
 	iif_func_esc = &iif_esc_jog;
 	iif_func_down = &iif_down_jog;
@@ -130,4 +113,38 @@ void iif_bind_jog(void)
 	iif_func_zup = &iif_zup_jog;
 	iif_func_released = &iif_released_jog;
 	iif_func_cycleStop = &iif_idle;
+}
+
+void timerJogCallback (void *p_arg)
+{
+	if ((JogkeyPressed & KEY_DOWN) == KEY_DOWN)
+	{
+		jogMaxDistance[AXIS_Y] = -1;
+		macro_func_ptr = jog_Macro;
+	}
+	if ((JogkeyPressed & KEY_UP) == KEY_UP)
+	{
+		jogMaxDistance[AXIS_Y] = 1;
+		macro_func_ptr = jog_Macro;
+	}
+	if ((JogkeyPressed & KEY_LEFT) == KEY_LEFT)
+	{
+		jogMaxDistance[AXIS_X] = -1;
+		macro_func_ptr = jog_Macro;
+	}
+	if ((JogkeyPressed & KEY_RIGHT) == KEY_RIGHT)
+	{
+		jogMaxDistance[AXIS_X] = 1;
+		macro_func_ptr = jog_Macro;
+	}
+	if ((JogkeyPressed & KEY_Z_DOWN) == KEY_Z_DOWN)
+	{
+		jogMaxDistance[AXIS_Z] = -0.1;
+		macro_func_ptr = jog_Macro;
+	}
+	if ((JogkeyPressed & KEY_Z_UP) == KEY_Z_UP)
+	{
+		jogMaxDistance[AXIS_Z] = 0.1;
+		macro_func_ptr = jog_Macro;
+	}
 }
