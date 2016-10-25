@@ -109,20 +109,23 @@ void keyboard_task(void)
 	}
 }
 #else
-
+#define KEY_DEBOUNCE 10
+#define KEY_DEBOUNCE_DLYMS 2
 void keyboard_task(void)
 {
-	uint8_t key_buf[3][3];
+	uint8_t key_buf[3][10];
 	uint8_t colPressed = 0xff;
 	uint32_t key = 0;
 	uint32_t key_old = 0;
 	uint8_t i = 0;
 	uint8_t k = 0;
+	uint8_t j = 0;
+	uint8_t matchCount = 0;
 	uint8_t col[3] = {KC0,KC1,KC2};
 
 	while(1)
 	{
-		vTaskDelay(30 / portTICK_RATE_MS);
+		vTaskDelay(KEY_DEBOUNCE_DLYMS / portTICK_RATE_MS);
 		WDT_FEED
 		switch_rtc_callback();					// switch debouncing
 		for (i = 0; i < 3; i++)
@@ -142,23 +145,28 @@ void keyboard_task(void)
 			}
 			if (key_buf[i][k] != 0x00)
 			{
-				if (key_buf[i][0] == key_buf[i][1])
+				for (j = 0;j < KEY_DEBOUNCE;j++)
 				{
-					if (key_buf[i][0] == key_buf[i][2])
+					if (key_buf[i][0] == key_buf[i][j])
 					{
-						key = key_buf[2][1] << 8 | key_buf[1][1] << 4 | key_buf[0][1];
-						colPressed = i;
-						if (key != key_old)
-						{
-							xQueueSend( qKeyboard, &key, 0 );
-						}
-						key_old = key;
+						matchCount++;
 					}
 				}
+				if (matchCount == KEY_DEBOUNCE)
+				{
+					key = key_buf[2][1] << 8 | key_buf[1][1] << 4 | key_buf[0][1];
+					colPressed = i;
+					if (key != key_old)
+					{
+						xQueueSend( qKeyboard, &key, 0 );
+					}
+					key_old = key;
+				}
+				matchCount = 0;
 			}
 		}
 		k++;
-		if (k > 2)
+		if (k == KEY_DEBOUNCE)
 		{
 			k = 0;
 		}

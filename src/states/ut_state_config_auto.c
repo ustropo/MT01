@@ -260,13 +260,14 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 			pContext->value[1] = STATE_DESLOCAZERO_MODE;
 			break;
 		case CONFIG_AUTO_SELECIONAR_LINHA:
-			if(gszCurFile[0] == NULL)
+			xio_open(cs.primary_src,0,0);
+			if(uspiffs[0].f < 0)
 			{
+				xio_close(cs.primary_src);
 				ut_lcd_output_warning("NENHUM ARQUIVO\n\
 									   CARREGADO\n");
 				if(delay_esc(2000) == KEY_ESC)
 				{
-					xio_close(cs.primary_src);
 					ut_lcd_output_warning("COMANDO\nCANCELADO\n");
 					/* Delay */
 					vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -289,18 +290,39 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 			}
 			break;
 		case CONFIG_AUTO_TESTAR_TAMANHO_PECA:
-			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
-			if(delay_esc(2000) == KEY_ESC)
+
+			xio_open(cs.primary_src,0,0);
+			if(uspiffs[0].f < 0)
 			{
 				xio_close(cs.primary_src);
-				ut_lcd_output_warning("COMANDO\nCANCELADO\n");
-				/* Delay */
-				vTaskDelay(1000 / portTICK_PERIOD_MS);
+				ut_lcd_output_warning("NENHUM ARQUIVO\n\
+									   CARREGADO\n");
+				if(delay_esc(2000) == KEY_ESC)
+				{
+					ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+					/* Delay */
+					vTaskDelay(1000 / portTICK_PERIOD_MS);
+					return STATE_CONFIG_AUTO_MODE;
+				}
+				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
+				pContext->value[1] = STATE_CONFIG_AUTO_MODE;
 				return STATE_CONFIG_AUTO_MODE;
 			}
-			configsVar->name = "DESEJA CONTINUAR?";
-			pContext->value[0] = STATE_CONFIG_AUTO_MODE;
-			pContext->value[1] = STATE_DESLOCAZERO_MODE;
+			else
+			{
+				ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
+				if(delay_esc(2000) == KEY_ESC)
+				{
+					xio_close(cs.primary_src);
+					ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+					/* Delay */
+					vTaskDelay(1000 / portTICK_PERIOD_MS);
+					return STATE_CONFIG_AUTO_MODE;
+				}
+				configsVar->name = "DESEJA CONTINUAR?";
+				pContext->value[0] = STATE_CONFIG_AUTO_MODE;
+				pContext->value[1] = STATE_DESLOCAZERO_MODE;
+			}
 			break;
 		default:
 			pContext->value[0] = STATE_CONFIG_AUTO_MODE;

@@ -42,6 +42,7 @@ uint8_t gTitle;
 extern float *velocidadeJog;
 extern bool intepreterRunning;
 
+
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
 #define STOP_AUTO_TITLE		    "MÁQUINA PAUSADA"
 #define DEFAULT_LINHA1_AUTO	    ""
@@ -366,7 +367,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	tg_set_primary_source(CNC_MEDIA);
 	xio_close(cs.primary_src);
 	macro_func_ptr = _command_dispatch;
-	xio_open(cs.primary_src,0,0);
+	xio_open(cs.primary_src,0,1);
 	xTaskNotifyGive(xCncTaskHandle);
 	iif_bind_filerunning();
 	while(true)
@@ -432,7 +433,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					}
 					else
 					{
-						macro_func_ptr = M3_Macro;
+						macro_func_ptr = macro_buffer;
 						iif_func_enter();
 					}
 				}
@@ -578,26 +579,6 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				ltorchBuffer = TRUE;
 			}
 			break;
-
-		case USB_DISCONNECTED:
-			xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
-			cm_request_feedhold();
-			cm_request_queue_flush();
-			xio_close(cs.primary_src);
-			cm.probe_state = PROBE_FAILED;
-			state = 0;
-			cm.cycle_state = CYCLE_OFF;
-			pl_arcook_stop();
-			isCuttingSet(false);
-			iif_bind_idle();
-			TORCH = FALSE;
-			cm.gmx.feed_rate_override_enable = true;
-			cm.gmx.feed_rate_override_factor = 1;
-			macro_func_ptr = command_idle;
-			ut_lcd_output_warning("PEN DRIVE\nDESCONECTADO\n");
-			vTaskDelay(2000 / portTICK_PERIOD_MS);
-			return STATE_CONFIG_AUTO_MODE;
-		break;
 
 		case EMERGENCIA_SIGNAL:
 			warm_stop();

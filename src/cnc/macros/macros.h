@@ -10,6 +10,7 @@
 #include "eeprom.h"
 
 extern stat_t (*macro_func_ptr)(void);
+extern stat_t (*macro_buffer)(void);
 extern int8_t macro;
 extern float jogMaxDistance[3];
 extern uint8_t state;

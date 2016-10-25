@@ -68,8 +68,10 @@ ut_state ut_state_line_selection(ut_context* pContext)
 	ut_menu config_line;
 	stat_t status;
 	char Str[20][20];
-	if(gszCurFile[0] == NULL)
+	xio_open(cs.primary_src,0,0);
+	if(uspiffs[0].f < 0)
 	{
+		xio_close(cs.primary_src);
 		ut_lcd_output_warning("NENHUM ARQUIVO\n\
 							   CARREGADO\n");
 

@@ -38,6 +38,7 @@ extern float zeroPiecebuffer[3];
 bool xMacroArcoOkSync = false;
 
 stat_t (*macro_func_ptr)(void);
+stat_t (*macro_buffer)(void);
 
 struct gcodeParserSingleton {	 	  // struct to manage globals
 	uint8_t modals[MODAL_GROUP_COUNT];// collects modal groups in a block
@@ -51,7 +52,7 @@ extern struct gcodeParserSingleton gp;
 stat_t M3_Macro(void)
 {
 	float tempo;
-
+	macro_buffer = M3_Macro;
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -233,7 +234,7 @@ stat_t M3_Macro(void)
 stat_t M4_Macro(void)
 {
 	float tempo;
-
+	macro_buffer = M4_Macro;
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags

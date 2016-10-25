@@ -164,7 +164,7 @@ float pl_thc_pid(void)
 {
 	float result = 0;
 	float THCVel = 0;
-	uint16_t delay_thc;
+	int16_t delay_thc;
 	/* velocidade do THC proporcinal a velocidade de feddrate */
 	THCVel = configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MULT;
 	/* reta do delay inversamente proporcinal a velocidade de feddrate */

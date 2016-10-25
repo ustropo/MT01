@@ -12,7 +12,7 @@
 #include "macros.h"
 #include "plasma.h"
 #include "keyboard.h"
-
+#include "settings.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -58,6 +58,7 @@ void iif_enter_jog(void)
 
 void iif_esc_jog(void)
 {
+	R_CMT_Stop(timerIif);
 	TORCH = FALSE;
 	cm_request_feedhold();
 	cm_request_queue_flush();
@@ -93,15 +94,20 @@ void iif_zup_jog(void) {
 }
 
 void iif_released_jog(void) {
-	cm_request_feedhold();
-	cm_request_queue_flush();
-	macro_func_ptr = _command_dispatch;
+
+	//cm_request_feedhold();
+	//cm_request_queue_flush();
+	//macro_func_ptr = _command_dispatch;
 }
 
 void iif_bind_jog(void)
 {
-	R_CMT_CreatePeriodic(1000,timerJogCallback,&timerIif);
 	JogkeyPressed = 0;
+	R_CMT_CreatePeriodic(1000,timerJogCallback,&timerIif);
+	jogMaxDistance[AXIS_X] = 0;
+	jogMaxDistance[AXIS_Y] = 0;
+	jogMaxDistance[AXIS_Z] = 0;
+	macro_func_ptr = jog_Macro;
 	iif_func_enter = &iif_enter_jog;
 	iif_func_esc = &iif_esc_jog;
 	iif_func_down = &iif_down_jog;
@@ -114,36 +120,40 @@ void iif_bind_jog(void)
 	iif_func_cycleStop = &iif_idle;
 }
 
+#define MULTI_A 0.000076923
+#define NUM_B 0.4230775
+
 void timerJogCallback (void *p_arg)
 {
 	if ((JogkeyPressed & KEY_DOWN) == KEY_DOWN)
 	{
-		jogMaxDistance[AXIS_Y] = -(*velocidadeJog*0.00015 - 0.125);
+		jogMaxDistance[AXIS_Y] = -(*velocidadeJog*MULTI_A + NUM_B);
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_UP) == KEY_UP)
 	{
-		jogMaxDistance[AXIS_Y] = (*velocidadeJog*0.00015 - 0.125);
+		jogMaxDistance[AXIS_Y] = (*velocidadeJog*MULTI_A + NUM_B);
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_LEFT) == KEY_LEFT)
 	{
-		jogMaxDistance[AXIS_X] = -(*velocidadeJog*0.00015 - 0.125);
+		jogMaxDistance[AXIS_X] = -(*velocidadeJog*MULTI_A + NUM_B);
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_RIGHT) == KEY_RIGHT)
 	{
-		jogMaxDistance[AXIS_X] = (*velocidadeJog*0.00015 - 0.125);
+		jogMaxDistance[AXIS_X] = (*velocidadeJog*MULTI_A + NUM_B);
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_Z_DOWN) == KEY_Z_DOWN)
 	{
-		jogMaxDistance[AXIS_Z] = -0.1;
+		jogMaxDistance[AXIS_Z] = -(*velocidadeJog*MULTI_A + NUM_B)*0.1;
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_Z_UP) == KEY_Z_UP)
 	{
-		jogMaxDistance[AXIS_Z] = 0.1;
+		jogMaxDistance[AXIS_Z] = (*velocidadeJog*MULTI_A + NUM_B)*0.1;
 		macro_func_ptr = jog_Macro;
 	}
 }
+
