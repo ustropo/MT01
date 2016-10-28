@@ -212,6 +212,7 @@ void config_int(ut_config_var* var)
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
 					break;
 				case STATE_CONFIG_MENU_OX:
+					eepromWriteConfig(CONFIGVAR_OX);
 					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);

@@ -378,7 +378,15 @@ static stat_t _parse_gcode_block(char_t *buf)
 						SET_MODAL (MODAL_GROUP_M4, program_flow, PROGRAM_END);
 				case 3: macro_func_ptr = M3_Macro;
 						break;
-				case 4: macro_func_ptr = M4_Macro;
+				case 4:
+						if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+						{
+							macro_func_ptr = M4_Macro;
+						}
+						else
+						{
+							status = STAT_GCODE_COMMAND_UNSUPPORTED;
+						}
 						break;
 				case 5:	macro_func_ptr = M5_Macro;
 						break;

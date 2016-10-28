@@ -443,6 +443,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					}
 					else
 					{
+						simTorch = false;
 						macro_func_ptr = macro_buffer;
 						iif_func_enter();
 					}
@@ -570,6 +571,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 				ut_lcd_output_warning("CHECAR SENSOR\nOHMICO\n");
 				TORCH = FALSE;
+				isCuttingSet(false);
 				arco = ARCO_OK_FAILED;
 				lstop = false;
 				warm_stop(0);
@@ -583,6 +585,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
 				TORCH = FALSE;
 				pl_arcook_stop();
+				isCuttingSet(false);
 				arco = ARCO_OK_FAILED;
 				lstop = false;
 				warm_stop(0);
