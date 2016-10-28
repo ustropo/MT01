@@ -120,6 +120,7 @@ extern bool zinhibitor;
 static void updatePosition(uint8_t menu)
 {
 	float x; float y; float z;
+	float vel;
 	char *lStr[6];
 	/* Display is only cleared once to improve performance */
 	lStr[4] = "";
@@ -138,7 +139,12 @@ static void updatePosition(uint8_t menu)
 					 currentLine = cm_get_linenum(RUNTIME);
  	 	 	 	 	 sprintf(gStrAuto[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrAuto[1];
-			         sprintf(gStrAuto[2], "VEL.: %.0f mm/min",  mp_get_runtime_velocity());
+		 	 	 	 vel = cm_get_feed_rate(ACTIVE_MODEL);
+		 	 	 	 if (vel == 0)
+		 	 	 	 {
+		 	 	 		vel = mp_get_runtime_velocity();
+		 	 	 	 }
+			         sprintf(gStrAuto[2], "VEL.: %.0f mm/min",  vel);
                      lStr[2] = gStrAuto[2];
 
 						 if (arcoOkGet())
@@ -170,7 +176,11 @@ static void updatePosition(uint8_t menu)
 		 	 	 	 currentLine = cm_get_linenum(RUNTIME);
 	 	 	 	 	 sprintf(gStrSim[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrSim[1];
-			         sprintf(gStrSim[2], "VEL.: %.0f mm/min",  mp_get_runtime_velocity());
+		 	 	 	 if (vel == 0)
+		 	 	 	 {
+		 	 	 		vel = mp_get_runtime_velocity();
+		 	 	 	 }
+			         sprintf(gStrSim[2], "VEL.: %.0f mm/min",  vel);
                      lStr[2] = gStrSim[2];
                      break;
 		case DESLOCA: lStr[0] = gStrDesloca[0];
@@ -694,6 +704,11 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 					iif_bind_idle();
 					macro_func_ptr = command_idle;
 					intepreterRunning = false;
+					ut_lcd_output_warning("COMANDO\nFINALIZADO\n");
+					keyEntry = 0;
+					while(keyEntry != KEY_ENTER && keyEntry != KEY_ESC){
+						xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
+					}
 					return (ut_state)pContext->value[0];
 				}
 			}

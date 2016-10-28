@@ -127,7 +127,7 @@ static void init()
  */
 ut_state ut_state_config_auto_menu(ut_context* pContext)
 {
-	char Str[20];
+	char Str[30];
 	void *temp = NULL;
 	char *pstr;
 	ut_menu config_menu;
@@ -203,27 +203,27 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 
 				ut_lcd_clear();
 
-				temp = pvPortMalloc( 20*MAX_ROW);
-				memset(temp,NULL,20*MAX_ROW);
+				temp = pvPortMalloc( 30*MAX_ROW);
+				memset(temp,NULL,30*MAX_ROW);
 				pstr = temp;
-				snprintf(&pstr[20*1],20, "NOME:%s",fileStat.name);
+				snprintf(&pstr[30*1],30, "NOME:%s",fileStat.name);
 				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 				{
 					eepromReadConfig(CONFIGVAR_PL);
-					snprintf(&pstr[0],20, "    MODO PLASMA     ");
-					snprintf(&pstr[20*2],20, "VEL. CORTE: %.0f mm/min",configVarPl[PL_CONFIG_VELOC_CORTE]);
-					snprintf(&pstr[20*3],20, "TENSÃO THC: %.0f V",configVarPl[PL_CONFIG_TENSAO_THC]);
+					snprintf(&pstr[0],30, "    MODO PLASMA     ");
+					snprintf(&pstr[30*2],30, "VEL. CORTE: %.0f mm/min",configVarPl[PL_CONFIG_VELOC_CORTE]);
+					snprintf(&pstr[30*3],30, "TENSÃO THC: %.0f V",configVarPl[PL_CONFIG_TENSAO_THC]);
 				}
 				else
 				{
-					snprintf(&pstr[0],20, "      MODO OXI      ");
+					snprintf(&pstr[0],30, "      MODO OXI      ");
 					eepromReadConfig(CONFIGVAR_OX);
-					snprintf(&pstr[20*2],20, "VEL. CORTE: %.0f mm/min",configVarPl[OX_CONFIG_VELOC_CORTE]);
+					snprintf(&pstr[30*2],30, "VEL. CORTE: %.0f mm/min",configVarPl[OX_CONFIG_VELOC_CORTE]);
 				}
 				ut_lcd_drawStr(0, 0, &pstr[0], BACKGROUND_FRAMED,u8g_font_helvB08);
 				for(uiMsgRow = 1; uiMsgRow < MAX_ROW; uiMsgRow++)
 				{
-					ut_lcd_drawStr(uiMsgRow, 0, &pstr[uiMsgRow*20], false,u8g_font_6x10);
+					ut_lcd_drawStr(uiMsgRow, 0, &pstr[uiMsgRow*30], false,u8g_font_5x8);
 				}
 				/* Output */
 				ut_lcd_output_str();

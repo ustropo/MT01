@@ -207,36 +207,30 @@ void config_int(ut_config_var* var)
 			{
 				case STATE_CONFIG_JOG:
 					eepromWriteConfig(CONFIGVAR_JOG);
-					ut_lcd_output_warning("     VALOR     \n\
-											 SALVO     \n");
+					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
 					break;
 				case STATE_CONFIG_MENU_OX:
-					eepromWriteConfig(CONFIGVAR_OX);
-					ut_lcd_output_warning("     VALOR     \n\
-											 SALVO     \n");
+					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
 					break;
 				case STATE_CONFIG_MENU_PL:
 					eepromWriteConfig(CONFIGVAR_PL);
-					ut_lcd_output_warning("     VALOR     \n\
-											 SALVO     \n");
+					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
 					break;
 				case STATE_CONFIG_MAQUINA:
 					eepromWriteConfig(CONFIGVAR_MAQ);
-					ut_lcd_output_warning("     VALOR     \n\
-											 SALVO     \n");
+					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
 					break;
 				case STATE_CONFIG_PARAMETROS_MAQ:
 					eepromWriteConfig(CONFIGVAR_PAR_MAQ);
-					ut_lcd_output_warning("     VALOR     \n\
-											 SALVO     \n");
+					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
 					config_init();
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
