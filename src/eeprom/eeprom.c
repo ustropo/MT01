@@ -11,31 +11,31 @@ enum { READY, NOT_READY } sample_state;
 
 /*! configVarOxInit - Constante inicial de parametrização para Oxicorte */
 const float configVarOxInit[OX_CONFIG_MAX] = {
-	5,                               //!< Altura de perfuração
-	1,                               //!< Altura de corte
-	5000,                            //!< Velocidade de corte
-	3,                               //!< Tempo de aquecimento
-	2                                //!< Tempo de Perfuração
+	15,                               //!< Altura de perfuração
+	5,                               //!< Altura de corte
+	500,                            //!< Velocidade de corte
+	30,                               //!< Tempo de aquecimento
+	1                                //!< Tempo de Perfuração
 };
 
 /*! configVarPlInit - Constante inicial de parametrização para Plasma */
 const float configVarPlInit[PL_CONFIG_MAX] = {
-	5,                               //!< Altura de perfuração
-	1,                               //!< Altura de corte
-	5000,                            //!< Velocidade de corte
-	1,                               //!< Tempo de Perfuração
-	150                              //!< Tensao do THC
+	4.8,                               //!< Altura de perfuração
+	2.8,                               //!< Altura de corte
+	2500,                            //!< Velocidade de corte
+	0.1,                               //!< Tempo de Perfuração
+	120                              //!< Tensao do THC
 };
 
 /*! configVarJogInit - Constante inicial de velocidade de jog*/
 const float configVarJogInit[JOG_MAX] = {
-	7500,                              //!< Velocidade inicial de jog rapido
-	1500,                              //!< Velocidade inicial de jog lento
+	6000,                              //!< Velocidade inicial de jog rapido
+	500,                              //!< Velocidade inicial de jog lento
 };
 
 /*! configVarJogInit - Constante inicial de config de maquina*/
 const float configVarMaqInit[CFG_MAQUINA_MAX - 1] = {
-	15,                               //!< Altura de deslocamento
+	25,                               //!< Altura de deslocamento
 };
 
 uint32_t configFlagsInit[FLAG_MAX] = {0,1};

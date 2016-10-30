@@ -30,8 +30,8 @@
 #define DEBOUNCE_COUNT 15
 #define ARCOOK_DELAY_COUNT 33
 
-#define THC_HISTERESE 1
-#define THC_PORCENTAGE 0.2
+#define THC_HISTERESE 1.5
+#define THC_PORCENTAGE 0.25
 #define THC_RAPIDO 0.005
 #define THC_LENTO  0.001
 #define THC_MULT  (0.000001428*1.15)
@@ -47,7 +47,7 @@
 
 void timer_motorPower_callback(void *pdata);
 void emergencia_task(void);
-extern void warm_stop(void);
+extern void warm_stop(uint8_t flag);
 
 extern bool simTorch;
 extern bool lstop;
@@ -357,7 +357,7 @@ void emergencia_task(void)
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 				cm_spindle_control(SPINDLE_OFF);
 	    		lstop = true;
-		//		warm_stop();
+				warm_stop(2);
 		    	if (currentLine == 0){
 		    		strcpy(Str,"MODO DE EMERGÊNCIA\n");
 		    	}

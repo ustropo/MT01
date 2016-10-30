@@ -571,7 +571,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 				ut_lcd_output_warning("CHECAR SENSOR\nOHMICO\n");
 				TORCH = FALSE;
-				isCuttingSet(false);
+			//	isCuttingSet(false);
 				arco = ARCO_OK_FAILED;
 				lstop = false;
 				warm_stop(0);
@@ -585,7 +585,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
 				TORCH = FALSE;
 				pl_arcook_stop();
-				isCuttingSet(false);
+			//	isCuttingSet(false);
 				arco = ARCO_OK_FAILED;
 				lstop = false;
 				warm_stop(0);
@@ -765,11 +765,14 @@ void warm_stop(uint8_t flag)
 	{
 		st_command_dwell(DWELL_PAUSE);
 	}
-	while(cm.feedhold_requested == true)
+	if (flag != 2)
 	{
-		WDT_FEED
+		while(cm.feedhold_requested == true)
+		{
+			WDT_FEED
+		}
 	}
-	if (flag == 0)
+	if (flag != 1)
 	{
 		ltorchBuffer = TORCH;
 		TORCH = FALSE;
