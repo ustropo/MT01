@@ -708,13 +708,13 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 				}
 				if(*value || cm.machine_state == MACHINE_PROGRAM_END){
 					iif_bind_idle();
-					macro_func_ptr = command_idle;
-					intepreterRunning = false;
 					ut_lcd_output_warning("COMANDO\nFINALIZADO\n");
 					keyEntry = 0;
 					while(keyEntry != KEY_ENTER && keyEntry != KEY_ESC){
 						xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
 					}
+					macro_func_ptr = command_idle;
+					intepreterRunning = false;
 					return (ut_state)pContext->value[0];
 				}
 			}

@@ -26,7 +26,7 @@ s32_t spiffs_init(void)
 
 	FS_spi_hw_init();
 
-//	R_SF_Erase(1, 0, SF_ERASE_BULK);
+	R_SF_Erase(1, 0, SF_ERASE_BULK);
 
 	cfg.hal_read_f = my_spi_read;
 	cfg.hal_write_f = my_spi_write;

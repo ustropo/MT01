@@ -355,7 +355,8 @@ void emergencia_task(void)
 			{
 				emergenciaFlag = true;
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
-				cm_spindle_control(SPINDLE_OFF);
+				TORCH = FALSE;
+				//cm_spindle_control(SPINDLE_OFF);
 	    		lstop = true;
 				warm_stop(2);
 		    	if (currentLine == 0){

@@ -99,8 +99,8 @@ void iif_zup_jog(void) {
 
 void iif_released_jog(void) {
 
-	//cm_request_feedhold();
-	//cm_request_queue_flush();
+//	cm_request_feedhold();
+//	cm_request_queue_flush();
 	//macro_func_ptr = _command_dispatch;
 	if (timerIif == 3)
 	{
@@ -130,43 +130,43 @@ void iif_bind_jog(void)
 
 #define MULTI_A 0.000076923
 #define NUM_B 0.4230775
-
+#define DESLOCAMENTOXY 0.5
 void timerJogCallback (void *p_arg)
 {
 	if ((JogkeyPressed & KEY_DOWN) == KEY_DOWN)
 	{
-		//jogMaxDistance[AXIS_Y] = -(*velocidadeJog*MULTI_A + NUM_B);
-		jogMaxDistance[AXIS_Y] = -1;
+		jogMaxDistance[AXIS_Y] = -(*velocidadeJog*MULTI_A + NUM_B);
+		//jogMaxDistance[AXIS_Y] = -DESLOCAMENTOXY;
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_UP) == KEY_UP)
 	{
-		//jogMaxDistance[AXIS_Y] = (*velocidadeJog*MULTI_A + NUM_B);
-		jogMaxDistance[AXIS_Y] = 1;
+		jogMaxDistance[AXIS_Y] = (*velocidadeJog*MULTI_A + NUM_B);
+		//jogMaxDistance[AXIS_Y] = DESLOCAMENTOXY;
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_LEFT) == KEY_LEFT)
 	{
-		//jogMaxDistance[AXIS_X] = -(*velocidadeJog*MULTI_A + NUM_B);
-		jogMaxDistance[AXIS_X] = -1;
+		jogMaxDistance[AXIS_X] = -(*velocidadeJog*MULTI_A + NUM_B);
+		//jogMaxDistance[AXIS_X] = -DESLOCAMENTOXY;
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_RIGHT) == KEY_RIGHT)
 	{
-		//jogMaxDistance[AXIS_X] = (*velocidadeJog*MULTI_A + NUM_B);
-		jogMaxDistance[AXIS_X] = 1;
+		jogMaxDistance[AXIS_X] = (*velocidadeJog*MULTI_A + NUM_B);
+		//jogMaxDistance[AXIS_X] = DESLOCAMENTOXY;
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_Z_DOWN) == KEY_Z_DOWN)
 	{
-		//jogMaxDistance[AXIS_Z] = -(*velocidadeJog*MULTI_A + NUM_B)*0.1;
-		jogMaxDistance[AXIS_Z] = -0.1;
+		//jogMaxDistance[AXIS_Z] = -(*velocidadeJog*MULTI_A + NUM_B)*1;
+		jogMaxDistance[AXIS_Z] = -0.3;
 		macro_func_ptr = jog_Macro;
 	}
 	if ((JogkeyPressed & KEY_Z_UP) == KEY_Z_UP)
 	{
-		//jogMaxDistance[AXIS_Z] = (*velocidadeJog*MULTI_A + NUM_B)*0.1;
-		jogMaxDistance[AXIS_Z] = 0.1;
+		//jogMaxDistance[AXIS_Z] = (*velocidadeJog*MULTI_A + NUM_B)*1;
+		jogMaxDistance[AXIS_Z] = 0.3;
 		macro_func_ptr = jog_Macro;
 	}
 //	R_CMT_Stop(timerIif);
@@ -219,7 +219,7 @@ void timerJogWalkCallback (void *p_arg)
 	if (JogkeyPressed != 0)
 	{
 		R_CMT_Stop(timerIif);
-		R_CMT_CreatePeriodic(1000,timerJogCallback,&timerIif);
+		R_CMT_CreatePeriodic(*velocidadeJog/10,timerJogCallback,&timerIif);
 	}
 	else
 	{
