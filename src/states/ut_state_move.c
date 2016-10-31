@@ -334,6 +334,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 ut_state ut_state_auto_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
+	uint32_t statePrevious;
 	ltorchBuffer = false;
 	uint32_t arco = 0;
 //	stepper_init();
@@ -429,7 +430,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				{
 					st_command_dwell(DWELL_RESTART);
 				}
-				if (arco == ARCO_OK_OFF)
+				if (arco == ARCO_OK_OFF || (statePrevious == EMERGENCIA_SIGNAL && ltorchBuffer == TRUE))
 				{
 					arco = 0;
 					if(isCuttingGet())
@@ -473,6 +474,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					if (simTorch)
 					{
 						TORCH = TRUE;
+						simTorch = false;
 						if(configFlags[MODOMAQUINA] == MODO_PLASMA){
 							pl_arcook_start();
 							isCuttingSet(true);
@@ -594,6 +596,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 
 		case EMERGENCIA_SIGNAL:
+			statePrevious = EMERGENCIA_SIGNAL;
 			warm_stop(0);
 			if(!sim){
 				updatePosition(AUTO);
@@ -772,7 +775,7 @@ void warm_stop(uint8_t flag)
 			WDT_FEED
 		}
 	}
-	if (flag != 1)
+	if (flag == 0)
 	{
 		ltorchBuffer = TORCH;
 		TORCH = FALSE;
