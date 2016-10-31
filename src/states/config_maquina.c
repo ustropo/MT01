@@ -19,7 +19,7 @@ const ut_state geNextStateMaq[CFG_MAQUINA_MAX] =
 {
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
-	STATE_CONFIG_PARAMETROS_MAQ
+	STATE_CONFIG_VAR
 };
 
 uint32_t mq_init_values[CFG_MAQUINA_MAX] =
@@ -34,7 +34,7 @@ ut_config_type mq_init_types[CFG_MAQUINA_MAX] =
 {
 	UT_CONFIG_INT,                        //!< Altura de deslocamento
 	UT_CONFIG_BOOL,                       //!< Modo maquina
-	NULL
+	UT_CONFIG_BOOL
 };
 
 char* mq_init_names[CFG_MAQUINA_MAX] =

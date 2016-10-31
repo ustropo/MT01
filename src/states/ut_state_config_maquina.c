@@ -20,6 +20,7 @@
 
 #include "lcd.h"
 #include "lcd_menu.h"
+#include "state_functions.h"
 
 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
@@ -95,9 +96,29 @@ ut_state ut_state_config_maquina(ut_context* pContext)
 	{
 		return STATE_MAIN_MENU;
 	}
-
 	/* Set selected item */
 	pContext->value[0] = STATE_CONFIG_MAQUINA;
 	configsVar = &configsMaq[config_menu.selectedItem];
+	switch(config_menu.selectedItem)
+	{
+		case CFG_MAQUINA_PARAMETROS:
+			ut_lcd_output_warning("CUIDADO!!!\nA MÁQUINA IRÁ\nRESETAR\n");
+			if(delay_esc(2000) == KEY_ESC)
+			{
+				xio_close(cs.primary_src);
+				ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+				/* Delay */
+				vTaskDelay(1000 / portTICK_PERIOD_MS);
+				return STATE_CONFIG_MAQUINA;
+			}
+			configsVar->name = "DESEJA CONTINUAR?";
+			pContext->value[0] = STATE_CONFIG_MAQUINA;
+			pContext->value[1] = STATE_CONFIG_PARAMETROS_MAQ;
+			break;
+		default:
+			break;
+
+	}
+
 	return geNextStateMaq[config_menu.selectedItem];
 }

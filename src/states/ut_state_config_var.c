@@ -231,10 +231,12 @@ void config_int(ut_config_var* var)
 					break;
 				case STATE_CONFIG_PARAMETROS_MAQ:
 					eepromWriteConfig(CONFIGVAR_PAR_MAQ);
-					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
-					config_init();
+					ut_lcd_output_warning("RESETANDO...\n");
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
+					taskENTER_CRITICAL();
+					while(1){}
+					taskEXIT_CRITICAL();
 					break;
 				case STATE_CONFIG_AUTO_MODE:
 					selecionarlinhas();
@@ -344,6 +346,18 @@ ut_state ut_state_config_var(ut_context* pContext)
 						vTaskDelay(2000 / portTICK_PERIOD_MS);
 					}
 					break;
+				}
+			break;
+		case STATE_CONFIG_MAQUINA:
+			switch(configsVar->currentItem)
+			{
+			case CFG_MAQUINA_PARAMETROS:
+				if(*Flag == 1)
+				{
+					stateBack = (ut_state)pContext->value[1];
+					sim = false;
+				}
+				break;
 			}
 		break;
 	}
