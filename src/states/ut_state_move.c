@@ -312,6 +312,12 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 			break;
 
 		case EMERGENCIA_SIGNAL:
+			cm_request_feedhold();
+			cm_request_queue_flush();
+			while(cm.queue_flush_requested == true)
+			{
+
+			}
 			xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 			break;
 

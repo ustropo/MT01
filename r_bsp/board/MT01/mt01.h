@@ -55,6 +55,9 @@
 
 #define WDT_FEED       IWDT.IWDTRR = 0x00u; \
     				   IWDT.IWDTRR = 0xFFu;
+
+#define RESET			R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR); \
+						SYSTEM.SWRR = 0xA501;
 #endif
 
 #endif /* MT01_H */

@@ -234,8 +234,7 @@ void config_int(ut_config_var* var)
 					ut_lcd_output_warning("RESETANDO...\n");
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
-					taskDISABLE_INTERRUPTS();
-					while(1){}
+					RESET
 					break;
 				case STATE_CONFIG_AUTO_MODE:
 					selecionarlinhas();

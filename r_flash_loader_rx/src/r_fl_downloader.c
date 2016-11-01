@@ -212,8 +212,7 @@ void R_FL_StateMachine(void)
 			res = f_close(&file);
 			res = f_open(&file, "MT01_proj.bin", FA_WRITE);
 		    f_rename("MT01_proj.bin", "MT01_done.bin");
-			R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
-			SYSTEM.SWRR = 0xA501;
+		    RESET
 		}
 	}
     
