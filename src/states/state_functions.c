@@ -246,7 +246,7 @@ void testar_peca(void *var)
 				Xcord = strtof(num,&str);
 				Ycord = strtof(++str,NULL);
 				xio_close(cs.primary_src);
-				xTaskNotifyGive(xCncTaskHandle);
+				//xTaskNotifyGive(xCncTaskHandle);
 				macro_func_ptr = limit_test;
 				break;
 			}

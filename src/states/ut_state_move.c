@@ -603,7 +603,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 
 		case EMERGENCIA_SIGNAL:
 			statePrevious = EMERGENCIA_SIGNAL;
-			warm_stop(0);
+		//	warm_stop(0);
 			if(!sim){
 				updatePosition(AUTO);
 				gTitle = AUTO;

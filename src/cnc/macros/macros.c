@@ -690,7 +690,7 @@ stat_t limit_test(void)
 		case 13: SET_MODAL_MACRO (MODAL_GROUP_M4, program_flow, PROGRAM_END);
 				state++; break;
 
-		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+		default:state = 0;  macro_func_ptr = _command_dispatch; return (STAT_OK);
 	}
 	_execute_gcode_block();
 	return (STAT_OK);

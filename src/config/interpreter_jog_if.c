@@ -62,7 +62,10 @@ void iif_enter_jog(void)
 
 void iif_esc_jog(void)
 {
-	R_CMT_Stop(timerIif);
+	if (timerIif == 3)
+	{
+		R_CMT_Stop(timerIif);
+	}
 	TORCH = FALSE;
 	cm_request_feedhold();
 	cm_request_queue_flush();
