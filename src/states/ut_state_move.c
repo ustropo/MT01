@@ -128,7 +128,9 @@ static void updatePosition(uint8_t menu)
 	{
 		case MANUAL: lStr[0] = gStrManual[0];
 					 lStr[1] = gStrManual[1];
-			         sprintf(gStrManual[2], "VEL.: %.0f mm/min", *velocidadeJog);
+			//         sprintf(gStrManual[2], "VEL.: %.0f mm/min", *velocidadeJog);
+			         sprintf(gStrManual[2], "VEL.: %.0f mm/min", mp_get_runtime_velocity());
+
 			         lStr[2] = gStrManual[2];
                      if (arcoOkGet())
                     	 lStr[3] = "AOK";
@@ -176,6 +178,7 @@ static void updatePosition(uint8_t menu)
 		 	 	 	 currentLine = cm_get_linenum(RUNTIME);
 	 	 	 	 	 sprintf(gStrSim[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrSim[1];
+		 	 	 	 vel = cm_get_feed_rate(ACTIVE_MODEL);
 		 	 	 	 if (vel == 0)
 		 	 	 	 {
 		 	 	 		vel = mp_get_runtime_velocity();
@@ -602,17 +605,24 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 
 		case EMERGENCIA_SIGNAL:
-			statePrevious = EMERGENCIA_SIGNAL;
-		//	warm_stop(0);
-			if(!sim){
-				updatePosition(AUTO);
-				gTitle = AUTO;
+			if (!programEnd)
+			{
+				statePrevious = EMERGENCIA_SIGNAL;
+			//	warm_stop(0);
+				if(!sim){
+					updatePosition(AUTO);
+					gTitle = AUTO;
+				}
+				else{
+					updatePosition(SIM);
+					gTitle = SIM;
+				}
+				xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 			}
-			else{
-				updatePosition(SIM);
-				gTitle = SIM;
+			else
+			{
+				ut_lcd_output_warning("CORTE AUTOMÁTICO\nFINALIZADO\nPRESSIONE ESC\n");
 			}
-			xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 			break;
 
 		default: break;

@@ -10,6 +10,8 @@
 
 #include "ut_state_config_var.h"
 
+extern bool reset_flag;
+
 extern ut_config_var configsParMaq[CFG_PAR_MAQ_MAX];
 extern ut_config_type pm_init_types[CFG_PAR_MAQ_MAX];
 extern char* pm_init_names[CFG_PAR_MAQ_MAX];

@@ -92,6 +92,13 @@ ut_state ut_state_config_par_maq(ut_context* pContext)
 	config_menu.selectedItem = 0;
 	if(ut_menu_browse(&config_menu, DEFAULT_CONFIG_TIMEOUT) < 0)
 	{
+		if (reset_flag == true)
+		{
+			ut_lcd_output_warning("RESETANDO...\n");
+					/* Delay */
+			vTaskDelay(2000 / portTICK_PERIOD_MS);
+			RESET
+		}
 		return STATE_MAIN_MENU;
 	}
 

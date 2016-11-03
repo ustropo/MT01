@@ -213,7 +213,7 @@ void testar_peca(void *var)
 	float numf;
 
 	ut_config_var *lvar = var;
-	uint32_t *value = lvar->value;
+	bool *value = lvar->value;
 	if(*value)
 	{
 		macro_func_ptr = command_idle;
@@ -224,8 +224,10 @@ void testar_peca(void *var)
 			i++;
 			if (i > 1000)
 			{
+				xio_close(cs.primary_src);
 				ut_lcd_output_warning("ARQUIVO\nSEM INFO\nDE LIMITES\n");
 				vTaskDelay(2000 / portTICK_PERIOD_MS);
+				*value = false;
 				return;
 			}
 			if (s == 'M')

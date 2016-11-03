@@ -14,6 +14,7 @@
 #include <string.h>
 
 ut_config_var configsParMaq[CFG_PAR_MAQ_MAX];
+bool reset_flag;
 
 const ut_state geNextStatePar[CFG_PAR_MAQ_MAX] =
 {

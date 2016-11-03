@@ -51,7 +51,7 @@ static ut_config_type init_types[CONFIG_JOG_MAX] =
 
 static char* init_names[CONFIG_JOG_MAX] =
 {
-	" SELECIONAR VELOCIDADE",
+	" SELECIONAR VEL.",
 	" ALTERAR JOG RÁPIDO",
 	" ALTERAR JOG LENTO"
 };

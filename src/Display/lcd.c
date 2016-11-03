@@ -260,9 +260,9 @@ void ut_lcd_output_str(ut_state state)
 				u8g_prepare(u8g_font_5x8);
 				u8g_DrawHLine(&main_u8g, x, 55, 128);
 				if(configFlags[MODOMAQUINA])
-					u8g_DrawStr(&main_u8g, 85, 56, "OXICORTE");
+					u8g_DrawStr(&main_u8g, 60, 56, "MODO OXICORTE");
 				else
-					u8g_DrawStr(&main_u8g, 85, 56, "PLASMA");
+					u8g_DrawStr(&main_u8g, 65, 56, "MODO PLASMA");
 			}
 		}
 

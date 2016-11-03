@@ -8,6 +8,7 @@
 #include "ut_context.h"
 #include "ut_state.h"
 #include "ut_state_config_var.h"
+#include "config_par_maquina.h"
 #include "eeprom.h"
 
 #include "FreeRTOS.h"
@@ -231,10 +232,10 @@ void config_int(ut_config_var* var)
 					break;
 				case STATE_CONFIG_PARAMETROS_MAQ:
 					eepromWriteConfig(CONFIGVAR_PAR_MAQ);
-					ut_lcd_output_warning("RESETANDO...\n");
+					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
-					RESET
+					reset_flag = true;
 					break;
 				case STATE_CONFIG_AUTO_MODE:
 					selecionarlinhas();
@@ -361,6 +362,22 @@ ut_state ut_state_config_var(ut_context* pContext)
 	}
 	/* Avoid null handler */
 	if(configsVar->func_var) { configsVar->func_var(configsVar); }
+	switch(configsVar->currentState)
+	{
+		case STATE_CONFIG_AUTO_MODE:
+			switch(configsVar->currentItem)
+			{
+				case CONFIG_AUTO_TESTAR_TAMANHO_PECA:
+					bool *retFile = configsVar->value;
+					if (*retFile == false)
+					{
+						stateBack = (ut_state)pContext->value[0];
+					}
+				break;
+			}
+		break;
+	}
+
 	return stateBack;
 }
 
