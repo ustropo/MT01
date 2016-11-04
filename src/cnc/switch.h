@@ -46,8 +46,8 @@
 											// timer for debouncing switches
 //#define SW_LOCKOUT_TICKS 25					// 25=250ms. RTC ticks are ~10ms each
 //#define SW_DEGLITCH_TICKS 3					// 3=30ms
-#define SW_LOCKOUT_TICKS 1					// 25=250ms. RTC ticks are ~10ms each
-#define SW_DEGLITCH_TICKS 1				// 3=30ms
+#define SW_LOCKOUT_TICKS 25					// 25=250ms. RTC ticks are ~10ms each
+#define SW_DEGLITCH_TICKS 5				// 3=30ms
 
 // switch modes
 #define SW_HOMING_BIT 0x01

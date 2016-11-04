@@ -111,9 +111,10 @@ void keyboard_task(void)
 #else
 #define KEY_DEBOUNCE 10
 #define KEY_DEBOUNCE_DLYMS 2
+
 void keyboard_task(void)
 {
-	uint8_t key_buf[3][10];
+	uint8_t key_buf[3][20];
 	uint8_t colPressed = 0xff;
 	uint32_t key = 0;
 	uint32_t key_old = 0;

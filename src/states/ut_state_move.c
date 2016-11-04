@@ -296,10 +296,10 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 		{
 			iif_func_zdown();
 		}
-		if ((keyEntry & KEY_ENTER) == KEY_ENTER)
-		{
-			iif_func_enter();
-		}
+//		if ((keyEntry & KEY_ENTER) == KEY_ENTER)
+//		{
+//			iif_func_enter();
+//		}
 
 		/* Check which key */
 		switch (keyEntry)
@@ -309,6 +309,10 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 			iif_func_esc();
 			intepreterRunning = false;
 			return STATE_CONFIG_MANUAL_MODE;
+
+		case KEY_ENTER:
+			iif_func_enter();
+			break;
 
 		case KEY_RELEASED:
 			iif_func_released();
@@ -646,6 +650,8 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 	/* Clear display */
 	updatePosition(DESLOCA);
 	gTitle = DESLOCA;
+	strcpy(gStrDesloca[0],DEFAULT_DESCOLA_TITLE);
+	strcpy(gStrDesloca[1],DEFAULT_AVISO_DESLOCA);
 	iif_bind_deslocar();
 	swTimers[AUTO_MENU_TIMER] = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
@@ -702,8 +708,12 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 				{
 					lstop = false;
 					iif_bind_filerunning_stop(lstop);
-					strcpy(gStrAuto[0],DEFAULT_DESCOLA_TITLE);
-					strcpy(gStrAuto[1],DEFAULT_AVISO_DESLOCA);
+					strcpy(gStrDesloca[0],DEFAULT_DESCOLA_TITLE);
+					strcpy(gStrDesloca[1],DEFAULT_AVISO_DESLOCA);
+					if(isDwell == true)
+					{
+						st_command_dwell(DWELL_RESTART);
+					}
 					cm_request_cycle_start();
 				}
 				break;
@@ -716,13 +726,23 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 				uint32_t *value = configsVar->value;
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 				if(cm.machine_state != MACHINE_PROGRAM_END){
-					cm_request_feedhold();
-					configsVar->currentState = STATE_AUTO_MODE;
 					configsVar->type = UT_CONFIG_BOOL;
 					configsVar->name = "DESEJA SAIR?";
 					ut_state_config_var(pContext);
+					if (*value)
+					{
+						cm_request_feedhold();
+						cm_request_queue_flush();
+						macro_func_ptr = command_idle;
+						intepreterRunning = false;
+						return (ut_state)pContext->value[0];
+					}
+					else
+					{
+						xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
+					}
 				}
-				if(*value || cm.machine_state == MACHINE_PROGRAM_END){
+				if(cm.machine_state == MACHINE_PROGRAM_END){
 					iif_bind_idle();
 					ut_lcd_output_warning("COMANDO\nFINALIZADO\n");
 					keyEntry = 0;
@@ -736,6 +756,8 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 			}
 			if(!lstop){
 				lstop = true;
+				strcpy(gStrDesloca[0],STOP_AUTO_TITLE);
+				strcpy(gStrDesloca[1],DEFAULT_AVISO_DESLOCA);
 				warm_stop(0);
 			}
 			break;
