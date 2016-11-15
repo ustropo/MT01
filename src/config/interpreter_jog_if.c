@@ -116,6 +116,7 @@ void iif_bind_jog(void)
 {
 	JogkeyPressed = 0;
 	xPress = 0;
+	state = 0;
 	jogMaxDistance[AXIS_X] = 0;
 	jogMaxDistance[AXIS_Y] = 0;
 	jogMaxDistance[AXIS_Z] = 0;

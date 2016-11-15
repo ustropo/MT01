@@ -246,13 +246,13 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 			}
 			break;
 		case CONFIG_AUTO_DESLOCAR_ZERO:
-			if ((mp_get_runtime_absolute_position(0) == AXIS_X) && (mp_get_runtime_absolute_position(AXIS_Y) == 0)	)
-			{
-				ut_lcd_output_warning("MÁQUINA\nESTÁ NO\nZERO PEÇA\n");
-				/* Delay */
-				vTaskDelay(1000 / portTICK_PERIOD_MS);
-				return STATE_CONFIG_AUTO_MODE;
-			}
+//			if ((mp_get_runtime_absolute_position(0) == AXIS_X) && (mp_get_runtime_absolute_position(AXIS_Y) == 0)	)
+//			{
+//				ut_lcd_output_warning("MÁQUINA\nESTÁ NO\nZERO PEÇA\n");
+//				/* Delay */
+//				vTaskDelay(1000 / portTICK_PERIOD_MS);
+//				return STATE_CONFIG_AUTO_MODE;
+//			}
 			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
 			if(delay_esc(2000) == KEY_ESC)
 			{

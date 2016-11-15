@@ -365,6 +365,7 @@ void emergencia_task(void)
 		    	else
 		    	{
 		    		sprintf(Str,"MODO DE EMERGÊNCIA\nPARADO LINHA\n%d\n",currentLine);
+		  //  		isCuttingSet(true);
 		    	}
 		    	ut_lcd_output_warning(Str);
 				while(keyEntry != KEY_ESC){

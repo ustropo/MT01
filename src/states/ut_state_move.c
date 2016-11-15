@@ -710,10 +710,10 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 					iif_bind_filerunning_stop(lstop);
 					strcpy(gStrDesloca[0],DEFAULT_DESCOLA_TITLE);
 					strcpy(gStrDesloca[1],DEFAULT_AVISO_DESLOCA);
-					if(isDwell == true)
-					{
-						st_command_dwell(DWELL_RESTART);
-					}
+//					if(isDwell == true)
+//					{
+//						st_command_dwell(DWELL_RESTART);
+//					}
 					cm_request_cycle_start();
 				}
 				break;
@@ -731,6 +731,10 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 					ut_state_config_var(pContext);
 					if (*value)
 					{
+//						if(isDwell == true)
+//						{
+//							st_command_dwell(DWELL_EXIT);
+//						}
 						cm_request_feedhold();
 						cm_request_queue_flush();
 						macro_func_ptr = command_idle;
