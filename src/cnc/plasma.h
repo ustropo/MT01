@@ -35,5 +35,7 @@ bool arcoOkGet(void);
 float THC_realGet(void);
 void delay_thcSet(uint16_t state);
 uint16_t delay_thcGet(void);
+void stopDuringCut_Set(bool state);
+bool stopDuringCut_Get(void);
 
 #endif /* CNC_PLASMA_H_ */

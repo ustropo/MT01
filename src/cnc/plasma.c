@@ -52,6 +52,7 @@ extern void warm_stop(uint8_t flag);
 extern bool simTorch;
 extern bool lstop;
 
+static bool stopDuringCut = false;
 static bool isCutting = false;
 static bool arcoOk = false;
 static uint16_t delay_thc = 0;
@@ -285,7 +286,6 @@ void plasma_task(void)
 
 	while(1)
 	{
-		arcoOkSet(false);
         ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
         ArcoOktaskIdle = true;
         debounce = 0;
@@ -324,6 +324,7 @@ void plasma_task(void)
 				}while(debounce != ARCOOK_DELAY_COUNT && isCutting && ArcoOktaskIdle);
 				if (isCutting && ArcoOktaskIdle)
 				{
+					stopDuringCut_Set(true);
 					qSend = ARCO_OK_FAILED;
 					macro_func_ptr = command_idle;
 					xQueueSend( qKeyboard, &qSend, 0 );
@@ -355,6 +356,10 @@ void emergencia_task(void)
 			{
 				emergenciaFlag = true;
 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+	    		if (isCuttingGet() == true)
+	    		{
+	    			stopDuringCut_Set(true);
+	    		}
 				TORCH = FALSE;
 				//cm_spindle_control(SPINDLE_OFF);
 	    		lstop = true;
@@ -365,7 +370,6 @@ void emergencia_task(void)
 		    	else
 		    	{
 		    		sprintf(Str,"MODO DE EMERGÊNCIA\nPARADO LINHA\n%d\n",currentLine);
-		  //  		isCuttingSet(true);
 		    	}
 		    	ut_lcd_output_warning(Str);
 				while(keyEntry != KEY_ESC){
@@ -374,6 +378,7 @@ void emergencia_task(void)
 				}
 				keyEntry = EMERGENCIA_SIGNAL;
 				xQueueSend( qKeyboard, &keyEntry, 0 );
+				macro_func_ptr = command_idle;
 				realease = true;
 				emergencyCount = 0;
 			}
@@ -384,6 +389,17 @@ void emergencia_task(void)
 void timer_motorPower_callback(void *pdata)
 {
 	PWMCH ^= 1;
+	if (TORCH == TRUE)
+	{
+		if (arcoOkGet() == true)
+		{
+			isCuttingSet(true);
+		}
+	}
+	else
+	{
+		isCuttingSet(false);
+	}
 	if(delay_thcStart){
 		if (delay_thc == 0xFFFF)
 		{
@@ -440,4 +456,15 @@ uint16_t delay_thcGet(void)
 {
 	return delay_thc;
 }
+
+void stopDuringCut_Set(bool state)
+{
+	stopDuringCut = state;
+}
+
+bool stopDuringCut_Get(void)
+{
+	return stopDuringCut;
+}
+
 

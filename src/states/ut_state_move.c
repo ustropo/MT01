@@ -360,6 +360,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	cm.gmx.feed_rate_override_enable = true;
 	cm.gmx.feed_rate_override_factor = 1;
 	programEnd = false;
+	stopDuringCut_Set(false);
 	cm.machine_state = MACHINE_READY;
 	/* Clear display */
 	if(!sim){
@@ -446,10 +447,10 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				if (arco == ARCO_OK_OFF || (statePrevious == EMERGENCIA_SIGNAL && ltorchBuffer == TRUE))
 				{
 					arco = 0;
-					if(isCuttingGet())
+					if(stopDuringCut_Get())
 					{
 						state = 0;
-						isCuttingSet(false);
+	//					isCuttingSet(false);
 //						isCuttingSet(true);
 //						pl_arcook_start();
 				//		cm_set_feed_rate(configVarPl[PL_CONFIG_VELOC_CORTE]);
@@ -490,7 +491,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 						simTorch = false;
 						if(configFlags[MODOMAQUINA] == MODO_PLASMA){
 							pl_arcook_start();
-							isCuttingSet(true);
+					//		isCuttingSet(true);
 						}
 					}
 				}
@@ -534,7 +535,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					state = 0;
 					cm.cycle_state = CYCLE_OFF;
 					pl_arcook_stop();
-					isCuttingSet(false);
+			//		isCuttingSet(false);
 					iif_bind_idle();
 					cm.gmx.feed_rate_override_enable = true;
 					cm.gmx.feed_rate_override_factor = 1;

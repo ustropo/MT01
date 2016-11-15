@@ -47,14 +47,14 @@ void iif_enter_jog(void)
 	if(!torchEnable)
 	{
 	//	cm_spindle_control(SPINDLE_CW);
-		isCuttingSet(true);
+	//	isCuttingSet(true);
 		TORCH = TRUE;
 		torchEnable = true;
 	}
 	else
 	{
 	//	cm_spindle_control(SPINDLE_OFF);
-		isCuttingSet(false);
+	//	isCuttingSet(false);
 		TORCH = FALSE;
 		torchEnable = false;
 	}

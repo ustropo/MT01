@@ -114,7 +114,7 @@ stat_t M3_Macro(void)
 						}
 						else
 						{
-							isCuttingSet(true);
+				//			isCuttingSet(true);
 						}
 					}
 					state++; break;
@@ -295,7 +295,7 @@ stat_t M4_Macro(void)
 						}
 						else
 						{
-							isCuttingSet(true);
+				//			isCuttingSet(true);
 						}
 					}
 					state++; break;
@@ -583,13 +583,13 @@ stat_t arcoOK_Macro(void)
 						xQueueSend( qKeyboard, &qSend, 0 );
 						macro_func_ptr = command_idle;
 						xMacroArcoOkSync = false;
-						isCuttingSet(true);
+			//			isCuttingSet(true);
 						return (STAT_OK);
 					}
 					else
 					{
 						cm_request_cycle_start();
-						isCuttingSet(true);
+						stopDuringCut_Set(false);
 					}
 					state++;
 					break;

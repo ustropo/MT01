@@ -147,7 +147,7 @@ static void _exec_spindle_control(float *value, float *flag)
 //		simTorch = false;
 	} else {
 		pl_arcook_stop();
-		isCuttingSet(false);
+//		isCuttingSet(false);
 		TORCH = FALSE;
 		simTorch = false;
 	}
