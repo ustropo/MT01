@@ -84,7 +84,7 @@ void initOx(void)
 
 	/* Zero all values */
 	memset(configsOx, 0, sizeof(configsOx));
-
+	eepromReadConfig(CONFIGVAR_OX);
 	/* Initialize all variables */
 	for(i = 0; i < OX_CONFIG_MAX; i++)
 	{

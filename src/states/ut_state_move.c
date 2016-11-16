@@ -447,7 +447,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				if (arco == ARCO_OK_OFF || (statePrevious == EMERGENCIA_SIGNAL && ltorchBuffer == TRUE))
 				{
 					arco = 0;
-					if(stopDuringCut_Get())
+					if(stopDuringCut_Get() && cm.probe_state != PROBE_WAITING)
 					{
 						state = 0;
 	//					isCuttingSet(false);
@@ -551,7 +551,32 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					currentLine = 0;
 					zinhibitor = false;
 					if (programEnd)
+					{
+						if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+						{
+							float temp[PL_CONFIG_MAX];
+							memcpy(temp,configVarPl,sizeof(configVarPl));
+							eepromReadConfig(CONFIGVAR_PL);
+							if(memcmp(configVarPl,temp,sizeof(configVarPl)) != 0)
+							{
+								memcpy(configVarPl,temp,sizeof(configVarPl));
+								eepromWriteConfig(CONFIGVAR_PL);
+							}
+						}
+						else
+						{
+							float temp[OX_CONFIG_MAX];
+							memcpy(temp,configVarOx,sizeof(configVarOx));
+							eepromReadConfig(CONFIGVAR_OX);
+							if(memcmp(configVarOx,temp,sizeof(configVarOx)) != 0)
+							{
+								memcpy(configVarOx,temp,sizeof(configVarPl));
+								eepromWriteConfig(CONFIGVAR_OX);
+							}
+						}
 						return STATE_MANUAL_MODE;
+					}
+
 					return STATE_CONFIG_AUTO_MODE;
 				}
 				else

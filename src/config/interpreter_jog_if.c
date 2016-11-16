@@ -133,7 +133,7 @@ void iif_bind_jog(void)
 	iif_func_cycleStop = &iif_idle;
 }
 
-#define MULTI_A 0.00015
+#define MULTI_A 2*0.00015
 #define NUM_B 0
 #define ZMULTI_A 0.000008
 #define ZNUM_B 0

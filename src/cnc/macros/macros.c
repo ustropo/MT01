@@ -77,13 +77,9 @@ stat_t M3_Macro(void)
 					state++; break;
 
 				/*  2- Zera o eixo Z com G28.3 Z0*/
-			case 1: if(configFlags[MODOMAQUINA] == MODO_PLASMA){
-
-						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
-						SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
-						SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
-
-					}
+			case 1: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+					SET_NON_MODAL_MACRO(next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
+					SET_NON_MODAL_MACRO(target[AXIS_Z], 0);
 					state++; break;
 
 					/* 3- Posiciona o eixo Z para "ALTURA DE PERFURAÇÃO" */

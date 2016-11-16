@@ -84,7 +84,7 @@ void initPl(void)
 
 	/* Zero all values */
 	memset(configsPl, 0, sizeof(configsPl));
-
+	eepromReadConfig(CONFIGVAR_PL);
 	/* Initialize all variables */
 	for(i = 0; i < PL_CONFIG_MAX; i++)
 	{

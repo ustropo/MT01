@@ -360,6 +360,7 @@ void emergencia_task(void)
 	    		{
 	    			stopDuringCut_Set(true);
 	    		}
+
 				TORCH = FALSE;
 				//cm_spindle_control(SPINDLE_OFF);
 	    		lstop = true;
