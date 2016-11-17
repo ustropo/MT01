@@ -37,6 +37,7 @@ Includes   <System Includes> , "Project Includes"
 #include "config.h"		// #2
 #include "hardware.h"
 #include "r_cmt_rx_if.h"
+#include "r_lvd_rx_if.h"
 #include "eeprom.h"
 #include "config_SwTimers.h"
 /* Flash Loader project includes. */
@@ -98,6 +99,13 @@ Return value    : none
 ******************************************************************************/
 void main(void)
 {
+	lvd_err_t err;
+	lvd_config_t channel1_cfg;
+	channel1_cfg.e_action = LVD_ACTION_RESET;
+	channel1_cfg.e_trigger = LVD_TRIGGER_FALL;
+	channel1_cfg.e_voltage_level =LVD_VOLTAGE_CH1_2_95;
+	err = R_LVD_Open(LVD_CHANNEL_1, &channel1_cfg, NULL);
+
 	bool ret = false;
 	/* Reserve the CMT0 for FreeRTOS */
 	ret = R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_CMT0));

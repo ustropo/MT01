@@ -726,10 +726,11 @@ static stat_t _exec_aline_segment()
 		for (i=0; i<AXES; i++) {
 			mr.gm.target[i] = mr.position[i] + (mr.unit[i] * segment_length);
 		}
-		if(!configFlags[MODOMAQUINA] && isCuttingGet()){
+		if((configFlags[MODOMAQUINA] == MODO_PLASMA) && isCuttingGet() == true){
 			zmove = pl_thc_pid();
 		}
-		if(!configFlags[MODOMAQUINA] && !isCuttingGet() && !sim){
+	//	if((configFlags[MODOMAQUINA] == MODO_PLASMA) && isCuttingGet() == false && !sim){
+		if((configFlags[MODOMAQUINA] == MODO_PLASMA) && isCuttingGet() == false && sim == false){
 			zmove = 0;
 		}
 		if(zmove != 0)
@@ -737,12 +738,20 @@ static stat_t _exec_aline_segment()
 			if (fp_ZERO(mr.unit[2]))
 			{
 				mr.gm.target[2] += zmove;
+				/* Não corrigir a mais que 50 mm*/
+				if (mr.gm.target[2] > 50.0)
+				{
+					mr.gm.target[2] = 50.0;
+				}
 				/* Se a correçao do THC fizer o target do eixo Z maior que a altura de deslocamento
 				 * a altura de deslocamento será igual a correção*/
 				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+				{
 					configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] = fmax(mr.gm.target[2],configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO]);
 
-				zmovedlenght += zmove;
+				}
+
+				zmovedlenght = mr.gm.target[2];
 				//mp_set_planner_position(2, mr.gm.target[2]);
 				mr.waypoint[SECTION_HEAD][2] = mr.gm.target[2];
 				mr.waypoint[SECTION_BODY][2] = mr.gm.target[2];

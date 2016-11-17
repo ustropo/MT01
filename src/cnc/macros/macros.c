@@ -52,13 +52,17 @@ extern struct gcodeParserSingleton gp;
 stat_t M3_Macro(void)
 {
 	float tempo;
+	/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
+	if (cm_get_runtime_busy() == true) { return (STAT_EAGAIN);}	// sync to planner move ends
+
 	macro_buffer = M3_Macro;
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
 	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
 	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
-
+	/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
+	if (cm_get_runtime_busy() == true) { return (STAT_EAGAIN);}	// sync to planner move ends
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
@@ -230,6 +234,9 @@ stat_t M3_Macro(void)
 stat_t M4_Macro(void)
 {
 	float tempo;
+	/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
+	if (cm_get_runtime_busy() == true) { return (STAT_EAGAIN);}	// sync to planner move ends
+
 	macro_buffer = M4_Macro;
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
@@ -318,6 +325,8 @@ stat_t M4_Macro(void)
 
 stat_t M5_Macro(void)
 {
+	/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
+	if (cm_get_runtime_busy() == true) { return (STAT_EAGAIN);}	// sync to planner move ends
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
@@ -586,6 +595,7 @@ stat_t arcoOK_Macro(void)
 					{
 						cm_request_cycle_start();
 						stopDuringCut_Set(false);
+						delay_thcStartStop(true);
 					}
 					state++;
 					break;

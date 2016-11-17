@@ -145,12 +145,12 @@ char** selecionarLinhatexto(void)
 
 void linhaSelecionada(uint32_t flag)
 {
-	if(flag)
+	if(flag == 1)
 	{
 		choosedLine = lineEntries[1];
 		choosedLinePosition = LinePositionEntries[1];
 	}
-	else
+	else if(flag == 0)
 	{
 		choosedLine = lineEntries[0];
 		choosedLinePosition = LinePositionEntries[0];

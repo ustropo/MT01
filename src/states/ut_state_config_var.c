@@ -62,6 +62,12 @@ static char* boolJogMaq[2] =
 	"OXICORTE"
 };
 
+static char* boolSim[2] =
+{
+	"SIMULAÇÃO",
+	"AUTOMÁTICO"
+};
+
 
 /**
  * Config boolean variable
@@ -98,6 +104,10 @@ void config_bool(ut_config_var* var)
 				case CONFIG_AUTO_SELECIONAR_LINHA:
 					boolStr = selecionarLinhatexto();
 				break;
+				case CONFIG_AUTO_MODO_SIM_RUN:
+					value = var->value;
+					boolStr = boolSim;
+				break;
 				default: break;
 			}
 			break;
@@ -125,7 +135,8 @@ void config_bool(ut_config_var* var)
 
 	/* Check if user selected a valid entry */
 	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0){
-		*value = 0;
+
+		*value = 0xFF;
 		return;
 	}
 	*value = menu.selectedItem;
@@ -250,6 +261,13 @@ void config_int(ut_config_var* var)
 			*value = Buffervalue;
 			mult = 1;
 			count = 0;
+			if(configsVar->currentState == STATE_CONFIG_AUTO_MODE)
+			{
+				if(configsVar->currentItem == CONFIG_AUTO_SELECIONAR_LINHA)
+				{
+					configsVar->type = UT_CONFIG_INT;
+				}
+			}
 			return;
 
 		case KEY_RELEASED:
@@ -335,15 +353,28 @@ ut_state ut_state_config_var(ut_context* pContext)
 					}
 					break;
 				case CONFIG_AUTO_SELECIONAR_LINHA:
-					if(configsVar->type == UT_CONFIG_BOOL){
-					var_handlers[configsVar->type](configsVar);
-					linhaSelecionada(*Flag);
-					}
-					else
-					{
-						ut_lcd_output_warning("NENHUM PONTO\nDE ENTRADA\nENCONTRADO\n");
-						vTaskDelay(2000 / portTICK_PERIOD_MS);
-					}
+					do{
+						if(configsVar->type == UT_CONFIG_BOOL){
+							var_handlers[configsVar->type](configsVar);
+							if (*Flag == 0xFF)
+							{
+								configsVar->type = UT_CONFIG_INT;
+								var_handlers[configsVar->type](configsVar);
+								*Flag = 0xFF;
+								if(configsVar->type == UT_CONFIG_INT)
+								{
+									ut_lcd_output_warning("NENHUM PONTO\nDE ENTRADA\nSELECIONADO\n");
+									vTaskDelay(2000 / portTICK_PERIOD_MS);
+								}
+							}
+						linhaSelecionada(*Flag);
+						}
+						else
+						{
+							ut_lcd_output_warning("NENHUM PONTO\nDE ENTRADA\nSELECIONADO\n");
+							vTaskDelay(2000 / portTICK_PERIOD_MS);
+						}
+					}while(*Flag == 0xFF && configsVar->type == UT_CONFIG_BOOL);
 					break;
 				}
 			break;
@@ -354,7 +385,6 @@ ut_state ut_state_config_var(ut_context* pContext)
 				if(*Flag == 1)
 				{
 					stateBack = (ut_state)pContext->value[1];
-					sim = false;
 				}
 				break;
 			}

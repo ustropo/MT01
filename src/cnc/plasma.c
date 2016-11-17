@@ -360,11 +360,11 @@ void emergencia_task(void)
 	    		{
 	    			stopDuringCut_Set(true);
 	    		}
-
+				warm_stop(2);
 				TORCH = FALSE;
 				//cm_spindle_control(SPINDLE_OFF);
 	    		lstop = true;
-				warm_stop(2);
+
 		    	if (currentLine == 0){
 		    		strcpy(Str,"MODO DE EMERGÊNCIA\n");
 		    	}
@@ -379,7 +379,7 @@ void emergencia_task(void)
 				}
 				keyEntry = EMERGENCIA_SIGNAL;
 				xQueueSend( qKeyboard, &keyEntry, 0 );
-				macro_func_ptr = command_idle;
+			//	macro_func_ptr = command_idle;
 				realease = true;
 				emergencyCount = 0;
 			}

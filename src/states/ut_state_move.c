@@ -128,8 +128,8 @@ static void updatePosition(uint8_t menu)
 	{
 		case MANUAL: lStr[0] = gStrManual[0];
 					 lStr[1] = gStrManual[1];
-			//         sprintf(gStrManual[2], "VEL.: %.0f mm/min", *velocidadeJog);
-			         sprintf(gStrManual[2], "VEL.: %.0f mm/min", mp_get_runtime_velocity());
+			         sprintf(gStrManual[2], "VEL.: %.0f mm/min", *velocidadeJog);
+			  //       sprintf(gStrManual[2], "VEL.: %.0f mm/min", mp_get_runtime_velocity());
 
 			         lStr[2] = gStrManual[2];
                      if (arcoOkGet())
@@ -352,6 +352,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	uint32_t arco = 0;
 //	stepper_init();
 	restart_stepper();
+	eepromReadConfig(CONFIGVAR_MAQ);
 	if (configFlags[MODOMAQUINA] == MODO_PLASMA)
 		eepromReadConfig(CONFIGVAR_PL);
 	else
@@ -444,37 +445,71 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				{
 					st_command_dwell(DWELL_RESTART);
 				}
-				if (arco == ARCO_OK_OFF || (statePrevious == EMERGENCIA_SIGNAL && ltorchBuffer == TRUE))
+	//			if (arco == ARCO_OK_OFF || (statePrevious == EMERGENCIA_SIGNAL && ltorchBuffer == TRUE))
+				if (configFlags[MODOMAQUINA] ==  MODO_PLASMA)
 				{
-					arco = 0;
-					if(stopDuringCut_Get() && cm.probe_state != PROBE_WAITING)
+					if (arco == ARCO_OK_OFF || ltorchBuffer == TRUE)
 					{
-						state = 0;
-	//					isCuttingSet(false);
-//						isCuttingSet(true);
-//						pl_arcook_start();
-				//		cm_set_feed_rate(configVarPl[PL_CONFIG_VELOC_CORTE]);
-						xMacroArcoOkSync = true;
+						arco = 0;
+						if(stopDuringCut_Get() && cm.probe_state != PROBE_WAITING)
+						{
+							state = 0;
+		//					isCuttingSet(false);
+	//						isCuttingSet(true);
+	//						pl_arcook_start();
+					//		cm_set_feed_rate(configVarPl[PL_CONFIG_VELOC_CORTE]);
+							xMacroArcoOkSync = true;
+						}
+						else
+						{
+							simTorch = false;
+							macro_func_ptr = macro_buffer;
+							iif_func_enter();
+						}
+						TORCH = ltorchBuffer;
+					}
+					else{
+						iif_func_enter();
+						TORCH = ltorchBuffer;
+					}
+				}
+				else /* configFlags[MODOMAQUINA] ==  MODO_PLASMA */
+				{
+					/* se estiver simulando*/
+					if (sim == true)
+					{
+						uint32_t *value = configsVar->value;
+						xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+						configsVar->currentItem = CONFIG_AUTO_MODO_SIM_RUN;
+						configsVar->type = UT_CONFIG_BOOL;
+						configsVar->name = "DESEJA IR PARA:";
+						ut_state_config_var(pContext);
+						xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
+						iif_func_enter();
+						if(*value == true)
+						{
+							gTitle = AUTO;
+							sim = false;
+							if (simTorch)
+							{
+								TORCH = TRUE;
+							}
+						}
 					}
 					else
 					{
-						simTorch = false;
-						macro_func_ptr = macro_buffer;
 						iif_func_enter();
 					}
 				}
-				else{
-					iif_func_enter();
-				}
-				TORCH = ltorchBuffer;
-				if(sim && configFlags[MODOMAQUINA] == MODO_OXICORTE){
-					gTitle = AUTO;
-					sim = false;
-					if (simTorch)
-					{
-						TORCH = TRUE;
-					}
-				}
+			//	TORCH = ltorchBuffer;
+//				if(sim && configFlags[MODOMAQUINA] == MODO_OXICORTE){
+//					gTitle = AUTO;
+//				//	sim = false;
+//					if (simTorch)
+//					{
+//						TORCH = TRUE;
+//					}
+//				}
 			}
 			else
 			{
@@ -491,7 +526,9 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 						simTorch = false;
 						if(configFlags[MODOMAQUINA] == MODO_PLASMA){
 							pl_arcook_start();
-					//		isCuttingSet(true);
+							/* Necessario para ligar o THC */
+							delay_thcStartStop(true);
+							isCuttingSet(true);
 						}
 					}
 				}
@@ -552,8 +589,19 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					zinhibitor = false;
 					if (programEnd)
 					{
+						/* Compara a altura de deslocamento co a nova altura corrigida, se for diferente grava na Flash*/
+						float temp1;
+						temp1 =  configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
+						eepromReadConfig(CONFIGVAR_MAQ);
+						if (temp1 != configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO])
+						{
+							configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] = temp1;
+							eepromWriteConfig(CONFIGVAR_MAQ);
+						}
+
 						if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 						{
+							/* Compara os parametros de plasma com o corrigido durante o processo, se for diferente grava na Flash*/
 							float temp[PL_CONFIG_MAX];
 							memcpy(temp,configVarPl,sizeof(configVarPl));
 							eepromReadConfig(CONFIGVAR_PL);
@@ -565,6 +613,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 						}
 						else
 						{
+							/* Compara os parametros de oxi com o corrigido durante o processo, se for diferente grava na Flash*/
 							float temp[OX_CONFIG_MAX];
 							memcpy(temp,configVarOx,sizeof(configVarOx));
 							eepromReadConfig(CONFIGVAR_OX);
@@ -595,6 +644,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				}
 				else
 				{
+					stopDuringCut_Set(true);
 					lstop = true;
 					warm_stop(0);
 				}
@@ -843,7 +893,7 @@ void warm_stop(uint8_t flag)
 			WDT_FEED
 		}
 	}
-	if (flag == 0)
+	if (flag != 1)
 	{
 		ltorchBuffer = TORCH;
 		TORCH = FALSE;
