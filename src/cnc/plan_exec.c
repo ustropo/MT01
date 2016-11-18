@@ -748,7 +748,12 @@ static stat_t _exec_aline_segment()
 				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 				{
 					configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] = fmax(mr.gm.target[2],configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO]);
-
+				}
+				else
+				{
+					configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] = fmax(mr.gm.target[2],configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO]);
+					/* Atualizando a altura de corte*/
+					configVarOx[OX_CONFIG_ALTURA_CORTE] = mr.gm.target[2];
 				}
 
 				zmovedlenght = mr.gm.target[2];

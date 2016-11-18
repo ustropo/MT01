@@ -42,8 +42,9 @@ typedef enum
 	CONFIG_AUTO_DESLOCAR_ZERO,
 	CONFIG_AUTO_SELECIONAR_LINHA,
 	CONFIG_AUTO_TESTAR_TAMANHO_PECA,
-	CONFIG_AUTO_MODO_SIM_RUN,
-	CONFIG_AUTO_MAX
+	CONFIG_AUTO_MAX,
+	/*Melhorar esta implementação */
+	CONFIG_AUTO_MODO_SIM_RUN
 } ut_config_auto_name;
 
 typedef enum

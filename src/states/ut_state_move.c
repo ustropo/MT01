@@ -499,9 +499,10 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					else
 					{
 						iif_func_enter();
+						TORCH = ltorchBuffer;
 					}
 				}
-			//	TORCH = ltorchBuffer;
+			//
 //				if(sim && configFlags[MODOMAQUINA] == MODO_OXICORTE){
 //					gTitle = AUTO;
 //				//	sim = false;
