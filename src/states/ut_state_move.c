@@ -540,12 +540,14 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			if (programEnd || lstop){
 				uint32_t *value = configsVar->value;
 				if(!programEnd){
-					cm_request_feedhold();
-					xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
-					configsVar->currentState = STATE_AUTO_MODE;
-					configsVar->type = UT_CONFIG_BOOL;
-					configsVar->name = "DESEJA SAIR?";
-					ut_state_config_var(pContext);
+				//	cm_request_feedhold();
+						xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+						iif_bind_idle();
+						configsVar->currentState = STATE_AUTO_MODE;
+						configsVar->type = UT_CONFIG_BOOL;
+						configsVar->name = "DESEJA SAIR?";
+						ut_state_config_var(pContext);
+						iif_bind_filerunning();
 				}
 				if(*value || programEnd){
 //					xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
@@ -632,7 +634,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				else
 				{
 					xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
-					warm_stop(1);
+		//			warm_stop(1);
 				}
 
 			}
