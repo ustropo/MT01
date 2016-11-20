@@ -482,7 +482,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 						xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 						configsVar->currentItem = CONFIG_AUTO_MODO_SIM_RUN;
 						configsVar->type = UT_CONFIG_BOOL;
-						configsVar->name = "DESEJA IR PARA:";
+						configsVar->name = "CONTINUAR COMO?";
 						ut_state_config_var(pContext);
 						xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 						iif_func_enter();

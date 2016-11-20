@@ -15,6 +15,8 @@ typedef enum
 {
 	MODOMAQUINA = 0,	//!< Flag do modo de funcinamento da maquina
 	VEL_THC,			//!< Flag da velocidade do THC
+	KERF,				//!< Kerf
+	MERGULHO,			//!< Mergulho
 	FLAG_MAX            //!< CONFIG_MAX
 } flag_name;
 
@@ -37,6 +39,11 @@ enum{
 enum{
 	MODO_PLASMA = 0,      //!< modo plasma
 	MODO_OXICORTE,        //!< modo Oxicorte
+};
+
+enum{
+	DESABILITADO = 0,      //!<
+	HABILITADO,        //!<
 };
 
 extern float configVarOx[OX_CONFIG_MAX];

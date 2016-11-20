@@ -228,7 +228,13 @@ stat_t mp_exec_aline(mpBuf_t *bf)
 
 	// Feedhold processing. Refer to canonical_machine.h for state machine
 	// Catch the feedhold request and start the planning the hold
-	if (cm.hold_state == FEEDHOLD_SYNC) { cm.hold_state = FEEDHOLD_PLAN;}
+	if (cm.hold_state == FEEDHOLD_SYNC) {
+		if (zmoved)
+		{
+			mr.target[AXIS_Z] = mr.gm.target[AXIS_Z];
+		}
+		cm.hold_state = FEEDHOLD_PLAN;
+	}
 
 	// Look for the end of the decel to go into HOLD state
 	if ((cm.hold_state == FEEDHOLD_DECEL) && (status == STAT_OK)) {

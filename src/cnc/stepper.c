@@ -753,7 +753,8 @@ void timer_dwell_callback(void *pdata)
 			mr.gm.target[AXIS_Z] += step;
 
 		mp_set_runtime_position(AXIS_Z,mr.gm.target[AXIS_Z]);
-		zmoved = true;
+		if(step != 0)
+			zmoved = true;
 		refresh = 0;
 		step = 0;
 	}

@@ -35,6 +35,7 @@ uint32_t linenumMacro;
 extern bool sim;
 extern bool intepreterRunning;
 extern float zeroPiecebuffer[3];
+extern bool lstop;
 bool xMacroArcoOkSync = false;
 
 stat_t (*macro_func_ptr)(void);
@@ -325,10 +326,11 @@ stat_t M4_Macro(void)
 
 stat_t M5_Macro(void)
 {
-	/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
-	if (cm_get_runtime_busy() == true) { return (STAT_EAGAIN);}	// sync to planner move ends
+
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
+		/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
+		if (cm_get_runtime_busy() == true ) { return (STAT_EAGAIN);}	// sync to planner move ends
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
 		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
@@ -338,6 +340,8 @@ stat_t M5_Macro(void)
 	}
 	else
 	{
+		/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
+		if (cm_get_runtime_busy() == true  || lstop == true) { return (STAT_EAGAIN);}	// sync to planner move ends
 		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
 		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];

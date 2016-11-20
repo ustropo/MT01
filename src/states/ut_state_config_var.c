@@ -65,7 +65,13 @@ static char* boolJogMaq[2] =
 static char* boolSim[2] =
 {
 	"SIMULAÇÃO",
-	"AUTOMÁTICO"
+	"MODO CORTE AUTO"
+};
+
+static char* boolEn[2] =
+{
+	"DESABILITAR",
+	"HABILITAR"
 };
 
 
@@ -122,6 +128,12 @@ void config_bool(ut_config_var* var)
 				default: break;
 			}
 			break;
+		case STATE_CONFIG_MAQUINA_THC:
+			Recordflag =true;
+			value = var->value;
+			boolStr = boolEn;
+			break;
+
 		default: break;
 	}
 	 menu.title = var->name;
@@ -135,8 +147,17 @@ void config_bool(ut_config_var* var)
 
 	/* Check if user selected a valid entry */
 	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0){
-
-		*value = 0xFF;
+		switch(configsVar->currentState)
+		{
+			case STATE_CONFIG_AUTO_MODE:
+					switch(configsVar->currentItem)
+					{
+						case CONFIG_AUTO_SELECIONAR_LINHA:
+							*value = 0xFF;
+						break;
+					}
+			break;
+		}
 		return;
 	}
 	*value = menu.selectedItem;

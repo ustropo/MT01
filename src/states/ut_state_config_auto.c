@@ -206,19 +206,29 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 				temp = pvPortMalloc( 30*MAX_ROW);
 				memset(temp,NULL,30*MAX_ROW);
 				pstr = temp;
-				snprintf(&pstr[30*1],30, "NOME:%s",fileStat.name);
+				snprintf(&pstr[30*1],30, "Nome:%s",fileStat.name);
 				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 				{
 					eepromReadConfig(CONFIGVAR_PL);
 					snprintf(&pstr[0],30, "    MODO PLASMA     ");
-					snprintf(&pstr[30*2],30, "VEL. CORTE: %.0f mm/min",configVarPl[PL_CONFIG_VELOC_CORTE]);
-					snprintf(&pstr[30*3],30, "TENSÃO THC: %.0f V",configVarPl[PL_CONFIG_TENSAO_THC]);
+					snprintf(&pstr[30*2],30, "Vel. corte: %.0f mm/min",configVarPl[PL_CONFIG_VELOC_CORTE]);
+					snprintf(&pstr[30*3],30, "Tensão THC: %.0f V",configVarPl[PL_CONFIG_TENSAO_THC]);
+
+					if (configFlags[KERF] == HABILITADO)
+						snprintf(&pstr[30*4],30, "Kerf: habilitado");
+					else
+						snprintf(&pstr[30*4],30, "Kerf: desabilitado");
+
+					if (configFlags[MERGULHO] == HABILITADO)
+						snprintf(&pstr[30*5],30, "Anti mergulho:habilitado");
+					else
+						snprintf(&pstr[30*5],30, "Anti mergulho:desabilitado");
 				}
 				else
 				{
 					snprintf(&pstr[0],30, "      MODO OXI      ");
 					eepromReadConfig(CONFIGVAR_OX);
-					snprintf(&pstr[30*2],30, "VEL. CORTE: %.0f mm/min",configVarOx[OX_CONFIG_VELOC_CORTE]);
+					snprintf(&pstr[30*2],30, "Vel. corte: %.0f mm/min",configVarOx[OX_CONFIG_VELOC_CORTE]);
 				}
 				ut_lcd_drawStr(0, 0, &pstr[0], BACKGROUND_FRAMED,u8g_font_helvB08);
 				for(uiMsgRow = 1; uiMsgRow < MAX_ROW; uiMsgRow++)
@@ -230,7 +240,7 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 
 				vPortFree(temp);
 
-				if(delay_esc(2500) == KEY_ESC)
+				if(delay_esc_enter(5000) == KEY_ESC)
 				{
 					xio_close(cs.primary_src);
 					ut_lcd_output_warning("COMANDO\nCANCELADO\n");

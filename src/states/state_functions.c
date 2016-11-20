@@ -274,6 +274,24 @@ uint32_t delay_esc(uint32_t timems)
 	return keyEntry;
 }
 
+uint32_t delay_esc_enter(uint32_t timems)
+{
+	uint32_t lret;
+	uint32_t i;
+	uint32_t keyEntry = 0xFFFFFFFF;
+	i = 0;
+	xQueueReset(qKeyboard);
+	do{
+
+		lret = xQueueReceive( qKeyboard, &keyEntry, 1 / portTICK_PERIOD_MS );
+		if(lret == pdFAIL)
+		{
+			i++;
+		}
+	}while(i < timems && keyEntry != KEY_ESC && keyEntry != KEY_ENTER );
+	return keyEntry;
+}
+
 
 void idle(void *var)
 {

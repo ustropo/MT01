@@ -26,6 +26,7 @@ typedef enum
 	STATE_CONFIG_AUTO_MODE,                   //!< Funçao da tela do menu de corte automatico
 	STATE_CONFIG_MAQUINA,                     //!< Funçao da tela de da configuraçao da maquina
 	STATE_CONFIG_PARAMETROS_MAQ,              //!< Funçao da tela de parametros da maquina
+	STATE_CONFIG_MAQUINA_THC,              	  //!< Funçao da tela de parametros do thc
 	STATE_CONFIG_VAR,                         //!< Funçao da tela de manipulação de variaveis
 	STATE_MANUAL_MODE,                        //!< Funçao da tela de corte manual
 	STATE_DESLOCAZERO_MODE,                   //!< Funçao da tela de deslocar para zero
@@ -103,8 +104,16 @@ typedef enum
 	CFG_MAQUINA_ALT_DESLOCAMENTO,     //!< Altura de deslocamento
 	CFG_MAQUINA_MODOMAQUINA,          //!< Modo da maquina
 	CFG_MAQUINA_PARAMETROS,			  //!< Parametros da maquina
+	CFG_MAQUINA_PARAMETROS_THC,		  //!< Parametros de THC
 	CFG_MAQUINA_MAX        			  //!< CONFIG_MAX
 } ut_config_maquina;
+
+typedef enum
+{
+	CFG_THC_KERF,     			//!< Kerf
+	CFG_THC_MERGULHO,          //!< mergulho
+	CFG_THC_MAX        			  //!< CONFIG_MAX
+} ut_config_maquina_thc;
 
 typedef enum
 {
@@ -144,6 +153,7 @@ extern ut_state ut_state_config_par_maq(ut_context* pContext);
 extern ut_state ut_state_deslocaZero_mode(ut_context* pContext);
 extern ut_state ut_state_config_auto_menu(ut_context* pContext);
 extern ut_state ut_state_line_selection(ut_context* pContext);
+extern ut_state ut_state_config_maq_thc(ut_context* pContext);
 
 
 /**

@@ -11,6 +11,7 @@
 #include "config.h"
 #include "controller.h"
 #include "plasma.h"
+#include "planner.h"
 #include "spindle.h"
 #include "hardware.h"
 #include "switch.h"
@@ -31,7 +32,8 @@
 #define ARCOOK_DELAY_COUNT 33
 
 #define THC_HISTERESE 1.5
-#define THC_PORCENTAGE 0.25
+#define THC_KERF_PORCENTAGE 0.25
+#define THC_MERGULHO_PORCENTAGE 0.80
 #define THC_RAPIDO 0.005
 #define THC_LENTO  0.001
 #define THC_MULT  (0.000001428*1.15)
@@ -197,9 +199,19 @@ float pl_thc_pid(void)
 			{
 				result = 0;
 			}
-			if(fabs(THC_err) > configVarPl[PL_CONFIG_TENSAO_THC]*THC_PORCENTAGE)
+			if (configFlags[KERF] == HABILITADO)
 			{
-				result = 0;
+				if(fabs(THC_err) > configVarPl[PL_CONFIG_TENSAO_THC]*THC_KERF_PORCENTAGE)
+				{
+					result = 0;
+				}
+			}
+			if (configFlags[MERGULHO] == HABILITADO)
+			{
+				if(mp_get_runtime_velocity() < configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MERGULHO_PORCENTAGE)
+				{
+					result = 0;
+				}
 			}
 		}
 	}

@@ -38,7 +38,7 @@ const float configVarMaqInit[CFG_MAQUINA_MAX - 1] = {
 	25,                               //!< Altura de deslocamento
 };
 
-uint32_t configFlagsInit[FLAG_MAX] = {0,1};
+uint32_t configFlagsInit[FLAG_MAX] = {MODO_PLASMA,1,DESABILITADO,DESABILITADO};
 uint32_t configFlags[FLAG_MAX];
 
 float configVarOx[OX_CONFIG_MAX];
@@ -205,6 +205,14 @@ void eepromConsistencyCheck(void)
 	for (i = 0; i < PL_CONFIG_MAX; i++)
 	{
 		if (configVarPl[i] > pl_init_max[i] || configVarPl[i] < pl_init_min[i])
+		{
+			eepromFormat();
+		}
+	}
+
+	for (i = 0; i < FLAG_MAX; i++)
+	{
+		if (configFlags[i] > 1 )
 		{
 			eepromFormat();
 		}
