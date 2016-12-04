@@ -31,10 +31,12 @@ static void iif_released_jog(void);
 extern float *velocidadeJog;
 char text[40];
 uint32_t JogkeyPressed;
+
 const char jog_stopflush[]= "\
 !\n\
 %";
 uint16_t xPress = 0;
+bool jogTimerRunning = 0;
 void timerJogCallback (void *p_arg);
 void timerJogInitCallback (void *p_arg);
 void timerJogWalkCallback (void *p_arg);
@@ -79,6 +81,7 @@ void iif_esc_jog(void)
 }
 
 void iif_down_jog(void) {
+	jogTimerRunning = true;
 	R_CMT_CreatePeriodic(20,timerJogInitCallback,&timerIif);
 }
 void iif_up_jog(void) {
@@ -93,17 +96,36 @@ void iif_right_jog(void) {
 }
 
 void iif_zdown_jog(void){
-	R_CMT_CreatePeriodic(20,timerJogInitCallback,&timerIif);
+	if (JogkeyPressed == KEY_Z_DOWN)
+	{
+
+		 R_CMT_CreatePeriodic(20,timerJogInitCallback,&timerIif);
+	}
+	else
+	{
+		zmove = -0.01;
+	}
 }
 
 void iif_zup_jog(void) {
-	R_CMT_CreatePeriodic(20,timerJogInitCallback,&timerIif);
+	if (JogkeyPressed == KEY_Z_UP)
+	{
+
+		 R_CMT_CreatePeriodic(20,timerJogInitCallback,&timerIif);
+	}
+	else
+	{
+		zmove = 0.01;
+	}
 }
 
 void iif_released_jog(void) {
 
-//	cm_request_feedhold();
-//	cm_request_queue_flush();
+	if (jogTimerRunning == false)
+	{
+		cm_request_feedhold();
+		cm_request_queue_flush();
+	}
 	//macro_func_ptr = _command_dispatch;
 	xPress = 0;
 	if (timerIif == 3)
@@ -230,10 +252,45 @@ void timerJogInitCallback (void *p_arg)
 
 void timerJogWalkCallback (void *p_arg)
 {
+	jogTimerRunning = false;
 	if (JogkeyPressed != 0)
 	{
-		R_CMT_Stop(timerIif);
-		R_CMT_CreatePeriodic(10000,timerJogCallback,&timerIif);
+		if ((JogkeyPressed & KEY_DOWN) == KEY_DOWN)
+		{
+			//jogMaxDistance[AXIS_Y] = -(*velocidadeJog*MULTI_A + NUM_B);
+			jogMaxDistance[AXIS_Y] = -100000;
+			macro_func_ptr = jog_Macro;
+		}
+		if ((JogkeyPressed & KEY_UP) == KEY_UP)
+		{
+			//jogMaxDistance[AXIS_Y] = (*velocidadeJog*MULTI_A + NUM_B);
+			jogMaxDistance[AXIS_Y] = 100000;
+			macro_func_ptr = jog_Macro;
+		}
+		if ((JogkeyPressed & KEY_LEFT) == KEY_LEFT)
+		{
+			//jogMaxDistance[AXIS_X] = -(*velocidadeJog*MULTI_A + NUM_B);
+			jogMaxDistance[AXIS_X] = -100000;
+			macro_func_ptr = jog_Macro;
+		}
+		if ((JogkeyPressed & KEY_RIGHT) == KEY_RIGHT)
+		{
+			//jogMaxDistance[AXIS_X] = (*velocidadeJog*MULTI_A + NUM_B);
+			jogMaxDistance[AXIS_X] = 100000;
+			macro_func_ptr = jog_Macro;
+		}
+		if ((JogkeyPressed & KEY_Z_DOWN) == KEY_Z_DOWN)
+		{
+			//jogMaxDistance[AXIS_Z] = -(*velocidadeJog*MULTI_A + NUM_B)*0.1;
+			jogMaxDistance[AXIS_Z] = -100000;
+			macro_func_ptr = jog_Macro;
+		}
+		if ((JogkeyPressed & KEY_Z_UP) == KEY_Z_UP)
+		{
+			//jogMaxDistance[AXIS_Z] = (*velocidadeJog*MULTI_A + NUM_B)*0.1;
+			jogMaxDistance[AXIS_Z] = 100000;
+			macro_func_ptr = jog_Macro;
+		}
 	}
 	else
 	{

@@ -240,6 +240,7 @@ static void updatePosition(uint8_t menu)
  */
 ut_state ut_state_manual_mode(ut_context* pContext)
 {
+	static uint32_t keyEntry_buffer;
 	uint32_t keyEntry;
 	restart_stepper();
 	/* Clear display */
@@ -296,11 +297,18 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 		{
 			iif_func_zdown();
 		}
-//		if ((keyEntry & KEY_ENTER) == KEY_ENTER)
-//		{
-//			iif_func_enter();
-//		}
+		if ((keyEntry_buffer & KEY_Z_UP) == KEY_Z_UP && (keyEntry & KEY_Z_UP) != KEY_Z_UP)
+		{
+			zmove = 0;
+		}
 
+		if ((keyEntry_buffer & KEY_Z_DOWN) == KEY_Z_DOWN && (keyEntry & KEY_Z_DOWN) != KEY_Z_DOWN)
+		{
+			zmove = 0;
+		}
+
+
+		keyEntry_buffer = keyEntry;
 		/* Check which key */
 		switch (keyEntry)
 		{

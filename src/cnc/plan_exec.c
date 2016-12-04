@@ -732,12 +732,18 @@ static stat_t _exec_aline_segment()
 		for (i=0; i<AXES; i++) {
 			mr.gm.target[i] = mr.position[i] + (mr.unit[i] * segment_length);
 		}
-		if((configFlags[MODOMAQUINA] == MODO_PLASMA) && isCuttingGet() == true){
-			zmove = pl_thc_pid();
-		}
-	//	if((configFlags[MODOMAQUINA] == MODO_PLASMA) && isCuttingGet() == false && !sim){
-		if((configFlags[MODOMAQUINA] == MODO_PLASMA) && isCuttingGet() == false && sim == false){
-			zmove = 0;
+		if (configsVar->currentState == STATE_CONFIG_AUTO_MODE)
+		{
+			if((configFlags[MODOMAQUINA] == MODO_PLASMA) && isCuttingGet() == true){
+				zmove = pl_thc_pid();
+			}
+
+			if((configFlags[MODOMAQUINA] == MODO_PLASMA) && isCuttingGet() == false && sim == false){
+				zmove = 0;
+			}
+		}else if (configsVar->currentState == STATE_CONFIG_MANUAL_MODE)
+		{
+
 		}
 		if(zmove != 0)
 		{
