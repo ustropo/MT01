@@ -34,6 +34,7 @@ extern bool sim;
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
 static uint8_t count = 0;
 static uint16_t mult = 1;
+static uint8_t func_back = 0;
 
 /**
  * Function pointer that can change a configuration
@@ -153,13 +154,14 @@ void config_bool(ut_config_var* var)
 					switch(configsVar->currentItem)
 					{
 						case CONFIG_AUTO_SELECIONAR_LINHA:
-							*value = 0xFF;
+							func_back = 0xFF;
 						break;
 					}
 			break;
 		}
 		return;
 	}
+	func_back = menu.selectedItem;
 	*value = menu.selectedItem;
 	/* save it - TODO: ask for confirmation, maybe? */
 	if(Recordflag)
@@ -377,25 +379,26 @@ ut_state ut_state_config_var(ut_context* pContext)
 					do{
 						if(configsVar->type == UT_CONFIG_BOOL){
 							var_handlers[configsVar->type](configsVar);
-							if (*Flag == 0xFF)
+							if (func_back == 0xFF)
 							{
 								configsVar->type = UT_CONFIG_INT;
 								var_handlers[configsVar->type](configsVar);
-								*Flag = 0xFF;
+								func_back = 0xFF;
 								if(configsVar->type == UT_CONFIG_INT)
 								{
 									ut_lcd_output_warning("NENHUM PONTO\nDE ENTRADA\nSELECIONADO\n");
 									vTaskDelay(2000 / portTICK_PERIOD_MS);
 								}
 							}
-						linhaSelecionada(*Flag);
+						linhaSelecionada(func_back);
 						}
 						else
 						{
 							ut_lcd_output_warning("NENHUM PONTO\nDE ENTRADA\nSELECIONADO\n");
 							vTaskDelay(2000 / portTICK_PERIOD_MS);
 						}
-					}while(*Flag == 0xFF && configsVar->type == UT_CONFIG_BOOL);
+					}while(func_back == 0xFF && configsVar->type == UT_CONFIG_BOOL);
+					func_back = 0;
 					break;
 				}
 			break;
