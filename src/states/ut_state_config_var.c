@@ -34,7 +34,7 @@ extern bool sim;
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
 static uint8_t count = 0;
 static uint16_t mult = 1;
-static uint8_t func_back = 0;
+uint8_t func_back = 0;
 
 /**
  * Function pointer that can change a configuration
@@ -94,6 +94,16 @@ void config_bool(ut_config_var* var)
 	boolStr = boolOptions;
 	switch(configsVar->currentState)
 	{
+	case STATE_AUTO_MODE:
+			switch(configsVar->currentItem)
+			{
+				case CONFIG_AUTO_MODO_SIM_RUN:
+					value = var->value;
+					boolStr = boolSim;
+				break;
+				default: break;
+			}
+			break;
 		case STATE_CONFIG_MAQUINA:
 			switch(configsVar->currentItem)
 			{
@@ -148,17 +158,18 @@ void config_bool(ut_config_var* var)
 
 	/* Check if user selected a valid entry */
 	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0){
-		switch(configsVar->currentState)
-		{
-			case STATE_CONFIG_AUTO_MODE:
-					switch(configsVar->currentItem)
-					{
-						case CONFIG_AUTO_SELECIONAR_LINHA:
-							func_back = 0xFF;
-						break;
-					}
-			break;
-		}
+//		switch(configsVar->currentState)
+//		{
+//			case STATE_CONFIG_AUTO_MODE:
+//					switch(configsVar->currentItem)
+//					{
+//						case CONFIG_AUTO_SELECIONAR_LINHA:
+//							func_back = 0xFF;
+//						break;
+//					}
+//			break;
+//		}
+		func_back = 0xFF;
 		return;
 	}
 	func_back = menu.selectedItem;

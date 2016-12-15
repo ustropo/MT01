@@ -41,6 +41,7 @@ char textZStr[MAX_COLUMN];
 uint8_t gTitle;
 extern float *velocidadeJog;
 extern bool intepreterRunning;
+extern uint8_t func_back;
 
 
 #define DEFAULT_AUTO_TITLE		"MODO AUTOMÁTICO"
@@ -368,6 +369,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 	lstop = false;
 	cm.gmx.feed_rate_override_enable = true;
 	cm.gmx.feed_rate_override_factor = 1;
+	func_back = 0;
 	programEnd = false;
 	stopDuringCut_Set(false);
 	cm.machine_state = MACHINE_READY;
@@ -440,22 +442,23 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		case KEY_ENTER:
 			if(lstop)
 			{
-				lstop = false;
-				iif_bind_filerunning_stop(lstop);
-				if(gTitle == AUTO){
-					strcpy(gStrAuto[0],DEFAULT_AUTO_TITLE);
-					strcpy(gStrAuto[1],DEFAULT_AVISO_AUTO);
-				}else if(gTitle == SIM){
-					strcpy(gStrSim[0],DEFAULT_SIM_TITLE);
-					strcpy(gStrSim[1],DEFAULT_AVISO_SIM);
-				}
-				if(isDwell == true)
-				{
-					st_command_dwell(DWELL_RESTART);
-				}
+
 	//			if (arco == ARCO_OK_OFF || (statePrevious == EMERGENCIA_SIGNAL && ltorchBuffer == TRUE))
 				if (configFlags[MODOMAQUINA] ==  MODO_PLASMA)
 				{
+					lstop = false;
+					iif_bind_filerunning_stop(lstop);
+					if(gTitle == AUTO){
+						strcpy(gStrAuto[0],DEFAULT_AUTO_TITLE);
+						strcpy(gStrAuto[1],DEFAULT_AVISO_AUTO);
+					}else if(gTitle == SIM){
+						strcpy(gStrSim[0],DEFAULT_SIM_TITLE);
+						strcpy(gStrSim[1],DEFAULT_AVISO_SIM);
+					}
+					if(isDwell == true)
+					{
+						st_command_dwell(DWELL_RESTART);
+					}
 					if (arco == ARCO_OK_OFF || ltorchBuffer == TRUE)
 					{
 						arco = 0;
@@ -488,21 +491,39 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					{
 						uint32_t *value = configsVar->value;
 						xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+						iif_bind_idle();
 						configsVar->currentItem = CONFIG_AUTO_MODO_SIM_RUN;
 						configsVar->type = UT_CONFIG_BOOL;
 						configsVar->name = "CONTINUAR COMO?";
 						ut_state_config_var(pContext);
+						iif_bind_filerunning();
 						xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
-						iif_func_enter();
-						if(*value == true)
-						{
-							gTitle = AUTO;
-							sim = false;
-							if (simTorch)
+						if(func_back != 0xFF){
+							lstop = false;
+							iif_bind_filerunning_stop(lstop);
+							if(gTitle == AUTO){
+								strcpy(gStrAuto[0],DEFAULT_AUTO_TITLE);
+								strcpy(gStrAuto[1],DEFAULT_AVISO_AUTO);
+							}else if(gTitle == SIM){
+								strcpy(gStrSim[0],DEFAULT_SIM_TITLE);
+								strcpy(gStrSim[1],DEFAULT_AVISO_SIM);
+							}
+							if(isDwell == true)
 							{
-								TORCH = TRUE;
+								st_command_dwell(DWELL_RESTART);
+							}
+							iif_func_enter();
+							if(*value == true)
+							{
+								gTitle = AUTO;
+								sim = false;
+								if (simTorch)
+								{
+									TORCH = TRUE;
+								}
 							}
 						}
+						func_back = 0;
 					}
 					else
 					{
@@ -552,6 +573,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 						xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 						iif_bind_idle();
 						configsVar->currentState = STATE_AUTO_MODE;
+						configsVar->currentItem = CONFIG_AUTO_RODAR_PROG;
 						configsVar->type = UT_CONFIG_BOOL;
 						configsVar->name = "DESEJA SAIR?";
 						ut_state_config_var(pContext);

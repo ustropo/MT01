@@ -36,7 +36,6 @@ const char jog_stopflush[]= "\
 !\n\
 %";
 uint16_t xPress = 0;
-bool jogTimerRunning = 0;
 void timerJogCallback (void *p_arg);
 void timerJogInitCallback (void *p_arg);
 void timerJogWalkCallback (void *p_arg);
@@ -81,7 +80,6 @@ void iif_esc_jog(void)
 }
 
 void iif_down_jog(void) {
-	jogTimerRunning = true;
 	R_CMT_CreatePeriodic(20,timerJogInitCallback,&timerIif);
 }
 void iif_up_jog(void) {
@@ -121,11 +119,8 @@ void iif_zup_jog(void) {
 
 void iif_released_jog(void) {
 
-	if (jogTimerRunning == false)
-	{
-		cm_request_feedhold();
-		cm_request_queue_flush();
-	}
+	cm_request_feedhold();
+	cm_request_queue_flush();
 	//macro_func_ptr = _command_dispatch;
 	xPress = 0;
 	if (timerIif == 3)
@@ -252,7 +247,6 @@ void timerJogInitCallback (void *p_arg)
 
 void timerJogWalkCallback (void *p_arg)
 {
-	jogTimerRunning = false;
 	if (JogkeyPressed != 0)
 	{
 		if ((JogkeyPressed & KEY_DOWN) == KEY_DOWN)
