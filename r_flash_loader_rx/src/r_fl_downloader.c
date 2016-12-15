@@ -54,6 +54,7 @@ Includes   <System Includes> , "Project Includes"
 #include "ff.h"
 
 #include "lcd.h"
+#include "lcd_menu.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -180,7 +181,7 @@ void R_FL_StateMachine(void)
 			/* Write strings */
 			for(uiMsgRow = 0; uiMsgRow < MAX_ROW; uiMsgRow++)
 			{
-				ut_lcd_drawStr(uiMsgRow, 0, gszbootMsg[uiMsgRow], false,u8g_font_6x10);
+				ut_lcd_drawStr(uiMsgRow, 0, gszbootMsg[uiMsgRow], false,ITEM_NO_MARKED,u8g_font_6x10);
 			}
 			/* Output */
 			ut_lcd_output_str();

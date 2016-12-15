@@ -230,10 +230,10 @@ ut_state ut_state_config_auto_menu(ut_context* pContext)
 					eepromReadConfig(CONFIGVAR_OX);
 					snprintf(&pstr[30*2],30, "Vel. corte: %.0f mm/min",configVarOx[OX_CONFIG_VELOC_CORTE]);
 				}
-				ut_lcd_drawStr(0, 0, &pstr[0], BACKGROUND_FRAMED,u8g_font_helvB08);
+				ut_lcd_drawStr(0, 0, &pstr[0], BACKGROUND_FRAMED,ITEM_NO_MARKED,u8g_font_helvB08);
 				for(uiMsgRow = 1; uiMsgRow < MAX_ROW; uiMsgRow++)
 				{
-					ut_lcd_drawStr(uiMsgRow, 0, &pstr[uiMsgRow*30], false,u8g_font_5x8);
+					ut_lcd_drawStr(uiMsgRow, 0, &pstr[uiMsgRow*30],ITEM_NO_MARKED, false,u8g_font_5x8);
 				}
 				/* Output */
 				ut_lcd_output_str();

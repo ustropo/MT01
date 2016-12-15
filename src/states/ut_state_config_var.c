@@ -71,8 +71,8 @@ static char* boolSim[2] =
 
 static char* boolEn[2] =
 {
-	"DESABILITAR",
-	"HABILITAR"
+	"DESABILITADO",
+	"HABILITADO"
 };
 
 
@@ -92,6 +92,7 @@ void config_bool(ut_config_var* var)
 	/* Initialize */
 	ut_menu_init(&menu);
 	boolStr = boolOptions;
+	menu.itemMarked = 0;
 	switch(configsVar->currentState)
 	{
 	case STATE_AUTO_MODE:
@@ -110,6 +111,7 @@ void config_bool(ut_config_var* var)
 				case CFG_MAQUINA_MODOMAQUINA:
 					Recordflag =true;
 					value = var->value;
+					menu.itemMarked = *value + 1;
 					boolStr = boolJogMaq;
 					break;
 				default: break;
@@ -134,6 +136,7 @@ void config_bool(ut_config_var* var)
 				case CONFIG_JOG_RAP_LENTO:
 					Recordflag =true;
 					value = var->value;
+					menu.itemMarked = *value + 1;
 					boolStr = boolJogVel;
 				break;
 				default: break;
@@ -142,6 +145,7 @@ void config_bool(ut_config_var* var)
 		case STATE_CONFIG_MAQUINA_THC:
 			Recordflag =true;
 			value = var->value;
+			menu.itemMarked = *value + 1;
 			boolStr = boolEn;
 			break;
 
@@ -155,7 +159,6 @@ void config_bool(ut_config_var* var)
 	}
 	value = var->value;
 	menu.selectedItem = *value % 2; // Just to be sure - it is really not necessary
-
 	/* Check if user selected a valid entry */
 	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0){
 //		switch(configsVar->currentState)

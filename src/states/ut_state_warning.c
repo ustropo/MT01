@@ -10,6 +10,7 @@
 #include "ut_state_config_var.h"
 #include "state_functions.h"
 
+#include "lcd_menu.h"
 #include "lcd.h"
 
 #include "FreeRTOS.h"
@@ -83,7 +84,7 @@ ut_state ut_state_warning(ut_context* pContext)
 		/* Write strings */
 		for(uiMsgRow = 0; uiMsgRow < MAX_ROW; uiMsgRow++)
 		{
-			ut_lcd_drawStr(uiMsgRow, 0, gszWarningMsg[uiPage*MAX_ROW + uiMsgRow], false,u8g_font_6x10);
+			ut_lcd_drawStr(uiMsgRow, 0, gszWarningMsg[uiPage*MAX_ROW + uiMsgRow], false, ITEM_NO_MARKED,u8g_font_6x10);
 		}
 		/* Output */
 		ut_lcd_output_str();

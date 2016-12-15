@@ -14,6 +14,8 @@
 // ***********************************************************************
 #define MENU_MAX_ITEMS		20
 #define MENU_MAX_ITEM_STR	32
+#define ITEM_NO_MARKED  	0
+#define ITEM_MARKED  		1
 
 // ***********************************************************************
 // Typedefs
@@ -57,6 +59,7 @@ typedef struct ut_menu_tag
 	uint16_t offset;
 	uint8_t maxItemsPerPage;
 	uint8_t boShowTitle;
+	uint8_t itemMarked;
 	ut_state currentState;
 } ut_menu;
 

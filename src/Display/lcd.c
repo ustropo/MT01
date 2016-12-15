@@ -23,6 +23,7 @@ static char gacChar[MAX_COLUMN * MAX_ROW];
 
 static const char* gacStr[MAX_ROW];
 static uint8_t gaboBackColorStr[MAX_ROW];
+static uint8_t gabolineMarked[MAX_ROW];
 static const u8g_fntpgm_uint8_t *gaboFontStr[MAX_ROW];
 
 /**
@@ -76,6 +77,7 @@ void ut_lcd_clear_str()
 	memset(gaboBackColorStr, 0, sizeof(gaboBackColorStr));
 	memset(gacStr, '\n', sizeof(gacStr));
 	memset(gaboFontStr, NULL, sizeof(gaboFontStr));
+	memset(gabolineMarked, 0, sizeof(gabolineMarked));
 }
 
 
@@ -109,7 +111,7 @@ void ut_lcd_drawString(uint8_t line, uint8_t column, const char* text, uint8_t i
  * @param text		String to draw.
  * @param invert	Which color to draw (0 -> white / 1 -> black)
  */
-void ut_lcd_drawStr(uint8_t line, uint8_t column, const char* text, uint8_t invert, const uint8_t* font)
+void ut_lcd_drawStr(uint8_t line, uint8_t column, const char* text, uint8_t invert, uint8_t lineMarked, const uint8_t* font)
 {
 	/* Check limits */
 	if(line >= MAX_ROW || column >= MAX_COLUMN) return;
@@ -118,6 +120,7 @@ void ut_lcd_drawStr(uint8_t line, uint8_t column, const char* text, uint8_t inve
 	gacStr[line] = text;
 	gaboBackColorStr[line] = invert;
 	gaboFontStr[line] = (const u8g_fntpgm_uint8_t *)font;
+	gabolineMarked[line] = lineMarked;
 }
 
 
@@ -161,7 +164,7 @@ static uint8_t ut_lcd_draw_glyph(uint8_t x, uint8_t y, uint8_t h, uint8_t invert
  * @param invert		Background color
  * @param glyph			Char
  */
-static uint8_t ut_lcd_draw_str(uint8_t x, uint8_t y, uint8_t h, uint8_t invert, const char* str)
+static uint8_t ut_lcd_draw_str(uint8_t x, uint8_t y, uint8_t h, uint8_t invert, uint8_t lineMarked, const char* str)
 {
 	uint8_t w = u8g_GetStrWidth(&main_u8g, str);
 
@@ -183,6 +186,13 @@ static uint8_t ut_lcd_draw_str(uint8_t x, uint8_t y, uint8_t h, uint8_t invert, 
 	}
 	/* Draw Str */
 	u8g_DrawStr(&main_u8g, x, y, str);
+	if(lineMarked)
+	{
+		x = u8g_GetStrWidth(&main_u8g,str);
+		u8g_prepare(u8g_font_m2icon_7);
+		u8g_DrawStr(&main_u8g, x + 5, y, "\x44\n");
+	}
+
 	/* Return to future info */
 	return w;
 }
@@ -251,8 +261,7 @@ void ut_lcd_output_str(ut_state state)
 			x = 0;
 			/* Through all columns */
 				/* Draw glyph */
-			x = ut_lcd_draw_str(x, y, h, gaboBackColorStr[row], gacStr[row]);
-
+			x = ut_lcd_draw_str(x, y, h, gaboBackColorStr[row],gabolineMarked[row], gacStr[row]);
 			/* Next position */
 			y += h;
 			if (state == STATE_MAIN_MENU)

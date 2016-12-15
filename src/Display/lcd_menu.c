@@ -87,7 +87,7 @@ void ut_menu_show(ut_menu* menu_ptr)
 		/* Copy data */
 	//	ut_lcd_drawString(row++, 0, menu_ptr->title, true);
 
-		ut_lcd_drawStr(row++, 0, menu_ptr->title, BACKGROUND_FRAMED,u8g_font_helvB08);
+		ut_lcd_drawStr(row++, 0, menu_ptr->title, BACKGROUND_FRAMED,ITEM_NO_MARKED,u8g_font_helvB08);
 
 	}
 
@@ -96,7 +96,7 @@ void ut_menu_show(ut_menu* menu_ptr)
 	for(; (menuItem < menu_ptr->numItems) && (row < (menu_ptr->maxItemsPerPage+1)); row++, menuItem++)
 	{
 	//	ut_lcd_drawString(row, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem));
-		ut_lcd_drawStr(row, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem),u8g_font_6x10);
+		ut_lcd_drawStr(row, 0, menu_ptr->items[menuItem].text, (menuItem == menu_ptr->selectedItem),(menu_ptr->itemMarked == row),u8g_font_6x10);
 	}
 
 	/* Put on screen */
