@@ -88,7 +88,7 @@ void config_bool(ut_config_var* var)
 	ut_menu menu;
 	uint8_t i;
 	bool Recordflag = false;
-
+	func_back = 0;
 	/* Initialize */
 	ut_menu_init(&menu);
 	boolStr = boolOptions;
@@ -353,6 +353,15 @@ ut_state ut_state_config_var(ut_context* pContext)
 
 	switch(configsVar->currentState)
 	{
+		case STATE_CONFIG_JOG:
+			if(configsVar->currentItem == CONFIG_JOG_RAP_LENTO )
+			{
+				if(func_back == 0xFF)
+				{
+					stateBack = (ut_state)pContext->value[1];
+				}
+			}
+			break;
 		case STATE_CONFIG_MANUAL_MODE:
 			if(configsVar->currentItem == CONFIG_MANUAL_DESLOCAR_ZERO )
 			{

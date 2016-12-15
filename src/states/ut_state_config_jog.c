@@ -136,7 +136,15 @@ ut_state ut_state_config_jog(ut_context* pContext)
 	{
 		return STATE_CONFIG_MANUAL_MODE;
 	}
-	pContext->value[0] = STATE_CONFIG_JOG;
+	if(config_menu.selectedItem == CONFIG_JOG_RAP_LENTO)
+	{
+		pContext->value[0] = STATE_MANUAL_MODE;
+		pContext->value[1] = STATE_CONFIG_JOG;
+	}
+	else
+	{
+		pContext->value[0] = STATE_CONFIG_JOG;
+	}
 	configsVar = &configs_jog[config_menu.selectedItem];
 	return geNextStateManual[config_menu.selectedItem];
 }
