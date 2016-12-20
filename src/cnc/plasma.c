@@ -86,10 +86,6 @@ void pl_arcook_init(void)
     IEN(ICU, IRQ0) = 0;            // Enable interrupt
     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
 #else
-//    ICU.IRQCR[9].BIT.IRQMD = 1;    // Borda de descida
-//    IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
-//    IPR(ICU, IRQ9) = 3;            //Set interrupt priority
-//    IEN(ICU, IRQ9) = 0;            // Enable interrupt
 
 	xTaskCreate((pdTASK_CODE)plasma_task, "Plasma task", 512, NULL, 3, &xPlasmaTaskHandle );
     /* Attempt to create a semaphore. */
@@ -101,37 +97,7 @@ void pl_thc_init(void)
 {
     adc_cfg_t config;
     adc_ch_cfg_t ch_cfg;
-    /*
-    mtu_timer_chnl_settings_t plasma_timer_cfg;
-    mtu_err_t result;
 
-    plasma_timer_cfg.clock_src.source  = MTU_CLK_SRC_INTERNAL;
-    plasma_timer_cfg.clock_src.clock_edge  = MTU_CLK_RISING_EDGE;
-    plasma_timer_cfg.clear_src  = MTU_CLR_TIMER_A;
-    plasma_timer_cfg.timer_a.actions.do_action = (mtu_actions_t)(MTU_ACTION_TRIGGER_ADC | MTU_ACTION_INTERRUPT | MTU_ACTION_REPEAT) ;
-    plasma_timer_cfg.timer_a.actions.output  = MTU_PIN_NO_OUTPUT;
-    plasma_timer_cfg.timer_a.freq  = 5000;
-    plasma_timer_cfg.timer_b.actions.do_action = MTU_ACTION_NONE;
-    plasma_timer_cfg.timer_b.actions.output  = MTU_PIN_NO_OUTPUT;
-    plasma_timer_cfg.timer_c.actions.do_action = MTU_ACTION_NONE;
-    plasma_timer_cfg.timer_d.actions.do_action = MTU_ACTION_NONE;
-    result = R_MTU_Timer_Open(MTU_CHANNEL_0, &plasma_timer_cfg, FIT_NO_FUNC);
-
-    config.trigger = ADC_TRIG_SYNC_TRG0AN_0;
-    config.priority = 3;
-    config.add_cnt = ADC_ADD_OFF;
-    config.alignment = ADC_ALIGN_RIGHT;
-    config.clearing = ADC_CLEAR_AFTER_READ_ON;
-    config.conv_speed = ADC_CONVERT_SPEED_PCLK;
-    R_ADC_Open(ADC_MODE_SS_ONE_CH, &config, thc_interrupt);
-
-    ch_cfg.chan_mask = ADC_MASK_CH3;
-    R_ADC_Control(ADC_CMD_ENABLE_CHANS, &ch_cfg);
-    R_ADC_Control(ADC_CMD_ENABLE_INT, NULL);
-    R_ADC_Control(ADC_CMD_ENABLE_TRIG, NULL);
-
-    result = R_MTU_Control(MTU_CHANNEL_0, MTU_CMD_START, FIT_NO_PTR);
-    */
     config.trigger = ADC_TRIG_SOFTWARE;
     config.priority = 0;
     config.add_cnt = ADC_ADD_OFF;
@@ -144,7 +110,7 @@ void pl_thc_init(void)
     R_ADC_Control(ADC_CMD_ENABLE_CHANS, &ch_cfg);
 }
 
-void pl_thc_read(float *thcValue)
+void pl_thc_read(void)
 {
 	uint16_t u16thc_read;
 	uint16_t u16thc_sum = 0;
@@ -160,7 +126,7 @@ void pl_thc_read(float *thcValue)
 		u16thc_sum += u16thc_read;
 	}
 	u16thc_value = u16thc_sum/8;
-	*thcValue = (float)(((float)300/4095)*u16thc_value);
+	THC_real = (float)(((float)300/4095)*u16thc_value);
 }
 
 float pl_thc_pid(void)
@@ -182,7 +148,7 @@ float pl_thc_pid(void)
 	{
 		delay_thc = 0;
 	}
-	pl_thc_read(&THC_real);
+	pl_thc_read();
 	if(delay_thcGet() > delay_thc){
 		if(THC_real > THC_VMIN)
 		{
@@ -237,9 +203,6 @@ void pl_arcook_start(void)
     IEN(ICU, IRQ0) = 1;            // Enable interrupt
 #else
 
-//	IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
-//	IEN(ICU, IRQ9) = 1;            // Enable interrupt
-//	xSemaphoreTake( xArcoOkSync, 0 );
     xTaskNotifyGive( xPlasmaTaskHandle);
 	arcoOkSet(false);
 #endif
@@ -251,9 +214,6 @@ void pl_arcook_stop(void)
     IEN(ICU, IRQ0) = 0;            // Disable interrupt
     IR(ICU, IRQ0)  = 0;            //Clear any previously pending interrupts
 #else
-//    IEN(ICU, IRQ9) = 0;            // Disable interrupt
-//    IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
-//    xTaskNotifyGive( xPlasmaTaskHandle);
     ArcoOktaskIdle = false;
 	arcoOkSet(false);
 #endif

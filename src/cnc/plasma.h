@@ -11,15 +11,18 @@
 #include "task.h"
 #include "semphr.h"
 
-#define ARCO_OK_FAILED  0xFFFFFFFF
-#define ARCO_OK_OFF     0xFFFFFFFE
-#define MATERIAL_FAILED 0xFFFFFFFD
+//#define ARCO_OK_FAILED  0xFFFFFFFF
+//#define ARCO_OK_OFF     0xFFFFFFFE
+//#define MATERIAL_FAILED 0xFFFFFFFD
+#define ARCO_OK_FAILED  0xFFFF0000
+#define ARCO_OK_OFF     0xFFFE0000
+#define MATERIAL_FAILED 0xFFFD0000
 extern SemaphoreHandle_t xArcoOkSync;
 extern uint32_t currentLine;
 
 void pl_arcook_init(void);
 void pl_thc_init(void);
-void pl_thc_read(float *thcValue);
+void pl_thc_read(void);
 float pl_thc_pid(void);
 void pl_arcook_start(void);
 void pl_arcook_stop(void);

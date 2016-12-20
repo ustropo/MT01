@@ -395,7 +395,7 @@ void ut_lcd_output_mov_mode(bool torch, char* title[6],const char* textX,const c
 	xSemaphoreGive(rspi_semaphore);
 }
 
-void ut_lcd_output_plasma_mode(bool torch, char* title[6],const char* textX,const char* textY,const char* textZ)
+void ut_lcd_output_plasma_mode(bool torch, char* title[7],const char* textX,const char* textY,const char* textZ)
 {
 	uint8_t row, x, y;
 	uint8_t h;
@@ -414,6 +414,7 @@ void ut_lcd_output_plasma_mode(bool torch, char* title[6],const char* textX,cons
 		u8g_prepare(u8g_font_4x6r);
 		str = DEFAULT_TOCHA;
 		u8g_DrawStr(&main_u8g, 95, 35, str);
+		u8g_DrawStr(&main_u8g, 92, 12, title[6]);
 		if(!torch)
 		{
 			str = DEFAULT_ACESA;
