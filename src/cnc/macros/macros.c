@@ -105,6 +105,7 @@ stat_t M3_Macro(void)
 					{
 						uint32_t lRet = pdFALSE;
 						pl_arcook_start();
+						xQueueReset((xQueueHandle)xArcoOkSync);
 						lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
 						if (lRet == pdFALSE)
 						{

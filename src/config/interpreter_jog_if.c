@@ -72,7 +72,7 @@ void iif_esc_jog(void)
 	TORCH = FALSE;
 	cm_request_feedhold();
 	cm_request_queue_flush();
-	while(cm.queue_flush_requested == true)
+	while(cm.feedhold_requested == true)
 	{
 
 	}
@@ -104,31 +104,27 @@ void iif_right_jog(void) {
 }
 
 void iif_zdown_jog(void){
-	jogMaxDistance[AXIS_Z] = -100000;
-	macro_func_ptr = jog_Macro;
-//	if (JogkeyPressed == KEY_Z_DOWN)
-//	{
-//
-//		 R_CMT_CreatePeriodic(20,timerJogInitCallback,&timerIif);
-//	}
-//	else
-//	{
-//		zmove = -0.01;
-//	}
+	if (JogkeyPressed == KEY_Z_DOWN)
+	{
+		jogMaxDistance[AXIS_Z] = -100000;
+		macro_func_ptr = jog_Macro;
+	}
+	else
+	{
+		zmove = -0.01;
+	}
 }
 
 void iif_zup_jog(void) {
-	jogMaxDistance[AXIS_Z] = 100000;
-	macro_func_ptr = jog_Macro;
-//	if (JogkeyPressed == KEY_Z_UP)
-//	{
-//
-//		 R_CMT_CreatePeriodic(20,timerJogInitCallback,&timerIif);
-//	}
-//	else
-//	{
-//		zmove = 0.01;
-//	}
+	if (JogkeyPressed == KEY_Z_UP)
+	{
+		jogMaxDistance[AXIS_Z] = 100000;
+		macro_func_ptr = jog_Macro;
+	}
+	else
+	{
+		zmove = 0.01;
+	}
 }
 
 void iif_released_jog(void) {

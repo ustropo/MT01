@@ -34,16 +34,6 @@
 #define LED_ON              (0)
 #define LED_OFF             (1)
 
-#ifndef MODULO
-#define KLINE				PORT5.PIDR.BYTE
-
-#define KCOL				PORTC.PDR.BYTE
-#define KC1					(0x05uL)
-#define KC2					(0x06uL)
-#define KC3					(0x0CuL)
-#define KC4					(0x14uL)
-#define LCD_CS              PORTC.PODR.BIT.B2
-#else
 #define KLINE				PORT4.PIDR.BYTE
 
 #define KCOL				PORTD.PDR.BYTE
@@ -58,7 +48,6 @@
 
 #define RESET			R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR); \
 						SYSTEM.SWRR = 0xA501;
-#endif
 
 #endif /* MT01_H */
 

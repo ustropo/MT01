@@ -67,7 +67,7 @@ Private global variables and functions
 ***********************************************************************************************************************/
 void charput (uint32_t output_char)
 {
-//	/* Wait for transmit buffer to be empty */
+	/* Wait for transmit buffer to be empty */
 //	while(0 != (E1_DBG_PORT.DBGSTAT & TXFL0EN));
 //
 //	/* Write the character out */

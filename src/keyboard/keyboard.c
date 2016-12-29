@@ -53,62 +53,6 @@ Description     : keyboard scan Task process
 Arguments       : none
 Return value    : none
  ******************************************************************************/
-#ifndef MODULO
-void keyboard_task(void)
-{
-	uint8_t key_buf[4][3];
-	bool keyPressed = false;
-	uint8_t colPressed = 0xff;
-	uint32_t key = 0;
-	uint8_t i = 0;
-	uint8_t k = 0;
-	uint8_t col[4] = {KC1,KC2,KC3,KC4};
-
-	while(1)
-	{
-		vTaskDelay(30 / portTICK_RATE_MS);
-		switch_rtc_callback();					// switch debouncing
-		for (i = 0; i < 4; i++)
-		{
-			KCOL = col[i];
-			vTaskDelay(1 / portTICK_RATE_MS);
-			key_buf[i][k] = KLINE;
-			if (i == colPressed)
-			{
-				if (key_buf[colPressed][k] == 0xFF)
-				{
-					key = 0;
-					xQueueSend( qKeyboard, &key, 0 );
-					keyPressed = false;
-					colPressed = 0xFF;
-				}
-			}
-			if (key_buf[i][k] != 0xFF)
-			{
-				if (key_buf[i][0] == key_buf[i][1])
-				{
-					if (key_buf[i][0] == key_buf[i][2])
-					{
-						key_buf[i][0] = ~key_buf[i][0];
-						key |=(uint32_t)key_buf[i][0]<<8*i;
-						colPressed = i;
-						if (keyPressed == false)
-						{
-							xQueueSend( qKeyboard, &key, 0 );
-						}
-						keyPressed = true;
-					}
-				}
-			}
-		}
-		k++;
-		if (k > 2)
-		{
-			k = 0;
-		}
-	}
-}
-#else
 #define KEY_DEBOUNCE 10
 #define KEY_DEBOUNCE_DLYMS 2
 
@@ -173,4 +117,3 @@ void keyboard_task(void)
 		}
 	}
 }
-#endif

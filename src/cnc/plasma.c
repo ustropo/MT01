@@ -51,6 +51,7 @@ void timer_motorPower_callback(void *pdata);
 void emergencia_task(void);
 extern void warm_stop(uint8_t flag);
 
+extern TaskHandle_t xCncTaskHandle;
 extern bool simTorch;
 extern bool lstop;
 
@@ -76,21 +77,9 @@ uint32_t currentLine;
 
 void pl_arcook_init(void)
 {
-#ifndef MODULO
-	R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_MPC);
-    PORTD.PMR.BYTE  = 0x41 ;
-    MPC.PD0PFS.BYTE = 0x40 ;    /* PD0 is a IRQ - ARCO_OK*/
-    ICU.IRQCR[0].BIT.IRQMD = 3;
-    IR(ICU, IRQ0)  = 0;            //Clear any previously pending interrupts
-    IPR(ICU, IRQ0) = 3;            //Set interrupt priority
-    IEN(ICU, IRQ0) = 0;            // Enable interrupt
-    R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
-#else
-
 	xTaskCreate((pdTASK_CODE)plasma_task, "Plasma task", 512, NULL, 3, &xPlasmaTaskHandle );
     /* Attempt to create a semaphore. */
 	xArcoOkSync = xSemaphoreCreateBinary();
-#endif
 }
 
 void pl_thc_init(void)
@@ -198,34 +187,18 @@ void pl_emergencia_init(void)
 
 void pl_arcook_start(void)
 {
-#ifndef MODULO
-    IR(ICU, IRQ0)  = 0;            //Clear any previously pending interrupts
-    IEN(ICU, IRQ0) = 1;            // Enable interrupt
-#else
-
     xTaskNotifyGive( xPlasmaTaskHandle);
 	arcoOkSet(false);
-#endif
 }
 
 void pl_arcook_stop(void)
 {
-#ifndef MODULO
-    IEN(ICU, IRQ0) = 0;            // Disable interrupt
-    IR(ICU, IRQ0)  = 0;            //Clear any previously pending interrupts
-#else
     ArcoOktaskIdle = false;
 	arcoOkSet(false);
-#endif
 }
 
-#ifndef MODULO
-#pragma interrupt IRQ0_isr(vect=VECT(ICU, IRQ0))
-static void IRQ0_isr (void) {
-#else
 #pragma interrupt IRQ9_isr(vect=VECT(ICU, IRQ9))
 static void IRQ9_isr (void) {
-#endif
 //	    BaseType_t xHigherPriorityTaskWoken;
 //
 //	    xHigherPriorityTaskWoken = pdFALSE;
@@ -332,9 +305,15 @@ void emergencia_task(void)
 	    		{
 	    			stopDuringCut_Set(true);
 	    		}
+
+			    vTaskPrioritySet( xCncTaskHandle, 3 );
 				warm_stop(2);
+			    vTaskPrioritySet( xCncTaskHandle, 1 );
 				TORCH = FALSE;
-				//cm_spindle_control(SPINDLE_OFF);
+			    if( uxTaskPriorityGet( xCncTaskHandle ) != 1 )
+				{
+
+				}
 	    		lstop = true;
 
 		    	if (currentLine == 0){

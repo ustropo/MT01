@@ -65,21 +65,10 @@ static void _switch_isr_helper(uint8_t sw_num);
 
 void switch_init(void)
 {
-#ifndef MODULO
-	R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_MPC);
-    PORTD.PMR.BYTE  = 0x40 ;
-    MPC.PD2PFS.BYTE = 0x40 ;    /* PD2 is a IRQ - LIMITES*/
-    ICU.IRQCR[2].BIT.IRQMD = 1;
-    IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
-    IPR(ICU, IRQ2) = 5;            //Set interrupt priority
-    IEN(ICU, IRQ2) = 1;            // Enable interrupt
-	R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
-#else
     ICU.IRQCR[2].BIT.IRQMD = 2;
     IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
     IPR(ICU, IRQ2) = 5;            //Set interrupt priority
     IEN(ICU, IRQ2) = 0;            // Enable interrupt
-#endif
     reset_switches();
 }
 

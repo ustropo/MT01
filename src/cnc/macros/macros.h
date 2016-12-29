@@ -7,6 +7,8 @@
 #ifndef CNC_MACROS_MACROS_H_
 #define CNC_MACROS_MACROS_H_
 
+#include "tinyg.h"			// #1
+#include "config.h"			// #2
 #include "eeprom.h"
 
 extern stat_t (*macro_func_ptr)(void);

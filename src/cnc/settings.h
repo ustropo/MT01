@@ -55,7 +55,7 @@
 
 // Communications and reporting settings
 #define COMM_MODE					TEXT_MODE				// one of: TEXT_MODE, JSON_MODE
-#define TEXT_VERBOSITY				TV_VERBOSE				// one of: TV_SILENT, TV_VERBOSE
+#define TEXT_VERBOSITY				TV_SILENT				// one of: TV_SILENT, TV_VERBOSE
 #define NETWORK_MODE				NETWORK_STANDALONE
 
 #define JSON_VERBOSITY				JV_SILENT				// one of: JV_SILENT, JV_FOOTER, JV_CONFIGS, JV_MESSAGES, JV_LINENUM, JV_VERBOSE

@@ -176,6 +176,8 @@ static ut_fs_navigate chooseFile()
 	struct spiffs_dirent e;
 	struct spiffs_dirent *pe = &e;
 	s32_t err;
+	void *temp = NULL;
+	uint32_t remain;
 
 	char *fn;
 	char aszFiles[MENU_MAX_ITEMS][MAX_PATH_LENGHT + 1];
@@ -194,16 +196,17 @@ static ut_fs_navigate chooseFile()
 //	filesMenu.boShowTitle = true;
 //	filesMenu.maxItemsPerPage = MAX_ROW;
 
+	memset(gszCurFile,'\0',sizeof(gszCurFile));
 	/* Open dir */
+	f_getcwd (gszCurFile,sizeof(gszCurFile));
 	eRes = f_opendir(&st_usb_dir, gszCurFile);
 	if(eRes == FR_OK)
 	{
 		/* Check if it is on root */
-		if(strlen(gszCurFile) > 0)
+		if(strcmp(gszCurFile,"/") != 0)
 		{
 			sprintf(aszFiles[filesMenu.numItems++], "..");
 		}
-
 		/* Populate menu */
 		while(true)
 		{
@@ -249,18 +252,21 @@ static ut_fs_navigate chooseFile()
 		{
 			if(filesMenu.items[filesMenu.selectedItem].text[0] == '/')
 			{
+
 				/* Is a dir, recursively */
 				strcat(gszCurFile, filesMenu.items[filesMenu.selectedItem].text);
+				f_chdir(gszCurFile);
 				return NAVIGATE_CONTINUE;
 			}
 			else if(filesMenu.items[filesMenu.selectedItem].text[0] == '.')
 			{
 				/* It should rise up a level */
-				char* last = ut_strrstr(gszCurFile, "/");
-				if(last != 0) *last = 0;
+				//char* last = ut_strrstr(gszCurFile, "/");
+				//if(last != 0) *last = 0;
+				f_chdir("..");
 				return NAVIGATE_CONTINUE;
 			}
-
+			memset(gszCurFile,'\0',sizeof(gszCurFile));
 			/* Is a file - end of routine */
 			strcat(gszCurFile, filesMenu.items[filesMenu.selectedItem].text);
 
@@ -278,10 +284,8 @@ static ut_fs_navigate chooseFile()
 			{
 				err = SPIFFS_fremove(fs, *fd);
 			}
+			ut_strrstr(gszCurFile, "/");
 			*fd = SPIFFS_open(fs, gszCurFile, SPIFFS_CREAT | SPIFFS_RDWR | SPIFFS_DIRECT, 0);
-			void *temp = NULL;
-			uint32_t remain;
-
 
 			temp = pvPortMalloc( FS_PAGE_SIZE );
 			while(!f_eof(&File))
@@ -297,9 +301,12 @@ static ut_fs_navigate chooseFile()
 		    return NAVIGATE_END;
 		}
 	}
-
 	/* Operation was cancelled */
 	gszCurFile[0] = 0;
+	ut_lcd_output_warning("NENHUM ARQUIVO\n\
+						   DE CORTE\nENCONTRADO\n");
+
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
 	return NAVIGATE_CANCELLED;
 }
 
@@ -327,6 +334,7 @@ ut_state ut_state_choose_file(ut_context* pContext)
 	{
 	/* Check if usb is mounted */
 		f_opendir(&st_usb_dir, USB_ROOT);
+		f_chdir("/");
 	}
 	else
 	{

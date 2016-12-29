@@ -9,7 +9,9 @@
 #include "ut_state.h"
 #include "ut_state_config_var.h"
 #include "config_par_maquina.h"
+#include "macros.h"
 #include "eeprom.h"
+
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -66,7 +68,7 @@ static char* boolJogMaq[2] =
 static char* boolSim[2] =
 {
 	"SIMULAÇÃO",
-	"MODO CORTE AUTO"
+	"DISPARAR E CORTAR"
 };
 
 static char* boolEn[2] =
@@ -256,6 +258,14 @@ void config_int(ut_config_var* var)
 			{
 				case STATE_CONFIG_JOG:
 					eepromWriteConfig(CONFIGVAR_JOG);
+					if (configsVar->currentItem == CONFIG_JOG_RAPIDO)
+					{
+						velocidadeJog = &configVarJog[JOG_RAPIDO];
+					}
+					else
+					{
+						velocidadeJog = &configVarJog[JOG_LENTO];
+					}
 					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
 							/* Delay */
 					vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -305,6 +315,7 @@ void config_int(ut_config_var* var)
 					configsVar->type = UT_CONFIG_INT;
 				}
 			}
+			func_back = 0xFF;
 			return;
 
 		case KEY_RELEASED:
@@ -357,12 +368,10 @@ ut_state ut_state_config_var(ut_context* pContext)
 	switch(configsVar->currentState)
 	{
 		case STATE_CONFIG_JOG:
-			if(configsVar->currentItem == CONFIG_JOG_RAP_LENTO )
+			if(func_back == 0xFF)
 			{
-				if(func_back == 0xFF)
-				{
-					stateBack = (ut_state)pContext->value[1];
-				}
+				stateBack = (ut_state)pContext->value[1];
+				func_back = 0;
 			}
 			break;
 		case STATE_CONFIG_MANUAL_MODE:

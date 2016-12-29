@@ -39,7 +39,6 @@ char textXStr[MAX_COLUMN];
 char textYStr[MAX_COLUMN];
 char textZStr[MAX_COLUMN];
 uint8_t gTitle;
-extern float *velocidadeJog;
 extern bool intepreterRunning;
 extern uint8_t func_back;
 
@@ -74,7 +73,7 @@ enum {
 	SIM
 };
 
-static char gStrManual[4][24] =
+static char gStrManual[6][24] =
 {
 	DEFAULT_MANUAL_TITLE,
 	DEFAULT_AVISO_MANUAL,
@@ -126,14 +125,12 @@ static void updatePosition(uint8_t menu)
 	/* Display is only cleared once to improve performance */
 	lStr[4] = "";
 	lStr[6] = "";
+	lStr[1] = "";
 	switch(menu)
 	{
-		case MANUAL: lStr[0] = gStrAuto[0];
-					 currentLine = cm_get_linenum(RUNTIME);
-						 sprintf(gStrAuto[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
-					 lStr[1] = gStrAuto[1];
-					sprintf(gStrAuto[2], "VEL.: %.0f mm/min",  *velocidadeJog);
-					lStr[2] = gStrAuto[2];
+		case MANUAL: lStr[0] = gStrManual[0];
+					sprintf(gStrManual[2], "VEL.: %.0f mm/min",  *velocidadeJog);
+					lStr[2] = gStrManual[2];
 
 					 if (!ARCO_OK)
 						 lStr[3] = "AOK";
@@ -141,11 +138,11 @@ static void updatePosition(uint8_t menu)
 						 lStr[3] = "";
 					 if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 					 {
-						 sprintf(gStrAuto[4], "THC SET: %.0f V",  configVarPl[PL_CONFIG_TENSAO_THC]);
-						 lStr[4] = gStrAuto[4];
+						 sprintf(gStrManual[4], "THC SET: %.0f V",  configVarPl[PL_CONFIG_TENSAO_THC]);
+						 lStr[4] = gStrManual[4];
 						 if(isCuttingGet()){
-							 sprintf(gStrAuto[5], "THC REAL: %.0f V",  THC_realGet());
-							 lStr[5] = gStrAuto[5];
+							 sprintf(gStrManual[5], "THC REAL: %.0f V",  THC_realGet());
+							 lStr[5] = gStrManual[5];
 						 }
 						 else
 						 {
@@ -155,13 +152,6 @@ static void updatePosition(uint8_t menu)
 							 lStr[6] = "OH";
 						 else
 							 lStr[6] = "";
-					}
-					else
-					{
-					 if(isDwell){
-							 sprintf(gStrAuto[4], "T: %.0f s",  st_get_dwell_elapsed_time());
-						 lStr[4] = gStrAuto[4];
-					 }
 					}
 					break;
 		case AUTO:   lStr[0] = gStrAuto[0];
@@ -558,6 +548,18 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					}
 					else
 					{
+						if(gTitle == AUTO){
+							strcpy(gStrAuto[0],DEFAULT_AUTO_TITLE);
+							strcpy(gStrAuto[1],DEFAULT_AVISO_AUTO);
+						}else if(gTitle == SIM){
+							strcpy(gStrSim[0],DEFAULT_SIM_TITLE);
+							strcpy(gStrSim[1],DEFAULT_AVISO_SIM);
+						}
+						if(isDwell == true)
+						{
+							st_command_dwell(DWELL_RESTART);
+						}
+						lstop = false;
 						iif_func_enter();
 						TORCH = ltorchBuffer;
 					}

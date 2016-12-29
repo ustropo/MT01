@@ -53,70 +53,6 @@ static void output_ports_configure(void)
 	/* Unlock MPC registers to enable writing to them. */
 	R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_MPC);
 
-#ifndef MODULO
-	/* Port 0 - not used*/
-	PORT0.PODR.BYTE = 0x00 ;    /* All outputs low to start */
-	PORT0.PDR.BYTE  = 0xFF ;    /* all  are outputs */
-
-	/* Port 1 - UART debug and USB 	VBUS and USB Overcurrent */
-	PORT1.PMR.BYTE = 0x5C;
-	MPC.P12PFS.BYTE = 0x0A;
-	MPC.P13PFS.BYTE = 0x0A;
-	MPC.P14PFS.BYTE = 0x12; /* USB0_OVRCURA */
-	MPC.P16PFS.BYTE = 0x12; /* USB0_VBUS */
-	PORT1.PODR.BYTE = 0x00 ; /* All outputs low to start */
-	PORT1.PDR.BYTE  = 0xFB ;  /* All  outputs */
-
-	/* Port 2 - USB control  */
-	PORT2.PODR.BYTE = 0x00 ;    /* All outputs low to start */
-	PORT2.PDR.BYTE  = 0xFF ;    /* All outputs  */
-
-	/* Port 3 - JTAG */
-	PORT3.PODR.BYTE = 0x00 ;    /* All outputs low to start */
-	PORT3.PDR.BYTE = 0x0C;
-	/* Port 4 -  */
-	PORT4.PODR.BYTE = 0x00 ;    /* All outputs low to start */
-	PORT4.PDR.BYTE  = 0xFF ;    /* All outputs  */
-
-	/* Port 5 - Keyboard lines */
-	PORT5.PODR.BYTE = 0xFF ;    /* All outputs low to start */
-	PORT5.PDR.BYTE  = 0x00 ;    /* All inputs */
-	PORT5.PCR.BYTE  = 0x3F ;	 /* Pull up */
-
-	/* Port A - serial memory & PWM  */
-	PORTA.PMR.BYTE  = 0x1A ;    /* SCI5 & TIOCA2 */
-	MPC.PA1PFS.BYTE = 0x0A ;    /* PA1 is SCK */
-	MPC.PA3PFS.BYTE = 0x0A ;    /* PA3 is MISO */
-	MPC.PA4PFS.BYTE = 0x0A ;    /* PA4 is MOSI */
-	//     MPC.PA6PFS.BYTE = 0x03 ;	/* PA6 is PWM charge*/
-	PORTA.PDR.BYTE  = 0xC0 ;    /* PA7 is CS */
-	PORTA.PODR.BYTE = 0x00 ;    /* */
-	PORTA.PDR.BYTE  = 0xF7 ;    /* All outputs except MISO */
-
-	//    /* Port B - LCD Contrast - not used */
-	PORTB.PODR.BYTE = 0x00 ;
-	PORTB.PDR.BYTE = 0xFF; /* All outputs */
-
-	/* Port C -  LCD SPI signals && Keyboard Col */
-	PORTC.PMR.BYTE  = 0x60 ;    /*  */
-
-	MPC.PC5PFS.BYTE = 0x0D ;    /* PC5 is RSPCKA */
-	MPC.PC6PFS.BYTE = 0x0D ;    /* PC6 is MOSIA */
-	PORTC.PODR.BYTE = 0x00 ;    /* All outputs low to start */
-	PORTC.PDR.BYTE  = 0xFF ;    /* All outputs except MISO */
-
-	/* Port D -  CNC signals */
-	PORTD.PODR.BYTE = 0x00 ;    /* All outputs low to start  	*/
-	PORTD.PDR.BYTE  = 0xD8 ;    /* PD0-PD2 and PD5 inputs, PD3-PD7 outputs  */
-
-	/* Port E -  CNC signals*/
-	PORTE.PODR.BYTE = 0x00 ;    /* All outputs low to start  */
-	PORTE.PDR.BYTE  = 0xFF ;    /* All outputs*/
-
-	/* Port J -  No used	*/
-	PORTJ.PODR.BYTE = 0x00 ;    /* All outputs low to start  */
-	PORTJ.PDR.BYTE  = 0x08 ;    /* All output */
-#else
 	/* Port 0 - not used*/
 	PORT0.PODR.BYTE = 0x00 ;    /* All outputs low to start */
 	PORT0.PDR.BYTE  = 0xFF ;    /* all  are outputs */
@@ -186,7 +122,6 @@ static void output_ports_configure(void)
 	/* Port J -  No used	*/
 	PORTJ.PODR.BYTE = 0x00 ;    /* All outputs low to start  */
 	PORTJ.PDR.BYTE  = 0xFF ;    /* All output */
-#endif
 	/* Lock MPC registers. */
 	R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
 }
