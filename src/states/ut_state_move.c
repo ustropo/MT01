@@ -483,14 +483,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					if (arco == ARCO_OK_OFF || ltorchBuffer == TRUE)
 					{
 						arco = 0;
-						//if(stopDuringCut_Get() && cm.probe_state != PROBE_WAITING)
 						if(stopDuringCut_Get())
 						{
-							//state = 0;
-		//					isCuttingSet(false);
-	//						isCuttingSet(true);
-	//						pl_arcook_start();
-					//		cm_set_feed_rate(configVarPl[PL_CONFIG_VELOC_CORTE]);
 							stopDuringCut_Set(false);
 							if (cm.probe_state == PROBE_WAITING)
 							{
@@ -746,15 +740,15 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		case ARCO_OK_FAILED:
 			if(!arco)
 			{
-				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
-				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
-				TORCH = FALSE;
-				pl_arcook_stop();
-			//	isCuttingSet(false);
-				arco = ARCO_OK_FAILED;
-				lstop = false;
-				warm_stop(0);
-				ltorchBuffer = TRUE;
+				if(!sim){
+					updatePosition(AUTO);
+					gTitle = AUTO;
+				}
+				else{
+					updatePosition(SIM);
+					gTitle = SIM;
+				}
+				xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 			}
 			break;
 

@@ -226,7 +226,7 @@ static void IRQ8_isr (void) {
 void plasma_task(void)
 {
 	uint8_t debounce;
-	uint32_t qSend;
+	uint32_t qSend = 0;
     bool pinState;
 
 	while(1)
@@ -269,9 +269,23 @@ void plasma_task(void)
 				}while(debounce != ARCOOK_DELAY_COUNT && isCutting && ArcoOktaskIdle);
 				if (isCutting && ArcoOktaskIdle)
 				{
+					xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
 					stopDuringCut_Set(true);
+				    vTaskPrioritySet( xCncTaskHandle, 3 );
+					warm_stop(2);
+				    vTaskPrioritySet( xCncTaskHandle, 1 );
+					TORCH = FALSE;
+					if( uxTaskPriorityGet( xCncTaskHandle ) != 1 )
+					{
+
+					}
+					lstop = true;
+					ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
+					while(qSend != KEY_ESC){
+						WDT_FEED
+						xQueueReceive( qKeyboard, &qSend, portMAX_DELAY );
+					}
 					qSend = ARCO_OK_FAILED;
-					macro_func_ptr = command_idle;
 					xQueueSend( qKeyboard, &qSend, 0 );
 				}
 			}
