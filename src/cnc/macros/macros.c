@@ -53,17 +53,14 @@ extern struct gcodeParserSingleton gp;
 stat_t M3_Macro(void)
 {
 	float tempo;
-	/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
-	if (cm_get_runtime_busy() == true) { return (STAT_EAGAIN);}	// sync to planner move ends
-
 	macro_buffer = M3_Macro;
+
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
 	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
 	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
-	/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
-	if (cm_get_runtime_busy() == true) { return (STAT_EAGAIN);}	// sync to planner move ends
+	printf("Macro M3 - state %d\nlinumacro - %d\n",state,linenumMacro);
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
@@ -103,21 +100,9 @@ stat_t M3_Macro(void)
 					/*  5 -Espera o arco OK */
 			case 4: if(!sim)
 					{
-						uint32_t lRet = pdFALSE;
-						pl_arcook_start();
-						xQueueReset((xQueueHandle)xArcoOkSync);
-						lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
-						if (lRet == pdFALSE)
-						{
-							uint32_t qSend = ARCO_OK_FAILED;
-							xQueueSend( qKeyboard, &qSend, 0 );
-							macro_func_ptr = command_idle;
-							return (STAT_OK);
-						}
-						else
-						{
-				//			isCuttingSet(true);
-						}
+						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+						SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_WAIT_SWITCH);
+						SET_NON_MODAL_MACRO (parameter, 3000);
 					}
 					state++; break;
 
@@ -146,7 +131,7 @@ stat_t M3_Macro(void)
 					SET_NON_MODAL_MACRO (feed_rate, vel_corte);
 					state++; break;
 
-			default: state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+			default: state = 0; macro_buffer = _command_dispatch ; macro_func_ptr = _command_dispatch; return (STAT_OK);
 		}
 	}
 	else
@@ -236,10 +221,8 @@ stat_t M3_Macro(void)
 stat_t M4_Macro(void)
 {
 	float tempo;
-	/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
-	if (cm_get_runtime_busy() == true) { return (STAT_EAGAIN);}	// sync to planner move ends
-
 	macro_buffer = M4_Macro;
+
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -289,19 +272,9 @@ stat_t M4_Macro(void)
 					/*  5 -Espera o arco OK */
 			case 4: if(!sim)
 					{
-						uint32_t lRet;
-						pl_arcook_start();
-						lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
-						if (lRet == pdFALSE)
-						{
-							uint32_t qSend = ARCO_OK_FAILED;
-							xQueueSend( qKeyboard, &qSend, 0 );
-							return (STAT_OK);
-						}
-						else
-						{
-				//			isCuttingSet(true);
-						}
+						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+						SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_WAIT_SWITCH);
+						SET_NON_MODAL_MACRO (parameter, 3000);
 					}
 					state++; break;
 
@@ -327,11 +300,11 @@ stat_t M4_Macro(void)
 
 stat_t M5_Macro(void)
 {
-
+	macro_buffer = M5_Macro;
 	if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 	{
 		/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
-		if (cm_get_runtime_busy() == true ) { return (STAT_EAGAIN);}	// sync to planner move ends
+	//	if (cm_get_runtime_busy() == true ) { return (STAT_EAGAIN);}	// sync to planner move ends
 		altura_perfuracao 	= 	configVarPl[PL_CONFIG_ALTURA_PERFURACAO];
 		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarPl[PL_CONFIG_ALTURA_CORTE];
@@ -342,7 +315,7 @@ stat_t M5_Macro(void)
 	else
 	{
 		/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
-		if (cm_get_runtime_busy() == true  || lstop == true) { return (STAT_EAGAIN);}	// sync to planner move ends
+		//if (cm_get_runtime_busy() == true  || lstop == true) { return (STAT_EAGAIN);}	// sync to planner move ends
 		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
 		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
@@ -350,7 +323,7 @@ stat_t M5_Macro(void)
 		tempo_perfuracao	= 	configVarOx[OX_CONFIG_TEMPO_PERFURACAO];
 		tempo_aquecimento	= 	configVarOx[OX_CONFIG_TEMPO_AQUECIMENTO];
 	}
-
+	printf("Macro M5 - state %d\nlinumacro - %d\n",state,linenumMacro);
 	// set initial state for new move
 	memset(&gp, 0, sizeof(gp));						// clear all parser values
 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
@@ -359,14 +332,15 @@ stat_t M5_Macro(void)
 
 	switch (state)
 	{
-		case 0: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
+		case 0: stopDuringCut_Set(false);
+				SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 			    SET_MODAL_MACRO (MODAL_GROUP_M7, spindle_mode, SPINDLE_OFF);
 				state++; break;
 		case 1: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 				SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
 				SET_NON_MODAL_MACRO(target[AXIS_Z], altura_deslocamento);
 				state++; break;
-		default:state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
+		default:state = 0; macro_buffer = _command_dispatch; macro_func_ptr = _command_dispatch; return (STAT_OK);
 	}
 	_execute_gcode_block();
 	return (STAT_OK);
@@ -576,38 +550,29 @@ stat_t G10_Macro(void)
 stat_t arcoOK_Macro(void)
 {
 	uint32_t lRet = pdFALSE;
-	// set initial state for new move
-//	memset(&gp, 0, sizeof(gp));						// clear all parser values
-//	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
-//	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
-//	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
+
 	if (xMacroArcoOkSync == true)
 	{
-		switch (state)
+		pl_arcook_start();
+		xQueueReset((xQueueHandle)xArcoOkSync);
+		lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
+		if (lRet == pdFALSE)
 		{
-			case 0:	pl_arcook_start();
-					lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
-					if (lRet == pdFALSE)
-					{
-						uint32_t qSend = ARCO_OK_FAILED;
-						xQueueSend( qKeyboard, &qSend, 0 );
-						macro_func_ptr = command_idle;
-						xMacroArcoOkSync = false;
-			//			isCuttingSet(true);
-						return (STAT_OK);
-					}
-					else
-					{
-						cm_request_cycle_start();
-						stopDuringCut_Set(false);
-						delay_thcStartStop(true);
-						xMacroArcoOkSync = false; state = 0; macro_func_ptr = _command_dispatch; return (STAT_OK);
-					}
-					break;
-			default:
-					break;
+			uint32_t qSend = ARCO_OK_FAILED;
+			xQueueSend( qKeyboard, &qSend, 0 );
+			macro_func_ptr = command_idle;
+			xMacroArcoOkSync = false;
 		}
-		_execute_gcode_block();
+		else
+		{
+			cm_request_cycle_start();
+			stopDuringCut_Set(false);
+			delay_thcStartStop(true);
+			xMacroArcoOkSync = false;
+			//state = 0;
+			//macro_func_ptr = _command_dispatch;
+			macro_func_ptr = macro_buffer;
+		}
 	}
 	return (STAT_OK);
 }

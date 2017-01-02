@@ -247,6 +247,7 @@ typedef struct cmSingleton {			// struct to manage cm globals and cycles
 	uint8_t homed[AXES];				// individual axis homing flags
 
 	uint8_t probe_state;				// 1==success, 0==failed
+	uint8_t wait_state;				    // 1==success, 0==failed
 	float probe_results[AXES];			// probing results
 
 	uint8_t	g28_flag;					// true = complete a G28 move
@@ -333,7 +334,8 @@ enum cmCycleState {
 	CYCLE_MACHINING,				// in normal machining cycle
 	CYCLE_PROBE,					// in probe cycle
 	CYCLE_HOMING,					// homing is treated as a specialized cycle
-	CYCLE_JOG						// jogging is treated as a specialized cycle
+	CYCLE_JOG,						// jogging is treated as a specialized cycle
+	CYCLE_WAITINGSWITCH				// waiting switch
 };
 
 enum cmMotionState {
@@ -363,6 +365,12 @@ enum cmProbeState {					// applies to cm.probe_state
 	PROBE_WAITING					// probe is waiting to be started
 };
 
+enum cmWaitingState {					// applies to cm.probe_state
+	WS_FAILED = 0,				// probe reached endpoint without triggering
+	WS_SUCCEEDED = 1,			// probe was triggered, cm.probe_results has position
+	WS_WAITING					// probe is waiting to be started
+};
+
 /* The difference between NextAction and MotionMode is that NextAction is
  * used by the current block, and may carry non-modal commands, whereas
  * MotionMode persists across blocks (as G modal group 1)
@@ -383,7 +391,8 @@ enum cmNextAction {						// these are in order to optimized CASE statement
 	NEXT_ACTION_SUSPEND_ORIGIN_OFFSETS,	// G92.2
 	NEXT_ACTION_RESUME_ORIGIN_OFFSETS,	// G92.3
 	NEXT_ACTION_DWELL,					// G4
-	NEXT_ACTION_STRAIGHT_PROBE			// G38.2
+	NEXT_ACTION_STRAIGHT_PROBE,			// G38.2
+	NEXT_ACTION_WAIT_SWITCH			    //
 };
 
 enum cmMotionMode {						// G Modal Group 1
@@ -651,6 +660,9 @@ stat_t cm_homing_callback(void);								// G28.2/.4 main loop callback
 // Probe cycles
 stat_t cm_straight_probe(float target[], float flags[]);		// G38.2
 stat_t cm_probe_callback(void);									// G38.2 main loop callback
+
+uint8_t cm_straight_wait(float time);
+uint8_t cm_wait_callback(void);
 
 // Jogging cycle
 stat_t cm_jogging_callback(void);								// jogging cycle main loop

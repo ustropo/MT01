@@ -201,6 +201,7 @@ static void _controller_HSM()
 	DISPATCH(cm_homing_callback());				// G28.2 continuation
 	DISPATCH(cm_jogging_callback());			// jog function
 	DISPATCH(cm_probe_callback());				// G38.2 continuation
+	DISPATCH(cm_wait_callback());				//
 	DISPATCH(cm_deferred_write_callback());		// persist G10 changes when not in machining cycle
 
 //----- command readers and parsers --------------------------------------------------//
@@ -210,6 +211,12 @@ static void _controller_HSM()
 #ifdef __AVR
 	DISPATCH(set_baud_callback());				// perform baud rate update (must be after TX sync)
 #endif
+
+	static uint32_t  linebuffer = 0;
+	if (linebuffer != cm_get_linenum(RUNTIME))
+		printf("line - %d\n", cm_get_linenum(RUNTIME));
+	linebuffer = cm_get_linenum(RUNTIME);
+
 	DISPATCH(macro_func_ptr());				// read and execute next command
 	DISPATCH(_normal_idler());					// blink LEDs slowly to show everything is OK
 }

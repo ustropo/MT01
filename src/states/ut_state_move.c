@@ -483,13 +483,20 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					if (arco == ARCO_OK_OFF || ltorchBuffer == TRUE)
 					{
 						arco = 0;
-						if(stopDuringCut_Get() && cm.probe_state != PROBE_WAITING)
+						//if(stopDuringCut_Get() && cm.probe_state != PROBE_WAITING)
+						if(stopDuringCut_Get())
 						{
-							state = 0;
+							//state = 0;
 		//					isCuttingSet(false);
 	//						isCuttingSet(true);
 	//						pl_arcook_start();
 					//		cm_set_feed_rate(configVarPl[PL_CONFIG_VELOC_CORTE]);
+							stopDuringCut_Set(false);
+							if (cm.probe_state == PROBE_WAITING)
+							{
+								simTorch = false;
+								macro_func_ptr = macro_buffer;
+							}
 							xMacroArcoOkSync = true;
 						}
 						else
@@ -710,7 +717,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				}
 				else
 				{
-					stopDuringCut_Set(true);
+					if (isCuttingGet() == true)
+						stopDuringCut_Set(true);
 					lstop = true;
 					warm_stop(0);
 				}
