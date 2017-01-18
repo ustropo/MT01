@@ -822,7 +822,7 @@ stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
 stat_t mp_plan_feedrateoverride_callback(mpBuf_t *bf)
 {
 
-//	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
+	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
 
 //	if (bf == NULL) return (STAT_ERROR);
 //	mpBuf_t *bp = bf;
@@ -842,15 +842,20 @@ stat_t mp_plan_feedrateoverride_callback(mpBuf_t *bf)
 //			default:
 //		}
 //	} while (((bp = mp_get_next_buffer(bp)) != bf));
-	mr.segment_velocity = mr.gm.feed_rate*cm.gmx.feed_rate_override_factor;
-	if(mr.segment_velocity > X_FEEDRATE_MAX)
-		mr.segment_velocity = X_FEEDRATE_MAX;
-	if(mr.segment_velocity < 10)
-		mr.segment_velocity = 10;
-	mr.exit_velocity = mr.exit_velocity*cm.gmx.feed_rate_override_factor;
-	mr.entry_velocity = mr.entry_velocity*cm.gmx.feed_rate_override_factor;
-//	_reset_replannable_list();				// make it replan all the blocks
-//	_plan_block_list(bf, &mr_flag);
+//	mr.segment_velocity = mr.gm.feed_rate*cm.gmx.feed_rate_override_factor;
+//	if(mr.segment_velocity > X_FEEDRATE_MAX)
+//		mr.segment_velocity = X_FEEDRATE_MAX;
+//	if(mr.segment_velocity < 10)
+//		mr.segment_velocity = 10;
+	if (mr.exit_velocity == mr.cruise_velocity && mr.cruise_velocity == mr.entry_velocity)
+	{
+		configVarPl[PL_CONFIG_VELOC_CORTE] = configVarPl[PL_CONFIG_VELOC_CORTE]*cm.gmx.feed_rate_override_factor;
+		mr.exit_velocity = mr.exit_velocity*cm.gmx.feed_rate_override_factor;
+		mr.cruise_velocity = mr.cruise_velocity*cm.gmx.feed_rate_override_factor;
+		mr.entry_velocity = mr.entry_velocity*cm.gmx.feed_rate_override_factor;
+		_reset_replannable_list();				// make it replan all the blocks
+		_plan_block_list(bf, &mr_flag);
+	}
 	return (STAT_OK);
 }
 #endif

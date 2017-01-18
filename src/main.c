@@ -106,6 +106,7 @@ void main(void)
 	channel1_cfg.e_voltage_level =LVD_VOLTAGE_CH1_2_95;
 	err = R_LVD_Open(LVD_CHANNEL_1, &channel1_cfg, NULL);
 
+	IWDT.IWDTCR.WORD = 0x3323;
 	bool ret = false;
 	/* Reserve the CMT0 for FreeRTOS */
 	ret = R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_CMT0));

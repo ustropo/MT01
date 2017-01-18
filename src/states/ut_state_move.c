@@ -158,11 +158,12 @@ static void updatePosition(uint8_t menu)
 					 currentLine = cm_get_linenum(RUNTIME);
  	 	 	 	 	 sprintf(gStrAuto[1], "LINHA: %d",  cm_get_linenum(RUNTIME));
 		 	 	 	 lStr[1] = gStrAuto[1];
-		 	 	 	 vel = cm_get_feed_rate(ACTIVE_MODEL);
+		 	 	 	 vel = cm_get_feed_rate(RUNTIME);
 		 	 	 	 if (vel == 0)
 		 	 	 	 {
 		 	 	 		vel = mp_get_runtime_velocity();
 		 	 	 	 }
+
 			         sprintf(gStrAuto[2], "VEL.: %.0f mm/min",  vel);
                      lStr[2] = gStrAuto[2];
 
@@ -481,6 +482,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 						st_command_dwell(DWELL_RESTART);
 					}
 					if (arco == ARCO_OK_OFF || ltorchBuffer == TRUE)
+					//if (ltorchBuffer == TRUE)
 					{
 						arco = 0;
 						if(stopDuringCut_Get())
@@ -738,17 +740,28 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			}
 			break;
 		case ARCO_OK_FAILED:
+			if(!sim){
+				updatePosition(AUTO);
+				gTitle = AUTO;
+			}
+			else{
+				updatePosition(SIM);
+				gTitle = SIM;
+			}
+			xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
+			break;
+		case ARCO_OK_INIT_FAILED:
 			if(!arco)
 			{
-				if(!sim){
-					updatePosition(AUTO);
-					gTitle = AUTO;
-				}
-				else{
-					updatePosition(SIM);
-					gTitle = SIM;
-				}
-				xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
+				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+				ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
+				TORCH = FALSE;
+				pl_arcook_stop();
+			//	isCuttingSet(false);
+				arco = ARCO_OK_FAILED;
+				lstop = false;
+				warm_stop(0);
+				ltorchBuffer = TRUE;
 			}
 			break;
 

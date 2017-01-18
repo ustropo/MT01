@@ -40,8 +40,12 @@
 #include "plasma.h"
 #include "controller.h"
 #include "keyboard.h"
+#include "config_SwTimers.h"
+#include "lcd.h"
+
 
 extern bool lstop;
+extern void warm_stop(uint8_t flag);
 /**** Probe singleton structure ****/
 
 #define MINIMUM_PROBE_TRAVEL 0.254
@@ -146,15 +150,16 @@ static stat_t _waiting_start()
 	lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
 	if (lRet == pdFALSE)
 	{
-		uint32_t qSend = ARCO_OK_FAILED;
+		uint32_t qSend = ARCO_OK_INIT_FAILED;
+		stopDuringCut_Set(true);
 		xQueueSend( qKeyboard, &qSend, 0 );
 		macro_func_ptr = command_idle;
-		cm.wait_state = WS_SUCCEEDED;
+		cm.wait_state = WS_FAILED;
 	//	return (STAT_OK);
 	}
 	else
 	{
-		cm.wait_state = WS_FAILED;
+		cm.wait_state = WS_SUCCEEDED;
 	}
 	return (_set_ws_func(_waiting_finish));
 }

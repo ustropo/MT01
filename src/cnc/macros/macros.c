@@ -558,7 +558,9 @@ stat_t arcoOK_Macro(void)
 		lRet = xSemaphoreTake( xArcoOkSync, pdMS_TO_TICKS(3000) );
 		if (lRet == pdFALSE)
 		{
-			uint32_t qSend = ARCO_OK_FAILED;
+			uint32_t qSend;
+			stopDuringCut_Set(true);
+			qSend = ARCO_OK_INIT_FAILED;
 			xQueueSend( qKeyboard, &qSend, 0 );
 			macro_func_ptr = command_idle;
 			xMacroArcoOkSync = false;

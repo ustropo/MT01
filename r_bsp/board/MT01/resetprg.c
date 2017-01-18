@@ -437,6 +437,13 @@ static void operating_frequency_set (void)
     /* We can now turn LOCO off since it is not going to be used. */
     SYSTEM.LOCOCR.BYTE = 0x01;
 #endif
+
+    SYSTEM.ILOCOCR.BIT.ILCSTP = 0;
+    for(uint16_t i = 0; i < 2000; i++)
+    {
+        /* Wait 12ms. See comment above for why. */
+        nop() ;
+    }
     /* Protect on. */
     SYSTEM.PRCR.WORD = 0xA500;
 
