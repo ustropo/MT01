@@ -233,9 +233,9 @@ void vTimerCallback( TimerHandle_t pxTimer )
 	if (configFlags[MODOMAQUINA] == MODO_OXICORTE || sim){
 		switch (lArrayIndex)
 		{
-			case ZUP_FILERUNNING_TIMER: zmove = 0.01;
+			case ZUP_FILERUNNING_TIMER: zmove = 0.005;
 			break;
-			case ZDOWN_FILERUNNING_TIMER: zmove = -0.01;
+			case ZDOWN_FILERUNNING_TIMER: zmove = -0.005;
 			break;
 		}
 	}

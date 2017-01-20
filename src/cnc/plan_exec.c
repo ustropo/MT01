@@ -765,7 +765,9 @@ static stat_t _exec_aline_segment()
 				{
 					configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] = fmax(mr.gm.target[2],configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO]);
 					/* Atualizando a altura de corte*/
-					configVarOx[OX_CONFIG_ALTURA_CORTE] = mr.gm.target[2];
+					configVarOx[OX_CONFIG_ALTURA_CORTE] += zmove;
+					configVarOx[OX_CONFIG_ALTURA_PERFURACAO] += zmove;
+					configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] += zmove;
 				}
 
 				zmovedlenght = mr.gm.target[2];

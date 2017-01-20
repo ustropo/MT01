@@ -795,26 +795,33 @@ stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
 {
 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
 	float value;
-	if (configFlags[MODOMAQUINA] == MODO_PLASMA){
+	//if (configFlags[MODOMAQUINA] == MODO_PLASMA){
 		value = mr.gm.target[AXIS_Z] - bf->gm.target[AXIS_Z];
 		if(bf->unit[AXIS_Z] > 0)
 		{
 			if(value>0)
 			{
-				bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+				if (configFlags[MODOMAQUINA] == MODO_PLASMA)
+					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+				else
+					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1) + zmoving;
 			}
 		}
 		else
 		{
 			if(value<0)
 			{
-				bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+				if (configFlags[MODOMAQUINA] == MODO_PLASMA)
+					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+				else
+					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1) + zmoving;
 			}
 		}
 		bf->length =fabs(value);
-	}
+
 		bf->replannable = 1;
 		_plan_block_list(bf, &mr_flag);
+	//}
 
 	return (STAT_OK);
 }

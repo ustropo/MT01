@@ -748,9 +748,27 @@ void timer_dwell_callback(void *pdata)
 	refresh += 1;
 	if(refresh == 1000){
 		if (MOTOR1_DIR == MOTOR_FOWARD)
+		{
 			mr.gm.target[AXIS_Z] -= step;
+			if(configFlags[MODOMAQUINA] == MODO_OXICORTE)
+			{
+				/* Atualizando a altura de corte*/
+				configVarOx[OX_CONFIG_ALTURA_CORTE] -= step;
+				configVarOx[OX_CONFIG_ALTURA_PERFURACAO] -= step;
+				configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] -= step;
+			}
+		}
 		else
+		{
 			mr.gm.target[AXIS_Z] += step;
+			if(configFlags[MODOMAQUINA] == MODO_OXICORTE)
+			{
+				/* Atualizando a altura de corte*/
+				configVarOx[OX_CONFIG_ALTURA_CORTE] += step;
+				configVarOx[OX_CONFIG_ALTURA_PERFURACAO] += step;
+				configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] += step;
+			}
+		}
 
 		mp_set_runtime_position(AXIS_Z,mr.gm.target[AXIS_Z]);
 		if(step != 0)
@@ -761,6 +779,7 @@ void timer_dwell_callback(void *pdata)
 	if (--st_run.dda_ticks_downcount == 0) {
 		isDwell = false;
 		refresh = 0;
+
 		step = 0;
 		if (st_pre.mot[MOTOR_1].direction == DIRECTION_CW)
 			MOTOR1_DIR = MOTOR_REVERSE; else

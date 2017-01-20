@@ -19,6 +19,8 @@
 #include "lcd.h"
 #include "keyboard.h"
 
+#define FEEDRATE_Z 900
+
 static float altura_perfuracao;
 static float altura_deslocamento;
 static float altura_corte;
@@ -71,11 +73,11 @@ stat_t M3_Macro(void)
 		tempo_aquecimento	= 	0;
 		switch (state)
 		{
-				/*   1- Procura chapa. G38.2 -50 COM FEEDRATE DE 800MM/MIN  */
+				/*   1- Procura chapa. G38.2 -50 COM FEEDRATE DE 900MM/MIN  */
 			case 0: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_STRAIGHT_PROBE);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], -50);
-					SET_NON_MODAL_MACRO (feed_rate, 800);
+					SET_NON_MODAL_MACRO (feed_rate, FEEDRATE_Z);
 					state++; break;
 
 				/*  2- Zera o eixo Z com G28.3 Z0*/
@@ -123,7 +125,7 @@ stat_t M3_Macro(void)
 			case 6: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], altura_corte);
-					SET_NON_MODAL_MACRO (feed_rate, 800);
+					SET_NON_MODAL_MACRO (feed_rate, FEEDRATE_Z);
 					state++; break;
 
 					/*8- Seta o sistema com o feedrate de corte "VELOC. DE CORTE" */
@@ -136,6 +138,7 @@ stat_t M3_Macro(void)
 	}
 	else
 	{
+		if (cm_get_runtime_busy() == true  || lstop == true) { return (STAT_EAGAIN);}	// sync to planner move ends
 		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
 		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
@@ -203,7 +206,7 @@ stat_t M3_Macro(void)
 			case 5: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], altura_corte);
-					SET_NON_MODAL_MACRO (feed_rate, 800);
+					SET_NON_MODAL_MACRO (feed_rate, FEEDRATE_Z);
 					state++; break;
 
 					/*7- Seta o sistema com o feedrate de corte "VELOC. DE CORTE" */
@@ -243,7 +246,7 @@ stat_t M4_Macro(void)
 			case 0: SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 					SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_STRAIGHT_PROBE);
 					SET_NON_MODAL_MACRO(target[AXIS_Z], -50);
-					SET_NON_MODAL_MACRO (feed_rate, 800);
+					SET_NON_MODAL_MACRO (feed_rate, FEEDRATE_Z);
 					state++; break;
 
 				/*  2- Zera o eixo Z com G28.3 Z0*/
@@ -315,7 +318,7 @@ stat_t M5_Macro(void)
 	else
 	{
 		/* A macro não pode acorrer até que o buffer seja esvaziado, para que ações durante o corte tenham efeito imediato*/
-		//if (cm_get_runtime_busy() == true  || lstop == true) { return (STAT_EAGAIN);}	// sync to planner move ends
+		if (cm_get_runtime_busy() == true  || lstop == true) { return (STAT_EAGAIN);}	// sync to planner move ends
 		altura_perfuracao 	= 	configVarOx[OX_CONFIG_ALTURA_PERFURACAO];
 		altura_deslocamento	= 	configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
 		altura_corte		= 	configVarOx[OX_CONFIG_ALTURA_CORTE];
