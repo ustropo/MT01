@@ -33,14 +33,16 @@ void vTimerLineCallback( TimerHandle_t pxTimer );
 void iif_bind_line_selection(void)
 {
 	timeNum = NONE;
-	swTimers[LINE_SELECTION_TIMER] = xTimerCreate
-	                   ( "Timer 1",
-	                     ( 250 ),
-	                     pdTRUE,
-	                     ( void * ) LINE_SELECTION_TIMER,
-						 vTimerLineCallback
-	                   );
-
+	if(swTimers[LINE_SELECTION_TIMER] == NULL)
+	{
+		swTimers[LINE_SELECTION_TIMER] = xTimerCreate
+						   ( "Timer 1",
+							 ( 250 ),
+							 pdTRUE,
+							 ( void * ) LINE_SELECTION_TIMER,
+							 vTimerLineCallback
+						   );
+	}
 	iif_func_enter = &iif_idle;
 	iif_func_esc = &iif_line_released;
 	iif_func_down = &iif_line_down;

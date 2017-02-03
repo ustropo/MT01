@@ -801,20 +801,14 @@ stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
 		{
 			if(value>0)
 			{
-				if (configFlags[MODOMAQUINA] == MODO_PLASMA)
 					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
-				else
-					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1) + zmoving;
 			}
 		}
 		else
 		{
 			if(value<0)
 			{
-				if (configFlags[MODOMAQUINA] == MODO_PLASMA)
 					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
-				else
-					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1) + zmoving;
 			}
 		}
 		bf->length =fabs(value);

@@ -100,6 +100,8 @@ void iif_released_filerunning(void)
 
 void iif_bind_filerunning(void)
 {
+	if(swTimers[ZUP_FILERUNNING_TIMER] == NULL)
+	{
 	swTimers[ZUP_FILERUNNING_TIMER] = xTimerCreate
 	                   ( "Timer 1",
 	                     ( 500 ),
@@ -107,6 +109,9 @@ void iif_bind_filerunning(void)
 	                     ( void * ) ZUP_FILERUNNING_TIMER,
 	                     vTimerCallback
 	                   );
+	}
+	if(swTimers[ZDOWN_FILERUNNING_TIMER] == NULL)
+	{
 	swTimers[ZDOWN_FILERUNNING_TIMER] = xTimerCreate
 	                   ( "Timer 1",
 	                     ( 500 ),
@@ -114,6 +119,9 @@ void iif_bind_filerunning(void)
 	                     ( void * ) ZDOWN_FILERUNNING_TIMER,
 	                     vTimerCallback
 	                   );
+	}
+	if(swTimers[RIGHT_FILERUNNING_TIMER] == NULL)
+	{
 	swTimers[RIGHT_FILERUNNING_TIMER] = xTimerCreate
 	                   ( "Timer 1",
 	                     ( 150 ),
@@ -121,6 +129,9 @@ void iif_bind_filerunning(void)
 	                     ( void * ) RIGHT_FILERUNNING_TIMER,
 	                     vTimerCallback
 	                   );
+	}
+	if(swTimers[LEFT_FILERUNNING_TIMER] == NULL)
+	{
 	swTimers[LEFT_FILERUNNING_TIMER] = xTimerCreate
 	                   ( "Timer 1",
 	                     ( 150 ),
@@ -128,6 +139,7 @@ void iif_bind_filerunning(void)
 	                     ( void * ) LEFT_FILERUNNING_TIMER,
 	                     vTimerCallback
 	                   );
+	}
 #ifdef VEL_CHANGE
 	swTimers[DOWN_FILERUNNING_TIMER] = xTimerCreate
 	                   ( "Timer 1",

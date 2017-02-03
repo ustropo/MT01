@@ -271,6 +271,8 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 	gTitle = MANUAL;
 //	tg_set_primary_source(XIO_DEV_COMMAND);
 	iif_bind_jog();
+	if(swTimers[AUTO_MENU_TIMER] == NULL)
+	{
 	swTimers[AUTO_MENU_TIMER] = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
@@ -285,6 +287,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 					 /* Each timer calls the same callback when it expires. */
 					 vTimerUpdateCallback
 				   );
+	}
 	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 	macro_func_ptr = command_idle;
 	xTaskNotifyGive(xCncTaskHandle);
@@ -405,7 +408,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 		gTitle = SIM;
 	}
 
-	if (swTimers[AUTO_MENU_TIMER] == NULL){
+	if (swTimers[AUTO_MENU_TIMER] == NULL)
+	{
 	swTimers[AUTO_MENU_TIMER] = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
@@ -810,6 +814,8 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 	strcpy(gStrDesloca[0],DEFAULT_DESCOLA_TITLE);
 	strcpy(gStrDesloca[1],DEFAULT_AVISO_DESLOCA);
 	iif_bind_deslocar();
+	if(swTimers[AUTO_MENU_TIMER] == NULL)
+	{
 	swTimers[AUTO_MENU_TIMER] = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
@@ -824,6 +830,7 @@ ut_state ut_state_deslocaZero_mode(ut_context* pContext)
 					 /* Each timer calls the same callback when it expires. */
 					 vTimerUpdateCallback
 				   );
+	}
 	xTimerStart( swTimers[AUTO_MENU_TIMER], 0 );
 	xTaskNotifyGive(xCncTaskHandle);
 	lstop = false;

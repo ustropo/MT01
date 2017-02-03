@@ -20,62 +20,162 @@ const ut_state geNextStatePar[CFG_PAR_MAQ_MAX] =
 {
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
+	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR
 };
 
 uint32_t pm_init_values[CFG_PAR_MAQ_MAX] =
 {
-	0,
-	0,
-	0
+		20,                             	  //!< Altura de deslocamento
+		20,                                    //!< Modo maquina
+		20,
+		400,
+		400,
+		6000,
+		10000,
+		10000,
+		900,
+		75.3982236862,
+		75.3982236862,
+		3,
+		0.2,
+		160000
 };
 
 /* Initial values for each config variable */
 ut_config_type pm_init_types[CFG_PAR_MAQ_MAX] =
 {
-	UT_CONFIG_INT,                        //!< Altura de deslocamento
-	UT_CONFIG_INT,                       //!< Modo maquina
-	UT_CONFIG_INT
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
+	UT_CONFIG_INT,
 };
 
 char* pm_init_names[CFG_PAR_MAQ_MAX] =
 {
 	" EIXO X1",                 //!< Altura de deslocamento
 	" EIXO X2",                   	  //!< Modo maquina
-	" EIXO Y"                 //!< Parametros maquina
+	" EIXO Y",                 //!< Parametros maquina
+	" JERK X",
+	" JERK Y",
+	" JERK Z",
+	" VEL. MAX X",
+	" VEL. MAX Y",
+	" VEL. MAX Z",
+	" MM POR REV. X",
+	" MM POR REV Y",
+	" MM POR REV Z",
+	" DESVIO DE JUNTA",
+	" ACEL. DE JUNTA",
 };
 
 float pm_init_max[CFG_PAR_MAQ_MAX] =
 {
 	20,                             	  //!< Altura de deslocamento
 	20,                                    //!< Modo maquina
-	20
+	20,
+	10000,
+	10000,
+	10000,
+	20000,
+	20000,
+	20000,
+	1000,
+	1000,
+	1000,
+	1,
+	2000000,
 };
 
 float pm_init_min[CFG_PAR_MAQ_MAX] =
 {
 	-20,                                    //!< Altura de deslocamento
 	-20,                                    //!< Modo maquina
-	-20
+	-20,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+
 };
 
 uint8_t pm_init_point[CFG_PAR_MAQ_MAX] =
 {
 	1,                                   //!< Altura de deslocamento
 	1,                                   //!< Modo maquina
-	1
+	1,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	1,
+	0,
 };
 
 float pm_init_step[CFG_PAR_MAQ_MAX] =
 {
 	0.1,                                  //!< Altura de deslocamento
 	0.1,                                 //!< Modo maquina
-	0.1
+	0.1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	0.01,
+	1,
 };
 
 char* pm_init_unit[CFG_PAR_MAQ_MAX] =
 {
 	"mm",                                 //!< Altura de deslocamento
 	"mm",                                 //!< Modo maquina
-	"mm"
+	"mm",
+	"mm/min^3",
+	"mm/min^3",
+	"mm/min^3",
+	"mm/min",
+	"mm/min",
+	"mm/min",
+	"mm/rev",
+	"mm/rev",
+	"mm/rev",
+	"mm/min^3",
+	"mm/min^3",
 };

@@ -206,6 +206,8 @@ void config_int(ut_config_var* var)
 
 	ut_lcd_output_int_var(var->name,szText);
 
+	if (swTimers[DOWN_CONFIGVAR_TIMER] == NULL)
+	{
 	swTimers[DOWN_CONFIGVAR_TIMER]= xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
@@ -220,7 +222,9 @@ void config_int(ut_config_var* var)
 					 /* Each timer calls the same callback when it expires. */
 					 vTimerUpdateCallback
 				   );
-
+	}
+	if (swTimers[UP_CONFIGVAR_TIMER] == NULL)
+	{
 	swTimers[UP_CONFIGVAR_TIMER] = xTimerCreate
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
@@ -235,7 +239,7 @@ void config_int(ut_config_var* var)
 					 /* Each timer calls the same callback when it expires. */
 					 vTimerUpdateCallback
 				   );
-
+	}
 	/* Loop to increment / decrement value */
 	/* Wait for keyboard */
 	while(xQueueReceive( qKeyboard, &keyEntry, DEFAULT_CONFIG_VAR_TOUT ))
