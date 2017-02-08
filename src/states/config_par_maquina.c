@@ -89,14 +89,14 @@ float pm_init_max[CFG_PAR_MAQ_MAX] =
 	20000,                       //!< VEL Z
 	1,                           //!< JUNCTION DEV
 	2000000,                     //!< JUNCTION ACCEL
-	0,                           //!< FORMAT MEM
+	1,                           //!< FORMAT MEM
 };
 
 float pm_init_min[CFG_PAR_MAQ_MAX] =
 {
-	-200,                        //!< EIXO_X1
-	-200,                        //!< EIXO_X2
-	-200,                        //!< EIXO_Y
+	0,                        	 //!< EIXO_X1
+	0,                        	 //!< EIXO_X2
+	0,                        	 //!< EIXO_Y
 	0,                           //!< JERK X
 	0,                           //!< JERK Y
 	0,                           //!< VEL X
@@ -124,9 +124,9 @@ uint8_t pm_init_point[CFG_PAR_MAQ_MAX] =
 
 float pm_init_step[CFG_PAR_MAQ_MAX] =
 {
-	0.1,                         //!< EIXO_X1
-	0.1,                         //!< EIXO_X2
-	0.1,                         //!< EIXO_Y
+	0.001,                         //!< EIXO_X1
+	0.001,                         //!< EIXO_X2
+	0.001,                         //!< EIXO_Y
 	1,                           //!< JERK X
 	1,                           //!< JERK Y
 	1,                           //!< VEL X

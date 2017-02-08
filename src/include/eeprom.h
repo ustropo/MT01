@@ -10,6 +10,7 @@
 
 #include "config_menu_pl.h"
 #include "config_menu_ox.h"
+#include "config_par_maquina.h"
 
 typedef enum
 {

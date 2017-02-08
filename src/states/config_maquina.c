@@ -44,7 +44,7 @@ char* mq_init_names[CFG_MAQUINA_MAX] =
 {
 	" ALT. DESLOCAMENTO",                 //!< Altura de deslocamento
 	" MODO MÁQUINA",                   	  //!< Modo maquina
-	" PARAMETROS EIXOS",                   //!< Parametros maquina
+	" PARAMETROS MÁQ.",                   //!< Parametros maquina
 	" PARAMETROS THC"                      //!< Parametros THC
 };
 

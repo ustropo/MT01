@@ -2,6 +2,7 @@
 #include "eeprom.h"
 #include "r_vee_if.h"
 #include <string.h>
+#include "settings.h"
 
 //#define VEE_DEMO_ERASE_FIRST
 
@@ -36,6 +37,21 @@ const float configVarJogInit[JOG_MAX] = {
 /*! configVarJogInit - Constante inicial de config de maquina*/
 const float configVarMaqInit[CFG_MAQUINA_MAX - 1] = {
 	25,                               //!< Altura de deslocamento
+};
+
+/*! configVarParMaqInit - Constante inicial de parametrização da maquina */
+const float configVarParMaqInit[CFG_PAR_MAQ_MAX] = {
+	TRAVELX,                            //!< EIXO_X1
+	TRAVELX,                            //!< EIXO_X2
+	TRAVELY,                            //!< EIXO_Y
+	X_JERK_MAX,                         //!< JERK X
+	Y_JERK_MAX,                         //!< JERK Y
+	20000,                     //!< VEL X
+	Y_VELOCITY_MAX,                     //!< VEL Y
+	Z_VELOCITY_MAX,                     //!< VEL Z
+	JUNCTION_DEVIATION,                  //!< JUNCTION DEV
+	JUNCTION_ACCELERATION,               //!< JUNCTION ACCEL
+	0
 };
 
 uint32_t configFlagsInit[FLAG_MAX] = {MODO_PLASMA,1,DESABILITADO,DESABILITADO};
@@ -217,6 +233,14 @@ void eepromConsistencyCheck(void)
 			eepromFormat();
 		}
 	}
+
+	for (i = 0; i < CFG_PAR_MAQ_MAX; i++)
+	{
+		if (configVarParMaq[i] > pm_init_max[i] || configVarParMaq[i] < pm_init_min[i])
+		{
+			eepromFormat();
+		}
+	}
 }
 
 static void eepromFormat(void)
@@ -250,6 +274,7 @@ static void eepromFormat(void)
 		memcpy(&configFlags,&configFlagsInit,sizeof(configFlags));
 		memcpy(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece));
 		memcpy(configVarMaq,configVarMaqInit,sizeof(configVarMaq));
+		memcpy(configVarParMaq,configVarParMaqInit,sizeof(configVarParMaq));
 		R_VEE_Open();
 		eepromWriteConfig(CONFIGVAR_OX);
 		eepromWriteConfig(CONFIGVAR_PL);
