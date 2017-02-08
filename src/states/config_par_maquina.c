@@ -18,164 +18,136 @@ bool reset_flag;
 
 const ut_state geNextStatePar[CFG_PAR_MAQ_MAX] =
 {
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR
+	STATE_CONFIG_VAR,                //!< EIXO_X1
+	STATE_CONFIG_VAR,                //!< EIXO_X2
+	STATE_CONFIG_VAR,                //!< EIXO_Y
+	STATE_CONFIG_VAR,                //!< JERK X
+	STATE_CONFIG_VAR,                //!< JERK Y
+	STATE_CONFIG_VAR,                //!< VEL X
+	STATE_CONFIG_VAR,                //!< VEL Y
+	STATE_CONFIG_VAR,                //!< VEL Z
+	STATE_CONFIG_VAR,                //!< JUNCTION DEV
+	STATE_CONFIG_VAR,                //!< JUNCTION ACCEL
+	STATE_CONFIG_VAR,                //!< FORMAT MEM
 };
 
 uint32_t pm_init_values[CFG_PAR_MAQ_MAX] =
 {
-		20,                             	  //!< Altura de deslocamento
-		20,                                    //!< Modo maquina
-		20,
-		400,
-		400,
-		6000,
-		10000,
-		10000,
-		900,
-		75.3982236862,
-		75.3982236862,
-		3,
-		0.2,
-		160000
+		20,                         //!< EIXO_X1
+		20,                         //!< EIXO_X2
+		20,                         //!< EIXO_Y
+		400,                        //!< JERK X
+		400,                        //!< JERK Y
+		10000,                      //!< VEL X
+		10000,                      //!< VEL Y
+		900,                        //!< VEL Z
+		0.2,                        //!< JUNCTION DEV
+		160000,                     //!< JUNCTION ACCEL
+		0,                          //!< FORMAT MEM
 };
 
 /* Initial values for each config variable */
 ut_config_type pm_init_types[CFG_PAR_MAQ_MAX] =
 {
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
-	UT_CONFIG_INT,
+	UT_CONFIG_INT,                 //!< EIXO_X1
+	UT_CONFIG_INT,                 //!< EIXO_X2
+	UT_CONFIG_INT,                 //!< EIXO_Y
+	UT_CONFIG_INT,                 //!< JERK X
+	UT_CONFIG_INT,                 //!< JERK Y
+	UT_CONFIG_INT,                 //!< VEL X
+	UT_CONFIG_INT,                 //!< VEL Y
+	UT_CONFIG_INT,                 //!< VEL Z
+	UT_CONFIG_INT,                 //!< JUNCTION DEV
+	UT_CONFIG_INT,                 //!< JUNCTION ACCEL
+	UT_CONFIG_BOOL,                //!< FORMAT MEM
 };
 
 char* pm_init_names[CFG_PAR_MAQ_MAX] =
 {
-	" EIXO X1",                 //!< Altura de deslocamento
-	" EIXO X2",                   	  //!< Modo maquina
-	" EIXO Y",                 //!< Parametros maquina
-	" JERK X",
-	" JERK Y",
-	" JERK Z",
-	" VEL. MAX X",
-	" VEL. MAX Y",
-	" VEL. MAX Z",
-	" MM POR REV. X",
-	" MM POR REV Y",
-	" MM POR REV Z",
-	" DESVIO DE JUNTA",
-	" ACEL. DE JUNTA",
+	" EIXO X1",                    //!< EIXO_X1
+	" EIXO X2",                    //!< EIXO_X2
+	" EIXO Y",                     //!< EIXO_Y
+	" JERK X",                     //!< JERK X
+	" JERK Y",                     //!< JERK Y
+	" VEL. MAX X",                 //!< VEL X
+	" VEL. MAX Y",                 //!< VEL Y
+	" VEL. MAX Z",                 //!< VEL Z
+	" DESVIO DE JUNTA",            //!< JUNCTION DEV
+	" ACEL. DE JUNTA",             //!< JUNCTION ACCEL
+	" FORMATA MEM"                 //!< FORMAT MEM
 };
 
 float pm_init_max[CFG_PAR_MAQ_MAX] =
 {
-	20,                             	  //!< Altura de deslocamento
-	20,                                    //!< Modo maquina
-	20,
-	10000,
-	10000,
-	10000,
-	20000,
-	20000,
-	20000,
-	1000,
-	1000,
-	1000,
-	1,
-	2000000,
+	200,                         //!< EIXO_X1
+	200,                         //!< EIXO_X2
+	200,                         //!< EIXO_Y
+	10000,                       //!< JERK X
+	10000,                       //!< JERK Y
+	20000,                       //!< VEL X
+	20000,                       //!< VEL Y
+	20000,                       //!< VEL Z
+	1,                           //!< JUNCTION DEV
+	2000000,                     //!< JUNCTION ACCEL
+	0,                           //!< FORMAT MEM
 };
 
 float pm_init_min[CFG_PAR_MAQ_MAX] =
 {
-	-20,                                    //!< Altura de deslocamento
-	-20,                                    //!< Modo maquina
-	-20,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-
+	-200,                        //!< EIXO_X1
+	-200,                        //!< EIXO_X2
+	-200,                        //!< EIXO_Y
+	0,                           //!< JERK X
+	0,                           //!< JERK Y
+	0,                           //!< VEL X
+	0,                           //!< VEL Y
+	0,                           //!< VEL Z
+	0,                           //!< JUNCTION DEV
+	0,                           //!< JUNCTION ACCEL
+	0,                           //!< FORMAT MEM
 };
 
 uint8_t pm_init_point[CFG_PAR_MAQ_MAX] =
 {
-	1,                                   //!< Altura de deslocamento
-	1,                                   //!< Modo maquina
-	1,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	1,
-	0,
+	1,                           //!< EIXO_X1
+	1,                           //!< EIXO_X2
+	1,                           //!< EIXO_Y
+	0,                           //!< JERK X
+	0,                           //!< JERK Y
+	0,                           //!< VEL X
+	0,                           //!< VEL Y
+	0,                           //!< VEL Z
+	0,                           //!< JUNCTION DEV
+	0,                           //!< JUNCTION ACCEL
+	0,                           //!< FORMAT MEM
 };
 
 float pm_init_step[CFG_PAR_MAQ_MAX] =
 {
-	0.1,                                  //!< Altura de deslocamento
-	0.1,                                 //!< Modo maquina
-	0.1,
-	1,
-	1,
-	1,
-	1,
-	1,
-	1,
-	1,
-	1,
-	1,
-	0.01,
-	1,
+	0.1,                         //!< EIXO_X1
+	0.1,                         //!< EIXO_X2
+	0.1,                         //!< EIXO_Y
+	1,                           //!< JERK X
+	1,                           //!< JERK Y
+	1,                           //!< VEL X
+	1,                           //!< VEL Y
+	1,                           //!< VEL Z
+	0.01,                        //!< JUNCTION DEV
+	1,                           //!< JUNCTION ACCEL
+	1,                           //!< FORMAT MEM
 };
 
 char* pm_init_unit[CFG_PAR_MAQ_MAX] =
 {
-	"mm",                                 //!< Altura de deslocamento
-	"mm",                                 //!< Modo maquina
-	"mm",
-	"mm/min^3",
-	"mm/min^3",
-	"mm/min^3",
-	"mm/min",
-	"mm/min",
-	"mm/min",
-	"mm/rev",
-	"mm/rev",
-	"mm/rev",
-	"mm/min^3",
-	"mm/min^3",
+	"mm",                        //!< EIXO_X1
+	"mm",                        //!< EIXO_X2
+	"mm",                        //!< EIXO_Y
+	"mm/min^3",                  //!< JERK X
+	"mm/min^3",                  //!< JERK Y
+	"mm/min",                    //!< VEL X
+	"mm/min",                    //!< VEL Y
+	"mm/min",                    //!< VEL Z
+	"mm",                        //!< JUNCTION DEV
+	"mm/min^3",                  //!< JUNCTION ACCEL
+	 NULL,                       //!< FORMAT MEM
 };

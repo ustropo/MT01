@@ -118,20 +118,17 @@ typedef enum
 typedef enum
 {
 	CFG_PAR_MAQ_EIXO_X1,     			//!< EIXO_X1
-	CFG_PAR_MAQ_EIXO_X2,          //!< EIXO_X2
-	CFG_PAR_MAQ_EIXO_Y,			  //!< EIXO_Y
-	CFG_PAR_MAQ_JERK_X,
-	CFG_PAR_MAQ_JERK_Y,
-	CFG_PAR_MAQ_JERK_Z,
-	CFG_PAR_MAQ_VEL_X,
-	CFG_PAR_MAQ_VEL_Y,
-	CFG_PAR_MAQ_VEL_Z,
-	CFG_PAR_MAQ_TRAVEL_X,
-	CFG_PAR_MAQ_TRAVEL_Y,
-	CFG_PAR_MAQ_TRAVEL_Z,
-	CFG_PAR_MAQ_JUNCTION_DEV,
-	CFG_PAR_MAQ_JUNCTION_ACEL,
-	CFG_PAR_MAQ_MAX        			  //!< CFG_PAR_MAQ_MAX
+	CFG_PAR_MAQ_EIXO_X2,          		//!< EIXO_X2
+	CFG_PAR_MAQ_EIXO_Y,			  		//!< EIXO_Y
+	CFG_PAR_MAQ_JERK_X,                 //!< JERK X
+	CFG_PAR_MAQ_JERK_Y,                 //!< JERK Y
+	CFG_PAR_MAQ_VEL_X,                  //!< VEL X
+	CFG_PAR_MAQ_VEL_Y,                  //!< VEL Y
+	CFG_PAR_MAQ_VEL_Z,                  //!< VEL Z
+	CFG_PAR_MAQ_JUNCTION_DEV,           //!< JUNCTION DEV
+	CFG_PAR_MAQ_JUNCTION_ACEL,          //!< JUNCTION ACCEL
+	CFG_FORMAT,                         //!< FORMAT MEM
+	CFG_PAR_MAQ_MAX        			    //!< CFG PAR MAX
 } ut_config_par_maquina;
 
 /**

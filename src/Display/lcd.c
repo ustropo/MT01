@@ -486,11 +486,31 @@ void ut_lcd_output_plasma_mode(bool torch, char* title[7],const char* textX,cons
 	xSemaphoreGive(rspi_semaphore);
 }
 
-void ut_lcd_output_int_var(const char* title,const char* varStr)
+void ut_lcd_output_int_var(const char* title,const char* varStr, uint8_t blinkpos, bool blink)
 {
+	char str2Show[20];
 	uint8_t h;
+	uint8_t endPos = 0, pointPos = 0;
+
+	strcpy(str2Show,varStr);
 	xSemaphoreTake(rspi_semaphore, portMAX_DELAY);
 	u8g_FirstPage(&main_u8g);
+
+	while (str2Show[endPos] != ' ')
+	{
+		if (str2Show[endPos] == '.')
+			pointPos = endPos;
+		endPos++;
+	}
+	pointPos = endPos - pointPos;
+	if (blink)
+	{
+
+		if (blinkpos >=  pointPos && pointPos < endPos)
+			str2Show[endPos - blinkpos - 1] = 0x20;
+		else
+			str2Show[endPos - blinkpos] = 0x20;
+	}
 	/* Picture loop */
 	do
 	{
@@ -499,7 +519,8 @@ void ut_lcd_output_int_var(const char* title,const char* varStr)
 		h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 		u8g_DrawStr(&main_u8g, 6, 11, title);
 		u8g_DrawHLine(&main_u8g, 10, h+11, 113);
-		u8g_DrawStr(&main_u8g, 40, h+20, varStr);
+		u8g_DrawStr(&main_u8g, 40, h+20, str2Show);
+		//u8g_DrawHLine(&main_u8g,40,h+28,5);
 	} while(u8g_NextPage(&main_u8g));
 	xSemaphoreGive(rspi_semaphore);
 }

@@ -292,6 +292,27 @@ uint32_t delay_esc_enter(uint32_t timems)
 	return keyEntry;
 }
 
+uint8_t get_dec_digits(float fnum)
+{
+	uint8_t decDigits = 0;
+	while (fnum > 1)
+	{
+		fnum = fnum/10;
+		decDigits++;
+	}
+	return decDigits;
+}
+
+uint8_t get_decimal_digits(float fnum)
+{
+	uint8_t decimalDigits = 0;
+	while (fnum < 1)
+	{
+		fnum = fnum*10;
+		decimalDigits++;
+	}
+	return decimalDigits;
+}
 
 void idle(void *var)
 {
