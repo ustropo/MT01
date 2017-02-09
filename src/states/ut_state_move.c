@@ -384,7 +384,7 @@ ut_state ut_state_manual_mode(ut_context* pContext)
 ut_state ut_state_auto_mode(ut_context* pContext)
 {
 	uint32_t keyEntry;
-	uint32_t statePrevious;
+	uint32_t statePrevious = 0;
 	ltorchBuffer = false;
 	uint32_t arco = 0;
 //	stepper_init();
@@ -469,6 +469,8 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 
 		case KEY_ENTER:
+			if (statePrevious == MATERIAL_FAILED)
+				break;
 			if(lstop)
 			{
 
@@ -609,6 +611,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 			break;
 
 		case KEY_ESC:
+			statePrevious = 0;
 			if (programEnd || lstop){
 				uint32_t *value = configsVar->value;
 				if(!programEnd){
@@ -666,39 +669,39 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					if (programEnd)
 					{
 						/* Compara a altura de deslocamento co a nova altura corrigida, se for diferente grava na Flash*/
-						float temp1;
-						temp1 =  configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
-						eepromReadConfig(CONFIGVAR_MAQ);
-						if (temp1 != configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO])
-						{
-							configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] = temp1;
-							eepromWriteConfig(CONFIGVAR_MAQ);
-						}
-
-						if(configFlags[MODOMAQUINA] == MODO_PLASMA)
-						{
-							/* Compara os parametros de plasma com o corrigido durante o processo, se for diferente grava na Flash*/
-							float temp[PL_CONFIG_MAX];
-							memcpy(temp,configVarPl,sizeof(configVarPl));
-							eepromReadConfig(CONFIGVAR_PL);
-							if(memcmp(configVarPl,temp,sizeof(configVarPl)) != 0)
-							{
-								memcpy(configVarPl,temp,sizeof(configVarPl));
-								eepromWriteConfig(CONFIGVAR_PL);
-							}
-						}
-						else
-						{
-							/* Compara os parametros de oxi com o corrigido durante o processo, se for diferente grava na Flash*/
-							float temp[OX_CONFIG_MAX];
-							memcpy(temp,configVarOx,sizeof(configVarOx));
-							eepromReadConfig(CONFIGVAR_OX);
-							if(memcmp(configVarOx,temp,sizeof(configVarOx)) != 0)
-							{
-								memcpy(configVarOx,temp,sizeof(configVarOx));
-								eepromWriteConfig(CONFIGVAR_OX);
-							}
-						}
+//						float temp1;
+//						temp1 =  configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
+//						eepromReadConfig(CONFIGVAR_MAQ);
+//						if (temp1 != configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO])
+//						{
+//							configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] = temp1;
+//							eepromWriteConfig(CONFIGVAR_MAQ);
+//						}
+//
+//						if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+//						{
+//							/* Compara os parametros de plasma com o corrigido durante o processo, se for diferente grava na Flash*/
+//							float temp[PL_CONFIG_MAX];
+//							memcpy(temp,configVarPl,sizeof(configVarPl));
+//							eepromReadConfig(CONFIGVAR_PL);
+//							if(memcmp(configVarPl,temp,sizeof(configVarPl)) != 0)
+//							{
+//								memcpy(configVarPl,temp,sizeof(configVarPl));
+//								eepromWriteConfig(CONFIGVAR_PL);
+//							}
+//						}
+//						else
+//						{
+//							/* Compara os parametros de oxi com o corrigido durante o processo, se for diferente grava na Flash*/
+//							float temp[OX_CONFIG_MAX];
+//							memcpy(temp,configVarOx,sizeof(configVarOx));
+//							eepromReadConfig(CONFIGVAR_OX);
+//							if(memcmp(configVarOx,temp,sizeof(configVarOx)) != 0)
+//							{
+//								memcpy(configVarOx,temp,sizeof(configVarOx));
+//								eepromWriteConfig(CONFIGVAR_OX);
+//							}
+//						}
 						return STATE_MANUAL_MODE;
 					}
 
@@ -740,6 +743,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 				ut_lcd_output_warning("CHECAR SENSOR\nOHMICO\n");
 				TORCH = FALSE;
 			//	isCuttingSet(false);
+				statePrevious = MATERIAL_FAILED;
 				arco = ARCO_OK_FAILED;
 				lstop = false;
 				warm_stop(0);

@@ -334,13 +334,14 @@ void ut_lcd_output_mov_mode(bool torch, char* title[6],const char* textX,const c
 			str = DEFAULT_ACESA;
 			u8g_DrawXBMP(&main_u8g, 94, 13, warning_width, warning_height, warning_bits);
 			u8g_DrawStr(&main_u8g, 95, 46, str);
+			u8g_DrawStr(&main_u8g, 112, 12, title[3]);
 		}
 		else
 		{
 			str = DEFAULT_APAGADA;
 			u8g_DrawStr(&main_u8g, 92, 46, str);
 		}
-		u8g_DrawStr(&main_u8g, 112, 12, title[3]);
+
 		for(row = 0; row < MAX_ROW+1; row++)
 		{
 			x = 0;
@@ -426,7 +427,6 @@ void ut_lcd_output_plasma_mode(bool torch, char* title[7],const char* textX,cons
 		{
 			str = DEFAULT_APAGADA;
 			u8g_DrawStr(&main_u8g, 92, 42, str);
-			u8g_DrawStr(&main_u8g, 112, 12, title[3]);
 		}
 		for(row = 0; row < MAX_ROW+1; row++)
 		{
