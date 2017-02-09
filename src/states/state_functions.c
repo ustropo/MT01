@@ -20,6 +20,7 @@
 #include "interpreter_if.h"
 #include "state_functions.h"
 #include "eeprom.h"
+#include "spiffs_hw.h"
 
 #include "keyboard.h"
 
@@ -290,6 +291,42 @@ uint32_t delay_esc_enter(uint32_t timems)
 		}
 	}while(i < timems && keyEntry != KEY_ESC && keyEntry != KEY_ENTER );
 	return keyEntry;
+}
+
+void mem_format(void *var)
+{
+	ut_config_var *lvar = var;
+	uint32_t *value = lvar->value;
+	mem_check mem_ret;
+	s32_t res_ext = 0;
+	if(*value)
+	{
+		eepromFormat();
+		mem_ret = eepromIntegrityCheck();
+		if(mem_ret == MEM_FAIL)
+		{
+			ut_lcd_output_warning("ERRO 001\n");
+			vTaskDelay(4000 / portTICK_PERIOD_MS);
+		}
+		else
+		{
+			ut_lcd_output_warning("MEMORIA INTERNA\nINTEGRA\n");
+			vTaskDelay(4000 / portTICK_PERIOD_MS);
+		}
+		ut_lcd_output_warning("FORMATANDO\nMEMÓRIA EXTERNA...\n");
+		res_ext = spiffs_format();
+		if (res_ext != SPIFFS_OK)
+		{
+			ut_lcd_output_warning("ERRO 002\n");
+			vTaskDelay(4000 / portTICK_PERIOD_MS);
+		}
+		else
+		{
+			ut_lcd_output_warning("MEMORIA EXTERNA\nINTEGRA\n");
+			vTaskDelay(4000 / portTICK_PERIOD_MS);
+		}
+		RESET
+	}
 }
 
 uint8_t get_dec_digits(float fnum)

@@ -10,7 +10,7 @@
 #include "ut_state_config_var.h"
 #include "eeprom.h"
 #include "config_par_maquina.h"
-
+#include "state_functions.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -24,7 +24,7 @@
 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
 static bool initialized = false;
-static const char* gszConfigMenuTitle = "PAR. DE EIXOS";
+static const char* gszConfigMenuTitle = "PAR. DE MÁQUINA";
 
 /**
  * Initialize config array
@@ -59,6 +59,7 @@ static void init()
 		configsParMaq[i].currentState = STATE_CONFIG_PARAMETROS_MAQ;
 		configsParMaq[i].currentItem = i;
 	}
+	configsParMaq[CFG_FORMAT].func_var = &mem_format;
 	initialized = true;
 }
 

@@ -6,7 +6,7 @@
 
 //#define VEE_DEMO_ERASE_FIRST
 
-static void eepromFormat(void);
+
 
 enum { READY, NOT_READY } sample_state;
 
@@ -243,7 +243,7 @@ void eepromConsistencyCheck(void)
 	}
 }
 
-static void eepromFormat(void)
+void eepromFormat(void)
 {
 
 		uint32_t loop1;
@@ -283,6 +283,33 @@ static void eepromFormat(void)
 		eepromWriteConfig(CONFIGVAR_PAR_MAQ);
 		eepromWriteConfig(CONFIGFLAG);
 		eepromWriteConfig(ZEROPIECE);
+}
+
+mem_check eepromIntegrityCheck(void)
+{
+	uint8_t i = 0;
+	bool res = MEM_OK;
+
+	for (i = 0; i < CONFIGVAR_MAX; i++)
+	{
+		eepromReadConfig(i);
+	}
+	if(memcmp(configVarOx,configVarOxInit,sizeof(configVarOx)))
+		res = MEM_FAIL;
+	if(memcmp(configVarPl,configVarPlInit,sizeof(configVarPl)))
+		res = MEM_FAIL;
+	if(memcmp(configVarJog,configVarJogInit,sizeof(configVarJog)))
+		res = MEM_FAIL;
+	if(memcmp(&configFlags,&configFlagsInit,sizeof(configFlags)))
+		res = MEM_FAIL;
+	if(memcmp(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece)))
+		res = MEM_FAIL;
+	if(memcmp(configVarMaq,configVarMaqInit,sizeof(configVarMaq)))
+		res = MEM_FAIL;
+	if(memcmp(configVarParMaq,configVarParMaqInit,sizeof(configVarParMaq)))
+		res = MEM_FAIL;
+
+	return res;
 }
 
 /***********************************************************************************************************************
