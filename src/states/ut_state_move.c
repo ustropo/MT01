@@ -136,22 +136,16 @@ static void updatePosition(uint8_t menu)
 						 lStr[3] = "AOK";
 					 else
 						 lStr[3] = "";
+					 if (MATERIAL)
+						 lStr[6] = "OH";
+					 else
+						 lStr[6] = "";
 					 if(configFlags[MODOMAQUINA] == MODO_PLASMA)
 					 {
-						 sprintf(gStrManual[4], "THC SET: %.0f V",  configVarPl[PL_CONFIG_TENSAO_THC]);
-						 lStr[4] = gStrManual[4];
-						 if(isCuttingGet()){
-							 sprintf(gStrManual[5], "THC REAL: %.0f V",  THC_realGet());
-							 lStr[5] = gStrManual[5];
-						 }
-						 else
-						 {
-							 lStr[5] = "THC REAL: --- V";
-						 }
-						 if (MATERIAL)
-							 lStr[6] = "OH";
-						 else
-							 lStr[6] = "";
+						sprintf(gStrManual[4], "THC SET: %.0f V",  configVarPl[PL_CONFIG_TENSAO_THC]);
+						lStr[4] = gStrManual[4];
+						sprintf(gStrManual[5], "THC REAL: %.0f V",  THC_realGet());
+						lStr[5] = gStrManual[5];
 					}
 					break;
 		case AUTO:   lStr[0] = gStrAuto[0];
@@ -235,21 +229,30 @@ static void updatePosition(uint8_t menu)
 	}
 	else
 	{
-		/* Put it into screen */
-		//if(configFlags[MODOMAQUINA] || sim || menu == MANUAL || menu == DESLOCA){
-		if(configFlags[MODOMAQUINA] || sim || menu == DESLOCA){
-			ut_lcd_output_mov_mode(TORCH,
+		if(menu == MANUAL)
+		{
+			ut_lcd_output_manual_mode(TORCH,
 					lStr,
 					(const char *)textXStr,
 					(const char *)textYStr,
 					(const char *)textZStr);
 		}
-		else{
-			ut_lcd_output_plasma_mode(TORCH,
-					lStr,
-					(const char *)textXStr,
-					(const char *)textYStr,
-					(const char *)textZStr);
+		else
+		{
+			if((configFlags[MODOMAQUINA] == MODO_OXICORTE) || sim || menu == DESLOCA){
+				ut_lcd_output_mov_mode(TORCH,
+						lStr,
+						(const char *)textXStr,
+						(const char *)textYStr,
+						(const char *)textZStr);
+			}
+			else{
+				ut_lcd_output_plasma_mode(TORCH,
+						lStr,
+						(const char *)textXStr,
+						(const char *)textYStr,
+						(const char *)textZStr);
+			}
 		}
 	}
 }
@@ -692,7 +695,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 							eepromReadConfig(CONFIGVAR_OX);
 							if(memcmp(configVarOx,temp,sizeof(configVarOx)) != 0)
 							{
-								memcpy(configVarOx,temp,sizeof(configVarPl));
+								memcpy(configVarOx,temp,sizeof(configVarOx));
 								eepromWriteConfig(CONFIGVAR_OX);
 							}
 						}

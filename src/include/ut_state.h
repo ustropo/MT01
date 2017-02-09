@@ -73,8 +73,7 @@ typedef enum
 
 typedef enum
 {
-	CONFIG_JOG_RAP_LENTO = 0,
-	CONFIG_JOG_RAPIDO,
+	CONFIG_JOG_RAPIDO = 0,
 	CONFIG_JOG_LENTO,
 	CONFIG_JOG_MAX
 } ut_config_jog_name;

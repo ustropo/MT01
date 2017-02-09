@@ -53,12 +53,6 @@ static char* boolOptions[2] =
 	"SIM"
 };
 
-static char* boolJogVel[2] =
-{
-	"LENTO",
-	"RÁPIDO"
-};
-
 static char* boolJogMaq[2] =
 {
 	"PLASMA",
@@ -128,18 +122,6 @@ void config_bool(ut_config_var* var)
 				case CONFIG_AUTO_MODO_SIM_RUN:
 					value = var->value;
 					boolStr = boolSim;
-				break;
-				default: break;
-			}
-			break;
-		case STATE_CONFIG_JOG:
-			switch(configsVar->currentItem)
-			{
-				case CONFIG_JOG_RAP_LENTO:
-					Recordflag =true;
-					value = var->value;
-					menu.itemMarked = *value + 1;
-					boolStr = boolJogVel;
 				break;
 				default: break;
 			}

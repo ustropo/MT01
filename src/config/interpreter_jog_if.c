@@ -47,7 +47,7 @@ void iif_enter_jog(void)
 	{
 	//	cm_spindle_control(SPINDLE_CW);
 	//	isCuttingSet(true);
-		pl_arcook_start();
+	//	pl_arcook_start();
 		TORCH = TRUE;
 		torchEnable = true;
 	}
@@ -55,7 +55,7 @@ void iif_enter_jog(void)
 	{
 	//	cm_spindle_control(SPINDLE_OFF);
 	//	isCuttingSet(false);
-		pl_arcook_stop();
+	//	pl_arcook_stop();
 		TORCH = FALSE;
 		torchEnable = false;
 	}
