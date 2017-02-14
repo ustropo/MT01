@@ -48,8 +48,8 @@ static ut_config_type init_types[CONFIG_JOG_MAX] =
 
 static char* init_names[CONFIG_JOG_MAX] =
 {
-	" ALTERAR JOG RÁPIDO",
-	" ALTERAR JOG LENTO"
+	" ALTERAR VEL. RÁPIDA",
+	" ALTERAR VEL. LENTA"
 };
 
 static var_func init_func[CONFIG_JOG_MAX] =
@@ -58,7 +58,7 @@ static var_func init_func[CONFIG_JOG_MAX] =
 	NULL,
 };
 
-static const char* gszConfigMenuTitle = "CONFIG. JOG";
+static const char* gszConfigMenuTitle = "VELOCIDADE MANUAL";
 
 /**
  * Initialize config array

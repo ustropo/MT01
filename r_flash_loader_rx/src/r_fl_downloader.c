@@ -59,6 +59,17 @@ Includes   <System Includes> , "Project Includes"
 #include <string.h>
 #include <stdio.h>
 
+#if (EASYMAK == 1)
+const char proj_name[] = "MT01_proj.bin";
+const char proj_programmed[] = "MT01_done.bin";
+#elif (COMPACTAXP  == 1)
+const char proj_name[] = "CompactaXP_proj.bin";
+const char proj_programmed[] = "CompactaXP_done.bin";
+#elif (MOBILE  == 1)
+const char proj_name[] = "Mobile_proj.bin";
+const char proj_programmed[] = "Mobile_done.bin";
+#endif
+
 #define CRC_ADDRESS (((uint32_t)__sectop("APPHEADER_1"))-0xFFF00000)
 extern bool drivemountFlag;
 FATFS media;
@@ -164,7 +175,7 @@ void R_FL_StateMachine(void)
 
 	/* Open a text file */
 	if(drivemountFlag){
-		res = f_open(&file, "MT01_proj.bin", FA_READ | FA_WRITE);
+		res = f_open(&file, proj_name, FA_READ | FA_WRITE);
 		if(FR_OK != res)
 		{
 			nop();
@@ -211,8 +222,8 @@ void R_FL_StateMachine(void)
 				WDT_FEED
 		   }
 			res = f_close(&file);
-			res = f_open(&file, "MT01_proj.bin", FA_WRITE);
-		    f_rename("MT01_proj.bin", "MT01_done.bin");
+			res = f_open(&file, proj_name, FA_WRITE);
+		    f_rename(proj_name, proj_programmed);
 		    RESET
 		}
 	}

@@ -46,7 +46,7 @@ const float configVarParMaqInit[CFG_PAR_MAQ_MAX] = {
 	TRAVELY,                            //!< EIXO_Y
 	X_JERK_MAX,                         //!< JERK X
 	Y_JERK_MAX,                         //!< JERK Y
-	20000,                     //!< VEL X
+	X_VELOCITY_MAX,                     //!< VEL X
 	Y_VELOCITY_MAX,                     //!< VEL Y
 	Z_VELOCITY_MAX,                     //!< VEL Z
 	JUNCTION_DEVIATION,                  //!< JUNCTION DEV
@@ -54,7 +54,7 @@ const float configVarParMaqInit[CFG_PAR_MAQ_MAX] = {
 	0
 };
 
-uint32_t configFlagsInit[FLAG_MAX] = {MODO_PLASMA,1,DESABILITADO,DESABILITADO};
+uint32_t configFlagsInit[FLAG_MAX] = {MODO_PLASMA,1,DESABILITADO,HABILITADO};
 uint32_t configFlags[FLAG_MAX];
 
 float configVarOx[OX_CONFIG_MAX];
@@ -236,7 +236,7 @@ void eepromConsistencyCheck(void)
 
 	for (i = 0; i < CFG_PAR_MAQ_MAX; i++)
 	{
-		if (configVarParMaq[i] > pm_init_max[i] || configVarParMaq[i] < pm_init_min[i])
+		if (configVarParMaq[i] > pm_init_max[i] || configVarParMaq[i] <= pm_init_min[i])
 		{
 			eepromFormat();
 		}

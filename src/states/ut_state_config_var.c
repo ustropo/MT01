@@ -37,6 +37,7 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer );
 static uint8_t count = 0;
 static uint16_t mult = 1;
 uint8_t func_back = 0;
+static bool blink = 0;
 
 /**
  * Function pointer that can change a configuration
@@ -101,6 +102,7 @@ void config_bool(ut_config_var* var)
 				default: break;
 			}
 			break;
+#if (COMPACTAXP == 0)
 		case STATE_CONFIG_MAQUINA:
 			switch(configsVar->currentItem)
 			{
@@ -113,6 +115,7 @@ void config_bool(ut_config_var* var)
 				default: break;
 			}
 			break;
+#endif
 		case STATE_CONFIG_AUTO_MODE:
 			switch(configsVar->currentItem)
 			{
@@ -145,17 +148,6 @@ void config_bool(ut_config_var* var)
 	menu.selectedItem = *value % 2; // Just to be sure - it is really not necessary
 	/* Check if user selected a valid entry */
 	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0){
-//		switch(configsVar->currentState)
-//		{
-//			case STATE_CONFIG_AUTO_MODE:
-//					switch(configsVar->currentItem)
-//					{
-//						case CONFIG_AUTO_SELECIONAR_LINHA:
-//							func_back = 0xFF;
-//						break;
-//					}
-//			break;
-//		}
 		func_back = 0xFF;
 		return;
 	}
@@ -234,6 +226,7 @@ void config_int(ut_config_var* var)
 				if(*value < configsVar->valueMin){
 					*value = configsVar->valueMin;
 				}
+				blink = 0;
 				//ut_lcd_output_int_var(configsVar->name,szText, count + 1,false);
 			break;
 
@@ -244,6 +237,7 @@ void config_int(ut_config_var* var)
 				if(*value > configsVar->valueMax){
 					*value = configsVar->valueMax;
 				}
+				blink = 0;
 				//ut_lcd_output_int_var(configsVar->name,szText, count + 1,false);
 			break;
 
@@ -494,7 +488,6 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 	long lArrayIndex;
 	uint8_t blinkpos = 1;
 	float *value = configsVar->value;
-	static bool blink = 0;
 	uint16_t decCount = 0;
 	uint16_t decimalCount = 0;
 	uint16_t digits = 0;

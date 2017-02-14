@@ -668,40 +668,6 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					zinhibitor = false;
 					if (programEnd)
 					{
-						/* Compara a altura de deslocamento co a nova altura corrigida, se for diferente grava na Flash*/
-//						float temp1;
-//						temp1 =  configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
-//						eepromReadConfig(CONFIGVAR_MAQ);
-//						if (temp1 != configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO])
-//						{
-//							configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] = temp1;
-//							eepromWriteConfig(CONFIGVAR_MAQ);
-//						}
-//
-//						if(configFlags[MODOMAQUINA] == MODO_PLASMA)
-//						{
-//							/* Compara os parametros de plasma com o corrigido durante o processo, se for diferente grava na Flash*/
-//							float temp[PL_CONFIG_MAX];
-//							memcpy(temp,configVarPl,sizeof(configVarPl));
-//							eepromReadConfig(CONFIGVAR_PL);
-//							if(memcmp(configVarPl,temp,sizeof(configVarPl)) != 0)
-//							{
-//								memcpy(configVarPl,temp,sizeof(configVarPl));
-//								eepromWriteConfig(CONFIGVAR_PL);
-//							}
-//						}
-//						else
-//						{
-//							/* Compara os parametros de oxi com o corrigido durante o processo, se for diferente grava na Flash*/
-//							float temp[OX_CONFIG_MAX];
-//							memcpy(temp,configVarOx,sizeof(configVarOx));
-//							eepromReadConfig(CONFIGVAR_OX);
-//							if(memcmp(configVarOx,temp,sizeof(configVarOx)) != 0)
-//							{
-//								memcpy(configVarOx,temp,sizeof(configVarOx));
-//								eepromWriteConfig(CONFIGVAR_OX);
-//							}
-//						}
 						return STATE_MANUAL_MODE;
 					}
 

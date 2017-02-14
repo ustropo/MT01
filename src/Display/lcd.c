@@ -606,13 +606,12 @@ void ut_lcd_output_int_var(const char* title,const char* varStr, uint8_t blinkpo
 	/* Picture loop */
 	do
 	{
-		u8g_DrawFrame(&main_u8g,10, 10, 113, 44);
+		u8g_DrawFrame(&main_u8g,3, 10, 120, 44);
 		u8g_prepare(u8g_font_6x10);
 		h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
-		u8g_DrawStr(&main_u8g, 6, 11, title);
-		u8g_DrawHLine(&main_u8g, 10, h+11, 113);
-		u8g_DrawStr(&main_u8g, 40, h+20, str2Show);
-		//u8g_DrawHLine(&main_u8g,40,h+28,5);
+		u8g_DrawStr(&main_u8g, 0, 11, title);
+		u8g_DrawHLine(&main_u8g, 3, h+11, 120);
+		u8g_DrawStr(&main_u8g, 33, h+20, str2Show);
 	} while(u8g_NextPage(&main_u8g));
 	xSemaphoreGive(rspi_semaphore);
 }

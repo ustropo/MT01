@@ -34,9 +34,9 @@
 #define THC_HISTERESE 1.5
 #define THC_KERF_PORCENTAGE 0.18
 #define THC_MERGULHO_PORCENTAGE 0.80
-#define THC_RAPIDO 0.005
-#define THC_LENTO  0.001
+
 #define THC_MULT  (0.000001428*1.15)
+#define THC_MULT_RAP (THC_MULT*1.25)
 #define THC_MAX 0.01
 
 
@@ -124,7 +124,11 @@ float pl_thc_pid(void)
 	float THCVel = 0;
 	int16_t delay_thc;
 	/* velocidade do THC proporcinal a velocidade de feddrate */
-	THCVel = configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MULT;
+	if (configVarPl[PL_CONFIG_VELOC_CORTE] < 3500)
+		THCVel = configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MULT;
+	else
+		THCVel = configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MULT_RAP;
+
 	/* reta do delay inversamente proporcinal a velocidade de feddrate */
 	delay_thc = (uint16_t)(17500 - configVarPl[PL_CONFIG_VELOC_CORTE]*5);
 	/* limite maximo da velocidade do THC */

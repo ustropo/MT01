@@ -105,16 +105,15 @@
 
 // machine default profiles - choose only one:
 
-//#include "settings/settings_default.h"				// Default settings for release
-//#include "settings/settings_cnc3040.h"
-//#include "settings/settings_test.h"					// Settings for testing - not for release
-//#include "settings/settings_openpnp.h"				// OpenPnP
-//#include "settings/settings_othermill.h"				// OMC OtherMill
-//#include "settings/settings_probotixV90.h"			// Probotix Fireball V90
-//#include "settings/settings_shapeoko2.h"				// Shapeoko2 - standard kit
-#include "settings/settings_easymak.h"				// Easymak Plasma
-//#include "settings/settings_ultimaker.h"				// Ultimaker 3D printer
-//#include "settings/settings_zen7x12.h"				// Zen Toolworks 7x12
+#if (EASYMAK == 1)
+	#include "settings/settings_easymak.h"				// Easymak Plasma
+#elif (COMPACTAXP  == 1)
+	#include "settings/settings_compacta.h"				// Compacta Plasma
+#elif (MOBILE  == 1)
+	#include "settings/settings_mobile.h"				// Mobile Plasma
+#endif
+
+
 
 /*** Handle optional modules that may not be in every machine ***/
 

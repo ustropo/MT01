@@ -101,7 +101,9 @@ typedef enum
 typedef enum
 {
 	CFG_MAQUINA_ALT_DESLOCAMENTO,     //!< Altura de deslocamento
+#if (COMPACTAXP == 0)
 	CFG_MAQUINA_MODOMAQUINA,          //!< Modo da maquina
+#endif
 	CFG_MAQUINA_PARAMETROS,			  //!< Parametros da maquina
 	CFG_MAQUINA_PARAMETROS_THC,		  //!< Parametros de THC
 	CFG_MAQUINA_MAX        			  //!< CONFIG_MAX
