@@ -244,6 +244,8 @@ ut_state ut_state_splash(ut_context* pContext)
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 
+//	check_machine_type();
+
 	R_FL_StateMachine();
 
  //   R_USB_Close( (usb_ip_t)msc_utr.ip );

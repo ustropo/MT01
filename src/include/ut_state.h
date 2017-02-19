@@ -128,6 +128,7 @@ typedef enum
 	CFG_PAR_MAQ_VEL_Z,                  //!< VEL Z
 	CFG_PAR_MAQ_JUNCTION_DEV,           //!< JUNCTION DEV
 	CFG_PAR_MAQ_JUNCTION_ACEL,          //!< JUNCTION ACCEL
+	CFG_PAR_MAQ_CHORDAL_TOL,            //!< CHORDAL TOLERANCE
 	CFG_FORMAT,                         //!< FORMAT MEM
 	CFG_PAR_MAQ_MAX        			    //!< CFG PAR MAX
 } ut_config_par_maquina;

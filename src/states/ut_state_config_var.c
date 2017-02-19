@@ -22,6 +22,7 @@
 #include "lcd.h"
 #include "lcd_menu.h"
 #include "keyboard.h"
+#include "util.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -199,7 +200,7 @@ void config_int(ut_config_var* var)
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
-					 ( 500 ),
+					 ( 250 ),
 					 /* The timers will auto-reload themselves when they
 					 expire. */
 					 pdTRUE,
@@ -243,13 +244,13 @@ void config_int(ut_config_var* var)
 
 		case KEY_LEFT:
 				mult = mult*10;
-
 				if (mult*configsVar->step > decNum)
 				{
-					mult = decNum;
+					mult = mult/10;
 				}
 				else
 				{
+
 					count++;
 				}
 

@@ -26,6 +26,7 @@
 
 #include "lcd_menu.h"
 #include "lcd.h"
+#include "util.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -335,6 +336,8 @@ uint8_t get_dec_digits(float fnum)
 	while (fnum > 1)
 	{
 		fnum = fnum/10;
+		if (fp_EQ(fnum,1))
+			fnum = 1;
 		decDigits++;
 	}
 	return decDigits;
@@ -346,9 +349,25 @@ uint8_t get_decimal_digits(float fnum)
 	while (fnum < 1)
 	{
 		fnum = fnum*10;
+		if (fp_EQ(fnum,1))
+			fnum = 1;
 		decimalDigits++;
 	}
 	return decimalDigits;
+}
+
+uint8_t check_machine_type(void)
+{
+	uint8_t ret = 0xFF;
+	uint8_t  str_src[10];
+	memcpy(str_src,(uint8_t *)(0x00100000 + 32*1023),10);
+	if (strcmp(str_src,"EASYMAK"))
+		ret = 0;
+	if (strcmp(str_src,"COMPACTA"))
+		ret = 1;
+	if (strcmp(str_src,"MOBILE"))
+		ret = 2;
+	return ret;
 }
 
 void idle(void *var)

@@ -51,6 +51,7 @@ const float configVarParMaqInit[CFG_PAR_MAQ_MAX] = {
 	Z_VELOCITY_MAX,                     //!< VEL Z
 	JUNCTION_DEVIATION,                  //!< JUNCTION DEV
 	JUNCTION_ACCELERATION,               //!< JUNCTION ACCEL
+	CHORDAL_TOLERANCE,
 	0
 };
 
@@ -234,7 +235,7 @@ void eepromConsistencyCheck(void)
 		}
 	}
 
-	for (i = 0; i < CFG_PAR_MAQ_MAX; i++)
+	for (i = 0; i < CFG_PAR_MAQ_MAX - 1; i++)
 	{
 		if (configVarParMaq[i] > pm_init_max[i] || configVarParMaq[i] <= pm_init_min[i])
 		{

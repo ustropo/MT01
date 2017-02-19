@@ -105,6 +105,7 @@ ut_state ut_state_config_par_maq(ut_context* pContext)
 
 	/* Set selected item */
 	pContext->value[0] = STATE_CONFIG_PARAMETROS_MAQ;
+	eepromReadConfig(CONFIGVAR_PAR_MAQ);
 	configsVar = &configsParMaq[config_menu.selectedItem];
 	return geNextStatePar[config_menu.selectedItem];
 }
