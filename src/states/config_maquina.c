@@ -18,7 +18,9 @@ ut_config_var configsMaq[CFG_MAQUINA_MAX];
 const ut_state geNextStateMaq[CFG_MAQUINA_MAX] =
 {
 	STATE_CONFIG_VAR,
+#if (COMPACTAXP == 0)
 	STATE_CONFIG_VAR,
+#endif
 	STATE_CONFIG_VAR,
 	STATE_CONFIG_MAQUINA_THC
 };
@@ -26,7 +28,9 @@ const ut_state geNextStateMaq[CFG_MAQUINA_MAX] =
 uint32_t mq_init_values[CFG_MAQUINA_MAX] =
 {
 	0,
+#if (COMPACTAXP == 0)
 	0,
+#endif
 	0,
 	0
 };
@@ -35,7 +39,9 @@ uint32_t mq_init_values[CFG_MAQUINA_MAX] =
 ut_config_type mq_init_types[CFG_MAQUINA_MAX] =
 {
 	UT_CONFIG_INT,                        //!< Altura de deslocamento
+#if (COMPACTAXP == 0)
 	UT_CONFIG_BOOL,                       //!< Modo maquina
+#endif
 	UT_CONFIG_BOOL,						  //!< Parametros maquina
 	UT_CONFIG_NULL              //!< Parametros THC
 };
@@ -43,15 +49,19 @@ ut_config_type mq_init_types[CFG_MAQUINA_MAX] =
 char* mq_init_names[CFG_MAQUINA_MAX] =
 {
 	" ALT. DESLOCAMENTO",                 //!< Altura de deslocamento
+#if (COMPACTAXP == 0)
 	" MODO MÁQUINA",                   	  //!< Modo maquina
-	" PARAMETROS EIXOS",                   //!< Parametros maquina
+#endif
+	" PARAMETROS MÁQ.",                   //!< Parametros maquina
 	" PARAMETROS THC"                      //!< Parametros THC
 };
 
 float mq_init_max[CFG_MAQUINA_MAX] =
 {
 	50,                             	  //!< Altura de deslocamento
+#if (COMPACTAXP == 0)
 	0,                                    //!< Modo maquina
+#endif
 	NULL,
 	NULL
 };
@@ -59,7 +69,9 @@ float mq_init_max[CFG_MAQUINA_MAX] =
 float mq_init_min[CFG_MAQUINA_MAX] =
 {
 	1,                                    //!< Altura de deslocamento
+#if (COMPACTAXP == 0)
 	0,                                    //!< Modo maquina
+#endif
 	NULL,
 	NULL
 };
@@ -67,14 +79,19 @@ float mq_init_min[CFG_MAQUINA_MAX] =
 uint8_t mq_init_point[CFG_MAQUINA_MAX] =
 {
 	1,                                   //!< Altura de deslocamento
+#if (COMPACTAXP == 0)
 	0,                                   //!< Modo maquina
+#endif
+	NULL,
 	NULL
 };
 
 float mq_init_step[CFG_MAQUINA_MAX] =
 {
 	0.1,                                  //!< Altura de deslocamento
+#if (COMPACTAXP == 0)
 	0,                                 //!< Modo maquina
+#endif
 	NULL,
 	NULL
 };
@@ -82,7 +99,9 @@ float mq_init_step[CFG_MAQUINA_MAX] =
 char* mq_init_unit[CFG_MAQUINA_MAX] =
 {
 	"mm",                                 //!< Altura de deslocamento
+#if (COMPACTAXP == 0)
 	NULL,                                 //!< Modo maquina
+#endif
 	NULL,
 	NULL
 };

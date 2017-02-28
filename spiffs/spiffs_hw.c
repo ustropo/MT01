@@ -44,9 +44,9 @@ s32_t spiffs_init(void)
 	return res;
 }
 
-void spiffs_format(void)
+s32_t spiffs_format(void)
 {
-	int res;
+	s32_t res = 0;
 
 	R_SF_Erase(1, 0, SF_ERASE_BULK);
 
@@ -62,6 +62,10 @@ void spiffs_format(void)
 	SPIFFS_unmount(fs);
 
 	res = SPIFFS_format(fs);
+	if (res != SPIFFS_OK)
+	{
+		return res;
+	}
 
 	res = SPIFFS_mount(fs,
 			&cfg,
@@ -71,6 +75,7 @@ void spiffs_format(void)
 			spiffs_cache_buf,
 			sizeof(spiffs_cache_buf),
 			0);
+	return res;
 }
 
 s32_t my_spi_read(u32_t addr, u32_t size, u8_t *buf)

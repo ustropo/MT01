@@ -101,7 +101,7 @@ const uint32_t g_vee_sect0_block_addresses[] =
 const uint32_t g_vee_sect0_df_blocks[][2] = 
 { 
     {BLOCK_DB0, BLOCK_DB7},  /* Start & end DF blocks making up VEE Block 0 */
-    {BLOCK_DB8, BLOCK_DB15}  /* Start & end DF blocks making up VEE Block 1 */
+    {BLOCK_DB8, BLOCK_DB14}  /* Start & end DF blocks making up VEE Block 1 */
 };
 /* To add more sectors copy the constant arrays below and change the values */
 

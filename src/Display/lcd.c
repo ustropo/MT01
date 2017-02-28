@@ -341,6 +341,7 @@ void ut_lcd_output_mov_mode(bool torch, char* title[6],const char* textX,const c
 			str = DEFAULT_APAGADA;
 			u8g_DrawStr(&main_u8g, 92, 46, str);
 		}
+
 		for(row = 0; row < MAX_ROW+1; row++)
 		{
 			x = 0;
@@ -486,20 +487,131 @@ void ut_lcd_output_plasma_mode(bool torch, char* title[7],const char* textX,cons
 	xSemaphoreGive(rspi_semaphore);
 }
 
-void ut_lcd_output_int_var(const char* title,const char* varStr)
+void ut_lcd_output_manual_mode(bool torch, char* title[7],const char* textX,const char* textY,const char* textZ)
 {
+	uint8_t row, x, y;
 	uint8_t h;
+	const char* str;
+//	u8g_prepare(u8g_font_6x10);
 	xSemaphoreTake(rspi_semaphore, portMAX_DELAY);
 	u8g_FirstPage(&main_u8g);
+	h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
 	/* Picture loop */
 	do
 	{
-		u8g_DrawFrame(&main_u8g,10, 10, 113, 44);
+		/* Through all rows */
+		y = 0;
+		u8g_DrawVLine(&main_u8g, 90, 11, 38);
+//		u8g_DrawHLine(&main_u8g, 0, 11+45, 128);
+		u8g_prepare(u8g_font_4x6r);
+		str = DEFAULT_TOCHA;
+		u8g_DrawStr(&main_u8g, 95, 35, str);
+		u8g_DrawStr(&main_u8g, 92, 12, title[6]);
+		if(!torch)
+		{
+			str = DEFAULT_ACESA;
+			u8g_DrawXBMP(&main_u8g, 94, 13, warning_width, warning_height, warning_bits);
+			u8g_DrawStr(&main_u8g, 95, 42, str);
+		}
+		else
+		{
+			str = DEFAULT_APAGADA;
+			u8g_DrawStr(&main_u8g, 92, 42, str);
+		}
+		u8g_DrawStr(&main_u8g, 112, 12, title[3]);
+		for(row = 0; row < MAX_ROW+1; row++)
+		{
+			x = 0;
+			switch(row)
+			{
+				case 0: str = title[0];
+						u8g_prepare(u8g_font_helvB08);
+						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+						u8g_DrawHLine(&main_u8g, x, h-1, 128);
+						break;
+				case 1: str = title[2];
+						u8g_prepare(u8g_font_5x8);
+						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+						break;
+				case 5: str = "";
+						u8g_prepare(u8g_font_5x8);
+						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) -1;
+						break;
+				case 6: str = title[1];
+						u8g_prepare(u8g_font_4x6r);
+
+						u8g_DrawStr(&main_u8g, (u8g_GetStrWidth(&main_u8g,str) + 25), y-5, title[4]);
+						u8g_DrawStr(&main_u8g, (u8g_GetStrWidth(&main_u8g,str) + 25), y+2, title[5]);
+			//			h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+						u8g_prepare(u8g_font_5x8);
+						u8g_DrawHLine(&main_u8g, x, y-6, 128);
+						y = y-2;
+						break;
+				case 2: u8g_prepare(u8g_font_helvB08);
+						u8g_DrawStr(&main_u8g, x, y, "X:");
+						str = textX;
+						x = 12;
+						u8g_prepare(u8g_font_6x10);
+						h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
+						break;
+				case 3: u8g_prepare(u8g_font_helvB08);
+						u8g_DrawStr(&main_u8g, x, y, "Y:");
+						u8g_prepare(u8g_font_6x10);
+						str = textY;
+						x = 12;
+						break;
+				case 4: u8g_prepare(u8g_font_helvB08);
+						u8g_DrawStr(&main_u8g, x, y, "Z:");
+						u8g_prepare(u8g_font_6x10);
+						str = textZ;
+						x = 12;
+						break;
+			}
+				/* Draw glyph */
+			u8g_DrawStr(&main_u8g, x, y, str);
+
+			/* Next position */
+			y += h;
+		}
+
+	} while(u8g_NextPage(&main_u8g));
+	xSemaphoreGive(rspi_semaphore);
+}
+
+void ut_lcd_output_int_var(const char* title,const char* varStr, uint8_t blinkpos, bool blink)
+{
+	char str2Show[20];
+	uint8_t h;
+	uint8_t endPos = 0, pointPos = 0;
+
+	strcpy(str2Show,varStr);
+	xSemaphoreTake(rspi_semaphore, portMAX_DELAY);
+	u8g_FirstPage(&main_u8g);
+
+	while (str2Show[endPos] != ' ')
+	{
+		if (str2Show[endPos] == '.')
+			pointPos = endPos;
+		endPos++;
+	}
+	pointPos = endPos - pointPos;
+	if (blink)
+	{
+
+		if (blinkpos >=  pointPos && pointPos < endPos)
+			str2Show[endPos - blinkpos - 1] = 0x20;
+		else
+			str2Show[endPos - blinkpos] = 0x20;
+	}
+	/* Picture loop */
+	do
+	{
+		u8g_DrawFrame(&main_u8g,3, 10, 120, 44);
 		u8g_prepare(u8g_font_6x10);
 		h = u8g_GetFontAscent(&main_u8g) - u8g_GetFontDescent(&main_u8g) + 1;
-		u8g_DrawStr(&main_u8g, 6, 11, title);
-		u8g_DrawHLine(&main_u8g, 10, h+11, 113);
-		u8g_DrawStr(&main_u8g, 40, h+20, varStr);
+		u8g_DrawStr(&main_u8g, 0, 11, title);
+		u8g_DrawHLine(&main_u8g, 3, h+11, 120);
+		u8g_DrawStr(&main_u8g, 33, h+20, str2Show);
 	} while(u8g_NextPage(&main_u8g));
 	xSemaphoreGive(rspi_semaphore);
 }

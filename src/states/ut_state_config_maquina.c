@@ -96,6 +96,7 @@ ut_state ut_state_config_maquina(ut_context* pContext)
 	{
 		return STATE_MAIN_MENU;
 	}
+	eepromReadConfig(CONFIGVAR_MAQ);
 	/* Set selected item */
 	pContext->value[0] = STATE_CONFIG_MAQUINA;
 	configsVar = &configsMaq[config_menu.selectedItem];

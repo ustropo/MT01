@@ -27,7 +27,6 @@
 
 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
 
-static void veljog(void *var);
 /* Array with all config variables */
 ut_config_var configs_jog[CONFIG_JOG_MAX];
 static bool initialized = false;
@@ -37,33 +36,29 @@ static char* jog_unit = "mm/min";
 static const ut_state geNextStateManual[CONFIG_JOG_MAX] =
 {
 	STATE_CONFIG_VAR,
-	STATE_CONFIG_VAR,
 	STATE_CONFIG_VAR
 };
 
 /* Initial values for each config variable */
 static ut_config_type init_types[CONFIG_JOG_MAX] =
 {
-	UT_CONFIG_BOOL,
 	UT_CONFIG_INT,
 	UT_CONFIG_INT
 };
 
 static char* init_names[CONFIG_JOG_MAX] =
 {
-	" SELECIONAR VEL.",
-	" ALTERAR JOG RÁPIDO",
-	" ALTERAR JOG LENTO"
+	" ALTERAR VEL. RÁPIDA",
+	" ALTERAR VEL. LENTA"
 };
 
 static var_func init_func[CONFIG_JOG_MAX] =
 {
-	veljog,
 	NULL,
 	NULL,
 };
 
-static const char* gszConfigMenuTitle = "CONFIG. JOG";
+static const char* gszConfigMenuTitle = "VELOCIDADE MANUAL";
 
 /**
  * Initialize config array
@@ -141,18 +136,4 @@ ut_state ut_state_config_jog(ut_context* pContext)
 	pContext->value[1] = STATE_CONFIG_JOG;
 	configsVar = &configs_jog[config_menu.selectedItem];
 	return geNextStateManual[config_menu.selectedItem];
-}
-
-static void veljog(void *var)
-{
-	ut_config_var *lvar = var;
-	uint32_t *value = lvar->value;
-	if(*value)
-	{
-		velocidadeJog = &configVarJog[JOG_RAPIDO];
-	}
-	else
-	{
-		velocidadeJog = &configVarJog[JOG_LENTO];
-	}
 }

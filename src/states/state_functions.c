@@ -20,11 +20,13 @@
 #include "interpreter_if.h"
 #include "state_functions.h"
 #include "eeprom.h"
+#include "spiffs_hw.h"
 
 #include "keyboard.h"
 
 #include "lcd_menu.h"
 #include "lcd.h"
+#include "util.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -292,6 +294,81 @@ uint32_t delay_esc_enter(uint32_t timems)
 	return keyEntry;
 }
 
+void mem_format(void *var)
+{
+	ut_config_var *lvar = var;
+	uint32_t *value = lvar->value;
+	mem_check mem_ret;
+	s32_t res_ext = 0;
+	if(*value)
+	{
+		eepromFormat();
+		mem_ret = eepromIntegrityCheck();
+		if(mem_ret == MEM_FAIL)
+		{
+			ut_lcd_output_warning("ERRO 001\n");
+			vTaskDelay(4000 / portTICK_PERIOD_MS);
+		}
+		else
+		{
+			ut_lcd_output_warning("MEMORIA INTERNA\nINTEGRA\n");
+			vTaskDelay(4000 / portTICK_PERIOD_MS);
+		}
+		ut_lcd_output_warning("FORMATANDO\nMEMÓRIA EXTERNA...\n");
+		res_ext = spiffs_format();
+		if (res_ext != SPIFFS_OK)
+		{
+			ut_lcd_output_warning("ERRO 002\n");
+			vTaskDelay(4000 / portTICK_PERIOD_MS);
+		}
+		else
+		{
+			ut_lcd_output_warning("MEMORIA EXTERNA\nINTEGRA\n");
+			vTaskDelay(4000 / portTICK_PERIOD_MS);
+		}
+		RESET
+	}
+}
+
+uint8_t get_dec_digits(float fnum)
+{
+	uint8_t decDigits = 0;
+	while (fnum > 1)
+	{
+		fnum = fnum/10;
+		if (fp_EQ(fnum,1))
+			fnum = 1;
+		decDigits++;
+	}
+	return decDigits;
+}
+
+uint8_t get_decimal_digits(float fnum)
+{
+	uint8_t decimalDigits = 0;
+	while (fnum < 1)
+	{
+		fnum = fnum*10;
+		if (fp_EQ(fnum,1))
+			fnum = 1;
+		decimalDigits++;
+	}
+	return decimalDigits;
+}
+
+maq_name check_machine_type(void)
+{
+	maq_name ret = UNDEFINED_MAQ;
+	char  str_src[10];
+	memcpy(str_src,(uint8_t *)(0x00100000 + 32*1023),10);
+	if (strcmp(str_src,"EASYMAK"))
+		ret = EASYMAK_MAQ;
+	if (strcmp(str_src,"COMPACTA"))
+		ret = COMPACTA_MAQ;
+	if (strcmp(str_src,"MOBILE"))
+		ret = MOBILE_MAQ;
+	return ret;
+}
 
 void idle(void *var)
 {

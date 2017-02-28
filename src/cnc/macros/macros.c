@@ -189,17 +189,24 @@ stat_t M3_Macro(void)
 					break;
 
 					/*5- Dwell do "TEMPO DE PERFURAÇÃO" */
-			case 4: if(configFlags[MODOMAQUINA] == MODO_OXICORTE){
-						if(tempo_perfuracao > 0){
+				case 4: if(!sim)
+						{
+							tempo = tempo_perfuracao;
+						}
+						else
+						{
+							tempo = 0;
+						}
+
+						if(tempo > 0){
 							SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 							SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
-							SET_NON_MODAL_MACRO (parameter, tempo_perfuracao*1000);
+							SET_NON_MODAL_MACRO (parameter, tempo*1000);
 						}
 						else
 						{
 							delay_thcStartStop(true);
 						}
-					}
 					state++; break;
 
 					/*6- Desce para a "ALTURA DE CORTE" com feedrate de 800*/

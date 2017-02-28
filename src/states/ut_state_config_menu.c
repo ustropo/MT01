@@ -60,7 +60,7 @@ ut_state ut_state_config_menu_ox(ut_context* pContext)
 	{
 		return STATE_MAIN_MENU;
 	}
-
+	eepromReadConfig(CONFIGVAR_OX);
 	/* Set selected item */
 	pContext->value[0] = STATE_CONFIG_MENU_OX;
 	configsVar = &configsOx[config_menu.selectedItem];
@@ -102,6 +102,7 @@ ut_state ut_state_config_menu_pl(ut_context* pContext)
 	}
 
 	/* Set selected item */
+	eepromReadConfig(CONFIGVAR_PL);
 	pContext->value[0] = STATE_CONFIG_MENU_PL;
 	configsVar = &configsPl[config_menu.selectedItem];
 	return STATE_CONFIG_VAR;

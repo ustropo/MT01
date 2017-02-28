@@ -1,29 +1,6 @@
 /*
- * settings_shapeoko375.h - Shapeoko2 500mm table
- * This file is part of the TinyG project
- *
- * Copyright (c) 2010 - 2014 Alden S. Hart, Jr.
- *
- * This file ("the software") is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, version 2 as published by the
- * Free Software Foundation. You should have received a copy of the GNU General Public
- * License, version 2 along with the software.  If not, see <http://www.gnu.org/licenses/>.
- *
- * As a special exception, you may use this file as part of a software library without
- * restriction. Specifically, if other files instantiate templates or use macros or
- * inline functions from this file, or you compile this file and link it with  other
- * files to produce an executable, this file does not by itself cause the resulting
- * executable to be covered by the GNU General Public License. This exception does not
- * however invalidate any other reasons why the executable file might be covered by the
- * GNU General Public License.
- *
- * THE SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY
- * WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
- * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
- * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+ * settings_easymak.h  */
+
 /* Note: The values in this file are the default settings that are loaded
  * 		 into a virgin EEPROM, and can be changed using the config commands.
  *		 After initial load the EEPROM values (or changed values) are used.
@@ -34,14 +11,19 @@
  */
 
 /***********************************************************************/
-/**** Shapeoko2 500mm profile ********************************************/
+/**** easymak profile ********************************************/
 /***********************************************************************/
 
 // ***> NOTE: The init message must be a single line with no CRs or LFs
 #define INIT_MESSAGE "Initializing configs to Shapeoko2 500mm profile"
 
-#define JUNCTION_DEVIATION		0.01	// default value, in mm - smaller is faster
-#define JUNCTION_ACCELERATION	2000000	// 2 million - centripetal acceleration around corners
+#define MT01_VERSION "Versão 1.1.0.007"
+
+//#define JUNCTION_DEVIATION		0.03// default value, in mm - smaller is faster
+//#define JUNCTION_ACCELERATION	1500000	// 2 million - centripetal acceleration around corners
+
+#define JUNCTION_DEVIATION		0.2// default value, in mm - smaller is faster
+#define JUNCTION_ACCELERATION	160000	// 2 million - centripetal acceleration around corners
 
 // *** settings.h overrides ***
 
@@ -55,33 +37,37 @@
 #define SWITCH_TYPE 			SW_TYPE_NORMALLY_CLOSED	// one of: SW_TYPE_NORMALLY_OPEN, SW_TYPE_NORMALLY_CLOSED
 
 // *** motor settings ***
+//#define TRAVELXY	75.3982236862
+#define TRAVELX	75.3982236862
+#define TRAVELY	75.3982236862
+#define TRAVELZ	3
 
-#define M1_MOTOR_MAP 			AXIS_X	// 1ma
-#define M1_STEP_ANGLE			1.8		// 1sa
-#define M1_TRAVEL_PER_REV		40.00	// 1tr
-#define M1_MICROSTEPS			64		// 1mi		1,2,4,8
-#define M1_POLARITY				1		// 1po		0=normal, 1=reversed
-#define M1_POWER_MODE			2		// 1pm		TRUE=low power idle enabled
+#define M1_MOTOR_MAP			AXIS_Z
+#define M1_STEP_ANGLE			1.8
+#define M1_TRAVEL_PER_REV		TRAVELZ
+#define M1_MICROSTEPS			64
+#define M1_POLARITY				0
+#define M1_POWER_MODE			2
 
 #define M2_MOTOR_MAP			AXIS_Y  // Y1 - left side of machine
 #define M2_STEP_ANGLE			1.8
-#define M2_TRAVEL_PER_REV		40.00
+#define M2_TRAVEL_PER_REV		TRAVELY
 #define M2_MICROSTEPS			64
-#define M2_POLARITY				1
+#define M2_POLARITY				0
 #define M2_POWER_MODE			2
 
-#define M3_MOTOR_MAP			AXIS_Y  // Y2 - right sif of machine
+#define M3_MOTOR_MAP			AXIS_X  // X2 - right sif of machine
 #define M3_STEP_ANGLE			1.8
-#define M3_TRAVEL_PER_REV		40.00
+#define M3_TRAVEL_PER_REV		TRAVELX
 #define M3_MICROSTEPS			64
-#define M3_POLARITY				0
+#define M3_POLARITY				1
 #define M3_POWER_MODE			2
 
-#define M4_MOTOR_MAP			AXIS_Z
+#define M4_MOTOR_MAP			AXIS_X
 #define M4_STEP_ANGLE			1.8
-#define M4_TRAVEL_PER_REV		2.1166
-#define M4_MICROSTEPS			16
-#define M4_POLARITY				1
+#define M4_TRAVEL_PER_REV		TRAVELX
+#define M4_MICROSTEPS			64
+#define M4_POLARITY				0
 #define M4_POWER_MODE			2
 
 #define M5_MOTOR_MAP			AXIS_DISABLED
@@ -98,6 +84,7 @@
 #define M6_POLARITY				0
 #define M6_POWER_MODE			MOTOR_POWER_MODE
 
+#define Z_STEP_PULSE (M1_TRAVEL_PER_REV*M1_STEP_ANGLE)/(360*M1_MICROSTEPS)
 // *** axis settings ***
 
 // These are relative conservative values for a well-tuned Shapeoko2 or similar XY belt / Z screw machine
@@ -106,9 +93,9 @@
 #define X_VELOCITY_MAX			10000 				// xvm		G0 max velocity in mm/min
 #define X_FEEDRATE_MAX			X_VELOCITY_MAX		// xfr 		G1 max feed rate in mm/min
 #define X_TRAVEL_MIN			0					// xtn		minimum travel
-#define X_TRAVEL_MAX			290					// xtm		maximum travel (travel between switches or crashes)
-#define X_JERK_MAX				5000				// xjm		yes, that's "5 billion" mm/(min^3)
-#define X_JERK_HOMING			5000				// xjh
+#define X_TRAVEL_MAX			3000					// xtm		maximum travel (travel between switches or crashes)
+#define X_JERK_MAX				400				// xjm		yes, that's "5 billion" mm/(min^3)
+#define X_JERK_HOMING			400				// xjh
 #define X_JUNCTION_DEVIATION	JUNCTION_DEVIATION	// xjd
 #define X_SWITCH_MODE_MIN		SW_MODE_HOMING		// xsn		SW_MODE_DISABLED, SW_MODE_HOMING, SW_MODE_LIMIT, SW_MODE_HOMING_LIMIT
 #define X_SWITCH_MODE_MAX 		SW_MODE_DISABLED	// xsx		SW_MODE_DISABLED, SW_MODE_HOMING, SW_MODE_LIMIT, SW_MODE_HOMING_LIMIT
@@ -121,9 +108,9 @@
 #define Y_VELOCITY_MAX			10000
 #define Y_FEEDRATE_MAX			Y_VELOCITY_MAX
 #define Y_TRAVEL_MIN			0
-#define Y_TRAVEL_MAX			320
-#define Y_JERK_MAX				5000
-#define Y_JERK_HOMING			5000				// xjh
+#define Y_TRAVEL_MAX			1500
+#define Y_JERK_MAX				400
+#define Y_JERK_HOMING			400				// xjh
 #define Y_JUNCTION_DEVIATION	JUNCTION_DEVIATION
 #define Y_SWITCH_MODE_MIN		SW_MODE_HOMING
 #define Y_SWITCH_MODE_MAX		SW_MODE_DISABLED
@@ -133,13 +120,13 @@
 #define Y_ZERO_BACKOFF			2
 
 #define Z_AXIS_MODE				AXIS_STANDARD
-#define Z_VELOCITY_MAX			1000
+#define Z_VELOCITY_MAX			900
 #define Z_FEEDRATE_MAX			Z_VELOCITY_MAX
 #define Z_TRAVEL_MAX			0
 #define Z_TRAVEL_MIN			-120                // this is approximate as Z depth depends on tooling
                                                     // value must be large enough to guarantee return to Zmax during homing
-#define Z_JERK_MAX				50					// 50,000,000
-#define Z_JERK_HOMING			1000
+#define Z_JERK_MAX				6000					// 50,000,000
+#define Z_JERK_HOMING			6000
 #define Z_JUNCTION_DEVIATION	JUNCTION_DEVIATION
 #define Z_SWITCH_MODE_MIN		SW_MODE_DISABLED
 #define Z_SWITCH_MODE_MAX		SW_MODE_HOMING
@@ -245,8 +232,8 @@
 #define G54_B_OFFSET 0
 #define G54_C_OFFSET 0
 
-#define G55_X_OFFSET (X_TRAVEL_MAX/2)	// set g55 to middle of table
-#define G55_Y_OFFSET (Y_TRAVEL_MAX/2)
+#define G55_X_OFFSET X_TRAVEL_MAX/2	// set g55 to middle of table
+#define G55_Y_OFFSET Y_TRAVEL_MAX/2
 #define G55_Z_OFFSET 0
 #define G55_A_OFFSET 0
 #define G55_B_OFFSET 0

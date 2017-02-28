@@ -40,6 +40,7 @@
 #include "help.h"
 #include "util.h"
 #include "xio.h"
+#include "eeprom.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -114,6 +115,7 @@ stat_t nv_persist(nvObj_t *nv)	// nv_persist() cannot be called from an interrup
 void config_init()
 {
 	nvObj_t *nv = nv_reset_nv_list();
+	char *P_str_axis[3] = {"x","y", "z"};
 	config_init_assertions();
 
 #ifdef __ARM
@@ -147,6 +149,67 @@ void config_init()
 // ++++ Then you can use the AVR code (or something like it)
 	cfg.comm_mode = TEXT_MODE;					// initial value until EEPROM is read
 	_set_defa(nv);
+
+	for (uint8_t i = 0; i < 3; i++ )
+	{
+		nv->index = nv_get_index(P_str_axis[i], "vm");
+		nv->value = configVarParMaq[CFG_PAR_MAQ_VEL_X + i];
+		strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+		nv_set(nv);
+		nv_persist(nv);
+	}
+
+	for (uint8_t i = 0; i < 3; i++ )
+	{
+		nv->index = nv_get_index(P_str_axis[i], "fr");
+		nv->value = configVarParMaq[CFG_PAR_MAQ_VEL_X + i];
+		strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+		nv_set(nv);
+		nv_persist(nv);
+	}
+
+	for (uint8_t i = 0; i < 2; i++ )
+	{
+		nv->index = nv_get_index(P_str_axis[i], "jm");
+		nv->value = configVarParMaq[CFG_PAR_MAQ_JERK_X + i];
+		strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+		nv_set(nv);
+		nv_persist(nv);
+	}
+
+	for (uint8_t i = 0; i < 3; i++ )
+	{
+		nv->index = nv_get_index(P_str_axis[i], "jd");
+		nv->value = configVarParMaq[CFG_PAR_MAQ_JUNCTION_DEV];
+		strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+		nv_set(nv);
+		nv_persist(nv);
+	}
+
+	nv->index = nv_get_index("", "ja");
+	nv->value = configVarParMaq[CFG_PAR_MAQ_JUNCTION_ACEL];
+	strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+	nv_set(nv);
+	nv_persist(nv);
+
+	nv->index = nv_get_index("2", "tr");
+	nv->value = configVarParMaq[CFG_PAR_MAQ_EIXO_Y];
+	strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+	nv_set(nv);
+	nv_persist(nv);
+
+	nv->index = nv_get_index("3", "tr");
+	nv->value = configVarParMaq[CFG_PAR_MAQ_EIXO_X1];
+	strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+	nv_set(nv);
+	nv_persist(nv);
+
+	nv->index = nv_get_index("4", "tr");
+	nv->value = configVarParMaq[CFG_PAR_MAQ_EIXO_X2];
+	strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+	nv_set(nv);
+	nv_persist(nv);
+
 #endif
 }
 

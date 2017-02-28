@@ -10,6 +10,7 @@
 
 #include "config_menu_pl.h"
 #include "config_menu_ox.h"
+#include "config_par_maquina.h"
 
 typedef enum
 {
@@ -20,6 +21,15 @@ typedef enum
 	FLAG_MAX            //!< CONFIG_MAX
 } flag_name;
 
+typedef enum
+{
+	UNDEFINED_MAQ = 0,		//!< Undefined
+	COMPACTA_MAQ,			//!< COMPACTA
+	MOBILE_MAQ,				//!< MOBILE
+	EASYMAK_MAQ,			//!< Easymak
+	TYPE_MAX_MAQ        //!< MAQ_TYPE_MAX
+} maq_name;
+
 enum{
 	CONFIGVAR_OX = 0,    //!< Indice da variavel EEPROM para oxicorte (configVarOx)
 	CONFIGVAR_PL,        //!< Indice da variavel EEPROM para plasma   (configVarPl)
@@ -28,6 +38,7 @@ enum{
 	ZEROPIECE,			 //!< Indice da variavel EEPROM para zero peça  (zeroPiece)
 	CONFIGVAR_MAQ,       //!< Indice da variavel EEPROM para config maquina      (configVarMaq)
 	CONFIGVAR_PAR_MAQ,   //!< Indice da variavel EEPROM para config parametros maquina      (configVarParMaq)
+	CONFIGVAR_MAX,   	//!<
 };
 
 enum{
@@ -46,6 +57,12 @@ enum{
 	HABILITADO,        //!<
 };
 
+typedef enum
+{
+	MEM_OK = 0,
+	MEM_FAIL
+} mem_check;
+
 extern float configVarOx[OX_CONFIG_MAX];
 extern float configVarPl[PL_CONFIG_MAX];
 extern float configVarJog[JOG_MAX];
@@ -60,5 +77,7 @@ void eepromInit(void);
 void eepromWriteConfig(uint8_t varType);
 void eepromReadConfig(uint8_t varType);
 void eepromConsistencyCheck(void);
+void eepromFormat(void);
+mem_check eepromIntegrityCheck(void);
 
 #endif /* INCLUDE_EEPROM_H_ */

@@ -22,6 +22,7 @@
 #include "lcd.h"
 #include "lcd_menu.h"
 #include "keyboard.h"
+#include "util.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -37,6 +38,7 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer );
 static uint8_t count = 0;
 static uint16_t mult = 1;
 uint8_t func_back = 0;
+static bool blink = 0;
 
 /**
  * Function pointer that can change a configuration
@@ -51,12 +53,6 @@ static char* boolOptions[2] =
 {
 	"NÃƒO",
 	"SIM"
-};
-
-static char* boolJogVel[2] =
-{
-	"LENTO",
-	"RÁPIDO"
 };
 
 static char* boolJogMaq[2] =
@@ -107,6 +103,7 @@ void config_bool(ut_config_var* var)
 				default: break;
 			}
 			break;
+#if (COMPACTAXP == 0)
 		case STATE_CONFIG_MAQUINA:
 			switch(configsVar->currentItem)
 			{
@@ -119,6 +116,7 @@ void config_bool(ut_config_var* var)
 				default: break;
 			}
 			break;
+#endif
 		case STATE_CONFIG_AUTO_MODE:
 			switch(configsVar->currentItem)
 			{
@@ -128,18 +126,6 @@ void config_bool(ut_config_var* var)
 				case CONFIG_AUTO_MODO_SIM_RUN:
 					value = var->value;
 					boolStr = boolSim;
-				break;
-				default: break;
-			}
-			break;
-		case STATE_CONFIG_JOG:
-			switch(configsVar->currentItem)
-			{
-				case CONFIG_JOG_RAP_LENTO:
-					Recordflag =true;
-					value = var->value;
-					menu.itemMarked = *value + 1;
-					boolStr = boolJogVel;
 				break;
 				default: break;
 			}
@@ -163,17 +149,6 @@ void config_bool(ut_config_var* var)
 	menu.selectedItem = *value % 2; // Just to be sure - it is really not necessary
 	/* Check if user selected a valid entry */
 	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0){
-//		switch(configsVar->currentState)
-//		{
-//			case STATE_CONFIG_AUTO_MODE:
-//					switch(configsVar->currentItem)
-//					{
-//						case CONFIG_AUTO_SELECIONAR_LINHA:
-//							func_back = 0xFF;
-//						break;
-//					}
-//			break;
-//		}
 		func_back = 0xFF;
 		return;
 	}
@@ -197,14 +172,27 @@ void config_int(ut_config_var* var)
 	float *value = configsVar->value;
 	char szText[MAX_COLUMN];
 	uint32_t keyEntry;
+	uint16_t decNum = 1;
+	uint16_t decCount = 0;
+	uint16_t decimalCount = 0;
+	uint16_t digits;
 	Buffervalue = *value;
-	switch(var->point)
+
+	decCount = get_dec_digits(configsVar->valueMax);
+	decimalCount = get_decimal_digits(configsVar->step);
+
+	if(decimalCount > 0)
+		digits = decCount + decimalCount + 1;
+	else
+		digits = decCount;
+
+	for (uint8_t i = 1; i<decCount; i++)
 	{
-		case 0: sprintf(szText, "%.0f %s", *value,var->unit); break;
-		case 1: sprintf(szText, "%.1f %s", *value,var->unit); break;
+		decNum = decNum*10;
 	}
 
-	ut_lcd_output_int_var(var->name,szText);
+	sprintf(szText, "%0*.*f %s", digits , decimalCount,*value,var->unit);
+	ut_lcd_output_int_var(var->name,szText,1,false);
 
 	if (swTimers[DOWN_CONFIGVAR_TIMER] == NULL)
 	{
@@ -212,7 +200,7 @@ void config_int(ut_config_var* var)
 				   (  /* Just a text name, not used by the RTOS kernel. */
 					 "Timer Update",
 					 /* The timer period in ticks, must be greater than 0. */
-					 ( 200 ),
+					 ( 250 ),
 					 /* The timers will auto-reload themselves when they
 					 expire. */
 					 pdTRUE,
@@ -223,23 +211,8 @@ void config_int(ut_config_var* var)
 					 vTimerUpdateCallback
 				   );
 	}
-	if (swTimers[UP_CONFIGVAR_TIMER] == NULL)
-	{
-	swTimers[UP_CONFIGVAR_TIMER] = xTimerCreate
-				   (  /* Just a text name, not used by the RTOS kernel. */
-					 "Timer Update",
-					 /* The timer period in ticks, must be greater than 0. */
-					 ( 200 ),
-					 /* The timers will auto-reload themselves when they
-					 expire. */
-					 pdTRUE,
-					 /* Assign each timer a unique id equal to its array
-					 index. */
-					 ( void * ) UP_CONFIGVAR_TIMER,
-					 /* Each timer calls the same callback when it expires. */
-					 vTimerUpdateCallback
-				   );
-	}
+
+	xTimerStart( swTimers[DOWN_CONFIGVAR_TIMER], 0 );
 	/* Loop to increment / decrement value */
 	/* Wait for keyboard */
 	while(xQueueReceive( qKeyboard, &keyEntry, DEFAULT_CONFIG_VAR_TOUT ))
@@ -248,16 +221,55 @@ void config_int(ut_config_var* var)
 		switch (keyEntry)
 		{
 		case KEY_DOWN:
-			/* TODO: define a min value */
-			xTimerStart( swTimers[DOWN_CONFIGVAR_TIMER], 0 );
+				if(*value > configsVar->valueMin){
+					*value = *value - configsVar->step*mult;
+				}
+				if(*value < configsVar->valueMin){
+					*value = configsVar->valueMin;
+				}
+				blink = 0;
+				//ut_lcd_output_int_var(configsVar->name,szText, count + 1,false);
 			break;
 
 		case KEY_UP:
-			/* TODO: define a max value */
-			xTimerStart( swTimers[UP_CONFIGVAR_TIMER], 0 );
+				if(*value < configsVar->valueMax){
+					*value = *value + configsVar->step*mult;
+				}
+				if(*value > configsVar->valueMax){
+					*value = configsVar->valueMax;
+				}
+				blink = 0;
+				//ut_lcd_output_int_var(configsVar->name,szText, count + 1,false);
+			break;
+
+		case KEY_LEFT:
+				mult = mult*10;
+				if (mult*configsVar->step > decNum)
+				{
+					mult = mult/10;
+				}
+				else
+				{
+
+					count++;
+				}
+
+			break;
+
+		case KEY_RIGHT:
+				mult = mult/10;
+				if (mult < 1)
+				{
+					mult = 1;
+				}
+				else
+				{
+					count--;
+				}
 			break;
 
 		case KEY_ENTER:
+			xTimerStop( swTimers[DOWN_CONFIGVAR_TIMER], 0 );
 			switch(configsVar->currentState)
 			{
 				case STATE_CONFIG_JOG:
@@ -304,6 +316,7 @@ void config_int(ut_config_var* var)
 					break;
 
 			}
+
 			mult = 1;
 			count = 0;
 			return;
@@ -320,13 +333,12 @@ void config_int(ut_config_var* var)
 				}
 			}
 			func_back = 0xFF;
+			xTimerStop( swTimers[DOWN_CONFIGVAR_TIMER], 0 );
 			return;
 
 		case KEY_RELEASED:
-			xTimerStop( swTimers[DOWN_CONFIGVAR_TIMER], 0 );
-			xTimerStop( swTimers[UP_CONFIGVAR_TIMER], 0 );
-			mult = 1;
-			count = 0;
+		//	mult = 1;
+		//	count = 0;
 			break;
 
 		default:
@@ -475,46 +487,22 @@ static void vTimerUpdateCallback( TimerHandle_t pxTimer )
 {
 	char szText[MAX_COLUMN];
 	long lArrayIndex;
+	uint8_t blinkpos = 1;
 	float *value = configsVar->value;
+	uint16_t decCount = 0;
+	uint16_t decimalCount = 0;
+	uint16_t digits = 0;
 
 	/* Optionally do something if the pxTimer parameter is NULL. */
 	configASSERT( pxTimer );
-	if(count == 10)
-	{
-		mult = mult*10;
-		if (mult > 100)
-			mult = 100;
-		count = 0;
-	}
+	decCount = get_dec_digits(configsVar->valueMax);
+	decimalCount = get_decimal_digits(configsVar->step);
+	if(decimalCount > 0)
+		digits = decCount + decimalCount + 1;
+	else
+		digits = decCount;
 
-	/* Which timer expired? */
-	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
-	switch (lArrayIndex)
-	{
-		case DOWN_CONFIGVAR_TIMER:
-			if(*value > configsVar->valueMin){
-				*value = *value - configsVar->step*mult;
-			}
-			if(*value < configsVar->valueMin){
-				*value = configsVar->valueMin;
-			}
-		break;
-		case UP_CONFIGVAR_TIMER:
-			if(*value < configsVar->valueMax){
-			*value = *value + configsVar->step*mult;
-			}
-			if(*value > configsVar->valueMax){
-			*value = configsVar->valueMax;
-			}
-		break;
-	}
-
-	switch(configsVar->point)
-	{
-		case 0: sprintf(szText, "%.0f %s", *value,configsVar->unit); break;
-		case 1: sprintf(szText, "%.1f %s", *value,configsVar->unit); break;
-	}
-
-	ut_lcd_output_int_var(configsVar->name,szText);
-	count++;
+	sprintf(szText, "%0*.*f %s", digits , decimalCount,*value,configsVar->unit);
+	ut_lcd_output_int_var(configsVar->name,szText, count + 1,blink);
+	blink = !blink;
 }

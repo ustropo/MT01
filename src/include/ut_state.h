@@ -73,8 +73,7 @@ typedef enum
 
 typedef enum
 {
-	CONFIG_JOG_RAP_LENTO = 0,
-	CONFIG_JOG_RAPIDO,
+	CONFIG_JOG_RAPIDO = 0,
 	CONFIG_JOG_LENTO,
 	CONFIG_JOG_MAX
 } ut_config_jog_name;
@@ -102,7 +101,9 @@ typedef enum
 typedef enum
 {
 	CFG_MAQUINA_ALT_DESLOCAMENTO,     //!< Altura de deslocamento
+#if (COMPACTAXP == 0)
 	CFG_MAQUINA_MODOMAQUINA,          //!< Modo da maquina
+#endif
 	CFG_MAQUINA_PARAMETROS,			  //!< Parametros da maquina
 	CFG_MAQUINA_PARAMETROS_THC,		  //!< Parametros de THC
 	CFG_MAQUINA_MAX        			  //!< CONFIG_MAX
@@ -118,20 +119,18 @@ typedef enum
 typedef enum
 {
 	CFG_PAR_MAQ_EIXO_X1,     			//!< EIXO_X1
-	CFG_PAR_MAQ_EIXO_X2,          //!< EIXO_X2
-	CFG_PAR_MAQ_EIXO_Y,			  //!< EIXO_Y
-	CFG_PAR_MAQ_JERK_X,
-	CFG_PAR_MAQ_JERK_Y,
-	CFG_PAR_MAQ_JERK_Z,
-	CFG_PAR_MAQ_VEL_X,
-	CFG_PAR_MAQ_VEL_Y,
-	CFG_PAR_MAQ_VEL_Z,
-	CFG_PAR_MAQ_TRAVEL_X,
-	CFG_PAR_MAQ_TRAVEL_Y,
-	CFG_PAR_MAQ_TRAVEL_Z,
-	CFG_PAR_MAQ_JUNCTION_DEV,
-	CFG_PAR_MAQ_JUNCTION_ACEL,
-	CFG_PAR_MAQ_MAX        			  //!< CFG_PAR_MAQ_MAX
+	CFG_PAR_MAQ_EIXO_X2,          		//!< EIXO_X2
+	CFG_PAR_MAQ_EIXO_Y,			  		//!< EIXO_Y
+	CFG_PAR_MAQ_JERK_X,                 //!< JERK X
+	CFG_PAR_MAQ_JERK_Y,                 //!< JERK Y
+	CFG_PAR_MAQ_VEL_X,                  //!< VEL X
+	CFG_PAR_MAQ_VEL_Y,                  //!< VEL Y
+	CFG_PAR_MAQ_VEL_Z,                  //!< VEL Z
+	CFG_PAR_MAQ_JUNCTION_DEV,           //!< JUNCTION DEV
+	CFG_PAR_MAQ_JUNCTION_ACEL,          //!< JUNCTION ACCEL
+	CFG_PAR_MAQ_CHORDAL_TOL,            //!< CHORDAL TOLERANCE
+	CFG_FORMAT,                         //!< FORMAT MEM
+	CFG_PAR_MAQ_MAX        			    //!< CFG PAR MAX
 } ut_config_par_maquina;
 
 /**
