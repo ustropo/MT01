@@ -1,0 +1,1177 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:31 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:31
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_usb_cscheduler.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_usb_cscheduler.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;r_usb_cscheduler.c
+                                 
+                                 		.glb	_mbox_table
+                                 		.glb	_mpl_table
+                                 		.glb	_usb_cstd_RecMsg
+                                 		.glb	_xQueueGenericReceive
+                                 		.glb	_R_usb_cstd_RecMsg
+                                 		.glb	_usb_cstd_SndMsg
+                                 		.glb	_xQueueGenericSend
+                                 		.glb	_R_usb_cstd_SndMsg
+                                 		.glb	_usb_cstd_iSndMsg
+                                 		.glb	_xQueueGenericSendFromISR
+                                 		.glb	_R_usb_cstd_iSndMsg
+                                 		.glb	_usb_cstd_PgetBlk
+                                 		.glb	_R_usb_cstd_PgetBlk
+                                 		.glb	_usb_cstd_RelBlk
+                                 		.glb	_R_usb_cstd_RelBlk
+                                 		.glb	_usb_cstd_WaiMsg
+                                 		.glb	_vTaskDelay
+                                 		.glb	_R_usb_cstd_WaiMsg
+                                 		.glb	_usb_cstd_WaitScheduler
+                                 		.glb	_usb_cstd_ScheInit
+                                 		.glb	_R_usb_cstd_Scheduler
+                                 		.glb	_R_usb_cstd_SetTaskPri
+                                 		.glb	_R_usb_cstd_CheckSchedule
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _usb_cstd_RecMsg:
+                                 		.STACK	_usb_cstd_RecMsg=36
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_usb_cscheduler.c
+                                 ;      21 * Description  : USB Host and Peripheral scheduler code
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Added RX71M.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 
+                                 ;      30 /******************************************************************************
+                                 ;      31 Includes   <System Includes> , "Project Includes"
+                                 ;      32 ******************************************************************************/
+                                 ;      33 #include "r_usb_basic_if.h"
+                                 ;      34 
+                                 ;      35 #ifdef FREE_RTOS_PP
+                                 ;      36 #include "FreeRTOS.h"
+                                 ;      37 #include "task.h"
+                                 ;      38 #include "queue.h"
+                                 ;      39 #include "config_kernel.h"
+                                 ;      40 #endif
+                                 ;      41 #ifdef FREE_RTOS_PP
+                                 ;      42     /* empty */
+                                 ;      43 #else
+                                 ;      44 /******************************************************************************
+                                 ;      45 Constant macro definitions
+                                 ;      46 ******************************************************************************/
+                                 ;      47 #define USB_IDMAX           11u                 /* Maximum Task ID +1 */
+                                 ;      48 #define USB_PRIMAX          8u                  /* Maximum Priority number +1 */
+                                 ;      49 #define USB_BLKMAX          20u                 /* Maximum block */
+                                 ;      50 #define USB_TABLEMAX        USB_BLKMAX          /* Maximum priority table */
+                                 ;      51 #define USB_WAIT_EVENT_MAX  (5u)
+                                 ;      52 
+                                 ;      53 /******************************************************************************
+                                 ;      54 Private global variables and functions
+                                 ;      55 ******************************************************************************/
+                                 ;      56 
+                                 ;      57 /* Priority Table */
+                                 ;      58 static USB_MSG_t*   usb_scstd_TableAdd[USB_PRIMAX][USB_TABLEMAX];
+                                 ;      59 static uint8_t      usb_scstd_TableID[USB_PRIMAX][USB_TABLEMAX];
+                                 ;      60 static uint8_t      usb_scstd_PriR[USB_PRIMAX];
+                                 ;      61 static uint8_t      usb_scstd_PriW[USB_PRIMAX];
+                                 ;      62 static uint8_t      usb_scstd_Pri[USB_IDMAX];
+                                 ;      63 
+                                 ;      64 /* Schedule Set Flag  */
+                                 ;      65 static uint8_t      usb_scstd_ScheduleFlag;
+                                 ;      66 
+                                 ;      67 /* Fixed-sized memory pools */
+                                 ;      68 static USB_UTR_t    usb_scstd_Block[USB_BLKMAX];
+                                 ;      69 static uint8_t      usb_scstd_BlkFlg[USB_BLKMAX];
+                                 ;      70 
+                                 ;      71 static USB_MSG_t*   usb_scstd_Add_use;
+                                 ;      72 static uint8_t      usb_scstd_ID_use;
+                                 ;      73 
+                                 ;      74 /* Wait MSG */
+                                 ;      75 static USB_MSG_t*   usb_scstd_WaitAdd[USB_IDMAX][USB_WAIT_EVENT_MAX];
+                                 ;      76 static uint16_t     usb_scstd_WaitCounter[USB_IDMAX][USB_WAIT_EVENT_MAX];
+                                 ;      77 #endif /* FREE_RTOS_PP */
+                                 ;      78 
+                                 ;      79 /******************************************************************************
+                                 ;      80 External variables and functions
+                                 ;      81 ******************************************************************************/
+                                 ;      82 extern void     usb_cpu_int_enable(USB_UTR_t *ptr);
+                                 ;      83 extern void     usb_cpu_int_disable(USB_UTR_t *ptr);
+                                 ;      84 
+                                 ;      85 /******************************************************************************
+                                 ;      86 Static variables and functions
+                                 ;      87 ******************************************************************************/
+                                 ;      88 
+                                 ;      89 /******************************************************************************
+                                 ;      90 Renesas Scheduler API functions
+                                 ;      91 ******************************************************************************/
+                                 ;      92 
+                                 ;      93 
+                                 ;      94 /******************************************************************************
+                                 ;      95 Function Name   : usb_cstd_RecMsg
+                                 ;      96 Description     : Receive a message to the specified id (mailbox).
+                                 ;      97 Argument        : uint8_t id        : ID number (mailbox).
+                                 ;      98                 : USB_MSG_t** mess  : Message pointer
+                                 ;      99                 : USB_TM_t tm       : Timeout Value
+                                 ;     100 Return          : uint16_t          : USB_E_OK / USB_E_ERROR
+                                 ;     101 ******************************************************************************/
+                                 ;     102 USB_ER_t usb_cstd_RecMsg( uint8_t id, USB_MSG_t** mess, USB_TM_t tm )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",102
+00000000 7100E0                  		ADD #0FFFFFFE0H, R0
+00000003 8789                    		MOV.B R1, 1FH[R0]
+00000005 A182                    		MOV.L R2, 18H[R0]
+00000007 A10B                    		MOV.L R3, 14H[R0]
+                                 ;     103 {
+                                 ;     104 #ifdef FREE_RTOS_PP
+                                 ;     105     signed portBASE_TYPE err;
+                                 ;     106     xQueueHandle handle;
+                                 ;     107 
+                                 ;     108     handle = *( mbox_table[ id ] );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",108
+00000009 FBE2rrrrrrrr            		MOV.L #_mbox_table, R14
+0000000F B789                    		MOVU.B 1FH[R0], R1
+00000011 FE61EE                  		MOV.L [R1,R14], R14
+00000014 E4E003                  		MOV.L [R14], 0CH[R0]
+00000017                         L11:	; entry.split
+                                 ;     109     *mess = NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",109
+00000017 A981                    		MOV.L 18H[R0], R1
+00000019 F81600                  		MOV.L #00000000H, [R1]
+0000001C                         L12:	; entry.split2
+                                 ;     110     tm; /* unused */
+                                 ;     111 
+                                 ;     112     /* xQueueReceive never time out */
+                                 ;     113     err = xQueueReceive( handle, (void *)mess, portMAX_DELAY );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",113
+0000001C A982                    		MOV.L 18H[R0], R2
+0000001E A889                    		MOV.L 0CH[R0], R1
+00000020 6604                    		MOV.L #00000000H, R4
+00000022 FB36FF                  		MOV.L #0FFFFFFFFH, R3
+00000025 05rrrrrr             A  		BSR _xQueueGenericReceive
+00000029 A081                    		MOV.L R1, 08H[R0]
+0000002B                         L13:	; entry.split3
+                                 ;     114 
+                                 ;     115     if (( err == pdTRUE ) && ( *mess != NULL ))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",115
+0000002B A881                    		MOV.L 08H[R0], R1
+0000002D 6111                    		CMP #01H, R1
+0000002F 20rr                    		BEQ L16
+00000031 2Err                 B  		BRA L18
+00000033                         L14:	; bb17
+                                 ;     116     {
+                                 ;     117         return USB_E_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",117
+00000033 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000036 2Err                 B  		BRA L20
+00000038                         L15:	; bb19
+                                 ;     118     }
+                                 ;     119     else
+                                 ;     120     {
+                                 ;     121         return USB_E_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",121
+00000038 F90601FF                		MOV.L #0FFFFFFFFH, 04H[R0]
+0000003C 2Err                 B  		BRA L20
+0000003E                         L16:	; bb24
+0000003E A981                    		MOV.L 18H[R0], R1
+00000040 EC1E                    		MOV.L [R1], R14
+00000042 610E                    		CMP #00H, R14
+00000044 10                   S  		BEQ L18
+00000045                         L17:	; bb29
+00000045 F80601                  		MOV.L #00000001H, [R0]
+00000048 08                   S  		BRA L19
+00000049                         L18:	; bb30
+00000049 F80600                  		MOV.L #00000000H, [R0]
+0000004C                         L19:	; bb31
+0000004C EC01                    		MOV.L [R0], R1
+0000004E 6101                    		CMP #00H, R1
+00000050 21rr                    		BNE L14
+00000052 2Err                 B  		BRA L15
+00000054                         L20:	; bb36
+00000054 A809                    		MOV.L 04H[R0], R1
+00000056 A101                    		MOV.L R1, 10H[R0]
+                                 ;     122     }
+                                 ;     123 #else
+                                 ;     124     if(( id < USB_IDMAX ) && ( usb_scstd_ID_use < USB_IDMAX ))
+                                 ;     125     {
+                                 ;     126         if( id == usb_scstd_ID_use )
+                                 ;     127         {
+                                 ;     128             *mess = usb_scstd_Add_use;
+                                 ;     129             return  USB_E_OK;
+                                 ;     130         }
+                                 ;     131     }   
+                                 ;     132     return  USB_E_ERROR;
+                                 ;     133 #endif /* FREE_RTOS_PP */
+                                 ;     134 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",134
+00000058 6708                    		RTSD #20H
+0000005A                         _R_usb_cstd_RecMsg:
+                                 		.STACK	_R_usb_cstd_RecMsg=24
+                                 ;     135 /******************************************************************************
+                                 ;     136 End of function usb_cstd_RecMsg
+                                 ;     137 ******************************************************************************/
+                                 ;     138 
+                                 ;     139 /******************************************************************************
+                                 ;     140 Function Name   : R_usb_cstd_RecMsg
+                                 ;     141 Description     : Receive a message to the specified id (mailbox).
+                                 ;     142 Argument        : uint8_t id        : ID number (mailbox).
+                                 ;     143                 : USB_MSG_t** mess  : Message pointer
+                                 ;     144                 : USB_TM_t tm       : Timeout Value
+                                 ;     145 Return          : uint16_t          : USB_E_OK / USB_E_ERROR
+                                 ;     146 ******************************************************************************/
+                                 ;     147 USB_ER_t R_usb_cstd_RecMsg( uint8_t id, USB_MSG_t** mess, USB_TM_t tm )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",147
+0000005A 7100EC                  		ADD #0FFFFFFECH, R0
+0000005D 8489                    		MOV.B R1, 13H[R0]
+0000005F A08A                    		MOV.L R2, 0CH[R0]
+00000061 A083                    		MOV.L R3, 08H[R0]
+                                 ;     148 {
+                                 ;     149     USB_ER_t err;
+                                 ;     150 
+                                 ;     151     err = usb_cstd_RecMsg( id,  mess, tm );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",151
+00000063 A88A                    		MOV.L 0CH[R0], R2
+00000065 B489                    		MOVU.B 13H[R0], R1
+00000067 39rrrr               W  		BSR _usb_cstd_RecMsg
+0000006A E301                    		MOV.L R1, [R0]
+0000006C                         L22:	; entry.split
+                                 ;     152 
+                                 ;     153     return err;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",153
+0000006C EC01                    		MOV.L [R0], R1
+0000006E A009                    		MOV.L R1, 04H[R0]
+00000070                         L23:	; entry.split1
+                                 ;     154 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",154
+00000070 6705                    		RTSD #14H
+00000072                         _usb_cstd_SndMsg:
+                                 		.STACK	_usb_cstd_SndMsg=28
+                                 ;     155 /******************************************************************************
+                                 ;     156 End of function R_usb_cstd_RecMsg
+                                 ;     157 ******************************************************************************/
+                                 ;     158 
+                                 ;     159 /******************************************************************************
+                                 ;     160 Function Name   : usb_cstd_SndMsg
+                                 ;     161 Description     : Send a message to the specified id (mailbox).
+                                 ;     162 Argument        : uint8_t id        : ID number (mailbox).
+                                 ;     163                 : USB_MSG_t* mess   : Message pointer
+                                 ;     164 Return          : USB_ER_t          : USB_E_OK / USB_E_ERROR
+                                 ;     165 ******************************************************************************/
+                                 ;     166 USB_ER_t usb_cstd_SndMsg( uint8_t id, USB_MSG_t* mess )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",166
+00000072 7100E8                  		ADD #0FFFFFFE8H, R0
+00000075 8589                    		MOV.B R1, 17H[R0]
+00000077 A102                    		MOV.L R2, 10H[R0]
+                                 ;     167 {
+                                 ;     168 #ifdef FREE_RTOS_PP
+                                 ;     169     signed portBASE_TYPE err;
+                                 ;     170     xQueueHandle handle;
+                                 ;     171 
+                                 ;     172     handle = *( mbox_table[ id ] );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",172
+00000079 FBE2rrrrrrrr            		MOV.L #_mbox_table, R14
+0000007F B589                    		MOVU.B 17H[R0], R1
+00000081 FE61EE                  		MOV.L [R1,R14], R14
+00000084 E4E002                  		MOV.L [R14], 08H[R0]
+00000087                         L25:	; entry.split
+                                 ;     173 
+                                 ;     174     err = xQueueSend( handle, (const void *)&mess, 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",174
+00000087 A881                    		MOV.L 08H[R0], R1
+00000089 6603                    		MOV.L #00000000H, R3
+0000008B 710210                  		ADD #10H, R0, R2
+0000008E EF34                    		MOV.L R3, R4
+00000090 05rrrrrr             A  		BSR _xQueueGenericSend
+00000094 A009                    		MOV.L R1, 04H[R0]
+00000096                         L26:	; entry.split1
+                                 ;     175 
+                                 ;     176     if ( err == pdTRUE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",176
+00000096 A809                    		MOV.L 04H[R0], R1
+00000098 6111                    		CMP #01H, R1
+0000009A 18                   S  		BNE L28
+0000009B                         L27:	; bb13
+                                 ;     177     {
+                                 ;     178         return USB_E_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",178
+0000009B F80600                  		MOV.L #00000000H, [R0]
+0000009E 08                   S  		BRA L29
+0000009F                         L28:	; bb15
+                                 ;     179     }
+                                 ;     180     else
+                                 ;     181     {
+                                 ;     182         return USB_E_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",182
+0000009F F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+000000A2                         L29:	; bb21
+000000A2 EC01                    		MOV.L [R0], R1
+000000A4 A089                    		MOV.L R1, 0CH[R0]
+                                 ;     183     }
+                                 ;     184 #else
+                                 ;     185     USB_ER_t    status;
+                                 ;     186 
+                                 ;     187     /* USB interrupt disable */
+                                 ;     188     usb_cpu_int_disable((USB_UTR_t*)mess);
+                                 ;     189     status = usb_cstd_iSndMsg(id,mess);
+                                 ;     190     /* USB interrupt enable */
+                                 ;     191     usb_cpu_int_enable((USB_UTR_t*)mess);
+                                 ;     192     return status;
+                                 ;     193 #endif /* FREE_RTOS_PP */
+                                 ;     194 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",194
+000000A6 6706                    		RTSD #18H
+000000A8                         _R_usb_cstd_SndMsg:
+                                 		.STACK	_R_usb_cstd_SndMsg=20
+                                 ;     195 /******************************************************************************
+                                 ;     196 End of function usb_cstd_SndMsg
+                                 ;     197 ******************************************************************************/
+                                 ;     198 
+                                 ;     199 /******************************************************************************
+                                 ;     200 Function Name   : R_usb_cstd_SndMsg
+                                 ;     201 Description     : Send a message to the specified id (mailbox).
+                                 ;     202 Argument        : uint8_t id        : ID number (mailbox).
+                                 ;     203                 : USB_MSG_t* mess   : Message pointer
+                                 ;     204 Return          : USB_ER_t          : USB_E_OK / USB_E_ERROR
+                                 ;     205 ******************************************************************************/
+                                 ;     206 USB_ER_t R_usb_cstd_SndMsg( uint8_t id, USB_MSG_t* mess )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",206
+000000A8 7100F0                  		ADD #0FFFFFFF0H, R0
+000000AB 8389                    		MOV.B R1, 0FH[R0]
+000000AD A082                    		MOV.L R2, 08H[R0]
+                                 ;     207 {
+                                 ;     208     USB_ER_t    status;
+                                 ;     209 
+                                 ;     210     status = usb_cstd_SndMsg( id, mess );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",210
+000000AF B389                    		MOVU.B 0FH[R0], R1
+000000B1 39rrrr               W  		BSR _usb_cstd_SndMsg
+000000B4 E301                    		MOV.L R1, [R0]
+000000B6                         L31:	; entry.split
+                                 ;     211 
+                                 ;     212     return status;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",212
+000000B6 EC01                    		MOV.L [R0], R1
+000000B8 A009                    		MOV.L R1, 04H[R0]
+000000BA                         L32:	; entry.split1
+                                 ;     213 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",213
+000000BA 6704                    		RTSD #10H
+000000BC                         _usb_cstd_iSndMsg:
+                                 		.STACK	_usb_cstd_iSndMsg=32
+                                 ;     214 /******************************************************************************
+                                 ;     215 End of function R_usb_cstd_SndMsg
+                                 ;     216 ******************************************************************************/
+                                 ;     217 
+                                 ;     218 /******************************************************************************
+                                 ;     219 Function Name   : usb_cstd_iSndMsg
+                                 ;     220 Description     : Send a message to the specified id (mailbox) while executing 
+                                 ;     221                 : an interrupt.
+                                 ;     222 Argument        : uint8_t id        : ID number (mailbox).
+                                 ;     223                 : USB_MSG_t* mess   : Message pointer
+                                 ;     224 Return          : USB_ER_t          : USB_E_OK / USB_E_ERROR
+                                 ;     225 ******************************************************************************/
+                                 ;     226 USB_ER_t usb_cstd_iSndMsg( uint8_t id, USB_MSG_t* mess )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",226
+000000BC 7100E4                  		ADD #0FFFFFFE4H, R0
+000000BF 8689                    		MOV.B R1, 1BH[R0]
+000000C1 A10A                    		MOV.L R2, 14H[R0]
+                                 ;     227 {
+                                 ;     228 #ifdef FREE_RTOS_PP
+                                 ;     229     signed portBASE_TYPE err;
+                                 ;     230     xQueueHandle handle;
+                                 ;     231     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",231
+000000C3 3E0300                  		MOV.L #00000000H, 0CH[R0]
+000000C6                         L34:	; entry.split
+                                 ;     232 
+                                 ;     233     handle = *( mbox_table[ id ] );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",233
+000000C6 FBE2rrrrrrrr            		MOV.L #_mbox_table, R14
+000000CC B689                    		MOVU.B 1BH[R0], R1
+000000CE FE61EE                  		MOV.L [R1,R14], R14
+000000D1 E4E002                  		MOV.L [R14], 08H[R0]
+000000D4                         L35:	; entry.split1
+                                 ;     234 
+                                 ;     235     err = xQueueSendFromISR( handle, (const void *)&mess, &xHigherPriorityTaskWoken );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",235
+000000D4 A881                    		MOV.L 08H[R0], R1
+000000D6 6604                    		MOV.L #00000000H, R4
+000000D8 71030C                  		ADD #0CH, R0, R3
+000000DB 710214                  		ADD #14H, R0, R2
+000000DE 05rrrrrr             A  		BSR _xQueueGenericSendFromISR
+000000E2 A009                    		MOV.L R1, 04H[R0]
+000000E4                         L36:	; entry.split2
+                                 ;     236 
+                                 ;     237     if ( err == pdTRUE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",237
+000000E4 A809                    		MOV.L 04H[R0], R1
+000000E6 6111                    		CMP #01H, R1
+000000E8 21rr                    		BNE L40
+000000EA                         L37:	; bb15
+                                 ;     238     {
+                                 ;     239         portYIELD_FROM_ISR ( xHigherPriorityTaskWoken );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",239
+000000EA A889                    		MOV.L 0CH[R0], R1
+000000EC 6101                    		CMP #00H, R1
+000000EE 20rr                    		BEQ L39
+000000F0                         L38:	; bb16
+                                 		._LINE_TOP  inline_asm
+                                  
+000000F0 7EA5                    	PUSH.L R5
+                                 	 
+000000F2 FB5EE07208              	MOV.L #553696, R5
+000000F7 F85401                  	MOV.B #1, [R5]
+                                 	 
+000000FA EC55                    	MOV.L [R5], R5
+                                 	 
+000000FC 7EB5                    	POP R5
+                                 		._LINE_END  inline_asm
+000000FE                         L39:	; bb20
+                                 ;     240         return USB_E_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",240
+000000FE F80600                  		MOV.L #00000000H, [R0]
+00000101 08                   S  		BRA L41
+00000102                         L40:	; bb22
+                                 ;     241     }
+                                 ;     242     else
+                                 ;     243     {
+                                 ;     244         return USB_E_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",244
+00000102 F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+00000105                         L41:	; bb29
+00000105 EC01                    		MOV.L [R0], R1
+00000107 A101                    		MOV.L R1, 10H[R0]
+                                 ;     245     }
+                                 ;     246 #else
+                                 ;     247     uint8_t usb_pri;        /* Task Priority */
+                                 ;     248     uint8_t usb_write;      /* Priority Table Writing pointer */
+                                 ;     249 
+                                 ;     250     if( id < USB_IDMAX )
+                                 ;     251     {
+                                 ;     252         /* Read priority and table pointer */
+                                 ;     253         usb_pri     = usb_scstd_Pri[id];
+                                 ;     254         usb_write   = usb_scstd_PriW[usb_pri];
+                                 ;     255         if( usb_pri < USB_PRIMAX )
+                                 ;     256         {
+                                 ;     257             /* Renewal write pointer */
+                                 ;     258             usb_write++;
+                                 ;     259             if( usb_write >= USB_TABLEMAX )
+                                 ;     260             {
+                                 ;     261                 usb_write = USB_TBLCLR;
+                                 ;     262             }
+                                 ;     263             /* Check pointer */
+                                 ;     264             if( usb_write == usb_scstd_PriR[usb_pri])
+                                 ;     265             {
+                                 ;     266                 return  USB_E_ERROR;
+                                 ;     267             }
+                                 ;     268             /* Save message */
+                                 ;     269             /* Set priority table */
+                                 ;     270             usb_scstd_TableID[usb_pri][usb_write]   = id;
+                                 ;     271             usb_scstd_TableAdd[usb_pri][usb_write]  = mess;
+                                 ;     272             usb_scstd_PriW[usb_pri]                 = usb_write;
+                                 ;     273             return  USB_E_OK;
+                                 ;     274         }
+                                 ;     275     }
+                                 ;     276     USB_PRINTF0("SND_MSG ERROR !!\n");
+                                 ;     277     return  USB_E_ERROR;
+                                 ;     278 #endif /* FREE_RTOS_PP */
+                                 ;     279 
+                                 ;     280 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",280
+00000109 6707                    		RTSD #1CH
+0000010B                         _R_usb_cstd_iSndMsg:
+                                 		.STACK	_R_usb_cstd_iSndMsg=20
+                                 ;     281 /******************************************************************************
+                                 ;     282 End of function usb_cstd_iSndMsg
+                                 ;     283 ******************************************************************************/
+                                 ;     284 
+                                 ;     285 /******************************************************************************
+                                 ;     286 Function Name   : R_usb_cstd_iSndMsg
+                                 ;     287 Description     : Send a message to the specified id (mailbox) while executing 
+                                 ;     288                 : an interrupt.
+                                 ;     289 Argument        : uint8_t id        : ID number (mailbox).
+                                 ;     290                 : USB_MSG_t* mess   : Message pointer
+                                 ;     291 Return          : USB_ER_t          : USB_E_OK / USB_E_ERROR
+                                 ;     292 ******************************************************************************/
+                                 ;     293 USB_ER_t R_usb_cstd_iSndMsg( uint8_t id, USB_MSG_t* mess )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",293
+0000010B 7100F0                  		ADD #0FFFFFFF0H, R0
+0000010E 8389                    		MOV.B R1, 0FH[R0]
+00000110 A082                    		MOV.L R2, 08H[R0]
+                                 ;     294 {
+                                 ;     295     USB_ER_t err;
+                                 ;     296 
+                                 ;     297     err = usb_cstd_iSndMsg( id, mess );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",297
+00000112 B389                    		MOVU.B 0FH[R0], R1
+00000114 39rrrr               W  		BSR _usb_cstd_iSndMsg
+00000117 E301                    		MOV.L R1, [R0]
+00000119                         L43:	; entry.split
+                                 ;     298 
+                                 ;     299     return err;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",299
+00000119 EC01                    		MOV.L [R0], R1
+0000011B A009                    		MOV.L R1, 04H[R0]
+0000011D                         L44:	; entry.split1
+                                 ;     300 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",300
+0000011D 6704                    		RTSD #10H
+0000011F                         _usb_cstd_PgetBlk:
+                                 		.STACK	_usb_cstd_PgetBlk=28
+                                 ;     301 /******************************************************************************
+                                 ;     302 End of function R_usb_cstd_iSndMsg
+                                 ;     303 ******************************************************************************/
+                                 ;     304 
+                                 ;     305 /******************************************************************************
+                                 ;     306 Function Name   : usb_cstd_PgetBlk
+                                 ;     307 Description     : Get a memory block for the caller.
+                                 ;     308 Argument        : uint8_t id        : ID number (mailbox).
+                                 ;     309                 : USB_UTR_t** blk   : Memory block pointer.
+                                 ;     310 Return          : USB_ER_t          : USB_E_OK / USB_E_ERROR
+                                 ;     311 ******************************************************************************/
+                                 ;     312 USB_ER_t usb_cstd_PgetBlk( uint8_t id, USB_UTR_t** blk )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",312
+0000011F 7100E8                  		ADD #0FFFFFFE8H, R0
+00000122 8589                    		MOV.B R1, 17H[R0]
+00000124 A102                    		MOV.L R2, 10H[R0]
+                                 ;     313 {
+                                 ;     314 #ifdef FREE_RTOS_PP
+                                 ;     315     signed portBASE_TYPE err;
+                                 ;     316     xQueueHandle handle;
+                                 ;     317     handle = *( mpl_table[ id ] );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",317
+00000126 FBE2rrrrrrrr            		MOV.L #_mpl_table, R14
+0000012C B589                    		MOVU.B 17H[R0], R1
+0000012E FE61EE                  		MOV.L [R1,R14], R14
+00000131 E4E002                  		MOV.L [R14], 08H[R0]
+00000134                         L46:	; entry.split
+                                 ;     318     err = xQueueReceive( handle, (void *)blk, (portTickType)0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",318
+00000134 A902                    		MOV.L 10H[R0], R2
+00000136 A881                    		MOV.L 08H[R0], R1
+00000138 6603                    		MOV.L #00000000H, R3
+0000013A EF34                    		MOV.L R3, R4
+0000013C 05rrrrrr             A  		BSR _xQueueGenericReceive
+00000140 A009                    		MOV.L R1, 04H[R0]
+00000142                         L47:	; entry.split1
+                                 ;     319     if ( err == pdTRUE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",319
+00000142 A809                    		MOV.L 04H[R0], R1
+00000144 6111                    		CMP #01H, R1
+00000146 18                   S  		BNE L49
+00000147                         L48:	; bb14
+                                 ;     320     {
+                                 ;     321         return USB_E_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",321
+00000147 F80600                  		MOV.L #00000000H, [R0]
+0000014A 08                   S  		BRA L50
+0000014B                         L49:	; bb16
+                                 ;     322     }
+                                 ;     323     else
+                                 ;     324     {
+                                 ;     325         return USB_E_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",325
+0000014B F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+0000014E                         L50:	; bb22
+0000014E EC01                    		MOV.L [R0], R1
+00000150 A089                    		MOV.L R1, 0CH[R0]
+                                 ;     326     }
+                                 ;     327 #else
+                                 ;     328     uint8_t usb_s_pblk_c;
+                                 ;     329 
+                                 ;     330     if( id < USB_IDMAX )
+                                 ;     331     {
+                                 ;     332         usb_s_pblk_c = USB_CNTCLR;
+                                 ;     333         while(usb_s_pblk_c != USB_BLKMAX)
+                                 ;     334         {
+                                 ;     335             if(usb_scstd_BlkFlg[usb_s_pblk_c] == USB_FLGCLR)
+                                 ;     336             {
+                                 ;     337                 /* Acquire fixed-size memory block */
+                                 ;     338                 *blk    = &usb_scstd_Block[usb_s_pblk_c];
+                                 ;     339                 usb_scstd_BlkFlg[usb_s_pblk_c]  = USB_FLGSET;
+                                 ;     340                 return  USB_E_OK;
+                                 ;     341             }
+                                 ;     342             usb_s_pblk_c++;
+                                 ;     343         }
+                                 ;     344         /* Error of BLK Table Full !!  */
+                                 ;     345         USB_PRINTF1("usb_scBlkFlg[%d][] Full !!\n",id);
+                                 ;     346     }
+                                 ;     347     return  USB_E_ERROR;
+                                 ;     348 #endif /* FREE_RTOS_PP */
+                                 ;     349 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",349
+00000152 6706                    		RTSD #18H
+00000154                         _R_usb_cstd_PgetBlk:
+                                 		.STACK	_R_usb_cstd_PgetBlk=20
+                                 ;     350 /******************************************************************************
+                                 ;     351 End of function usb_cstd_PgetBlk
+                                 ;     352 ******************************************************************************/
+                                 ;     353 
+                                 ;     354 /******************************************************************************
+                                 ;     355 Function Name   : R_usb_cstd_PgetBlk
+                                 ;     356 Description     : Call the get memory block function to get a memory block for 
+                                 ;     357                 : the caller.
+                                 ;     358 Argument        : uint8_t id        : ID number (mailbox).
+                                 ;     359                 : USB_UTR_t** blk   : Memory block pointer.
+                                 ;     360 Return          : USB_ER_t          : USB_E_OK / USB_E_ERROR
+                                 ;     361 ******************************************************************************/
+                                 ;     362 USB_ER_t R_usb_cstd_PgetBlk( uint8_t id, USB_UTR_t** blk )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",362
+00000154 7100F0                  		ADD #0FFFFFFF0H, R0
+00000157 8389                    		MOV.B R1, 0FH[R0]
+00000159 A082                    		MOV.L R2, 08H[R0]
+                                 ;     363 {
+                                 ;     364     USB_ER_t err;
+                                 ;     365 
+                                 ;     366     err = usb_cstd_PgetBlk( id, blk );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",366
+0000015B B389                    		MOVU.B 0FH[R0], R1
+0000015D 39rrrr               W  		BSR _usb_cstd_PgetBlk
+00000160 E301                    		MOV.L R1, [R0]
+00000162                         L52:	; entry.split
+                                 ;     367 
+                                 ;     368     return err;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",368
+00000162 EC01                    		MOV.L [R0], R1
+00000164 A009                    		MOV.L R1, 04H[R0]
+00000166                         L53:	; entry.split1
+                                 ;     369 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",369
+00000166 6704                    		RTSD #10H
+00000168                         _usb_cstd_RelBlk:
+                                 		.STACK	_usb_cstd_RelBlk=28
+                                 ;     370 /******************************************************************************
+                                 ;     371 End of function R_usb_cstd_PgetBlk
+                                 ;     372 ******************************************************************************/
+                                 ;     373 
+                                 ;     374 /******************************************************************************
+                                 ;     375 Function Name   : usb_cstd_RelBlk
+                                 ;     376 Description     : Release a memory block.
+                                 ;     377 Argument        : uint8_t id        : ID number (mailbox).
+                                 ;     378                 : USB_UTR_t* blk    : Memory block pointer.
+                                 ;     379 Return          : USB_ER_t          : USB_E_OK / USB_E_ERROR
+                                 ;     380 ******************************************************************************/
+                                 ;     381 USB_ER_t usb_cstd_RelBlk( uint8_t id,  USB_UTR_t* blk )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",381
+00000168 7100E8                  		ADD #0FFFFFFE8H, R0
+0000016B 8589                    		MOV.B R1, 17H[R0]
+0000016D A102                    		MOV.L R2, 10H[R0]
+                                 ;     382 {
+                                 ;     383 #ifdef FREE_RTOS_PP
+                                 ;     384     signed portBASE_TYPE err;
+                                 ;     385     xQueueHandle handle;
+                                 ;     386 
+                                 ;     387     handle = *( mpl_table[ id ] );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",387
+0000016F FBE2rrrrrrrr            		MOV.L #_mpl_table, R14
+00000175 B589                    		MOVU.B 17H[R0], R1
+00000177 FE61EE                  		MOV.L [R1,R14], R14
+0000017A E4E002                  		MOV.L [R14], 08H[R0]
+0000017D                         L55:	; entry.split
+                                 ;     388     err = xQueueSend( handle, (void *)&blk, (portTickType)0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",388
+0000017D A881                    		MOV.L 08H[R0], R1
+0000017F 6603                    		MOV.L #00000000H, R3
+00000181 710210                  		ADD #10H, R0, R2
+00000184 EF34                    		MOV.L R3, R4
+00000186 05rrrrrr             A  		BSR _xQueueGenericSend
+0000018A A009                    		MOV.L R1, 04H[R0]
+0000018C                         L56:	; entry.split1
+                                 ;     389 
+                                 ;     390     if ( err == pdTRUE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",390
+0000018C A809                    		MOV.L 04H[R0], R1
+0000018E 6111                    		CMP #01H, R1
+00000190 18                   S  		BNE L58
+00000191                         L57:	; bb13
+                                 ;     391     {
+                                 ;     392         return USB_E_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",392
+00000191 F80600                  		MOV.L #00000000H, [R0]
+00000194 08                   S  		BRA L59
+00000195                         L58:	; bb15
+                                 ;     393     }
+                                 ;     394     else
+                                 ;     395     {
+                                 ;     396         return USB_E_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",396
+00000195 F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+00000198                         L59:	; bb21
+00000198 EC01                    		MOV.L [R0], R1
+0000019A A089                    		MOV.L R1, 0CH[R0]
+                                 ;     397     }
+                                 ;     398 #else
+                                 ;     399     uint16_t    usb_s_rblk_c;
+                                 ;     400 
+                                 ;     401     if( id < USB_IDMAX )
+                                 ;     402     {
+                                 ;     403         usb_s_rblk_c = USB_CNTCLR;
+                                 ;     404         while(usb_s_rblk_c != USB_BLKMAX)
+                                 ;     405         {
+                                 ;     406             if(blk == &usb_scstd_Block[usb_s_rblk_c])
+                                 ;     407             {
+                                 ;     408                 /* Release fixed-size memory block */
+                                 ;     409                 usb_scstd_BlkFlg[usb_s_rblk_c] = USB_FLGCLR;
+                                 ;     410                 return  USB_E_OK;
+                                 ;     411             }
+                                 ;     412             usb_s_rblk_c++;
+                                 ;     413         }
+                                 ;     414         /* Error of BLK Flag is not CLR !!  */
+                                 ;     415         USB_PRINTF0("TskBlk NO CLR !!\n");
+                                 ;     416     }
+                                 ;     417     return  USB_E_ERROR;
+                                 ;     418 #endif /* FREE_RTOS_PP */
+                                 ;     419 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",419
+0000019C 6706                    		RTSD #18H
+0000019E                         _R_usb_cstd_RelBlk:
+                                 		.STACK	_R_usb_cstd_RelBlk=20
+                                 ;     420 /******************************************************************************
+                                 ;     421 End of function usb_cstd_RelBlk
+                                 ;     422 ******************************************************************************/
+                                 ;     423 
+                                 ;     424 /******************************************************************************
+                                 ;     425 Function Name   : R_usb_cstd_RelBlk
+                                 ;     426 Description     : Call the function to release a memory block.
+                                 ;     427 Argument        : uint8_t id        : ID number (mailbox).
+                                 ;     428                 : USB_UTR_t* blk    : Memory block pointer.
+                                 ;     429 Return          : USB_ER_t          : USB_E_OK / USB_E_ERROR
+                                 ;     430 ******************************************************************************/
+                                 ;     431 USB_ER_t R_usb_cstd_RelBlk( uint8_t id,  USB_UTR_t* blk )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",431
+0000019E 7100F0                  		ADD #0FFFFFFF0H, R0
+000001A1 8389                    		MOV.B R1, 0FH[R0]
+000001A3 A082                    		MOV.L R2, 08H[R0]
+                                 ;     432 {
+                                 ;     433     USB_ER_t err;
+                                 ;     434 
+                                 ;     435     err = usb_cstd_RelBlk( id, blk );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",435
+000001A5 B389                    		MOVU.B 0FH[R0], R1
+000001A7 39rrrr               W  		BSR _usb_cstd_RelBlk
+000001AA E301                    		MOV.L R1, [R0]
+000001AC                         L61:	; entry.split
+                                 ;     436 
+                                 ;     437     return  err;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",437
+000001AC EC01                    		MOV.L [R0], R1
+000001AE A009                    		MOV.L R1, 04H[R0]
+000001B0                         L62:	; entry.split1
+                                 ;     438 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",438
+000001B0 6704                    		RTSD #10H
+000001B2                         _usb_cstd_WaiMsg:
+                                 		.STACK	_usb_cstd_WaiMsg=24
+                                 ;     439 /******************************************************************************
+                                 ;     440 End of function R_usb_cstd_RelBlk
+                                 ;     441 ******************************************************************************/
+                                 ;     442 
+                                 ;     443 /******************************************************************************
+                                 ;     444 Function Name   : usb_cstd_WaiMsg
+                                 ;     445 Description     : Runs USB_SND_MSG after running the scheduler the specified 
+                                 ;     446                 : number of times.
+                                 ;     447 Argument        : uint8_t  id       : ID number (mailbox).
+                                 ;     448                 : USB_MSG_t *mess   : Message pointer.
+                                 ;     449                 : uint16_t  times   : Timeout value.
+                                 ;     450 Return          : USB_ER_t          : USB_E_OK / USB_E_ERROR.
+                                 ;     451 ******************************************************************************/
+                                 ;     452 USB_ER_t usb_cstd_WaiMsg( uint8_t id, USB_MSG_t* mess, USB_TM_t times )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",452
+000001B2 7100EC                  		ADD #0FFFFFFECH, R0
+000001B5 8489                    		MOV.B R1, 13H[R0]
+000001B7 A08A                    		MOV.L R2, 0CH[R0]
+000001B9 A083                    		MOV.L R3, 08H[R0]
+                                 ;     453 {
+                                 ;     454 #ifdef FREE_RTOS_PP
+                                 ;     455     USB_ER_t err;
+                                 ;     456 
+                                 ;     457     vTaskDelay( times );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",457
+000001BB EF31                    		MOV.L R3, R1
+000001BD 05rrrrrr             A  		BSR _vTaskDelay
+000001C1                         L64:	; entry.split
+                                 ;     458 
+                                 ;     459     err = usb_cstd_SndMsg( id, mess );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",459
+000001C1 A88A                    		MOV.L 0CH[R0], R2
+000001C3 B489                    		MOVU.B 13H[R0], R1
+000001C5 39rrrr               W  		BSR _usb_cstd_SndMsg
+000001C8 E301                    		MOV.L R1, [R0]
+000001CA                         L65:	; entry.split1
+                                 ;     460 
+                                 ;     461     return err;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",461
+000001CA EC01                    		MOV.L [R0], R1
+000001CC A009                    		MOV.L R1, 04H[R0]
+000001CE                         L66:	; entry.split2
+                                 ;     462 #else
+                                 ;     463     uint8_t i;
+                                 ;     464 
+                                 ;     465     if( id < USB_IDMAX )
+                                 ;     466     {
+                                 ;     467         for( i =0; i <USB_WAIT_EVENT_MAX ; i++ )
+                                 ;     468         {
+                                 ;     469             if( usb_scstd_WaitCounter[id][i] == 0 )
+                                 ;     470             {
+                                 ;     471                 usb_scstd_WaitAdd[id][i] = mess;
+                                 ;     472                 usb_scstd_WaitCounter[id][i] = times;
+                                 ;     473                 return  USB_E_OK;
+                                 ;     474             }
+                                 ;     475         }
+                                 ;     476     }
+                                 ;     477     /* Error !!  */
+                                 ;     478     USB_PRINTF0("WAI_MSG ERROR !!\n");
+                                 ;     479     return  USB_E_ERROR;
+                                 ;     480 #endif /* FREE_RTOS_PP */
+                                 ;     481 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",481
+000001CE 6705                    		RTSD #14H
+000001D0                         _R_usb_cstd_WaiMsg:
+                                 		.STACK	_R_usb_cstd_WaiMsg=24
+                                 ;     482 /******************************************************************************
+                                 ;     483 End of function usb_cstd_WaiMsg
+                                 ;     484 ******************************************************************************/
+                                 ;     485 
+                                 ;     486 /******************************************************************************
+                                 ;     487 Function Name   : R_usb_cstd_WaiMsg
+                                 ;     488 Description     : Will run USB_SND_MSG after running the scheduler the specified 
+                                 ;     489                 : number of times.
+                                 ;     490 Argument        : uint8_t  id       : ID number (mailbox).
+                                 ;     491                 : USB_MSG_t *mess   : Message pointer.
+                                 ;     492                 : uint16_t  times   : Timeout value.
+                                 ;     493 Return          : USB_ER_t          : USB_E_OK / USB_E_ERROR.
+                                 ;     494 ******************************************************************************/
+                                 ;     495 USB_ER_t R_usb_cstd_WaiMsg( uint8_t id, USB_MSG_t* mess, USB_TM_t times )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",495
+000001D0 7100EC                  		ADD #0FFFFFFECH, R0
+000001D3 8489                    		MOV.B R1, 13H[R0]
+000001D5 A08A                    		MOV.L R2, 0CH[R0]
+000001D7 A083                    		MOV.L R3, 08H[R0]
+                                 ;     496 {
+                                 ;     497     USB_ER_t err;
+                                 ;     498 
+                                 ;     499     err = usb_cstd_WaiMsg( id, mess, times );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",499
+000001D9 A88A                    		MOV.L 0CH[R0], R2
+000001DB B489                    		MOVU.B 13H[R0], R1
+000001DD 39rrrr               W  		BSR _usb_cstd_WaiMsg
+000001E0 E301                    		MOV.L R1, [R0]
+000001E2                         L68:	; entry.split
+                                 ;     500 
+                                 ;     501     return  err;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",501
+000001E2 EC01                    		MOV.L [R0], R1
+000001E4 A009                    		MOV.L R1, 04H[R0]
+000001E6                         L69:	; entry.split1
+                                 ;     502 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",502
+000001E6 6705                    		RTSD #14H
+000001E8                         _usb_cstd_WaitScheduler:
+                                 		.STACK	_usb_cstd_WaitScheduler=4
+                                 ;     503 /******************************************************************************
+                                 ;     504 End of function R_usb_cstd_WaiMsg
+                                 ;     505 ******************************************************************************/
+                                 ;     506 
+                                 ;     507 /******************************************************************************
+                                 ;     508 Function Name   : usb_cstd_WaitScheduler
+                                 ;     509 Description     : Schedules a wait request.
+                                 ;     510 Argument        : none
+                                 ;     511 Return          : none
+                                 ;     512 ******************************************************************************/
+                                 ;     513 void usb_cstd_WaitScheduler(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",513
+000001E8 02                      		RTS
+000001E9                         _usb_cstd_ScheInit:
+                                 		.STACK	_usb_cstd_ScheInit=4
+                                 ;     514 {
+                                 ;     515 #ifdef FREE_RTOS_PP
+                                 ;     516     /* empty */
+                                 ;     517     /* This function is not used.
+                                 ;     518        Nothing is processed in this function. */
+                                 ;     519 #else
+                                 ;     520     USB_ER_t    err;
+                                 ;     521     uint8_t     id;
+                                 ;     522     uint8_t i;
+                                 ;     523 
+                                 ;     524     for( id=0; id < USB_IDMAX; id++ )
+                                 ;     525     {
+                                 ;     526         for( i =0; i <USB_WAIT_EVENT_MAX ; i++ )
+                                 ;     527         {
+                                 ;     528             if(usb_scstd_WaitCounter[id][i] != 0)
+                                 ;     529             {
+                                 ;     530                 usb_scstd_WaitCounter[id][i]--;
+                                 ;     531                 if(usb_scstd_WaitCounter[id][i] == 0)
+                                 ;     532                 {
+                                 ;     533                     err = usb_cstd_SndMsg(id, usb_scstd_WaitAdd[id][i]);
+                                 ;     534                     if( err != USB_E_OK )
+                                 ;     535                     {
+                                 ;     536                         usb_scstd_WaitCounter[id][i]++;
+                                 ;     537                     }
+                                 ;     538                 }
+                                 ;     539             }
+                                 ;     540         }
+                                 ;     541     }
+                                 ;     542 #endif /* FREE_RTOS_PP */
+                                 ;     543 }
+                                 ;     544 /******************************************************************************
+                                 ;     545 End of function usb_cstd_WaitScheduler
+                                 ;     546 ******************************************************************************/
+                                 ;     547 
+                                 ;     548 /******************************************************************************
+                                 ;     549 Function Name   : usb_cstd_ScheInit
+                                 ;     550 Description     : Scheduler initialization.
+                                 ;     551 Argument        : none
+                                 ;     552 Return          : none
+                                 ;     553 ******************************************************************************/
+                                 ;     554 void usb_cstd_ScheInit(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",554
+000001E9 02                      		RTS
+000001EA                         _R_usb_cstd_Scheduler:
+                                 		.STACK	_R_usb_cstd_Scheduler=4
+                                 ;     555 {
+                                 ;     556 #ifdef FREE_RTOS_PP
+                                 ;     557     /* empty */
+                                 ;     558     /* This function is not used.
+                                 ;     559        Nothing is processed in this function. */
+                                 ;     560 #else
+                                 ;     561     uint8_t i;
+                                 ;     562     uint8_t j;
+                                 ;     563 
+                                 ;     564     /* Initial Scheduler */
+                                 ;     565     usb_scstd_ID_use        = USB_NONE;
+                                 ;     566     usb_scstd_ScheduleFlag  = USB_NONE;
+                                 ;     567 
+                                 ;     568     /* Initialize  priority table pointer and priority table */
+                                 ;     569     for(i=0;i!=USB_PRIMAX;i++)
+                                 ;     570     {
+                                 ;     571         usb_scstd_PriR[i]   = USB_NONE;
+                                 ;     572         usb_scstd_PriW[i]   = USB_NONE;
+                                 ;     573         for(j=0;j!=USB_TABLEMAX;j++)
+                                 ;     574         {
+                                 ;     575             usb_scstd_TableID[i][j] = USB_IDMAX;
+                                 ;     576         }
+                                 ;     577     }
+                                 ;     578 
+                                 ;     579     /* Initialize block table */
+                                 ;     580     for(i=0;i!=USB_BLKMAX;i++)
+                                 ;     581     {
+                                 ;     582         usb_scstd_BlkFlg[i]         = USB_NONE;
+                                 ;     583     }
+                                 ;     584 
+                                 ;     585     /* Initialize priority */
+                                 ;     586     for(i=0;i!=USB_IDMAX;i++)
+                                 ;     587     {
+                                 ;     588         usb_scstd_Pri[i]            = (uint8_t)USB_IDCLR;
+                                 ;     589         for( j =0; j <USB_WAIT_EVENT_MAX ; j++ )
+                                 ;     590         {
+                                 ;     591             usb_scstd_WaitAdd[i][j] = (USB_MSG_t*)USB_NONE;
+                                 ;     592             usb_scstd_WaitCounter[i][j] = USB_NONE;
+                                 ;     593         }
+                                 ;     594     }
+                                 ;     595 #endif /* FREE_RTOS_PP */
+                                 ;     596 }
+                                 ;     597 /******************************************************************************
+                                 ;     598 End of function usb_cstd_ScheInit
+                                 ;     599 ******************************************************************************/
+                                 ;     600 
+                                 ;     601 /******************************************************************************
+                                 ;     602 Function Name   : R_usb_cstd_Scheduler
+                                 ;     603 Description     : The scheduler.
+                                 ;     604 Argument        : none
+                                 ;     605 Return          : none
+                                 ;     606 ******************************************************************************/
+                                 ;     607 void R_usb_cstd_Scheduler(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",607
+000001EA 02                      		RTS
+000001EB                         _R_usb_cstd_SetTaskPri:
+                                 		.STACK	_R_usb_cstd_SetTaskPri=8
+                                 ;     608 {
+                                 ;     609 #ifdef FREE_RTOS_PP
+                                 ;     610     /* empty */
+                                 ;     611     /* This function is not used.
+                                 ;     612        Nothing is processed in this function. */
+                                 ;     613 #else
+                                 ;     614     uint8_t    usb_pri;         /* Priority Counter */
+                                 ;     615     uint8_t    usb_read;        /* Priority Table read pointer */
+                                 ;     616 
+                                 ;     617     /* wait msg */
+                                 ;     618     usb_cstd_WaitScheduler();
+                                 ;     619 
+                                 ;     620     /* Priority Table reading */
+                                 ;     621     usb_pri = USB_CNTCLR;
+                                 ;     622     while( usb_pri < USB_PRIMAX )
+                                 ;     623     {
+                                 ;     624         usb_read    = usb_scstd_PriR[usb_pri];
+                                 ;     625         if( usb_read != usb_scstd_PriW[usb_pri] )
+                                 ;     626         {
+                                 ;     627             /* Priority Table read pointer increment */
+                                 ;     628             usb_read++;     
+                                 ;     629             if( usb_read >= USB_TABLEMAX )
+                                 ;     630             {
+                                 ;     631                 usb_read = USB_TBLCLR;
+                                 ;     632             }
+                                 ;     633             /* Set practise message */
+                                 ;     634             usb_scstd_ID_use    = usb_scstd_TableID[usb_pri][usb_read];
+                                 ;     635             usb_scstd_Add_use   = usb_scstd_TableAdd[usb_pri][usb_read];
+                                 ;     636             usb_scstd_TableID[usb_pri][usb_read]    = USB_IDMAX;
+                                 ;     637             usb_scstd_PriR[usb_pri]                 = usb_read;
+                                 ;     638             usb_scstd_ScheduleFlag                  = USB_FLGSET;
+                                 ;     639             usb_pri = USB_PRIMAX;
+                                 ;     640         }
+                                 ;     641         else
+                                 ;     642         {
+                                 ;     643             usb_pri++;
+                                 ;     644         }
+                                 ;     645     }
+                                 ;     646 #endif /* FREE_RTOS_PP */
+                                 ;     647 }
+                                 ;     648 /******************************************************************************
+                                 ;     649 End of function R_usb_cstd_Scheduler
+                                 ;     650 ******************************************************************************/
+                                 ;     651 
+                                 ;     652 /******************************************************************************
+                                 ;     653 Function Name   : R_usb_cstd_SetTaskPri
+                                 ;     654 Description     : Set a task's priority.
+                                 ;     655 Argument        : uint8_t tasknum   : Task id.
+                                 ;     656                 : uint8_t pri       : The task priority to be set.
+                                 ;     657 Return          : none
+                                 ;     658 ******************************************************************************/
+                                 ;     659 void R_usb_cstd_SetTaskPri(uint8_t tasknum, uint8_t pri)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",659
+000001EB 6040                    		SUB #04H, R0
+000001ED 8089                    		MOV.B R1, 03H[R0]
+000001EF 8082                    		MOV.B R2, 02H[R0]
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",681
+000001F1 6701                    		RTSD #04H
+000001F3                         _R_usb_cstd_CheckSchedule:
+                                 		.STACK	_R_usb_cstd_CheckSchedule=8
+                                 ;     660 {
+                                 ;     661 #ifdef FREE_RTOS_PP
+                                 ;     662     /* empty */
+                                 ;     663     /* This function is not used.
+                                 ;     664        Nothing is processed in this function. */
+                                 ;     665 #else
+                                 ;     666     if(tasknum < USB_IDMAX)
+                                 ;     667     {
+                                 ;     668         if(pri < USB_PRIMAX)
+                                 ;     669         {
+                                 ;     670             usb_scstd_Pri[tasknum]=pri;
+                                 ;     671         }
+                                 ;     672         else if(pri == (uint8_t)USB_IDCLR)
+                                 ;     673         {
+                                 ;     674             usb_scstd_Pri[tasknum]=(uint8_t)USB_IDCLR;
+                                 ;     675         }
+                                 ;     676         else
+                                 ;     677         {
+                                 ;     678         }
+                                 ;     679     }
+                                 ;     680 #endif /* FREE_RTOS_PP */
+                                 ;     681 }
+                                 ;     682 /******************************************************************************
+                                 ;     683 End of function R_usb_cstd_SetTaskPri
+                                 ;     684 ******************************************************************************/
+                                 ;     685 
+                                 ;     686 /******************************************************************************
+                                 ;     687 Function Name   : R_usb_cstd_CheckSchedule
+                                 ;     688 Description     : Check schedule flag to see if caller's "time has come", then 
+                                 ;     689                 : clear it.
+                                 ;     690 Argument        : none
+                                 ;     691 Return          : flg   : usb_scstd_ScheduleFlag
+                                 ;     692 ******************************************************************************/
+                                 ;     693 uint8_t R_usb_cstd_CheckSchedule(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",693
+000001F3 6040                    		SUB #04H, R0
+                                 ;     694 {
+                                 ;     695 #ifdef FREE_RTOS_PP
+                                 ;     696     /* This function is not used. */
+                                 ;     697     return USB_FLGCLR; /* In order not to take out an error with compile. */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",697
+000001F5 3C0300                  		MOV.B #00H, 03H[R0]
+000001F8 B089                    		MOVU.B 03H[R0], R1
+000001FA                         L75:	; entry.split
+                                 ;     698 #else
+                                 ;     699     uint8_t flg;
+                                 ;     700 
+                                 ;     701     flg = usb_scstd_ScheduleFlag;
+                                 ;     702     usb_scstd_ScheduleFlag = USB_FLGCLR;
+                                 ;     703     return flg;
+                                 ;     704 #endif /* FREE_RTOS_PP */
+                                 ;     705 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cscheduler.c",705
+000001FA 5B11                    		MOVU.B R1, R1
+000001FC 6701                    		RTSD #04H
+                                 ;     706 /******************************************************************************
+                                 ;     707 End of function R_usb_cstd_CheckSchedule
+                                 ;     708 ******************************************************************************/
+                                 ;     709 
+                                 ;     710 /******************************************************************************
+                                 ;     711 End  Of File
+                                 ;     712 ******************************************************************************/
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01144   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000510(000001FEH)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx7E87\$ccrx\r_usb_cscheduler.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_usb_cscheduler.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_usb_basic\src\driver\comm\r_usb_cscheduler.obj

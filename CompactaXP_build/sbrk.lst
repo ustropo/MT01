@@ -1,0 +1,212 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:45 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:45
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=sbrk.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=sbrk.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;sbrk.c
+                                 
+                                 		.glb	_sbrk
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _sbrk:
+                                 		.STACK	_sbrk=16
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : sbrk.c
+                                 ;      21 * Device(s)    : RX
+                                 ;      22 * Description  : Configures the MCU heap memory.  The size of the heap is defined by the macro HEAPSIZE below.
+                                 ;      23 ***********************************************************************************************************************/
+                                 ;      24 /***********************************************************************************************************************
+                                 ;      25 * History : DD.MM.YYYY Version  Description
+                                 ;      26 *         : 26.10.2011 1.00     First Release
+                                 ;      27 *         : 12.03.2012 1.10     Heap size is now defined in r_bsp_config.h, not sbrk.h.
+                                 ;      28 *         : 19.11.2012 1.20     Updated code to use 'BSP_' and 'BSP_CFG_' prefix for macros.
+                                 ;      29 *         : 26.11.2013 1.21     Replaced stddef.h, stdio.h, and stdint.h includes with include for platform.h.
+                                 ;      30 ***********************************************************************************************************************/
+                                 ;      31 
+                                 ;      32 /***********************************************************************************************************************
+                                 ;      33 Includes   <System Includes> , "Project Includes"
+                                 ;      34 ***********************************************************************************************************************/
+                                 ;      35 #include "r_bsp_config.h"
+                                 ;      36 
+                                 ;      37 /* ONly use this file if heap is enabled in r_bsp_config. */
+                                 ;      38 #if (BSP_CFG_HEAP_BYTES > 0)
+                                 ;      39 
+                                 ;      40 /* Used for getting BSP_CFG_HEAP_BYTES macro. */
+                                 ;      41 #include "platform.h"
+                                 ;      42 
+                                 ;      43 /* BCH - 01/16/2013 */
+                                 ;      44 /* 3447: External linkage is not needed for these toolchain supplied library functions.    
+                                 ;      45    3227: Not going to add const since this is toolchain library function.
+                                 ;      46    3218: Not going to change since this is provided toolchain library code. 
+                                 ;      47    3210: Not going to change since this is provided toolchain library code. */
+                                 ;      48 /* PRQA S 3447, 3227, 3218, 3210 ++ */
+                                 ;      49 
+                                 ;      50 /***********************************************************************************************************************
+                                 ;      51 Macro definitions
+                                 ;      52 ***********************************************************************************************************************/
+                                 ;      53 
+                                 ;      54 /***********************************************************************************************************************
+                                 ;      55 Function Prototypes
+                                 ;      56 ***********************************************************************************************************************/
+                                 ;      57 /* Memory allocation function prototype declaration */
+                                 ;      58 int8_t  *sbrk(size_t size);
+                                 ;      59 
+                                 ;      60 /***********************************************************************************************************************
+                                 ;      61 Global Variables
+                                 ;      62 ***********************************************************************************************************************/
+                                 ;      63 //const size_t _sbrk_size=      /* Specifies the minimum unit of */
+                                 ;      64 /* the defined heap area */
+                                 ;      65 extern int8_t *_s1ptr;
+                                 ;      66 
+                                 ;      67 union HEAP_TYPE
+                                 ;      68 {
+                                 ;      69     int32_t  dummy;             /* Dummy for 4-byte boundary */
+                                 ;      70     int8_t heap[BSP_CFG_HEAP_BYTES];    /* Declaration of the area managed by sbrk*/
+                                 ;      71 };
+                                 ;      72 /* Declare memory heap area */
+                                 ;      73 static union HEAP_TYPE heap_area;
+                                 ;      74 /* End address allocated by sbrk    */
+                                 ;      75 static int8_t *brk=(int8_t *)&heap_area;
+                                 ;      76 
+                                 ;      77 /***********************************************************************************************************************
+                                 ;      78 * Function name: sbrk
+                                 ;      79 * Description  : This function configures MCU memory area allocation.
+                                 ;      80 * Arguments    : size - 
+                                 ;      81 *                    assigned area size
+                                 ;      82 * Return value : Start address of allocated area (pass)
+                                 ;      83 *                -1 (failure)
+                                 ;      84 ***********************************************************************************************************************/
+                                 ;      85 int8_t  *sbrk(size_t size)                      
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\sbrk.c",85
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
+                                 ;      86 {
+                                 ;      87     int8_t  *p;
+                                 ;      88 
+                                 ;      89     if ((brk + size) > (heap_area.heap + BSP_CFG_HEAP_BYTES))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\sbrk.c",89
+00000004 FBE2rrrrrrrr            		MOV.L #__$brk, R14
+0000000A 0688E1                  		ADD [R14].L, R1
+0000000D FBE2rrrrrrrr            		MOV.L #__$heap_area, R14
+00000013 72EE0004                		ADD #0400H, R14
+00000017 47E1                    		CMP R14, R1
+00000019 25rr                    		BLEU L12
+0000001B                         L11:	; bb3
+                                 ;      90     {
+                                 ;      91         /* Empty area size  */
+                                 ;      92         p = (int8_t *)-1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\sbrk.c",92
+0000001B F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+0000001E 2Err                 B  		BRA L14
+00000020                         L12:	; bb4
+                                 ;      93     }
+                                 ;      94     else
+                                 ;      95     {
+                                 ;      96         /* Area assignment */
+                                 ;      97         p = brk;  
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\sbrk.c",97
+00000020 FBE2rrrrrrrr            		MOV.L #__$brk, R14
+00000026 E0E0                    		MOV.L [R14], [R0]
+00000028                         L13:	; bb4.split
+                                 ;      98 
+                                 ;      99         /* End address update */                           
+                                 ;     100         brk += size;                           
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\sbrk.c",100
+00000028 FBE2rrrrrrrr            		MOV.L #__$brk, R14
+0000002E ECEF                    		MOV.L [R14], R15
+00000030 06890F02                		ADD 08H[R0].L, R15
+00000034 E3EF                    		MOV.L R15, [R14]
+00000036                         L14:	; bb14
+                                 ;     101     }
+                                 ;     102 
+                                 ;     103     /* Return result */
+                                 ;     104     return p;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\sbrk.c",104
+00000036 EC01                    		MOV.L [R0], R1
+00000038 A009                    		MOV.L R1, 04H[R0]
+0000003A                         L15:	; bb14.split
+                                 ;     105 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\sbrk.c",105
+0000003A 6703                    		RTSD #0CH
+                                 ;     106 
+                                 ;     107 #endif /* BSP_CFG_HEAP_BYTES */
+                                 ;     108 
+                                 ;     109 
+                                 ;     110 
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         __$brk:
+00000000 rrrrrrrr                		.lword	__$heap_area
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         __$heap_area:
+00000000(00000400H)              		.blkl	256
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00177   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000060(0000003CH)  P
+ROMDATA  0000000004(00000004H)  D
+DATA     0000001024(00000400H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx7E87\$ccrx\sbrk.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\sbrk.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_bsp\board\MT01\sbrk.obj

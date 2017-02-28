@@ -1,0 +1,527 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:53:51 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:53:51
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=ut_state_config_maquina.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=ut_state_config_maquina.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;ut_state_config_maquina.c
+                                 
+                                 		.glb	_configsVar
+                                 		.glb	_configVarMaq
+                                 		.glb	_configFlags
+                                 		.glb	_configsMaq
+                                 		.glb	_mq_init_types
+                                 		.glb	_mq_init_names
+                                 		.glb	_mq_init_max
+                                 		.glb	_mq_init_min
+                                 		.glb	_mq_init_step
+                                 		.glb	_mq_init_point
+                                 		.glb	_mq_init_unit
+                                 		.glb	_geNextStateMaq
+                                 		.glb	_cs
+                                 		.glb	_ut_state_config_maquina
+                                 		.glb	_ut_menu_init
+                                 		.glb	_ut_menu_browse
+                                 		.glb	_eepromReadConfig
+                                 		.glb	_ut_lcd_output_warning
+                                 		.glb	_xio_close
+                                 		.glb	_vTaskDelay
+                                 		.glb	_delay_esc
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         __$init:
+                                 		.STACK	__$init=8
+                                 ;       1 /*
+                                 ;       2  * ut_state_config_menu.c
+                                 ;       3  *
+                                 ;       4  *  Created on: Dec 6, 2015
+                                 ;       5  *      Author: Fernando
+                                 ;       6  */
+                                 ;       7 
+                                 ;       8 #include "ut_context.h"
+                                 ;       9 #include "ut_state.h"
+                                 ;      10 #include "ut_state_config_var.h"
+                                 ;      11 #include "eeprom.h"
+                                 ;      12 #include "config_maquina.h"
+                                 ;      13 
+                                 ;      14 
+                                 ;      15 #include "FreeRTOS.h"
+                                 ;      16 #include "task.h"
+                                 ;      17 
+                                 ;      18 #include "keyboard.h"
+                                 ;      19 #include "interpreter_if.h"
+                                 ;      20 
+                                 ;      21 #include "lcd.h"
+                                 ;      22 #include "lcd_menu.h"
+                                 ;      23 #include "state_functions.h"
+                                 ;      24 
+                                 ;      25 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
+                                 ;      26 
+                                 ;      27 static bool initialized = false;
+                                 ;      28 static const char* gszConfigMenuTitle = "CONFIG. DE MÁQUINA";
+                                 ;      29 
+                                 ;      30 /**
+                                 ;      31  * Initialize config array
+                                 ;      32  */
+                                 ;      33 static void init()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",33
+00000000 6040                    		SUB #04H, R0
+                                 ;      34 {
+                                 ;      35 	uint8_t i;
+                                 ;      36 
+                                 ;      37 	/* Check if already initialized */
+                                 ;      38 	if(initialized) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",38
+00000002 FBE2rrrrrrrr            		MOV.L #__$initialized, R14
+00000008 58EE                    		MOVU.B [R14], R14
+0000000A 610E                    		CMP #00H, R14
+0000000C 20rr                    		BEQ L18
+0000000E                         L15:	; bb2
+                                 ;      39 		for(i = 0; i < CFG_MAQUINA_MAX; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",39
+0000000E 3C0300                  		MOV.B #00H, 03H[R0]
+00000011 2Err                 B  		BRA L17
+00000013                         L16:	; bb3
+                                 ;      40 		{
+                                 ;      41 			configsMaq[i].name = mq_init_names[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",41
+00000013 B089                    		MOVU.B 03H[R0], R1
+00000015 FBE2rrrrrrrr            		MOV.L #_mq_init_names, R14
+0000001B FE61E2                  		MOV.L [R1,R14], R2
+0000001E 75112C                  		MUL #2CH, R1
+00000021 FB32rrrrrrrr            		MOV.L #_configsMaq, R3
+00000027 4B13                    		ADD R1, R3
+00000029 A1BA                    		MOV.L R2, 1CH[R3]
+0000002B B089                    		MOVU.B 03H[R0], R1
+0000002D 6211                    		ADD #01H, R1
+0000002F 8089                    		MOV.B R1, 03H[R0]
+00000031                         L17:	; bb13
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",39
+00000031 B089                    		MOVU.B 03H[R0], R1
+00000033 6141                    		CMP #04H, R1
+00000035 29rr                    		BLT L16
+00000037 38rrrr               W  		BRA L33
+0000003A                         L18:	; bb25
+0000003A 7543B0                  		MOV.L #000000B0H, R3
+0000003D 6602                    		MOV.L #00000000H, R2
+                                 ;      42 		}
+                                 ;      43 		return;
+                                 ;      44 	}
+                                 ;      45 
+                                 ;      46 	/* Zero all values */
+                                 ;      47 	memset(configsMaq, 0, sizeof(configsMaq));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",47
+0000003F FB12rrrrrrrr            		MOV.L #_configsMaq, R1
+00000045 7F88                    		SSTR.B
+00000047                         L19:	; bb25.split
+                                 ;      48 
+                                 ;      49 	/* Initialize all variables */
+                                 ;      50 	for(i = 0; i < CFG_MAQUINA_MAX; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",50
+00000047 3C0300                  		MOV.B #00H, 03H[R0]
+0000004A 38rrrr               W  		BRA L29
+0000004D                         L20:	; bb26
+                                 ;      51 	{
+                                 ;      52 		configsMaq[i].type = mq_init_types[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",52
+0000004D B089                    		MOVU.B 03H[R0], R1
+0000004F FBE2rrrrrrrr            		MOV.L #_mq_init_types, R14
+00000055 FE61EE                  		MOV.L [R1,R14], R14
+00000058 75112C                  		MUL #2CH, R1
+0000005B FBF2rrrrrrrr            		MOV.L #_configsMaq, R15
+00000061 4B1F                    		ADD R1, R15
+00000063 E3FE                    		MOV.L R14, [R15]
+00000065                         L21:	; bb26.split
+                                 ;      53 		configsMaq[i].valueMax = mq_init_max[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",53
+00000065 B089                    		MOVU.B 03H[R0], R1
+00000067 FBE2rrrrrrrr            		MOV.L #_mq_init_max, R14
+0000006D FE61E2                  		MOV.L [R1,R14], R2
+00000070 75112C                  		MUL #2CH, R1
+00000073 FB32rrrrrrrr            		MOV.L #_configsMaq, R3
+00000079 4B13                    		ADD R1, R3
+0000007B A0BA                    		MOV.L R2, 0CH[R3]
+0000007D                         L22:	; bb26.split1
+                                 ;      54 		configsMaq[i].valueMin = mq_init_min[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",54
+0000007D B089                    		MOVU.B 03H[R0], R1
+0000007F FBE2rrrrrrrr            		MOV.L #_mq_init_min, R14
+00000085 FE61E2                  		MOV.L [R1,R14], R2
+00000088 75112C                  		MUL #2CH, R1
+0000008B FB32rrrrrrrr            		MOV.L #_configsMaq, R3
+00000091 4B13                    		ADD R1, R3
+00000093 A0B2                    		MOV.L R2, 08H[R3]
+00000095                         L23:	; bb26.split2
+                                 ;      55 		configsMaq[i].name = mq_init_names[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",55
+00000095 B089                    		MOVU.B 03H[R0], R1
+00000097 FBE2rrrrrrrr            		MOV.L #_mq_init_names, R14
+0000009D FE61E2                  		MOV.L [R1,R14], R2
+000000A0 75112C                  		MUL #2CH, R1
+000000A3 FB32rrrrrrrr            		MOV.L #_configsMaq, R3
+000000A9 4B13                    		ADD R1, R3
+000000AB A1BA                    		MOV.L R2, 1CH[R3]
+000000AD                         L24:	; bb26.split3
+                                 ;      56 		configsMaq[i].unit = mq_init_unit[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",56
+000000AD B089                    		MOVU.B 03H[R0], R1
+000000AF FBE2rrrrrrrr            		MOV.L #_mq_init_unit, R14
+000000B5 FE61E2                  		MOV.L [R1,R14], R2
+000000B8 75112C                  		MUL #2CH, R1
+000000BB FB32rrrrrrrr            		MOV.L #_configsMaq, R3
+000000C1 4B13                    		ADD R1, R3
+000000C3 A1B2                    		MOV.L R2, 18H[R3]
+000000C5                         L25:	; bb26.split4
+                                 ;      57 		configsMaq[i].step = mq_init_step[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",57
+000000C5 B089                    		MOVU.B 03H[R0], R1
+000000C7 FBE2rrrrrrrr            		MOV.L #_mq_init_step, R14
+000000CD FE61E2                  		MOV.L [R1,R14], R2
+000000D0 75112C                  		MUL #2CH, R1
+000000D3 FB32rrrrrrrr            		MOV.L #_configsMaq, R3
+000000D9 4B13                    		ADD R1, R3
+000000DB A132                    		MOV.L R2, 10H[R3]
+000000DD                         L26:	; bb26.split5
+                                 ;      58 		configsMaq[i].point = mq_init_point[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",58
+000000DD B089                    		MOVU.B 03H[R0], R1
+000000DF FBE2rrrrrrrr            		MOV.L #_mq_init_point, R14
+000000E5 FECE12                  		MOVU.B [R14,R1], R2
+000000E8 75112C                  		MUL #2CH, R1
+000000EB FB32rrrrrrrr            		MOV.L #_configsMaq, R3
+000000F1 4B13                    		ADD R1, R3
+000000F3 8532                    		MOV.B R2, 14H[R3]
+000000F5                         L27:	; bb26.split6
+                                 ;      59 		configsMaq[i].currentState = STATE_CONFIG_MAQUINA;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",59
+000000F5 B089                    		MOVU.B 03H[R0], R1
+000000F7 75112C                  		MUL #2CH, R1
+000000FA FB22rrrrrrrr            		MOV.L #_configsMaq, R2
+00000100 4B12                    		ADD R1, R2
+00000102 3E2809                  		MOV.L #00000009H, 20H[R2]
+00000105                         L28:	; bb26.split7
+                                 ;      60 		configsMaq[i].currentItem = i;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",60
+00000105 B089                    		MOVU.B 03H[R0], R1
+00000107 EF1E                    		MOV.L R1, R14
+00000109 751E2C                  		MUL #2CH, R14
+0000010C FBF2rrrrrrrr            		MOV.L #_configsMaq, R15
+00000112 4BEF                    		ADD R14, R15
+00000114 C7F124                  		MOV.B R1, 24H[R15]
+00000117 B089                    		MOVU.B 03H[R0], R1
+00000119 6211                    		ADD #01H, R1
+0000011B 8089                    		MOV.B R1, 03H[R0]
+0000011D                         L29:	; bb95
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",50
+0000011D B089                    		MOVU.B 03H[R0], R1
+0000011F 6141                    		CMP #04H, R1
+00000121 28rr                  * 		BLT L20
+         38rrrr                  
+00000126                         L30:	; bb101
+                                 ;      61 	}
+                                 ;      62 	configsMaq[0].value = &configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",62
+00000126 FB12rrrrrrrr            		MOV.L #_configsMaq, R1
+0000012C FB22rrrrrrrr            		MOV.L #_configVarMaq, R2
+00000132 A01A                    		MOV.L R2, 04H[R1]
+00000134                         L31:	; bb101.split
+                                 ;      63 	configsMaq[1].value = &configFlags[MODOMAQUINA];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",63
+00000134 FB12rrrrrrrr            		MOV.L #_configsMaq, R1
+0000013A FB22rrrrrrrr            		MOV.L #_configFlags, R2
+00000140 A312                    		MOV.L R2, 30H[R1]
+00000142                         L32:	; bb101.split8
+                                 ;      64 	initialized = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",64
+00000142 FBE2rrrrrrrr            		MOV.L #__$initialized, R14
+00000148 F8E401                  		MOV.B #01H, [R14]
+0000014B 6701                    		RTSD #04H
+0000014D                         L33:	; return
+                                 ;      65 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",65
+0000014D 6701                    		RTSD #04H
+0000014F                         _ut_state_config_maquina:
+                                 		.STACK	_ut_state_config_maquina=440
+                                 ;      66 
+                                 ;      67 /**
+                                 ;      68  * Shows a configuration menu for the machine.
+                                 ;      69  *
+                                 ;      70  * @param pContext Context object
+                                 ;      71  * @return Main menu state
+                                 ;      72  */
+                                 ;      73 ut_state ut_state_config_maquina(ut_context* pContext)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",73
+0000014F 72004CFE                		ADD #0FFFFFE4CH, R0
+00000153 E7016C                  		MOV.L R1, 01B0H[R0]
+                                 ;      74 {
+                                 ;      75 	ut_menu config_menu;
+                                 ;      76 	uint8_t i;
+                                 ;      77 
+                                 ;      78 	/* Initialize variables */
+                                 ;      79 	init();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",79
+00000156 39rrrr               W  		BSR __$init
+00000159                         L35:	; entry.split
+00000159 710104                  		ADD #04H, R0, R1
+                                 ;      80 
+                                 ;      81 	/* Initialize menu */
+                                 ;      82 	ut_menu_init(&config_menu);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",82
+0000015C 05rrrrrr             A  		BSR _ut_menu_init
+00000160                         L36:	; entry.split1
+                                 ;      83 
+                                 ;      84 	/* Options */
+                                 ;      85 	config_menu.title = gszConfigMenuTitle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",85
+00000160 FBE2rrrrrrrr            		MOV.L #__$gszConfigMenuTitle, R14
+00000166 E4E065                  		MOV.L [R14], 0194H[R0]
+00000169                         L37:	; entry.split2
+                                 ;      86 //	config_menu.offset = 1;
+                                 ;      87 	/* Items */
+                                 ;      88 	for(i = 0; i < CFG_MAQUINA_MAX; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",88
+00000169 FA04AB0100              		MOV.B #00H, 01ABH[R0]
+0000016E 2Err                 B  		BRA L39
+00000170                         L38:	; bb
+                                 ;      89 	{
+                                 ;      90 		config_menu.items[config_menu.numItems++].text = configsMaq[i].name;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",90
+00000170 5D0ECD                  		MOVU.W 019AH[R0], R14
+00000173 751E14                  		MUL #14H, R14
+00000176 710F04                  		ADD #04H, R0, R15
+00000179 4BEF                    		ADD R14, R15
+0000017B 5A01AB01                		MOVU.B 01ABH[R0], R1
+0000017F 75112C                  		MUL #2CH, R1
+00000182 FBE2rrrrrrrr            		MOV.L #_configsMaq, R14
+00000188 4B1E                    		ADD R1, R14
+0000018A E5EF0703                		MOV.L 1CH[R14], 0CH[R15]
+0000018E DD0ECD                  		MOV.W 019AH[R0], R14
+00000191 621E                    		ADD #01H, R14
+00000193 D70ECD                  		MOV.W R14, 019AH[R0]
+00000196 5A01AB01                		MOVU.B 01ABH[R0], R1
+0000019A 6211                    		ADD #01H, R1
+0000019C CB01AB01                		MOV.B R1, 01ABH[R0]
+000001A0                         L39:	; bb22
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",88
+000001A0 5A01AB01                		MOVU.B 01ABH[R0], R1
+000001A4 6141                    		CMP #04H, R1
+000001A6 29rr                    		BLT L38
+000001A8                         L40:	; bb27
+                                 ;      91 	}
+                                 ;      92 
+                                 ;      93 	/* Show menu */
+                                 ;      94 	config_menu.selectedItem = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",94
+000001A8 F905CC00                		MOV.W #0000H, 0198H[R0]
+000001AC                         L41:	; bb27.split
+000001AC FB26FF                  		MOV.L #0FFFFFFFFH, R2
+000001AF 710104                  		ADD #04H, R0, R1
+                                 ;      95 	if(ut_menu_browse(&config_menu, DEFAULT_CONFIG_TIMEOUT) < 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",95
+000001B2 05rrrrrr             A  		BSR _ut_menu_browse
+000001B6 69F1                    		SHLR #1FH, R1
+000001B8 6101                    		CMP #00H, R1
+000001BA 10                   S  		BEQ L43
+000001BB                         L42:	; bb30
+                                 ;      96 	{
+                                 ;      97 		return STATE_MAIN_MENU;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",97
+000001BB F80602                  		MOV.L #00000002H, [R0]
+000001BE 38rrrr               W  		BRA L57
+000001C1                         L43:	; bb37
+000001C1 6651                    		MOV.L #00000005H, R1
+                                 ;      98 	}
+                                 ;      99 	eepromReadConfig(CONFIGVAR_MAQ);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",99
+000001C3 05rrrrrr             A  		BSR _eepromReadConfig
+000001C7                         L44:	; bb37.split
+                                 ;     100 	/* Set selected item */
+                                 ;     101 	pContext->value[0] = STATE_CONFIG_MAQUINA;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",101
+000001C7 ED016C                  		MOV.L 01B0H[R0], R1
+000001CA 3C1209                  		MOV.B #09H, 02H[R1]
+000001CD                         L45:	; bb37.split3
+                                 ;     102 	configsVar = &configsMaq[config_menu.selectedItem];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",102
+000001CD 5D0ECC                  		MOVU.W 0198H[R0], R14
+000001D0 751E2C                  		MUL #2CH, R14
+000001D3 FBF2rrrrrrrr            		MOV.L #_configsMaq, R15
+000001D9 4BEF                    		ADD R14, R15
+000001DB FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000001E1 E3EF                    		MOV.L R15, [R14]
+000001E3                         L46:	; bb37.split4
+                                 ;     103 	switch(config_menu.selectedItem)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",103
+000001E3 5D0ECC                  		MOVU.W 0198H[R0], R14
+000001E6 612E                    		CMP #02H, R14
+000001E8 21rr                    		BNE L56
+000001EA                         L47:	; bb49
+                                 ;     104 	{
+                                 ;     105 		case CFG_MAQUINA_PARAMETROS:
+                                 ;     106 			ut_lcd_output_warning("CUIDADO!!!\nA MÁQUINA IRÁ\nRESETAR\n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",106
+000001EA FB12rrrrrrrr            		MOV.L #_L11, R1
+000001F0 05rrrrrr             A  		BSR _ut_lcd_output_warning
+000001F4                         L48:	; bb49.split
+000001F4 FB1AD007                		MOV.L #000007D0H, R1
+                                 ;     107 			if(delay_esc(2000) == KEY_ESC)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",107
+000001F8 05rrrrrr             A  		BSR _delay_esc
+000001FC 6111                    		CMP #01H, R1
+000001FE 21rr                    		BNE L53
+00000200                         L49:	; bb51
+                                 ;     108 			{
+                                 ;     109 				xio_close(cs.primary_src);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",109
+00000200 FB12rrrrrrrr            		MOV.L #_cs, R1
+00000206 B611                    		MOVU.B 18H[R1], R1
+00000208 05rrrrrr             A  		BSR _xio_close
+0000020C                         L50:	; bb51.split
+                                 ;     110 				ut_lcd_output_warning("COMANDO\nCANCELADO\n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",110
+0000020C FB12rrrrrrrr            		MOV.L #_L12, R1
+00000212 05rrrrrr             A  		BSR _ut_lcd_output_warning
+00000216                         L51:	; bb51.split5
+00000216 FB1AE803                		MOV.L #000003E8H, R1
+                                 ;     111 				/* Delay */
+                                 ;     112 				vTaskDelay(1000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",112
+0000021A 05rrrrrr             A  		BSR _vTaskDelay
+0000021E                         L52:	; bb51.split6
+                                 ;     113 				return STATE_CONFIG_MAQUINA;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",113
+0000021E F80609                  		MOV.L #00000009H, [R0]
+00000221 2Err                 B  		BRA L57
+00000223                         L53:	; bb58
+                                 ;     114 			}
+                                 ;     115 			configsVar->name = "DESEJA CONTINUAR?";
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",115
+00000223 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000229 ECE1                    		MOV.L [R14], R1
+0000022B FB22rrrrrrrr            		MOV.L #_L13, R2
+00000231 A19A                    		MOV.L R2, 1CH[R1]
+00000233                         L54:	; bb58.split
+                                 ;     116 			pContext->value[0] = STATE_CONFIG_MAQUINA;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",116
+00000233 ED016C                  		MOV.L 01B0H[R0], R1
+00000236 3C1209                  		MOV.B #09H, 02H[R1]
+00000239                         L55:	; bb58.split7
+                                 ;     117 			pContext->value[1] = STATE_CONFIG_PARAMETROS_MAQ;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",117
+00000239 ED016C                  		MOV.L 01B0H[R0], R1
+0000023C 3C130A                  		MOV.B #0AH, 03H[R1]
+0000023F                         L56:	; bb70
+                                 ;     118 			break;
+                                 ;     119 		default:
+                                 ;     120 			break;
+                                 ;     121 
+                                 ;     122 	}
+                                 ;     123 
+                                 ;     124 	return geNextStateMaq[config_menu.selectedItem];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",124
+0000023F FBE2rrrrrrrr            		MOV.L #_geNextStateMaq, R14
+00000245 5D0FCC                  		MOVU.W 0198H[R0], R15
+00000248 FE6FE1                  		MOV.L [R15,R14], R1
+0000024B E301                    		MOV.L R1, [R0]
+0000024D                         L57:	; bb77
+0000024D EC01                    		MOV.L [R0], R1
+0000024F E7016B                  		MOV.L R1, 01ACH[R0]
+                                 ;     125 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_maquina.c",125
+00000252 676D                    		RTSD #01B4H
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 434F4E46                		.byte	"CONFIG. DE M"
+         49472E20                
+         4445204D                
+0000000C C1                      		.byte	0C1H
+0000000D 5155494E                		.byte	"QUINA"
+         41                      
+00000012 00                      		.byte	00H
+00000013                         _L11:
+00000013 43554944                		.byte	"CUIDADO!!!"
+         41444F21                
+         2121                    
+0000001D 0A                      		.byte	0AH
+0000001E 41204D                  		.byte	"A M"
+00000021 C1                      		.byte	0C1H
+00000022 5155494E                		.byte	"QUINA IR"
+         41204952                
+0000002A C10A                    		.byte	0C1H,0AH
+0000002C 52455345                		.byte	"RESETAR"
+         544152                  
+00000033 0A00                    		.byte	0AH,00H
+00000035                         _L12:
+00000035 434F4D41                		.byte	"COMANDO"
+         4E444F                  
+0000003C 0A                      		.byte	0AH
+0000003D 43414E43                		.byte	"CANCELADO"
+         454C4144                
+         4F                      
+00000046 0A00                    		.byte	0AH,00H
+00000048                         _L13:
+00000048 44455345                		.byte	"DESEJA CONTINUAR?"
+         4A412043                
+         4F4E5449                
+         4E554152                
+         3F                      
+00000059 00                      		.byte	00H
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         __$gszConfigMenuTitle:
+00000000 rrrrrrrr                		.lword	_L10
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$initialized:
+00000000 00                      		.byte	00H
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00476   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000596(00000254H)  P
+ROMDATA  0000000090(0000005AH)  L
+ROMDATA  0000000004(00000004H)  D
+ROMDATA  0000000001(00000001H)  D_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\ut_state_config_maquina.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\ut_state_config_maquina.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\src\states\ut_state_config_maquina.obj

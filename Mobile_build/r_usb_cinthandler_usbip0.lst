@@ -1,0 +1,376 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:54:27 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:54:27
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_usb_cinthandler_usbip0.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_usb_cinthandler_usbip0.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;r_usb_cinthandler_usbip0.c
+                                 
+                                 		.glb	_usb_gcstd_IntMsg
+                                 		.glb	_usb_gcstd_IntMsgCnt
+                                 		.glb	_usb_gcstd_IntMsgD0fifo
+                                 		.glb	_usb_cstd_InitUsbMessage
+                                 		.glb	_usb_cstd_DmaHandler
+                                 		.glb	_usb_cstd_UsbHandler
+                                 		.glb	_usb_cstd_GetUsbIpAdr
+                                 		.glb	_usb_cstd_InterruptClock
+                                 		.glb	_usb_hstd_InterruptHandler
+                                 		.glb	_usb_cstd_iSndMsg
+                                 		.glb	_usb_cstd_is_host_mode
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _usb_cstd_InitUsbMessage:
+                                 		.STACK	_usb_cstd_InitUsbMessage=16
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_usb_cinthandler_usbip0.c
+                                 ;      21 * Description  : USB IP0 Host and Peripheral interrupt handler code
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Added RX71M.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 
+                                 ;      30 /******************************************************************************
+                                 ;      31 Includes   <System Includes> , "Project Includes"
+                                 ;      32 ******************************************************************************/
+                                 ;      33 #include "r_usb_basic_if.h"
+                                 ;      34 #include "r_usb_reg_access.h"
+                                 ;      35 
+                                 ;      36 
+                                 ;      37 /******************************************************************************
+                                 ;      38 Constant macro definitions
+                                 ;      39 ******************************************************************************/
+                                 ;      40 
+                                 ;      41 
+                                 ;      42 /******************************************************************************
+                                 ;      43 External variables and functions
+                                 ;      44 ******************************************************************************/
+                                 ;      45 extern void usb_cstd_d0fifo_handler(void);
+                                 ;      46 
+                                 ;      47 /******************************************************************************
+                                 ;      48 Private global variables and functions
+                                 ;      49 ******************************************************************************/
+                                 ;      50 
+                                 ;      51 USB_UTR_t       usb_gcstd_IntMsg[USB_NUM_USBIP][USB_INTMSGMAX]; /* Interrupt message */
+                                 ;      52 uint16_t        usb_gcstd_IntMsgCnt[USB_NUM_USBIP];             /* Interrupt message count */
+                                 ;      53 USB_UTR_t       usb_gcstd_IntMsgD0fifo;
+                                 ;      54 
+                                 ;      55 
+                                 ;      56 /******************************************************************************
+                                 ;      57 Renesas Abstracted common Interrupt handler functions
+                                 ;      58 ******************************************************************************/
+                                 ;      59 
+                                 ;      60 /******************************************************************************
+                                 ;      61 Function Name   : usb_cstd_InitUsbMessage
+                                 ;      62 Description     : Initialization of message to be used at time of USB interrupt.
+                                 ;      63 Arguments       : USB_UTR_t *ptr : USB internal structure. Selects e.g. channel.
+                                 ;      64                 : uint16_t  function    : Host or peripheral mode.
+                                 ;      65 Return value    : none
+                                 ;      66 ******************************************************************************/
+                                 ;      67 void usb_cstd_InitUsbMessage(USB_UTR_t *ptr, uint16_t function)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",67
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
+00000004 908A                    		MOV.W R2, 06H[R0]
+                                 ;      68 {
+                                 ;      69     /* TD.5.4 The interruption message of PCD is notified to HCD.  */
+                                 ;      70     uint16_t        i, msg_info;
+                                 ;      71 
+                                 ;      72     if( function == USB_PERI )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",72
+00000006 6122                    		CMP #02H, R2
+00000008 18                   S  		BNE L12
+00000009                         L11:	; bb5
+                                 ;      73     {
+                                 ;      74         /* Peripheral Function */
+                                 ;      75         msg_info = USB_MSG_PCD_INT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",75
+00000009 F909025101              		MOV.W #0151H, 04H[R0]
+0000000E 08                   S  		BRA L13
+0000000F                         L12:	; bb6
+                                 ;      76     }
+                                 ;      77     else
+                                 ;      78     {
+                                 ;      79         /* Host Function */
+                                 ;      80         msg_info = USB_MSG_HCD_INT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",80
+0000000F F909021701              		MOV.W #0117H, 04H[R0]
+00000014                         L13:	; bb10
+                                 ;      81     }
+                                 ;      82 
+                                 ;      83     for( i = 0; i < USB_INTMSGMAX; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",83
+00000014 3D0100                  		MOV.W #0000H, 02H[R0]
+00000017 2Err                 B  		BRA L15
+00000019                         L14:	; bb11
+                                 ;      84     {
+                                 ;      85         usb_gcstd_IntMsg[ptr->ip][i].msginfo = msg_info;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",85
+00000019 76119402                		MUL #0294H, R1
+0000001D FB22rrrrrrrr            		MOV.L #_usb_gcstd_IntMsg, R2
+00000023 4B12                    		ADD R1, R2
+00000025 B809                    		MOVU.W 02H[R0], R1
+00000027 75112C                  		MUL #2CH, R1
+0000002A 4B12                    		ADD R1, R2
+0000002C D5020202                		MOV.W 04H[R0], 04H[R2]
+00000030 9809                    		MOV.W 02H[R0], R1
+00000032 6211                    		ADD #01H, R1
+00000034 9009                    		MOV.W R1, 02H[R0]
+00000036                         L15:	; bb25
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",83
+00000036 B809                    		MOVU.W 02H[R0], R1
+00000038 61F1                    		CMP #0FH, R1
+0000003A A881                    		MOV.L 08H[R0], R1
+0000003C B991                    		MOVU.W 0CH[R1], R1
+0000003E 29rr                    		BLT L14
+00000040                         L16:	; bb31
+                                 ;      86     }
+                                 ;      87 
+                                 ;      88     usb_gcstd_IntMsgCnt[ptr->ip] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",88
+00000040 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_IntMsgCnt, R14
+00000046 660F                    		MOV.L #00000000H, R15
+00000048 FE11EF                  		MOV.W R15, [R1,R14]
+0000004B 6703                    		RTSD #0CH
+0000004D                         _usb_cstd_DmaHandler:
+                                 		.STACK	_usb_cstd_DmaHandler=4
+                                 ;      89 }
+                                 ;      90 /******************************************************************************
+                                 ;      91 End of function usb_cstd_InitUsbMessage
+                                 ;      92 ******************************************************************************/
+                                 ;      93 
+                                 ;      94 #if USB_FUNCSEL_USBIP0_PP != USB_NOUSE_PP
+                                 ;      95 /******************************************************************************
+                                 ;      96 Function Name   : usb_cstd_DmaHandler
+                                 ;      97 Description     : DMA interrupt routine. Send message to PCD/HCD task.
+                                 ;      98 Arguments       : none
+                                 ;      99 Return value    : none
+                                 ;     100 ******************************************************************************/
+                                 ;     101 void usb_cstd_DmaHandler(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",101
+0000004D 02                      		RTS
+0000004E                         _usb_cstd_UsbHandler:
+                                 		.STACK	_usb_cstd_UsbHandler=16
+                                 ;     102 {
+                                 ;     103 #ifdef USB_DTC_ENABLE
+                                 ;     104     usb_cstd_d0fifo_handler();
+                                 ;     105 #endif /* USB_DTC_ENABLE */
+                                 ;     106 }
+                                 ;     107 /******************************************************************************
+                                 ;     108 End of function usb_cstd_DmaHandler
+                                 ;     109 ******************************************************************************/
+                                 ;     110 
+                                 ;     111 /******************************************************************************
+                                 ;     112 Function Name   : usb_cstd_UsbHandler
+                                 ;     113 Description     : USB interrupt routine. Analyze which USB interrupt occurred 
+                                 ;     114                 : and send message to PCD/HCD task.
+                                 ;     115 Arguments       : none
+                                 ;     116 Return value    : none
+                                 ;     117 ******************************************************************************/
+                                 ;     118 void usb_cstd_UsbHandler(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",118
+0000004E 7EA6                    		PUSH.L R6
+00000050 6080                    		SUB #08H, R0
+                                 ;     119 {
+                                 ;     120     USB_UTR_t       *ptr;
+                                 ;     121 
+                                 ;     122 
+                                 ;     123     /* Initial pointer */
+                                 ;     124     ptr = &usb_gcstd_IntMsg[0][usb_gcstd_IntMsgCnt[0]];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",124
+00000052 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_IntMsgCnt, R14
+00000058 5CEE                    		MOVU.W [R14], R14
+0000005A 751E2C                  		MUL #2CH, R14
+0000005D FB12rrrrrrrr            		MOV.L #_usb_gcstd_IntMsg, R1
+00000063 4BE1                    		ADD R14, R1
+00000065 E301                    		MOV.L R1, [R0]
+00000067                         L19:	; entry.split
+                                 ;     125     ptr->ip  = USB_USBIP_0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",125
+00000067 EC01                    		MOV.L [R0], R1
+00000069 3D1600                  		MOV.W #0000H, 0CH[R1]
+0000006C                         L20:	; entry.split1
+                                 ;     126     ptr->ipp = usb_cstd_GetUsbIpAdr( ptr->ip );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",126
+0000006C EC06                    		MOV.L [R0], R6
+0000006E B9E1                    		MOVU.W 0CH[R6], R1
+00000070 05rrrrrr             A  		BSR _usb_cstd_GetUsbIpAdr
+00000074 A0E1                    		MOV.L R1, 08H[R6]
+00000076                         L21:	; entry.split2
+                                 ;     127 
+                                 ;     128     usb_cstd_InterruptClock( ptr );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",128
+00000076 EC01                    		MOV.L [R0], R1
+00000078 05rrrrrr             A  		BSR _usb_cstd_InterruptClock
+0000007C                         L22:	; entry.split3
+                                 ;     129 
+                                 ;     130     /* Check Host or Peripheral */
+                                 ;     131     if( usb_cstd_is_host_mode(ptr) == USB_NO )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",131
+0000007C EC01                    		MOV.L [R0], R1
+0000007E 05rrrrrr             A  		BSR _usb_cstd_is_host_mode
+00000082 6101                    		CMP #00H, R1
+00000084 20rr                    		BEQ L26
+00000086                         L23:	; bb16
+                                 ;     132     {
+                                 ;     133 #if USB_FUNCSEL_USBIP0_PP == USB_PERI_PP
+                                 ;     134         USB_ER_t        err;
+                                 ;     135 
+                                 ;     136         /* Peripheral Function */
+                                 ;     137         /* Peripheral Interrupt handler */
+                                 ;     138         usb_pstd_InterruptHandler(ptr);
+                                 ;     139         ptr->msghead = (USB_MH_t)USB_NULL;
+                                 ;     140         /* Send message */
+                                 ;     141         err = USB_ISND_MSG(USB_PCD_MBX, (USB_MSG_t*)ptr);
+                                 ;     142         if( err != USB_E_OK )
+                                 ;     143         {
+                                 ;     144             USB_PRINTF1("### lib_UsbHandler DEF1 isnd_msg error (%ld)\n", err);
+                                 ;     145         }
+                                 ;     146 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_PERI_PP */
+                                 ;     147     }
+                                 ;     148     else
+                                 ;     149     {
+                                 ;     150 #if USB_FUNCSEL_USBIP0_PP == USB_HOST_PP
+                                 ;     151         USB_ER_t        err;
+                                 ;     152 
+                                 ;     153         /* Host Function */
+                                 ;     154         /* Host Interrupt handler */
+                                 ;     155         usb_hstd_InterruptHandler(ptr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",155
+00000086 EC01                    		MOV.L [R0], R1
+00000088 05rrrrrr             A  		BSR _usb_hstd_InterruptHandler
+0000008C                         L24:	; bb16.split
+                                 ;     156         ptr->msghead = (USB_MH_t)USB_NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",156
+0000008C EC01                    		MOV.L [R0], R1
+0000008E F81600                  		MOV.L #00000000H, [R1]
+00000091                         L25:	; bb16.split4
+                                 ;     157         /* Send message */
+                                 ;     158         err = USB_ISND_MSG(USB_HCD_MBX, (USB_MSG_t*)ptr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",158
+00000091 EC02                    		MOV.L [R0], R2
+00000093 6611                    		MOV.L #00000001H, R1
+00000095 05rrrrrr             A  		BSR _usb_cstd_iSndMsg
+00000099 A009                    		MOV.L R1, 04H[R0]
+0000009B                         L26:	; bb35
+                                 ;     159         if( err != USB_E_OK )
+                                 ;     160         {
+                                 ;     161             USB_PRINTF1("### lib_UsbHandler DEF2 isnd_msg error (%ld)\n", err);
+                                 ;     162         }
+                                 ;     163 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP */
+                                 ;     164     }
+                                 ;     165 
+                                 ;     166     /* Renewal Message count  */
+                                 ;     167     usb_gcstd_IntMsgCnt[0]++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",167
+0000009B FBE2rrrrrrrr            		MOV.L #_usb_gcstd_IntMsgCnt, R14
+000000A1 DCEF                    		MOV.W [R14], R15
+000000A3 621F                    		ADD #01H, R15
+000000A5 D3EF                    		MOV.W R15, [R14]
+000000A7                         L27:	; bb35.split
+                                 ;     168     if( usb_gcstd_IntMsgCnt[0] == USB_INTMSGMAX )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",168
+000000A7 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_IntMsgCnt, R14
+000000AD 5CEE                    		MOVU.W [R14], R14
+000000AF 61FE                    		CMP #0FH, R14
+000000B1 21rr                    		BNE L29
+000000B3                         L28:	; bb39
+                                 ;     169     {
+                                 ;     170         usb_gcstd_IntMsgCnt[0] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",170
+000000B3 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_IntMsgCnt, R14
+000000B9 F8E500                  		MOV.W #0000H, [R14]
+000000BC 3F6603                  		RTSD #0CH, R6-R6
+000000BF                         L29:	; return
+                                 ;     171     }
+                                 ;     172 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.c",172
+000000BF 3F6603                  		RTSD #0CH, R6-R6
+                                 ;     173 /******************************************************************************
+                                 ;     174 End of function usb_cstd_UsbHandler
+                                 ;     175 ******************************************************************************/
+                                 ;     176 
+                                 ;     177 #endif  /* #if USB_FUNCSEL_USBIP0_PP != USB_NOUSE_PP */
+                                 ;     178 /******************************************************************************
+                                 ;     179 End  Of File
+                                 ;     180 ******************************************************************************/
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _usb_gcstd_IntMsg:
+00000000(00000528H)              		.blkl	330
+00000528                         _usb_gcstd_IntMsgD0fifo:
+00000528(0000002CH)              		.blkl	11
+                                 		.SECTION	B_2,DATA,ALIGN=2
+00000000                         _usb_gcstd_IntMsgCnt:
+00000000(00000004H)              		.blkw	2
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00341   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000194(000000C2H)  P
+DATA     0000001364(00000554H)  B
+DATA     0000000004(00000004H)  B_2
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\r_usb_cinthandler_usbip0.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\r_usb_cinthandler_usbip0.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\r_usb_basic\src\driver\comm\r_usb_cinthandler_usbip0.obj

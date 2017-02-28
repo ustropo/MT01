@@ -1,0 +1,546 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:15 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:15
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=u8g_com_io.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=u8g_com_io.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;u8g_com_io.c
+                                 
+                                 		.glb	_u8g_Pin
+                                 		.glb	_u8g_SetPinOutput
+                                 		.glb	_u8g_SetPinInput
+                                 		.glb	_u8g_SetPinLevel
+                                 		.glb	_u8g_GetPinLevel
+                                 		.glb	_u8g_SetPIOutput
+                                 		.glb	_u8g_SetPILevel
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _u8g_Pin:
+                                 		.STACK	_u8g_Pin=8
+                                 ;       1 /*
+                                 ;       2   
+                                 ;       3   u8g_com_io.c
+                                 ;       4   
+                                 ;       5   abstraction layer for low level i/o 
+                                 ;       6 
+                                 ;       7   Universal 8bit Graphics Library
+                                 ;       8   
+                                 ;       9   Copyright (c) 2012, olikraus@gmail.com
+                                 ;      10   All rights reserved.
+                                 ;      11 
+                                 ;      12   Redistribution and use in source and binary forms, with or without modification, 
+                                 ;      13   are permitted provided that the following conditions are met:
+                                 ;      14 
+                                 ;      15   * Redistributions of source code must retain the above copyright notice, this list 
+                                 ;      16     of conditions and the following disclaimer.
+                                 ;      17     
+                                 ;      18   * Redistributions in binary form must reproduce the above copyright notice, this 
+                                 ;      19     list of conditions and the following disclaimer in the documentation and/or other 
+                                 ;      20     materials provided with the distribution.
+                                 ;      21 
+                                 ;      22   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+                                 ;      23   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+                                 ;      24   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+                                 ;      25   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+                                 ;      26   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+                                 ;      27   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+                                 ;      28   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+                                 ;      29   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+                                 ;      30   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+                                 ;      31   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+                                 ;      32   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+                                 ;      33   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+                                 ;      34   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+                                 ;      35 
+                                 ;      36   Update for ATOMIC operation done (01 Jun 2013)
+                                 ;      37     U8G_ATOMIC_OR(ptr, val)
+                                 ;      38     U8G_ATOMIC_AND(ptr, val)
+                                 ;      39     U8G_ATOMIC_START();
+                                 ;      40     U8G_ATOMIC_END();
+                                 ;      41 
+                                 ;      42   uint8_t u8g_Pin(uint8_t port, uint8_t bitpos)						Convert to internal number: AVR: port*8+bitpos, ARM: port*16+bit
+                                 ;      43   void u8g_SetPinOutput(uint8_t internal_pin_number)
+                                 ;      44   void u8g_SetPinInput(uint8_t internal_pin_number)
+                                 ;      45   void u8g_SetPinLevel(uint8_t internal_pin_number, uint8_t level)
+                                 ;      46   uint8_t u8g_GetPinLevel(uint8_t internal_pin_number)
+                                 ;      47 
+                                 ;      48 
+                                 ;      49 */
+                                 ;      50 
+                                 ;      51 #include "u8g.h"
+                                 ;      52 
+                                 ;      53 #if defined(__AVR__)
+                                 ;      54 
+                                 ;      55 #include <avr/interrupt.h>
+                                 ;      56 #include <avr/io.h>
+                                 ;      57 
+                                 ;      58 typedef volatile uint8_t * IO_PTR;
+                                 ;      59 
+                                 ;      60 /* create internal pin number */
+                                 ;      61 uint8_t u8g_Pin(uint8_t port, uint8_t bitpos)
+                                 ;      62 {
+                                 ;      63   port <<= 3;
+                                 ;      64   port += bitpos;
+                                 ;      65   return port;
+                                 ;      66 }
+                                 ;      67 
+                                 ;      68 const IO_PTR u8g_avr_ddr_P[] PROGMEM = {
+                                 ;      69 #ifdef DDRA
+                                 ;      70   &DDRA,
+                                 ;      71 #else
+                                 ;      72   0,
+                                 ;      73 #endif
+                                 ;      74   &DDRB,
+                                 ;      75 #ifdef DDRC
+                                 ;      76   &DDRC,
+                                 ;      77 #ifdef DDRD
+                                 ;      78   &DDRD,
+                                 ;      79 #ifdef DDRE
+                                 ;      80   &DDRE,
+                                 ;      81 #ifdef DDRF
+                                 ;      82   &DDRF,
+                                 ;      83 #ifdef DDRG
+                                 ;      84   &DDRG,
+                                 ;      85 #ifdef DDRH
+                                 ;      86   &DDRH,
+                                 ;      87 #endif
+                                 ;      88 #endif
+                                 ;      89 #endif
+                                 ;      90 #endif
+                                 ;      91 #endif
+                                 ;      92 #endif
+                                 ;      93 };
+                                 ;      94 
+                                 ;      95 
+                                 ;      96 const IO_PTR u8g_avr_port_P[] PROGMEM = {
+                                 ;      97 #ifdef PORTA
+                                 ;      98   &PORTA,
+                                 ;      99 #else
+                                 ;     100   0,
+                                 ;     101 #endif
+                                 ;     102   &PORTB,
+                                 ;     103 #ifdef PORTC
+                                 ;     104   &PORTC,
+                                 ;     105 #ifdef PORTD
+                                 ;     106   &PORTD,
+                                 ;     107 #ifdef PORTE
+                                 ;     108   &PORTE,
+                                 ;     109 #ifdef PORTF
+                                 ;     110   &PORTF,
+                                 ;     111 #ifdef PORTG
+                                 ;     112   &PORTG,
+                                 ;     113 #ifdef PORTH
+                                 ;     114   &PORTH,
+                                 ;     115 #endif
+                                 ;     116 #endif
+                                 ;     117 #endif
+                                 ;     118 #endif
+                                 ;     119 #endif
+                                 ;     120 #endif
+                                 ;     121 };
+                                 ;     122 
+                                 ;     123 const IO_PTR u8g_avr_pin_P[] PROGMEM = {
+                                 ;     124 #ifdef PINA
+                                 ;     125   &PINA,
+                                 ;     126 #else
+                                 ;     127   0,
+                                 ;     128 #endif
+                                 ;     129   &PINB,
+                                 ;     130 #ifdef PINC
+                                 ;     131   &PINC,
+                                 ;     132 #ifdef PIND
+                                 ;     133   &PIND,
+                                 ;     134 #ifdef PINE
+                                 ;     135   &PINE,
+                                 ;     136 #ifdef PINF
+                                 ;     137   &PINF,
+                                 ;     138 #ifdef PING
+                                 ;     139   &PING,
+                                 ;     140 #ifdef PINH
+                                 ;     141   &PINH,
+                                 ;     142 #endif
+                                 ;     143 #endif
+                                 ;     144 #endif
+                                 ;     145 #endif
+                                 ;     146 #endif
+                                 ;     147 #endif
+                                 ;     148 };
+                                 ;     149 
+                                 ;     150 static volatile uint8_t *u8g_get_avr_io_ptr(const IO_PTR *base, uint8_t offset)
+                                 ;     151 {
+                                 ;     152   volatile uint8_t * tmp;
+                                 ;     153   base += offset;
+                                 ;     154   memcpy_P(&tmp, base, sizeof(volatile uint8_t * PROGMEM));
+                                 ;     155   return tmp; 
+                                 ;     156 }
+                                 ;     157 
+                                 ;     158 /* set direction to output of the specified pin (internal pin number) */
+                                 ;     159 void u8g_SetPinOutput(uint8_t internal_pin_number)
+                                 ;     160 {
+                                 ;     161   *u8g_get_avr_io_ptr(u8g_avr_ddr_P, internal_pin_number>>3) |= _BV(internal_pin_number&7);
+                                 ;     162 }
+                                 ;     163 
+                                 ;     164 void u8g_SetPinInput(uint8_t internal_pin_number)
+                                 ;     165 {
+                                 ;     166   *u8g_get_avr_io_ptr(u8g_avr_ddr_P, internal_pin_number>>3) &= ~_BV(internal_pin_number&7);
+                                 ;     167 }
+                                 ;     168 
+                                 ;     169 void u8g_SetPinLevel(uint8_t internal_pin_number, uint8_t level)
+                                 ;     170 {
+                                 ;     171   volatile uint8_t * tmp = u8g_get_avr_io_ptr(u8g_avr_port_P, internal_pin_number>>3);
+                                 ;     172   
+                                 ;     173   if ( level == 0 )
+                                 ;     174   {
+                                 ;     175     U8G_ATOMIC_AND(tmp, ~_BV(internal_pin_number&7));
+                                 ;     176    // *tmp &= ~_BV(internal_pin_number&7);
+                                 ;     177   }
+                                 ;     178   else
+                                 ;     179   {
+                                 ;     180     U8G_ATOMIC_OR(tmp, _BV(internal_pin_number&7));
+                                 ;     181     //*tmp |= _BV(internal_pin_number&7);
+                                 ;     182   }
+                                 ;     183   
+                                 ;     184 }
+                                 ;     185 
+                                 ;     186 uint8_t u8g_GetPinLevel(uint8_t internal_pin_number)
+                                 ;     187 {
+                                 ;     188   volatile uint8_t * tmp = u8g_get_avr_io_ptr(u8g_avr_pin_P, internal_pin_number>>3);
+                                 ;     189   if ( ((*tmp) & _BV(internal_pin_number&7))  != 0 )
+                                 ;     190     return 1;
+                                 ;     191   return 0;
+                                 ;     192 }
+                                 ;     193 
+                                 ;     194 #elif defined (__MSP430__)
+                                 ;     195 #include <msp430.h>
+                                 ;     196 
+                                 ;     197 typedef volatile uint8_t * IO_PTR;
+                                 ;     198 
+                                 ;     199 // MSP430 F5XXX / F6XXX series. 
+                                 ;     200 const IO_PTR u8g_msp_ddr_P[] PROGMEM = {
+                                 ;     201 	&P1DIR
+                                 ;     202 	,&P2DIR
+                                 ;     203 	,&P3DIR
+                                 ;     204 	,&P4DIR
+                                 ;     205 	,&P5DIR
+                                 ;     206 	,&P6DIR
+                                 ;     207 	,&P7DIR
+                                 ;     208 	,&P8DIR
+                                 ;     209 #if defined (__MSP430_HAS_PORT9_R__)
+                                 ;     210 	,&P9DIR
+                                 ;     211 #if defined (__MSP430_HAS_PORT10_R__)
+                                 ;     212 	,&P10DIR
+                                 ;     213 #endif
+                                 ;     214 #endif
+                                 ;     215 };
+                                 ;     216 
+                                 ;     217 const IO_PTR u8g_msp_port_P[] PROGMEM = {
+                                 ;     218 	&P1OUT
+                                 ;     219 	,&P2OUT
+                                 ;     220 	,&P3OUT
+                                 ;     221 	,&P4OUT
+                                 ;     222 	,&P5OUT
+                                 ;     223 	,&P6OUT
+                                 ;     224 	,&P7OUT
+                                 ;     225 	,&P8OUT
+                                 ;     226 #if defined (__MSP430_HAS_PORT9_R__)
+                                 ;     227 	,&P9OUT
+                                 ;     228 #if defined (__MSP430_HAS_PORT10_R__)
+                                 ;     229 	,&P10OUT
+                                 ;     230 #endif
+                                 ;     231 #endif
+                                 ;     232 };
+                                 ;     233 
+                                 ;     234 const IO_PTR u8g_msp_pin_P[] PROGMEM = {
+                                 ;     235 	&P1IN
+                                 ;     236 	,&P2IN
+                                 ;     237 	,&P3IN
+                                 ;     238 	,&P4IN
+                                 ;     239 	,&P5IN
+                                 ;     240 	,&P6IN
+                                 ;     241 	,&P7IN
+                                 ;     242 	,&P8IN
+                                 ;     243 #if defined (__MSP430_HAS_PORT9_R__)
+                                 ;     244 	,&P9IN
+                                 ;     245 #if defined (__MSP430_HAS_PORT10_R__)
+                                 ;     246 	,&P10IN
+                                 ;     247 #endif
+                                 ;     248 #endif
+                                 ;     249 };
+                                 ;     250 
+                                 ;     251 uint8_t u8g_Pin(uint8_t port, uint8_t bitpos)
+                                 ;     252 {
+                                 ;     253 	port <<= 3;
+                                 ;     254 	port += bitpos;
+                                 ;     255 	return port;
+                                 ;     256 }
+                                 ;     257 
+                                 ;     258 void u8g_SetPinOutput(uint8_t internal_pin_number)
+                                 ;     259 {
+                                 ;     260 	uint8_t port = (internal_pin_number >> 3)-1;
+                                 ;     261 	uint8_t output = 1 << (internal_pin_number & 0x07);
+                                 ;     262 	*u8g_msp_ddr_P[port] |= output;
+                                 ;     263 }
+                                 ;     264 
+                                 ;     265 void u8g_SetPinInput(uint8_t internal_pin_number)
+                                 ;     266 {
+                                 ;     267 	uint8_t port = (internal_pin_number >> 3)-1;
+                                 ;     268 	*u8g_msp_ddr_P[port] &= ~(1 << (internal_pin_number & 0x07));
+                                 ;     269 }
+                                 ;     270 
+                                 ;     271 void u8g_SetPinLevel(uint8_t internal_pin_number, uint8_t level)
+                                 ;     272 {
+                                 ;     273 	uint8_t port = (internal_pin_number >> 3)-1;
+                                 ;     274 	if (level == 0)
+                                 ;     275 	{
+                                 ;     276 		*u8g_msp_port_P[port] &= ~(1 << (internal_pin_number & 0x07));
+                                 ;     277 	}
+                                 ;     278 	else
+                                 ;     279 	{
+                                 ;     280 		*u8g_msp_port_P[port]|= (1 << (internal_pin_number & 0x07));
+                                 ;     281 	}
+                                 ;     282 }
+                                 ;     283 
+                                 ;     284 uint8_t u8g_GetPinLevel(uint8_t internal_pin_number)
+                                 ;     285 {
+                                 ;     286 	uint8_t port = (internal_pin_number >> 3)-1;
+                                 ;     287 	uint8_t tmp = *u8g_msp_pin_P[port];
+                                 ;     288 	if (tmp & (1 << (internal_pin_number & 0x07)))
+                                 ;     289 	{
+                                 ;     290 		return 1;
+                                 ;     291 	}
+                                 ;     292 	return 0;
+                                 ;     293 }
+                                 ;     294 
+                                 ;     295 #elif defined(U8G_RASPBERRY_PI)
+                                 ;     296 
+                                 ;     297 #include <wiringPi.h>
+                                 ;     298 //#include "/usr/local/include/wiringPi.h"
+                                 ;     299 
+                                 ;     300 void u8g_SetPinOutput(uint8_t internal_pin_number) {
+                                 ;     301    pinMode(internal_pin_number, OUTPUT);
+                                 ;     302 }
+                                 ;     303 
+                                 ;     304 void u8g_SetPinInput(uint8_t internal_pin_number) {
+                                 ;     305    pinMode(internal_pin_number, INPUT);
+                                 ;     306 }
+                                 ;     307 
+                                 ;     308 void u8g_SetPinLevel(uint8_t internal_pin_number, uint8_t level) {
+                                 ;     309    digitalWrite(internal_pin_number, level);
+                                 ;     310 }
+                                 ;     311 
+                                 ;     312 uint8_t u8g_GetPinLevel(uint8_t internal_pin_number) {
+                                 ;     313    return digitalRead(internal_pin_number);
+                                 ;     314 }
+                                 ;     315 
+                                 ;     316 
+                                 ;     317 #else
+                                 ;     318 
+                                 ;     319 /* convert "port" and "bitpos" to internal pin number */
+                                 ;     320 uint8_t u8g_Pin(uint8_t port, uint8_t bitpos)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",320
+00000000 6040                    		SUB #04H, R0
+00000002 8089                    		MOV.B R1, 03H[R0]
+00000004 8082                    		MOV.B R2, 02H[R0]
+                                 ;     321 {
+                                 ;     322   port <<= 3;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",322
+00000006 B089                    		MOVU.B 03H[R0], R1
+00000008 6C31                    		SHLL #03H, R1
+0000000A 8089                    		MOV.B R1, 03H[R0]
+0000000C                         L11:	; entry.split
+                                 ;     323   port += bitpos;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",323
+0000000C B089                    		MOVU.B 03H[R0], R1
+0000000E 490102                  		ADD 02H[R0].UB, R1
+00000011 8089                    		MOV.B R1, 03H[R0]
+00000013                         L12:	; entry.split1
+                                 ;     324   return port;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",324
+00000013 C5000301                		MOV.B 03H[R0], 01H[R0]
+00000017 B009                    		MOVU.B 01H[R0], R1
+00000019                         L13:	; entry.split2
+                                 ;     325 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",325
+00000019 5B11                    		MOVU.B R1, R1
+0000001B 6701                    		RTSD #04H
+0000001D                         _u8g_SetPinOutput:
+                                 		.STACK	_u8g_SetPinOutput=8
+                                 ;     326 
+                                 ;     327 void u8g_SetPinOutput(uint8_t internal_pin_number)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",327
+0000001D 6040                    		SUB #04H, R0
+0000001F 8089                    		MOV.B R1, 03H[R0]
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",329
+00000021 6701                    		RTSD #04H
+00000023                         _u8g_SetPinInput:
+                                 		.STACK	_u8g_SetPinInput=8
+                                 ;     328 {
+                                 ;     329 }
+                                 ;     330 
+                                 ;     331 void u8g_SetPinInput(uint8_t internal_pin_number)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",331
+00000023 6040                    		SUB #04H, R0
+00000025 8089                    		MOV.B R1, 03H[R0]
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",333
+00000027 6701                    		RTSD #04H
+00000029                         _u8g_SetPinLevel:
+                                 		.STACK	_u8g_SetPinLevel=8
+                                 ;     332 {
+                                 ;     333 }
+                                 ;     334 
+                                 ;     335 void u8g_SetPinLevel(uint8_t internal_pin_number, uint8_t level)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",335
+00000029 6040                    		SUB #04H, R0
+0000002B 8089                    		MOV.B R1, 03H[R0]
+0000002D 8082                    		MOV.B R2, 02H[R0]
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",337
+0000002F 6701                    		RTSD #04H
+00000031                         _u8g_GetPinLevel:
+                                 		.STACK	_u8g_GetPinLevel=8
+                                 ;     336 {
+                                 ;     337 }
+                                 ;     338 
+                                 ;     339 uint8_t u8g_GetPinLevel(uint8_t internal_pin_number)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",339
+00000031 6040                    		SUB #04H, R0
+00000033 8089                    		MOV.B R1, 03H[R0]
+                                 ;     340 {
+                                 ;     341   return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",341
+00000035 3C0200                  		MOV.B #00H, 02H[R0]
+00000038 B081                    		MOVU.B 02H[R0], R1
+0000003A                         L18:	; entry.split
+                                 ;     342 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",342
+0000003A 5B11                    		MOVU.B R1, R1
+0000003C 6701                    		RTSD #04H
+0000003E                         _u8g_SetPIOutput:
+                                 		.STACK	_u8g_SetPIOutput=12
+                                 ;     343 
+                                 ;     344 #endif
+                                 ;     345 
+                                 ;     346 
+                                 ;     347 #if defined(U8G_WITH_PINLIST)
+                                 ;     348 
+                                 ;     349 void u8g_SetPIOutput(u8g_t *u8g, uint8_t pi)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",349
+0000003E 6080                    		SUB #08H, R0
+00000040 A009                    		MOV.L R1, 04H[R0]
+00000042 808A                    		MOV.B R2, 03H[R0]
+                                 ;     350 {
+                                 ;     351   uint8_t pin;
+                                 ;     352   pin = u8g->pin_list[pi];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",352
+00000044 A809                    		MOV.L 04H[R0], R1
+00000046 490103                  		ADD 03H[R0].UB, R1
+00000049 C5103402                		MOV.B 34H[R1], 02H[R0]
+0000004D                         L20:	; entry.split
+                                 ;     353   if ( pin != U8G_PIN_NONE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",353
+0000004D B081                    		MOVU.B 02H[R0], R1
+0000004F 7551FF                  		CMP #0FFH, R1
+00000052 10                   S  		BEQ L22
+00000053                         L21:	; bb10
+                                 ;     354     u8g_SetPinOutput(pin);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",354
+00000053 B081                    		MOVU.B 02H[R0], R1
+00000055 39rrrr               W  		BSR _u8g_SetPinOutput
+00000058 6702                    		RTSD #08H
+0000005A                         L22:	; return
+                                 ;     355 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",355
+0000005A 6702                    		RTSD #08H
+0000005C                         _u8g_SetPILevel:
+                                 		.STACK	_u8g_SetPILevel=12
+                                 ;     356 
+                                 ;     357 void u8g_SetPILevel(u8g_t *u8g, uint8_t pi, uint8_t level)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",357
+0000005C 6080                    		SUB #08H, R0
+0000005E A009                    		MOV.L R1, 04H[R0]
+00000060 808A                    		MOV.B R2, 03H[R0]
+00000062 8083                    		MOV.B R3, 02H[R0]
+                                 ;     358 {
+                                 ;     359   uint8_t pin;
+                                 ;     360   pin = u8g->pin_list[pi];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",360
+00000064 A809                    		MOV.L 04H[R0], R1
+00000066 490103                  		ADD 03H[R0].UB, R1
+00000069 C5103401                		MOV.B 34H[R1], 01H[R0]
+0000006D                         L24:	; entry.split
+                                 ;     361   if ( pin != U8G_PIN_NONE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",361
+0000006D B009                    		MOVU.B 01H[R0], R1
+0000006F 7551FF                  		CMP #0FFH, R1
+00000072 10                   S  		BEQ L26
+00000073                         L25:	; bb11
+                                 ;     362     u8g_SetPinLevel(pin, level);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",362
+00000073 B082                    		MOVU.B 02H[R0], R2
+00000075 B009                    		MOVU.B 01H[R0], R1
+00000077 39rrrr               W  		BSR _u8g_SetPinLevel
+0000007A 6702                    		RTSD #08H
+0000007C                         L26:	; return
+                                 ;     363 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_io.c",363
+0000007C 6702                    		RTSD #08H
+                                 ;     364 
+                                 ;     365 #else  /* defined(U8G_WITH_PINLIST) */
+                                 ;     366 void u8g_SetPIOutput(u8g_t *u8g, uint8_t pi)
+                                 ;     367 {
+                                 ;     368 }
+                                 ;     369 
+                                 ;     370 void u8g_SetPILevel(u8g_t *u8g, uint8_t pi, uint8_t level)
+                                 ;     371 {
+                                 ;     372 }
+                                 ;     373 
+                                 ;     374 #endif /* defined(U8G_WITH_PINLIST) */
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00513   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000126(0000007EH)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\u8g_com_io.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\u8g_com_io.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\Display\u8g_com_io.obj

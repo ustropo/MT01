@@ -1,0 +1,462 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:37 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:37
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_fl_memory_spi_flash.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_fl_memory_spi_flash.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;r_fl_memory_spi_flash.c
+                                 
+                                 		.glb	_memID
+                                 		.glb	_g_fl_li_mem_info
+                                 		.glb	_fl_mem_read
+                                 		.glb	_R_SF_ReadStatus
+                                 		.glb	_R_SF_ReadData
+                                 		.glb	_fl_mem_write
+                                 		.glb	_R_SF_WriteData
+                                 		.glb	_fl_mem_get_busy
+                                 		.glb	_fl_mem_init
+                                 		.glb	_R_SF_Init
+                                 		.glb	_fl_mem_erase
+                                 		.glb	_R_SF_Erase
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _fl_mem_read:
+                                 		.STACK	_fl_mem_read=16
+                                 ;       1 /*******************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only 
+                                 ;       4 * intended for use with Renesas products. No other uses are authorized. This 
+                                 ;       5 * software is owned by Renesas Electronics Corporation and is protected under
+                                 ;       6 * all applicable laws, including copyright laws.
+                                 ;       7 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       8 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+                                 ;       9 * LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE 
+                                 ;      10 * AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+                                 ;      11 * TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS 
+                                 ;      12 * ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE 
+                                 ;      13 * FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+                                 ;      14 * ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+                                 ;      15 * BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      16 * Renesas reserves the right, without notice, to make changes to this software
+                                 ;      17 * and to discontinue the availability of this software. By using this software,
+                                 ;      18 * you agree to the additional terms and conditions found by accessing the 
+                                 ;      19 * following link:
+                                 ;      20 * http://www.renesas.com/disclaimer *
+                                 ;      21 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      22 *******************************************************************************/
+                                 ;      23 /*******************************************************************************
+                                 ;      24 * File Name    : r_fl_memory_spi_flash.c
+                                 ;      25 * Version      : 3.00
+                                 ;      26 * Description  : Low level memory operations are implemented here.  This file
+                                 ;      27 *                will change depending on what storage is used for holding
+                                 ;      28 *                Load Images (or other data that is downloaded). This 
+                                 ;      29 *                code is setup to work with a Numonyx P5Q PCM. This part
+                                 ;      30 *                uses the same interface as most SPI flashes so you should be
+                                 ;      31 *                able to easily modify this one to work with your own.
+                                 ;      32 ******************************************************************************/  
+                                 ;      33 /******************************************************************************
+                                 ;      34 * History : DD.MM.YYYY Version Description
+                                 ;      35 *         : 05.04.2010 1.00    First Release
+                                 ;      36 *         : 22.03.2011 2.00    First Release for YRDK
+                                 ;      37 *         : 23.02.2012 3.00    Made compliant with CS v4.0. Moved over from 
+                                 ;      38 *                              straight driver code to using r_rspi_rx600 
+                                 ;      39 *                              package. Got rid of FL_Ext_Addresses array and
+                                 ;      40 *                              replaced with g_fl_li_mem_info structure. This
+                                 ;      41 *                              was done to make the Memory portion of the FL
+                                 ;      42 *                              project more modular.
+                                 ;      43 ******************************************************************************/
+                                 ;      44 
+                                 ;      45 /******************************************************************************
+                                 ;      46 Includes   <System Includes> , "Project Includes"
+                                 ;      47 ******************************************************************************/
+                                 ;      48 /* Info on which board is being used. */
+                                 ;      49 #include "platform.h"
+                                 ;      50 /* Flash Loader project includes. */
+                                 ;      51 #include "r_fl_includes.h"
+                                 ;      52 /* Uses r_rspi_rx package. */
+                                 ;      53 #include "r_rspi_rx_if.h"
+                                 ;      54 /* SPI Flash package. */
+                                 ;      55 #include "r_spi_flash_if.h"
+                                 ;      56 
+                                 ;      57 uint8_t memID[3];
+                                 ;      58 
+                                 ;      59 /******************************************************************************
+                                 ;      60 Macro definitions
+                                 ;      61 ******************************************************************************/
+                                 ;      62 /* Choose which channel to use based on selected board. */
+                                 ;      63 #if defined(BSP_BOARD_RDKRX62N) || defined(BSP_BOARD_RDKRX63N) || defined(BSP_BOARD_RSKRX210)
+                                 ;      64     #define FL_RSPI_CHANNEL     (1)
+                                 ;      65 #elif defined(BSP_BOARD_RSKRX62N) || defined(BSP_BOARD_RSKRX63N)
+                                 ;      66     #define FL_RSPI_CHANNEL     (1)
+                                 ;      67 #elif defined(BSP_BOARD_MT01)
+                                 ;      68     #define FL_RSPI_CHANNEL     (1)
+                                 ;      69 #else
+                                 ;      70     #error "No RSPI channel chosen for SPI flash communications. Please choose channel in r_fl_memory_p5q.c"
+                                 ;      71 #endif
+                                 ;      72 
+                                 ;      73 /******************************************************************************
+                                 ;      74 Exported global variables (to be accessed by other files)
+                                 ;      75 ******************************************************************************/
+                                 ;      76 /* This structure defines the memory that load images will be stored in. */
+                                 ;      77 const fl_li_storage_t g_fl_li_mem_info = 
+                                 ;      78 {
+                                 ;      79     /* The minimum erase size in bytes. */
+                                 ;      80     (uint32_t)SF_MEM_MIN_ERASE_BYTES,
+                                 ;      81     /* The maximum bytes that can be programmed at once. Starting with v3.0 of the FL this is no longer a SPI flash
+                                 ;      82        specific number. The r_spi_flash package now handles programming of as many bytes as you want at once. This value
+                                 ;      83        is still kept in the event that you do want to split up SPI flash programs. Another reason I am leaving this in 
+                                 ;      84        here is because other memories may be used where this is more of a requirement.  */
+                                 ;      85     (0x400),
+                                 ;      86     /* Addresses of FL Load Images. '+1' is used because the last entry in the
+                                 ;      87        array is the max address for load image data. */
+                                 ;      88 #if   FL_CFG_MEM_NUM_LOAD_IMAGES == 1
+                                 ;      89     { FL_CFG_MEM_BASE_ADDR, 
+                                 ;      90       FL_CFG_MEM_BASE_ADDR + FL_CFG_MEM_MAX_LI_SIZE_BYTES }
+                                 ;      91 #elif   FL_CFG_MEM_NUM_LOAD_IMAGES == 2
+                                 ;      92     { FL_CFG_MEM_BASE_ADDR, 
+                                 ;      93       FL_CFG_MEM_BASE_ADDR + FL_CFG_MEM_MAX_LI_SIZE_BYTES,
+                                 ;      94       FL_CFG_MEM_BASE_ADDR + (FL_CFG_MEM_MAX_LI_SIZE_BYTES*2) }
+                                 ;      95 #elif FL_CFG_MEM_NUM_LOAD_IMAGES == 3
+                                 ;      96     { FL_CFG_MEM_BASE_ADDR, 
+                                 ;      97       FL_CFG_MEM_BASE_ADDR + FL_CFG_MEM_MAX_LI_SIZE_BYTES,
+                                 ;      98       FL_CFG_MEM_BASE_ADDR + (FL_CFG_MEM_MAX_LI_SIZE_BYTES*2),
+                                 ;      99       FL_CFG_MEM_BASE_ADDR + (FL_CFG_MEM_MAX_LI_SIZE_BYTES*3) }
+                                 ;     100 #else
+                                 ;     101     #error "Addresses are not specified for this many Load Images. Please add details for this setup in r_fl_memory**.c"
+                                 ;     102 #endif
+                                 ;     103 };
+                                 ;     104 
+                                 ;     105 /******************************************************************************
+                                 ;     106 * Function Name: fl_mem_read
+                                 ;     107 * Description  : Reads data from memory where load images are stored
+                                 ;     108 * Arguments    : rx_address - 
+                                 ;     109 *                    Where to read from in memory
+                                 ;     110 *                rx_buffer - 
+                                 ;     111 *                    Where to place read data
+                                 ;     112 *                rx_bytes - 
+                                 ;     113 *                    How many bytes to read
+                                 ;     114 * Return value : none
+                                 ;     115 ******************************************************************************/
+                                 ;     116 void fl_mem_read(uint32_t rx_address, uint8_t * rx_buffer, uint32_t rx_bytes)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",116
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
+00000004 A00A                    		MOV.L R2, 04H[R0]
+00000006 E303                    		MOV.L R3, [R0]
+00000008                         L11:	; bb4
+00000008 6611                    		MOV.L #00000001H, R1
+                                 ;     117 {      
+                                 ;     118     while((R_SF_ReadStatus(FL_RSPI_CHANNEL) & SF_WIP_BIT_MASK) == 1) 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",118
+0000000A 05rrrrrr             A  		BSR _R_SF_ReadStatus
+0000000E 6411                    		AND #01H, R1
+00000010 6111                    		CMP #01H, R1
+00000012 20rr                    		BEQ L11
+00000014                         L12:	; bb9
+                                 ;     119     {
+                                 ;     120         /* Make sure SPI flash is not busy */
+                                 ;     121     }
+                                 ;     122     
+                                 ;     123     /* Read data from external SPI flash */
+                                 ;     124     R_SF_ReadData( FL_RSPI_CHANNEL,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",124
+00000014 EC04                    		MOV.L [R0], R4
+00000016 A80B                    		MOV.L 04H[R0], R3
+00000018 A882                    		MOV.L 08H[R0], R2
+0000001A 6611                    		MOV.L #00000001H, R1
+0000001C 05rrrrrr             A  		BSR _R_SF_ReadData
+00000020 6703                    		RTSD #0CH
+00000022                         _fl_mem_write:
+                                 		.STACK	_fl_mem_write=16
+                                 ;     125                    rx_address,
+                                 ;     126                    rx_buffer,
+                                 ;     127                    rx_bytes);
+                                 ;     128 }
+                                 ;     129 /******************************************************************************
+                                 ;     130 End of function fl_mem_read
+                                 ;     131 ******************************************************************************/
+                                 ;     132 
+                                 ;     133 /******************************************************************************
+                                 ;     134 * Function Name: fl_mem_write
+                                 ;     135 * Description  : Writes data to memory where load images are stored
+                                 ;     136 * Arguments    : tx_address - 
+                                 ;     137 *                    Where to write in memory
+                                 ;     138 *                tx_buffer - 
+                                 ;     139 *                    What data to write                 
+                                 ;     140 *                tx_bytes - 
+                                 ;     141 *                    How many bytes to write
+                                 ;     142 * Return value : none
+                                 ;     143 ******************************************************************************/
+                                 ;     144 void fl_mem_write(uint32_t tx_address, uint8_t *tx_buffer, uint32_t tx_bytes)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",144
+00000022 60C0                    		SUB #0CH, R0
+00000024 A081                    		MOV.L R1, 08H[R0]
+00000026 A00A                    		MOV.L R2, 04H[R0]
+00000028 E303                    		MOV.L R3, [R0]
+0000002A                         L14:	; bb4
+0000002A 6611                    		MOV.L #00000001H, R1
+                                 ;     145 {
+                                 ;     146     while((R_SF_ReadStatus(FL_RSPI_CHANNEL) & SF_WIP_BIT_MASK) == 1) 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",146
+0000002C 05rrrrrr             A  		BSR _R_SF_ReadStatus
+00000030 6411                    		AND #01H, R1
+00000032 6111                    		CMP #01H, R1
+00000034 20rr                    		BEQ L14
+00000036                         L15:	; bb9
+                                 ;     147     {
+                                 ;     148         /* Make sure SPI flash is not busy */
+                                 ;     149     }
+                                 ;     150     
+                                 ;     151     /* Write data to external SPI flash */
+                                 ;     152     R_SF_WriteData( FL_RSPI_CHANNEL,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",152
+00000036 EC04                    		MOV.L [R0], R4
+00000038 A80B                    		MOV.L 04H[R0], R3
+0000003A A882                    		MOV.L 08H[R0], R2
+0000003C 6611                    		MOV.L #00000001H, R1
+0000003E 05rrrrrr             A  		BSR _R_SF_WriteData
+00000042 6703                    		RTSD #0CH
+00000044                         _fl_mem_get_busy:
+                                 		.STACK	_fl_mem_get_busy=8
+                                 ;     153                     tx_address,
+                                 ;     154                     tx_buffer,
+                                 ;     155                     tx_bytes);
+                                 ;     156 }
+                                 ;     157 /******************************************************************************
+                                 ;     158 End of function fl_mem_write
+                                 ;     159 ******************************************************************************/
+                                 ;     160 
+                                 ;     161 /******************************************************************************
+                                 ;     162 * Function Name: fl_mem_get_busy
+                                 ;     163 * Description  : Returns whether the memory is currently busy
+                                 ;     164 * Arguments    : none
+                                 ;     165 * Return value : true - 
+                                 ;     166 *                    The memory is busy
+                                 ;     167 *                false - 
+                                 ;     168 *                    The memory is not busy
+                                 ;     169 ******************************************************************************/
+                                 ;     170 bool fl_mem_get_busy(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",170
+00000044 6040                    		SUB #04H, R0
+00000046 6611                    		MOV.L #00000001H, R1
+                                 ;     171 {
+                                 ;     172     if( (R_SF_ReadStatus(FL_RSPI_CHANNEL) & SF_WIP_BIT_MASK) != 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",172
+00000048 05rrrrrr             A  		BSR _R_SF_ReadStatus
+0000004C 7C01                    		BTST #00H, R1
+0000004E 10                   S  		BEQ L18
+0000004F                         L17:	; bb1
+                                 ;     173     {
+                                 ;     174         return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",174
+0000004F 3C0201                  		MOV.B #01H, 02H[R0]
+00000052 08                   S  		BRA L19
+00000053                         L18:	; bb3
+                                 ;     175     }
+                                 ;     176     else
+                                 ;     177     {
+                                 ;     178         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",178
+00000053 3C0200                  		MOV.B #00H, 02H[R0]
+00000056                         L19:	; bb11
+00000056 C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     179     }
+                                 ;     180 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",180
+0000005A B089                    		MOVU.B 03H[R0], R1
+0000005C 6701                    		RTSD #04H
+0000005E                         _fl_mem_init:
+                                 		.STACK	_fl_mem_init=4
+                                 ;     181 /******************************************************************************
+                                 ;     182 End of function fl_mem_get_busy
+                                 ;     183 ******************************************************************************/
+                                 ;     184 
+                                 ;     185 /******************************************************************************
+                                 ;     186 * Function Name: fl_mem_init
+                                 ;     187 * Description  : Initializes resources needed for talking to memory holding
+                                 ;     188 *                FL load images
+                                 ;     189 * Arguments    : none
+                                 ;     190 * Return value : none
+                                 ;     191 ******************************************************************************/
+                                 ;     192 void fl_mem_init(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",192
+0000005E 6611                    		MOV.L #00000001H, R1
+                                 ;     193 {
+                                 ;     194 	R_SF_Init(FL_RSPI_CHANNEL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",194
+00000060 05rrrrrr             A  		BSR _R_SF_Init
+00000064 02                      		RTS
+00000065                         _fl_mem_erase:
+                                 		.STACK	_fl_mem_erase=12
+                                 ;     195 }
+                                 ;     196 /******************************************************************************
+                                 ;     197 End of function fl_mem_init
+                                 ;     198 ******************************************************************************/
+                                 ;     199 
+                                 ;     200 /******************************************************************************
+                                 ;     201 * Function Name: fl_mem_erase
+                                 ;     202 * Description  : Erases parts, or whole, memory used for FL load images
+                                 ;     203 * Arguments    : address - 
+                                 ;     204 *                    Where you want to erase
+                                 ;     205 *                size - 
+                                 ;     206 *                    How many bytes to erase
+                                 ;     207 * Return value : true - 
+                                 ;     208 *                    Sucessfull
+                                 ;     209 *                false - 
+                                 ;     210 *                    Not successfull, invalid argument
+                                 ;     211 ******************************************************************************/
+                                 ;     212 bool fl_mem_erase(const uint32_t address, const uint8_t size)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",212
+00000065 6080                    		SUB #08H, R0
+00000067 A009                    		MOV.L R1, 04H[R0]
+00000069 808A                    		MOV.B R2, 03H[R0]
+0000006B                         L22:	; bb3
+0000006B 6611                    		MOV.L #00000001H, R1
+                                 ;     213 {
+                                 ;     214     while((R_SF_ReadStatus(FL_RSPI_CHANNEL) & SF_WIP_BIT_MASK) == 1) 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",214
+0000006D 05rrrrrr             A  		BSR _R_SF_ReadStatus
+00000071 6411                    		AND #01H, R1
+00000073 6111                    		CMP #01H, R1
+00000075 20rr                    		BEQ L22
+00000077                         L23:	; bb10
+                                 ;     215     {
+                                 ;     216         /* Make sure SPI flash is not busy */
+                                 ;     217     }
+                                 ;     218     
+                                 ;     219     /* Erase requested part of memory */
+                                 ;     220     if(size == FL_MEM_ERASE_SECTOR)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",220
+00000077 B089                    		MOVU.B 03H[R0], R1
+00000079 6101                    		CMP #00H, R1
+0000007B 21rr                    		BNE L25
+0000007D                         L24:	; bb11
+                                 ;     221     {
+                                 ;     222         /* Erase sector */
+                                 ;     223         R_SF_Erase(FL_RSPI_CHANNEL, address, SF_ERASE_SECTOR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",223
+0000007D A80A                    		MOV.L 04H[R0], R2
+0000007F 6603                    		MOV.L #00000000H, R3
+00000081 6611                    		MOV.L #00000001H, R1
+00000083 05rrrrrr             A  		BSR _R_SF_Erase
+00000087 2Err                 B  		BRA L30
+00000089                         L25:	; bb15
+                                 ;     224     } 
+                                 ;     225     else if(size == FL_MEM_ERASE_CHIP)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",225
+00000089 B089                    		MOVU.B 03H[R0], R1
+0000008B 6111                    		CMP #01H, R1
+0000008D 21rr                    		BNE L27
+0000008F                         L26:	; bb16
+                                 ;     226     {
+                                 ;     227         /* Bulk erase */
+                                 ;     228         R_SF_Erase(FL_RSPI_CHANNEL, address, SF_ERASE_BULK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",228
+0000008F A80A                    		MOV.L 04H[R0], R2
+00000091 6611                    		MOV.L #00000001H, R1
+00000093 EF13                    		MOV.L R1, R3
+00000095 05rrrrrr             A  		BSR _R_SF_Erase
+00000099 2Err                 B  		BRA L30
+0000009B                         L27:	; bb20
+                                 ;     229     } 
+                                 ;     230     else if(size == FL_MEM_ERASE_BLOCK)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",230
+0000009B B089                    		MOVU.B 03H[R0], R1
+0000009D 6121                    		CMP #02H, R1
+0000009F 21rr                    		BNE L29
+000000A1                         L28:	; bb21
+                                 ;     231     {
+                                 ;     232         /* Bulk erase */
+                                 ;     233         R_SF_Erase(FL_RSPI_CHANNEL, address, SF_ERASE_BLOCK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",233
+000000A1 A80A                    		MOV.L 04H[R0], R2
+000000A3 6623                    		MOV.L #00000002H, R3
+000000A5 6611                    		MOV.L #00000001H, R1
+000000A7 05rrrrrr             A  		BSR _R_SF_Erase
+000000AB 08                   S  		BRA L30
+000000AC                         L29:	; bb24
+                                 ;     234     }
+                                 ;     235     else 
+                                 ;     236     {
+                                 ;     237         /* Unknown option */
+                                 ;     238         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",238
+000000AC 3C0100                  		MOV.B #00H, 01H[R0]
+000000AF 08                   S  		BRA L31
+000000B0                         L30:	; bb43
+                                 ;     239     }
+                                 ;     240     
+                                 ;     241     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",241
+000000B0 3C0101                  		MOV.B #01H, 01H[R0]
+000000B3                         L31:	; bb45
+000000B3 C5000102                		MOV.B 01H[R0], 02H[R0]
+                                 ;     242 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.c",242
+000000B7 B081                    		MOVU.B 02H[R0], R1
+000000B9 6702                    		RTSD #08H
+                                 ;     243 /******************************************************************************
+                                 ;     244 End of function fl_mem_erase
+                                 ;     245 ******************************************************************************/
+                                 ;     246 
+                                 		.SECTION	C,ROMDATA,ALIGN=4
+00000000                         _g_fl_li_mem_info:
+00000000 00100000                		.lword	00001000H
+00000004 00040000                		.lword	00000400H
+00000008 00000000                		.lword	00000000H
+0000000C 00001000                		.lword	00100000H
+                                 		.SECTION	B_1,DATA
+00000000                         _memID:
+00000000(00000003H)              		.blkb	3
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00427   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000187(000000BBH)  P
+ROMDATA  0000000016(00000010H)  C
+DATA     0000000003(00000003H)  B_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\r_fl_memory_spi_flash.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_fl_memory_spi_flash.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_flash_loader_rx\src\memory\r_fl_memory_spi_flash.obj

@@ -1,0 +1,500 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:48:34 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:48:34
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=ut_state_line_selection.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=ut_state_line_selection.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;ut_state_line_selection.c
+                                 
+                                 		.glb	_macro_func_ptr
+                                 		.glb	_cs
+                                 		.glb	_uspiffs
+                                 		.glb	_lineNumEntry
+                                 		.glb	_index
+                                 		.glb	_actualLine
+                                 		.glb	_previousLine
+                                 		.glb	_choosedLine
+                                 		.glb	_choosedLinePosition
+                                 		.glb	_ut_state_line_selection
+                                 		.glb	_xio_open
+                                 		.glb	_xio_close
+                                 		.glb	_ut_lcd_output_warning
+                                 		.glb	_vTaskDelay
+                                 		.glb	_iif_bind_line_selection
+                                 		.glb	_ut_menu_init
+                                 		.glb	_parse_gcode_func_selection
+                                 		.glb	_command_idle
+                                 		.glb	_xio_gets
+                                 		.glb	_sprintf
+                                 		.glb	_gc_gcode_parser
+                                 		.glb	_iif_bind_idle
+                                 		.glb	_ut_menu_browse
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _ut_state_line_selection:
+                                 		.STACK	_ut_state_line_selection=852
+                                 ;       1 /*
+                                 ;       2  * ut_state_line_selection.c
+                                 ;       3  *
+                                 ;       4  *  Created on: Mar 22, 2016
+                                 ;       5  *      Author: Leonardo
+                                 ;       6  */
+                                 ;       7 
+                                 ;       8 #include "tinyg.h"			// #1
+                                 ;       9 #include "config.h"			// #2
+                                 ;      10 #include "gcode_parser.h"
+                                 ;      11 #include "macros.h"
+                                 ;      12 
+                                 ;      13 #include "FreeRTOS.h"
+                                 ;      14 #include "task.h"
+                                 ;      15 #include "ff.h"
+                                 ;      16 
+                                 ;      17 #include "ut_context.h"
+                                 ;      18 #include "ut_state.h"
+                                 ;      19 #include "interpreter_if.h"
+                                 ;      20 
+                                 ;      21 #include "lcd_menu.h"
+                                 ;      22 #include "lcd.h"
+                                 ;      23 
+                                 ;      24 #include <string.h>
+                                 ;      25 #include <stdio.h>
+                                 ;      26 #include <stdlib.h>
+                                 ;      27 
+                                 ;      28 #define NUM_ENTRIES 20
+                                 ;      29 #define DEFAULT_CONFIG_TIMEOUT	portMAX_DELAY
+                                 ;      30 
+                                 ;      31 // ***********************************************************************
+                                 ;      32 // Global variables
+                                 ;      33 // ***********************************************************************
+                                 ;      34 uint32_t lineNumEntry[NUM_ENTRIES];
+                                 ;      35 uint16_t index = 0;
+                                 ;      36 extern uint32_t actualLine;
+                                 ;      37 extern uint32_t previousLine;
+                                 ;      38 extern uint32_t choosedLine;
+                                 ;      39 extern uint32_t choosedLinePosition;
+                                 ;      40 
+                                 ;      41 // ***********************************************************************
+                                 ;      42 // Internal variables
+                                 ;      43 // ***********************************************************************
+                                 ;      44 static const char* gszConfigMenuTitle = "SELECIONAR LINHA";
+                                 ;      45 
+                                 ;      46 // ***********************************************************************
+                                 ;      47 // Global types
+                                 ;      48 // ***********************************************************************
+                                 ;      49 
+                                 ;      50 
+                                 ;      51 // ***********************************************************************
+                                 ;      52 // Global functions
+                                 ;      53 // ***********************************************************************
+                                 ;      54 
+                                 ;      55 
+                                 ;      56 // ***********************************************************************
+                                 ;      57 // Public functions
+                                 ;      58 // ***********************************************************************
+                                 ;      59 
+                                 ;      60 /**
+                                 ;      61  * Select a M5 entry point G
+                                 ;      62  * @param pContext
+                                 ;      63  * @return
+                                 ;      64  */
+                                 ;      65 ut_state ut_state_line_selection(ut_context* pContext)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",65
+00000000 7200B8FC                		ADD #0FFFFFCB8H, R0
+00000004 E701D1                  		MOV.L R1, 0344H[R0]
+                                 ;      66 {
+                                 ;      67 	uint8_t i = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",67
+00000007 3C0700                  		MOV.B #00H, 07H[R0]
+0000000A                         L15:	; entry.split
+                                 ;      68 	ut_menu config_line;
+                                 ;      69 	stat_t status;
+                                 ;      70 	char Str[20][20];
+                                 ;      71 	xio_open(cs.primary_src,0,0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",71
+0000000A FB12rrrrrrrr            		MOV.L #_cs, R1
+00000010 B611                    		MOVU.B 18H[R1], R1
+00000012 6602                    		MOV.L #00000000H, R2
+00000014 EF23                    		MOV.L R2, R3
+00000016 05rrrrrr             A  		BSR _xio_open
+0000001A                         L16:	; entry.split1
+                                 ;      72 	if(uspiffs[0].f < 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",72
+0000001A FBE2rrrrrrrr            		MOV.L #_uspiffs, R14
+00000020 DDEE32                  		MOV.W 64H[R14], R14
+00000023 69FE                    		SHLR #1FH, R14
+00000025 610E                    		CMP #00H, R14
+00000027 20rr                    		BEQ L20
+00000029                         L17:	; bb8
+                                 ;      73 	{
+                                 ;      74 		xio_close(cs.primary_src);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",74
+00000029 FB12rrrrrrrr            		MOV.L #_cs, R1
+0000002F B611                    		MOVU.B 18H[R1], R1
+00000031 05rrrrrr             A  		BSR _xio_close
+00000035                         L18:	; bb8.split
+                                 ;      75 		ut_lcd_output_warning("NENHUM ARQUIVO\n\
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",75
+00000035 FB12rrrrrrrr            		MOV.L #_L11, R1
+0000003B 05rrrrrr             A  		BSR _ut_lcd_output_warning
+0000003F                         L19:	; bb8.split2
+0000003F FB1AD007                		MOV.L #000007D0H, R1
+                                 ;      76 							   CARREGADO\n");
+                                 ;      77 
+                                 ;      78 		vTaskDelay(2000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",78
+00000043 05rrrrrr             A  		BSR _vTaskDelay
+00000047 38rrrr               W  		BRA L51
+0000004A                         L20:	; bb10
+                                 ;      79 	}
+                                 ;      80 	else
+                                 ;      81 	{
+                                 ;      82 		/* Initialize menu */
+                                 ;      83 		ut_lcd_output_warning("LENDO ARQUIVO\n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",83
+0000004A FB12rrrrrrrr            		MOV.L #_L12, R1
+00000050 05rrrrrr             A  		BSR _ut_lcd_output_warning
+00000054                         L21:	; bb10.split
+                                 ;      84 		iif_bind_line_selection();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",84
+00000054 05rrrrrr             A  		BSR _iif_bind_line_selection
+00000058                         L22:	; bb10.split3
+00000058 710108                  		ADD #08H, R0, R1
+                                 ;      85 		ut_menu_init(&config_line);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",85
+0000005B 05rrrrrr             A  		BSR _ut_menu_init
+0000005F                         L23:	; bb10.split4
+                                 ;      86 		choosedLinePosition = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",86
+0000005F FBE2rrrrrrrr            		MOV.L #_choosedLinePosition, R14
+00000065 F8E600                  		MOV.L #00000000H, [R14]
+00000068                         L24:	; bb10.split5
+                                 ;      87 		choosedLine = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",87
+00000068 FBE2rrrrrrrr            		MOV.L #_choosedLine, R14
+0000006E F8E600                  		MOV.L #00000000H, [R14]
+00000071                         L25:	; bb10.split6
+                                 ;      88 		/* Options */
+                                 ;      89 		config_line.title = gszConfigMenuTitle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",89
+00000071 FBE2rrrrrrrr            		MOV.L #__$gszConfigMenuTitle, R14
+00000077 E4E066                  		MOV.L [R14], 0198H[R0]
+0000007A                         L26:	; bb10.split7
+                                 ;      90 		config_line.currentState = STATE_LINE_SELECTION;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",90
+0000007A F9066A10                		MOV.L #00000010H, 01A8H[R0]
+0000007E                         L27:	; bb10.split8
+                                 ;      91 		index = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",91
+0000007E FBE2rrrrrrrr            		MOV.L #_index, R14
+00000084 F8E500                  		MOV.W #0000H, [R14]
+00000087                         L28:	; bb10.split9
+00000087 754350                  		MOV.L #00000050H, R3
+0000008A 7542FF                  		MOV.L #000000FFH, R2
+                                 ;      92 		memset(lineNumEntry,0xFFFFFFFF,sizeof(lineNumEntry));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",92
+0000008D FB12rrrrrrrr            		MOV.L #_lineNumEntry, R1
+00000093 7F88                    		SSTR.B
+00000095                         L29:	; bb10.split10
+00000095 6611                    		MOV.L #00000001H, R1
+                                 ;      93 		parse_gcode_func_selection(LINE_PARSER);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",93
+00000097 05rrrrrr             A  		BSR _parse_gcode_func_selection
+0000009B                         L30:	; bb10.split11
+                                 ;      94 		macro_func_ptr = command_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",94
+0000009B FBE2rrrrrrrr            		MOV.L #_macro_func_ptr, R14
+000000A1 FBF2rrrrrrrr            		MOV.L #_command_idle, R15
+000000A7 E3EF                    		MOV.L R15, [R14]
+000000A9                         L31:	; bb10.split12
+                                 ;      95 		xio_close(cs.primary_src);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",95
+000000A9 FB12rrrrrrrr            		MOV.L #_cs, R1
+000000AF B611                    		MOVU.B 18H[R1], R1
+000000B1 05rrrrrr             A  		BSR _xio_close
+000000B5                         L32:	; bb10.split13
+                                 ;      96 		xio_open(cs.primary_src,0,0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",96
+000000B5 FB12rrrrrrrr            		MOV.L #_cs, R1
+000000BB B611                    		MOVU.B 18H[R1], R1
+000000BD 6602                    		MOV.L #00000000H, R2
+000000BF EF23                    		MOV.L R2, R3
+000000C1 05rrrrrr             A  		BSR _xio_open
+000000C5 38rrrr               W  		BRA L41
+000000C8                         L33:	; bb19
+                                 ;      97 		while (true) {
+                                 ;      98 			if ((status = xio_gets(cs.primary_src, cs.in_buf, sizeof(cs.in_buf))) == STAT_OK) {
+                                 ;      99 				cs.bufp = cs.in_buf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",99
+000000C8 FB12rrrrrrrr            		MOV.L #_cs, R1
+000000CE 711244                  		ADD #44H, R1, R2
+000000D1 A412                    		MOV.L R2, 40H[R1]
+000000D3                         L34:	; bb28
+                                 ;     100 
+                                 ;     101 			}
+                                 ;     102 			// handle end-of-file from file devices
+                                 ;     103 			if (status == STAT_EOF) {						// EOF can come from file devices only
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",103
+000000D3 5A01AF01                		MOVU.B 01AFH[R0], R1
+000000D7 6181                    		CMP #08H, R1
+000000D9 21rr                    		BNE L36
+000000DB                         L35:	; bb29
+                                 ;     104 				xio_close(cs.primary_src);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",104
+000000DB FB12rrrrrrrr            		MOV.L #_cs, R1
+000000E1 B611                    		MOVU.B 18H[R1], R1
+000000E3 05rrrrrr             A  		BSR _xio_close
+000000E7 38rrrr               W  		BRA L42
+000000EA                         L36:	; bb37
+                                 ;     105 				break;
+                                 ;     106 			}
+                                 ;     107 			// set up the buffers
+                                 ;     108 			cs.linelen = strlen(cs.in_buf)+1;					// linelen only tracks primary input
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",108
+000000EA FB42rrrrrrrr            		MOV.L #_cs, R4
+000000F0 714144                  		ADD #44H, R4, R1
+000000F3 FB56FF                  		MOV.L #0FFFFFFFFH, R5
+000000F6 6602                    		MOV.L #00000000H, R2
+000000F8 EF53                    		MOV.L R5, R3
+000000FA 7F80                    		SUNTIL.B
+000000FC 4335                    		SUB R3, R5
+000000FE 93C5                    		MOV.W R5, 1CH[R4]
+00000100                         L37:	; bb37.split
+                                 ;     109 			if (gc_gcode_parser(cs.bufp) == STAT_OK)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",109
+00000100 FB12rrrrrrrr            		MOV.L #_cs, R1
+00000106 AC11                    		MOV.L 40H[R1], R1
+00000108 05rrrrrr             A  		BSR _gc_gcode_parser
+0000010C 6101                    		CMP #00H, R1
+0000010E 21rr                    		BNE L41
+00000110                         L38:	; bb42
+                                 ;     110 			{
+                                 ;     111 				sprintf(Str[config_line.numItems], "ENTRADA LINHA %d", lineNumEntry[config_line.numItems]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",111
+00000110 5D0ECF                  		MOVU.W 019EH[R0], R14
+00000113 FBF2rrrrrrrr            		MOV.L #_lineNumEntry, R15
+00000119 FE6EF1                  		MOV.L [R14,R15], R1
+0000011C 6080                    		SUB #08H, R0
+0000011E A009                    		MOV.L R1, 04H[R0]
+00000120 FBF2rrrrrrrr            		MOV.L #_L13, R15
+00000126 E30F                    		MOV.L R15, [R0]
+00000128 751E14                  		MUL #14H, R14
+0000012B 7201B801                		ADD #01B8H, R0, R1
+0000012F 4BE1                    		ADD R14, R1
+00000131 05rrrrrr             A  		BSR _sprintf
+00000135 6280                    		ADD #08H, R0
+00000137                         L39:	; bb42.split
+                                 ;     112 				config_line.items[config_line.numItems].value = actualLine - (actualLine - previousLine);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",112
+00000137 5D0ECF                  		MOVU.W 019EH[R0], R14
+0000013A 751E14                  		MUL #14H, R14
+0000013D 710108                  		ADD #08H, R0, R1
+00000140 4BE1                    		ADD R14, R1
+00000142 FBE2rrrrrrrr            		MOV.L #_actualLine, R14
+00000148 ECE2                    		MOV.L [R14], R2
+0000014A FBE2rrrrrrrr            		MOV.L #_previousLine, R14
+00000150 EF2F                    		MOV.L R2, R15
+00000152 0680EF                  		SUB [R14].L, R15
+00000155 43F2                    		SUB R15, R2
+00000157 A092                    		MOV.L R2, 08H[R1]
+00000159                         L40:	; bb42.split14
+                                 ;     113 				if(++config_line.numItems == MENU_MAX_ITEMS) { break; }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",113
+00000159 DD0ECF                  		MOV.W 019EH[R0], R14
+0000015C 621E                    		ADD #01H, R14
+0000015E D70ECF                  		MOV.W R14, 019EH[R0]
+00000161 5FEE                    		MOVU.W R14, R14
+00000163 755E14                  		CMP #14H, R14
+00000166 20rr                    		BEQ L42
+00000168                         L41:	; bb86.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",98
+00000168 FB22rrrrrrrr            		MOV.L #_cs, R2
+0000016E B621                    		MOVU.B 18H[R2], R1
+00000170 712244                  		ADD #44H, R2
+00000173 7543FF                  		MOV.L #000000FFH, R3
+00000176 05rrrrrr             A  		BSR _xio_gets
+0000017A CB01AF01                		MOV.B R1, 01AFH[R0]
+0000017E 5B1E                    		MOVU.B R1, R14
+00000180 610E                    		CMP #00H, R14
+00000182 3Arrrr               W  		BEQ L33
+00000185 38rrrr               W  		BRA L34
+00000188                         L42:	; bb88
+                                 ;     114 			}
+                                 ;     115 		}
+                                 ;     116 
+                                 ;     117 		/* Fill menu */
+                                 ;     118 		for(i = 0; i < config_line.numItems; ++i)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",118
+00000188 3C0700                  		MOV.B #00H, 07H[R0]
+0000018B 2Err                 B  		BRA L44
+0000018D                         L43:	; bb89
+                                 ;     119 		{
+                                 ;     120 			config_line.items[i].text = Str[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",120
+0000018D B189                    		MOVU.B 07H[R0], R1
+0000018F 751114                  		MUL #14H, R1
+00000192 710208                  		ADD #08H, R0, R2
+00000195 4B12                    		ADD R1, R2
+00000197 7203B001                		ADD #01B0H, R0, R3
+0000019B 4B13                    		ADD R1, R3
+0000019D A0AB                    		MOV.L R3, 0CH[R2]
+0000019F B189                    		MOVU.B 07H[R0], R1
+000001A1 6211                    		ADD #01H, R1
+000001A3 8189                    		MOV.B R1, 07H[R0]
+000001A5                         L44:	; bb103
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",118
+000001A5 B189                    		MOVU.B 07H[R0], R1
+000001A7 06C501CF                		CMP 019EH[R0].UW, R1
+000001AB 29rr                    		BLT L43
+000001AD                         L45:	; bb112
+                                 ;     121 		}
+                                 ;     122 
+                                 ;     123 		/* Show menu */
+                                 ;     124 		config_line.selectedItem = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",124
+000001AD F905CE00                		MOV.W #0000H, 019CH[R0]
+000001B1                         L46:	; bb112.split
+000001B1 FB26FF                  		MOV.L #0FFFFFFFFH, R2
+000001B4 710108                  		ADD #08H, R0, R1
+                                 ;     125 		if(ut_menu_browse(&config_line, DEFAULT_CONFIG_TIMEOUT) < 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",125
+000001B7 05rrrrrr             A  		BSR _ut_menu_browse
+000001BB 69F1                    		SHLR #1FH, R1
+000001BD 6101                    		CMP #00H, R1
+000001BF 10                   S  		BEQ L49
+000001C0                         L47:	; bb115
+                                 ;     126 		{
+                                 ;     127 			iif_bind_idle();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",127
+000001C0 05rrrrrr             A  		BSR _iif_bind_idle
+000001C4                         L48:	; bb115.split
+                                 ;     128 			return STATE_MAIN_MENU;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",128
+000001C4 F80602                  		MOV.L #00000002H, [R0]
+000001C7 2Err                 B  		BRA L53
+000001C9                         L49:	; bb122
+                                 ;     129 		}
+                                 ;     130 		choosedLinePosition = config_line.items[config_line.selectedItem].value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",130
+000001C9 5D0ECE                  		MOVU.W 019CH[R0], R14
+000001CC 751E14                  		MUL #14H, R14
+000001CF 710F08                  		ADD #08H, R0, R15
+000001D2 4BEF                    		ADD R14, R15
+000001D4 FBE2rrrrrrrr            		MOV.L #_choosedLinePosition, R14
+000001DA E1FE02                  		MOV.L 08H[R15], [R14]
+000001DD                         L50:	; bb122.split
+                                 ;     131 		choosedLine = lineNumEntry[config_line.selectedItem];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",131
+000001DD FBE2rrrrrrrr            		MOV.L #_lineNumEntry, R14
+000001E3 5D0FCE                  		MOVU.W 019CH[R0], R15
+000001E6 FE6FEE                  		MOV.L [R15,R14], R14
+000001E9 FBF2rrrrrrrr            		MOV.L #_choosedLine, R15
+000001EF E3FE                    		MOV.L R14, [R15]
+000001F1                         L51:	; bb141
+                                 ;     132 	}
+                                 ;     133 	iif_bind_idle();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",133
+000001F1 05rrrrrr             A  		BSR _iif_bind_idle
+000001F5                         L52:	; bb141.split
+                                 ;     134 	/* Go back to menu */
+                                 ;     135 	return STATE_CONFIG_AUTO_MODE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",135
+000001F5 F80608                  		MOV.L #00000008H, [R0]
+000001F8                         L53:	; bb143
+000001F8 EC01                    		MOV.L [R0], R1
+000001FA E701D0                  		MOV.L R1, 0340H[R0]
+                                 ;     136 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_line_selection.c",136
+000001FD 67D2                    		RTSD #0348H
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 53454C45                		.byte	"SELECIONAR LINHA"
+         43494F4E                
+         4152204C                
+         494E4841                
+00000010 00                      		.byte	00H
+00000011                         _L11:
+00000011 4E454E48                		.byte	"NENHUM ARQUIVO"
+         554D2041                
+         52515549                
+         564F                    
+0000001F 0A090909                		.byte	0AH,09H,09H,09H,09H,09H,09H,09H
+         09090909                
+00000027 20202043                		.byte	"   CARREGADO"
+         41525245                
+         4741444F                
+00000033 0A00                    		.byte	0AH,00H
+00000035                         _L12:
+00000035 4C454E44                		.byte	"LENDO ARQUIVO"
+         4F204152                
+         51554956                
+         4F                      
+00000042 0A00                    		.byte	0AH,00H
+00000044                         _L13:
+00000044 454E5452                		.byte	"ENTRADA LINHA %d"
+         41444120                
+         4C494E48                
+         41202564                
+00000054 00                      		.byte	00H
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         __$gszConfigMenuTitle:
+00000000 rrrrrrrr                		.lword	_L10
+                                 		.SECTION	D_2,ROMDATA,ALIGN=2
+00000000                         _index:
+00000000 0000                    		.word	0000H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _lineNumEntry:
+00000000(00000050H)              		.blkl	20
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00448   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000511(000001FFH)  P
+ROMDATA  0000000085(00000055H)  L
+ROMDATA  0000000004(00000004H)  D
+ROMDATA  0000000002(00000002H)  D_2
+DATA     0000000080(00000050H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx7E87\$ccrx\ut_state_line_selection.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\ut_state_line_selection.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\src\states\ut_state_line_selection.obj

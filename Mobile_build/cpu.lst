@@ -1,0 +1,508 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:54:37 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:54:37
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=cpu.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=cpu.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;cpu.c
+                                 
+                                 		.glb	_R_BSP_InterruptsDisable
+                                 		.glb	_R_BSP_InterruptsEnable
+                                 		.glb	_R_BSP_CpuInterruptLevelRead
+                                 		.glb	_R_BSP_CpuInterruptLevelWrite
+                                 		.glb	_R_BSP_RegisterProtectEnable
+                                 		.glb	_R_BSP_RegisterProtectDisable
+                                 		.glb	_bsp_register_protect_open
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _R_BSP_InterruptsDisable:
+                                 		.STACK	_R_BSP_InterruptsDisable=4
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name	   : cpu.c
+                                 ;      21 * Description  : This module implements CPU specific functions. An example is enabling/disabling interrupts. 
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version  Description
+                                 ;      25 *         : 14.03.2013 1.00     First Release
+                                 ;      26 *         : 16.07.2013 1.10     Added bsp_register_protect_open() function.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 /***********************************************************************************************************************
+                                 ;      30 Includes   <System Includes> , "Project Includes"
+                                 ;      31 ***********************************************************************************************************************/
+                                 ;      32 /* Platform support. */
+                                 ;      33 #include "platform.h"
+                                 ;      34 
+                                 ;      35 /***********************************************************************************************************************
+                                 ;      36 Macro definitions
+                                 ;      37 ***********************************************************************************************************************/
+                                 ;      38 /* Key code for writing PRCR register. */
+                                 ;      39 #define BSP_PRV_PRCR_KEY        (0xA500)
+                                 ;      40 
+                                 ;      41 /***********************************************************************************************************************
+                                 ;      42 Error checking
+                                 ;      43 ***********************************************************************************************************************/
+                                 ;      44 #if !defined(__RENESAS__)
+                                 ;      45     #error "ERROR - Need to add compiler specific code in cpu.c"
+                                 ;      46 #endif
+                                 ;      47 
+                                 ;      48 /***********************************************************************************************************************
+                                 ;      49 Typedef definitions
+                                 ;      50 ***********************************************************************************************************************/
+                                 ;      51 
+                                 ;      52 /***********************************************************************************************************************
+                                 ;      53 Exported global variables (to be accessed by other files)
+                                 ;      54 ***********************************************************************************************************************/
+                                 ;      55  
+                                 ;      56 /***********************************************************************************************************************
+                                 ;      57 Private global variables and functions
+                                 ;      58 ***********************************************************************************************************************/
+                                 ;      59 /* Used for holding reference counters for protection bits. */
+                                 ;      60 static volatile uint16_t g_protect_counters[BSP_REG_PROTECT_TOTAL_ITEMS];
+                                 ;      61 /* Masks for setting or clearing the PRCR register. Use -1 for size because PWPR in MPC is used differently. */
+                                 ;      62 static const    uint16_t g_prcr_masks[BSP_REG_PROTECT_TOTAL_ITEMS-1] = 
+                                 ;      63 {
+                                 ;      64     0x0001,         /* PRC0. */
+                                 ;      65     0x0002,         /* PRC1. */
+                                 ;      66     0x0008,         /* PRC3. */
+                                 ;      67 };
+                                 ;      68 
+                                 ;      69 /***********************************************************************************************************************
+                                 ;      70 * Function Name: R_BSP_InterruptsDisable
+                                 ;      71 * Description  : Globally disable interrupts.
+                                 ;      72 * Arguments    : none
+                                 ;      73 * Return Value : none
+                                 ;      74 ***********************************************************************************************************************/
+                                 ;      75 void R_BSP_InterruptsDisable (void)
+                                 ;      76 {
+                                 ;      77 #if defined(__RENESAS__)
+                                 ;      78     /* Use the compiler intrinsic function to clear the I flag. This function is available with for the Renesas RX 
+                                 ;      79        compiler. This may need to be changed for other compilers. */
+                                 ;      80     clrpsw_i();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",80
+00000000 7FB8                    		CLRPSW I
+00000002 02                      		RTS
+00000003                         _R_BSP_InterruptsEnable:
+                                 		.STACK	_R_BSP_InterruptsEnable=4
+                                 ;      81 #endif
+                                 ;      82 } 
+                                 ;      83 
+                                 ;      84 /***********************************************************************************************************************
+                                 ;      85 * Function Name: R_BSP_InterruptsEnable
+                                 ;      86 * Description  : Globally enable interrupts.
+                                 ;      87 * Arguments    : none
+                                 ;      88 * Return Value : none
+                                 ;      89 ***********************************************************************************************************************/
+                                 ;      90 void R_BSP_InterruptsEnable (void)
+                                 ;      91 {
+                                 ;      92 #if defined(__RENESAS__)
+                                 ;      93     /* Use the compiler intrinsic function to set the I flag. This function is available with for the Renesas RX 
+                                 ;      94        compiler. This may need to be changed for other compilers. */
+                                 ;      95     setpsw_i();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",95
+00000003 7FA8                    		SETPSW I
+00000005 02                      		RTS
+00000006                         _R_BSP_CpuInterruptLevelRead:
+                                 		.STACK	_R_BSP_CpuInterruptLevelRead=8
+                                 ;      96 #endif
+                                 ;      97 } 
+                                 ;      98 
+                                 ;      99 /***********************************************************************************************************************
+                                 ;     100 * Function Name: R_BSP_CpuInterruptLevelRead
+                                 ;     101 * Description  : Reads the processor interrupt priority level.
+                                 ;     102 * Arguments    : none
+                                 ;     103 * Return Value : The current processor IPL
+                                 ;     104 ***********************************************************************************************************************/
+                                 ;     105 uint32_t R_BSP_CpuInterruptLevelRead (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",105
+00000006 6040                    		SUB #04H, R0
+                                 ;     106 {
+                                 ;     107 #if defined(__RENESAS__)
+                                 ;     108     /* Use the compiler intrinsic function to read the CPU IPL. This function is available with for the Renesas RX 
+                                 ;     109        compiler. This may need to be changed for other compilers. */
+                                 ;     110     return (uint32_t)get_ipl();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",110
+00000008 FD6A0E                  		MVFC PSW, R14
+0000000B FD67E1                  		REVL R14, R1
+0000000E 64F1                    		AND #0FH, R1
+00000010 E301                    		MOV.L R1, [R0]
+00000012                         L13:	; entry.split
+                                 ;     111 #endif
+                                 ;     112 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",112
+00000012 6701                    		RTSD #04H
+00000014                         _R_BSP_CpuInterruptLevelWrite:
+                                 		.STACK	_R_BSP_CpuInterruptLevelWrite=12
+                                 ;     113 
+                                 ;     114 /***********************************************************************************************************************
+                                 ;     115 * Function Name: R_BSP_CpuInterruptLevelWrite
+                                 ;     116 * Description  : Writes the processor interrupt priority level.
+                                 ;     117 * Arguments    : level -
+                                 ;     118 *                    The level to set the processor's IPL to.
+                                 ;     119 * Return Value : true -
+                                 ;     120 *                    The level was set successfully.
+                                 ;     121 *                false -
+                                 ;     122 *                    Invalid level input. 
+                                 ;     123 ***********************************************************************************************************************/
+                                 ;     124 bool R_BSP_CpuInterruptLevelWrite (uint32_t level)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",124
+00000014 6080                    		SUB #08H, R0
+00000016 A009                    		MOV.L R1, 04H[R0]
+                                 ;     125 {
+                                 ;     126 #if (BSP_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     127     /* Check for valid level. */
+                                 ;     128     if (level > BSP_MCU_IPL_MAX)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",128
+00000018 755110                  		CMP #10H, R1
+0000001B 23rr                    		BLTU L16
+0000001D                         L15:	; bb2
+                                 ;     129     {
+                                 ;     130         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",130
+0000001D 3C0200                  		MOV.B #00H, 02H[R0]
+00000020 2Err                 B  		BRA L18
+00000022                         L16:	; bb7
+                                 ;     131     }
+                                 ;     132 #endif
+                                 ;     133 
+                                 ;     134 #if defined(__RENESAS__)
+                                 ;     135     /* Use the compiler intrinsic function to set the CPU IPL. This function is available with for the Renesas RX 
+                                 ;     136        compiler. This may need to be changed for other compilers. */
+                                 ;     137     set_ipl((signed long)level);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",137
+00000022 A809                    		MOV.L 04H[R0], R1
+00000024 6DC1                    		SHLL #1CH, R1
+00000026 6841                    		SHLR #04H, R1
+00000028 FD6A0E                  		MVFC PSW, R14
+0000002B 742EFFFFFFF0            		AND #0F0FFFFFFH, R14
+00000031 57E1                    		OR R14, R1
+00000033 FD6810                  		MVTC R1, PSW
+00000036                         L17:	; bb7.split
+                                 ;     138 #endif
+                                 ;     139 
+                                 ;     140     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",140
+00000036 3C0201                  		MOV.B #01H, 02H[R0]
+00000039                         L18:	; bb10
+00000039 C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     141 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",141
+0000003D B089                    		MOVU.B 03H[R0], R1
+0000003F 6702                    		RTSD #08H
+00000041                         _R_BSP_RegisterProtectEnable:
+                                 		.STACK	_R_BSP_RegisterProtectEnable=8
+                                 ;     142 
+                                 ;     143 /***********************************************************************************************************************
+                                 ;     144 * Function Name: R_BSP_RegisterProtectEnable
+                                 ;     145 * Description  : Enables register protection. Registers that are protected cannot be written to. Register protection is 
+                                 ;     146 *                enabled by using the Protect Register (PRCR) and the MPC's Write-Protect Register (PWPR).
+                                 ;     147 * Arguments    : none
+                                 ;     148 * Return Value : none
+                                 ;     149 ***********************************************************************************************************************/
+                                 ;     150 void R_BSP_RegisterProtectEnable (bsp_reg_protect_t regs_to_protect)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",150
+00000041 6040                    		SUB #04H, R0
+00000043 E301                    		MOV.L R1, [R0]
+                                 ;     151 {
+                                 ;     152     /* Is it safe to disable write access? */
+                                 ;     153     if (0 != g_protect_counters[regs_to_protect])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",153
+00000045 FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
+0000004B FED1EE                  		MOVU.W [R1,R14], R14
+0000004E 610E                    		CMP #00H, R14
+00000050 20rr                    		BEQ L21
+00000052                         L20:	; bb2
+                                 ;     154     {
+                                 ;     155         /* Decrement the protect counter */
+                                 ;     156         g_protect_counters[regs_to_protect]--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",156
+00000052 EC01                    		MOV.L [R0], R1
+00000054 FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
+0000005A FE51EF                  		MOV.W [R1,R14], R15
+0000005D 601F                    		SUB #01H, R15
+0000005F FE11EF                  		MOV.W R15, [R1,R14]
+00000062                         L21:	; bb13
+                                 ;     157     }
+                                 ;     158 
+                                 ;     159     /* Is it safe to disable write access? */
+                                 ;     160     if (0 == g_protect_counters[regs_to_protect])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",160
+00000062 EC01                    		MOV.L [R0], R1
+00000064 FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
+0000006A FED1EE                  		MOVU.W [R1,R14], R14
+0000006D 610E                    		CMP #00H, R14
+0000006F 21rr                    		BNE L27
+00000071                         L22:	; bb15
+                                 ;     161     {
+                                 ;     162         if (BSP_REG_PROTECT_MPC != regs_to_protect)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",162
+00000071 EC01                    		MOV.L [R0], R1
+00000073 6131                    		CMP #03H, R1
+00000075 20rr                    		BEQ L24
+00000077                         L23:	; bb16
+00000077 FBEEFE0308              		MOV.L #000803FEH, R14
+                                 ;     163         {
+                                 ;     164             /* Enable protection using PRCR register. */
+                                 ;     165             /* When writing to the PRCR register the upper 8-bits must be the correct key. Set lower bits to 0 to 
+                                 ;     166                disable writes. 
+                                 ;     167                b15:b8 PRKEY - Write 0xA5 to upper byte to enable writing to lower byte
+                                 ;     168                b7:b4  Reserved (set to 0)
+                                 ;     169                b3     PRC3  - Enables writing to the registers related to the LVD: LVCMPCR, LVDLVLR, LVD1CR0, LVD1CR1, 
+                                 ;     170                               LVD1SR, LVD2CR0, LVD2CR1, LVD2SR.
+                                 ;     171                b2     Reserved (set to 0)
+                                 ;     172                b1     PRC1  - Enables writing to the registers related to operating modes, low power consumption, the 
+                                 ;     173                               clock generation circuit, and software reset: SYSCR1, SBYCR, MSTPCRA, MSTPCRB, MSTPCRC, 
+                                 ;     174                               OPCCR, RSTCKCR, SOPCCR, MOFCR, MOSCWTCR, SWRR.
+                                 ;     175                b0     PRC0  - Enables writing to the registers related to the clock generation circuit: SCKCR, SCKCR3,
+                                 ;     176                               PLLCR, PLLCR2, MOSCCR, SOSCCR,LOCOCR, ILOCOCR, HOCOCR, OSTDCR, OSTDSR, CKOCR.
+                                 ;     177             */
+                                 ;     178             SYSTEM.PRCR.WORD = (uint16_t)((SYSTEM.PRCR.WORD | BSP_PRV_PRCR_KEY) & (~g_prcr_masks[regs_to_protect]));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",178
+0000007C 5CEF                    		MOVU.W [R14], R15
+0000007E FB52rrrrrrrr            		MOV.L #__$g_prcr_masks, R5
+00000084 EC01                    		MOV.L [R0], R1
+00000086 FE5155                  		MOV.W [R1,R5], R5
+00000089 7E05                    		NOT R5
+0000008B 773F00A500              		OR #0A500H, R15
+00000090 535F                    		AND R5, R15
+00000092 D3EF                    		MOV.W R15, [R14]
+00000094 6701                    		RTSD #04H
+00000096                         L24:	; bb26
+00000096 FBEE1FC108              		MOV.L #0008C11FH, R14
+                                 ;     179         }
+                                 ;     180         else
+                                 ;     181         {
+                                 ;     182             /* Enable protection for MPC using PWPR register. */
+                                 ;     183             /* Enable writing of PFSWE bit. It could be assumed that the B0WI bit is still cleared from a call to 
+                                 ;     184                protection disable function, but it is written here to make sure that the PFSWE bit always gets 
+                                 ;     185                cleared. */
+                                 ;     186             MPC.PWPR.BIT.B0WI = 0;     
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",186
+0000009B F0EF                    		BCLR #07H, [R14].B
+0000009D                         L25:	; bb26.split
+0000009D FBEE1FC108              		MOV.L #0008C11FH, R14
+                                 ;     187             /* Disable writing to PFS registers. */ 
+                                 ;     188             MPC.PWPR.BIT.PFSWE = 0;    
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",188
+000000A2 F0EE                    		BCLR #06H, [R14].B
+000000A4                         L26:	; bb26.split1
+000000A4 FBEE1FC108              		MOV.L #0008C11FH, R14
+                                 ;     189             /* Disable writing of PFSWE bit. */
+                                 ;     190             MPC.PWPR.BIT.B0WI = 1;     
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",190
+000000A9 F0E7                    		BSET #07H, [R14].B
+000000AB 6701                    		RTSD #04H
+000000AD                         L27:	; return
+                                 ;     191         }
+                                 ;     192     }
+                                 ;     193 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",193
+000000AD 6701                    		RTSD #04H
+000000AF                         _R_BSP_RegisterProtectDisable:
+                                 		.STACK	_R_BSP_RegisterProtectDisable=8
+                                 ;     194 
+                                 ;     195 /***********************************************************************************************************************
+                                 ;     196 * Function Name: R_BSP_RegisterProtectDisable
+                                 ;     197 * Description  : Disables register protection. Registers that are protected cannot be written to. Register protection is
+                                 ;     198 *                disabled by using the Protect Register (PRCR) and the MPC's Write-Protect Register (PWPR).
+                                 ;     199 * Arguments    : none
+                                 ;     200 * Return Value : none
+                                 ;     201 ***********************************************************************************************************************/
+                                 ;     202 void R_BSP_RegisterProtectDisable (bsp_reg_protect_t regs_to_unprotect)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",202
+000000AF 6040                    		SUB #04H, R0
+000000B1 E301                    		MOV.L R1, [R0]
+                                 ;     203 {
+                                 ;     204     /* If this is first entry then disable protection. */
+                                 ;     205     if (0 == g_protect_counters[regs_to_unprotect])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",205
+000000B3 FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
+000000B9 FED1EE                  		MOVU.W [R1,R14], R14
+000000BC 610E                    		CMP #00H, R14
+000000BE 21rr                    		BNE L33
+000000C0                         L29:	; bb3
+                                 ;     206     {
+                                 ;     207         if (BSP_REG_PROTECT_MPC != regs_to_unprotect)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",207
+000000C0 EC01                    		MOV.L [R0], R1
+000000C2 6131                    		CMP #03H, R1
+000000C4 20rr                    		BEQ L31
+000000C6                         L30:	; bb4
+000000C6 FBEEFE0308              		MOV.L #000803FEH, R14
+                                 ;     208         {
+                                 ;     209             /* Enable protection using PRCR register. */
+                                 ;     210             /* When writing to the PRCR register the upper 8-bits must be the correct key. Set lower bits to 1 to 
+                                 ;     211                enable writes. 
+                                 ;     212                b15:b8 PRKEY - Write 0xA5 to upper byte to enable writing to lower byte
+                                 ;     213                b7:b4  Reserved (set to 0)
+                                 ;     214                b3     PRC3  - Enables writing to the registers related to the LVD: LVCMPCR, LVDLVLR, LVD1CR0, LVD1CR1, 
+                                 ;     215                               LVD1SR, LVD2CR0, LVD2CR1, LVD2SR.
+                                 ;     216                b2     Reserved (set to 0)
+                                 ;     217                b1     PRC1  - Enables writing to the registers related to operating modes, low power consumption, the 
+                                 ;     218                               clock generation circuit, and software reset: SYSCR1, SBYCR, MSTPCRA, MSTPCRB, MSTPCRC, 
+                                 ;     219                               OPCCR, RSTCKCR, SOPCCR, MOFCR, MOSCWTCR, SWRR.
+                                 ;     220                b0     PRC0  - Enables writing to the registers related to the clock generation circuit: SCKCR, SCKCR3,
+                                 ;     221                               PLLCR, PLLCR2, MOSCCR, SOSCCR,LOCOCR, ILOCOCR, HOCOCR, OSTDCR, OSTDSR, CKOCR.
+                                 ;     222             */
+                                 ;     223             SYSTEM.PRCR.WORD = (uint16_t)((SYSTEM.PRCR.WORD | BSP_PRV_PRCR_KEY) | g_prcr_masks[regs_to_unprotect]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",223
+000000CB 5CEF                    		MOVU.W [R14], R15
+000000CD EC01                    		MOV.L [R0], R1
+000000CF 6C11                    		SHLL #01H, R1
+000000D1 FB52rrrrrrrr            		MOV.L #__$g_prcr_masks, R5
+000000D7 4B15                    		ADD R1, R5
+000000D9 06D45F                  		OR [R5].UW, R15
+000000DC 773F00A500              		OR #0A500H, R15
+000000E1 D3EF                    		MOV.W R15, [R14]
+000000E3 2Err                 B  		BRA L33
+000000E5                         L31:	; bb13
+000000E5 FBEE1FC108              		MOV.L #0008C11FH, R14
+                                 ;     224         }
+                                 ;     225         else
+                                 ;     226         {
+                                 ;     227             /* Disable protection for MPC using PWPR register. */
+                                 ;     228             /* Enable writing of PFSWE bit. */
+                                 ;     229             MPC.PWPR.BIT.B0WI = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",229
+000000EA F0EF                    		BCLR #07H, [R14].B
+000000EC                         L32:	; bb13.split
+000000EC FBEE1FC108              		MOV.L #0008C11FH, R14
+                                 ;     230             /* Enable writing to PFS registers. */ 
+                                 ;     231             MPC.PWPR.BIT.PFSWE = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",231
+000000F1 F0E6                    		BSET #06H, [R14].B
+000000F3                         L33:	; bb31
+                                 ;     232         }
+                                 ;     233     }
+                                 ;     234 
+                                 ;     235     /* Increment the protect counter */
+                                 ;     236     g_protect_counters[regs_to_unprotect]++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",236
+000000F3 EC01                    		MOV.L [R0], R1
+000000F5 FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
+000000FB FE51EF                  		MOV.W [R1,R14], R15
+000000FE 621F                    		ADD #01H, R15
+00000100 FE11EF                  		MOV.W R15, [R1,R14]
+00000103 6701                    		RTSD #04H
+00000105                         _bsp_register_protect_open:
+                                 		.STACK	_bsp_register_protect_open=8
+                                 ;     237 }
+                                 ;     238 
+                                 ;     239 /***********************************************************************************************************************
+                                 ;     240 * Function Name: bsp_register_protect_open
+                                 ;     241 * Description  : Initializes variables needed for register protection functionality.
+                                 ;     242 * Arguments    : none
+                                 ;     243 * Return Value : none
+                                 ;     244 ***********************************************************************************************************************/
+                                 ;     245 void bsp_register_protect_open (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",245
+00000105 6040                    		SUB #04H, R0
+                                 ;     246 {
+                                 ;     247     uint32_t i;
+                                 ;     248 
+                                 ;     249     /* Initialize reference counters to 0. */
+                                 ;     250     for (i = 0; i < BSP_REG_PROTECT_TOTAL_ITEMS; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",250
+00000107 F80600                  		MOV.L #00000000H, [R0]
+0000010A 2Err                 B  		BRA L36
+0000010C                         L35:	; bb
+                                 ;     251     {
+                                 ;     252         g_protect_counters[i] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",252
+0000010C EC01                    		MOV.L [R0], R1
+0000010E FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
+00000114 660F                    		MOV.L #00000000H, R15
+00000116 FE11EF                  		MOV.W R15, [R1,R14]
+00000119 EC01                    		MOV.L [R0], R1
+0000011B 6211                    		ADD #01H, R1
+0000011D E301                    		MOV.L R1, [R0]
+0000011F                         L36:	; bb5
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",250
+0000011F EC01                    		MOV.L [R0], R1
+00000121 6141                    		CMP #04H, R1
+00000123 23rr                    		BLTU L35
+00000125                         L37:	; return
+                                 ;     253     }
+                                 ;     254 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",254
+00000125 6701                    		RTSD #04H
+                                 ;     255 
+                                 ;     256 
+                                 		.SECTION	C_2,ROMDATA,ALIGN=2
+00000000                         __$g_prcr_masks:
+00000000 0100                    		.word	0001H
+00000002 0200                    		.word	0002H
+00000004 0800                    		.word	0008H
+                                 		.SECTION	B_2,DATA,ALIGN=2
+00000000                         __$g_protect_counters:
+00000000(00000008H)              		.blkw	4
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00473   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000295(00000127H)  P
+ROMDATA  0000000006(00000006H)  C_2
+DATA     0000000008(00000008H)  B_2
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\cpu.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\cpu.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\r_bsp\mcu\rx63n\cpu.obj

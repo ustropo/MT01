@@ -1,0 +1,1996 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:49:17 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:49:17
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_mtu_timers_rx.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_mtu_timers_rx.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;r_mtu_timers_rx.c
+                                 
+                                 		.glb	_g_mtu_clock_divisors
+                                 		.glb	_g_num_channels_in_use
+                                 		.glb	_g_mtu_channel_mode
+                                 		.glb	_g_mtu_channel_clr_src
+                                 		.glb	_g_mtu_channel_repeats
+                                 		.glb	_g_mtu_tgr_callbacks
+                                 		.glb	_g_mtu_tgi_icu_en_flags
+                                 		.glb	_g_chnl_clk_divs
+                                 		.glb	_g_chnl_ext_clks
+                                 		.glb	_g_chnl_clear_src
+                                 		.glb	_g_mtu_handles
+                                 		.glb	_R_MTU_Timer_Open
+                                 		.glb	_R_BSP_HardwareLock
+                                 		.glb	_mtu_interrupts_disable
+                                 		.glb	_mtu_interrupts_clear
+                                 		.glb	_power_on_off
+                                 		.glb	_mtu_channel_clear
+                                 		.glb	_R_BSP_HardwareUnlock
+                                 		.glb	_mtu_calc_clock_divisor
+                                 		.glb	_mtu_calc_tgr_ticks
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _R_MTU_Timer_Open:
+                                 		.STACK	_R_MTU_Timer_Open=60
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_mtu_timers_rx.c
+                                 ;      21 * Device(s)    : RX Family
+                                 ;      22 * Tool-Chain   : Renesas RX Standard Toolchain 1.02+
+                                 ;      23 * OS           : None
+                                 ;      24 * H/W Platform :
+                                 ;      25 * Description  : Functions for using MTU on RX devices.
+                                 ;      26 ************************************************************************************************************************
+                                 ;      27 * History : DD.MM.YYYY Version Description           
+                                 ;      28 *         : 30.09.2014  1.00   First Release
+                                 ;      29 ***********************************************************************************************************************/
+                                 ;      30 /***********************************************************************************************************************
+                                 ;      31 Includes   <System Includes> , "Project Includes"
+                                 ;      32 ***********************************************************************************************************************/
+                                 ;      33 #include "platform.h"
+                                 ;      34 #include "r_mtu_rx_if.h"
+                                 ;      35 /* Internal definitions. */
+                                 ;      36 #include "r_mtu_rx_private.h"
+                                 ;      37 
+                                 ;      38 /***********************************************************************************************************************
+                                 ;      39 Private local function declarations
+                                 ;      40 ***********************************************************************************************************************/
+                                 ;      41 
+                                 ;      42 /***********************************************************************************************************************
+                                 ;      43 API function definitions
+                                 ;      44 ***********************************************************************************************************************/
+                                 ;      45 #if MTU_CFG_USE_TIMER == 1
+                                 ;      46 /***********************************************************************************************************************
+                                 ;      47 * Function Name: R_MTU_Timer_Open
+                                 ;      48 * Description  : This function applies power to the MTU channel,
+                                 ;      49 *                initializes the associated registers to prepare for compare/match timer operations,
+                                 ;      50 *                and applies user-configurable options.
+                                 ;      51 * Arguments    : channel -
+                                 ;      52 *                   Number of the MTU channel to be initialized
+                                 ;      53 *                pconfig -
+                                 ;      54 *                   Pointer to MTU channel configuration data structure.
+                                 ;      55 *                pcallback -
+                                 ;      56 *                   Pointer to function called from interrupt
+                                 ;      57 * Return Value : MTU_SUCCESS-
+                                 ;      58 *                   Successful; channel initialized
+                                 ;      59 *                MTU_TIMERS_ERR_BAD_CHAN-
+                                 ;      60 *                   Channel number is invalid for part
+                                 ;      61 *                MTU_TIMERS_ERR_CH_NOT_CLOSED-
+                                 ;      62 *                   Channel currently in operation; Perform R_MTU_Close() first
+                                 ;      63 *                MTU_TIMERS_ERR_NULL_PTR-
+                                 ;      64 *                   pconfig pointer is NULL
+                                 ;      65 *                MTU_ERR_ARG_RANGE-
+                                 ;      66 *                   The pconfig structure contains a value that exceeds limits.
+                                 ;      67 *                MTU_TIMERS_ERR_INVALID_ARG-
+                                 ;      68 *                   An element of the pconfig structure contains an invalid value.
+                                 ;      69 *                MTU_TIMERS_ERR_LOCK-
+                                 ;      70 *                      The lock could not be acquired. The channel is busy.
+                                 ;      71 ***********************************************************************************************************************/
+                                 ;      72 mtu_err_t   R_MTU_Timer_Open (mtu_channel_t              channel,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",72
+00000000 7100C8                  		ADD #0FFFFFFC8H, R0
+00000003 A309                    		MOV.L R1, 34H[R0]
+00000005 A302                    		MOV.L R2, 30H[R0]
+00000007 A28B                    		MOV.L R3, 2CH[R0]
+                                 ;      73                               mtu_timer_chnl_settings_t *pconfig,
+                                 ;      74                               void                     (*pcallback)(void *pdata))
+                                 ;      75 {
+                                 ;      76     mtu_handle_t  my_handle;
+                                 ;      77     bool result;
+                                 ;      78     uint8_t pclk_divisor_index;
+                                 ;      79     uint16_t pclk_divisor;
+                                 ;      80     uint8_t tcr_bits = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",80
+00000009 3C8100                  		MOV.B #00H, 11H[R0]
+0000000C                         L11:	; entry.split
+                                 ;      81     uint16_t tgr_value;
+                                 ;      82     uint32_t cycle_freq;
+                                 ;      83     uint32_t i;
+                                 ;      84     uint8_t * p_byte1;
+                                 ;      85     uint8_t * p_byte2;
+                                 ;      86 
+                                 ;      87     #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;      88     bool        lock_result = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",88
+0000000C F9042700                		MOV.B #00H, 27H[R0]
+00000010                         L12:	; entry.split1
+                                 ;      89     #endif
+                                 ;      90 
+                                 ;      91     #if MTU_CFG_PARAM_CHECKING_ENABLE == 1
+                                 ;      92     if (MTU_CHANNEL_MAX <= channel)     // First check for channel number out of range
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",92
+00000010 AB09                    		MOV.L 34H[R0], R1
+00000012 6151                    		CMP #05H, R1
+00000014 29rr                    		BLT L14
+00000016                         L13:	; bb15
+                                 ;      93     {
+                                 ;      94         return MTU_ERR_BAD_CHAN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",94
+00000016 3E0101                  		MOV.L #00000001H, 04H[R0]
+00000019 38rrrr               W  		BRA L210
+0000001C                         L14:	; bb21
+                                 ;      95     }
+                                 ;      96 
+                                 ;      97     if (NULL == g_mtu_handles[channel])  // Now check that channel has been configured for build
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",97
+0000001C FBE2rrrrrrrr            		MOV.L #_g_mtu_handles, R14
+00000022 AB09                    		MOV.L 34H[R0], R1
+00000024 FE61EE                  		MOV.L [R1,R14], R14
+00000027 610E                    		CMP #00H, R14
+00000029 18                   S  		BNE L16
+0000002A                         L15:	; bb22
+                                 ;      98     {
+                                 ;      99         return MTU_ERR_BAD_CHAN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",99
+0000002A 3E0101                  		MOV.L #00000001H, 04H[R0]
+0000002D 38rrrr               W  		BRA L210
+00000030                         L16:	; bb31
+                                 ;     100     }
+                                 ;     101 
+                                 ;     102     if (NULL == pconfig)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",102
+00000030 AB01                    		MOV.L 30H[R0], R1
+00000032 6101                    		CMP #00H, R1
+00000034 18                   S  		BNE L18
+00000035                         L17:	; bb32
+                                 ;     103     {
+                                 ;     104         return MTU_ERR_NULL_PTR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",104
+00000035 3E0107                  		MOV.L #00000007H, 04H[R0]
+00000038 38rrrr               W  		BRA L210
+0000003B                         L18:	; bb39
+                                 ;     105     }
+                                 ;     106 
+                                 ;     107     /* Check to see if the peripheral has already been initialized. */
+                                 ;     108     if (g_mtu_channel_mode[channel])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",108
+0000003B AB09                    		MOV.L 34H[R0], R1
+0000003D FBE2rrrrrrrr            		MOV.L #_g_mtu_channel_mode, R14
+00000043 FECE1E                  		MOVU.B [R14,R1], R14
+00000046 610E                    		CMP #00H, R14
+00000048 10                   S  		BEQ L20
+00000049                         L19:	; bb40
+                                 ;     109     {
+                                 ;     110         return MTU_ERR_CH_NOT_CLOSED;   // This channel has already been initialized.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",110
+00000049 3E0103                  		MOV.L #00000003H, 04H[R0]
+0000004C 38rrrr               W  		BRA L210
+0000004F                         L20:	; bb50
+                                 ;     111     }
+                                 ;     112 
+                                 ;     113     if ((MTU_CHANNEL_1 == channel) || (MTU_CHANNEL_2 == channel))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",113
+0000004F AB09                    		MOV.L 34H[R0], R1
+00000051 6111                    		CMP #01H, R1
+00000053 20rr                    		BEQ L28
+00000055 2Err                 B  		BRA L27
+00000057                         L21:	; bb52
+                                 ;     114     {
+                                 ;     115         if((MTU_ACTION_NONE != pconfig->timer_c.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",115
+00000057 AB01                    		MOV.L 30H[R0], R1
+00000059 AA91                    		MOV.L 28H[R1], R1
+0000005B 6101                    		CMP #00H, R1
+0000005D 18                   S  		BNE L23
+0000005E 2Err                 B  		BRA L25
+00000060                         L22:	; bb53
+                                 ;     116            && (MTU_ACTION_NONE != pconfig->timer_d.actions.do_action))
+                                 ;     117         {
+                                 ;     118             return MTU_ERR_INVALID_ARG; // Resource not present on these channels.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",118
+00000060 3E0105                  		MOV.L #00000005H, 04H[R0]
+00000063 38rrrr               W  		BRA L210
+00000066                         L23:	; bb62
+00000066 AB01                    		MOV.L 30H[R0], R1
+00000068 AB19                    		MOV.L 34H[R1], R1
+0000006A 6101                    		CMP #00H, R1
+0000006C 10                   S  		BEQ L25
+0000006D                         L24:	; bb70
+0000006D F80601                  		MOV.L #00000001H, [R0]
+00000070 08                   S  		BRA L26
+00000071                         L25:	; bb71
+00000071 F80600                  		MOV.L #00000000H, [R0]
+00000074                         L26:	; bb72
+00000074 EC01                    		MOV.L [R0], R1
+00000076 6101                    		CMP #00H, R1
+00000078 21rr                    		BNE L22
+0000007A 2Err                 B  		BRA L31
+0000007C                         L27:	; bb81
+0000007C AB09                    		MOV.L 34H[R0], R1
+0000007E 6121                    		CMP #02H, R1
+00000080 18                   S  		BNE L29
+00000081                         L28:	; bb85
+00000081 F80601                  		MOV.L #00000001H, [R0]
+00000084 08                   S  		BRA L30
+00000085                         L29:	; bb86
+00000085 F80600                  		MOV.L #00000000H, [R0]
+00000088                         L30:	; bb87
+00000088 EC01                    		MOV.L [R0], R1
+0000008A 6101                    		CMP #00H, R1
+0000008C 21rr                    		BNE L21
+0000008E                         L31:	; bb92
+                                 ;     119         }
+                                 ;     120     }
+                                 ;     121 
+                                 ;     122     /* Check counter clearing source  */
+                                 ;     123     switch (pconfig->clear_src)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",123
+0000008E AB01                    		MOV.L 30H[R0], R1
+00000090 A891                    		MOV.L 08H[R1], R1
+00000092 6151                    		CMP #05H, R1
+00000094 24rr                    		BGTU L34
+00000096                         L32:	; bb97
+                                 ;     124     {
+                                 ;     125         case MTU_CLR_DISABLED:
+                                 ;     126         case MTU_CLR_TGRA:
+                                 ;     127         case MTU_CLR_TGRB:
+                                 ;     128         case MTU_CLR_TGRC:
+                                 ;     129         case MTU_CLR_TGRD:
+                                 ;     130         case MTU_CLR_SYNC:
+                                 ;     131         {   /* Find the bits to set this in the table. Not all channels have this setting. */
+                                 ;     132             if(MTU_NOT_SUPP == g_chnl_clear_src[channel][pconfig->clear_src])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",132
+00000096 AB09                    		MOV.L 34H[R0], R1
+00000098 6C31                    		SHLL #03H, R1
+0000009A FBE2rrrrrrrr            		MOV.L #_g_chnl_clear_src, R14
+000000A0 4B1E                    		ADD R1, R14
+000000A2 AB01                    		MOV.L 30H[R0], R1
+000000A4 A891                    		MOV.L 08H[R1], R1
+000000A6 FECE1E                  		MOVU.B [R14,R1], R14
+000000A9 755EFF                  		CMP #0FFH, R14
+000000AC 21rr                    		BNE L35
+000000AE                         L33:	; bb98
+                                 ;     133             {
+                                 ;     134                 return MTU_ERR_INVALID_ARG; // Not supported by this channel
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",134
+000000AE 3E0105                  		MOV.L #00000005H, 04H[R0]
+000000B1 38rrrr               W  		BRA L210
+000000B4                         L34:	; bb113
+                                 ;     135             }
+                                 ;     136         }
+                                 ;     137         break;
+                                 ;     138         default:
+                                 ;     139         {
+                                 ;     140             return MTU_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",140
+000000B4 3E0105                  		MOV.L #00000005H, 04H[R0]
+000000B7 38rrrr               W  		BRA L210
+000000BA                         L35:	; bb115
+                                 ;     141         }
+                                 ;     142     }
+                                 ;     143     #endif // MTU_CFG_PARAM_CHECKING_ENABLE
+                                 ;     144 
+                                 ;     145     #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     146     /* Attempt to acquire lock for this MTU channel. Prevents reentrancy conflict. */
+                                 ;     147     lock_result = R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",147
+000000BA AB09                    		MOV.L 34H[R0], R1
+000000BC 71112E                  		ADD #2EH, R1
+000000BF 05rrrrrr             A  		BSR _R_BSP_HardwareLock
+000000C3 C70127                  		MOV.B R1, 27H[R0]
+000000C6                         L36:	; bb115.split
+                                 ;     148 
+                                 ;     149     if(false == lock_result)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",149
+000000C6 590127                  		MOVU.B 27H[R0], R1
+000000C9 6101                    		CMP #00H, R1
+000000CB 18                   S  		BNE L38
+000000CC                         L37:	; bb120
+                                 ;     150     {
+                                 ;     151         return MTU_ERR_LOCK;   // The R_MTU_Timer_Create function is currently locked.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",151
+000000CC 3E0108                  		MOV.L #00000008H, 04H[R0]
+000000CF 38rrrr               W  		BRA L210
+000000D2                         L38:	; bb127
+                                 ;     152     }
+                                 ;     153     #endif
+                                 ;     154 
+                                 ;     155     my_handle = g_mtu_handles[channel];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",155
+000000D2 FBE2rrrrrrrr            		MOV.L #_g_mtu_handles, R14
+000000D8 AB09                    		MOV.L 34H[R0], R1
+000000DA FE61E1                  		MOV.L [R1,R14], R1
+000000DD A081                    		MOV.L R1, 08H[R0]
+000000DF                         L39:	; bb127.split
+                                 ;     156 
+                                 ;     157     /* Save a copy of the user's config structure into local channel settings. */
+                                 ;     158     p_byte1 = (uint8_t *)pconfig;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",158
+000000DF E5000C07                		MOV.L 30H[R0], 1CH[R0]
+000000E3                         L40:	; bb127.split2
+                                 ;     159     p_byte2 = (uint8_t *)my_handle->p_mtu_chnl_tmr_settings;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",159
+000000E3 A881                    		MOV.L 08H[R0], R1
+000000E5 E5100108                		MOV.L 04H[R1], 20H[R0]
+000000E9                         L41:	; bb127.split3
+                                 ;     160 
+                                 ;     161     for (i = 0; i < sizeof(mtu_timer_chnl_settings_t); i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",161
+000000E9 3E0600                  		MOV.L #00000000H, 18H[R0]
+000000EC 2Err                 B  		BRA L43
+000000EE                         L42:	; bb137
+                                 ;     162     {
+                                 ;     163     	p_byte2[i] = p_byte1[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",163
+000000EE A981                    		MOV.L 18H[R0], R1
+000000F0 A98A                    		MOV.L 1CH[R0], R2
+000000F2 FEC21E                  		MOVU.B [R2,R1], R14
+000000F5 AA02                    		MOV.L 20H[R0], R2
+000000F7 FE021E                  		MOV.B R14, [R2,R1]
+000000FA A981                    		MOV.L 18H[R0], R1
+000000FC 6211                    		ADD #01H, R1
+000000FE A181                    		MOV.L R1, 18H[R0]
+00000100                         L43:	; bb147
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",161
+00000100 A981                    		MOV.L 18H[R0], R1
+00000102 75513C                  		CMP #3CH, R1
+00000105 23rr                    		BLTU L42
+00000107                         L44:	; bb152
+                                 ;     164     }
+                                 ;     165 
+                                 ;     166     tcr_bits = g_chnl_clear_src[channel][pconfig->clear_src];   // Select counter clearing source.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",166
+00000107 AB09                    		MOV.L 34H[R0], R1
+00000109 6C31                    		SHLL #03H, R1
+0000010B FBE2rrrrrrrr            		MOV.L #_g_chnl_clear_src, R14
+00000111 4B1E                    		ADD R1, R14
+00000113 AB01                    		MOV.L 30H[R0], R1
+00000115 A891                    		MOV.L 08H[R1], R1
+00000117 FECE11                  		MOVU.B [R14,R1], R1
+0000011A 8409                    		MOV.B R1, 11H[R0]
+0000011C                         L45:	; bb152.split
+                                 ;     167     g_mtu_channel_clr_src[channel] = pconfig->clear_src;        // Keep a global copy for ISRs.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",167
+0000011C AB01                    		MOV.L 30H[R0], R1
+0000011E A891                    		MOV.L 08H[R1], R1
+00000120 FBE2rrrrrrrr            		MOV.L #_g_mtu_channel_clr_src, R14
+00000126 AB0A                    		MOV.L 34H[R0], R2
+00000128 FE0E21                  		MOV.B R1, [R14,R2]
+0000012B                         L46:	; bb152.split4
+                                 ;     168 
+                                 ;     169     /* ICU settings. */
+                                 ;     170     mtu_interrupts_disable(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",170
+0000012B 590134                  		MOVU.B 34H[R0], R1
+0000012E 05rrrrrr             A  		BSR _mtu_interrupts_disable
+00000132                         L47:	; bb152.split5
+                                 ;     171     mtu_interrupts_clear(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",171
+00000132 590134                  		MOVU.B 34H[R0], R1
+00000135 05rrrrrr             A  		BSR _mtu_interrupts_clear
+00000139                         L48:	; bb152.split6
+                                 ;     172     *my_handle->regs.ipr = my_handle->priority; // Set the priority register from config.h value.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",172
+00000139 A881                    		MOV.L 08H[R0], R1
+0000013B AD1A                    		MOV.L 54H[R1], R2
+0000013D C11259                  		MOV.B 59H[R1], [R2]
+00000140                         L49:	; bb152.split7
+00000140 6601                    		MOV.L #00000000H, R1
+                                 ;     173 
+                                 ;     174     power_on_off(MTU_POWER_ON);                 // Make sure MTU channel is powered on.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",174
+00000142 05rrrrrr             A  		BSR _power_on_off
+00000146                         L50:	; bb152.split8
+                                 ;     175 
+                                 ;     176     mtu_channel_clear(channel);                 // Clear the registers and state variables for channel.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",176
+00000146 590134                  		MOVU.B 34H[R0], R1
+00000149 05rrrrrr             A  		BSR _mtu_channel_clear
+0000014D                         L51:	; bb152.split9
+                                 ;     177 
+                                 ;     178     switch (pconfig->clock_src.source)          // Select counter clock source
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",178
+0000014D AB01                    		MOV.L 30H[R0], R1
+0000014F EC1E                    		MOV.L [R1], R14
+00000151 615E                    		CMP #05H, R14
+00000153 22rr                  * 		BLTU L83
+         38rrrr                  
+00000158                         L52:	; bb152.split9
+00000158 615E                    		CMP #05H, R14
+0000015A 3Brrrr               W  		BNE L87
+0000015D                         L53:	; bb184
+                                 ;     179     {
+                                 ;     180         case MTU_CLK_SRC_INTERNAL:
+                                 ;     181         {
+                                 ;     182             /* Calculate the clock pre-scaler based on timer that has the longest period. */
+                                 ;     183             cycle_freq = 0xFFFFFFFF; // Seed
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",183
+0000015D F90605FF                		MOV.L #0FFFFFFFFH, 14H[R0]
+00000161                         L54:	; bb184.split
+                                 ;     184 
+                                 ;     185             if (MTU_ACTION_NONE != pconfig->timer_a.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",185
+00000161 AB01                    		MOV.L 30H[R0], R1
+00000163 A911                    		MOV.L 10H[R1], R1
+00000165 6101                    		CMP #00H, R1
+00000167 10                   S  		BEQ L56
+00000168                         L55:	; bb186
+                                 ;     186             {
+                                 ;     187                 cycle_freq = pconfig->timer_a.freq;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",187
+00000168 AB01                    		MOV.L 30H[R0], R1
+0000016A E5100305                		MOV.L 0CH[R1], 14H[R0]
+0000016E                         L56:	; bb200
+                                 ;     188             }
+                                 ;     189             if ((MTU_ACTION_NONE != pconfig->timer_b.actions.do_action) && (cycle_freq > pconfig->timer_b.freq))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",189
+0000016E AB01                    		MOV.L 30H[R0], R1
+00000170 A999                    		MOV.L 1CH[R1], R1
+00000172 6101                    		CMP #00H, R1
+00000174 21rr                    		BNE L58
+00000176 2Err                 B  		BRA L60
+00000178                         L57:	; bb201
+                                 ;     190             {
+                                 ;     191                     cycle_freq = pconfig->timer_b.freq;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",191
+00000178 AB01                    		MOV.L 30H[R0], R1
+0000017A E5100605                		MOV.L 18H[R1], 14H[R0]
+0000017E 2Err                 B  		BRA L62
+00000180                         L58:	; bb213
+00000180 AB01                    		MOV.L 30H[R0], R1
+00000182 A90A                    		MOV.L 14H[R0], R2
+00000184 06851206                		CMP 18H[R1].L, R2
+00000188 25rr                    		BLEU L60
+0000018A                         L59:	; bb221
+0000018A F80601                  		MOV.L #00000001H, [R0]
+0000018D 08                   S  		BRA L61
+0000018E                         L60:	; bb222
+0000018E F80600                  		MOV.L #00000000H, [R0]
+00000191                         L61:	; bb223
+00000191 EC01                    		MOV.L [R0], R1
+00000193 6101                    		CMP #00H, R1
+00000195 21rr                    		BNE L57
+00000197                         L62:	; bb229
+                                 ;     192             }
+                                 ;     193             if ((MTU_ACTION_NONE != pconfig->timer_c.actions.do_action) && (cycle_freq > pconfig->timer_c.freq))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",193
+00000197 AB01                    		MOV.L 30H[R0], R1
+00000199 AA91                    		MOV.L 28H[R1], R1
+0000019B 6101                    		CMP #00H, R1
+0000019D 21rr                    		BNE L64
+0000019F 2Err                 B  		BRA L66
+000001A1                         L63:	; bb230
+                                 ;     194             {
+                                 ;     195                     cycle_freq = pconfig->timer_c.freq;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",195
+000001A1 AB01                    		MOV.L 30H[R0], R1
+000001A3 E5100905                		MOV.L 24H[R1], 14H[R0]
+000001A7 2Err                 B  		BRA L68
+000001A9                         L64:	; bb242
+000001A9 AB01                    		MOV.L 30H[R0], R1
+000001AB A90A                    		MOV.L 14H[R0], R2
+000001AD 06851209                		CMP 24H[R1].L, R2
+000001B1 25rr                    		BLEU L66
+000001B3                         L65:	; bb250
+000001B3 F80601                  		MOV.L #00000001H, [R0]
+000001B6 08                   S  		BRA L67
+000001B7                         L66:	; bb251
+000001B7 F80600                  		MOV.L #00000000H, [R0]
+000001BA                         L67:	; bb252
+000001BA EC01                    		MOV.L [R0], R1
+000001BC 6101                    		CMP #00H, R1
+000001BE 21rr                    		BNE L63
+000001C0                         L68:	; bb258
+                                 ;     196             }
+                                 ;     197             if ((MTU_ACTION_NONE != pconfig->timer_d.actions.do_action) && (cycle_freq > pconfig->timer_d.freq))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",197
+000001C0 AB01                    		MOV.L 30H[R0], R1
+000001C2 AB19                    		MOV.L 34H[R1], R1
+000001C4 6101                    		CMP #00H, R1
+000001C6 21rr                    		BNE L70
+000001C8 2Err                 B  		BRA L72
+000001CA                         L69:	; bb259
+                                 ;     198             {
+                                 ;     199                     cycle_freq = pconfig->timer_d.freq;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",199
+000001CA AB01                    		MOV.L 30H[R0], R1
+000001CC E5100C05                		MOV.L 30H[R1], 14H[R0]
+000001D0 2Err                 B  		BRA L74
+000001D2                         L70:	; bb271
+000001D2 AB01                    		MOV.L 30H[R0], R1
+000001D4 A90A                    		MOV.L 14H[R0], R2
+000001D6 0685120C                		CMP 30H[R1].L, R2
+000001DA 25rr                    		BLEU L72
+000001DC                         L71:	; bb279
+000001DC F80601                  		MOV.L #00000001H, [R0]
+000001DF 08                   S  		BRA L73
+000001E0                         L72:	; bb280
+000001E0 F80600                  		MOV.L #00000000H, [R0]
+000001E3                         L73:	; bb281
+000001E3 EC01                    		MOV.L [R0], R1
+000001E5 6101                    		CMP #00H, R1
+000001E7 21rr                    		BNE L69
+000001E9                         L74:	; bb287
+                                 ;     200             }
+                                 ;     201 
+                                 ;     202             if (0 == cycle_freq) // don't allow 0 frequency.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",202
+000001E9 A909                    		MOV.L 14H[R0], R1
+000001EB 6101                    		CMP #00H, R1
+000001ED AB09                    		MOV.L 34H[R0], R1
+000001EF 21rr                    		BNE L77
+000001F1                         L75:	; bb288
+                                 ;     203             {
+                                 ;     204                 #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     205                 R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",205
+000001F1 71112E                  		ADD #2EH, R1
+000001F4 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+000001F8                         L76:	; bb288.split
+                                 ;     206                 #endif
+                                 ;     207                 return MTU_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",207
+000001F8 3E0105                  		MOV.L #00000005H, 04H[R0]
+000001FB 38rrrr               W  		BRA L210
+000001FE                         L77:	; bb297
+                                 ;     208             }
+                                 ;     209 
+                                 ;     210             /* calculate clock divisor based on target frequency or period. */
+                                 ;     211             result = mtu_calc_clock_divisor(channel, &pclk_divisor_index, cycle_freq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",211
+000001FE A90B                    		MOV.L 14H[R0], R3
+00000200 5B11                    		MOVU.B R1, R1
+00000202 71020D                  		ADD #0DH, R0, R2
+00000205 05rrrrrr             A  		BSR _mtu_calc_clock_divisor
+00000209 8301                    		MOV.B R1, 0CH[R0]
+0000020B                         L78:	; bb297.split
+                                 ;     212 
+                                 ;     213             if(true == result)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",213
+0000020B B301                    		MOVU.B 0CH[R0], R1
+0000020D 6111                    		CMP #01H, R1
+0000020F AB09                    		MOV.L 34H[R0], R1
+00000211 21rr                    		BNE L81
+00000213                         L79:	; bb303
+                                 ;     214             {
+                                 ;     215                 tcr_bits |= g_chnl_clk_divs[channel][pclk_divisor_index]; // Save divisor bits for later.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",215
+00000213 6361                    		MUL #06H, R1
+00000215 FBE2rrrrrrrr            		MOV.L #_g_chnl_clk_divs, R14
+0000021B 4B1E                    		ADD R1, R14
+0000021D B309                    		MOVU.B 0DH[R0], R1
+0000021F FECE11                  		MOVU.B [R14,R1], R1
+00000222 550111                  		OR 11H[R0].UB, R1
+00000225 8409                    		MOV.B R1, 11H[R0]
+00000227                         L80:	; bb303.split
+                                 ;     216                 pclk_divisor = g_mtu_clock_divisors[pclk_divisor_index];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",216
+00000227 FBE2rrrrrrrr            		MOV.L #_g_mtu_clock_divisors, R14
+0000022D B309                    		MOVU.B 0DH[R0], R1
+0000022F FE61E1                  		MOV.L [R1,R14], R1
+00000232 9189                    		MOV.W R1, 0EH[R0]
+00000234 2Err                 B  		BRA L89
+00000236                         L81:	; bb321
+                                 ;     217             }
+                                 ;     218             else
+                                 ;     219             {
+                                 ;     220                 #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     221                 R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",221
+00000236 71112E                  		ADD #2EH, R1
+00000239 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+0000023D                         L82:	; bb321.split
+                                 ;     222                 #endif
+                                 ;     223                 return MTU_ERR_ARG_RANGE; // Could not obtain requested frequency.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",223
+0000023D 3E0106                  		MOV.L #00000006H, 04H[R0]
+00000240 38rrrr               W  		BRA L210
+00000243                         L83:	; bb333
+                                 ;     224             }
+                                 ;     225         }
+                                 ;     226         break;
+                                 ;     227 
+                                 ;     228         /* Other than internal clocking source: */
+                                 ;     229         case MTU_CLK_SRC_EXT_MTCLKA:
+                                 ;     230         case MTU_CLK_SRC_EXT_MTCLKB:
+                                 ;     231         case MTU_CLK_SRC_EXT_MTCLKC:
+                                 ;     232         case MTU_CLK_SRC_EXT_MTCLKD:
+                                 ;     233         case MTU_CLK_SRC_CASCADE:
+                                 ;     234         {   /* Find the bits to set this in the table. Not all channels have this setting. */
+                                 ;     235             if(MTU_NOT_SUPP != g_chnl_ext_clks[channel][pconfig->clock_src.source])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",235
+00000243 AB09                    		MOV.L 34H[R0], R1
+00000245 EF1E                    		MOV.L R1, R14
+00000247 635E                    		MUL #05H, R14
+00000249 FBF2rrrrrrrr            		MOV.L #_g_chnl_ext_clks, R15
+0000024F 4BEF                    		ADD R14, R15
+00000251 AB02                    		MOV.L 30H[R0], R2
+00000253 EC2E                    		MOV.L [R2], R14
+00000255 FECFEE                  		MOVU.B [R15,R14], R14
+00000258 755EFF                  		CMP #0FFH, R14
+0000025B 20rr                    		BEQ L85
+0000025D                         L84:	; bb334
+                                 ;     236             {
+                                 ;     237                 tcr_bits |= g_chnl_ext_clks[channel][pconfig->clock_src.source];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",237
+0000025D 6351                    		MUL #05H, R1
+0000025F FBE2rrrrrrrr            		MOV.L #_g_chnl_ext_clks, R14
+00000265 4B1E                    		ADD R1, R14
+00000267 AB01                    		MOV.L 30H[R0], R1
+00000269 EC1F                    		MOV.L [R1], R15
+0000026B FECEF1                  		MOVU.B [R14,R15], R1
+0000026E 550111                  		OR 11H[R0].UB, R1
+00000271 8409                    		MOV.B R1, 11H[R0]
+00000273 2Err                 B  		BRA L89
+00000275                         L85:	; bb349
+                                 ;     238             }
+                                 ;     239             else
+                                 ;     240             {
+                                 ;     241                 #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     242                 R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",242
+00000275 71112E                  		ADD #2EH, R1
+00000278 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+0000027C                         L86:	; bb349.split
+                                 ;     243                 #endif
+                                 ;     244                 return MTU_ERR_INVALID_ARG; // Not supported by this channel
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",244
+0000027C 3E0105                  		MOV.L #00000005H, 04H[R0]
+0000027F 38rrrr               W  		BRA L210
+00000282                         L87:	; bb368
+                                 ;     245             }
+                                 ;     246         }
+                                 ;     247         break;
+                                 ;     248 
+                                 ;     249         default:
+                                 ;     250         {
+                                 ;     251             #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     252             R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",252
+00000282 AB09                    		MOV.L 34H[R0], R1
+00000284 71112E                  		ADD #2EH, R1
+00000287 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+0000028B                         L88:	; bb368.split
+                                 ;     253             #endif
+                                 ;     254             return MTU_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",254
+0000028B 3E0105                  		MOV.L #00000005H, 04H[R0]
+0000028E 38rrrr               W  		BRA L210
+00000291                         L89:	; bb373
+                                 ;     255         }
+                                 ;     256     }
+                                 ;     257 
+                                 ;     258     tcr_bits |= pconfig->clock_src.clock_edge;  // Set clock active edge.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",258
+00000291 AB01                    		MOV.L 30H[R0], R1
+00000293 A819                    		MOV.L 04H[R1], R1
+00000295 550111                  		OR 11H[R0].UB, R1
+00000298 8409                    		MOV.B R1, 11H[R0]
+0000029A                         L90:	; bb373.split
+                                 ;     259     *my_handle->regs.tcr = tcr_bits;            // Copy the completed setting to the TCR register.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",259
+0000029A A881                    		MOV.L 08H[R0], R1
+0000029C A891                    		MOV.L 08H[R1], R1
+0000029E C10111                  		MOV.B 11H[R0], [R1]
+000002A1                         L91:	; bb373.split10
+                                 ;     260 
+                                 ;     261     /* Set the compare/match operation register values for each TGR being used for this channel. */
+                                 ;     262     if(MTU_ACTION_NONE != pconfig->timer_a.actions.do_action)    // MTU_ACTION_NONE means this timer event not used.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",262
+000002A1 AB01                    		MOV.L 30H[R0], R1
+000002A3 A911                    		MOV.L 10H[R1], R1
+000002A5 6101                    		CMP #00H, R1
+000002A7 3Arrrr               W  		BEQ L120
+000002AA                         L92:	; bb389
+                                 ;     263     {
+                                 ;     264         if(MTU_CLK_SRC_INTERNAL ==  pconfig->clock_src.source)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",264
+000002AA AB01                    		MOV.L 30H[R0], R1
+000002AC EC1E                    		MOV.L [R1], R14
+000002AE 615E                    		CMP #05H, R14
+000002B0 21rr                    		BNE L98
+000002B2                         L93:	; bb390
+                                 ;     265         {
+                                 ;     266             /* Set compare match register with the value calculated from requested frequency. */
+                                 ;     267             tgr_value = mtu_calc_tgr_ticks(pclk_divisor, pconfig->timer_a.freq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",267
+000002B2 AB01                    		MOV.L 30H[R0], R1
+000002B4 A89A                    		MOV.L 0CH[R1], R2
+000002B6 B989                    		MOVU.W 0EH[R0], R1
+000002B8 05rrrrrr             A  		BSR _mtu_calc_tgr_ticks
+000002BC 9209                    		MOV.W R1, 12H[R0]
+000002BE                         L94:	; bb390.split
+                                 ;     268 
+                                 ;     269             if(0 != tgr_value)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",269
+000002BE BA09                    		MOVU.W 12H[R0], R1
+000002C0 6101                    		CMP #00H, R1
+000002C2 10                   S  		BEQ L96
+000002C3                         L95:	; bb398
+                                 ;     270             {
+                                 ;     271                 *my_handle->regs.tgra = tgr_value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",271
+000002C3 A881                    		MOV.L 08H[R0], R1
+000002C5 AA91                    		MOV.L 28H[R1], R1
+000002C7 D10109                  		MOV.W 12H[R0], [R1]
+000002CA 2Err                 B  		BRA L99
+000002CC                         L96:	; bb404
+                                 ;     272             }
+                                 ;     273             else
+                                 ;     274             {
+                                 ;     275                 #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     276                 R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",276
+000002CC AB09                    		MOV.L 34H[R0], R1
+000002CE 71112E                  		ADD #2EH, R1
+000002D1 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+000002D5                         L97:	; bb404.split
+                                 ;     277                 #endif
+                                 ;     278                 return MTU_ERR_ARG_RANGE; // Could not obtain requested frequency.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",278
+000002D5 3E0106                  		MOV.L #00000006H, 04H[R0]
+000002D8 38rrrr               W  		BRA L210
+000002DB                         L98:	; bb415
+                                 ;     279             }
+                                 ;     280         }
+                                 ;     281         else
+                                 ;     282         {
+                                 ;     283             *(my_handle->regs.tgra) = pconfig->timer_a.freq;  // External clock source. Use freq as direct TGR count.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",283
+000002DB AB01                    		MOV.L 30H[R0], R1
+000002DD A899                    		MOV.L 0CH[R1], R1
+000002DF A882                    		MOV.L 08H[R0], R2
+000002E1 AAA2                    		MOV.L 28H[R2], R2
+000002E3 D321                    		MOV.W R1, [R2]
+000002E5                         L99:	; bb433
+                                 ;     284         }
+                                 ;     285 
+                                 ;     286         /* Set up actions to perform on compare match. */
+                                 ;     287         if(MTU_ACTION_OUTPUT & pconfig->timer_a.actions.do_action)      // Output to a pin
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",287
+000002E5 AB01                    		MOV.L 30H[R0], R1
+000002E7 A911                    		MOV.L 10H[R1], R1
+000002E9 7C01                    		BTST #00H, R1
+000002EB 20rr                    		BEQ L103
+000002ED                         L100:	; bb434
+                                 ;     288         {
+                                 ;     289             *my_handle->regs.tiorh |= pconfig->timer_a.actions.output;  // Set bits in lower nibble
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",289
+000002ED A881                    		MOV.L 08H[R0], R1
+000002EF A911                    		MOV.L 10H[R1], R1
+000002F1 AB02                    		MOV.L 30H[R0], R2
+000002F3 A92A                    		MOV.L 14H[R2], R2
+000002F5 5412                    		OR [R1].UB, R2
+000002F7 C312                    		MOV.B R2, [R1]
+000002F9                         L101:	; bb434.split
+                                 ;     290 
+                                 ;     291             #ifndef BSP_MCU_RX110
+                                 ;     292             if (MTU_CHANNEL_4 == channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",292
+000002F9 AB09                    		MOV.L 34H[R0], R1
+000002FB 6141                    		CMP #04H, R1
+000002FD 18                   S  		BNE L103
+000002FE                         L102:	; bb449
+000002FE FBEE0A8608              		MOV.L #0008860AH, R14
+                                 ;     293             {
+                                 ;     294                 MTU.TOER.BIT.OE4A = 1; // Must also turn on Timer Output Master Enable Register for this channel.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",294
+00000303 F0E1                    		BSET #01H, [R14].B
+00000305                         L103:	; bb468
+                                 ;     295             }
+                                 ;     296             #endif
+                                 ;     297         }
+                                 ;     298 
+                                 ;     299         /* Set up actions to perform on compare match. */
+                                 ;     300         if((MTU_ACTION_INTERRUPT & pconfig->timer_a.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",300
+00000305 AB01                    		MOV.L 30H[R0], R1
+00000307 A911                    		MOV.L 10H[R1], R1
+00000309 7C11                    		BTST #01H, R1
+0000030B 21rr                    		BNE L108
+0000030D 2Err                 B  		BRA L107
+0000030F                         L104:	; bb469
+                                 ;     301           || (MTU_ACTION_CALLBACK & pconfig->timer_a.actions.do_action)) // Request an interrupt
+                                 ;     302         {
+                                 ;     303             g_mtu_tgi_icu_en_flags[channel][MTU_TIMER_A] = 1;            // Set a software control flag
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",303
+0000030F AB09                    		MOV.L 34H[R0], R1
+00000311 6C21                    		SHLL #02H, R1
+00000313 FBE2rrrrrrrr            		MOV.L #_g_mtu_tgi_icu_en_flags, R14
+00000319 661F                    		MOV.L #00000001H, R15
+0000031B FE0E1F                  		MOV.B R15, [R14,R1]
+0000031E                         L105:	; bb469.split
+                                 ;     304 
+                                 ;     305             if (MTU_ACTION_CALLBACK & pconfig->timer_a.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",305
+0000031E AB01                    		MOV.L 30H[R0], R1
+00000320 A911                    		MOV.L 10H[R1], R1
+00000322 7C21                    		BTST #02H, R1
+00000324 20rr                    		BEQ L111
+00000326                         L106:	; bb475
+                                 ;     306             {
+                                 ;     307                  g_mtu_tgr_callbacks[channel][MTU_TIMER_A] = 1;          // Do the callback for this interrupt.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",307
+00000326 AB09                    		MOV.L 34H[R0], R1
+00000328 6C21                    		SHLL #02H, R1
+0000032A FBE2rrrrrrrr            		MOV.L #_g_mtu_tgr_callbacks, R14
+00000330 661F                    		MOV.L #00000001H, R15
+00000332 FE0E1F                  		MOV.B R15, [R14,R1]
+00000335 2Err                 B  		BRA L111
+00000337                         L107:	; bb498
+00000337 AB01                    		MOV.L 30H[R0], R1
+00000339 A911                    		MOV.L 10H[R1], R1
+0000033B 7C21                    		BTST #02H, R1
+0000033D 10                   S  		BEQ L109
+0000033E                         L108:	; bb507
+0000033E F80601                  		MOV.L #00000001H, [R0]
+00000341 08                   S  		BRA L110
+00000342                         L109:	; bb508
+00000342 F80600                  		MOV.L #00000000H, [R0]
+00000345                         L110:	; bb509
+00000345 EC01                    		MOV.L [R0], R1
+00000347 6101                    		CMP #00H, R1
+00000349 21rr                    		BNE L104
+0000034B                         L111:	; bb515
+                                 ;     308             }
+                                 ;     309         }
+                                 ;     310 
+                                 ;     311         if (MTU_ACTION_TRIGGER_ADC & pconfig->timer_a.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",311
+0000034B AB01                    		MOV.L 30H[R0], R1
+0000034D A911                    		MOV.L 10H[R1], R1
+0000034F 7C51                    		BTST #05H, R1
+00000351 10                   S  		BEQ L113
+00000352                         L112:	; bb516
+                                 ;     312         {
+                                 ;     313         	*my_handle->regs.tier |= MTU_ADC_TRIG;   // Set ADC TTGE trigger bit in MTU register.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",313
+00000352 A881                    		MOV.L 08H[R0], R1
+00000354 A991                    		MOV.L 18H[R1], R1
+00000356 F017                    		BSET #07H, [R1].B
+00000358                         L113:	; bb534
+                                 ;     314         }
+                                 ;     315 
+                                 ;     316         *my_handle->regs.tier |= MTU_TGIEA;                 // Always set interrupt enable bit in MTU register.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",316
+00000358 A881                    		MOV.L 08H[R0], R1
+0000035A A991                    		MOV.L 18H[R1], R1
+0000035C F010                    		BSET #00H, [R1].B
+0000035E                         L114:	; bb534.split
+                                 ;     317 
+                                 ;     318         /* Set repeat mode if option selected and this TGR is clear source.*/
+                                 ;     319         if((MTU_ACTION_REPEAT & pconfig->timer_a.actions.do_action) && (MTU_CLR_TGRA == pconfig->clear_src))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",319
+0000035E AB01                    		MOV.L 30H[R0], R1
+00000360 A911                    		MOV.L 10H[R1], R1
+00000362 7C41                    		BTST #04H, R1
+00000364 21rr                    		BNE L116
+00000366 2Err                 B  		BRA L118
+00000368                         L115:	; bb544
+                                 ;     320         {
+                                 ;     321             g_mtu_channel_repeats[channel] = 1;                  // Continuous running
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",321
+00000368 AB09                    		MOV.L 34H[R0], R1
+0000036A FBE2rrrrrrrr            		MOV.L #_g_mtu_channel_repeats, R14
+00000370 661F                    		MOV.L #00000001H, R15
+00000372 FE0E1F                  		MOV.B R15, [R14,R1]
+00000375 2Err                 B  		BRA L120
+00000377                         L116:	; bb555
+00000377 AB01                    		MOV.L 30H[R0], R1
+00000379 A891                    		MOV.L 08H[R1], R1
+0000037B 6101                    		CMP #00H, R1
+0000037D 18                   S  		BNE L118
+0000037E                         L117:	; bb561
+0000037E F80601                  		MOV.L #00000001H, [R0]
+00000381 08                   S  		BRA L119
+00000382                         L118:	; bb562
+00000382 F80600                  		MOV.L #00000000H, [R0]
+00000385                         L119:	; bb563
+00000385 EC01                    		MOV.L [R0], R1
+00000387 6101                    		CMP #00H, R1
+00000389 21rr                    		BNE L115
+0000038B                         L120:	; bb578
+                                 ;     322         }
+                                 ;     323     }
+                                 ;     324 
+                                 ;     325     if(MTU_ACTION_NONE != pconfig->timer_b.actions.do_action)    // MTU_ACTION_NONE means this timer event not used.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",325
+0000038B AB01                    		MOV.L 30H[R0], R1
+0000038D A999                    		MOV.L 1CH[R1], R1
+0000038F 6101                    		CMP #00H, R1
+00000391 3Arrrr               W  		BEQ L149
+00000394                         L121:	; bb580
+                                 ;     326     {
+                                 ;     327         if(MTU_CLK_SRC_INTERNAL ==  pconfig->clock_src.source)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",327
+00000394 AB01                    		MOV.L 30H[R0], R1
+00000396 EC1E                    		MOV.L [R1], R14
+00000398 615E                    		CMP #05H, R14
+0000039A 21rr                    		BNE L127
+0000039C                         L122:	; bb581
+                                 ;     328         {
+                                 ;     329             /* Set compare match register with the value calculated from requested frequency. */
+                                 ;     330             tgr_value = mtu_calc_tgr_ticks(pclk_divisor, pconfig->timer_b.freq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",330
+0000039C AB01                    		MOV.L 30H[R0], R1
+0000039E A992                    		MOV.L 18H[R1], R2
+000003A0 B989                    		MOVU.W 0EH[R0], R1
+000003A2 05rrrrrr             A  		BSR _mtu_calc_tgr_ticks
+000003A6 9209                    		MOV.W R1, 12H[R0]
+000003A8                         L123:	; bb581.split
+                                 ;     331 
+                                 ;     332             if(0 != tgr_value)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",332
+000003A8 BA09                    		MOVU.W 12H[R0], R1
+000003AA 6101                    		CMP #00H, R1
+000003AC 10                   S  		BEQ L125
+000003AD                         L124:	; bb589
+                                 ;     333             {
+                                 ;     334                 *my_handle->regs.tgrb  = tgr_value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",334
+000003AD A881                    		MOV.L 08H[R0], R1
+000003AF AA99                    		MOV.L 2CH[R1], R1
+000003B1 D10109                  		MOV.W 12H[R0], [R1]
+000003B4 2Err                 B  		BRA L128
+000003B6                         L125:	; bb595
+                                 ;     335             }
+                                 ;     336             else
+                                 ;     337             {
+                                 ;     338                 #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     339                 R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",339
+000003B6 AB09                    		MOV.L 34H[R0], R1
+000003B8 71112E                  		ADD #2EH, R1
+000003BB 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+000003BF                         L126:	; bb595.split
+                                 ;     340                 #endif
+                                 ;     341                 return MTU_ERR_ARG_RANGE;                    // Could not obtain requested frequency.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",341
+000003BF 3E0106                  		MOV.L #00000006H, 04H[R0]
+000003C2 38rrrr               W  		BRA L210
+000003C5                         L127:	; bb606
+                                 ;     342             }
+                                 ;     343         }
+                                 ;     344         else
+                                 ;     345         {
+                                 ;     346             *my_handle->regs.tgrb  = pconfig->timer_b.freq;  // External clock source. Use freq as direct TGR count.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",346
+000003C5 AB01                    		MOV.L 30H[R0], R1
+000003C7 A991                    		MOV.L 18H[R1], R1
+000003C9 A882                    		MOV.L 08H[R0], R2
+000003CB AAAA                    		MOV.L 2CH[R2], R2
+000003CD D321                    		MOV.W R1, [R2]
+000003CF                         L128:	; bb624
+                                 ;     347         }
+                                 ;     348 
+                                 ;     349         /* Set up actions to perform on compare match. */
+                                 ;     350         if(MTU_ACTION_OUTPUT & pconfig->timer_b.actions.do_action) // Output to a pin
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",350
+000003CF AB01                    		MOV.L 30H[R0], R1
+000003D1 A999                    		MOV.L 1CH[R1], R1
+000003D3 7C01                    		BTST #00H, R1
+000003D5 20rr                    		BEQ L134
+000003D7                         L129:	; bb625
+                                 ;     351         {
+                                 ;     352             *my_handle->regs.tiorh |=  (pconfig->timer_b.actions.output << 4); // Move bits to upper nibble
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",352
+000003D7 AB01                    		MOV.L 30H[R0], R1
+000003D9 AA11                    		MOV.L 20H[R1], R1
+000003DB 6C41                    		SHLL #04H, R1
+000003DD A882                    		MOV.L 08H[R0], R2
+000003DF A922                    		MOV.L 10H[R2], R2
+000003E1 5421                    		OR [R2].UB, R1
+000003E3 C321                    		MOV.B R1, [R2]
+000003E5                         L130:	; bb625.split
+                                 ;     353 
+                                 ;     354             /* Must also turn on Timer Output Master Enable Register for these channels. */
+                                 ;     355             #ifndef BSP_MCU_RX110
+                                 ;     356 
+                                 ;     357             if (MTU_CHANNEL_3 == channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",357
+000003E5 AB09                    		MOV.L 34H[R0], R1
+000003E7 6131                    		CMP #03H, R1
+000003E9 18                   S  		BNE L132
+000003EA                         L131:	; bb641
+000003EA FBEE0A8608              		MOV.L #0008860AH, R14
+                                 ;     358             {
+                                 ;     359                 MTU.TOER.BIT.OE3B = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",359
+000003EF F0E0                    		BSET #00H, [R14].B
+000003F1                         L132:	; bb650
+                                 ;     360             }
+                                 ;     361 
+                                 ;     362             if (MTU_CHANNEL_4 == channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",362
+000003F1 AB09                    		MOV.L 34H[R0], R1
+000003F3 6141                    		CMP #04H, R1
+000003F5 18                   S  		BNE L134
+000003F6                         L133:	; bb651
+000003F6 FBEE0A8608              		MOV.L #0008860AH, R14
+                                 ;     363             {
+                                 ;     364                 MTU.TOER.BIT.OE4B = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",364
+000003FB F0E2                    		BSET #02H, [R14].B
+000003FD                         L134:	; bb670
+                                 ;     365             }
+                                 ;     366             #endif
+                                 ;     367         }
+                                 ;     368 
+                                 ;     369         /* Set up actions to perform on compare match. */
+                                 ;     370         if((MTU_ACTION_INTERRUPT & pconfig->timer_b.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",370
+000003FD AB01                    		MOV.L 30H[R0], R1
+000003FF A999                    		MOV.L 1CH[R1], R1
+00000401 7C11                    		BTST #01H, R1
+00000403 21rr                    		BNE L139
+00000405 2Err                 B  		BRA L138
+00000407                         L135:	; bb671
+                                 ;     371           || (MTU_ACTION_CALLBACK & pconfig->timer_b.actions.do_action)) // Request an interrupt
+                                 ;     372         {
+                                 ;     373             g_mtu_tgi_icu_en_flags[channel][MTU_TIMER_B] = 1;            // Set a software control flag
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",373
+00000407 AB09                    		MOV.L 34H[R0], R1
+00000409 6C21                    		SHLL #02H, R1
+0000040B FB22rrrrrrrr            		MOV.L #_g_mtu_tgi_icu_en_flags, R2
+00000411 4B12                    		ADD R1, R2
+00000413 3C2101                  		MOV.B #01H, 01H[R2]
+00000416                         L136:	; bb671.split
+                                 ;     374 
+                                 ;     375             if (MTU_ACTION_CALLBACK & pconfig->timer_b.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",375
+00000416 AB01                    		MOV.L 30H[R0], R1
+00000418 A999                    		MOV.L 1CH[R1], R1
+0000041A 7C21                    		BTST #02H, R1
+0000041C 20rr                    		BEQ L142
+0000041E                         L137:	; bb677
+                                 ;     376             {
+                                 ;     377                  g_mtu_tgr_callbacks[channel][MTU_TIMER_B] = 1;          // Do the callback for this interrupt.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",377
+0000041E AB09                    		MOV.L 34H[R0], R1
+00000420 6C21                    		SHLL #02H, R1
+00000422 FB22rrrrrrrr            		MOV.L #_g_mtu_tgr_callbacks, R2
+00000428 4B12                    		ADD R1, R2
+0000042A 3C2101                  		MOV.B #01H, 01H[R2]
+0000042D 2Err                 B  		BRA L142
+0000042F                         L138:	; bb700
+0000042F AB01                    		MOV.L 30H[R0], R1
+00000431 A999                    		MOV.L 1CH[R1], R1
+00000433 7C21                    		BTST #02H, R1
+00000435 10                   S  		BEQ L140
+00000436                         L139:	; bb709
+00000436 F80601                  		MOV.L #00000001H, [R0]
+00000439 08                   S  		BRA L141
+0000043A                         L140:	; bb710
+0000043A F80600                  		MOV.L #00000000H, [R0]
+0000043D                         L141:	; bb711
+0000043D EC01                    		MOV.L [R0], R1
+0000043F 6101                    		CMP #00H, R1
+00000441 21rr                    		BNE L135
+00000443                         L142:	; bb716
+                                 ;     378             }
+                                 ;     379         }
+                                 ;     380 
+                                 ;     381         *my_handle->regs.tier |= MTU_TGIEB;                 // Always set interrupt enable bit in MTU register.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",381
+00000443 A881                    		MOV.L 08H[R0], R1
+00000445 A991                    		MOV.L 18H[R1], R1
+00000447 F011                    		BSET #01H, [R1].B
+00000449                         L143:	; bb716.split
+                                 ;     382 
+                                 ;     383         /* Set repeat mode if option selected and this TGR is clear source.*/
+                                 ;     384         if((MTU_ACTION_REPEAT & pconfig->timer_b.actions.do_action) && (MTU_CLR_TGRB == pconfig->clear_src))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",384
+00000449 AB01                    		MOV.L 30H[R0], R1
+0000044B A999                    		MOV.L 1CH[R1], R1
+0000044D 7C41                    		BTST #04H, R1
+0000044F 21rr                    		BNE L145
+00000451 2Err                 B  		BRA L147
+00000453                         L144:	; bb726
+                                 ;     385         {
+                                 ;     386             g_mtu_channel_repeats[channel] = 1;                  // Continuous running
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",386
+00000453 AB09                    		MOV.L 34H[R0], R1
+00000455 FBE2rrrrrrrr            		MOV.L #_g_mtu_channel_repeats, R14
+0000045B 661F                    		MOV.L #00000001H, R15
+0000045D FE0E1F                  		MOV.B R15, [R14,R1]
+00000460 2Err                 B  		BRA L149
+00000462                         L145:	; bb737
+00000462 AB01                    		MOV.L 30H[R0], R1
+00000464 A891                    		MOV.L 08H[R1], R1
+00000466 6111                    		CMP #01H, R1
+00000468 18                   S  		BNE L147
+00000469                         L146:	; bb743
+00000469 F80601                  		MOV.L #00000001H, [R0]
+0000046C 08                   S  		BRA L148
+0000046D                         L147:	; bb744
+0000046D F80600                  		MOV.L #00000000H, [R0]
+00000470                         L148:	; bb745
+00000470 EC01                    		MOV.L [R0], R1
+00000472 6101                    		CMP #00H, R1
+00000474 21rr                    		BNE L144
+00000476                         L149:	; bb760
+                                 ;     387         }
+                                 ;     388     }
+                                 ;     389 
+                                 ;     390     if(MTU_ACTION_NONE != pconfig->timer_c.actions.do_action)    // MTU_ACTION_NONE means this timer event not used..
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",390
+00000476 AB01                    		MOV.L 30H[R0], R1
+00000478 AA91                    		MOV.L 28H[R1], R1
+0000047A 6101                    		CMP #00H, R1
+0000047C 3Arrrr               W  		BEQ L176
+0000047F                         L150:	; bb762
+                                 ;     391     {
+                                 ;     392         if(MTU_CLK_SRC_INTERNAL ==  pconfig->clock_src.source)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",392
+0000047F AB01                    		MOV.L 30H[R0], R1
+00000481 EC1E                    		MOV.L [R1], R14
+00000483 615E                    		CMP #05H, R14
+00000485 21rr                    		BNE L156
+00000487                         L151:	; bb763
+                                 ;     393         {
+                                 ;     394             /* Set compare match register with the value calculated from requested frequency. */
+                                 ;     395             tgr_value = mtu_calc_tgr_ticks(pclk_divisor, pconfig->timer_c.freq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",395
+00000487 AB01                    		MOV.L 30H[R0], R1
+00000489 AA1A                    		MOV.L 24H[R1], R2
+0000048B B989                    		MOVU.W 0EH[R0], R1
+0000048D 05rrrrrr             A  		BSR _mtu_calc_tgr_ticks
+00000491 9209                    		MOV.W R1, 12H[R0]
+00000493                         L152:	; bb763.split
+                                 ;     396 
+                                 ;     397             if(0 != tgr_value)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",397
+00000493 BA09                    		MOVU.W 12H[R0], R1
+00000495 6101                    		CMP #00H, R1
+00000497 10                   S  		BEQ L154
+00000498                         L153:	; bb771
+                                 ;     398             {
+                                 ;     399                 *my_handle->regs.tgrc  = tgr_value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",399
+00000498 A881                    		MOV.L 08H[R0], R1
+0000049A AB11                    		MOV.L 30H[R1], R1
+0000049C D10109                  		MOV.W 12H[R0], [R1]
+0000049F 2Err                 B  		BRA L157
+000004A1                         L154:	; bb777
+                                 ;     400             }
+                                 ;     401             else
+                                 ;     402             {
+                                 ;     403                 #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     404                 R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",404
+000004A1 AB09                    		MOV.L 34H[R0], R1
+000004A3 71112E                  		ADD #2EH, R1
+000004A6 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+000004AA                         L155:	; bb777.split
+                                 ;     405                 #endif
+                                 ;     406                 return MTU_ERR_ARG_RANGE;         // Could not obtain requested frequency.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",406
+000004AA 3E0106                  		MOV.L #00000006H, 04H[R0]
+000004AD 38rrrr               W  		BRA L210
+000004B0                         L156:	; bb788
+                                 ;     407             }
+                                 ;     408         }
+                                 ;     409         else
+                                 ;     410         {
+                                 ;     411             *my_handle->regs.tgrc  = pconfig->timer_c.freq;  // External clock source. Use freq as direct TGR count.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",411
+000004B0 AB01                    		MOV.L 30H[R0], R1
+000004B2 AA19                    		MOV.L 24H[R1], R1
+000004B4 A882                    		MOV.L 08H[R0], R2
+000004B6 AB22                    		MOV.L 30H[R2], R2
+000004B8 D321                    		MOV.W R1, [R2]
+000004BA                         L157:	; bb806
+                                 ;     412         }
+                                 ;     413 
+                                 ;     414         /* Set up actions to perform on compare match. */
+                                 ;     415         if(MTU_ACTION_OUTPUT & pconfig->timer_c.actions.do_action)      // Output to a pin
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",415
+000004BA AB01                    		MOV.L 30H[R0], R1
+000004BC AA91                    		MOV.L 28H[R1], R1
+000004BE 7C01                    		BTST #00H, R1
+000004C0 20rr                    		BEQ L161
+000004C2                         L158:	; bb807
+                                 ;     416         {
+                                 ;     417             *my_handle->regs.tiorl |= pconfig->timer_c.actions.output;  // Set bits in lower nibble
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",417
+000004C2 A881                    		MOV.L 08H[R0], R1
+000004C4 A919                    		MOV.L 14H[R1], R1
+000004C6 AB02                    		MOV.L 30H[R0], R2
+000004C8 AAAA                    		MOV.L 2CH[R2], R2
+000004CA 5412                    		OR [R1].UB, R2
+000004CC C312                    		MOV.B R2, [R1]
+000004CE                         L159:	; bb807.split
+                                 ;     418 
+                                 ;     419             #ifndef BSP_MCU_RX110
+                                 ;     420             if (MTU_CHANNEL_4 == channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",420
+000004CE AB09                    		MOV.L 34H[R0], R1
+000004D0 6141                    		CMP #04H, R1
+000004D2 18                   S  		BNE L161
+000004D3                         L160:	; bb822
+000004D3 FBEE0A8608              		MOV.L #0008860AH, R14
+                                 ;     421             {
+                                 ;     422                 MTU.TOER.BIT.OE4C = 1; // Must also turn on Timer Output Master Enable Register for this channel.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",422
+000004D8 F0E4                    		BSET #04H, [R14].B
+000004DA                         L161:	; bb841
+                                 ;     423             }
+                                 ;     424             #endif
+                                 ;     425         }
+                                 ;     426 
+                                 ;     427         if((MTU_ACTION_INTERRUPT & pconfig->timer_c.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",427
+000004DA AB01                    		MOV.L 30H[R0], R1
+000004DC AA91                    		MOV.L 28H[R1], R1
+000004DE 7C11                    		BTST #01H, R1
+000004E0 21rr                    		BNE L166
+000004E2 2Err                 B  		BRA L165
+000004E4                         L162:	; bb842
+                                 ;     428           || (MTU_ACTION_CALLBACK & pconfig->timer_c.actions.do_action)) // Request an interrupt
+                                 ;     429         {
+                                 ;     430             g_mtu_tgi_icu_en_flags[channel][MTU_TIMER_C] = 1;            // Set a software control flag
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",430
+000004E4 AB09                    		MOV.L 34H[R0], R1
+000004E6 6C21                    		SHLL #02H, R1
+000004E8 FB22rrrrrrrr            		MOV.L #_g_mtu_tgi_icu_en_flags, R2
+000004EE 4B12                    		ADD R1, R2
+000004F0 3C2201                  		MOV.B #01H, 02H[R2]
+000004F3                         L163:	; bb842.split
+                                 ;     431 
+                                 ;     432             if (MTU_ACTION_CALLBACK & pconfig->timer_c.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",432
+000004F3 AB01                    		MOV.L 30H[R0], R1
+000004F5 AA91                    		MOV.L 28H[R1], R1
+000004F7 7C21                    		BTST #02H, R1
+000004F9 20rr                    		BEQ L169
+000004FB                         L164:	; bb848
+                                 ;     433             {
+                                 ;     434                  g_mtu_tgr_callbacks[channel][MTU_TIMER_C] = 1; // Do the callback for this interrupt.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",434
+000004FB AB09                    		MOV.L 34H[R0], R1
+000004FD 6C21                    		SHLL #02H, R1
+000004FF FB22rrrrrrrr            		MOV.L #_g_mtu_tgr_callbacks, R2
+00000505 4B12                    		ADD R1, R2
+00000507 3C2201                  		MOV.B #01H, 02H[R2]
+0000050A 2Err                 B  		BRA L169
+0000050C                         L165:	; bb871
+0000050C AB01                    		MOV.L 30H[R0], R1
+0000050E AA91                    		MOV.L 28H[R1], R1
+00000510 7C21                    		BTST #02H, R1
+00000512 10                   S  		BEQ L167
+00000513                         L166:	; bb880
+00000513 F80601                  		MOV.L #00000001H, [R0]
+00000516 08                   S  		BRA L168
+00000517                         L167:	; bb881
+00000517 F80600                  		MOV.L #00000000H, [R0]
+0000051A                         L168:	; bb882
+0000051A EC01                    		MOV.L [R0], R1
+0000051C 6101                    		CMP #00H, R1
+0000051E 21rr                    		BNE L162
+00000520                         L169:	; bb887
+                                 ;     435             }
+                                 ;     436         }
+                                 ;     437 
+                                 ;     438         *my_handle->regs.tier |= MTU_TGIEC;     // Always set interrupt enable bit in MTU register.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",438
+00000520 A881                    		MOV.L 08H[R0], R1
+00000522 A991                    		MOV.L 18H[R1], R1
+00000524 F012                    		BSET #02H, [R1].B
+00000526                         L170:	; bb887.split
+                                 ;     439 
+                                 ;     440         /* Set repeat mode if option selected and this TGR is clear source.*/
+                                 ;     441         if((MTU_ACTION_REPEAT & pconfig->timer_c.actions.do_action) && (MTU_CLR_TGRC == pconfig->clear_src))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",441
+00000526 AB01                    		MOV.L 30H[R0], R1
+00000528 AA91                    		MOV.L 28H[R1], R1
+0000052A 7C41                    		BTST #04H, R1
+0000052C 21rr                    		BNE L172
+0000052E 2Err                 B  		BRA L174
+00000530                         L171:	; bb897
+                                 ;     442         {
+                                 ;     443             g_mtu_channel_repeats[channel] = 1; // Continuous running
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",443
+00000530 AB09                    		MOV.L 34H[R0], R1
+00000532 FBE2rrrrrrrr            		MOV.L #_g_mtu_channel_repeats, R14
+00000538 661F                    		MOV.L #00000001H, R15
+0000053A FE0E1F                  		MOV.B R15, [R14,R1]
+0000053D 2Err                 B  		BRA L176
+0000053F                         L172:	; bb908
+0000053F AB01                    		MOV.L 30H[R0], R1
+00000541 A891                    		MOV.L 08H[R1], R1
+00000543 6121                    		CMP #02H, R1
+00000545 18                   S  		BNE L174
+00000546                         L173:	; bb914
+00000546 F80601                  		MOV.L #00000001H, [R0]
+00000549 08                   S  		BRA L175
+0000054A                         L174:	; bb915
+0000054A F80600                  		MOV.L #00000000H, [R0]
+0000054D                         L175:	; bb916
+0000054D EC01                    		MOV.L [R0], R1
+0000054F 6101                    		CMP #00H, R1
+00000551 21rr                    		BNE L171
+00000553                         L176:	; bb931
+                                 ;     444         }
+                                 ;     445     }
+                                 ;     446 
+                                 ;     447     if(MTU_ACTION_NONE != pconfig->timer_d.actions.do_action)    // MTU_ACTION_NONE means this timer event not used.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",447
+00000553 AB01                    		MOV.L 30H[R0], R1
+00000555 AB19                    		MOV.L 34H[R1], R1
+00000557 6101                    		CMP #00H, R1
+00000559 3Arrrr               W  		BEQ L205
+0000055C                         L177:	; bb933
+                                 ;     448     {
+                                 ;     449         if(MTU_CLK_SRC_INTERNAL ==  pconfig->clock_src.source)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",449
+0000055C AB01                    		MOV.L 30H[R0], R1
+0000055E EC1E                    		MOV.L [R1], R14
+00000560 615E                    		CMP #05H, R14
+00000562 21rr                    		BNE L183
+00000564                         L178:	; bb934
+                                 ;     450         {
+                                 ;     451             /* Set compare match register with the value calculated from requested frequency. */
+                                 ;     452             tgr_value = mtu_calc_tgr_ticks(pclk_divisor, pconfig->timer_d.freq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",452
+00000564 AB01                    		MOV.L 30H[R0], R1
+00000566 AB12                    		MOV.L 30H[R1], R2
+00000568 B989                    		MOVU.W 0EH[R0], R1
+0000056A 05rrrrrr             A  		BSR _mtu_calc_tgr_ticks
+0000056E 9209                    		MOV.W R1, 12H[R0]
+00000570                         L179:	; bb934.split
+                                 ;     453 
+                                 ;     454             if(0 != tgr_value)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",454
+00000570 BA09                    		MOVU.W 12H[R0], R1
+00000572 6101                    		CMP #00H, R1
+00000574 10                   S  		BEQ L181
+00000575                         L180:	; bb942
+                                 ;     455             {
+                                 ;     456                 *my_handle->regs.tgrd  = tgr_value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",456
+00000575 A881                    		MOV.L 08H[R0], R1
+00000577 AB19                    		MOV.L 34H[R1], R1
+00000579 D10109                  		MOV.W 12H[R0], [R1]
+0000057C 2Err                 B  		BRA L184
+0000057E                         L181:	; bb948
+                                 ;     457             }
+                                 ;     458             else
+                                 ;     459             {
+                                 ;     460                 #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     461                 R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",461
+0000057E AB09                    		MOV.L 34H[R0], R1
+00000580 71112E                  		ADD #2EH, R1
+00000583 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+00000587                         L182:	; bb948.split
+                                 ;     462                 #endif
+                                 ;     463                 return MTU_ERR_ARG_RANGE;     // Could not obtain requested frequency.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",463
+00000587 3E0106                  		MOV.L #00000006H, 04H[R0]
+0000058A 38rrrr               W  		BRA L210
+0000058D                         L183:	; bb959
+                                 ;     464             }
+                                 ;     465         }
+                                 ;     466         else
+                                 ;     467         {
+                                 ;     468             *my_handle->regs.tgrd  = pconfig->timer_d.freq; // External clock source. Use freq as direct TGR count.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",468
+0000058D AB01                    		MOV.L 30H[R0], R1
+0000058F AB11                    		MOV.L 30H[R1], R1
+00000591 A882                    		MOV.L 08H[R0], R2
+00000593 AB2A                    		MOV.L 34H[R2], R2
+00000595 D321                    		MOV.W R1, [R2]
+00000597                         L184:	; bb977
+                                 ;     469         }
+                                 ;     470 
+                                 ;     471         /* Set up actions to perform on compare match. */
+                                 ;     472         if(MTU_ACTION_OUTPUT & pconfig->timer_d.actions.do_action)    // Output to a pin
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",472
+00000597 AB01                    		MOV.L 30H[R0], R1
+00000599 AB19                    		MOV.L 34H[R1], R1
+0000059B 7C01                    		BTST #00H, R1
+0000059D 20rr                    		BEQ L190
+0000059F                         L185:	; bb978
+                                 ;     473         {
+                                 ;     474             *my_handle->regs.tiorl |=  (pconfig->timer_d.actions.output << 4); // Move bits to upper nibble
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",474
+0000059F AB01                    		MOV.L 30H[R0], R1
+000005A1 AB91                    		MOV.L 38H[R1], R1
+000005A3 6C41                    		SHLL #04H, R1
+000005A5 A882                    		MOV.L 08H[R0], R2
+000005A7 A92A                    		MOV.L 14H[R2], R2
+000005A9 5421                    		OR [R2].UB, R1
+000005AB C321                    		MOV.B R1, [R2]
+000005AD                         L186:	; bb978.split
+                                 ;     475 
+                                 ;     476             #ifndef BSP_MCU_RX110
+                                 ;     477             /* Must also turn on Timer Output Master Enable Register for these channels. */
+                                 ;     478             if (MTU_CHANNEL_3 == channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",478
+000005AD AB09                    		MOV.L 34H[R0], R1
+000005AF 6131                    		CMP #03H, R1
+000005B1 18                   S  		BNE L188
+000005B2                         L187:	; bb994
+000005B2 FBEE0A8608              		MOV.L #0008860AH, R14
+                                 ;     479             {
+                                 ;     480                 MTU.TOER.BIT.OE3D = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",480
+000005B7 F0E3                    		BSET #03H, [R14].B
+000005B9                         L188:	; bb1003
+                                 ;     481             }
+                                 ;     482             if (MTU_CHANNEL_4 == channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",482
+000005B9 AB09                    		MOV.L 34H[R0], R1
+000005BB 6141                    		CMP #04H, R1
+000005BD 18                   S  		BNE L190
+000005BE                         L189:	; bb1004
+000005BE FBEE0A8608              		MOV.L #0008860AH, R14
+                                 ;     483             {
+                                 ;     484                 MTU.TOER.BIT.OE4D = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",484
+000005C3 F0E5                    		BSET #05H, [R14].B
+000005C5                         L190:	; bb1023
+                                 ;     485             }
+                                 ;     486             #endif
+                                 ;     487         }
+                                 ;     488 
+                                 ;     489         if((MTU_ACTION_INTERRUPT & pconfig->timer_d.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",489
+000005C5 AB01                    		MOV.L 30H[R0], R1
+000005C7 AB19                    		MOV.L 34H[R1], R1
+000005C9 7C11                    		BTST #01H, R1
+000005CB 21rr                    		BNE L195
+000005CD 2Err                 B  		BRA L194
+000005CF                         L191:	; bb1024
+                                 ;     490           || (MTU_ACTION_CALLBACK & pconfig->timer_d.actions.do_action)) // Request an interrupt
+                                 ;     491         {
+                                 ;     492             g_mtu_tgi_icu_en_flags[channel][MTU_TIMER_D] = 1;            // Set a software control flag
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",492
+000005CF AB09                    		MOV.L 34H[R0], R1
+000005D1 6C21                    		SHLL #02H, R1
+000005D3 FB22rrrrrrrr            		MOV.L #_g_mtu_tgi_icu_en_flags, R2
+000005D9 4B12                    		ADD R1, R2
+000005DB 3C2301                  		MOV.B #01H, 03H[R2]
+000005DE                         L192:	; bb1024.split
+                                 ;     493 
+                                 ;     494             if (MTU_ACTION_CALLBACK & pconfig->timer_d.actions.do_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",494
+000005DE AB01                    		MOV.L 30H[R0], R1
+000005E0 AB19                    		MOV.L 34H[R1], R1
+000005E2 7C21                    		BTST #02H, R1
+000005E4 20rr                    		BEQ L198
+000005E6                         L193:	; bb1030
+                                 ;     495             {
+                                 ;     496                  g_mtu_tgr_callbacks[channel][MTU_TIMER_D] = 1;          // Do the callback for this interrupt.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",496
+000005E6 AB09                    		MOV.L 34H[R0], R1
+000005E8 6C21                    		SHLL #02H, R1
+000005EA FB22rrrrrrrr            		MOV.L #_g_mtu_tgr_callbacks, R2
+000005F0 4B12                    		ADD R1, R2
+000005F2 3C2301                  		MOV.B #01H, 03H[R2]
+000005F5 2Err                 B  		BRA L198
+000005F7                         L194:	; bb1053
+000005F7 AB01                    		MOV.L 30H[R0], R1
+000005F9 AB19                    		MOV.L 34H[R1], R1
+000005FB 7C21                    		BTST #02H, R1
+000005FD 10                   S  		BEQ L196
+000005FE                         L195:	; bb1062
+000005FE F80601                  		MOV.L #00000001H, [R0]
+00000601 08                   S  		BRA L197
+00000602                         L196:	; bb1063
+00000602 F80600                  		MOV.L #00000000H, [R0]
+00000605                         L197:	; bb1064
+00000605 EC01                    		MOV.L [R0], R1
+00000607 6101                    		CMP #00H, R1
+00000609 21rr                    		BNE L191
+0000060B                         L198:	; bb1069
+                                 ;     497             }
+                                 ;     498         }
+                                 ;     499 
+                                 ;     500         *my_handle->regs.tier |= MTU_TGIED;                 // Always set interrupt enable bit in MTU register.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",500
+0000060B A881                    		MOV.L 08H[R0], R1
+0000060D A991                    		MOV.L 18H[R1], R1
+0000060F F013                    		BSET #03H, [R1].B
+00000611                         L199:	; bb1069.split
+                                 ;     501 
+                                 ;     502         /* Set repeat mode if option selected and this TGR is clear source.*/
+                                 ;     503         if((MTU_ACTION_REPEAT & pconfig->timer_d.actions.do_action) && (MTU_CLR_TGRD == pconfig->clear_src))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",503
+00000611 AB01                    		MOV.L 30H[R0], R1
+00000613 AB19                    		MOV.L 34H[R1], R1
+00000615 7C41                    		BTST #04H, R1
+00000617 21rr                    		BNE L201
+00000619 2Err                 B  		BRA L203
+0000061B                         L200:	; bb1079
+                                 ;     504         {
+                                 ;     505             g_mtu_channel_repeats[channel] = 1;             // Continuous running
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",505
+0000061B AB09                    		MOV.L 34H[R0], R1
+0000061D FBE2rrrrrrrr            		MOV.L #_g_mtu_channel_repeats, R14
+00000623 661F                    		MOV.L #00000001H, R15
+00000625 FE0E1F                  		MOV.B R15, [R14,R1]
+00000628 2Err                 B  		BRA L205
+0000062A                         L201:	; bb1090
+0000062A AB01                    		MOV.L 30H[R0], R1
+0000062C A891                    		MOV.L 08H[R1], R1
+0000062E 6131                    		CMP #03H, R1
+00000630 18                   S  		BNE L203
+00000631                         L202:	; bb1096
+00000631 F80601                  		MOV.L #00000001H, [R0]
+00000634 08                   S  		BRA L204
+00000635                         L203:	; bb1097
+00000635 F80600                  		MOV.L #00000000H, [R0]
+00000638                         L204:	; bb1098
+00000638 EC01                    		MOV.L [R0], R1
+0000063A 6101                    		CMP #00H, R1
+0000063C 21rr                    		BNE L200
+0000063E                         L205:	; bb1112
+                                 ;     506         }
+                                 ;     507     }
+                                 ;     508 
+                                 ;     509     g_mtu_channel_mode[channel] = MTU_MODE_COMPARE_MATCH;   // Tag the channel is in use for compare match.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",509
+0000063E AB09                    		MOV.L 34H[R0], R1
+00000640 FBE2rrrrrrrr            		MOV.L #_g_mtu_channel_mode, R14
+00000646 661F                    		MOV.L #00000001H, R15
+00000648 FE0E1F                  		MOV.B R15, [R14,R1]
+0000064B                         L206:	; bb1112.split
+                                 ;     510     g_num_channels_in_use++;                                // Add this channel to the count.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",510
+0000064B FBE2rrrrrrrr            		MOV.L #_g_num_channels_in_use, R14
+00000651 58EF                    		MOVU.B [R14], R15
+00000653 621F                    		ADD #01H, R15
+00000655 C3EF                    		MOV.B R15, [R14]
+00000657                         L207:	; bb1112.split11
+                                 ;     511     *g_mtu_handles[channel]->p_callback = pcallback;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",511
+00000657 FBE2rrrrrrrr            		MOV.L #_g_mtu_handles, R14
+0000065D AB09                    		MOV.L 34H[R0], R1
+0000065F FE61EE                  		MOV.L [R1,R14], R14
+00000662 ECEE                    		MOV.L [R14], R14
+00000664 E10E0B                  		MOV.L 2CH[R0], [R14]
+00000667                         L208:	; bb1112.split12
+                                 ;     512 
+                                 ;     513     #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     514     R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",514
+00000667 AB09                    		MOV.L 34H[R0], R1
+00000669 71112E                  		ADD #2EH, R1
+0000066C 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+00000670                         L209:	; bb1112.split13
+                                 ;     515     #endif
+                                 ;     516 
+                                 ;     517     return MTU_SUCCESS;    // Ready to start count operation now with a start command.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",517
+00000670 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000673                         L210:	; bb1127
+00000673 A809                    		MOV.L 04H[R0], R1
+00000675 A281                    		MOV.L R1, 28H[R0]
+                                 ;     518 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_mtu_rx\src\r_mtu_timers_rx.c",518
+00000677 670E                    		RTSD #38H
+                                 ;     519 /* end of function R_MTU_Timer_Open(). */
+                                 ;     520 #endif
+                                 ;     521 
+                                 ;     522 
+                                 ;     523 #if MTU_CFG_USE_CAPTURE == 1
+                                 ;     524 /***********************************************************************************************************************
+                                 ;     525 * Function Name: R_MTU_Capture_Open
+                                 ;     526 * Description  : This function applies power to the MTU channel,
+                                 ;     527 *                initializes the associated registers,
+                                 ;     528 *                applies user-configurable options,
+                                 ;     529 *                and provides the channel handle for use with other API functions.
+                                 ;     530 * Arguments    : channel -
+                                 ;     531 *                   Number of the MTU channel to be initialized
+                                 ;     532 *                pconfig -
+                                 ;     533 *                   Pointer to MTU channel configuration data structure.
+                                 ;     534 *                pcallback -
+                                 ;     535 *                   Pointer to function called from interrupt
+                                 ;     536 * Return Value : MTU_SUCCESS-
+                                 ;     537 *                   Successful; channel initialized
+                                 ;     538 *                MTU_TIMERS_ERR_BAD_CHAN-
+                                 ;     539 *                   Channel number is invalid for part
+                                 ;     540 *                MTU_TIMERS_ERR_CH_NOT_CLOSED-
+                                 ;     541 *                   Channel currently in operation; Perform R_MTU_Close() first
+                                 ;     542 *                MTU_TIMERS_ERR_NULL_PTR-
+                                 ;     543 *                   pconfig pointer is NULL
+                                 ;     544 *                MTU_TIMERS_ERR_INVALID_ARG-
+                                 ;     545 *                   An element of the pconfig structure contains an invalid value.
+                                 ;     546 *                MTU_TIMERS_ERR_LOCK-
+                                 ;     547 *                      The lock could not be acquired. The channel is busy.
+                                 ;     548 ***********************************************************************************************************************/
+                                 ;     549 mtu_err_t   R_MTU_Capture_Open (mtu_channel_t                channel,
+                                 ;     550                                 mtu_capture_chnl_settings_t *pconfig,
+                                 ;     551                                 void                       (*pcallback)(void *pdata))
+                                 ;     552 {
+                                 ;     553     mtu_handle_t  my_handle;
+                                 ;     554     uint8_t tcr_bits = 0;
+                                 ;     555 
+                                 ;     556     #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     557     bool        lock_result = false;
+                                 ;     558     #endif
+                                 ;     559 
+                                 ;     560     #if MTU_CFG_PARAM_CHECKING_ENABLE == 1
+                                 ;     561     if (MTU_CHANNEL_MAX <= channel)           // First check for channel number out of range
+                                 ;     562     {
+                                 ;     563         return MTU_ERR_BAD_CHAN;
+                                 ;     564     }
+                                 ;     565 
+                                 ;     566     if (NULL == g_mtu_handles[channel])       // Now check that channel has been configured for build
+                                 ;     567     {
+                                 ;     568         return MTU_ERR_BAD_CHAN;
+                                 ;     569     }
+                                 ;     570 
+                                 ;     571     if (NULL == pconfig)
+                                 ;     572     {
+                                 ;     573         return MTU_ERR_NULL_PTR;
+                                 ;     574     }
+                                 ;     575 
+                                 ;     576     /* Check to see if the peripheral has already been initialized. */
+                                 ;     577     if (g_mtu_channel_mode[channel])
+                                 ;     578     {
+                                 ;     579         return MTU_ERR_CH_NOT_CLOSED;   // This channel has already been initialized.
+                                 ;     580     }
+                                 ;     581 
+                                 ;     582     if ((MTU_CHANNEL_1 == channel) || (MTU_CHANNEL_2 == channel))
+                                 ;     583     {
+                                 ;     584         if((MTU_ACTION_NONE != pconfig->capture_c.actions) && (MTU_ACTION_NONE != pconfig->capture_d.actions))
+                                 ;     585         {
+                                 ;     586             return MTU_ERR_INVALID_ARG; // Resource not present on these channels.
+                                 ;     587         }
+                                 ;     588     }
+                                 ;     589 
+                                 ;     590     /* Check counter clearing source for capture. */
+                                 ;     591     switch (pconfig->clear_src)
+                                 ;     592     {
+                                 ;     593         case MTU_CLR_DISABLED:
+                                 ;     594         case MTU_CLR_TGRA:
+                                 ;     595         case MTU_CLR_TGRB:
+                                 ;     596         case MTU_CLR_TGRC:
+                                 ;     597         case MTU_CLR_TGRD:
+                                 ;     598         case MTU_CLR_SYNC:
+                                 ;     599         {   /* Find the bits to set this in the table. Not all channels have this setting. */
+                                 ;     600             if(MTU_NOT_SUPP == g_chnl_clear_src[channel][pconfig->clear_src])
+                                 ;     601             {
+                                 ;     602              return MTU_ERR_INVALID_ARG; // Not supported by this channel
+                                 ;     603             }
+                                 ;     604         }
+                                 ;     605         break;
+                                 ;     606         default:
+                                 ;     607         {
+                                 ;     608             return MTU_ERR_INVALID_ARG;
+                                 ;     609         }
+                                 ;     610     }
+                                 ;     611     #endif // MTU_CFG_PARAM_CHECKING_ENABLE
+                                 ;     612 
+                                 ;     613     #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     614     /* Attempt to acquire lock for this MTU channel. Prevents reentrancy conflict. */
+                                 ;     615     lock_result = R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 ;     616 
+                                 ;     617     if(false == lock_result)
+                                 ;     618     {
+                                 ;     619         return MTU_ERR_LOCK; /* The R_MTU_Timer_Create function is currently locked. */
+                                 ;     620     }
+                                 ;     621     #endif
+                                 ;     622 
+                                 ;     623     my_handle = g_mtu_handles[channel];
+                                 ;     624 
+                                 ;     625     mtu_interrupts_disable(channel);
+                                 ;     626     mtu_interrupts_clear(channel);
+                                 ;     627     *my_handle->regs.ipr = my_handle->priority; // Set the priority register from config.h value.
+                                 ;     628 
+                                 ;     629     power_on_off(MTU_POWER_ON); // Make sure channel is powered on.
+                                 ;     630 
+                                 ;     631     mtu_channel_clear(channel);
+                                 ;     632 
+                                 ;     633     tcr_bits = g_chnl_clear_src[channel][pconfig->clear_src]; // Select counter clearing source for capture.
+                                 ;     634     g_mtu_channel_clr_src[channel] = pconfig->clear_src;      // Keep a global copy for ISRs.
+                                 ;     635 
+                                 ;     636     switch (pconfig->clock_src.source)    // Select counter clock source
+                                 ;     637     {
+                                 ;     638         case MTU_CLK_SRC_INTERNAL:
+                                 ;     639         {
+                                 ;     640             /* Only internal clock (PCLK) can be scaled with a divisor. */
+                                 ;     641             switch (pconfig->clock_div)
+                                 ;     642             {
+                                 ;     643                 case MTU_SRC_CLK_DIV_1:
+                                 ;     644                 case MTU_SRC_CLK_DIV_4:
+                                 ;     645                 case MTU_SRC_CLK_DIV_16:
+                                 ;     646                 case MTU_SRC_CLK_DIV_64:
+                                 ;     647                 case MTU_SRC_CLK_DIV_256:
+                                 ;     648                 case MTU_SRC_CLK_DIV_1024:
+                                 ;     649                 {
+                                 ;     650                     /* Find the bits to set this in the table. Not all channels have this setting. */
+                                 ;     651                     if(MTU_NOT_SUPP != g_chnl_clk_divs[channel][pconfig->clock_div])
+                                 ;     652                     {
+                                 ;     653                         /* Set the clock divisor. */
+                                 ;     654                         tcr_bits |= g_chnl_clk_divs[channel][pconfig->clock_div]; // Save divisor bits for later.
+                                 ;     655                     }
+                                 ;     656                     else
+                                 ;     657                     {
+                                 ;     658                         #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     659                         R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 ;     660                         #endif
+                                 ;     661                         return MTU_ERR_INVALID_ARG;
+                                 ;     662                     }
+                                 ;     663                 }
+                                 ;     664                 break;
+                                 ;     665                 default:
+                                 ;     666                 {
+                                 ;     667                     #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     668                     R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 ;     669                     #endif
+                                 ;     670                     return MTU_ERR_INVALID_ARG;
+                                 ;     671                 }
+                                 ;     672             }
+                                 ;     673         }
+                                 ;     674         break;
+                                 ;     675 
+                                 ;     676         case MTU_CLK_SRC_EXT_MTCLKA:
+                                 ;     677         case MTU_CLK_SRC_EXT_MTCLKB:
+                                 ;     678         case MTU_CLK_SRC_EXT_MTCLKC:
+                                 ;     679         case MTU_CLK_SRC_EXT_MTCLKD:
+                                 ;     680         case MTU_CLK_SRC_CASCADE:
+                                 ;     681         {   /* Find the bits to set this in the table. Not all channels have this setting. */
+                                 ;     682             if(MTU_NOT_SUPP != g_chnl_ext_clks[channel][pconfig->clock_src.source])
+                                 ;     683             {
+                                 ;     684                 tcr_bits |= g_chnl_ext_clks[channel][pconfig->clock_src.source];
+                                 ;     685             }
+                                 ;     686             else
+                                 ;     687             {
+                                 ;     688                 #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     689                 R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 ;     690                 #endif
+                                 ;     691                 return MTU_ERR_INVALID_ARG; // Not supported by this channel
+                                 ;     692             }
+                                 ;     693         }
+                                 ;     694         break;
+                                 ;     695 
+                                 ;     696         default:
+                                 ;     697         {
+                                 ;     698             #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     699             R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 ;     700             #endif
+                                 ;     701             return MTU_ERR_INVALID_ARG;
+                                 ;     702         }
+                                 ;     703     }
+                                 ;     704 
+                                 ;     705     tcr_bits |= pconfig->clock_src.clock_edge;      // Set clock active edge.
+                                 ;     706     *my_handle->regs.tcr = tcr_bits;                // Copy the completed setting to the TCR register.
+                                 ;     707     *my_handle->regs.nfcr = my_handle->filt_clk;    // Set the noise filter clock source.
+                                 ;     708 
+                                 ;     709     if(MTU_ACTION_CAPTURE & pconfig->capture_a.actions)
+                                 ;     710     {
+                                 ;     711         /* Set up capture pin edge parameters. */
+                                 ;     712         *my_handle->regs.tiorh |= pconfig->capture_a.capture_edge;  // Set bits in lower nibble
+                                 ;     713 
+                                 ;     714         /* Set up capture pin noise filter parameters. */
+                                 ;     715         if (true == pconfig->capture_a.filter_enable)
+                                 ;     716         {
+                                 ;     717             *my_handle->regs.nfcr |= MTU_FILT_EN_A;
+                                 ;     718         }
+                                 ;     719         else
+                                 ;     720         {
+                                 ;     721             *my_handle->regs.nfcr &= ~MTU_FILT_EN_A;
+                                 ;     722         }
+                                 ;     723 
+                                 ;     724         /* Set up actions to perform on capture event. */
+                                 ;     725         if((MTU_ACTION_INTERRUPT & pconfig->capture_a.actions)
+                                 ;     726           || (MTU_ACTION_CALLBACK & pconfig->capture_a.actions)) // Request an interrupt
+                                 ;     727         {
+                                 ;     728             g_mtu_tgi_icu_en_flags[channel][MTU_TIMER_A] = 1;  // Set a software control flag
+                                 ;     729 
+                                 ;     730             if (MTU_ACTION_CALLBACK & pconfig->capture_a.actions)
+                                 ;     731             {
+                                 ;     732                  g_mtu_tgr_callbacks[channel][MTU_TIMER_A] = 1; // Do the callback for this interrupt.
+                                 ;     733             }
+                                 ;     734         }
+                                 ;     735 
+                                 ;     736         if (MTU_ACTION_TRIGGER_ADC & pconfig->capture_a.actions)
+                                 ;     737         {
+                                 ;     738         	*my_handle->regs.tier |= MTU_ADC_TRIG;   // Set ADC TTGE trigger bit in MTU register.
+                                 ;     739         }
+                                 ;     740 
+                                 ;     741         *my_handle->regs.tier |= MTU_TGIEA;             // Always set interrupt enable bit in MTU register.
+                                 ;     742 
+                                 ;     743         /* Set repeat mode if option selected and this TGR is clear source.*/
+                                 ;     744         if((MTU_ACTION_REPEAT & pconfig->capture_a.actions) && (MTU_CLR_TGRA == pconfig->clear_src))
+                                 ;     745         {
+                                 ;     746             g_mtu_channel_repeats[channel] = 1;         // Continuous running
+                                 ;     747         }
+                                 ;     748     }
+                                 ;     749 
+                                 ;     750     if(MTU_ACTION_CAPTURE & pconfig->capture_b.actions)
+                                 ;     751     {
+                                 ;     752         /* Set up capture pin edge parameters. */
+                                 ;     753         *my_handle->regs.tiorh |=  (pconfig->capture_b.capture_edge << 4); // Move bits to upper nibble
+                                 ;     754 
+                                 ;     755         /* Set up capture pin noise filter parameters. */
+                                 ;     756         if (true == pconfig->capture_b.filter_enable)
+                                 ;     757         {
+                                 ;     758             *my_handle->regs.nfcr |= MTU_FILT_EN_B;
+                                 ;     759         }
+                                 ;     760         else
+                                 ;     761         {
+                                 ;     762             *my_handle->regs.nfcr &= ~MTU_FILT_EN_B;
+                                 ;     763         }
+                                 ;     764 
+                                 ;     765         if((MTU_ACTION_INTERRUPT & pconfig->capture_b.actions)
+                                 ;     766           || (MTU_ACTION_CALLBACK & pconfig->capture_b.actions)) // Request an interrupt
+                                 ;     767         {
+                                 ;     768             g_mtu_tgi_icu_en_flags[channel][MTU_TIMER_B] = 1;    // Set a software control flag
+                                 ;     769 
+                                 ;     770             if (MTU_ACTION_CALLBACK & pconfig->capture_b.actions)
+                                 ;     771             {
+                                 ;     772                  g_mtu_tgr_callbacks[channel][MTU_TIMER_B] = 1;  // Do the callback for this interrupt.
+                                 ;     773             }
+                                 ;     774         }
+                                 ;     775 
+                                 ;     776         *my_handle->regs.tier |= MTU_TGIEB;             // Always set interrupt enable bit in MTU register.
+                                 ;     777 
+                                 ;     778         /* Set repeat mode if option selected and this TGR is clear source.*/
+                                 ;     779         if((MTU_ACTION_REPEAT & pconfig->capture_b.actions) && (MTU_CLR_TGRB == pconfig->clear_src))
+                                 ;     780         {
+                                 ;     781             g_mtu_channel_repeats[channel] = 1;         // Continuous running
+                                 ;     782         }
+                                 ;     783     }
+                                 ;     784 
+                                 ;     785     if(MTU_ACTION_CAPTURE & pconfig->capture_c.actions) // Non-zero value means use this timer TGR. Zero means not used.
+                                 ;     786     {
+                                 ;     787         /* Set up capture pin edge parameters. */
+                                 ;     788         *my_handle->regs.tiorl |= pconfig->capture_c.capture_edge;  // Set bits in lower nibble
+                                 ;     789 
+                                 ;     790         /* Set up capture pin noise filter parameters. */
+                                 ;     791         if (true == pconfig->capture_c.filter_enable)
+                                 ;     792         {
+                                 ;     793             *my_handle->regs.nfcr |= MTU_FILT_EN_C;
+                                 ;     794         }
+                                 ;     795         else
+                                 ;     796         {
+                                 ;     797             *my_handle->regs.nfcr &= ~MTU_FILT_EN_C;
+                                 ;     798         }
+                                 ;     799 
+                                 ;     800         if((MTU_ACTION_INTERRUPT & pconfig->capture_c.actions)
+                                 ;     801           || (MTU_ACTION_CALLBACK & pconfig->capture_c.actions)) // Request an interrupt
+                                 ;     802         {
+                                 ;     803             g_mtu_tgi_icu_en_flags[channel][MTU_TIMER_C] = 1;  // Set a software control flag
+                                 ;     804 
+                                 ;     805             if (MTU_ACTION_CALLBACK & pconfig->capture_c.actions)
+                                 ;     806             {
+                                 ;     807                  g_mtu_tgr_callbacks[channel][MTU_TIMER_C] = 1; // Do the callback for this interrupt.
+                                 ;     808             }
+                                 ;     809         }
+                                 ;     810 
+                                 ;     811         *my_handle->regs.tier |= MTU_TGIEC;                // Always set interrupt enable bit in MTU register.
+                                 ;     812 
+                                 ;     813         /* Set repeat mode if option selected and this TGR is clear source.*/
+                                 ;     814         if((MTU_ACTION_REPEAT & pconfig->capture_c.actions) && (MTU_CLR_TGRC == pconfig->clear_src))
+                                 ;     815         {
+                                 ;     816             g_mtu_channel_repeats[channel] = 1;            // Continuous running
+                                 ;     817         }
+                                 ;     818     }
+                                 ;     819 
+                                 ;     820     if(MTU_ACTION_CAPTURE & pconfig->capture_d.actions)    // Non-zero value = use this timer TGR. Zero = not used.
+                                 ;     821     {
+                                 ;     822         /* Set up capture pin edge parameters. */
+                                 ;     823         *my_handle->regs.tiorl &= 0x0F;                                   // First clear the upper nibble.
+                                 ;     824         *my_handle->regs.tiorl |= (pconfig->capture_d.capture_edge << 4); // Move bits to upper nibble
+                                 ;     825 
+                                 ;     826         /* Set up capture pin noise filter parameters. */
+                                 ;     827         if (true == pconfig->capture_d.filter_enable)
+                                 ;     828         {
+                                 ;     829             *my_handle->regs.nfcr |= MTU_FILT_EN_D;
+                                 ;     830         }
+                                 ;     831         else
+                                 ;     832         {
+                                 ;     833             *my_handle->regs.nfcr &= ~MTU_FILT_EN_D;
+                                 ;     834         }
+                                 ;     835 
+                                 ;     836         if((MTU_ACTION_INTERRUPT & pconfig->capture_d.actions)
+                                 ;     837           || (MTU_ACTION_CALLBACK & pconfig->capture_d.actions)) // Request an interrupt
+                                 ;     838         {
+                                 ;     839             g_mtu_tgi_icu_en_flags[channel][MTU_TIMER_D] = 1;    // Set a software control flag
+                                 ;     840 
+                                 ;     841             if (MTU_ACTION_CALLBACK & pconfig->capture_d.actions)
+                                 ;     842             {
+                                 ;     843                  g_mtu_tgr_callbacks[channel][MTU_TIMER_D] = 1;  // Do the callback for this interrupt.
+                                 ;     844             }
+                                 ;     845         }
+                                 ;     846 
+                                 ;     847         *my_handle->regs.tier |= MTU_TGIED;             // Always set interrupt enable bit in MTU register.
+                                 ;     848 
+                                 ;     849         /* Set repeat mode if option selected and this TGR is clear source.*/
+                                 ;     850         if((MTU_ACTION_REPEAT & pconfig->capture_d.actions) && (MTU_CLR_TGRD == pconfig->clear_src))
+                                 ;     851         {
+                                 ;     852             g_mtu_channel_repeats[channel] = 1;             // Continuous running
+                                 ;     853         }
+                                 ;     854     }
+                                 ;     855 
+                                 ;     856     g_mtu_channel_mode[channel] = MTU_MODE_INPUT_CAPTURE;   // Tag the channel is in use for input capture.
+                                 ;     857     g_num_channels_in_use++;                                // Add this channel to the count.
+                                 ;     858     *g_mtu_handles[channel]->p_callback = pcallback;
+                                 ;     859 
+                                 ;     860     #if MTU_CFG_REQUIRE_LOCK == 1
+                                 ;     861     R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_MTU0 + channel));
+                                 ;     862     #endif
+                                 ;     863 
+                                 ;     864     return MTU_SUCCESS;     // Ready to start capture operation now.
+                                 ;     865 }
+                                 ;     866 #endif
+                                 ;     867 /* end of function R_MTU_Capture_Open(). */
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01962   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001657(00000679H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx7E87\$ccrx\r_mtu_timers_rx.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\r_mtu_timers_rx.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\r_mtu_rx\src\r_mtu_timers_rx.obj

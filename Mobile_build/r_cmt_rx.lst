@@ -1,0 +1,1915 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:54:37 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:54:37
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_cmt_rx.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_cmt_rx.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;r_cmt_rx.c
+                                 
+                                 		.glb	_R_CMT_CreatePeriodic
+                                 		.glb	_R_CMT_CreateOneShot
+                                 		.glb	_R_CMT_Stop
+                                 		.glb	_R_BSP_HardwareUnlock
+                                 		.glb	_R_CMT_Control
+                                 		.glb	_R_BSP_HardwareLock
+                                 		.glb	_R_BSP_RegisterProtectDisable
+                                 		.glb	_R_BSP_RegisterProtectEnable
+                                 		.glb	_R_CMT_GetVersion
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _R_CMT_CreatePeriodic:
+                                 		.STACK	_R_CMT_CreatePeriodic=20
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2013, 2014 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_cmt_rx.c
+                                 ;      21 * Description  : This module creates timer ticks using CMT channels or one-shot events based on period in uS. 
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 06.11.2013 2.10    First GSCE Release.
+                                 ;      26 *         : 11.03.2014 2.20    Added support for RX110.
+                                 ;      27 *                              Fixes bug in R_CMT_Control CMT_RX_CMD_GET_NUM_CHANNELS command.
+                                 ;      28 *         : 22.04.2014 2.30    Added support for RX64M.
+                                 ;      29 *         : 10.11.2014 2.40    Added support for RX113M.
+                                 ;      30 ***********************************************************************************************************************/
+                                 ;      31 
+                                 ;      32 /***********************************************************************************************************************
+                                 ;      33 Includes   <System Includes> , "Project Includes"
+                                 ;      34 ***********************************************************************************************************************/
+                                 ;      35 #include "platform.h"
+                                 ;      36 /* Configuration for this package. */
+                                 ;      37 #include "r_cmt_rx_config.h"
+                                 ;      38 /* Header file for this package. */
+                                 ;      39 #include "r_cmt_rx_if.h"
+                                 ;      40 
+                                 ;      41 /***********************************************************************************************************************
+                                 ;      42 Macro definitions
+                                 ;      43 ***********************************************************************************************************************/
+                                 ;      44 /* Define the number of CMT channels based on MCU type. */
+                                 ;      45 #if defined(BSP_MCU_RX62_ALL) ||  defined(BSP_MCU_RX63_ALL) || defined(BSP_MCU_RX21_ALL) || \
+                                 ;      46     defined(BSP_MCU_RX61_ALL) || defined(BSP_MCU_RX64_ALL)  || defined(BSP_MCU_RX113)
+                                 ;      47     #define CMT_RX_NUM_CHANNELS        (4)
+                                 ;      48 #elif defined(BSP_MCU_RX111) || defined(BSP_MCU_RX110)
+                                 ;      49     #define CMT_RX_NUM_CHANNELS        (2)
+                                 ;      50 #else
+                                 ;      51     #error "Error! Number of channels for this MCU is not defined in r_cmt_rx.c"
+                                 ;      52 #endif
+                                 ;      53 
+                                 ;      54 /* Max number of ticks for counter without overflowing/underflowing. */
+                                 ;      55 #define CMT_RX_MAX_TIMER_TICKS         (0x10000)
+                                 ;      56 
+                                 ;      57 /* Starting with RX63x MCUs, there are 2 peripheral clocks: PCLKA and PCLKB. PCLKA is only used by the Ethernet block.
+                                 ;      58    This means that PCLKB would match functionality of PCLK in RX62x devices as far as the CMT is concerned. PCLKB is 
+                                 ;      59    used for the CMT on RX210 MCUs too. */
+                                 ;      60 #if defined(BSP_MCU_RX63_ALL) || defined(BSP_MCU_RX21_ALL) || defined(BSP_MCU_RX11_ALL) || defined(BSP_MCU_RX64_ALL) || \
+                                 ;      61 	defined(BSP_MCU_RX113)
+                                 ;      62     #define CMT_PCLK_HZ                 (BSP_PCLKB_HZ)
+                                 ;      63 #else
+                                 ;      64     #define CMT_PCLK_HZ                 (BSP_PCLK_HZ)
+                                 ;      65 #endif
+                                 ;      66 
+                                 ;      67 /* Which MCUs have register protection. */
+                                 ;      68 #if defined(BSP_MCU_RX21_ALL) || defined(BSP_MCU_RX63_ALL) || defined(BSP_MCU_RX11_ALL) || defined(BSP_MCU_RX64_ALL)
+                                 ;      69     #define CMT_REG_PROTECT             (1)
+                                 ;      70 #else
+                                 ;      71     #define CMT_REG_PROTECT             (0)
+                                 ;      72 #endif
+                                 ;      73 
+                                 ;      74 
+                                 ;      75 /***********************************************************************************************************************
+                                 ;      76 Typedef definitions
+                                 ;      77 ***********************************************************************************************************************/
+                                 ;      78 /* Enum for current mode of CMT channel. */
+                                 ;      79 typedef enum
+                                 ;      80 {
+                                 ;      81     CMT_RX_MODE_DISABLED = 0,
+                                 ;      82     CMT_RX_MODE_PERIODIC,
+                                 ;      83     CMT_RX_MODE_ONE_SHOT
+                                 ;      84 } cmt_modes_t;
+                                 ;      85 
+                                 ;      86 /***********************************************************************************************************************
+                                 ;      87 Private global variables and functions
+                                 ;      88 ***********************************************************************************************************************/
+                                 ;      89 /* Used to prevent having duplicate code for each channel. This only works if the channels are identical (just at 
+                                 ;      90    different locations in memory). This is easy to tell by looking in iodefine.h and seeing if the same structure
+                                 ;      91    was used for all channels. */
+                                 ;      92 static volatile struct st_cmt0 __evenaccess * const g_cmt_channels[CMT_RX_NUM_CHANNELS] =
+                                 ;      93 {
+                                 ;      94 /* Currently all RX MCUs have either 2 or 4 CMT channels. */
+                                 ;      95 #if   CMT_RX_NUM_CHANNELS == 4
+                                 ;      96     &CMT0, &CMT1, &CMT2, &CMT3
+                                 ;      97 #elif CMT_RX_NUM_CHANNELS == 2
+                                 ;      98     &CMT0, &CMT1
+                                 ;      99 #else
+                                 ;     100     #error "Error! r_cmt_rx is not setup for this many CMT channels. Please refer to g_cmt_channels[] in r_cmt_rx.c"
+                                 ;     101 #endif
+                                 ;     102 };
+                                 ;     103 
+                                 ;     104 /* Holds current mode of each CMT channel. */
+                                 ;     105 static cmt_modes_t g_cmt_modes[CMT_RX_NUM_CHANNELS];
+                                 ;     106 
+                                 ;     107 /* This array holds the available clock dividers. For example, if PCLK/8 is available, then '8' would be an entry.
+                                 ;     108    Note that the index of the divider in the array should correspond to the bit setting used for the CKS[1:0] bitfield.
+                                 ;     109    For example, 128 is at index 2 in the array and to choose PCLK/128 in the CMCR register you would set the CKS[1:0] 
+                                 ;     110    bitfield to 2. */
+                                 ;     111 static const uint32_t g_cmt_clock_dividers[] = { 8, 32, 128, 512 };
+                                 ;     112 
+                                 ;     113 /* Array that holds user's callback functions. */
+                                 ;     114 static void  (* g_cmt_callbacks[CMT_RX_NUM_CHANNELS])(void * pdata);
+                                 ;     115 
+                                 ;     116 /* Internal functions. */
+                                 ;     117 static bool cmt_lock_state(void);
+                                 ;     118 static void cmt_unlock_state(void);
+                                 ;     119 static bool cmt_find_channel(uint32_t * channel);
+                                 ;     120 static void power_on(uint32_t channel);
+                                 ;     121 static void power_off(uint32_t channel);
+                                 ;     122 static void cmt_counter_start(uint32_t channel);
+                                 ;     123 static void cmt_counter_stop(uint32_t channel);
+                                 ;     124 static bool cmt_setup_channel(uint32_t channel, uint32_t frequency_hz);
+                                 ;     125 static void cmt_isr_common(uint32_t channel);
+                                 ;     126 static bool cmt_create(uint32_t frequency_hz, void (* callback)(void * pdata), cmt_modes_t mode, uint32_t * channel);
+                                 ;     127 
+                                 ;     128 /***********************************************************************************************************************
+                                 ;     129 * Function Name: R_CMT_CreatePeriodic
+                                 ;     130 * Description  : Sets up a CMT channel and calls a callback function at a set frequency.
+                                 ;     131 * Arguments    : frequency_hz -
+                                 ;     132 *                    Frequency in Hz of how often to call the callback function.
+                                 ;     133 *                callback -
+                                 ;     134 *                    Which function to call when timer expires. If you wish to use R_CMT_Control() to check the status 
+                                 ;     135 *                    of a channel instead of using a callback then use FIT_NO_FUNC for this parameter.
+                                 ;     136 *                channel -
+                                 ;     137 *                    Pointer of where to store which channel was used.
+                                 ;     138 * Return Value : true - 
+                                 ;     139 *                    Channel initialized successfully.
+                                 ;     140 *                false -
+                                 ;     141 *                    Invalid channel or frequency could not be used.
+                                 ;     142 ***********************************************************************************************************************/
+                                 ;     143 bool R_CMT_CreatePeriodic (uint32_t frequency_hz, void (* callback)(void * pdata), uint32_t * channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",143
+00000000 7100F0                  		ADD #0FFFFFFF0H, R0
+00000003 EF34                    		MOV.L R3, R4
+00000005 A089                    		MOV.L R1, 0CH[R0]
+00000007 A082                    		MOV.L R2, 08H[R0]
+00000009 A00C                    		MOV.L R4, 04H[R0]
+                                 ;     144 {
+                                 ;     145     return cmt_create(frequency_hz, callback, CMT_RX_MODE_PERIODIC, channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",145
+0000000B A882                    		MOV.L 08H[R0], R2
+0000000D A889                    		MOV.L 0CH[R0], R1
+0000000F 6613                    		MOV.L #00000001H, R3
+00000011 39rrrr               W  		BSR __$cmt_create
+00000014 8089                    		MOV.B R1, 03H[R0]
+00000016 B089                    		MOVU.B 03H[R0], R1
+00000018                         L11:	; entry.split
+                                 ;     146 } 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",146
+00000018 5B11                    		MOVU.B R1, R1
+0000001A 6704                    		RTSD #10H
+0000001C                         _R_CMT_CreateOneShot:
+                                 		.STACK	_R_CMT_CreateOneShot=20
+                                 ;     147 
+                                 ;     148 /***********************************************************************************************************************
+                                 ;     149 * Function Name: R_CMT_CreateOneShot
+                                 ;     150 * Description  : Sets up a CMT channel and calls a callback function once after a user-defined amount of time.
+                                 ;     151 * Arguments    : period_us -
+                                 ;     152 *                    How long until compare match occurs. Unit is microseconds.
+                                 ;     153 *                callback -
+                                 ;     154 *                    Which function to call when timer expires. If you wish to use R_CMT_Control() to check the status 
+                                 ;     155 *                    of a channel instead of using a callback then use FIT_NO_FUNC for this parameter.
+                                 ;     156 *                channel -
+                                 ;     157 *                    Pointer of where to store which channel was used.
+                                 ;     158 * Return Value : true - 
+                                 ;     159 *                    Channel initialized successfully.
+                                 ;     160 *                false -
+                                 ;     161 *                    Invalid channel or period could not be used.
+                                 ;     162 ***********************************************************************************************************************/
+                                 ;     163 bool R_CMT_CreateOneShot (uint32_t period_us, void (* callback)(void * pdata), uint32_t * channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",163
+0000001C 7100F0                  		ADD #0FFFFFFF0H, R0
+0000001F EF34                    		MOV.L R3, R4
+00000021 A089                    		MOV.L R1, 0CH[R0]
+00000023 A082                    		MOV.L R2, 08H[R0]
+00000025 A00C                    		MOV.L R4, 04H[R0]
+00000027 FB1E40420F              		MOV.L #000F4240H, R1
+                                 ;     164 {    
+                                 ;     165     return cmt_create((1000000/period_us), callback, CMT_RX_MODE_ONE_SHOT, channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",165
+0000002C 06A1090103              		DIVU 0CH[R0].L, R1
+00000031 A882                    		MOV.L 08H[R0], R2
+00000033 6623                    		MOV.L #00000002H, R3
+00000035 39rrrr               W  		BSR __$cmt_create
+00000038 8089                    		MOV.B R1, 03H[R0]
+0000003A B089                    		MOVU.B 03H[R0], R1
+0000003C                         L13:	; entry.split
+                                 ;     166 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",166
+0000003C 5B11                    		MOVU.B R1, R1
+0000003E 6704                    		RTSD #10H
+00000040                         _R_CMT_Stop:
+                                 		.STACK	_R_CMT_Stop=12
+                                 ;     167 
+                                 ;     168 /***********************************************************************************************************************
+                                 ;     169 * Function Name: R_CMT_Stop
+                                 ;     170 * Description  : Stop a counter and puts it in module stop state to conserve power.
+                                 ;     171 * Arguments    : channel - 
+                                 ;     172 *                    Which channel to use.
+                                 ;     173 * Return Value : true - 
+                                 ;     174 *                    Counter stopped.
+                                 ;     175 *                false -
+                                 ;     176 *                    Could not obtain lock to control CMT. Try again later. 
+                                 ;     177 ***********************************************************************************************************************/
+                                 ;     178 bool R_CMT_Stop (uint32_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",178
+00000040 6080                    		SUB #08H, R0
+00000042 A009                    		MOV.L R1, 04H[R0]
+                                 ;     179 {
+                                 ;     180     /* Make sure valid channel number was input. */
+                                 ;     181     if (channel >= CMT_RX_NUM_CHANNELS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",181
+00000044 6141                    		CMP #04H, R1
+00000046 23rr                    		BLTU L16
+00000048                         L15:	; bb2
+                                 ;     182     {
+                                 ;     183         /* Invalid channel number was used. */
+                                 ;     184         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",184
+00000048 3C0200                  		MOV.B #00H, 02H[R0]
+0000004B 2Err                 B  		BRA L21
+0000004D                         L16:	; bb7
+                                 ;     185     }
+                                 ;     186 
+                                 ;     187     /* Stop counter. */
+                                 ;     188     cmt_counter_stop(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",188
+0000004D A809                    		MOV.L 04H[R0], R1
+0000004F 39rrrr               W  		BSR __$cmt_counter_stop
+00000052                         L17:	; bb7.split
+                                 ;     189 
+                                 ;     190     /* Turn off power to channel. */
+                                 ;     191     power_off(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",191
+00000052 A809                    		MOV.L 04H[R0], R1
+00000054 39rrrr               W  		BSR __$power_off
+00000057                         L18:	; bb7.split1
+                                 ;     192 
+                                 ;     193     /* Set mode to disabled. */
+                                 ;     194     g_cmt_modes[channel] = CMT_RX_MODE_DISABLED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",194
+00000057 A809                    		MOV.L 04H[R0], R1
+00000059 FBE2rrrrrrrr            		MOV.L #__$g_cmt_modes, R14
+0000005F 660F                    		MOV.L #00000000H, R15
+00000061 FE21EF                  		MOV.L R15, [R1,R14]
+00000064                         L19:	; bb7.split2
+                                 ;     195 
+                                 ;     196     /* Set channel as available. */
+                                 ;     197     R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_CMT0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",197
+00000064 A809                    		MOV.L 04H[R0], R1
+00000066 6261                    		ADD #06H, R1
+00000068 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+0000006C                         L20:	; bb7.split3
+                                 ;     198 
+                                 ;     199     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",199
+0000006C 3C0201                  		MOV.B #01H, 02H[R0]
+0000006F                         L21:	; bb16
+0000006F C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     200 } 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",200
+00000073 B089                    		MOVU.B 03H[R0], R1
+00000075 6702                    		RTSD #08H
+00000077                         _R_CMT_Control:
+                                 		.STACK	_R_CMT_Control=20
+                                 ;     201 
+                                 ;     202 /***********************************************************************************************************************
+                                 ;     203 * Function Name: R_CMT_Control
+                                 ;     204 * Description  : Handles minor functions of this module.
+                                 ;     205 * Arguments    : channel - 
+                                 ;     206 *                    Which channel is being referenced. If not channel is needed input CMT_RX_NO_CHANNEL.
+                                 ;     207 *                command -
+                                 ;     208 *                    What command is being input.
+                                 ;     209 *                pdata - 
+                                 ;     210 *                    Pointer to data to be input or filled in if needed.
+                                 ;     211 * Return Value : true - 
+                                 ;     212 *                    Command completed successfully.
+                                 ;     213 *                false -
+                                 ;     214 *                    Invalid command. 
+                                 ;     215 ***********************************************************************************************************************/
+                                 ;     216 bool R_CMT_Control (uint32_t channel, cmt_commands_t command, void * pdata)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",216
+00000077 7100F0                  		ADD #0FFFFFFF0H, R0
+0000007A A089                    		MOV.L R1, 0CH[R0]
+0000007C A082                    		MOV.L R2, 08H[R0]
+0000007E A00B                    		MOV.L R3, 04H[R0]
+                                 ;     217 {
+                                 ;     218     bool ret = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",218
+00000080 3C0201                  		MOV.B #01H, 02H[R0]
+00000083                         L23:	; entry.split
+                                 ;     219 
+                                 ;     220     /* Process command that was input. */
+                                 ;     221     switch (command)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",221
+00000083 A881                    		MOV.L 08H[R0], R1
+00000085 6141                    		CMP #04H, R1
+00000087 20rr                    		BEQ L32
+00000089                         L24:	; entry.split
+00000089 6111                    		CMP #01H, R1
+0000008B 20rr                    		BEQ L33
+0000008D                         L25:	; entry.split
+0000008D 711EFE                  		ADD #0FFFFFFFEH, R1, R14
+00000090 612E                    		CMP #02H, R14
+00000092 22rr                  * 		BLTU L43
+         38rrrr                  
+00000097                         L26:	; entry.split
+00000097 6101                    		CMP #00H, R1
+00000099 3Brrrr               W  		BNE L55
+0000009C                         L27:	; bb6
+                                 ;     222     {
+                                 ;     223         case CMT_RX_CMD_IS_CHANNEL_COUNTING:
+                                 ;     224             /* Check input channel. */
+                                 ;     225             if (channel < CMT_RX_NUM_CHANNELS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",225
+0000009C A889                    		MOV.L 0CH[R0], R1
+0000009E 6131                    		CMP #03H, R1
+000000A0 24rr                    		BGTU L31
+000000A2                         L28:	; bb8
+                                 ;     226             {
+                                 ;     227                 /* Valid channel input. Is this channel currently counting? */
+                                 ;     228                 if (CMT_RX_MODE_DISABLED == g_cmt_modes[channel])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",228
+000000A2 FBE2rrrrrrrr            		MOV.L #__$g_cmt_modes, R14
+000000A8 A889                    		MOV.L 0CH[R0], R1
+000000AA FE61EE                  		MOV.L [R1,R14], R14
+000000AD 610E                    		CMP #00H, R14
+000000AF A809                    		MOV.L 04H[R0], R1
+000000B1 18                   S  		BNE L30
+000000B2                         L29:	; bb9
+                                 ;     229                 {
+                                 ;     230                     *(bool *)pdata = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",230
+000000B2 F81400                  		MOV.B #00H, [R1]
+000000B5 38rrrr               W  		BRA L56
+000000B8                         L30:	; bb11
+                                 ;     231                 }
+                                 ;     232                 else
+                                 ;     233                 {
+                                 ;     234                     *(bool *)pdata = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",234
+000000B8 F81401                  		MOV.B #01H, [R1]
+000000BB 38rrrr               W  		BRA L56
+000000BE                         L31:	; bb19
+                                 ;     235                 }
+                                 ;     236             }
+                                 ;     237             else
+                                 ;     238             {
+                                 ;     239                 ret = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",239
+000000BE 3C0200                  		MOV.B #00H, 02H[R0]
+000000C1 38rrrr               W  		BRA L56
+000000C4                         L32:	; bb25
+                                 ;     240             }
+                                 ;     241         break;
+                                 ;     242 
+                                 ;     243         case CMT_RX_CMD_GET_NUM_CHANNELS:
+                                 ;     244             *(uint32_t *)pdata = CMT_RX_NUM_CHANNELS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",244
+000000C4 A809                    		MOV.L 04H[R0], R1
+000000C6 F81604                  		MOV.L #00000004H, [R1]
+000000C9 38rrrr               W  		BRA L56
+000000CC                         L33:	; bb29
+                                 ;     245         break;
+                                 ;     246 
+                                 ;     247         case CMT_RX_CMD_PAUSE:
+                                 ;     248 
+                                 ;     249             if (channel < CMT_RX_NUM_CHANNELS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",249
+000000CC A889                    		MOV.L 0CH[R0], R1
+000000CE 6131                    		CMP #03H, R1
+000000D0 25rr                  * 		BGTU L56
+         38rrrr                  
+000000D5                         L34:	; bb31
+                                 ;     250             {
+                                 ;     251                 /* Valid channel input. Is this channel currently counting? */
+                                 ;     252                 if (CMT_RX_MODE_DISABLED != g_cmt_modes[channel])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",252
+000000D5 FBE2rrrrrrrr            		MOV.L #__$g_cmt_modes, R14
+000000DB A889                    		MOV.L 0CH[R0], R1
+000000DD FE61EE                  		MOV.L [R1,R14], R14
+000000E0 610E                    		CMP #00H, R14
+000000E2 3Arrrr               W  		BEQ L56
+000000E5                         L35:	; bb32
+                                 ;     253                 {
+                                 ;     254 
+                                 ;     255                     switch (channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",255
+000000E5 A889                    		MOV.L 0CH[R0], R1
+000000E7 6131                    		CMP #03H, R1
+000000E9 20rr                    		BEQ L42
+000000EB                         L36:	; bb32
+000000EB 6111                    		CMP #01H, R1
+000000ED 20rr                    		BEQ L40
+000000EF                         L37:	; bb32
+000000EF 6121                    		CMP #02H, R1
+000000F1 20rr                    		BEQ L41
+000000F3                         L38:	; bb32
+000000F3 6101                    		CMP #00H, R1
+000000F5 3Brrrr               W  		BNE L56
+000000F8                         L39:	; bb34
+000000F8 FBEE008008              		MOV.L #00088000H, R14
+                                 ;     256                     {
+                                 ;     257                         case 0:
+                                 ;     258                             CMT.CMSTR0.BIT.STR0 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",258
+000000FD 5CEF                    		MOVU.W [R14], R15
+000000FF 772FFEFF00              		AND #0FFFEH, R15
+00000104 D3EF                    		MOV.W R15, [R14]
+00000106 38rrrr               W  		BRA L56
+00000109                         L40:	; bb38
+00000109 FBEE008008              		MOV.L #00088000H, R14
+                                 ;     259                         break;
+                                 ;     260                         case 1:
+                                 ;     261                             CMT.CMSTR0.BIT.STR1 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",261
+0000010E 5CEF                    		MOVU.W [R14], R15
+00000110 772FFDFF00              		AND #0FFFDH, R15
+00000115 D3EF                    		MOV.W R15, [R14]
+00000117 38rrrr               W  		BRA L56
+0000011A                         L41:	; bb42
+0000011A FBEE108008              		MOV.L #00088010H, R14
+                                 ;     262                         break;
+                                 ;     263 
+                                 ;     264                         #if   CMT_RX_NUM_CHANNELS == 4
+                                 ;     265                         case 2:
+                                 ;     266                             CMT.CMSTR1.BIT.STR2 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",266
+0000011F 5CEF                    		MOVU.W [R14], R15
+00000121 772FFEFF00              		AND #0FFFEH, R15
+00000126 D3EF                    		MOV.W R15, [R14]
+00000128 38rrrr               W  		BRA L56
+0000012B                         L42:	; bb46
+0000012B FBEE108008              		MOV.L #00088010H, R14
+                                 ;     267                         break;
+                                 ;     268                         case 3:
+                                 ;     269                             CMT.CMSTR1.BIT.STR3 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",269
+00000130 5CEF                    		MOVU.W [R14], R15
+00000132 772FFDFF00              		AND #0FFFDH, R15
+00000137 D3EF                    		MOV.W R15, [R14]
+00000139 2Err                 B  		BRA L56
+0000013B                         L43:	; bb65
+                                 ;     270                         break;
+                                 ;     271                         #endif
+                                 ;     272 
+                                 ;     273                         default:
+                                 ;     274                         break;
+                                 ;     275                     }
+                                 ;     276                 }
+                                 ;     277             }
+                                 ;     278             break;
+                                 ;     279 
+                                 ;     280 
+                                 ;     281         /* Both restart and resume do the same thing, except restart zeros the counter first */ 
+                                 ;     282         case CMT_RX_CMD_RESTART:
+                                 ;     283         case CMT_RX_CMD_RESUME:
+                                 ;     284             if (channel < CMT_RX_NUM_CHANNELS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",284
+0000013B A889                    		MOV.L 0CH[R0], R1
+0000013D 6131                    		CMP #03H, R1
+0000013F 24rr                    		BGTU L56
+00000141                         L44:	; bb67
+                                 ;     285             {
+                                 ;     286                 /* Valid channel input. Is this channel currently counting? */
+                                 ;     287                 if (CMT_RX_MODE_DISABLED != g_cmt_modes[channel])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",287
+00000141 FBE2rrrrrrrr            		MOV.L #__$g_cmt_modes, R14
+00000147 A889                    		MOV.L 0CH[R0], R1
+00000149 FE61EE                  		MOV.L [R1,R14], R14
+0000014C 610E                    		CMP #00H, R14
+0000014E 20rr                    		BEQ L56
+00000150                         L45:	; bb69
+                                 ;     288                 {
+                                 ;     289 
+                                 ;     290                     if (CMT_RX_CMD_RESTART == command)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",290
+00000150 A881                    		MOV.L 08H[R0], R1
+00000152 6121                    		CMP #02H, R1
+00000154 21rr                    		BNE L47
+00000156                         L46:	; bb70
+                                 ;     291                     {
+                                 ;     292                       /* For restarting, clear counter. */
+                                 ;     293                       (*g_cmt_channels[channel]).CMCNT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",293
+00000156 FBE2rrrrrrrr            		MOV.L #__$g_cmt_channels, R14
+0000015C A889                    		MOV.L 0CH[R0], R1
+0000015E FE61E1                  		MOV.L [R1,R14], R1
+00000161 3D1100                  		MOV.W #0000H, 02H[R1]
+00000164                         L47:	; bb79
+                                 ;     294                     }
+                                 ;     295 
+                                 ;     296                     switch (channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",296
+00000164 A889                    		MOV.L 0CH[R0], R1
+00000166 6131                    		CMP #03H, R1
+00000168 20rr                    		BEQ L54
+0000016A                         L48:	; bb79
+0000016A 6111                    		CMP #01H, R1
+0000016C 20rr                    		BEQ L52
+0000016E                         L49:	; bb79
+0000016E 6121                    		CMP #02H, R1
+00000170 20rr                    		BEQ L53
+00000172                         L50:	; bb79
+00000172 6101                    		CMP #00H, R1
+00000174 21rr                    		BNE L56
+00000176                         L51:	; bb81
+00000176 FBEE008008              		MOV.L #00088000H, R14
+                                 ;     297                     {
+                                 ;     298                     case 0:
+                                 ;     299                         CMT.CMSTR0.BIT.STR0 = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",299
+0000017B DCEF                    		MOV.W [R14], R15
+0000017D 780F                    		BSET #00H, R15
+0000017F D3EF                    		MOV.W R15, [R14]
+00000181 2Err                 B  		BRA L56
+00000183                         L52:	; bb85
+00000183 FBEE008008              		MOV.L #00088000H, R14
+                                 ;     300                         break;
+                                 ;     301                     case 1:
+                                 ;     302                         CMT.CMSTR0.BIT.STR1 = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",302
+00000188 DCEF                    		MOV.W [R14], R15
+0000018A 781F                    		BSET #01H, R15
+0000018C D3EF                    		MOV.W R15, [R14]
+0000018E 2Err                 B  		BRA L56
+00000190                         L53:	; bb89
+00000190 FBEE108008              		MOV.L #00088010H, R14
+                                 ;     303                         break;
+                                 ;     304 #if   CMT_RX_NUM_CHANNELS == 4
+                                 ;     305                     case 2:
+                                 ;     306                         CMT.CMSTR1.BIT.STR2 = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",306
+00000195 DCEF                    		MOV.W [R14], R15
+00000197 780F                    		BSET #00H, R15
+00000199 D3EF                    		MOV.W R15, [R14]
+0000019B 2Err                 B  		BRA L56
+0000019D                         L54:	; bb93
+0000019D FBEE108008              		MOV.L #00088010H, R14
+                                 ;     307                         break;
+                                 ;     308                     case 3:
+                                 ;     309                         CMT.CMSTR1.BIT.STR3 = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",309
+000001A2 DCEF                    		MOV.W [R14], R15
+000001A4 781F                    		BSET #01H, R15
+000001A6 D3EF                    		MOV.W R15, [R14]
+000001A8 08                   S  		BRA L56
+000001A9                         L55:	; bb111
+                                 ;     310                         break;
+                                 ;     311 #endif
+                                 ;     312                     default:
+                                 ;     313                         break;
+                                 ;     314                     }
+                                 ;     315                 }
+                                 ;     316             }
+                                 ;     317             break;
+                                 ;     318 
+                                 ;     319         default:
+                                 ;     320             ret = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",320
+000001A9 3C0200                  		MOV.B #00H, 02H[R0]
+000001AC                         L56:	; bb112
+                                 ;     321         break;
+                                 ;     322     }
+                                 ;     323 
+                                 ;     324     return ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",324
+000001AC C5000203                		MOV.B 02H[R0], 03H[R0]
+000001B0 B089                    		MOVU.B 03H[R0], R1
+000001B2                         L57:	; bb112.split
+                                 ;     325 } 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",325
+000001B2 5B11                    		MOVU.B R1, R1
+000001B4 6704                    		RTSD #10H
+000001B6                         __$cmt_create:
+                                 		.STACK	__$cmt_create=24
+                                 ;     326 
+                                 ;     327 /***********************************************************************************************************************
+                                 ;     328 * Function Name: cmt_create
+                                 ;     329 * Description  : Sets up a CMT channel based on user input options.
+                                 ;     330 * Arguments    : frequency_hz -
+                                 ;     331 *                    Frequency in Hz of how often to call the callback function.
+                                 ;     332 *                callback -
+                                 ;     333 *                    Which function to call when timer expires.
+                                 ;     334 *                channel -
+                                 ;     335 *                    Pointer of where to store which channel was used.
+                                 ;     336 * Return Value : true - 
+                                 ;     337 *                    Channel initialized successfully.
+                                 ;     338 *                false -
+                                 ;     339 *                    Invalid channel or period could not be used.
+                                 ;     340 ***********************************************************************************************************************/
+                                 ;     341 static bool cmt_create (uint32_t frequency_hz, void (* callback)(void * pdata), cmt_modes_t mode, uint32_t * channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",341
+000001B6 7100EC                  		ADD #0FFFFFFECH, R0
+000001B9 A101                    		MOV.L R1, 10H[R0]
+000001BB A08A                    		MOV.L R2, 0CH[R0]
+000001BD A083                    		MOV.L R3, 08H[R0]
+000001BF A00C                    		MOV.L R4, 04H[R0]
+                                 ;     342 {
+                                 ;     343     /* Return value. */
+                                 ;     344     bool     ret = false;    
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",344
+000001C1 3C0200                  		MOV.B #00H, 02H[R0]
+000001C4                         L59:	; entry.split
+                                 ;     345 
+                                 ;     346     /* Grab state to make sure we do not interfere with another operation. */
+                                 ;     347     if (cmt_lock_state() != true)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",347
+000001C4 39rrrr               W  		BSR __$cmt_lock_state
+000001C7 6111                    		CMP #01H, R1
+000001C9 10                   S  		BEQ L61
+000001CA                         L60:	; bb6
+                                 ;     348     {
+                                 ;     349         /* Another operation is already in progress. */
+                                 ;     350         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",350
+000001CA 3C0100                  		MOV.B #00H, 01H[R0]
+000001CD 2Err                 B  		BRA L71
+000001CF                         L61:	; bb13
+                                 ;     351     }
+                                 ;     352 
+                                 ;     353     /* Was a channel found? */
+                                 ;     354     if (false == cmt_find_channel(channel))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",354
+000001CF A809                    		MOV.L 04H[R0], R1
+000001D1 39rrrr               W  		BSR __$cmt_find_channel
+000001D4 6101                    		CMP #00H, R1
+000001D6 18                   S  		BNE L63
+000001D7                         L62:	; bb14
+                                 ;     355     {
+                                 ;     356         /* Channel not found or not available. */
+                                 ;     357         ret = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",357
+000001D7 3C0200                  		MOV.B #00H, 02H[R0]
+000001DA 2Err                 B  		BRA L69
+000001DC                         L63:	; bb15
+                                 ;     358     }
+                                 ;     359     else
+                                 ;     360     {
+                                 ;     361         /* Look to see if we can support this frequency. */
+                                 ;     362         ret = cmt_setup_channel(*channel, frequency_hz);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",362
+000001DC A809                    		MOV.L 04H[R0], R1
+000001DE EC11                    		MOV.L [R1], R1
+000001E0 A902                    		MOV.L 10H[R0], R2
+000001E2 39rrrr               W  		BSR __$cmt_setup_channel
+000001E5 8081                    		MOV.B R1, 02H[R0]
+000001E7                         L64:	; bb15.split
+                                 ;     363     
+                                 ;     364         /* Set up ICU registers, save callback function, and start counter if valid divider was found. */
+                                 ;     365         if (ret == true)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",365
+000001E7 B081                    		MOVU.B 02H[R0], R1
+000001E9 6111                    		CMP #01H, R1
+000001EB A809                    		MOV.L 04H[R0], R1
+000001ED EC11                    		MOV.L [R1], R1
+000001EF 21rr                    		BNE L68
+000001F1                         L65:	; bb21
+                                 ;     366         {        
+                                 ;     367             /* Set mode of operation. */
+                                 ;     368             g_cmt_modes[*channel] = mode;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",368
+000001F1 6C21                    		SHLL #02H, R1
+000001F3 FBE2rrrrrrrr            		MOV.L #__$g_cmt_modes, R14
+000001F9 4B1E                    		ADD R1, R14
+000001FB E10E02                  		MOV.L 08H[R0], [R14]
+000001FE                         L66:	; bb21.split
+                                 ;     369     
+                                 ;     370             /* Save callback function to be used. */
+                                 ;     371             g_cmt_callbacks[*channel] = callback;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",371
+000001FE A809                    		MOV.L 04H[R0], R1
+00000200 EC1E                    		MOV.L [R1], R14
+00000202 FBF2rrrrrrrr            		MOV.L #__$g_cmt_callbacks, R15
+00000208 A889                    		MOV.L 0CH[R0], R1
+0000020A FE2EF1                  		MOV.L R1, [R14,R15]
+0000020D                         L67:	; bb21.split1
+                                 ;     372     
+                                 ;     373             /* Start channel counting. */
+                                 ;     374             cmt_counter_start(*channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",374
+0000020D A809                    		MOV.L 04H[R0], R1
+0000020F EC11                    		MOV.L [R1], R1
+00000211 39rrrr               W  		BSR __$cmt_counter_start
+00000214 08                   S  		BRA L69
+00000215                         L68:	; bb32
+                                 ;     375         }
+                                 ;     376         else
+                                 ;     377         {
+                                 ;     378             /* Could not support input frequency. Release lock on channel. */
+                                 ;     379             R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_CMT0 + *channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",379
+00000215 6261                    		ADD #06H, R1
+00000217 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+0000021B                         L69:	; bb49
+                                 ;     380         }
+                                 ;     381     }
+                                 ;     382 
+                                 ;     383     /* Release state so other operations can be performed. */
+                                 ;     384     cmt_unlock_state();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",384
+0000021B 39rrrr               W  		BSR __$cmt_unlock_state
+0000021E                         L70:	; bb49.split
+                                 ;     385 
+                                 ;     386     return ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",386
+0000021E C5000201                		MOV.B 02H[R0], 01H[R0]
+00000222                         L71:	; bb52
+00000222 C5000103                		MOV.B 01H[R0], 03H[R0]
+                                 ;     387 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",387
+00000226 B089                    		MOVU.B 03H[R0], R1
+00000228 6705                    		RTSD #14H
+0000022A                         __$cmt_lock_state:
+                                 		.STACK	__$cmt_lock_state=8
+                                 ;     388 
+                                 ;     389 /***********************************************************************************************************************
+                                 ;     390 * Function Name: cmt_lock_state
+                                 ;     391 * Description  : Attempt to lock the state so that we right to perform an operation.
+                                 ;     392 * Arguments    : channel - 
+                                 ;     393 *                    Which channel to use.
+                                 ;     394 * Return Value : true - 
+                                 ;     395 *                    State was obtained
+                                 ;     396 *                false - 
+                                 ;     397 *                    State was not obtained because code is busy with another on-going operation.
+                                 ;     398 ***********************************************************************************************************************/
+                                 ;     399 static bool cmt_lock_state (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",399
+0000022A 6040                    		SUB #04H, R0
+0000022C 6651                    		MOV.L #00000005H, R1
+                                 ;     400 {
+                                 ;     401     bool ret;
+                                 ;     402 
+                                 ;     403     /* Attempt to acquire lock. */
+                                 ;     404     ret = R_BSP_HardwareLock(BSP_LOCK_CMT);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",404
+0000022E 05rrrrrr             A  		BSR _R_BSP_HardwareLock
+00000232 8081                    		MOV.B R1, 02H[R0]
+00000234                         L73:	; entry.split
+                                 ;     405 
+                                 ;     406     return ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",406
+00000234 C5000203                		MOV.B 02H[R0], 03H[R0]
+00000238 B089                    		MOVU.B 03H[R0], R1
+0000023A                         L74:	; entry.split1
+                                 ;     407 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",407
+0000023A 5B11                    		MOVU.B R1, R1
+0000023C 6701                    		RTSD #04H
+0000023E                         __$cmt_unlock_state:
+                                 		.STACK	__$cmt_unlock_state=4
+                                 ;     408 
+                                 ;     409 /***********************************************************************************************************************
+                                 ;     410 * Function Name: cmt_unlock_state
+                                 ;     411 * Description  : Release state so that other operations can be performed.
+                                 ;     412 * Arguments    : channel - 
+                                 ;     413 *                    Which channel to use.
+                                 ;     414 * Return Value : none
+                                 ;     415 ***********************************************************************************************************************/
+                                 ;     416 static void cmt_unlock_state (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",416
+0000023E 6651                    		MOV.L #00000005H, R1
+                                 ;     417 {
+                                 ;     418     /* Release lock. */
+                                 ;     419     R_BSP_HardwareUnlock(BSP_LOCK_CMT);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",419
+00000240 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+00000244 02                      		RTS
+00000245                         __$cmt_find_channel:
+                                 		.STACK	__$cmt_find_channel=20
+                                 ;     420 }
+                                 ;     421 
+                                 ;     422 /***********************************************************************************************************************
+                                 ;     423 * Function Name: cmt_find_channel
+                                 ;     424 * Description  : Attempt to find open CMT channel to use.
+                                 ;     425 * Arguments    : channel - 
+                                 ;     426 *                    Channel number if channel was found.
+                                 ;     427 * Return Value : true -
+                                 ;     428 *                    Channel was found and locked.
+                                 ;     429 *                false -
+                                 ;     430 *                    No channels available.
+                                 ;     431 ***********************************************************************************************************************/
+                                 ;     432 static bool cmt_find_channel (uint32_t * channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",432
+00000245 7100F0                  		ADD #0FFFFFFF0H, R0
+00000248 A089                    		MOV.L R1, 0CH[R0]
+                                 ;     433 {
+                                 ;     434     bool     channel_found = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",434
+0000024A 3C0300                  		MOV.B #00H, 03H[R0]
+0000024D                         L77:	; entry.split
+                                 ;     435     uint32_t i;
+                                 ;     436 
+                                 ;     437     /* Look for an available channel. */
+                                 ;     438     for (i = 0; i < CMT_RX_NUM_CHANNELS; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",438
+0000024D 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000250 2Err                 B  		BRA L82
+00000252                         L78:	; bb4
+                                 ;     439     {
+                                 ;     440         if (true == R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_CMT0 + i)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",440
+00000252 A809                    		MOV.L 04H[R0], R1
+00000254 6261                    		ADD #06H, R1
+00000256 05rrrrrr             A  		BSR _R_BSP_HardwareLock
+0000025A 6111                    		CMP #01H, R1
+0000025C 21rr                    		BNE L81
+0000025E                         L79:	; bb5
+                                 ;     441         {
+                                 ;     442             /* Channel found. */
+                                 ;     443             *channel = i;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",443
+0000025E A809                    		MOV.L 04H[R0], R1
+00000260 A88A                    		MOV.L 0CH[R0], R2
+00000262 E321                    		MOV.L R1, [R2]
+00000264                         L80:	; bb5.split
+                                 ;     444             channel_found = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",444
+00000264 3C0301                  		MOV.B #01H, 03H[R0]
+00000267 2Err                 B  		BRA L83
+00000269                         L81:	; bb15
+00000269 A809                    		MOV.L 04H[R0], R1
+0000026B 6211                    		ADD #01H, R1
+0000026D A009                    		MOV.L R1, 04H[R0]
+0000026F                         L82:	; bb18
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",438
+0000026F A809                    		MOV.L 04H[R0], R1
+00000271 6141                    		CMP #04H, R1
+00000273 23rr                    		BLTU L78
+00000275                         L83:	; bb24
+                                 ;     445             
+                                 ;     446             break;            
+                                 ;     447         }
+                                 ;     448     }        
+                                 ;     449 
+                                 ;     450     return channel_found;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",450
+00000275 C500030B                		MOV.B 03H[R0], 0BH[R0]
+00000279 B289                    		MOVU.B 0BH[R0], R1
+0000027B                         L84:	; bb24.split
+                                 ;     451 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",451
+0000027B 5B11                    		MOVU.B R1, R1
+0000027D 6704                    		RTSD #10H
+0000027F                         __$power_on:
+                                 		.STACK	__$power_on=8
+                                 ;     452 
+                                 ;     453 /***********************************************************************************************************************
+                                 ;     454 * Function Name: power_on
+                                 ;     455 * Description  : Enables CMT channel.
+                                 ;     456 * Arguments    : channel - 
+                                 ;     457 *                    Channel number to enable.
+                                 ;     458 * Return Value : none
+                                 ;     459 ***********************************************************************************************************************/
+                                 ;     460 static void power_on (uint32_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",460
+0000027F 6040                    		SUB #04H, R0
+00000281 E301                    		MOV.L R1, [R0]
+00000283 6611                    		MOV.L #00000001H, R1
+                                 ;     461 {
+                                 ;     462 #if CMT_REG_PROTECT == 1
+                                 ;     463     /* Enable writing to MSTP registers. */
+                                 ;     464     R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",464
+00000285 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+00000289                         L86:	; entry.split
+                                 ;     465 #endif
+                                 ;     466 
+                                 ;     467     /* Enable selected CMT Channel. Go ahead and make sure counter is stopped too. */
+                                 ;     468     switch (channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",468
+00000289 EC01                    		MOV.L [R0], R1
+0000028B 6131                    		CMP #03H, R1
+0000028D 20rr                    		BEQ L96
+0000028F                         L87:	; entry.split
+0000028F 6111                    		CMP #01H, R1
+00000291 20rr                    		BEQ L92
+00000293                         L88:	; entry.split
+00000293 6121                    		CMP #02H, R1
+00000295 20rr                    		BEQ L94
+00000297                         L89:	; entry.split
+00000297 6101                    		CMP #00H, R1
+00000299 21rr                    		BNE L98
+0000029B                         L90:	; bb
+0000029B FBEE100008              		MOV.L #00080010H, R14
+                                 ;     469     {
+                                 ;     470         case 0:
+                                 ;     471             /* Bring module out of stop state. */
+                                 ;     472             MSTP(CMT0) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",472
+000002A0 ECEF                    		MOV.L [R14], R15
+000002A2 7AFF                    		BCLR #0FH, R15
+000002A4 E3EF                    		MOV.L R15, [R14]
+000002A6                         L91:	; bb.split
+                                 ;     473 
+                                 ;     474             /* Stop counter. */
+                                 ;     475             CMT.CMSTR0.BIT.STR0 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",475
+000002A6 FBEE008008              		MOV.L #00088000H, R14
+000002AB 5CEF                    		MOVU.W [R14], R15
+000002AD 772FFEFF00              		AND #0FFFEH, R15
+000002B2 D3EF                    		MOV.W R15, [R14]
+000002B4 2Err                 B  		BRA L98
+000002B6                         L92:	; bb8
+000002B6 FBEE100008              		MOV.L #00080010H, R14
+                                 ;     476         break;   
+                                 ;     477         case 1:
+                                 ;     478             /* Bring module out of stop state. */
+                                 ;     479             MSTP(CMT1) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",479
+000002BB ECEF                    		MOV.L [R14], R15
+000002BD 7AFF                    		BCLR #0FH, R15
+000002BF E3EF                    		MOV.L R15, [R14]
+000002C1                         L93:	; bb8.split
+                                 ;     480 
+                                 ;     481             /* Stop counter. */
+                                 ;     482             CMT.CMSTR0.BIT.STR1 = 0;        
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",482
+000002C1 FBEE008008              		MOV.L #00088000H, R14
+000002C6 5CEF                    		MOVU.W [R14], R15
+000002C8 772FFDFF00              		AND #0FFFDH, R15
+000002CD D3EF                    		MOV.W R15, [R14]
+000002CF 2Err                 B  		BRA L98
+000002D1                         L94:	; bb15
+000002D1 FBEE100008              		MOV.L #00080010H, R14
+                                 ;     483         break;
+                                 ;     484 #if   CMT_RX_NUM_CHANNELS == 4
+                                 ;     485         case 2:
+                                 ;     486             /* Bring module out of stop state. */
+                                 ;     487             MSTP(CMT2) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",487
+000002D6 ECEF                    		MOV.L [R14], R15
+000002D8 7AEF                    		BCLR #0EH, R15
+000002DA E3EF                    		MOV.L R15, [R14]
+000002DC                         L95:	; bb15.split
+                                 ;     488 
+                                 ;     489             /* Stop counter. */
+                                 ;     490             CMT.CMSTR1.BIT.STR2 = 0;        
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",490
+000002DC FB1E008008              		MOV.L #00088000H, R1
+000002E1 BA12                    		MOVU.W 10H[R1], R2
+000002E3 7722FEFF00              		AND #0FFFEH, R2
+000002E8 9212                    		MOV.W R2, 10H[R1]
+000002EA 2Err                 B  		BRA L98
+000002EC                         L96:	; bb22
+000002EC FBEE100008              		MOV.L #00080010H, R14
+                                 ;     491         break;
+                                 ;     492         case 3:
+                                 ;     493             /* Bring module out of stop state. */
+                                 ;     494             MSTP(CMT3) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",494
+000002F1 ECEF                    		MOV.L [R14], R15
+000002F3 7AEF                    		BCLR #0EH, R15
+000002F5 E3EF                    		MOV.L R15, [R14]
+000002F7                         L97:	; bb22.split
+                                 ;     495 
+                                 ;     496             /* Stop counter. */
+                                 ;     497             CMT.CMSTR1.BIT.STR3 = 0;       
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",497
+000002F7 FB1E008008              		MOV.L #00088000H, R1
+000002FC BA12                    		MOVU.W 10H[R1], R2
+000002FE 7722FDFF00              		AND #0FFFDH, R2
+00000303 9212                    		MOV.W R2, 10H[R1]
+00000305                         L98:	; bb30
+00000305 6611                    		MOV.L #00000001H, R1
+                                 ;     498         break;
+                                 ;     499 #endif
+                                 ;     500         default:
+                                 ;     501             /* Should never get here. Valid channel number is checked above. */
+                                 ;     502         break;
+                                 ;     503     }    
+                                 ;     504 
+                                 ;     505 #if CMT_REG_PROTECT == 1
+                                 ;     506     /* Disable writing to MSTP registers. */
+                                 ;     507     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",507
+00000307 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+0000030B 6701                    		RTSD #04H
+0000030D                         __$power_off:
+                                 		.STACK	__$power_off=8
+                                 ;     508 #endif
+                                 ;     509 }
+                                 ;     510 
+                                 ;     511 /***********************************************************************************************************************
+                                 ;     512 * Function Name: power_off
+                                 ;     513 * Description  : Disables CMT channel.
+                                 ;     514 * Arguments    : channel - 
+                                 ;     515 *                    Channel number to disable.
+                                 ;     516 * Return Value : none
+                                 ;     517 ***********************************************************************************************************************/
+                                 ;     518 static void power_off (uint32_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",518
+0000030D 6040                    		SUB #04H, R0
+0000030F E301                    		MOV.L R1, [R0]
+00000311 6611                    		MOV.L #00000001H, R1
+                                 ;     519 {
+                                 ;     520 #if CMT_REG_PROTECT == 1
+                                 ;     521     /* Enable writing to MSTP registers. */
+                                 ;     522     R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",522
+00000313 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+00000317                         L100:	; entry.split
+                                 ;     523 #endif
+                                 ;     524 
+                                 ;     525     /* Enable selected CMT Channel. Go ahead and make sure counter is stopped too. Since each MSTP bit controls
+                                 ;     526        2 channels, make sure to only disable CMT unit when both channels are off. */
+                                 ;     527     switch (channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",527
+00000317 EC01                    		MOV.L [R0], R1
+00000319 6131                    		CMP #03H, R1
+0000031B 3Arrrr               W  		BEQ L113
+0000031E                         L101:	; entry.split
+0000031E 6111                    		CMP #01H, R1
+00000320 20rr                    		BEQ L107
+00000322                         L102:	; entry.split
+00000322 6121                    		CMP #02H, R1
+00000324 20rr                    		BEQ L110
+00000326                         L103:	; entry.split
+00000326 6101                    		CMP #00H, R1
+00000328 3Brrrr               W  		BNE L116
+0000032B                         L104:	; bb2
+                                 ;     528     {
+                                 ;     529         case 0:
+                                 ;     530             /* Only turn off CMT unit if both channels are off. */
+                                 ;     531             if (g_cmt_modes[1] == CMT_RX_MODE_DISABLED)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",531
+0000032B FB12rrrrrrrr            		MOV.L #__$g_cmt_modes, R1
+00000331 A819                    		MOV.L 04H[R1], R1
+00000333 6101                    		CMP #00H, R1
+00000335 21rr                    		BNE L106
+00000337                         L105:	; bb3
+00000337 FBEE100008              		MOV.L #00080010H, R14
+                                 ;     532             {
+                                 ;     533                 /* Put module in stop state. */
+                                 ;     534                 MSTP(CMT0) = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",534
+0000033C ECEF                    		MOV.L [R14], R15
+0000033E 78FF                    		BSET #0FH, R15
+00000340 E3EF                    		MOV.L R15, [R14]
+00000342                         L106:	; bb10
+                                 ;     535             }
+                                 ;     536 
+                                 ;     537             /* Stop counter. */
+                                 ;     538             CMT.CMSTR0.BIT.STR0 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",538
+00000342 FBEE008008              		MOV.L #00088000H, R14
+00000347 5CEF                    		MOVU.W [R14], R15
+00000349 772FFEFF00              		AND #0FFFEH, R15
+0000034E D3EF                    		MOV.W R15, [R14]
+00000350 2Err                 B  		BRA L116
+00000352                         L107:	; bb15
+                                 ;     539         break;   
+                                 ;     540         case 1:
+                                 ;     541             /* Only turn off CMT unit if both channels are off. */
+                                 ;     542             if (g_cmt_modes[0] == CMT_RX_MODE_DISABLED)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",542
+00000352 FBE2rrrrrrrr            		MOV.L #__$g_cmt_modes, R14
+00000358 ECEE                    		MOV.L [R14], R14
+0000035A 610E                    		CMP #00H, R14
+0000035C 21rr                    		BNE L109
+0000035E                         L108:	; bb16
+0000035E FBEE100008              		MOV.L #00080010H, R14
+                                 ;     543             {
+                                 ;     544                 /* Put module in stop state. */
+                                 ;     545                 MSTP(CMT1) = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",545
+00000363 ECEF                    		MOV.L [R14], R15
+00000365 78FF                    		BSET #0FH, R15
+00000367 E3EF                    		MOV.L R15, [R14]
+00000369                         L109:	; bb24
+                                 ;     546             }
+                                 ;     547             /* Stop counter. */
+                                 ;     548             CMT.CMSTR0.BIT.STR1 = 0;        
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",548
+00000369 FBEE008008              		MOV.L #00088000H, R14
+0000036E 5CEF                    		MOVU.W [R14], R15
+00000370 772FFDFF00              		AND #0FFFDH, R15
+00000375 D3EF                    		MOV.W R15, [R14]
+00000377 2Err                 B  		BRA L116
+00000379                         L110:	; bb29
+                                 ;     549         break;
+                                 ;     550 #if   CMT_RX_NUM_CHANNELS == 4
+                                 ;     551         case 2:
+                                 ;     552             /* Only turn off CMT unit if both channels are off. */
+                                 ;     553             if (g_cmt_modes[3] == CMT_RX_MODE_DISABLED)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",553
+00000379 FB12rrrrrrrr            		MOV.L #__$g_cmt_modes, R1
+0000037F A899                    		MOV.L 0CH[R1], R1
+00000381 6101                    		CMP #00H, R1
+00000383 21rr                    		BNE L112
+00000385                         L111:	; bb30
+00000385 FBEE100008              		MOV.L #00080010H, R14
+                                 ;     554             {
+                                 ;     555                 /* Put module in stop state. */
+                                 ;     556                 MSTP(CMT2) = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",556
+0000038A ECEF                    		MOV.L [R14], R15
+0000038C 78EF                    		BSET #0EH, R15
+0000038E E3EF                    		MOV.L R15, [R14]
+00000390                         L112:	; bb38
+                                 ;     557             }
+                                 ;     558             /* Stop counter. */
+                                 ;     559             CMT.CMSTR1.BIT.STR2 = 0;        
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",559
+00000390 FB1E008008              		MOV.L #00088000H, R1
+00000395 BA12                    		MOVU.W 10H[R1], R2
+00000397 7722FEFF00              		AND #0FFFEH, R2
+0000039C 9212                    		MOV.W R2, 10H[R1]
+0000039E 2Err                 B  		BRA L116
+000003A0                         L113:	; bb43
+                                 ;     560         break;
+                                 ;     561         case 3:
+                                 ;     562             /* Only turn off CMT unit if both channels are off. */
+                                 ;     563             if (g_cmt_modes[2] == CMT_RX_MODE_DISABLED)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",563
+000003A0 FB12rrrrrrrr            		MOV.L #__$g_cmt_modes, R1
+000003A6 A891                    		MOV.L 08H[R1], R1
+000003A8 6101                    		CMP #00H, R1
+000003AA 21rr                    		BNE L115
+000003AC                         L114:	; bb44
+000003AC FBEE100008              		MOV.L #00080010H, R14
+                                 ;     564             {
+                                 ;     565                 /* Put module in stop state. */
+                                 ;     566                 MSTP(CMT3) = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",566
+000003B1 ECEF                    		MOV.L [R14], R15
+000003B3 78EF                    		BSET #0EH, R15
+000003B5 E3EF                    		MOV.L R15, [R14]
+000003B7                         L115:	; bb52
+                                 ;     567             }
+                                 ;     568             /* Stop counter. */
+                                 ;     569             CMT.CMSTR1.BIT.STR3 = 0;       
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",569
+000003B7 FB1E008008              		MOV.L #00088000H, R1
+000003BC BA12                    		MOVU.W 10H[R1], R2
+000003BE 7722FDFF00              		AND #0FFFDH, R2
+000003C3 9212                    		MOV.W R2, 10H[R1]
+000003C5                         L116:	; bb57
+000003C5 6611                    		MOV.L #00000001H, R1
+                                 ;     570         break;
+                                 ;     571 #endif
+                                 ;     572         default:
+                                 ;     573             /* Should never get here. Valid channel number is checked above. */
+                                 ;     574         break;
+                                 ;     575     }    
+                                 ;     576 
+                                 ;     577 #if CMT_REG_PROTECT == 1
+                                 ;     578     /* Disable writing to MSTP registers. */
+                                 ;     579     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",579
+000003C7 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+000003CB 6701                    		RTSD #04H
+000003CD                         __$cmt_counter_start:
+                                 		.STACK	__$cmt_counter_start=8
+                                 ;     580 #endif
+                                 ;     581 }
+                                 ;     582 
+                                 ;     583 /***********************************************************************************************************************
+                                 ;     584 * Function Name: cmt_counter_start
+                                 ;     585 * Description  : Starts a CMT channel counting.
+                                 ;     586 * Arguments    : channel - 
+                                 ;     587 *                    Channel number to use.
+                                 ;     588 * Return Value : none
+                                 ;     589 ***********************************************************************************************************************/
+                                 ;     590 static void cmt_counter_start (uint32_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",590
+000003CD 6040                    		SUB #04H, R0
+000003CF E301                    		MOV.L R1, [R0]
+                                 ;     591 {
+                                 ;     592     /* Enable compare match interurpt. */
+                                 ;     593     (*g_cmt_channels[channel]).CMCR.BIT.CMIE = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",593
+000003D1 FBE2rrrrrrrr            		MOV.L #__$g_cmt_channels, R14
+000003D7 FE61EE                  		MOV.L [R1,R14], R14
+000003DA DCEF                    		MOV.W [R14], R15
+000003DC 786F                    		BSET #06H, R15
+000003DE D3EF                    		MOV.W R15, [R14]
+000003E0                         L118:	; entry.split
+                                 ;     594 
+                                 ;     595     /* Clear counter. */
+                                 ;     596     (*g_cmt_channels[channel]).CMCNT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",596
+000003E0 FBE2rrrrrrrr            		MOV.L #__$g_cmt_channels, R14
+000003E6 EC01                    		MOV.L [R0], R1
+000003E8 FE61E1                  		MOV.L [R1,R14], R1
+000003EB 3D1100                  		MOV.W #0000H, 02H[R1]
+000003EE                         L119:	; entry.split1
+                                 ;     597 
+                                 ;     598     /* Start counter channel. */
+                                 ;     599     switch (channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",599
+000003EE EC01                    		MOV.L [R0], R1
+000003F0 6131                    		CMP #03H, R1
+000003F2 3Arrrr               W  		BEQ L135
+000003F5                         L120:	; entry.split1
+000003F5 6111                    		CMP #01H, R1
+000003F7 20rr                    		BEQ L127
+000003F9                         L121:	; entry.split1
+000003F9 6121                    		CMP #02H, R1
+000003FB 20rr                    		BEQ L131
+000003FD                         L122:	; entry.split1
+000003FD 6101                    		CMP #00H, R1
+000003FF 3Brrrr               W  		BNE L139
+00000402                         L123:	; bb
+                                 ;     600     {
+                                 ;     601         case 0:
+                                 ;     602             /* Setup ICU registers. */
+                                 ;     603             IR(CMT0, CMI0)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",603
+00000402 FBEE1C7008              		MOV.L #0008701CH, R14
+00000407 F0E8                    		BCLR #00H, [R14].B
+00000409                         L124:	; bb.split
+                                 ;     604             IPR(CMT0, CMI0) = CMT_RX_CFG_IPR;   //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",604
+00000409 FBEE1C7008              		MOV.L #0008701CH, R14
+0000040E 5AEFE802                		MOVU.B 02E8H[R14], R15
+00000412 655F                    		OR #05H, R15
+00000414 762FF500                		AND #0F5H, R15
+00000418 CBEFE802                		MOV.B R15, 02E8H[R14]
+0000041C                         L125:	; bb.split2
+                                 ;     605             IEN(CMT0, CMI0) = 1;                //Enable compare match interrupt                
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",605
+0000041C FBEE1C7008              		MOV.L #0008701CH, R14
+00000421 F2E4E701                		BSET #04H, 01E7H[R14].B
+00000425                         L126:	; bb.split3
+                                 ;     606 
+                                 ;     607             /* Start counter. */
+                                 ;     608             CMT.CMSTR0.BIT.STR0 = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",608
+00000425 FBEE008008              		MOV.L #00088000H, R14
+0000042A DCEF                    		MOV.W [R14], R15
+0000042C 780F                    		BSET #00H, R15
+0000042E D3EF                    		MOV.W R15, [R14]
+00000430 6701                    		RTSD #04H
+00000432                         L127:	; bb30
+                                 ;     609         break;   
+                                 ;     610         case 1:
+                                 ;     611             /* Setup ICU registers. */
+                                 ;     612             IR(CMT1, CMI1)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",612
+00000432 FBEE1C7008              		MOV.L #0008701CH, R14
+00000437 F1E801                  		BCLR #00H, 01H[R14].B
+0000043A                         L128:	; bb30.split
+                                 ;     613             IPR(CMT1, CMI1) = CMT_RX_CFG_IPR;   //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",613
+0000043A FBEE1C7008              		MOV.L #0008701CH, R14
+0000043F 5AEFE902                		MOVU.B 02E9H[R14], R15
+00000443 655F                    		OR #05H, R15
+00000445 762FF500                		AND #0F5H, R15
+00000449 CBEFE902                		MOV.B R15, 02E9H[R14]
+0000044D                         L129:	; bb30.split4
+                                 ;     614             IEN(CMT1, CMI1) = 1;                //Enable compare match interrupt                
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",614
+0000044D FBEE1C7008              		MOV.L #0008701CH, R14
+00000452 F2E5E701                		BSET #05H, 01E7H[R14].B
+00000456                         L130:	; bb30.split5
+                                 ;     615 
+                                 ;     616             /* Start counter. */
+                                 ;     617             CMT.CMSTR0.BIT.STR1 = 1;        
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",617
+00000456 FBEE008008              		MOV.L #00088000H, R14
+0000045B DCEF                    		MOV.W [R14], R15
+0000045D 781F                    		BSET #01H, R15
+0000045F D3EF                    		MOV.W R15, [R14]
+00000461 6701                    		RTSD #04H
+00000463                         L131:	; bb43
+                                 ;     618         break;
+                                 ;     619 #if   CMT_RX_NUM_CHANNELS == 4
+                                 ;     620         case 2:
+                                 ;     621             /* Setup ICU registers. */
+                                 ;     622             IR(CMT2, CMI2)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",622
+00000463 FBEE1C7008              		MOV.L #0008701CH, R14
+00000468 F1E802                  		BCLR #00H, 02H[R14].B
+0000046B                         L132:	; bb43.split
+                                 ;     623             IPR(CMT2, CMI2) = CMT_RX_CFG_IPR;   //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",623
+0000046B FBEE1C7008              		MOV.L #0008701CH, R14
+00000470 5AEFEA02                		MOVU.B 02EAH[R14], R15
+00000474 655F                    		OR #05H, R15
+00000476 762FF500                		AND #0F5H, R15
+0000047A CBEFEA02                		MOV.B R15, 02EAH[R14]
+0000047E                         L133:	; bb43.split6
+                                 ;     624             IEN(CMT2, CMI2) = 1;                //Enable compare match interrupt                
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",624
+0000047E FBEE1C7008              		MOV.L #0008701CH, R14
+00000483 F2E6E701                		BSET #06H, 01E7H[R14].B
+00000487                         L134:	; bb43.split7
+                                 ;     625 
+                                 ;     626             /* Start counter. */
+                                 ;     627             CMT.CMSTR1.BIT.STR2 = 1;        
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",627
+00000487 FB1E008008              		MOV.L #00088000H, R1
+0000048C 9A12                    		MOV.W 10H[R1], R2
+0000048E 7802                    		BSET #00H, R2
+00000490 9212                    		MOV.W R2, 10H[R1]
+00000492 6701                    		RTSD #04H
+00000494                         L135:	; bb56
+                                 ;     628         break;
+                                 ;     629         case 3:
+                                 ;     630             /* Setup ICU registers. */
+                                 ;     631             IR(CMT3, CMI3)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",631
+00000494 FBEE1C7008              		MOV.L #0008701CH, R14
+00000499 F1E803                  		BCLR #00H, 03H[R14].B
+0000049C                         L136:	; bb56.split
+                                 ;     632             IPR(CMT3, CMI3) = CMT_RX_CFG_IPR;   //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",632
+0000049C FBEE1C7008              		MOV.L #0008701CH, R14
+000004A1 5AEFEB02                		MOVU.B 02EBH[R14], R15
+000004A5 655F                    		OR #05H, R15
+000004A7 762FF500                		AND #0F5H, R15
+000004AB CBEFEB02                		MOV.B R15, 02EBH[R14]
+000004AF                         L137:	; bb56.split8
+                                 ;     633             IEN(CMT3, CMI3) = 1;                //Enable compare match interrupt                
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",633
+000004AF FBEE1C7008              		MOV.L #0008701CH, R14
+000004B4 F2E7E701                		BSET #07H, 01E7H[R14].B
+000004B8                         L138:	; bb56.split9
+                                 ;     634 
+                                 ;     635             /* Start counter. */
+                                 ;     636             CMT.CMSTR1.BIT.STR3 = 1;       
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",636
+000004B8 FB1E008008              		MOV.L #00088000H, R1
+000004BD 9A12                    		MOV.W 10H[R1], R2
+000004BF 7812                    		BSET #01H, R2
+000004C1 9212                    		MOV.W R2, 10H[R1]
+000004C3 6701                    		RTSD #04H
+000004C5                         L139:	; return
+                                 ;     637         break;
+                                 ;     638 #endif
+                                 ;     639         default:
+                                 ;     640             /* Should never get here. Valid channel number is checked above. */
+                                 ;     641         break;
+                                 ;     642     }    
+                                 ;     643 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",643
+000004C5 6701                    		RTSD #04H
+000004C7                         __$cmt_counter_stop:
+                                 		.STACK	__$cmt_counter_stop=8
+                                 ;     644 
+                                 ;     645 /***********************************************************************************************************************
+                                 ;     646 * Function Name: cmt_counter_stop
+                                 ;     647 * Description  : Stops a CMT channel counting.
+                                 ;     648 * Arguments    : channel - 
+                                 ;     649 *                    Channel number to use.
+                                 ;     650 * Return Value : none
+                                 ;     651 ***********************************************************************************************************************/
+                                 ;     652 static void cmt_counter_stop (uint32_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",652
+000004C7 6040                    		SUB #04H, R0
+000004C9 E301                    		MOV.L R1, [R0]
+                                 ;     653 {
+                                 ;     654     /* Stop counter channel. */
+                                 ;     655     switch (channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",655
+000004CB 6131                    		CMP #03H, R1
+000004CD 3Arrrr               W  		BEQ L156
+000004D0                         L141:	; entry
+000004D0 6111                    		CMP #01H, R1
+000004D2 20rr                    		BEQ L148
+000004D4                         L142:	; entry
+000004D4 6121                    		CMP #02H, R1
+000004D6 20rr                    		BEQ L152
+000004D8                         L143:	; entry
+000004D8 6101                    		CMP #00H, R1
+000004DA 3Brrrr               W  		BNE L160
+000004DD                         L144:	; bb
+                                 ;     656     {
+                                 ;     657         case 0:
+                                 ;     658             /* Set ICU registers. */
+                                 ;     659             IR(CMT0, CMI0)  = 0;            //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",659
+000004DD FBEE1C7008              		MOV.L #0008701CH, R14
+000004E2 F0E8                    		BCLR #00H, [R14].B
+000004E4                         L145:	; bb.split
+                                 ;     660             IPR(CMT0, CMI0) = 0;            //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",660
+000004E4 FBEE1C7008              		MOV.L #0008701CH, R14
+000004E9 754FF0                  		MOV.L #000000F0H, R15
+000004EC 52EFE802                		AND 02E8H[R14].UB, R15
+000004F0 CBEFE802                		MOV.B R15, 02E8H[R14]
+000004F4                         L146:	; bb.split1
+                                 ;     661             IEN(CMT0, CMI0) = 0;            //Disable compare match interrupt                
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",661
+000004F4 FBEE1C7008              		MOV.L #0008701CH, R14
+000004F9 F2ECE701                		BCLR #04H, 01E7H[R14].B
+000004FD                         L147:	; bb.split2
+                                 ;     662 
+                                 ;     663             /* Stop counter. */
+                                 ;     664             CMT.CMSTR0.BIT.STR0 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",664
+000004FD FBEE008008              		MOV.L #00088000H, R14
+00000502 5CEF                    		MOVU.W [R14], R15
+00000504 772FFEFF00              		AND #0FFFEH, R15
+00000509 D3EF                    		MOV.W R15, [R14]
+0000050B 6701                    		RTSD #04H
+0000050D                         L148:	; bb14
+                                 ;     665         break;   
+                                 ;     666         case 1:
+                                 ;     667             /* Set ICU registers. */
+                                 ;     668             IR(CMT1, CMI1)  = 0;            //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",668
+0000050D FBEE1C7008              		MOV.L #0008701CH, R14
+00000512 F1E801                  		BCLR #00H, 01H[R14].B
+00000515                         L149:	; bb14.split
+                                 ;     669             IPR(CMT1, CMI1) = 0;            //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",669
+00000515 FBEE1C7008              		MOV.L #0008701CH, R14
+0000051A 754FF0                  		MOV.L #000000F0H, R15
+0000051D 52EFE902                		AND 02E9H[R14].UB, R15
+00000521 CBEFE902                		MOV.B R15, 02E9H[R14]
+00000525                         L150:	; bb14.split3
+                                 ;     670             IEN(CMT1, CMI1) = 0;            //Disable compare match interrupt                
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",670
+00000525 FBEE1C7008              		MOV.L #0008701CH, R14
+0000052A F2EDE701                		BCLR #05H, 01E7H[R14].B
+0000052E                         L151:	; bb14.split4
+                                 ;     671 
+                                 ;     672             /* Stop counter. */
+                                 ;     673             CMT.CMSTR0.BIT.STR1 = 0;        
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",673
+0000052E FBEE008008              		MOV.L #00088000H, R14
+00000533 5CEF                    		MOVU.W [R14], R15
+00000535 772FFDFF00              		AND #0FFFDH, R15
+0000053A D3EF                    		MOV.W R15, [R14]
+0000053C 6701                    		RTSD #04H
+0000053E                         L152:	; bb27
+                                 ;     674         break;
+                                 ;     675 #if   CMT_RX_NUM_CHANNELS == 4
+                                 ;     676         case 2:
+                                 ;     677             /* Set ICU registers. */
+                                 ;     678             IR(CMT2, CMI2)  = 0;            //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",678
+0000053E FBEE1C7008              		MOV.L #0008701CH, R14
+00000543 F1E802                  		BCLR #00H, 02H[R14].B
+00000546                         L153:	; bb27.split
+                                 ;     679             IPR(CMT2, CMI2) = 0;            //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",679
+00000546 FBEE1C7008              		MOV.L #0008701CH, R14
+0000054B 754FF0                  		MOV.L #000000F0H, R15
+0000054E 52EFEA02                		AND 02EAH[R14].UB, R15
+00000552 CBEFEA02                		MOV.B R15, 02EAH[R14]
+00000556                         L154:	; bb27.split5
+                                 ;     680             IEN(CMT2, CMI2) = 0;            //Disable compare match interrupt                
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",680
+00000556 FBEE1C7008              		MOV.L #0008701CH, R14
+0000055B F2EEE701                		BCLR #06H, 01E7H[R14].B
+0000055F                         L155:	; bb27.split6
+                                 ;     681 
+                                 ;     682             /* Stop counter. */
+                                 ;     683             CMT.CMSTR1.BIT.STR2 = 0;        
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",683
+0000055F FB1E008008              		MOV.L #00088000H, R1
+00000564 BA12                    		MOVU.W 10H[R1], R2
+00000566 7722FEFF00              		AND #0FFFEH, R2
+0000056B 9212                    		MOV.W R2, 10H[R1]
+0000056D 6701                    		RTSD #04H
+0000056F                         L156:	; bb40
+                                 ;     684         break;
+                                 ;     685         case 3:
+                                 ;     686             /* Set ICU registers. */
+                                 ;     687             IR(CMT3, CMI3)  = 0;            //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",687
+0000056F FBEE1C7008              		MOV.L #0008701CH, R14
+00000574 F1E803                  		BCLR #00H, 03H[R14].B
+00000577                         L157:	; bb40.split
+                                 ;     688             IPR(CMT3, CMI3) = 0;            //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",688
+00000577 FBEE1C7008              		MOV.L #0008701CH, R14
+0000057C 754FF0                  		MOV.L #000000F0H, R15
+0000057F 52EFEB02                		AND 02EBH[R14].UB, R15
+00000583 CBEFEB02                		MOV.B R15, 02EBH[R14]
+00000587                         L158:	; bb40.split7
+                                 ;     689             IEN(CMT3, CMI3) = 0;            //Disable compare match interrupt                
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",689
+00000587 FBEE1C7008              		MOV.L #0008701CH, R14
+0000058C F2EFE701                		BCLR #07H, 01E7H[R14].B
+00000590                         L159:	; bb40.split8
+                                 ;     690 
+                                 ;     691             /* Stop counter. */
+                                 ;     692             CMT.CMSTR1.BIT.STR3 = 0;       
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",692
+00000590 FB1E008008              		MOV.L #00088000H, R1
+00000595 BA12                    		MOVU.W 10H[R1], R2
+00000597 7722FDFF00              		AND #0FFFDH, R2
+0000059C 9212                    		MOV.W R2, 10H[R1]
+0000059E 6701                    		RTSD #04H
+000005A0                         L160:	; return
+                                 ;     693         break;
+                                 ;     694 #endif
+                                 ;     695         default:
+                                 ;     696             /* Should never get here. Valid channel number is checked above. */
+                                 ;     697         break;
+                                 ;     698     }    
+                                 ;     699 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",699
+000005A0 6701                    		RTSD #04H
+000005A2                         __$cmt_setup_channel:
+                                 		.STACK	__$cmt_setup_channel=20
+                                 ;     700 
+                                 ;     701 /***********************************************************************************************************************
+                                 ;     702 * Function Name: cmt_setup_channel
+                                 ;     703 * Description  : Sets dividers and counter so compare match occurs at input frequency.
+                                 ;     704 * Arguments    : channel - 
+                                 ;     705 *                    Channel number to use.
+                                 ;     706 *                frequency_hz -
+                                 ;     707 *                    Frequency at which to set CMT channel
+                                 ;     708 * Return Value : true
+                                 ;     709 ***********************************************************************************************************************/
+                                 ;     710 static bool cmt_setup_channel (uint32_t channel, uint32_t frequency_hz)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",710
+000005A2 7100F0                  		ADD #0FFFFFFF0H, R0
+000005A5 A089                    		MOV.L R1, 0CH[R0]
+000005A7 A082                    		MOV.L R2, 08H[R0]
+                                 ;     711 {
+                                 ;     712     uint32_t i;
+                                 ;     713     bool     ret = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",713
+000005A9 3C0600                  		MOV.B #00H, 06H[R0]
+000005AC                         L162:	; entry.split
+                                 ;     714 
+                                 ;     715 
+                                 ;     716     if (((uint32_t)CMT_PCLK_HZ / 8) >= frequency_hz) /* Requested frequency must not be higher than PCLK. */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",716
+000005AC A881                    		MOV.L 08H[R0], R1
+000005AE 7701808D5B              		CMP #005B8D80H, R1
+000005B3 24rr                    		BGTU L171
+000005B5                         L163:	; bb5
+                                 ;     717     {
+                                 ;     718         /* Choose clock. This is done by looking through the available dividers to see if we can match the frequency
+                                 ;     719            input by the user. */
+                                 ;     720         for (i = 0; i < (sizeof(g_cmt_clock_dividers)/sizeof(g_cmt_clock_dividers[0])); i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",720
+000005B5 F80600                  		MOV.L #00000000H, [R0]
+000005B8 2Err                 B  		BRA L170
+000005BA                         L164:	; bb7
+                                 ;     721         {
+                                 ;     722             /* Determine minimum frequency this divider can hit. For example, if a PCLK/8 is used and PCLK is 48MHz, then
+                                 ;     723                the minimum frequency we can support is around 91.5Hz. This obtained by doing the following calculation:
+                                 ;     724                (PCLK / divider) / max_counter_value
+                                 ;     725                Example:
+                                 ;     726                (48,000,000 / 8) / 65,536 = 91.5 */
+                                 ;     727             if (frequency_hz > (((uint32_t)CMT_PCLK_HZ / g_cmt_clock_dividers[i]) / (uint32_t)CMT_RX_MAX_TIMER_TICKS))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",727
+000005BA EC01                    		MOV.L [R0], R1
+000005BC 6C21                    		SHLL #02H, R1
+000005BE FBE2rrrrrrrr            		MOV.L #__$g_cmt_clock_dividers, R14
+000005C4 4B1E                    		ADD R1, R14
+000005C6 FBF2006CDC02            		MOV.L #02DC6C00H, R15
+000005CC 06A009EF                		DIVU [R14].L, R15
+000005D0 690F                    		SHLR #10H, R15
+000005D2 06850F02                		CMP 08H[R0].L, R15
+000005D6 22rr                    		BGEU L169
+000005D8                         L165:	; bb8
+                                 ;     728             {
+                                 ;     729                 /* Enable peripheral channel. */
+                                 ;     730                 power_on(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",730
+000005D8 A889                    		MOV.L 0CH[R0], R1
+000005DA 39rrrr               W  		BSR __$power_on
+000005DD                         L166:	; bb8.split
+                                 ;     731 
+                                 ;     732                 /* We can use this divider. Figure out counter ticks needed for this frequency. */
+                                 ;     733                 (*g_cmt_channels[channel]).CMCOR = (uint16_t)((((uint32_t)CMT_PCLK_HZ /g_cmt_clock_dividers[i])/frequency_hz) -1 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",733
+000005DD EC01                    		MOV.L [R0], R1
+000005DF 6C21                    		SHLL #02H, R1
+000005E1 FBE2rrrrrrrr            		MOV.L #__$g_cmt_clock_dividers, R14
+000005E7 4B1E                    		ADD R1, R14
+000005E9 FB12006CDC02            		MOV.L #02DC6C00H, R1
+000005EF 06A009E1                		DIVU [R14].L, R1
+000005F3 06A1090102              		DIVU 08H[R0].L, R1
+000005F8 6011                    		SUB #01H, R1
+000005FA FBE2rrrrrrrr            		MOV.L #__$g_cmt_channels, R14
+00000600 A88A                    		MOV.L 0CH[R0], R2
+00000602 FE62E2                  		MOV.L [R2,R14], R2
+00000605 90A1                    		MOV.W R1, 04H[R2]
+00000607                         L167:	; bb8.split1
+                                 ;     734 
+                                 ;     735 
+                                 ;     736                 /* Set clock divider to be used. */
+                                 ;     737                 (*g_cmt_channels[channel]).CMCR.BIT.CKS = i;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",737
+00000607 FBE2rrrrrrrr            		MOV.L #__$g_cmt_channels, R14
+0000060D A889                    		MOV.L 0CH[R0], R1
+0000060F FE61EE                  		MOV.L [R1,R14], R14
+00000612 5C01                    		MOVU.W [R0], R1
+00000614 5CEF                    		MOVU.W [R14], R15
+00000616 772FFCFF00              		AND #0FFFCH, R15
+0000061B 6431                    		AND #03H, R1
+0000061D 571F                    		OR R1, R15
+0000061F D3EF                    		MOV.W R15, [R14]
+00000621                         L168:	; bb8.split2
+                                 ;     738 
+                                 ;     739                 /* Save that we did find a valid divider. */
+                                 ;     740                 ret = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",740
+00000621 3C0601                  		MOV.B #01H, 06H[R0]
+00000624 2Err                 B  		BRA L171
+00000626                         L169:	; bb46
+00000626 EC01                    		MOV.L [R0], R1
+00000628 6211                    		ADD #01H, R1
+0000062A E301                    		MOV.L R1, [R0]
+0000062C                         L170:	; bb49
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",720
+0000062C EC01                    		MOV.L [R0], R1
+0000062E 6141                    		CMP #04H, R1
+00000630 23rr                    		BLTU L164
+00000632                         L171:	; bb60
+                                 ;     741 
+                                 ;     742                 /* No need to check other dividers. */
+                                 ;     743                 break;
+                                 ;     744             }
+                                 ;     745         }
+                                 ;     746     }
+                                 ;     747 
+                                 ;     748     return ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",748
+00000632 C5000607                		MOV.B 06H[R0], 07H[R0]
+00000636 B189                    		MOVU.B 07H[R0], R1
+00000638                         L172:	; bb60.split
+                                 ;     749 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",749
+00000638 5B11                    		MOVU.B R1, R1
+0000063A 6704                    		RTSD #10H
+0000063C                         _R_CMT_GetVersion:
+                                 		.STACK	_R_CMT_GetVersion=8
+                                 ;     750 
+                                 ;     751 /***********************************************************************************************************************
+                                 ;     752 * Function Name: R_CMT_GetVersion
+                                 ;     753 * Description  : Returns the current version of this module. The version number is encoded where the top 2 bytes are the
+                                 ;     754 *                major version number and the bottom 2 bytes are the minor version number. For example, Version 4.25 
+                                 ;     755 *                would be returned as 0x00040019.
+                                 ;     756 * Arguments    : none
+                                 ;     757 * Return Value : Version of this module.
+                                 ;     758 ***********************************************************************************************************************/
+                                 ;     759 #pragma inline(R_CMT_GetVersion)
+                                 ;     760 uint32_t R_CMT_GetVersion (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",760
+0000063C 6040                    		SUB #04H, R0
+                                 ;     761 {
+                                 ;     762     /* These version macros are defined in r_cmt_rx_if.h. */
+                                 ;     763     return ((((uint32_t)CMT_RX_VERSION_MAJOR) << 16) | (uint32_t)CMT_RX_VERSION_MINOR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",763
+0000063E F80E290002              		MOV.L #00020029H, [R0]
+00000643 FB1E290002              		MOV.L #00020029H, R1
+00000648                         L174:	; entry.split
+                                 ;     764 } 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",764
+00000648 6701                    		RTSD #04H
+0000064A                         __$cmt_isr_common:
+                                 		.STACK	__$cmt_isr_common=12
+                                 ;     765 
+                                 ;     766 /***********************************************************************************************************************
+                                 ;     767 * Function Name: cmt_isr_common
+                                 ;     768 * Description  : Common part of ISR handling. Put here and made inline so changes will always apply to all channels.
+                                 ;     769 * Arguments    : channel -
+                                 ;     770 *                    Which channel this is for.
+                                 ;     771 * Return Value : none
+                                 ;     772 ***********************************************************************************************************************/
+                                 ;     773 #pragma inline(cmt_isr_common)
+                                 ;     774 static void cmt_isr_common (uint32_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",774
+0000064A 6080                    		SUB #08H, R0
+0000064C A009                    		MOV.L R1, 04H[R0]
+                                 ;     775 {
+                                 ;     776     /* Check for valid callback pointer before calling it. */
+                                 ;     777     if ((NULL != g_cmt_callbacks[channel]) && ((uint32_t)FIT_NO_FUNC != (uint32_t)g_cmt_callbacks[channel]))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",777
+0000064E FBE2rrrrrrrr            		MOV.L #__$g_cmt_callbacks, R14
+00000654 FE61EE                  		MOV.L [R1,R14], R14
+00000657 610E                    		CMP #00H, R14
+00000659 21rr                    		BNE L177
+0000065B 2Err                 B  		BRA L179
+0000065D                         L176:	; bb2
+                                 ;     778     {
+                                 ;     779         /* Valid callback found, jump to it. */
+                                 ;     780         g_cmt_callbacks[channel]((void *)channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",780
+0000065D A809                    		MOV.L 04H[R0], R1
+0000065F FBE2rrrrrrrr            		MOV.L #__$g_cmt_callbacks, R14
+00000665 FE61EE                  		MOV.L [R1,R14], R14
+00000668 7F1E                    		JSR R14
+0000066A 2Err                 B  		BRA L181
+0000066C                         L177:	; bb12
+0000066C FBE2rrrrrrrr            		MOV.L #__$g_cmt_callbacks, R14
+00000672 A809                    		MOV.L 04H[R0], R1
+00000674 FE61EE                  		MOV.L [R1,R14], R14
+00000677 740E00000010            		CMP #10000000H, R14
+0000067D 10                   S  		BEQ L179
+0000067E                         L178:	; bb19
+0000067E F80601                  		MOV.L #00000001H, [R0]
+00000681 08                   S  		BRA L180
+00000682                         L179:	; bb20
+00000682 F80600                  		MOV.L #00000000H, [R0]
+00000685                         L180:	; bb21
+00000685 EC01                    		MOV.L [R0], R1
+00000687 6101                    		CMP #00H, R1
+00000689 21rr                    		BNE L176
+0000068B                         L181:	; bb26
+                                 ;     781     }
+                                 ;     782 
+                                 ;     783     /* If this is one-shot mode then stop timer. */
+                                 ;     784     if (CMT_RX_MODE_ONE_SHOT == g_cmt_modes[channel])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",784
+0000068B FBE2rrrrrrrr            		MOV.L #__$g_cmt_modes, R14
+00000691 A809                    		MOV.L 04H[R0], R1
+00000693 FE61EE                  		MOV.L [R1,R14], R14
+00000696 612E                    		CMP #02H, R14
+00000698 18                   S  		BNE L183
+00000699                         L182:	; bb27
+                                 ;     785     {
+                                 ;     786         R_CMT_Stop(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",786
+00000699 A809                    		MOV.L 04H[R0], R1
+0000069B 39rrrr               W  		BSR _R_CMT_Stop
+0000069E 6702                    		RTSD #08H
+000006A0                         L183:	; return
+                                 ;     787     }
+                                 ;     788 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",788
+000006A0 6702                    		RTSD #08H
+000006A2                         __$cmt1_isr:
+                                 		.STACK	__$cmt1_isr=36
+                                 		.RVECTOR	29,__$cmt1_isr
+                                 ;     789 
+                                 ;     790 /***********************************************************************************************************************
+                                 ;     791 * Function Name: cmt0_isr
+                                 ;     792 * Description  : Interrupt when compare match for this channel occurs.
+                                 ;     793 * Arguments    : none
+                                 ;     794 * Return Value : none
+                                 ;     795 ***********************************************************************************************************************/
+                                 ;     796 #ifndef FREE_RTOS_PP /* Prevent the conflict with FreeRTOS timer */
+                                 ;     797 #pragma interrupt cmt0_isr(vect=VECT(CMT0, CMI0))
+                                 ;     798 static void cmt0_isr (void)
+                                 ;     799 {
+                                 ;     800     cmt_isr_common(0);
+                                 ;     801 }
+                                 ;     802 #endif /* FREE_RTOS_PP */
+                                 ;     803 
+                                 ;     804 /***********************************************************************************************************************
+                                 ;     805 * Function Name: cmt1_isr
+                                 ;     806 * Description  : Interrupt when compare match for this channel occurs.
+                                 ;     807 * Arguments    : none
+                                 ;     808 * Return Value : none
+                                 ;     809 ***********************************************************************************************************************/
+                                 ;     810 #pragma interrupt cmt1_isr(vect=VECT(CMT1, CMI1))
+                                 ;     811 static void cmt1_isr (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",811
+000006A2 6EEF                    		PUSHM R14-R15
+000006A4 6E15                    		PUSHM R1-R5
+000006A6 6611                    		MOV.L #00000001H, R1
+                                 ;     812 {
+                                 ;     813     cmt_isr_common(1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",813
+000006A8 39rrrr               W  		BSR __$cmt_isr_common
+000006AB 6F15                    		POPM R1-R5
+000006AD 6FEF                    		POPM R14-R15
+000006AF 7F95                    		RTE
+000006B1                         __$cmt2_isr:
+                                 		.STACK	__$cmt2_isr=36
+                                 		.RVECTOR	30,__$cmt2_isr
+                                 ;     814 }
+                                 ;     815 
+                                 ;     816 #if   CMT_RX_NUM_CHANNELS == 4
+                                 ;     817 /***********************************************************************************************************************
+                                 ;     818 * Function Name: cmt2_isr
+                                 ;     819 * Description  : Interrupt when compare match for this channel occurs.
+                                 ;     820 * Arguments    : none
+                                 ;     821 * Return Value : none
+                                 ;     822 ***********************************************************************************************************************/
+                                 ;     823 #pragma interrupt cmt2_isr(vect=VECT(CMT2, CMI2))
+                                 ;     824 static void cmt2_isr (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",824
+000006B1 6EEF                    		PUSHM R14-R15
+000006B3 6E15                    		PUSHM R1-R5
+000006B5 6621                    		MOV.L #00000002H, R1
+                                 ;     825 {
+                                 ;     826     cmt_isr_common(2);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",826
+000006B7 39rrrr               W  		BSR __$cmt_isr_common
+000006BA 6F15                    		POPM R1-R5
+000006BC 6FEF                    		POPM R14-R15
+000006BE 7F95                    		RTE
+000006C0                         __$cmt3_isr:
+                                 		.STACK	__$cmt3_isr=36
+                                 		.RVECTOR	31,__$cmt3_isr
+                                 ;     827 }
+                                 ;     828 
+                                 ;     829 /***********************************************************************************************************************
+                                 ;     830 * Function Name: cmt3_isr
+                                 ;     831 * Description  : Interrupt when compare match for this channel occurs.
+                                 ;     832 * Arguments    : none
+                                 ;     833 * Return Value : none
+                                 ;     834 ***********************************************************************************************************************/
+                                 ;     835 #pragma interrupt cmt3_isr(vect=VECT(CMT3, CMI3))
+                                 ;     836 static void cmt3_isr (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",836
+000006C0 6EEF                    		PUSHM R14-R15
+000006C2 6E15                    		PUSHM R1-R5
+000006C4 6631                    		MOV.L #00000003H, R1
+                                 ;     837 {
+                                 ;     838     cmt_isr_common(3);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_cmt_rx\src\r_cmt_rx.c",838
+000006C6 39rrrr               W  		BSR __$cmt_isr_common
+000006C9 6F15                    		POPM R1-R5
+000006CB 6FEF                    		POPM R14-R15
+000006CD 7F95                    		RTE
+                                 ;     839 }
+                                 ;     840 #endif
+                                 ;     841 
+                                 ;     842 
+                                 		.SECTION	C,ROMDATA,ALIGN=4
+00000000                         __$g_cmt_channels:
+00000000 02800800                		.lword	00088002H
+00000004 08800800                		.lword	00088008H
+00000008 12800800                		.lword	00088012H
+0000000C 18800800                		.lword	00088018H
+00000010                         __$g_cmt_clock_dividers:
+00000010 08000000                		.lword	00000008H
+00000014 20000000                		.lword	00000020H
+00000018 80000000                		.lword	00000080H
+0000001C 00020000                		.lword	00000200H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         __$g_cmt_modes:
+00000000(00000010H)              		.blkl	4
+00000010                         __$g_cmt_callbacks:
+00000010(00000010H)              		.blkl	4
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01878   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001743(000006CFH)  P
+ROMDATA  0000000032(00000020H)  C
+DATA     0000000032(00000020H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\r_cmt_rx.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\r_cmt_rx.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\r_cmt_rx\src\r_cmt_rx.obj

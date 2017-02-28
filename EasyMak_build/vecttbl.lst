@@ -1,0 +1,673 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:49:24 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:49:23
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=vecttbl.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=vecttbl.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;vecttbl.c
+                                 
+                                 		.glb	_Fixed_Vectors
+                                 		.glb	_excep_supervisor_inst_isr
+                                 		.glb	_excep_undefined_inst_isr
+                                 		.glb	_excep_floating_point_isr
+                                 		.glb	_non_maskable_isr
+                                 		.glb	_undefined_interrupt_source_isr
+                                 		.glb	_PowerON_Reset_PC
+                                 		.glb	_R_BSP_InterruptControl
+                                 		.glb	_bus_error_isr
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _excep_supervisor_inst_isr:
+                                 		.STACK	_excep_supervisor_inst_isr=36
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : vecttbl.c
+                                 ;      21 * Device(s)    : RX63x
+                                 ;      22 * Description  : Definition of the fixed vector table and user boot options.
+                                 ;      23 ***********************************************************************************************************************/
+                                 ;      24 /***********************************************************************************************************************
+                                 ;      25 * History : DD.MM.YYYY Version  Description
+                                 ;      26 *         : 26.10.2011 1.00     First Release
+                                 ;      27 *         : 17.02.2012 1.10     Made function names compliant with CS v4.0
+                                 ;      28 *         : 13.03.2012 1.20     ID Code is now specified in r_bsp_config.h. It is still used here in Fixed_Vectors[].
+                                 ;      29 *         : 26.06.2012 1.30     Brought in arrays from flash_options.c into here because they were in the same space.
+                                 ;      30 *                               Also added optional callbacks to the ISRs. Now using sections instead of defining the
+                                 ;      31 *                               address for a specific array. Added macros to define the OFS registers. Added option
+                                 ;      32 *                               to choose endian for User App and User Boot. Add macro to set ROM Code Protection.
+                                 ;      33 *         : 16.07.2012 1.40     Added code to handle exception interrupts better.
+                                 ;      34 *         : 19.11.2012 1.50     Updated code to use 'BSP_' and 'BSP_CFG_' prefix for macros.
+                                 ;      35 *         : 06.05.2013 1.60     Code auto detects endian from compiler macros now.
+                                 ;      36 *         : 24.06.2013 1.70     Code now uses functions from mcu_interrupts.c for exception callbacks. All interrupts
+                                 ;      37 *                               that map to NMI vector are now supported. Fixed bug in FPU flag clearing.
+                                 ;      38 ***********************************************************************************************************************/
+                                 ;      39 
+                                 ;      40 /***********************************************************************************************************************
+                                 ;      41 Includes   <System Includes> , "Project Includes"
+                                 ;      42 ***********************************************************************************************************************/
+                                 ;      43 /* BSP configuration. */
+                                 ;      44 #include "platform.h"
+                                 ;      45 
+                                 ;      46 /***********************************************************************************************************************
+                                 ;      47 Macro definitions
+                                 ;      48 ***********************************************************************************************************************/
+                                 ;      49 /* Defines CV, CO, CZ, CU, CX, and CE bits. */
+                                 ;      50 #define FPU_CAUSE_FLAGS     (0x000000FC)
+                                 ;      51 
+                                 ;      52 /***********************************************************************************************************************
+                                 ;      53 * Function name: PowerON_Reset_PC
+                                 ;      54 * Description  : The reset vector points to this function.  Code execution starts in this function after reset.
+                                 ;      55 * Arguments    : none
+                                 ;      56 * Return value : none
+                                 ;      57 ***********************************************************************************************************************/
+                                 ;      58 /* BCH - 01/16/2013 */
+                                 ;      59 /* 3447: External linkage is not needed for this special function as it is the function that is run out of reset. */
+                                 ;      60 /* PRQA S 3447 ++ */
+                                 ;      61 #ifndef RELEASE
+                                 ;      62 extern void PowerON_Reset_PC(void);
+                                 ;      63 
+                                 ;      64 
+                                 ;      65 /***********************************************************************************************************************
+                                 ;      66 * Function name: excep_supervisor_inst_isr
+                                 ;      67 * Description  : Supervisor Instruction Violation ISR
+                                 ;      68 * Arguments    : none
+                                 ;      69 * Return Value : none
+                                 ;      70 ***********************************************************************************************************************/
+                                 ;      71 #pragma interrupt (excep_supervisor_inst_isr)
+                                 ;      72 void excep_supervisor_inst_isr(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",72
+00000000 6EEF                    		PUSHM R14-R15
+00000002 6E15                    		PUSHM R1-R5
+00000004 FB3200000010            		MOV.L #10000000H, R3
+0000000A 6601                    		MOV.L #00000000H, R1
+                                 ;      73 {
+                                 ;      74     /* If user has registered a callback for this exception then call it. */
+                                 ;      75     R_BSP_InterruptControl(BSP_INT_SRC_EXC_SUPERVISOR_INSTR, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",75
+0000000C EF12                    		MOV.L R1, R2
+0000000E 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+00000012 6F15                    		POPM R1-R5
+00000014 6FEF                    		POPM R14-R15
+00000016 7F95                    		RTE
+00000018                         _excep_undefined_inst_isr:
+                                 		.STACK	_excep_undefined_inst_isr=36
+                                 ;      76 }
+                                 ;      77 
+                                 ;      78 /***********************************************************************************************************************
+                                 ;      79 * Function name: excep_undefined_inst_isr
+                                 ;      80 * Description  : Undefined instruction exception ISR
+                                 ;      81 * Arguments    : none
+                                 ;      82 * Return Value : none
+                                 ;      83 ***********************************************************************************************************************/
+                                 ;      84 #pragma interrupt (excep_undefined_inst_isr)
+                                 ;      85 void excep_undefined_inst_isr(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",85
+00000018 6EEF                    		PUSHM R14-R15
+0000001A 6E15                    		PUSHM R1-R5
+0000001C FB3200000010            		MOV.L #10000000H, R3
+00000022 6602                    		MOV.L #00000000H, R2
+00000024 6611                    		MOV.L #00000001H, R1
+                                 ;      86 {
+                                 ;      87     /* If user has registered a callback for this exception then call it. */
+                                 ;      88     R_BSP_InterruptControl(BSP_INT_SRC_EXC_UNDEFINED_INSTR, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",88
+00000026 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+0000002A 6F15                    		POPM R1-R5
+0000002C 6FEF                    		POPM R14-R15
+0000002E 7F95                    		RTE
+00000030                         _excep_floating_point_isr:
+                                 		.STACK	_excep_floating_point_isr=40
+                                 ;      89 }
+                                 ;      90 
+                                 ;      91 /***********************************************************************************************************************
+                                 ;      92 * Function name: excep_floating_point_isr
+                                 ;      93 * Description  : Floating point exception ISR
+                                 ;      94 * Arguments    : none
+                                 ;      95 * Return Value : none
+                                 ;      96 ***********************************************************************************************************************/
+                                 ;      97 #pragma interrupt (excep_floating_point_isr)
+                                 ;      98 void excep_floating_point_isr(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",98
+00000030 6EEF                    		PUSHM R14-R15
+00000032 6E15                    		PUSHM R1-R5
+00000034 6040                    		SUB #04H, R0
+00000036 FB3200000010            		MOV.L #10000000H, R3
+0000003C 6602                    		MOV.L #00000000H, R2
+0000003E 6631                    		MOV.L #00000003H, R1
+                                 ;      99 {
+                                 ;     100     /* Used for reading FPSW register. */
+                                 ;     101     uint32_t temp_fpsw;
+                                 ;     102 
+                                 ;     103     /* If user has registered a callback for this exception then call it. */
+                                 ;     104     R_BSP_InterruptControl(BSP_INT_SRC_EXC_FPU, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",104
+00000040 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+00000044                         L13:	; entry.split
+                                 ;     105 
+                                 ;     106     /* Get current FPSW. */
+                                 ;     107     temp_fpsw = (uint32_t)get_fpsw();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",107
+00000044 FD6A31                  		MVFC FPSW, R1
+00000047 E301                    		MOV.L R1, [R0]
+00000049                         L14:	; entry.split1
+                                 ;     108     /* Clear only the FPU exception flags. */
+                                 ;     109     set_fpsw(temp_fpsw & ((uint32_t)~FPU_CAUSE_FLAGS));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",109
+00000049 EC01                    		MOV.L [R0], R1
+0000004B 762103FF                		AND #0FFFFFF03H, R1
+0000004F FD6813                  		MVTC R1, FPSW
+00000052 6240                    		ADD #04H, R0
+00000054 6F15                    		POPM R1-R5
+00000056 6FEF                    		POPM R14-R15
+00000058 7F95                    		RTE
+0000005A                         _non_maskable_isr:
+                                 		.STACK	_non_maskable_isr=36
+                                 ;     110 }
+                                 ;     111 
+                                 ;     112 /***********************************************************************************************************************
+                                 ;     113 * Function name: non_maskable_isr
+                                 ;     114 * Description  : Non-maskable interrupt ISR
+                                 ;     115 * Arguments    : none
+                                 ;     116 * Return Value : none
+                                 ;     117 ***********************************************************************************************************************/
+                                 ;     118 #pragma interrupt (non_maskable_isr)
+                                 ;     119 void non_maskable_isr(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",119
+0000005A 6EEF                    		PUSHM R14-R15
+0000005C 6E15                    		PUSHM R1-R5
+0000005E FB1E807508              		MOV.L #00087580H, R1
+                                 ;     120 {
+                                 ;     121     /* Determine what is the cause of this interrupt. */
+                                 ;     122     if (1 == ICU.NMISR.BIT.NMIST)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",122
+00000063 5811                    		MOVU.B [R1], R1
+00000065 6411                    		AND #01H, R1
+00000067 6111                    		CMP #01H, R1
+00000069 21rr                    		BNE L18
+0000006B                         L16:	; bb1
+0000006B FB3200000010            		MOV.L #10000000H, R3
+00000071 6602                    		MOV.L #00000000H, R2
+00000073 6621                    		MOV.L #00000002H, R1
+                                 ;     123     {
+                                 ;     124         /* NMI pin interrupt is requested. */
+                                 ;     125         R_BSP_InterruptControl(BSP_INT_SRC_EXC_NMI_PIN, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",125
+00000075 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+00000079                         L17:	; bb1.split
+00000079 FB1E827508              		MOV.L #00087582H, R1
+                                 ;     126 
+                                 ;     127         /* Clear NMI pin interrupt flag. */
+                                 ;     128         ICU.NMICLR.BIT.NMICLR = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",128
+0000007E F010                    		BSET #00H, [R1].B
+00000080                         L18:	; bb12
+00000080 FB1E807508              		MOV.L #00087580H, R1
+                                 ;     129     }
+                                 ;     130 
+                                 ;     131     if (1 == ICU.NMISR.BIT.OSTST)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",131
+00000085 5811                    		MOVU.B [R1], R1
+00000087 6811                    		SHLR #01H, R1
+00000089 6411                    		AND #01H, R1
+0000008B 6111                    		CMP #01H, R1
+0000008D 21rr                    		BNE L21
+0000008F                         L19:	; bb13
+0000008F FB3200000010            		MOV.L #10000000H, R3
+00000095 6602                    		MOV.L #00000000H, R2
+00000097 6641                    		MOV.L #00000004H, R1
+                                 ;     132     {
+                                 ;     133         /* Oscillation stop detection interrupt is requested. */
+                                 ;     134         R_BSP_InterruptControl(BSP_INT_SRC_OSC_STOP_DETECT, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",134
+00000099 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+0000009D                         L20:	; bb13.split
+0000009D FB1E827508              		MOV.L #00087582H, R1
+                                 ;     135 
+                                 ;     136         /* Clear oscillation stop detect flag. */
+                                 ;     137         ICU.NMICLR.BIT.OSTCLR = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",137
+000000A2 F011                    		BSET #01H, [R1].B
+000000A4                         L21:	; bb26
+000000A4 FB1E807508              		MOV.L #00087580H, R1
+                                 ;     138     }
+                                 ;     139 
+                                 ;     140     if (1 == ICU.NMISR.BIT.WDTST)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",140
+000000A9 5811                    		MOVU.B [R1], R1
+000000AB 6821                    		SHLR #02H, R1
+000000AD 6411                    		AND #01H, R1
+000000AF 6111                    		CMP #01H, R1
+000000B1 21rr                    		BNE L24
+000000B3                         L22:	; bb27
+000000B3 FB3200000010            		MOV.L #10000000H, R3
+000000B9 6602                    		MOV.L #00000000H, R2
+000000BB 6651                    		MOV.L #00000005H, R1
+                                 ;     141     {
+                                 ;     142         /* WDT underflow/refresh error interrupt is requested. */
+                                 ;     143         R_BSP_InterruptControl(BSP_INT_SRC_WDT_ERROR, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",143
+000000BD 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+000000C1                         L23:	; bb27.split
+000000C1 FB1E827508              		MOV.L #00087582H, R1
+                                 ;     144 
+                                 ;     145         /* Clear WDT flag. */
+                                 ;     146         ICU.NMICLR.BIT.WDTCLR = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",146
+000000C6 F012                    		BSET #02H, [R1].B
+000000C8                         L24:	; bb40
+000000C8 FB1E807508              		MOV.L #00087580H, R1
+                                 ;     147     }
+                                 ;     148 
+                                 ;     149     if (1 == ICU.NMISR.BIT.IWDTST)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",149
+000000CD 5811                    		MOVU.B [R1], R1
+000000CF 6831                    		SHLR #03H, R1
+000000D1 6411                    		AND #01H, R1
+000000D3 6111                    		CMP #01H, R1
+000000D5 21rr                    		BNE L27
+000000D7                         L25:	; bb41
+000000D7 FB3200000010            		MOV.L #10000000H, R3
+000000DD 6602                    		MOV.L #00000000H, R2
+000000DF 6661                    		MOV.L #00000006H, R1
+                                 ;     150     {
+                                 ;     151         /* IWDT underflow/refresh error interrupt is requested. */
+                                 ;     152         R_BSP_InterruptControl(BSP_INT_SRC_IWDT_ERROR, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",152
+000000E1 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+000000E5                         L26:	; bb41.split
+000000E5 FB1E827508              		MOV.L #00087582H, R1
+                                 ;     153 
+                                 ;     154         /* Clear IWDT flag. */
+                                 ;     155         ICU.NMICLR.BIT.IWDTCLR = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",155
+000000EA F013                    		BSET #03H, [R1].B
+000000EC                         L27:	; bb54
+000000EC FB1E807508              		MOV.L #00087580H, R1
+                                 ;     156     }
+                                 ;     157 
+                                 ;     158     if (1 == ICU.NMISR.BIT.LVD1ST)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",158
+000000F1 5811                    		MOVU.B [R1], R1
+000000F3 6841                    		SHLR #04H, R1
+000000F5 6411                    		AND #01H, R1
+000000F7 6111                    		CMP #01H, R1
+000000F9 21rr                    		BNE L30
+000000FB                         L28:	; bb55
+000000FB FB3200000010            		MOV.L #10000000H, R3
+00000101 6602                    		MOV.L #00000000H, R2
+00000103 6671                    		MOV.L #00000007H, R1
+                                 ;     159     {
+                                 ;     160         /* Voltage monitoring 1 interrupt is requested. */
+                                 ;     161         R_BSP_InterruptControl(BSP_INT_SRC_LVD1, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",161
+00000105 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+00000109                         L29:	; bb55.split
+00000109 FB1E827508              		MOV.L #00087582H, R1
+                                 ;     162 
+                                 ;     163         /* Clear LVD1 flag. */
+                                 ;     164         ICU.NMICLR.BIT.LVD1CLR = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",164
+0000010E F014                    		BSET #04H, [R1].B
+00000110                         L30:	; bb68
+00000110 FB1E807508              		MOV.L #00087580H, R1
+                                 ;     165     }
+                                 ;     166 
+                                 ;     167     if (1 == ICU.NMISR.BIT.LVD2ST)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",167
+00000115 5811                    		MOVU.B [R1], R1
+00000117 6851                    		SHLR #05H, R1
+00000119 6411                    		AND #01H, R1
+0000011B 6111                    		CMP #01H, R1
+0000011D 21rr                    		BNE L33
+0000011F                         L31:	; bb69
+0000011F FB3200000010            		MOV.L #10000000H, R3
+00000125 6602                    		MOV.L #00000000H, R2
+00000127 6681                    		MOV.L #00000008H, R1
+                                 ;     168     {
+                                 ;     169         /* Voltage monitoring 1 interrupt is requested. */
+                                 ;     170         R_BSP_InterruptControl(BSP_INT_SRC_LVD2, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",170
+00000129 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+0000012D                         L32:	; bb69.split
+0000012D FB1E827508              		MOV.L #00087582H, R1
+                                 ;     171 
+                                 ;     172         /* Clear LVD2 flag. */
+                                 ;     173         ICU.NMICLR.BIT.LVD2CLR = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",173
+00000132 F015                    		BSET #05H, [R1].B
+00000134 6F15                    		POPM R1-R5
+00000136 6FEF                    		POPM R14-R15
+00000138 7F95                    		RTE
+0000013A                         L33:	; return
+                                 ;     174     }
+                                 ;     175 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",175
+0000013A 6F15                    		POPM R1-R5
+0000013C 6FEF                    		POPM R14-R15
+0000013E 7F95                    		RTE
+00000140                         _undefined_interrupt_source_isr:
+                                 		.STACK	_undefined_interrupt_source_isr=36
+                                 ;     176 
+                                 ;     177 /***********************************************************************************************************************
+                                 ;     178 * Function name: undefined_interrupt_source_isr
+                                 ;     179 * Description  : All undefined interrupt vectors point to this function.
+                                 ;     180 *                Set a breakpoint in this function to determine which source is creating unwanted interrupts.
+                                 ;     181 * Arguments    : none
+                                 ;     182 * Return Value : none
+                                 ;     183 ***********************************************************************************************************************/
+                                 ;     184 #pragma interrupt (undefined_interrupt_source_isr)
+                                 ;     185 void undefined_interrupt_source_isr(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",185
+00000140 6EEF                    		PUSHM R14-R15
+00000142 6E15                    		PUSHM R1-R5
+00000144 FB3200000010            		MOV.L #10000000H, R3
+0000014A 6602                    		MOV.L #00000000H, R2
+0000014C 6691                    		MOV.L #00000009H, R1
+                                 ;     186 {
+                                 ;     187     /* If user has registered a callback for this exception then call it. */
+                                 ;     188     R_BSP_InterruptControl(BSP_INT_SRC_UNDEFINED_INTERRUPT, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",188
+0000014E 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+00000152 6F15                    		POPM R1-R5
+00000154 6FEF                    		POPM R14-R15
+00000156 7F95                    		RTE
+00000158                         _bus_error_isr:
+                                 		.STACK	_bus_error_isr=36
+                                 		.RVECTOR	16,_bus_error_isr
+                                 ;     189 }
+                                 ;     190 
+                                 ;     191 /***********************************************************************************************************************
+                                 ;     192 * Function name: bus_error_isr
+                                 ;     193 * Description  : By default, this demo code enables the Bus Error Interrupt. This interrupt will fire if the user tries 
+                                 ;     194 *                to access code or data from one of the reserved areas in the memory map, including the areas covered 
+                                 ;     195 *                by disabled chip selects. A nop() statement is included here as a convenient place to set a breakpoint 
+                                 ;     196 *                during debugging and development, and further handling should be added by the user for their 
+                                 ;     197 *                application.
+                                 ;     198 * Arguments    : none
+                                 ;     199 * Return value : none
+                                 ;     200 ***********************************************************************************************************************/
+                                 ;     201 #pragma interrupt (bus_error_isr(vect=VECT(BSC,BUSERR)))
+                                 ;     202 void bus_error_isr (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",202
+00000158 6EEF                    		PUSHM R14-R15
+0000015A 6E15                    		PUSHM R1-R5
+0000015C FB1E001308              		MOV.L #00081300H, R1
+                                 ;     203 {
+                                 ;     204     /* Clear the bus error */
+                                 ;     205     BSC.BERCLR.BIT.STSCLR = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",205
+00000161 F010                    		BSET #00H, [R1].B
+00000163                         L36:	; entry.split
+00000163 FB3200000010            		MOV.L #10000000H, R3
+00000169 6602                    		MOV.L #00000000H, R2
+0000016B 66A1                    		MOV.L #0000000AH, R1
+                                 ;     206 
+                                 ;     207     /* 
+                                 ;     208         To find the address that was accessed when the bus error occurred, read the register BSC.BERSR2.WORD.  The upper
+                                 ;     209         13 bits of this register contain the upper 13-bits of the offending address (in 512K byte units)
+                                 ;     210     */
+                                 ;     211 
+                                 ;     212     /* If user has registered a callback for this exception then call it. */
+                                 ;     213     R_BSP_InterruptControl(BSP_INT_SRC_BUS_ERROR, BSP_INT_CMD_CALL_CALLBACK, FIT_NO_PTR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\vecttbl.c",213
+0000016D 05rrrrrr             A  		BSR _R_BSP_InterruptControl
+00000171 6F15                    		POPM R1-R5
+00000173 6FEF                    		POPM R14-R15
+00000175 7F95                    		RTE
+                                 ;     214 }
+                                 ;     215 
+                                 ;     216 /***********************************************************************************************************************
+                                 ;     217 * The following array fills in the UB codes to get into User Boot Mode, the MDEB register, and the User Boot reset
+                                 ;     218 * vector.
+                                 ;     219 ***********************************************************************************************************************/
+                                 ;     220 /* The UB Code A, UB Code B, and Endian select register B (MDEB) are located in the User Boot space. Immediately
+                                 ;     221    following the MDEB register is the User Boot Reset Vector so it is defined below as well. These settings will only
+                                 ;     222    be used when the MCU is reset in User Boot Mode. In order for the MCU to start up in User Boot Mode the following
+                                 ;     223    conditions must be met:
+                                 ;     224    1) UB code A is 55736572h and 426F6F74h.
+                                 ;     225    2) UB code B is FFFF FF07h and 0008 C04Ch.
+                                 ;     226    3) The low level is being input on the MD pin.
+                                 ;     227    4) The high level is being input on the PC7 pin. 
+                                 ;     228    Please see the Option-Setting Memory section of your MCU's HW manual for more information. */
+                                 ;     229 
+                                 ;     230 /* 0xFF7FFFE8 - 0xFF7FFFEF : UB Code A register  
+                                 ;     231    0xFF7FFFF0 - 0xFF7FFFF7 : UB Code B register
+                                 ;     232    0xFF7FFFF8 - 0xFF7FFFFB : MDEB register
+                                 ;     233    0xFF7FFFFC - 0xFF7FFFFF : User Boot Reset Vector */
+                                 ;     234 
+                                 ;     235 #if BSP_CFG_USER_BOOT_ENABLE == 1
+                                 ;     236 
+                                 ;     237 /* Allocate this space in the user boot sector. */
+                                 ;     238 #pragma section C UBSETTINGS 
+                                 ;     239 
+                                 ;     240 extern void PowerON_Reset_PC(void);
+                                 ;     241 
+                                 ;     242 /* Use this array if you are using User Boot. Make sure to fill in valid address for UB Reset Vector. */
+                                 ;     243 const uint32_t user_boot_settings[6] = 
+                                 ;     244 {
+                                 ;     245     0x55736572,                 //Required setting for UB Code A to get into User Boot
+                                 ;     246     0x426f6f74,                 //Required setting for UB Code A to get into User Boot
+                                 ;     247     0xffffff07,                 //Required setting for UB Code B to get into User Boot
+                                 ;     248     0x0008c04c,                 //Required setting for UB Code B to get into User Boot
+                                 ;     249     /* Choose endian for user application code
+                                 ;     250        MDEB Register - Endian Select Register B
+                                 ;     251        b31:b3 Reserved (set to 1)
+                                 ;     252        b2:b0  MDE - Endian Select (0 = Big Endian, 7 = Little Endian) */                    
+                                 ;     253     #if (defined(__BIG) || defined(__BIG_ENDIAN__) || defined(__RX_BIG_ENDIAN__))
+                                 ;     254     0xFFFFFFF8,     //Big Endian chosen for User Boot Code
+                                 ;     255     #else
+                                 ;     256     0xFFFFFFFF,     //Little Endian chosen for User Boot Code
+                                 ;     257     #endif                     
+                                 ;     258     (uint32_t) PowerON_Reset_PC //This is the User Boot Reset Vector. When using User Boot put in the reset address here
+                                 ;     259 };
+                                 ;     260 #endif
+                                 ;     261 
+                                 ;     262 /***********************************************************************************************************************
+                                 ;     263 * The following array fills in the option function select registers, fixed vector table, and the ID code protection 
+                                 ;     264 * bytes.
+                                 ;     265 ***********************************************************************************************************************/
+                                 ;     266 #pragma section C FIXEDVECT
+                                 ;     267 
+                                 ;     268 void * const Fixed_Vectors[] = 
+                                 ;     269 {
+                                 ;     270     /* The Endian select register S (MDES), Option function select register 1 (OFS1), and Option function select 
+                                 ;     271        register 0 (OFS0) are located in User ROM. */
+                                 ;     272     
+                                 ;     273     /* 0xFFFFFF80 - 0xFFFFFF83 : MDES register
+                                 ;     274        0xFFFFFF84 - 0xFFFFFF87 : Reserved space (0xFF's)
+                                 ;     275        0xFFFFFF88 - 0xFFFFFF8B : OFS1 register
+                                 ;     276        0xFFFFFF8C - 0xFFFFFF8F : OFS0 register */
+                                 ;     277 
+                                 ;     278     /* Choose endian for user application code
+                                 ;     279        MDES Register - Endian Select Register S
+                                 ;     280        b31:b3 Reserved (set to 1)
+                                 ;     281        b2:b0  MDE - Endian Select (0 = Big Endian, 7 = Little Endian) */
+                                 ;     282 #if (defined(__BIG) || defined(__BIG_ENDIAN__) || defined(__RX_BIG_ENDIAN__))
+                                 ;     283     (void *)0xFFFFFFF8,     //Big Endian chosen for User Application
+                                 ;     284 #else
+                                 ;     285     (void *)0xFFFFFFFF,     //Little Endian chosen for User Application
+                                 ;     286 #endif                     
+                                 ;     287     (void *)0xFFFFFFFF,     //Reserved space
+                                 ;     288     /* Configure whether voltage detection 0 circuit and HOCO are enabled after reset. 
+                                 ;     289        OFS1 - Option Function Select Register 1 
+                                 ;     290        b31:b9 Reserved (set to 1)
+                                 ;     291        b8     HOCOEN - Enable/disable HOCO oscillation after a reset (0=enable, 1=disable)
+                                 ;     292        b7:b3  Reserved (set to 1)
+                                 ;     293        b2     LVDAS - Choose to enable/disable Voltage Detection 0 Circuit after a reset (0=enable, 1=disable)
+                                 ;     294        b1:b0  Reserved (set to 1) */
+                                 ;     295     (void *)BSP_CFG_OFS1_REG_VALUE,     //Defined in r_bsp_config.h
+                                 ;     296     /* Configure WDT and IWDT settings. 
+                                 ;     297        OFS0 - Option Function Select Register 0 
+                                 ;     298        b31:b29 Reserved (set to 1)
+                                 ;     299        b28     WDTRSTIRQS - WDT Reset Interrupt Request - What to do on underflow (0=take interrupt, 1=reset MCU)
+                                 ;     300        b27:b26 WDTRPSS - WDT Window Start Position Select - (0=25%, 1=50%, 2=75%, 3=100%,don't use)
+                                 ;     301        b25:b24 WDTRPES - WDT Window End Position Select - (0=75%, 1=50%, 2=25%, 3=0%,don't use)
+                                 ;     302        b23:b20 WDTCKS - WDT Clock Frequency Division Ratio - (1=/4, 4=/64, 0xF=/128, 6=/512, 7=/2048, 8=/8192)
+                                 ;     303        b19:b18 WDTTOPS - WDT Timeout Period Select - (0=1024 cycles, 1=4096, 2=8192, 3=16384)
+                                 ;     304        b17     WDTSTRT - WDT Start Mode Select - (0=auto-start after reset, halt after reset)
+                                 ;     305        b16:b15 Reserved (set to 1)
+                                 ;     306        b14     IWDTSLCSTP - IWDT Sleep Mode Count Stop Control - (0=can't stop count, 1=stop w/some low power modes)
+                                 ;     307        b13     Reserved (set to 1)
+                                 ;     308        b12     IWDTRSTIRQS - IWDT Reset Interrupt Request - What to do on underflow (0=take interrupt, 1=reset MCU)
+                                 ;     309        b11:b10 IWDTRPSS - IWDT Window Start Position Select - (0=25%, 1=50%, 2=75%, 3=100%,don't use)
+                                 ;     310        b9:b8   IWDTRPES - IWDT Window End Position Select - (0=75%, 1=50%, 2=25%, 3=0%,don't use)
+                                 ;     311        b7:b4   IWDTCKS - IWDT Clock Frequency Division Ratio - (0=none, 2=/16, 3 = /32, 4=/64, 0xF=/128, 5=/256)
+                                 ;     312        b3:b2   IWDTTOPS - IWDT Timeout Period Select - (0=1024 cycles, 1=4096, 2=8192, 3=16384)
+                                 ;     313        b1      IWDTSTRT - IWDT Start Mode Select - (0=auto-start after reset, halt after reset)
+                                 ;     314        b0      Reserved (set to 1) */
+                                 ;     315     (void *)BSP_CFG_OFS0_REG_VALUE,
+                                 ;     316 
+                                 ;     317     /* 0xffffff90 through 0xffffff9f: Reserved area - must be all 0xFF */
+                                 ;     318     (void *)0xFFFFFFFF,   /* 0xffffff90 - Reserved */
+                                 ;     319     (void *)0xFFFFFFFF,   /* 0xffffff94 - Reserved */
+                                 ;     320     (void *)0xFFFFFFFF,   /* 0xffffff98 - Reserved */
+                                 ;     321 
+                                 ;     322     /* The 32-bit area immediately below (0xffffff9c through 0xffffff9f) is a special area that allows the ROM to be 
+                                 ;     323        protected from reading or writing by a parallel programmer. Please refer to the HW manual for appropriate 
+                                 ;     324        settings. The default (all 0xff) places no restrictions and therefore allows reads and writes by a parallel 
+                                 ;     325        programmer. */
+                                 ;     326     (void *)BSP_CFG_ROM_CODE_PROTECT_VALUE,   /* 0xffffff9C - ROM Code Protection */
+                                 ;     327 
+                                 ;     328     /* The memory are immediately below (0xffffffa0 through 0xffffffaf) is a special area that allows the on-chip 
+                                 ;     329        firmware to be protected. See the section "ID Code Protection" in the HW manual for details on how to enable 
+                                 ;     330        protection. Setting the four long words below to non-0xFF values will enable protection.  Do this only after 
+                                 ;     331        carefully review the HW manual */
+                                 ;     332    
+                                 ;     333     /* 0xffffffA0 through 0xffffffaf: ID Code Protection. The ID code is specified using macros in r_bsp_config.h.  */
+                                 ;     334     (void *) BSP_CFG_ID_CODE_LONG_1,  /* 0xffffffA0 - Control code and ID code */
+                                 ;     335     (void *) BSP_CFG_ID_CODE_LONG_2,  /* 0xffffffA4 - ID code (cont.) */
+                                 ;     336     (void *) BSP_CFG_ID_CODE_LONG_3,  /* 0xffffffA8 - ID code (cont.) */
+                                 ;     337     (void *) BSP_CFG_ID_CODE_LONG_4,  /* 0xffffffAC - ID code (cont.) */
+                                 ;     338   
+                                 ;     339     /* 0xffffffB0 through 0xffffffcf: Reserved area */
+                                 ;     340     (void *) 0xFFFFFFFF,  /* 0xffffffB0 - Reserved */
+                                 ;     341     (void *) 0xFFFFFFFF,  /* 0xffffffB4 - Reserved */
+                                 ;     342     (void *) 0xFFFFFFFF,  /* 0xffffffB8 - Reserved */
+                                 ;     343     (void *) 0xFFFFFFFF,  /* 0xffffffBC - Reserved */
+                                 ;     344     (void *) 0xFFFFFFFF,  /* 0xffffffC0 - Reserved */
+                                 ;     345     (void *) 0xFFFFFFFF,  /* 0xffffffC4 - Reserved */
+                                 ;     346     (void *) 0xFFFFFFFF,  /* 0xffffffC8 - Reserved */
+                                 ;     347     (void *) 0xFFFFFFFF,  /* 0xffffffCC - Reserved */
+                                 ;     348 
+                                 ;     349     /* Fixed vector table */
+                                 ;     350     /* BCH - 01/16/2013 */
+                                 ;     351     /* The PRQA tool gives a defect here for casting between pointer-to-function to pointer-to-object since this is 
+                                 ;     352        undefined behavior in C90. This could be split into a separate array but it would not provide any real benefit.
+                                 ;     353        For now this is suppressed. */
+                                 ;     354     /* PRQA S 0307 ++ */
+                                 ;     355     (void *) excep_supervisor_inst_isr,         /* 0xffffffd0  Exception(Supervisor Instruction) */
+                                 ;     356     (void *) undefined_interrupt_source_isr,    /* 0xffffffd4  Reserved */
+                                 ;     357     (void *) undefined_interrupt_source_isr,    /* 0xffffffd8  Reserved */
+                                 ;     358     (void *) excep_undefined_inst_isr,          /* 0xffffffdc  Exception(Undefined Instruction) */
+                                 ;     359     (void *) undefined_interrupt_source_isr,    /* 0xffffffe0  Reserved */
+                                 ;     360     (void *) excep_floating_point_isr,          /* 0xffffffe4  Exception(Floating Point) */
+                                 ;     361     (void *) undefined_interrupt_source_isr,    /* 0xffffffe8  Reserved */
+                                 ;     362     (void *) undefined_interrupt_source_isr,    /* 0xffffffec  Reserved */
+                                 ;     363     (void *) undefined_interrupt_source_isr,    /* 0xfffffff0  Reserved */
+                                 ;     364     (void *) undefined_interrupt_source_isr,    /* 0xfffffff4  Reserved */
+                                 ;     365     (void *) non_maskable_isr,                  /* 0xfffffff8  NMI */
+                                 ;     366 	(void *)PowerON_Reset_PC
+                                 ;     367 };
+                                 ;     368 
+                                 ;     369 #endif
+                                 		.SECTION	FIXEDVECT,ROMDATA,ALIGN=4
+00000000                         _Fixed_Vectors:
+00000000 FFFFFFFF                		.lword	0FFFFFFFFH
+00000004 FFFFFFFF                		.lword	0FFFFFFFFH
+00000008 FFFFFFFF                		.lword	0FFFFFFFFH
+0000000C FFFFFFFF                		.lword	0FFFFFFFFH
+00000010 FFFFFFFF                		.lword	0FFFFFFFFH
+00000014 FFFFFFFF                		.lword	0FFFFFFFFH
+00000018 FFFFFFFF                		.lword	0FFFFFFFFH
+0000001C FFFFFFFF                		.lword	0FFFFFFFFH
+00000020 FFFFFFFF                		.lword	0FFFFFFFFH
+00000024 FFFFFFFF                		.lword	0FFFFFFFFH
+00000028 FFFFFFFF                		.lword	0FFFFFFFFH
+0000002C FFFFFFFF                		.lword	0FFFFFFFFH
+00000030 FFFFFFFF                		.lword	0FFFFFFFFH
+00000034 FFFFFFFF                		.lword	0FFFFFFFFH
+00000038 FFFFFFFF                		.lword	0FFFFFFFFH
+0000003C FFFFFFFF                		.lword	0FFFFFFFFH
+00000040 FFFFFFFF                		.lword	0FFFFFFFFH
+00000044 FFFFFFFF                		.lword	0FFFFFFFFH
+00000048 FFFFFFFF                		.lword	0FFFFFFFFH
+0000004C FFFFFFFF                		.lword	0FFFFFFFFH
+00000050 rrrrrrrr                		.lword	_excep_supervisor_inst_isr
+00000054 rrrrrrrr                		.lword	_undefined_interrupt_source_isr
+00000058 rrrrrrrr                		.lword	_undefined_interrupt_source_isr
+0000005C rrrrrrrr                		.lword	_excep_undefined_inst_isr
+00000060 rrrrrrrr                		.lword	_undefined_interrupt_source_isr
+00000064 rrrrrrrr                		.lword	_excep_floating_point_isr
+00000068 rrrrrrrr                		.lword	_undefined_interrupt_source_isr
+0000006C rrrrrrrr                		.lword	_undefined_interrupt_source_isr
+00000070 rrrrrrrr                		.lword	_undefined_interrupt_source_isr
+00000074 rrrrrrrr                		.lword	_undefined_interrupt_source_isr
+00000078 rrrrrrrr                		.lword	_non_maskable_isr
+0000007C rrrrrrrr                		.lword	_PowerON_Reset_PC
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00639   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000375(00000177H)  P
+ROMDATA  0000000128(00000080H)  FIXEDVECT
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\vecttbl.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\vecttbl.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\r_bsp\board\MT01\vecttbl.obj

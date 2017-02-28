@@ -1,0 +1,2421 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:08 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:08
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=maincnc_task.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=maincnc_task.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;maincnc_task.c
+                                 
+                                 		.glb	_xCncTaskHandle
+                                 		.glb	_status_code
+                                 		.glb	_global_string_buf
+                                 		.glb	__system_init
+                                 		.glb	_hardware_init
+                                 		.glb	_persistence_init
+                                 		.glb	_stepper_init
+                                 		.glb	_encoder_init
+                                 		.glb	_switch_init
+                                 		.glb	_pl_arcook_init
+                                 		.glb	_pl_thc_init
+                                 		.glb	_pwm_init
+                                 		.glb	_macroInitVar
+                                 		.glb	_config_init
+                                 		.glb	_network_init
+                                 		.glb	_planner_init
+                                 		.glb	_canonical_machine_init
+                                 		.glb	_main_cnc_task
+                                 		.glb	_run_canned_startup
+                                 		.glb	_controller_run
+                                 		.glb	_get_status_message
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         __system_init:
+                                 		.STACK	__system_init=4
+                                 ;       1 /*
+                                 ;       2  * main.c - TinyG - An embedded rs274/ngc CNC controller
+                                 ;       3  * This file is part of the TinyG project.
+                                 ;       4  *
+                                 ;       5  * Copyright (c) 2010 - 2015 Alden S. Hart, Jr.
+                                 ;       6  * Copyright (c) 2013 - 2015 Robert Giseburt
+                                 ;       7  *
+                                 ;       8  * This file ("the software") is free software: you can redistribute it and/or modify
+                                 ;       9  * it under the terms of the GNU General Public License, version 2 as published by the
+                                 ;      10  * Free Software Foundation. You should have received a copy of the GNU General Public
+                                 ;      11  * License, version 2 along with the software.  If not, see <http://www.gnu.org/licenses/>.
+                                 ;      12  *
+                                 ;      13  * THE SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY
+                                 ;      14  * WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                 ;      15  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+                                 ;      16  * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                 ;      17  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+                                 ;      18  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                                 ;      19  */
+                                 ;      20 /* See github.com/Synthetos/tinyg for code and docs on the wiki
+                                 ;      21  */
+                                 ;      22 
+                                 ;      23 #include "tinyg.h"					// #1 There are some dependencies
+                                 ;      24 #include "config.h"					// #2
+                                 ;      25 #include "hardware.h"
+                                 ;      26 #include "persistence.h"
+                                 ;      27 #include "controller.h"
+                                 ;      28 #include "canonical_machine.h"
+                                 ;      29 #include "report.h"
+                                 ;      30 #include "planner.h"
+                                 ;      31 #include "stepper.h"
+                                 ;      32 #include "encoder.h"
+                                 ;      33 #include "network.h"
+                                 ;      34 #include "switch.h"
+                                 ;      35 #include "plasma.h"
+                                 ;      36 #include "test.h"
+                                 ;      37 #include "pwm.h"
+                                 ;      38 #include "xio.h"
+                                 ;      39 #include "macros.h"
+                                 ;      40 
+                                 ;      41 #include "FreeRTOS.h"
+                                 ;      42 #include "task.h"
+                                 ;      43 
+                                 ;      44 #ifdef __AVR
+                                 ;      45 #include <avr/interrupt.h>
+                                 ;      46 #include "xmega/xmega_interrupts.h"
+                                 ;      47 #endif // __AVR
+                                 ;      48 
+                                 ;      49 #ifdef __ARM
+                                 ;      50 #include "MotateTimers.h"
+                                 ;      51 using Motate::delay;
+                                 ;      52 
+                                 ;      53 #ifdef __cplusplus
+                                 ;      54 extern "C"{
+                                 ;      55 #endif // __cplusplus
+                                 ;      56 
+                                 ;      57 void _init() __attribute__ ((weak));
+                                 ;      58 void _init() {;}
+                                 ;      59 
+                                 ;      60 void __libc_init_array(void);
+                                 ;      61 
+                                 ;      62 #ifdef __cplusplus
+                                 ;      63 }
+                                 ;      64 #endif // __cplusplus
+                                 ;      65 #endif // __ARM
+                                 ;      66 
+                                 ;      67 /******************** Application Code ************************/
+                                 ;      68 
+                                 ;      69 #ifdef __ARM
+                                 ;      70 const Motate::USBSettings_t Motate::USBSettings = {
+                                 ;      71 	/*gVendorID         = */ 0x1d50,
+                                 ;      72 	/*gProductID        = */ 0x606d,
+                                 ;      73 	/*gProductVersion   = */ TINYG_FIRMWARE_VERSION,
+                                 ;      74 	/*gAttributes       = */ kUSBConfigAttributeSelfPowered,
+                                 ;      75 	/*gPowerConsumption = */ 500
+                                 ;      76 };
+                                 ;      77 	/*gProductVersion   = */ //0.1,
+                                 ;      78 
+                                 ;      79 Motate::USBDevice< Motate::USBCDC > usb;
+                                 ;      80 //Motate::USBDevice< Motate::USBCDC, Motate::USBCDC > usb;
+                                 ;      81 
+                                 ;      82 typeof usb._mixin_0_type::Serial &SerialUSB = usb._mixin_0_type::Serial;
+                                 ;      83 //typeof usb._mixin_1_type::Serial &SerialUSB1 = usb._mixin_1_type::Serial;
+                                 ;      84 
+                                 ;      85 MOTATE_SET_USB_VENDOR_STRING( {'S' ,'y', 'n', 't', 'h', 'e', 't', 'o', 's'} )
+                                 ;      86 MOTATE_SET_USB_PRODUCT_STRING( {'T', 'i', 'n', 'y', 'G', ' ', 'v', '2'} )
+                                 ;      87 MOTATE_SET_USB_SERIAL_NUMBER_STRING( {'0','0','1'} )
+                                 ;      88 
+                                 ;      89 Motate::SPI<kSocket4_SPISlaveSelectPinNumber> spi;
+                                 ;      90 #endif
+                                 ;      91 
+                                 ;      92 #ifdef __RX
+                                 ;      93 TaskHandle_t xCncTaskHandle;
+                                 ;      94 #endif
+                                 ;      95 
+                                 ;      96 /*
+                                 ;      97  * _system_init()
+                                 ;      98  */
+                                 ;      99 
+                                 ;     100 void _system_init(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",100
+00000000 02                      		RTS
+00000001                         __$_application_init:
+                                 		.STACK	__$_application_init=4
+                                 ;     101 {
+                                 ;     102 #ifdef __ARM
+                                 ;     103 	SystemInit();
+                                 ;     104 
+                                 ;     105 	// Disable watchdog
+                                 ;     106 	WDT->WDT_MR = WDT_MR_WDDIS;
+                                 ;     107 
+                                 ;     108 	// Initialize C library
+                                 ;     109 	__libc_init_array();
+                                 ;     110 
+                                 ;     111 	usb.attach();					// USB setup
+                                 ;     112 	delay(1000);
+                                 ;     113 #endif
+                                 ;     114 }
+                                 ;     115 
+                                 ;     116 /*
+                                 ;     117  * _application_init()
+                                 ;     118  */
+                                 ;     119 
+                                 ;     120 static void _application_init(void)
+                                 ;     121 {
+                                 ;     122 	// There are a lot of dependencies in the order of these inits.
+                                 ;     123 	// Don't change the ordering unless you understand this.
+                                 ;     124 
+                                 ;     125 	// do these first
+                                 ;     126 	hardware_init();				// system hardware setup 			- must be first
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",126
+00000001 05rrrrrr             A  		BSR _hardware_init
+00000005                         L12:	; entry.split
+                                 ;     127 	persistence_init();				// set up EEPROM or other NVM		- must be second
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",127
+00000005 05rrrrrr             A  		BSR _persistence_init
+00000009                         L13:	; entry.split1
+                                 ;     128 //RXMOD	rtc_init();						// real time counter
+                                 ;     129 //	xio_init();						// eXtended IO subsystem
+                                 ;     130 
+                                 ;     131 	// do these next
+                                 ;     132 	stepper_init(); 				// stepper subsystem 				- must precede gpio_init()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",132
+00000009 05rrrrrr             A  		BSR _stepper_init
+0000000D                         L14:	; entry.split2
+                                 ;     133 	encoder_init();					// virtual encoders
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",133
+0000000D 05rrrrrr             A  		BSR _encoder_init
+00000011                         L15:	; entry.split3
+                                 ;     134 	switch_init();					// switches
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",134
+00000011 05rrrrrr             A  		BSR _switch_init
+00000015                         L16:	; entry.split4
+                                 ;     135 	pl_arcook_init();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",135
+00000015 05rrrrrr             A  		BSR _pl_arcook_init
+00000019                         L17:	; entry.split5
+                                 ;     136 	pl_thc_init();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",136
+00000019 05rrrrrr             A  		BSR _pl_thc_init
+0000001D                         L18:	; entry.split6
+                                 ;     137 //	gpio_init();					// parallel IO
+                                 ;     138 	pwm_init();						// pulse width modulation drivers	- must follow gpio_init()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",138
+0000001D 05rrrrrr             A  		BSR _pwm_init
+00000021                         L19:	; entry.split7
+                                 ;     139 	macroInitVar();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",139
+00000021 05rrrrrr             A  		BSR _macroInitVar
+00000025                         L20:	; entry.split8
+                                 ;     140 //RXMOD	controller_init(STD_IN, STD_OUT, STD_ERR);// must be first app init; reqs xio_init()
+                                 ;     141 	config_init();					// config records from eeprom 		- must be next app init
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",141
+00000025 05rrrrrr             A  		BSR _config_init
+00000029                         L21:	; entry.split9
+                                 ;     142 	network_init();					// reset std devices if required	- must follow config_init()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",142
+00000029 05rrrrrr             A  		BSR _network_init
+0000002D                         L22:	; entry.split10
+                                 ;     143 	planner_init();					// motion planning subsystem
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",143
+0000002D 05rrrrrr             A  		BSR _planner_init
+00000031                         L23:	; entry.split11
+                                 ;     144 	canonical_machine_init();		// canonical machine				- must follow config_init()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",144
+00000031 05rrrrrr             A  		BSR _canonical_machine_init
+00000035 02                      		RTS
+00000036                         _main_cnc_task:
+                                 		.STACK	_main_cnc_task=4
+                                 ;     145 
+                                 ;     146 //	rpt_print_system_ready_message();// (LAST) announce system is ready
+                                 ;     147 }
+                                 ;     148 
+                                 ;     149 /*
+                                 ;     150  * main()
+                                 ;     151  */
+                                 ;     152 
+                                 ;     153 int main_cnc_task(void)
+                                 ;     154 {
+                                 ;     155 	// system initialization
+                                 ;     156 	_system_init();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",156
+00000036 39rrrr               W  		BSR __system_init
+00000039                         L25:	; entry.split
+                                 ;     157 
+                                 ;     158 	// TinyG application setup
+                                 ;     159 	_application_init();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",159
+00000039 39rrrr               W  		BSR __$_application_init
+0000003C                         L26:	; entry.split1
+                                 ;     160 	run_canned_startup();			// run any pre-loaded commands
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",160
+0000003C 05rrrrrr             A  		BSR _run_canned_startup
+00000040                         L27:	; bb1.split
+                                 ;     161 
+                                 ;     162 	// main loop
+                                 ;     163 	for (;;) {
+                                 ;     164 		controller_run( );			// single pass through the controller
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",164
+00000040 05rrrrrr             A  		BSR _controller_run
+00000044 2Err                 B  		BRA L27
+00000046                         _get_status_message:
+                                 		.STACK	_get_status_message=12
+                                 ;     165 	}
+                                 ;     166 	return 0;
+                                 ;     167 }
+                                 ;     168 
+                                 ;     169 
+                                 ;     170 /**** Status Messages ***************************************************************
+                                 ;     171  * get_status_message() - return the status message
+                                 ;     172  *
+                                 ;     173  * See tinyg.h for status codes. These strings must align with the status codes in tinyg.h
+                                 ;     174  * The number of elements in the indexing array must match the # of strings
+                                 ;     175  *
+                                 ;     176  * Reference for putting display strings and string arrays in AVR program memory:
+                                 ;     177  * http://www.cs.mun.ca/~paul/cs4723/material/atmel/avr-libc-user-manual-1.6.5/pgmspace.html
+                                 ;     178  */
+                                 ;     179 
+                                 ;     180 stat_t status_code;						// allocate a variable for the ritorno macro
+                                 ;     181 char global_string_buf[MESSAGE_LEN];	// allocate a string for global message use
+                                 ;     182 
+                                 ;     183 //#ifdef __TEXT_MODE
+                                 ;     184 
+                                 ;     185 /*** Status message strings ***/
+                                 ;     186 
+                                 ;     187 static const char stat_00[] PROGMEM = "OK";
+                                 ;     188 static const char stat_01[] PROGMEM = "Error";
+                                 ;     189 static const char stat_02[] PROGMEM = "Eagain";
+                                 ;     190 static const char stat_03[] PROGMEM = "Noop";
+                                 ;     191 static const char stat_04[] PROGMEM = "Complete";
+                                 ;     192 static const char stat_05[] PROGMEM = "Terminated";
+                                 ;     193 static const char stat_06[] PROGMEM = "Hard reset";
+                                 ;     194 static const char stat_07[] PROGMEM = "End of line";
+                                 ;     195 static const char stat_08[] PROGMEM = "End of file";
+                                 ;     196 static const char stat_09[] PROGMEM = "File not open";
+                                 ;     197 
+                                 ;     198 static const char stat_10[] PROGMEM = "Max file size exceeded";
+                                 ;     199 static const char stat_11[] PROGMEM = "No such device";
+                                 ;     200 static const char stat_12[] PROGMEM = "Buffer empty";
+                                 ;     201 static const char stat_13[] PROGMEM = "Buffer full";
+                                 ;     202 static const char stat_14[] PROGMEM = "Buffer full - fatal";
+                                 ;     203 static const char stat_15[] PROGMEM = "Initializing";
+                                 ;     204 static const char stat_16[] PROGMEM = "Entering boot loader";
+                                 ;     205 static const char stat_17[] PROGMEM = "Function is stubbed";
+                                 ;     206 static const char stat_18[] PROGMEM = "18";
+                                 ;     207 static const char stat_19[] PROGMEM = "19";
+                                 ;     208 
+                                 ;     209 static const char stat_20[] PROGMEM = "Internal error";
+                                 ;     210 static const char stat_21[] PROGMEM = "Internal range error";
+                                 ;     211 static const char stat_22[] PROGMEM = "Floating point error";
+                                 ;     212 static const char stat_23[] PROGMEM = "Divide by zero";
+                                 ;     213 static const char stat_24[] PROGMEM = "Invalid Address";
+                                 ;     214 static const char stat_25[] PROGMEM = "Read-only address";
+                                 ;     215 static const char stat_26[] PROGMEM = "Initialization failure";
+                                 ;     216 static const char stat_27[] PROGMEM = "System alarm - shutting down";
+                                 ;     217 static const char stat_28[] PROGMEM = "Failed to get planner buffer";
+                                 ;     218 static const char stat_29[] PROGMEM = "Generic exception report";
+                                 ;     219 
+                                 ;     220 static const char stat_30[] PROGMEM = "Move time is infinite";
+                                 ;     221 static const char stat_31[] PROGMEM = "Move time is NAN";
+                                 ;     222 static const char stat_32[] PROGMEM = "Float is infinite";
+                                 ;     223 static const char stat_33[] PROGMEM = "Float is NAN";
+                                 ;     224 static const char stat_34[] PROGMEM = "Persistence error";
+                                 ;     225 static const char stat_35[] PROGMEM = "Bad status report setting";
+                                 ;     226 static const char stat_36[] PROGMEM = "36";
+                                 ;     227 static const char stat_37[] PROGMEM = "37";
+                                 ;     228 static const char stat_38[] PROGMEM = "38";
+                                 ;     229 static const char stat_39[] PROGMEM = "39";
+                                 ;     230 
+                                 ;     231 static const char stat_40[] PROGMEM = "40";
+                                 ;     232 static const char stat_41[] PROGMEM = "41";
+                                 ;     233 static const char stat_42[] PROGMEM = "42";
+                                 ;     234 static const char stat_43[] PROGMEM = "43";
+                                 ;     235 static const char stat_44[] PROGMEM = "44";
+                                 ;     236 static const char stat_45[] PROGMEM = "45";
+                                 ;     237 static const char stat_46[] PROGMEM = "46";
+                                 ;     238 static const char stat_47[] PROGMEM = "47";
+                                 ;     239 static const char stat_48[] PROGMEM = "48";
+                                 ;     240 static const char stat_49[] PROGMEM = "49";
+                                 ;     241 static const char stat_50[] PROGMEM = "50";
+                                 ;     242 static const char stat_51[] PROGMEM = "51";
+                                 ;     243 static const char stat_52[] PROGMEM = "52";
+                                 ;     244 static const char stat_53[] PROGMEM = "53";
+                                 ;     245 static const char stat_54[] PROGMEM = "54";
+                                 ;     246 static const char stat_55[] PROGMEM = "55";
+                                 ;     247 static const char stat_56[] PROGMEM = "56";
+                                 ;     248 static const char stat_57[] PROGMEM = "57";
+                                 ;     249 static const char stat_58[] PROGMEM = "58";
+                                 ;     250 static const char stat_59[] PROGMEM = "59";
+                                 ;     251 static const char stat_60[] PROGMEM = "60";
+                                 ;     252 static const char stat_61[] PROGMEM = "61";
+                                 ;     253 static const char stat_62[] PROGMEM = "62";
+                                 ;     254 static const char stat_63[] PROGMEM = "63";
+                                 ;     255 static const char stat_64[] PROGMEM = "64";
+                                 ;     256 static const char stat_65[] PROGMEM = "65";
+                                 ;     257 static const char stat_66[] PROGMEM = "66";
+                                 ;     258 static const char stat_67[] PROGMEM = "67";
+                                 ;     259 static const char stat_68[] PROGMEM = "68";
+                                 ;     260 static const char stat_69[] PROGMEM = "69";
+                                 ;     261 static const char stat_70[] PROGMEM = "70";
+                                 ;     262 static const char stat_71[] PROGMEM = "71";
+                                 ;     263 static const char stat_72[] PROGMEM = "72";
+                                 ;     264 static const char stat_73[] PROGMEM = "73";
+                                 ;     265 static const char stat_74[] PROGMEM = "74";
+                                 ;     266 static const char stat_75[] PROGMEM = "75";
+                                 ;     267 static const char stat_76[] PROGMEM = "76";
+                                 ;     268 static const char stat_77[] PROGMEM = "77";
+                                 ;     269 static const char stat_78[] PROGMEM = "78";
+                                 ;     270 static const char stat_79[] PROGMEM = "79";
+                                 ;     271 static const char stat_80[] PROGMEM = "80";
+                                 ;     272 static const char stat_81[] PROGMEM = "81";
+                                 ;     273 static const char stat_82[] PROGMEM = "82";
+                                 ;     274 static const char stat_83[] PROGMEM = "83";
+                                 ;     275 static const char stat_84[] PROGMEM = "84";
+                                 ;     276 static const char stat_85[] PROGMEM = "85";
+                                 ;     277 static const char stat_86[] PROGMEM = "86";
+                                 ;     278 static const char stat_87[] PROGMEM = "87";
+                                 ;     279 static const char stat_88[] PROGMEM = "88";
+                                 ;     280 static const char stat_89[] PROGMEM = "89";
+                                 ;     281 
+                                 ;     282 static const char stat_90[] PROGMEM = "Config sub-system assertion failure";
+                                 ;     283 static const char stat_91[] PROGMEM = "IO sub-system assertion failure";
+                                 ;     284 static const char stat_92[] PROGMEM = "Encoder assertion failure";
+                                 ;     285 static const char stat_93[] PROGMEM = "Stepper assertion failure";
+                                 ;     286 static const char stat_94[] PROGMEM = "Planner assertion failure";
+                                 ;     287 static const char stat_95[] PROGMEM = "Canonical machine assertion failure";
+                                 ;     288 static const char stat_96[] PROGMEM = "Controller assertion failure";
+                                 ;     289 static const char stat_97[] PROGMEM = "Stack overflow detected";
+                                 ;     290 static const char stat_98[] PROGMEM = "Memory fault detected";
+                                 ;     291 static const char stat_99[] PROGMEM = "Generic assertion failure";
+                                 ;     292 
+                                 ;     293 static const char stat_100[] PROGMEM = "Unrecognized command or config name";
+                                 ;     294 static const char stat_101[] PROGMEM = "Invalid or malformed command";
+                                 ;     295 static const char stat_102[] PROGMEM = "Bad number format";
+                                 ;     296 static const char stat_103[] PROGMEM = "Unsupported number or JSON type";
+                                 ;     297 static const char stat_104[] PROGMEM = "Parameter is read-only";
+                                 ;     298 static const char stat_105[] PROGMEM = "Parameter cannot be read";
+                                 ;     299 static const char stat_106[] PROGMEM = "Command not accepted at this time";
+                                 ;     300 static const char stat_107[] PROGMEM = "Input exceeds max length";
+                                 ;     301 static const char stat_108[] PROGMEM = "Input less than minimum value";
+                                 ;     302 static const char stat_109[] PROGMEM = "Input exceeds maximum value";
+                                 ;     303 
+                                 ;     304 static const char stat_110[] PROGMEM = "Input value range error";
+                                 ;     305 static const char stat_111[] PROGMEM = "JSON syntax error";
+                                 ;     306 static const char stat_112[] PROGMEM = "JSON input has too many pairs";
+                                 ;     307 static const char stat_113[] PROGMEM = "JSON string too long";
+                                 ;     308 static const char stat_114[] PROGMEM = "114";
+                                 ;     309 static const char stat_115[] PROGMEM = "115";
+                                 ;     310 static const char stat_116[] PROGMEM = "116";
+                                 ;     311 static const char stat_117[] PROGMEM = "117";
+                                 ;     312 static const char stat_118[] PROGMEM = "118";
+                                 ;     313 static const char stat_119[] PROGMEM = "119";
+                                 ;     314 
+                                 ;     315 static const char stat_120[] PROGMEM = "120";
+                                 ;     316 static const char stat_121[] PROGMEM = "121";
+                                 ;     317 static const char stat_122[] PROGMEM = "122";
+                                 ;     318 static const char stat_123[] PROGMEM = "123";
+                                 ;     319 static const char stat_124[] PROGMEM = "124";
+                                 ;     320 static const char stat_125[] PROGMEM = "125";
+                                 ;     321 static const char stat_126[] PROGMEM = "126";
+                                 ;     322 static const char stat_127[] PROGMEM = "127";
+                                 ;     323 static const char stat_128[] PROGMEM = "128";
+                                 ;     324 static const char stat_129[] PROGMEM = "129";
+                                 ;     325 
+                                 ;     326 static const char stat_130[] PROGMEM = "Generic Gcode input error";
+                                 ;     327 static const char stat_131[] PROGMEM = "Gcode command unsupported";
+                                 ;     328 static const char stat_132[] PROGMEM = "M code unsupported";
+                                 ;     329 static const char stat_133[] PROGMEM = "Gcode modal group violation";
+                                 ;     330 static const char stat_134[] PROGMEM = "Axis word missing";
+                                 ;     331 static const char stat_135[] PROGMEM = "Axis cannot be present";
+                                 ;     332 static const char stat_136[] PROGMEM = "Axis is invalid for this command";
+                                 ;     333 static const char stat_137[] PROGMEM = "Axis is disabled";
+                                 ;     334 static const char stat_138[] PROGMEM = "Axis target position is missing";
+                                 ;     335 static const char stat_139[] PROGMEM = "Axis target position is invalid";
+                                 ;     336 
+                                 ;     337 static const char stat_140[] PROGMEM = "Selected plane is missing";
+                                 ;     338 static const char stat_141[] PROGMEM = "Selected plane is invalid";
+                                 ;     339 static const char stat_142[] PROGMEM = "Feedrate not specified";
+                                 ;     340 static const char stat_143[] PROGMEM = "Inverse time mode cannot be used with this command";
+                                 ;     341 static const char stat_144[] PROGMEM = "Rotary axes cannot be used with this command";
+                                 ;     342 static const char stat_145[] PROGMEM = "G0 or G1 must be active for G53";
+                                 ;     343 static const char stat_146[] PROGMEM = "Requested velocity exceeds limits";
+                                 ;     344 static const char stat_147[] PROGMEM = "Cutter compensation cannot be enabled";
+                                 ;     345 static const char stat_148[] PROGMEM = "Programmed point same as current point";
+                                 ;     346 static const char stat_149[] PROGMEM = "Spindle speed below minimum";
+                                 ;     347 
+                                 ;     348 static const char stat_150[] PROGMEM = "Spindle speed exceeded maximum";
+                                 ;     349 static const char stat_151[] PROGMEM = "Spindle S word is missing";
+                                 ;     350 static const char stat_152[] PROGMEM = "Spindle S word is invalid";
+                                 ;     351 static const char stat_153[] PROGMEM = "Spindle must be off for this command";
+                                 ;     352 static const char stat_154[] PROGMEM = "Spindle must be turning for this command";
+                                 ;     353 static const char stat_155[] PROGMEM = "Arc specification error";
+                                 ;     354 static const char stat_156[] PROGMEM = "Arc specification error - missing axis(es)";
+                                 ;     355 static const char stat_157[] PROGMEM = "Arc specification error - missing offset(s)";
+                                 ;     356 static const char stat_158[] PROGMEM = "Arc specification error - radius arc out of tolerance";	// current longest message: 56 chard
+                                 ;     357 static const char stat_159[] PROGMEM = "Arc specification error - endpoint is starting point";
+                                 ;     358 
+                                 ;     359 static const char stat_160[] PROGMEM = "P word is missing";
+                                 ;     360 static const char stat_161[] PROGMEM = "P word is invalid";
+                                 ;     361 static const char stat_162[] PROGMEM = "P word is zero";
+                                 ;     362 static const char stat_163[] PROGMEM = "P word is negative";
+                                 ;     363 static const char stat_164[] PROGMEM = "P word is not an integer";
+                                 ;     364 static const char stat_165[] PROGMEM = "P word is not a valid tool number";
+                                 ;     365 static const char stat_166[] PROGMEM = "D word is missing";
+                                 ;     366 static const char stat_167[] PROGMEM = "D word is invalid";
+                                 ;     367 static const char stat_168[] PROGMEM = "E word is missing";
+                                 ;     368 static const char stat_169[] PROGMEM = "E word is invalid";
+                                 ;     369 
+                                 ;     370 static const char stat_170[] PROGMEM = "H word is missing";
+                                 ;     371 static const char stat_171[] PROGMEM = "H word is invalid";
+                                 ;     372 static const char stat_172[] PROGMEM = "L word is missing";
+                                 ;     373 static const char stat_173[] PROGMEM = "L word is invalid";
+                                 ;     374 static const char stat_174[] PROGMEM = "Q word is missing";
+                                 ;     375 static const char stat_175[] PROGMEM = "Q word is invalid";
+                                 ;     376 static const char stat_176[] PROGMEM = "R word is missing";
+                                 ;     377 static const char stat_177[] PROGMEM = "R word is invalid";
+                                 ;     378 static const char stat_178[] PROGMEM = "T word is missing";
+                                 ;     379 static const char stat_179[] PROGMEM = "T word is invalid";
+                                 ;     380 
+                                 ;     381 static const char stat_180[] PROGMEM = "180";
+                                 ;     382 static const char stat_181[] PROGMEM = "181";
+                                 ;     383 static const char stat_182[] PROGMEM = "182";
+                                 ;     384 static const char stat_183[] PROGMEM = "183";
+                                 ;     385 static const char stat_184[] PROGMEM = "184";
+                                 ;     386 static const char stat_185[] PROGMEM = "185";
+                                 ;     387 static const char stat_186[] PROGMEM = "186";
+                                 ;     388 static const char stat_187[] PROGMEM = "187";
+                                 ;     389 static const char stat_188[] PROGMEM = "188";
+                                 ;     390 static const char stat_189[] PROGMEM = "189";
+                                 ;     391 
+                                 ;     392 static const char stat_190[] PROGMEM = "190";
+                                 ;     393 static const char stat_191[] PROGMEM = "191";
+                                 ;     394 static const char stat_192[] PROGMEM = "192";
+                                 ;     395 static const char stat_193[] PROGMEM = "193";
+                                 ;     396 static const char stat_194[] PROGMEM = "194";
+                                 ;     397 static const char stat_195[] PROGMEM = "195";
+                                 ;     398 static const char stat_196[] PROGMEM = "196";
+                                 ;     399 static const char stat_197[] PROGMEM = "197";
+                                 ;     400 static const char stat_198[] PROGMEM = "198";
+                                 ;     401 static const char stat_199[] PROGMEM = "199";
+                                 ;     402 
+                                 ;     403 static const char stat_200[] PROGMEM = "Generic TinyG error";
+                                 ;     404 static const char stat_201[] PROGMEM = "Move less than minimum length";
+                                 ;     405 static const char stat_202[] PROGMEM = "Move less than minimum time";
+                                 ;     406 static const char stat_203[] PROGMEM = "Machine is alarmed - Command not processed";	// current longest message 43 chars (including NUL)
+                                 ;     407 static const char stat_204[] PROGMEM = "Limit switch hit - Shutdown occurred";
+                                 ;     408 static const char stat_205[] PROGMEM = "Trapezoid planner failed to converge";
+                                 ;     409 static const char stat_206[] PROGMEM = "206";
+                                 ;     410 static const char stat_207[] PROGMEM = "207";
+                                 ;     411 static const char stat_208[] PROGMEM = "208";
+                                 ;     412 static const char stat_209[] PROGMEM = "209";
+                                 ;     413 
+                                 ;     414 static const char stat_210[] PROGMEM = "210";
+                                 ;     415 static const char stat_211[] PROGMEM = "211";
+                                 ;     416 static const char stat_212[] PROGMEM = "212";
+                                 ;     417 static const char stat_213[] PROGMEM = "213";
+                                 ;     418 static const char stat_214[] PROGMEM = "214";
+                                 ;     419 static const char stat_215[] PROGMEM = "215";
+                                 ;     420 static const char stat_216[] PROGMEM = "216";
+                                 ;     421 static const char stat_217[] PROGMEM = "217";
+                                 ;     422 static const char stat_218[] PROGMEM = "218";
+                                 ;     423 static const char stat_219[] PROGMEM = "219";
+                                 ;     424 
+                                 ;     425 static const char stat_220[] PROGMEM = "Soft limit exceeded";
+                                 ;     426 static const char stat_221[] PROGMEM = "Soft limit exceeded - X min";
+                                 ;     427 static const char stat_222[] PROGMEM = "Soft limit exceeded - X max";
+                                 ;     428 static const char stat_223[] PROGMEM = "Soft limit exceeded - Y min";
+                                 ;     429 static const char stat_224[] PROGMEM = "Soft limit exceeded - Y max";
+                                 ;     430 static const char stat_225[] PROGMEM = "Soft limit exceeded - Z min";
+                                 ;     431 static const char stat_226[] PROGMEM = "Soft limit exceeded - Z max";
+                                 ;     432 static const char stat_227[] PROGMEM = "Soft limit exceeded - A min";
+                                 ;     433 static const char stat_228[] PROGMEM = "Soft limit exceeded - A max";
+                                 ;     434 static const char stat_229[] PROGMEM = "Soft limit exceeded - B min";
+                                 ;     435 static const char stat_230[] PROGMEM = "Soft limit exceeded - B max";
+                                 ;     436 static const char stat_231[] PROGMEM = "Soft limit exceeded - C min";
+                                 ;     437 static const char stat_232[] PROGMEM = "Soft limit exceeded - C max";
+                                 ;     438 static const char stat_233[] PROGMEM = "233";
+                                 ;     439 static const char stat_234[] PROGMEM = "234";
+                                 ;     440 static const char stat_235[] PROGMEM = "235";
+                                 ;     441 static const char stat_236[] PROGMEM = "236";
+                                 ;     442 static const char stat_237[] PROGMEM = "237";
+                                 ;     443 static const char stat_238[] PROGMEM = "238";
+                                 ;     444 static const char stat_239[] PROGMEM = "239";
+                                 ;     445 
+                                 ;     446 static const char stat_240[] PROGMEM = "Homing cycle failed";
+                                 ;     447 static const char stat_241[] PROGMEM = "Homing Error - Bad or no axis specified";
+                                 ;     448 static const char stat_242[] PROGMEM = "Homing Error - Search velocity is zero";
+                                 ;     449 static const char stat_243[] PROGMEM = "Homing Error - Latch velocity is zero";
+                                 ;     450 static const char stat_244[] PROGMEM = "Homing Error - Travel min & max are the same";
+                                 ;     451 static const char stat_245[] PROGMEM = "Homing Error - Negative latch backoff";
+                                 ;     452 static const char stat_246[] PROGMEM = "Homing Error - Homing switches misconfigured";
+                                 ;     453 static const char stat_247[] PROGMEM = "247";
+                                 ;     454 static const char stat_248[] PROGMEM = "248";
+                                 ;     455 static const char stat_249[] PROGMEM = "249";
+                                 ;     456 
+                                 ;     457 static const char stat_250[] PROGMEM = "Probe cycle failed";
+                                 ;     458 static const char stat_251[] PROGMEM = "Probe endpoint is starting point";
+                                 ;     459 static const char stat_252[] PROGMEM = "Jogging cycle failed";
+                                 ;     460 
+                                 ;     461 static const char *const stat_msg[] PROGMEM = {
+                                 ;     462 	stat_00, stat_01, stat_02, stat_03, stat_04, stat_05, stat_06, stat_07, stat_08, stat_09,
+                                 ;     463 	stat_10, stat_11, stat_12, stat_13, stat_14, stat_15, stat_16, stat_17, stat_18, stat_19,
+                                 ;     464 	stat_20, stat_21, stat_22, stat_23, stat_24, stat_25, stat_26, stat_27, stat_28, stat_29,
+                                 ;     465 	stat_30, stat_31, stat_32, stat_33, stat_34, stat_35, stat_36, stat_37, stat_38, stat_39,
+                                 ;     466 	stat_40, stat_41, stat_42, stat_43, stat_44, stat_45, stat_46, stat_47, stat_48, stat_49,
+                                 ;     467 	stat_50, stat_51, stat_52, stat_53, stat_54, stat_55, stat_56, stat_57, stat_58, stat_59,
+                                 ;     468 	stat_60, stat_61, stat_62, stat_63, stat_64, stat_65, stat_66, stat_67, stat_68, stat_69,
+                                 ;     469 	stat_70, stat_71, stat_72, stat_73, stat_74, stat_75, stat_76, stat_77, stat_78, stat_79,
+                                 ;     470 	stat_80, stat_81, stat_82, stat_83, stat_84, stat_85, stat_86, stat_87, stat_88, stat_89,
+                                 ;     471 	stat_90, stat_91, stat_92, stat_93, stat_94, stat_95, stat_96, stat_97, stat_98, stat_99,
+                                 ;     472 	stat_100, stat_101, stat_102, stat_103, stat_104, stat_105, stat_106, stat_107, stat_108, stat_109,
+                                 ;     473 	stat_110, stat_111, stat_112, stat_113, stat_114, stat_115, stat_116, stat_117, stat_118, stat_119,
+                                 ;     474 	stat_120, stat_121, stat_122, stat_123, stat_124, stat_125, stat_126, stat_127, stat_128, stat_129,
+                                 ;     475 	stat_130, stat_131, stat_132, stat_133, stat_134, stat_135, stat_136, stat_137, stat_138, stat_139,
+                                 ;     476 	stat_140, stat_141, stat_142, stat_143, stat_144, stat_145, stat_146, stat_147, stat_148, stat_149,
+                                 ;     477 	stat_150, stat_151, stat_152, stat_153, stat_154, stat_155, stat_156, stat_157, stat_158, stat_159,
+                                 ;     478 	stat_160, stat_161, stat_162, stat_163, stat_164, stat_165, stat_166, stat_167, stat_168, stat_169,
+                                 ;     479 	stat_170, stat_171, stat_172, stat_173, stat_174, stat_175, stat_176, stat_177, stat_178, stat_179,
+                                 ;     480 	stat_180, stat_181, stat_182, stat_183, stat_184, stat_185, stat_186, stat_187, stat_188, stat_189,
+                                 ;     481 	stat_190, stat_191, stat_192, stat_193, stat_194, stat_195, stat_196, stat_197, stat_198, stat_199,
+                                 ;     482 	stat_200, stat_201, stat_202, stat_203, stat_204, stat_205, stat_206, stat_207, stat_208, stat_209,
+                                 ;     483 	stat_210, stat_211, stat_212, stat_213, stat_214, stat_215, stat_216, stat_217, stat_218, stat_219,
+                                 ;     484 	stat_220, stat_221, stat_222, stat_223, stat_224, stat_225, stat_226, stat_227, stat_228, stat_229,
+                                 ;     485 	stat_230, stat_231, stat_232, stat_233, stat_234, stat_235, stat_236, stat_237, stat_238, stat_239,
+                                 ;     486 	stat_240, stat_241, stat_242, stat_243, stat_244, stat_245, stat_246, stat_247, stat_248, stat_249,
+                                 ;     487 	stat_250, stat_251, stat_252
+                                 ;     488 };
+                                 ;     489 
+                                 ;     490 char *get_status_message(stat_t status)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",490
+00000046 6080                    		SUB #08H, R0
+00000048 8189                    		MOV.B R1, 07H[R0]
+                                 ;     491 {
+                                 ;     492 	return ((char *)GET_TEXT_ITEM(stat_msg, status));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",492
+0000004A FBE2rrrrrrrr            		MOV.L #__$stat_msg, R14
+00000050 B189                    		MOVU.B 07H[R0], R1
+00000052 FE61E1                  		MOV.L [R1,R14], R1
+00000055 E301                    		MOV.L R1, [R0]
+00000057                         L29:	; entry.split
+                                 ;     493 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\maincnc_task.c",493
+00000057 6702                    		RTSD #08H
+                                 		.SECTION	C,ROMDATA,ALIGN=4
+00000000                         __$stat_msg:
+00000000 rrrrrrrr                		.lword	__$stat_00
+00000004 rrrrrrrr                		.lword	__$stat_01
+00000008 rrrrrrrr                		.lword	__$stat_02
+0000000C rrrrrrrr                		.lword	__$stat_03
+00000010 rrrrrrrr                		.lword	__$stat_04
+00000014 rrrrrrrr                		.lword	__$stat_05
+00000018 rrrrrrrr                		.lword	__$stat_06
+0000001C rrrrrrrr                		.lword	__$stat_07
+00000020 rrrrrrrr                		.lword	__$stat_08
+00000024 rrrrrrrr                		.lword	__$stat_09
+00000028 rrrrrrrr                		.lword	__$stat_10
+0000002C rrrrrrrr                		.lword	__$stat_11
+00000030 rrrrrrrr                		.lword	__$stat_12
+00000034 rrrrrrrr                		.lword	__$stat_13
+00000038 rrrrrrrr                		.lword	__$stat_14
+0000003C rrrrrrrr                		.lword	__$stat_15
+00000040 rrrrrrrr                		.lword	__$stat_16
+00000044 rrrrrrrr                		.lword	__$stat_17
+00000048 rrrrrrrr                		.lword	__$stat_18
+0000004C rrrrrrrr                		.lword	__$stat_19
+00000050 rrrrrrrr                		.lword	__$stat_20
+00000054 rrrrrrrr                		.lword	__$stat_21
+00000058 rrrrrrrr                		.lword	__$stat_22
+0000005C rrrrrrrr                		.lword	__$stat_23
+00000060 rrrrrrrr                		.lword	__$stat_24
+00000064 rrrrrrrr                		.lword	__$stat_25
+00000068 rrrrrrrr                		.lword	__$stat_26
+0000006C rrrrrrrr                		.lword	__$stat_27
+00000070 rrrrrrrr                		.lword	__$stat_28
+00000074 rrrrrrrr                		.lword	__$stat_29
+00000078 rrrrrrrr                		.lword	__$stat_30
+0000007C rrrrrrrr                		.lword	__$stat_31
+00000080 rrrrrrrr                		.lword	__$stat_32
+00000084 rrrrrrrr                		.lword	__$stat_33
+00000088 rrrrrrrr                		.lword	__$stat_34
+0000008C rrrrrrrr                		.lword	__$stat_35
+00000090 rrrrrrrr                		.lword	__$stat_36
+00000094 rrrrrrrr                		.lword	__$stat_37
+00000098 rrrrrrrr                		.lword	__$stat_38
+0000009C rrrrrrrr                		.lword	__$stat_39
+000000A0 rrrrrrrr                		.lword	__$stat_40
+000000A4 rrrrrrrr                		.lword	__$stat_41
+000000A8 rrrrrrrr                		.lword	__$stat_42
+000000AC rrrrrrrr                		.lword	__$stat_43
+000000B0 rrrrrrrr                		.lword	__$stat_44
+000000B4 rrrrrrrr                		.lword	__$stat_45
+000000B8 rrrrrrrr                		.lword	__$stat_46
+000000BC rrrrrrrr                		.lword	__$stat_47
+000000C0 rrrrrrrr                		.lword	__$stat_48
+000000C4 rrrrrrrr                		.lword	__$stat_49
+000000C8 rrrrrrrr                		.lword	__$stat_50
+000000CC rrrrrrrr                		.lword	__$stat_51
+000000D0 rrrrrrrr                		.lword	__$stat_52
+000000D4 rrrrrrrr                		.lword	__$stat_53
+000000D8 rrrrrrrr                		.lword	__$stat_54
+000000DC rrrrrrrr                		.lword	__$stat_55
+000000E0 rrrrrrrr                		.lword	__$stat_56
+000000E4 rrrrrrrr                		.lword	__$stat_57
+000000E8 rrrrrrrr                		.lword	__$stat_58
+000000EC rrrrrrrr                		.lword	__$stat_59
+000000F0 rrrrrrrr                		.lword	__$stat_60
+000000F4 rrrrrrrr                		.lword	__$stat_61
+000000F8 rrrrrrrr                		.lword	__$stat_62
+000000FC rrrrrrrr                		.lword	__$stat_63
+00000100 rrrrrrrr                		.lword	__$stat_64
+00000104 rrrrrrrr                		.lword	__$stat_65
+00000108 rrrrrrrr                		.lword	__$stat_66
+0000010C rrrrrrrr                		.lword	__$stat_67
+00000110 rrrrrrrr                		.lword	__$stat_68
+00000114 rrrrrrrr                		.lword	__$stat_69
+00000118 rrrrrrrr                		.lword	__$stat_70
+0000011C rrrrrrrr                		.lword	__$stat_71
+00000120 rrrrrrrr                		.lword	__$stat_72
+00000124 rrrrrrrr                		.lword	__$stat_73
+00000128 rrrrrrrr                		.lword	__$stat_74
+0000012C rrrrrrrr                		.lword	__$stat_75
+00000130 rrrrrrrr                		.lword	__$stat_76
+00000134 rrrrrrrr                		.lword	__$stat_77
+00000138 rrrrrrrr                		.lword	__$stat_78
+0000013C rrrrrrrr                		.lword	__$stat_79
+00000140 rrrrrrrr                		.lword	__$stat_80
+00000144 rrrrrrrr                		.lword	__$stat_81
+00000148 rrrrrrrr                		.lword	__$stat_82
+0000014C rrrrrrrr                		.lword	__$stat_83
+00000150 rrrrrrrr                		.lword	__$stat_84
+00000154 rrrrrrrr                		.lword	__$stat_85
+00000158 rrrrrrrr                		.lword	__$stat_86
+0000015C rrrrrrrr                		.lword	__$stat_87
+00000160 rrrrrrrr                		.lword	__$stat_88
+00000164 rrrrrrrr                		.lword	__$stat_89
+00000168 rrrrrrrr                		.lword	__$stat_90
+0000016C rrrrrrrr                		.lword	__$stat_91
+00000170 rrrrrrrr                		.lword	__$stat_92
+00000174 rrrrrrrr                		.lword	__$stat_93
+00000178 rrrrrrrr                		.lword	__$stat_94
+0000017C rrrrrrrr                		.lword	__$stat_95
+00000180 rrrrrrrr                		.lword	__$stat_96
+00000184 rrrrrrrr                		.lword	__$stat_97
+00000188 rrrrrrrr                		.lword	__$stat_98
+0000018C rrrrrrrr                		.lword	__$stat_99
+00000190 rrrrrrrr                		.lword	__$stat_100
+00000194 rrrrrrrr                		.lword	__$stat_101
+00000198 rrrrrrrr                		.lword	__$stat_102
+0000019C rrrrrrrr                		.lword	__$stat_103
+000001A0 rrrrrrrr                		.lword	__$stat_104
+000001A4 rrrrrrrr                		.lword	__$stat_105
+000001A8 rrrrrrrr                		.lword	__$stat_106
+000001AC rrrrrrrr                		.lword	__$stat_107
+000001B0 rrrrrrrr                		.lword	__$stat_108
+000001B4 rrrrrrrr                		.lword	__$stat_109
+000001B8 rrrrrrrr                		.lword	__$stat_110
+000001BC rrrrrrrr                		.lword	__$stat_111
+000001C0 rrrrrrrr                		.lword	__$stat_112
+000001C4 rrrrrrrr                		.lword	__$stat_113
+000001C8 rrrrrrrr                		.lword	__$stat_114
+000001CC rrrrrrrr                		.lword	__$stat_115
+000001D0 rrrrrrrr                		.lword	__$stat_116
+000001D4 rrrrrrrr                		.lword	__$stat_117
+000001D8 rrrrrrrr                		.lword	__$stat_118
+000001DC rrrrrrrr                		.lword	__$stat_119
+000001E0 rrrrrrrr                		.lword	__$stat_120
+000001E4 rrrrrrrr                		.lword	__$stat_121
+000001E8 rrrrrrrr                		.lword	__$stat_122
+000001EC rrrrrrrr                		.lword	__$stat_123
+000001F0 rrrrrrrr                		.lword	__$stat_124
+000001F4 rrrrrrrr                		.lword	__$stat_125
+000001F8 rrrrrrrr                		.lword	__$stat_126
+000001FC rrrrrrrr                		.lword	__$stat_127
+00000200 rrrrrrrr                		.lword	__$stat_128
+00000204 rrrrrrrr                		.lword	__$stat_129
+00000208 rrrrrrrr                		.lword	__$stat_130
+0000020C rrrrrrrr                		.lword	__$stat_131
+00000210 rrrrrrrr                		.lword	__$stat_132
+00000214 rrrrrrrr                		.lword	__$stat_133
+00000218 rrrrrrrr                		.lword	__$stat_134
+0000021C rrrrrrrr                		.lword	__$stat_135
+00000220 rrrrrrrr                		.lword	__$stat_136
+00000224 rrrrrrrr                		.lword	__$stat_137
+00000228 rrrrrrrr                		.lword	__$stat_138
+0000022C rrrrrrrr                		.lword	__$stat_139
+00000230 rrrrrrrr                		.lword	__$stat_140
+00000234 rrrrrrrr                		.lword	__$stat_141
+00000238 rrrrrrrr                		.lword	__$stat_142
+0000023C rrrrrrrr                		.lword	__$stat_143
+00000240 rrrrrrrr                		.lword	__$stat_144
+00000244 rrrrrrrr                		.lword	__$stat_145
+00000248 rrrrrrrr                		.lword	__$stat_146
+0000024C rrrrrrrr                		.lword	__$stat_147
+00000250 rrrrrrrr                		.lword	__$stat_148
+00000254 rrrrrrrr                		.lword	__$stat_149
+00000258 rrrrrrrr                		.lword	__$stat_150
+0000025C rrrrrrrr                		.lword	__$stat_151
+00000260 rrrrrrrr                		.lword	__$stat_152
+00000264 rrrrrrrr                		.lword	__$stat_153
+00000268 rrrrrrrr                		.lword	__$stat_154
+0000026C rrrrrrrr                		.lword	__$stat_155
+00000270 rrrrrrrr                		.lword	__$stat_156
+00000274 rrrrrrrr                		.lword	__$stat_157
+00000278 rrrrrrrr                		.lword	__$stat_158
+0000027C rrrrrrrr                		.lword	__$stat_159
+00000280 rrrrrrrr                		.lword	__$stat_160
+00000284 rrrrrrrr                		.lword	__$stat_161
+00000288 rrrrrrrr                		.lword	__$stat_162
+0000028C rrrrrrrr                		.lword	__$stat_163
+00000290 rrrrrrrr                		.lword	__$stat_164
+00000294 rrrrrrrr                		.lword	__$stat_165
+00000298 rrrrrrrr                		.lword	__$stat_166
+0000029C rrrrrrrr                		.lword	__$stat_167
+000002A0 rrrrrrrr                		.lword	__$stat_168
+000002A4 rrrrrrrr                		.lword	__$stat_169
+000002A8 rrrrrrrr                		.lword	__$stat_170
+000002AC rrrrrrrr                		.lword	__$stat_171
+000002B0 rrrrrrrr                		.lword	__$stat_172
+000002B4 rrrrrrrr                		.lword	__$stat_173
+000002B8 rrrrrrrr                		.lword	__$stat_174
+000002BC rrrrrrrr                		.lword	__$stat_175
+000002C0 rrrrrrrr                		.lword	__$stat_176
+000002C4 rrrrrrrr                		.lword	__$stat_177
+000002C8 rrrrrrrr                		.lword	__$stat_178
+000002CC rrrrrrrr                		.lword	__$stat_179
+000002D0 rrrrrrrr                		.lword	__$stat_180
+000002D4 rrrrrrrr                		.lword	__$stat_181
+000002D8 rrrrrrrr                		.lword	__$stat_182
+000002DC rrrrrrrr                		.lword	__$stat_183
+000002E0 rrrrrrrr                		.lword	__$stat_184
+000002E4 rrrrrrrr                		.lword	__$stat_185
+000002E8 rrrrrrrr                		.lword	__$stat_186
+000002EC rrrrrrrr                		.lword	__$stat_187
+000002F0 rrrrrrrr                		.lword	__$stat_188
+000002F4 rrrrrrrr                		.lword	__$stat_189
+000002F8 rrrrrrrr                		.lword	__$stat_190
+000002FC rrrrrrrr                		.lword	__$stat_191
+00000300 rrrrrrrr                		.lword	__$stat_192
+00000304 rrrrrrrr                		.lword	__$stat_193
+00000308 rrrrrrrr                		.lword	__$stat_194
+0000030C rrrrrrrr                		.lword	__$stat_195
+00000310 rrrrrrrr                		.lword	__$stat_196
+00000314 rrrrrrrr                		.lword	__$stat_197
+00000318 rrrrrrrr                		.lword	__$stat_198
+0000031C rrrrrrrr                		.lword	__$stat_199
+00000320 rrrrrrrr                		.lword	__$stat_200
+00000324 rrrrrrrr                		.lword	__$stat_201
+00000328 rrrrrrrr                		.lword	__$stat_202
+0000032C rrrrrrrr                		.lword	__$stat_203
+00000330 rrrrrrrr                		.lword	__$stat_204
+00000334 rrrrrrrr                		.lword	__$stat_205
+00000338 rrrrrrrr                		.lword	__$stat_206
+0000033C rrrrrrrr                		.lword	__$stat_207
+00000340 rrrrrrrr                		.lword	__$stat_208
+00000344 rrrrrrrr                		.lword	__$stat_209
+00000348 rrrrrrrr                		.lword	__$stat_210
+0000034C rrrrrrrr                		.lword	__$stat_211
+00000350 rrrrrrrr                		.lword	__$stat_212
+00000354 rrrrrrrr                		.lword	__$stat_213
+00000358 rrrrrrrr                		.lword	__$stat_214
+0000035C rrrrrrrr                		.lword	__$stat_215
+00000360 rrrrrrrr                		.lword	__$stat_216
+00000364 rrrrrrrr                		.lword	__$stat_217
+00000368 rrrrrrrr                		.lword	__$stat_218
+0000036C rrrrrrrr                		.lword	__$stat_219
+00000370 rrrrrrrr                		.lword	__$stat_220
+00000374 rrrrrrrr                		.lword	__$stat_221
+00000378 rrrrrrrr                		.lword	__$stat_222
+0000037C rrrrrrrr                		.lword	__$stat_223
+00000380 rrrrrrrr                		.lword	__$stat_224
+00000384 rrrrrrrr                		.lword	__$stat_225
+00000388 rrrrrrrr                		.lword	__$stat_226
+0000038C rrrrrrrr                		.lword	__$stat_227
+00000390 rrrrrrrr                		.lword	__$stat_228
+00000394 rrrrrrrr                		.lword	__$stat_229
+00000398 rrrrrrrr                		.lword	__$stat_230
+0000039C rrrrrrrr                		.lword	__$stat_231
+000003A0 rrrrrrrr                		.lword	__$stat_232
+000003A4 rrrrrrrr                		.lword	__$stat_233
+000003A8 rrrrrrrr                		.lword	__$stat_234
+000003AC rrrrrrrr                		.lword	__$stat_235
+000003B0 rrrrrrrr                		.lword	__$stat_236
+000003B4 rrrrrrrr                		.lword	__$stat_237
+000003B8 rrrrrrrr                		.lword	__$stat_238
+000003BC rrrrrrrr                		.lword	__$stat_239
+000003C0 rrrrrrrr                		.lword	__$stat_240
+000003C4 rrrrrrrr                		.lword	__$stat_241
+000003C8 rrrrrrrr                		.lword	__$stat_242
+000003CC rrrrrrrr                		.lword	__$stat_243
+000003D0 rrrrrrrr                		.lword	__$stat_244
+000003D4 rrrrrrrr                		.lword	__$stat_245
+000003D8 rrrrrrrr                		.lword	__$stat_246
+000003DC rrrrrrrr                		.lword	__$stat_247
+000003E0 rrrrrrrr                		.lword	__$stat_248
+000003E4 rrrrrrrr                		.lword	__$stat_249
+000003E8 rrrrrrrr                		.lword	__$stat_250
+000003EC rrrrrrrr                		.lword	__$stat_251
+000003F0 rrrrrrrr                		.lword	__$stat_252
+                                 		.SECTION	C_1,ROMDATA
+00000000                         __$stat_00:
+00000000 4F4B                    		.byte	"OK"
+00000002 00                      		.byte	00H
+00000003                         __$stat_01:
+00000003 4572726F                		.byte	"Error"
+         72                      
+00000008 00                      		.byte	00H
+00000009                         __$stat_02:
+00000009 45616761                		.byte	"Eagain"
+         696E                    
+0000000F 00                      		.byte	00H
+00000010                         __$stat_03:
+00000010 4E6F6F70                		.byte	"Noop"
+00000014 00                      		.byte	00H
+00000015                         __$stat_04:
+00000015 436F6D70                		.byte	"Complete"
+         6C657465                
+0000001D 00                      		.byte	00H
+0000001E                         __$stat_05:
+0000001E 5465726D                		.byte	"Terminated"
+         696E6174                
+         6564                    
+00000028 00                      		.byte	00H
+00000029                         __$stat_06:
+00000029 48617264                		.byte	"Hard reset"
+         20726573                
+         6574                    
+00000033 00                      		.byte	00H
+00000034                         __$stat_07:
+00000034 456E6420                		.byte	"End of line"
+         6F66206C                
+         696E65                  
+0000003F 00                      		.byte	00H
+00000040                         __$stat_08:
+00000040 456E6420                		.byte	"End of file"
+         6F662066                
+         696C65                  
+0000004B 00                      		.byte	00H
+0000004C                         __$stat_09:
+0000004C 46696C65                		.byte	"File not open"
+         206E6F74                
+         206F7065                
+         6E                      
+00000059 00                      		.byte	00H
+0000005A                         __$stat_10:
+0000005A 4D617820                		.byte	"Max file size exceeded"
+         66696C65                
+         2073697A                
+         65206578                
+         63656564                
+         6564                    
+00000070 00                      		.byte	00H
+00000071                         __$stat_11:
+00000071 4E6F2073                		.byte	"No such device"
+         75636820                
+         64657669                
+         6365                    
+0000007F 00                      		.byte	00H
+00000080                         __$stat_12:
+00000080 42756666                		.byte	"Buffer empty"
+         65722065                
+         6D707479                
+0000008C 00                      		.byte	00H
+0000008D                         __$stat_13:
+0000008D 42756666                		.byte	"Buffer full"
+         65722066                
+         756C6C                  
+00000098 00                      		.byte	00H
+00000099                         __$stat_14:
+00000099 42756666                		.byte	"Buffer full - fatal"
+         65722066                
+         756C6C20                
+         2D206661                
+         74616C                  
+000000AC 00                      		.byte	00H
+000000AD                         __$stat_15:
+000000AD 496E6974                		.byte	"Initializing"
+         69616C69                
+         7A696E67                
+000000B9 00                      		.byte	00H
+000000BA                         __$stat_16:
+000000BA 456E7465                		.byte	"Entering boot loader"
+         72696E67                
+         20626F6F                
+         74206C6F                
+         61646572                
+000000CE 00                      		.byte	00H
+000000CF                         __$stat_17:
+000000CF 46756E63                		.byte	"Function is stubbed"
+         74696F6E                
+         20697320                
+         73747562                
+         626564                  
+000000E2 00                      		.byte	00H
+000000E3                         __$stat_18:
+000000E3 3138                    		.byte	"18"
+000000E5 00                      		.byte	00H
+000000E6                         __$stat_19:
+000000E6 3139                    		.byte	"19"
+000000E8 00                      		.byte	00H
+000000E9                         __$stat_20:
+000000E9 496E7465                		.byte	"Internal error"
+         726E616C                
+         20657272                
+         6F72                    
+000000F7 00                      		.byte	00H
+000000F8                         __$stat_21:
+000000F8 496E7465                		.byte	"Internal range error"
+         726E616C                
+         2072616E                
+         67652065                
+         72726F72                
+0000010C 00                      		.byte	00H
+0000010D                         __$stat_22:
+0000010D 466C6F61                		.byte	"Floating point error"
+         74696E67                
+         20706F69                
+         6E742065                
+         72726F72                
+00000121 00                      		.byte	00H
+00000122                         __$stat_23:
+00000122 44697669                		.byte	"Divide by zero"
+         64652062                
+         79207A65                
+         726F                    
+00000130 00                      		.byte	00H
+00000131                         __$stat_24:
+00000131 496E7661                		.byte	"Invalid Address"
+         6C696420                
+         41646472                
+         657373                  
+00000140 00                      		.byte	00H
+00000141                         __$stat_25:
+00000141 52656164                		.byte	"Read-only address"
+         2D6F6E6C                
+         79206164                
+         64726573                
+         73                      
+00000152 00                      		.byte	00H
+00000153                         __$stat_26:
+00000153 496E6974                		.byte	"Initialization failure"
+         69616C69                
+         7A617469                
+         6F6E2066                
+         61696C75                
+         7265                    
+00000169 00                      		.byte	00H
+0000016A                         __$stat_27:
+0000016A 53797374                		.byte	"System alarm - shutting down"
+         656D2061                
+         6C61726D                
+         202D2073                
+         68757474                
+         696E6720                
+         646F776E                
+00000186 00                      		.byte	00H
+00000187                         __$stat_28:
+00000187 4661696C                		.byte	"Failed to get planner buffer"
+         65642074                
+         6F206765                
+         7420706C                
+         616E6E65                
+         72206275                
+         66666572                
+000001A3 00                      		.byte	00H
+000001A4                         __$stat_29:
+000001A4 47656E65                		.byte	"Generic exception report"
+         72696320                
+         65786365                
+         7074696F                
+         6E207265                
+         706F7274                
+000001BC 00                      		.byte	00H
+000001BD                         __$stat_30:
+000001BD 4D6F7665                		.byte	"Move time is infinite"
+         2074696D                
+         65206973                
+         20696E66                
+         696E6974                
+         65                      
+000001D2 00                      		.byte	00H
+000001D3                         __$stat_31:
+000001D3 4D6F7665                		.byte	"Move time is NAN"
+         2074696D                
+         65206973                
+         204E414E                
+000001E3 00                      		.byte	00H
+000001E4                         __$stat_32:
+000001E4 466C6F61                		.byte	"Float is infinite"
+         74206973                
+         20696E66                
+         696E6974                
+         65                      
+000001F5 00                      		.byte	00H
+000001F6                         __$stat_33:
+000001F6 466C6F61                		.byte	"Float is NAN"
+         74206973                
+         204E414E                
+00000202 00                      		.byte	00H
+00000203                         __$stat_34:
+00000203 50657273                		.byte	"Persistence error"
+         69737465                
+         6E636520                
+         6572726F                
+         72                      
+00000214 00                      		.byte	00H
+00000215                         __$stat_35:
+00000215 42616420                		.byte	"Bad status report setting"
+         73746174                
+         75732072                
+         65706F72                
+         74207365                
+         7474696E                
+         67                      
+0000022E 00                      		.byte	00H
+0000022F                         __$stat_36:
+0000022F 3336                    		.byte	"36"
+00000231 00                      		.byte	00H
+00000232                         __$stat_37:
+00000232 3337                    		.byte	"37"
+00000234 00                      		.byte	00H
+00000235                         __$stat_38:
+00000235 3338                    		.byte	"38"
+00000237 00                      		.byte	00H
+00000238                         __$stat_39:
+00000238 3339                    		.byte	"39"
+0000023A 00                      		.byte	00H
+0000023B                         __$stat_40:
+0000023B 3430                    		.byte	"40"
+0000023D 00                      		.byte	00H
+0000023E                         __$stat_41:
+0000023E 3431                    		.byte	"41"
+00000240 00                      		.byte	00H
+00000241                         __$stat_42:
+00000241 3432                    		.byte	"42"
+00000243 00                      		.byte	00H
+00000244                         __$stat_43:
+00000244 3433                    		.byte	"43"
+00000246 00                      		.byte	00H
+00000247                         __$stat_44:
+00000247 3434                    		.byte	"44"
+00000249 00                      		.byte	00H
+0000024A                         __$stat_45:
+0000024A 3435                    		.byte	"45"
+0000024C 00                      		.byte	00H
+0000024D                         __$stat_46:
+0000024D 3436                    		.byte	"46"
+0000024F 00                      		.byte	00H
+00000250                         __$stat_47:
+00000250 3437                    		.byte	"47"
+00000252 00                      		.byte	00H
+00000253                         __$stat_48:
+00000253 3438                    		.byte	"48"
+00000255 00                      		.byte	00H
+00000256                         __$stat_49:
+00000256 3439                    		.byte	"49"
+00000258 00                      		.byte	00H
+00000259                         __$stat_50:
+00000259 3530                    		.byte	"50"
+0000025B 00                      		.byte	00H
+0000025C                         __$stat_51:
+0000025C 3531                    		.byte	"51"
+0000025E 00                      		.byte	00H
+0000025F                         __$stat_52:
+0000025F 3532                    		.byte	"52"
+00000261 00                      		.byte	00H
+00000262                         __$stat_53:
+00000262 3533                    		.byte	"53"
+00000264 00                      		.byte	00H
+00000265                         __$stat_54:
+00000265 3534                    		.byte	"54"
+00000267 00                      		.byte	00H
+00000268                         __$stat_55:
+00000268 3535                    		.byte	"55"
+0000026A 00                      		.byte	00H
+0000026B                         __$stat_56:
+0000026B 3536                    		.byte	"56"
+0000026D 00                      		.byte	00H
+0000026E                         __$stat_57:
+0000026E 3537                    		.byte	"57"
+00000270 00                      		.byte	00H
+00000271                         __$stat_58:
+00000271 3538                    		.byte	"58"
+00000273 00                      		.byte	00H
+00000274                         __$stat_59:
+00000274 3539                    		.byte	"59"
+00000276 00                      		.byte	00H
+00000277                         __$stat_60:
+00000277 3630                    		.byte	"60"
+00000279 00                      		.byte	00H
+0000027A                         __$stat_61:
+0000027A 3631                    		.byte	"61"
+0000027C 00                      		.byte	00H
+0000027D                         __$stat_62:
+0000027D 3632                    		.byte	"62"
+0000027F 00                      		.byte	00H
+00000280                         __$stat_63:
+00000280 3633                    		.byte	"63"
+00000282 00                      		.byte	00H
+00000283                         __$stat_64:
+00000283 3634                    		.byte	"64"
+00000285 00                      		.byte	00H
+00000286                         __$stat_65:
+00000286 3635                    		.byte	"65"
+00000288 00                      		.byte	00H
+00000289                         __$stat_66:
+00000289 3636                    		.byte	"66"
+0000028B 00                      		.byte	00H
+0000028C                         __$stat_67:
+0000028C 3637                    		.byte	"67"
+0000028E 00                      		.byte	00H
+0000028F                         __$stat_68:
+0000028F 3638                    		.byte	"68"
+00000291 00                      		.byte	00H
+00000292                         __$stat_69:
+00000292 3639                    		.byte	"69"
+00000294 00                      		.byte	00H
+00000295                         __$stat_70:
+00000295 3730                    		.byte	"70"
+00000297 00                      		.byte	00H
+00000298                         __$stat_71:
+00000298 3731                    		.byte	"71"
+0000029A 00                      		.byte	00H
+0000029B                         __$stat_72:
+0000029B 3732                    		.byte	"72"
+0000029D 00                      		.byte	00H
+0000029E                         __$stat_73:
+0000029E 3733                    		.byte	"73"
+000002A0 00                      		.byte	00H
+000002A1                         __$stat_74:
+000002A1 3734                    		.byte	"74"
+000002A3 00                      		.byte	00H
+000002A4                         __$stat_75:
+000002A4 3735                    		.byte	"75"
+000002A6 00                      		.byte	00H
+000002A7                         __$stat_76:
+000002A7 3736                    		.byte	"76"
+000002A9 00                      		.byte	00H
+000002AA                         __$stat_77:
+000002AA 3737                    		.byte	"77"
+000002AC 00                      		.byte	00H
+000002AD                         __$stat_78:
+000002AD 3738                    		.byte	"78"
+000002AF 00                      		.byte	00H
+000002B0                         __$stat_79:
+000002B0 3739                    		.byte	"79"
+000002B2 00                      		.byte	00H
+000002B3                         __$stat_80:
+000002B3 3830                    		.byte	"80"
+000002B5 00                      		.byte	00H
+000002B6                         __$stat_81:
+000002B6 3831                    		.byte	"81"
+000002B8 00                      		.byte	00H
+000002B9                         __$stat_82:
+000002B9 3832                    		.byte	"82"
+000002BB 00                      		.byte	00H
+000002BC                         __$stat_83:
+000002BC 3833                    		.byte	"83"
+000002BE 00                      		.byte	00H
+000002BF                         __$stat_84:
+000002BF 3834                    		.byte	"84"
+000002C1 00                      		.byte	00H
+000002C2                         __$stat_85:
+000002C2 3835                    		.byte	"85"
+000002C4 00                      		.byte	00H
+000002C5                         __$stat_86:
+000002C5 3836                    		.byte	"86"
+000002C7 00                      		.byte	00H
+000002C8                         __$stat_87:
+000002C8 3837                    		.byte	"87"
+000002CA 00                      		.byte	00H
+000002CB                         __$stat_88:
+000002CB 3838                    		.byte	"88"
+000002CD 00                      		.byte	00H
+000002CE                         __$stat_89:
+000002CE 3839                    		.byte	"89"
+000002D0 00                      		.byte	00H
+000002D1                         __$stat_90:
+000002D1 436F6E66                		.byte	"Config sub-system assertion failure"
+         69672073                
+         75622D73                
+         79737465                
+         6D206173                
+         73657274                
+         696F6E20                
+         6661696C                
+         757265                  
+000002F4 00                      		.byte	00H
+000002F5                         __$stat_91:
+000002F5 494F2073                		.byte	"IO sub-system assertion failure"
+         75622D73                
+         79737465                
+         6D206173                
+         73657274                
+         696F6E20                
+         6661696C                
+         757265                  
+00000314 00                      		.byte	00H
+00000315                         __$stat_92:
+00000315 456E636F                		.byte	"Encoder assertion failure"
+         64657220                
+         61737365                
+         7274696F                
+         6E206661                
+         696C7572                
+         65                      
+0000032E 00                      		.byte	00H
+0000032F                         __$stat_93:
+0000032F 53746570                		.byte	"Stepper assertion failure"
+         70657220                
+         61737365                
+         7274696F                
+         6E206661                
+         696C7572                
+         65                      
+00000348 00                      		.byte	00H
+00000349                         __$stat_94:
+00000349 506C616E                		.byte	"Planner assertion failure"
+         6E657220                
+         61737365                
+         7274696F                
+         6E206661                
+         696C7572                
+         65                      
+00000362 00                      		.byte	00H
+00000363                         __$stat_95:
+00000363 43616E6F                		.byte	"Canonical machine assertion failure"
+         6E696361                
+         6C206D61                
+         6368696E                
+         65206173                
+         73657274                
+         696F6E20                
+         6661696C                
+         757265                  
+00000386 00                      		.byte	00H
+00000387                         __$stat_96:
+00000387 436F6E74                		.byte	"Controller assertion failure"
+         726F6C6C                
+         65722061                
+         73736572                
+         74696F6E                
+         20666169                
+         6C757265                
+000003A3 00                      		.byte	00H
+000003A4                         __$stat_97:
+000003A4 53746163                		.byte	"Stack overflow detected"
+         6B206F76                
+         6572666C                
+         6F772064                
+         65746563                
+         746564                  
+000003BB 00                      		.byte	00H
+000003BC                         __$stat_98:
+000003BC 4D656D6F                		.byte	"Memory fault detected"
+         72792066                
+         61756C74                
+         20646574                
+         65637465                
+         64                      
+000003D1 00                      		.byte	00H
+000003D2                         __$stat_99:
+000003D2 47656E65                		.byte	"Generic assertion failure"
+         72696320                
+         61737365                
+         7274696F                
+         6E206661                
+         696C7572                
+         65                      
+000003EB 00                      		.byte	00H
+000003EC                         __$stat_100:
+000003EC 556E7265                		.byte	"Unrecognized command or config name"
+         636F676E                
+         697A6564                
+         20636F6D                
+         6D616E64                
+         206F7220                
+         636F6E66                
+         6967206E                
+         616D65                  
+0000040F 00                      		.byte	00H
+00000410                         __$stat_101:
+00000410 496E7661                		.byte	"Invalid or malformed command"
+         6C696420                
+         6F72206D                
+         616C666F                
+         726D6564                
+         20636F6D                
+         6D616E64                
+0000042C 00                      		.byte	00H
+0000042D                         __$stat_102:
+0000042D 42616420                		.byte	"Bad number format"
+         6E756D62                
+         65722066                
+         6F726D61                
+         74                      
+0000043E 00                      		.byte	00H
+0000043F                         __$stat_103:
+0000043F 556E7375                		.byte	"Unsupported number or JSON type"
+         70706F72                
+         74656420                
+         6E756D62                
+         6572206F                
+         72204A53                
+         4F4E2074                
+         797065                  
+0000045E 00                      		.byte	00H
+0000045F                         __$stat_104:
+0000045F 50617261                		.byte	"Parameter is read-only"
+         6D657465                
+         72206973                
+         20726561                
+         642D6F6E                
+         6C79                    
+00000475 00                      		.byte	00H
+00000476                         __$stat_105:
+00000476 50617261                		.byte	"Parameter cannot be read"
+         6D657465                
+         72206361                
+         6E6E6F74                
+         20626520                
+         72656164                
+0000048E 00                      		.byte	00H
+0000048F                         __$stat_106:
+0000048F 436F6D6D                		.byte	"Command not accepted at this time"
+         616E6420                
+         6E6F7420                
+         61636365                
+         70746564                
+         20617420                
+         74686973                
+         2074696D                
+         65                      
+000004B0 00                      		.byte	00H
+000004B1                         __$stat_107:
+000004B1 496E7075                		.byte	"Input exceeds max length"
+         74206578                
+         63656564                
+         73206D61                
+         78206C65                
+         6E677468                
+000004C9 00                      		.byte	00H
+000004CA                         __$stat_108:
+000004CA 496E7075                		.byte	"Input less than minimum value"
+         74206C65                
+         73732074                
+         68616E20                
+         6D696E69                
+         6D756D20                
+         76616C75                
+         65                      
+000004E7 00                      		.byte	00H
+000004E8                         __$stat_109:
+000004E8 496E7075                		.byte	"Input exceeds maximum value"
+         74206578                
+         63656564                
+         73206D61                
+         78696D75                
+         6D207661                
+         6C7565                  
+00000503 00                      		.byte	00H
+00000504                         __$stat_110:
+00000504 496E7075                		.byte	"Input value range error"
+         74207661                
+         6C756520                
+         72616E67                
+         65206572                
+         726F72                  
+0000051B 00                      		.byte	00H
+0000051C                         __$stat_111:
+0000051C 4A534F4E                		.byte	"JSON syntax error"
+         2073796E                
+         74617820                
+         6572726F                
+         72                      
+0000052D 00                      		.byte	00H
+0000052E                         __$stat_112:
+0000052E 4A534F4E                		.byte	"JSON input has too many pairs"
+         20696E70                
+         75742068                
+         61732074                
+         6F6F206D                
+         616E7920                
+         70616972                
+         73                      
+0000054B 00                      		.byte	00H
+0000054C                         __$stat_113:
+0000054C 4A534F4E                		.byte	"JSON string too long"
+         20737472                
+         696E6720                
+         746F6F20                
+         6C6F6E67                
+00000560 00                      		.byte	00H
+00000561                         __$stat_114:
+00000561 313134                  		.byte	"114"
+00000564 00                      		.byte	00H
+00000565                         __$stat_115:
+00000565 313135                  		.byte	"115"
+00000568 00                      		.byte	00H
+00000569                         __$stat_116:
+00000569 313136                  		.byte	"116"
+0000056C 00                      		.byte	00H
+0000056D                         __$stat_117:
+0000056D 313137                  		.byte	"117"
+00000570 00                      		.byte	00H
+00000571                         __$stat_118:
+00000571 313138                  		.byte	"118"
+00000574 00                      		.byte	00H
+00000575                         __$stat_119:
+00000575 313139                  		.byte	"119"
+00000578 00                      		.byte	00H
+00000579                         __$stat_120:
+00000579 313230                  		.byte	"120"
+0000057C 00                      		.byte	00H
+0000057D                         __$stat_121:
+0000057D 313231                  		.byte	"121"
+00000580 00                      		.byte	00H
+00000581                         __$stat_122:
+00000581 313232                  		.byte	"122"
+00000584 00                      		.byte	00H
+00000585                         __$stat_123:
+00000585 313233                  		.byte	"123"
+00000588 00                      		.byte	00H
+00000589                         __$stat_124:
+00000589 313234                  		.byte	"124"
+0000058C 00                      		.byte	00H
+0000058D                         __$stat_125:
+0000058D 313235                  		.byte	"125"
+00000590 00                      		.byte	00H
+00000591                         __$stat_126:
+00000591 313236                  		.byte	"126"
+00000594 00                      		.byte	00H
+00000595                         __$stat_127:
+00000595 313237                  		.byte	"127"
+00000598 00                      		.byte	00H
+00000599                         __$stat_128:
+00000599 313238                  		.byte	"128"
+0000059C 00                      		.byte	00H
+0000059D                         __$stat_129:
+0000059D 313239                  		.byte	"129"
+000005A0 00                      		.byte	00H
+000005A1                         __$stat_130:
+000005A1 47656E65                		.byte	"Generic Gcode input error"
+         72696320                
+         47636F64                
+         6520696E                
+         70757420                
+         6572726F                
+         72                      
+000005BA 00                      		.byte	00H
+000005BB                         __$stat_131:
+000005BB 47636F64                		.byte	"Gcode command unsupported"
+         6520636F                
+         6D6D616E                
+         6420756E                
+         73757070                
+         6F727465                
+         64                      
+000005D4 00                      		.byte	00H
+000005D5                         __$stat_132:
+000005D5 4D20636F                		.byte	"M code unsupported"
+         64652075                
+         6E737570                
+         706F7274                
+         6564                    
+000005E7 00                      		.byte	00H
+000005E8                         __$stat_133:
+000005E8 47636F64                		.byte	"Gcode modal group violation"
+         65206D6F                
+         64616C20                
+         67726F75                
+         70207669                
+         6F6C6174                
+         696F6E                  
+00000603 00                      		.byte	00H
+00000604                         __$stat_134:
+00000604 41786973                		.byte	"Axis word missing"
+         20776F72                
+         64206D69                
+         7373696E                
+         67                      
+00000615 00                      		.byte	00H
+00000616                         __$stat_135:
+00000616 41786973                		.byte	"Axis cannot be present"
+         2063616E                
+         6E6F7420                
+         62652070                
+         72657365                
+         6E74                    
+0000062C 00                      		.byte	00H
+0000062D                         __$stat_136:
+0000062D 41786973                		.byte	"Axis is invalid for this command"
+         20697320                
+         696E7661                
+         6C696420                
+         666F7220                
+         74686973                
+         20636F6D                
+         6D616E64                
+0000064D 00                      		.byte	00H
+0000064E                         __$stat_137:
+0000064E 41786973                		.byte	"Axis is disabled"
+         20697320                
+         64697361                
+         626C6564                
+0000065E 00                      		.byte	00H
+0000065F                         __$stat_138:
+0000065F 41786973                		.byte	"Axis target position is missing"
+         20746172                
+         67657420                
+         706F7369                
+         74696F6E                
+         20697320                
+         6D697373                
+         696E67                  
+0000067E 00                      		.byte	00H
+0000067F                         __$stat_139:
+0000067F 41786973                		.byte	"Axis target position is invalid"
+         20746172                
+         67657420                
+         706F7369                
+         74696F6E                
+         20697320                
+         696E7661                
+         6C6964                  
+0000069E 00                      		.byte	00H
+0000069F                         __$stat_140:
+0000069F 53656C65                		.byte	"Selected plane is missing"
+         63746564                
+         20706C61                
+         6E652069                
+         73206D69                
+         7373696E                
+         67                      
+000006B8 00                      		.byte	00H
+000006B9                         __$stat_141:
+000006B9 53656C65                		.byte	"Selected plane is invalid"
+         63746564                
+         20706C61                
+         6E652069                
+         7320696E                
+         76616C69                
+         64                      
+000006D2 00                      		.byte	00H
+000006D3                         __$stat_142:
+000006D3 46656564                		.byte	"Feedrate not specified"
+         72617465                
+         206E6F74                
+         20737065                
+         63696669                
+         6564                    
+000006E9 00                      		.byte	00H
+000006EA                         __$stat_143:
+000006EA 496E7665                		.byte	"Inverse time mode cannot be used with this command"
+         72736520                
+         74696D65                
+         206D6F64                
+         65206361                
+         6E6E6F74                
+         20626520                
+         75736564                
+         20776974                
+         68207468                
+         69732063                
+         6F6D6D61                
+         6E64                    
+0000071C 00                      		.byte	00H
+0000071D                         __$stat_144:
+0000071D 526F7461                		.byte	"Rotary axes cannot be used with this command"
+         72792061                
+         78657320                
+         63616E6E                
+         6F742062                
+         65207573                
+         65642077                
+         69746820                
+         74686973                
+         20636F6D                
+         6D616E64                
+00000749 00                      		.byte	00H
+0000074A                         __$stat_145:
+0000074A 4730206F                		.byte	"G0 or G1 must be active for G53"
+         72204731                
+         206D7573                
+         74206265                
+         20616374                
+         69766520                
+         666F7220                
+         473533                  
+00000769 00                      		.byte	00H
+0000076A                         __$stat_146:
+0000076A 52657175                		.byte	"Requested velocity exceeds limits"
+         65737465                
+         64207665                
+         6C6F6369                
+         74792065                
+         78636565                
+         6473206C                
+         696D6974                
+         73                      
+0000078B 00                      		.byte	00H
+0000078C                         __$stat_147:
+0000078C 43757474                		.byte	"Cutter compensation cannot be enabled"
+         65722063                
+         6F6D7065                
+         6E736174                
+         696F6E20                
+         63616E6E                
+         6F742062                
+         6520656E                
+         61626C65                
+         64                      
+000007B1 00                      		.byte	00H
+000007B2                         __$stat_148:
+000007B2 50726F67                		.byte	"Programmed point same as current point"
+         72616D6D                
+         65642070                
+         6F696E74                
+         2073616D                
+         65206173                
+         20637572                
+         72656E74                
+         20706F69                
+         6E74                    
+000007D8 00                      		.byte	00H
+000007D9                         __$stat_149:
+000007D9 5370696E                		.byte	"Spindle speed below minimum"
+         646C6520                
+         73706565                
+         64206265                
+         6C6F7720                
+         6D696E69                
+         6D756D                  
+000007F4 00                      		.byte	00H
+000007F5                         __$stat_150:
+000007F5 5370696E                		.byte	"Spindle speed exceeded maximum"
+         646C6520                
+         73706565                
+         64206578                
+         63656564                
+         6564206D                
+         6178696D                
+         756D                    
+00000813 00                      		.byte	00H
+00000814                         __$stat_151:
+00000814 5370696E                		.byte	"Spindle S word is missing"
+         646C6520                
+         5320776F                
+         72642069                
+         73206D69                
+         7373696E                
+         67                      
+0000082D 00                      		.byte	00H
+0000082E                         __$stat_152:
+0000082E 5370696E                		.byte	"Spindle S word is invalid"
+         646C6520                
+         5320776F                
+         72642069                
+         7320696E                
+         76616C69                
+         64                      
+00000847 00                      		.byte	00H
+00000848                         __$stat_153:
+00000848 5370696E                		.byte	"Spindle must be off for this command"
+         646C6520                
+         6D757374                
+         20626520                
+         6F666620                
+         666F7220                
+         74686973                
+         20636F6D                
+         6D616E64                
+0000086C 00                      		.byte	00H
+0000086D                         __$stat_154:
+0000086D 5370696E                		.byte	"Spindle must be turning for this command"
+         646C6520                
+         6D757374                
+         20626520                
+         7475726E                
+         696E6720                
+         666F7220                
+         74686973                
+         20636F6D                
+         6D616E64                
+00000895 00                      		.byte	00H
+00000896                         __$stat_155:
+00000896 41726320                		.byte	"Arc specification error"
+         73706563                
+         69666963                
+         6174696F                
+         6E206572                
+         726F72                  
+000008AD 00                      		.byte	00H
+000008AE                         __$stat_156:
+000008AE 41726320                		.byte	"Arc specification error - missing axis(es)"
+         73706563                
+         69666963                
+         6174696F                
+         6E206572                
+         726F7220                
+         2D206D69                
+         7373696E                
+         67206178                
+         69732865                
+         7329                    
+000008D8 00                      		.byte	00H
+000008D9                         __$stat_157:
+000008D9 41726320                		.byte	"Arc specification error - missing offset(s)"
+         73706563                
+         69666963                
+         6174696F                
+         6E206572                
+         726F7220                
+         2D206D69                
+         7373696E                
+         67206F66                
+         66736574                
+         287329                  
+00000904 00                      		.byte	00H
+00000905                         __$stat_158:
+00000905 41726320                		.byte	"Arc specification error - radius arc out of tolerance"
+         73706563                
+         69666963                
+         6174696F                
+         6E206572                
+         726F7220                
+         2D207261                
+         64697573                
+         20617263                
+         206F7574                
+         206F6620                
+         746F6C65                
+         72616E63                
+         65                      
+0000093A 00                      		.byte	00H
+0000093B                         __$stat_159:
+0000093B 41726320                		.byte	"Arc specification error - endpoint is starting point"
+         73706563                
+         69666963                
+         6174696F                
+         6E206572                
+         726F7220                
+         2D20656E                
+         64706F69                
+         6E742069                
+         73207374                
+         61727469                
+         6E672070                
+         6F696E74                
+0000096F 00                      		.byte	00H
+00000970                         __$stat_160:
+00000970 5020776F                		.byte	"P word is missing"
+         72642069                
+         73206D69                
+         7373696E                
+         67                      
+00000981 00                      		.byte	00H
+00000982                         __$stat_161:
+00000982 5020776F                		.byte	"P word is invalid"
+         72642069                
+         7320696E                
+         76616C69                
+         64                      
+00000993 00                      		.byte	00H
+00000994                         __$stat_162:
+00000994 5020776F                		.byte	"P word is zero"
+         72642069                
+         73207A65                
+         726F                    
+000009A2 00                      		.byte	00H
+000009A3                         __$stat_163:
+000009A3 5020776F                		.byte	"P word is negative"
+         72642069                
+         73206E65                
+         67617469                
+         7665                    
+000009B5 00                      		.byte	00H
+000009B6                         __$stat_164:
+000009B6 5020776F                		.byte	"P word is not an integer"
+         72642069                
+         73206E6F                
+         7420616E                
+         20696E74                
+         65676572                
+000009CE 00                      		.byte	00H
+000009CF                         __$stat_165:
+000009CF 5020776F                		.byte	"P word is not a valid tool number"
+         72642069                
+         73206E6F                
+         74206120                
+         76616C69                
+         6420746F                
+         6F6C206E                
+         756D6265                
+         72                      
+000009F0 00                      		.byte	00H
+000009F1                         __$stat_166:
+000009F1 4420776F                		.byte	"D word is missing"
+         72642069                
+         73206D69                
+         7373696E                
+         67                      
+00000A02 00                      		.byte	00H
+00000A03                         __$stat_167:
+00000A03 4420776F                		.byte	"D word is invalid"
+         72642069                
+         7320696E                
+         76616C69                
+         64                      
+00000A14 00                      		.byte	00H
+00000A15                         __$stat_168:
+00000A15 4520776F                		.byte	"E word is missing"
+         72642069                
+         73206D69                
+         7373696E                
+         67                      
+00000A26 00                      		.byte	00H
+00000A27                         __$stat_169:
+00000A27 4520776F                		.byte	"E word is invalid"
+         72642069                
+         7320696E                
+         76616C69                
+         64                      
+00000A38 00                      		.byte	00H
+00000A39                         __$stat_170:
+00000A39 4820776F                		.byte	"H word is missing"
+         72642069                
+         73206D69                
+         7373696E                
+         67                      
+00000A4A 00                      		.byte	00H
+00000A4B                         __$stat_171:
+00000A4B 4820776F                		.byte	"H word is invalid"
+         72642069                
+         7320696E                
+         76616C69                
+         64                      
+00000A5C 00                      		.byte	00H
+00000A5D                         __$stat_172:
+00000A5D 4C20776F                		.byte	"L word is missing"
+         72642069                
+         73206D69                
+         7373696E                
+         67                      
+00000A6E 00                      		.byte	00H
+00000A6F                         __$stat_173:
+00000A6F 4C20776F                		.byte	"L word is invalid"
+         72642069                
+         7320696E                
+         76616C69                
+         64                      
+00000A80 00                      		.byte	00H
+00000A81                         __$stat_174:
+00000A81 5120776F                		.byte	"Q word is missing"
+         72642069                
+         73206D69                
+         7373696E                
+         67                      
+00000A92 00                      		.byte	00H
+00000A93                         __$stat_175:
+00000A93 5120776F                		.byte	"Q word is invalid"
+         72642069                
+         7320696E                
+         76616C69                
+         64                      
+00000AA4 00                      		.byte	00H
+00000AA5                         __$stat_176:
+00000AA5 5220776F                		.byte	"R word is missing"
+         72642069                
+         73206D69                
+         7373696E                
+         67                      
+00000AB6 00                      		.byte	00H
+00000AB7                         __$stat_177:
+00000AB7 5220776F                		.byte	"R word is invalid"
+         72642069                
+         7320696E                
+         76616C69                
+         64                      
+00000AC8 00                      		.byte	00H
+00000AC9                         __$stat_178:
+00000AC9 5420776F                		.byte	"T word is missing"
+         72642069                
+         73206D69                
+         7373696E                
+         67                      
+00000ADA 00                      		.byte	00H
+00000ADB                         __$stat_179:
+00000ADB 5420776F                		.byte	"T word is invalid"
+         72642069                
+         7320696E                
+         76616C69                
+         64                      
+00000AEC 00                      		.byte	00H
+00000AED                         __$stat_180:
+00000AED 313830                  		.byte	"180"
+00000AF0 00                      		.byte	00H
+00000AF1                         __$stat_181:
+00000AF1 313831                  		.byte	"181"
+00000AF4 00                      		.byte	00H
+00000AF5                         __$stat_182:
+00000AF5 313832                  		.byte	"182"
+00000AF8 00                      		.byte	00H
+00000AF9                         __$stat_183:
+00000AF9 313833                  		.byte	"183"
+00000AFC 00                      		.byte	00H
+00000AFD                         __$stat_184:
+00000AFD 313834                  		.byte	"184"
+00000B00 00                      		.byte	00H
+00000B01                         __$stat_185:
+00000B01 313835                  		.byte	"185"
+00000B04 00                      		.byte	00H
+00000B05                         __$stat_186:
+00000B05 313836                  		.byte	"186"
+00000B08 00                      		.byte	00H
+00000B09                         __$stat_187:
+00000B09 313837                  		.byte	"187"
+00000B0C 00                      		.byte	00H
+00000B0D                         __$stat_188:
+00000B0D 313838                  		.byte	"188"
+00000B10 00                      		.byte	00H
+00000B11                         __$stat_189:
+00000B11 313839                  		.byte	"189"
+00000B14 00                      		.byte	00H
+00000B15                         __$stat_190:
+00000B15 313930                  		.byte	"190"
+00000B18 00                      		.byte	00H
+00000B19                         __$stat_191:
+00000B19 313931                  		.byte	"191"
+00000B1C 00                      		.byte	00H
+00000B1D                         __$stat_192:
+00000B1D 313932                  		.byte	"192"
+00000B20 00                      		.byte	00H
+00000B21                         __$stat_193:
+00000B21 313933                  		.byte	"193"
+00000B24 00                      		.byte	00H
+00000B25                         __$stat_194:
+00000B25 313934                  		.byte	"194"
+00000B28 00                      		.byte	00H
+00000B29                         __$stat_195:
+00000B29 313935                  		.byte	"195"
+00000B2C 00                      		.byte	00H
+00000B2D                         __$stat_196:
+00000B2D 313936                  		.byte	"196"
+00000B30 00                      		.byte	00H
+00000B31                         __$stat_197:
+00000B31 313937                  		.byte	"197"
+00000B34 00                      		.byte	00H
+00000B35                         __$stat_198:
+00000B35 313938                  		.byte	"198"
+00000B38 00                      		.byte	00H
+00000B39                         __$stat_199:
+00000B39 313939                  		.byte	"199"
+00000B3C 00                      		.byte	00H
+00000B3D                         __$stat_200:
+00000B3D 47656E65                		.byte	"Generic TinyG error"
+         72696320                
+         54696E79                
+         47206572                
+         726F72                  
+00000B50 00                      		.byte	00H
+00000B51                         __$stat_201:
+00000B51 4D6F7665                		.byte	"Move less than minimum length"
+         206C6573                
+         73207468                
+         616E206D                
+         696E696D                
+         756D206C                
+         656E6774                
+         68                      
+00000B6E 00                      		.byte	00H
+00000B6F                         __$stat_202:
+00000B6F 4D6F7665                		.byte	"Move less than minimum time"
+         206C6573                
+         73207468                
+         616E206D                
+         696E696D                
+         756D2074                
+         696D65                  
+00000B8A 00                      		.byte	00H
+00000B8B                         __$stat_203:
+00000B8B 4D616368                		.byte	"Machine is alarmed - Command not processed"
+         696E6520                
+         69732061                
+         6C61726D                
+         6564202D                
+         20436F6D                
+         6D616E64                
+         206E6F74                
+         2070726F                
+         63657373                
+         6564                    
+00000BB5 00                      		.byte	00H
+00000BB6                         __$stat_204:
+00000BB6 4C696D69                		.byte	"Limit switch hit - Shutdown occurred"
+         74207377                
+         69746368                
+         20686974                
+         202D2053                
+         68757464                
+         6F776E20                
+         6F636375                
+         72726564                
+00000BDA 00                      		.byte	00H
+00000BDB                         __$stat_205:
+00000BDB 54726170                		.byte	"Trapezoid planner failed to converge"
+         657A6F69                
+         6420706C                
+         616E6E65                
+         72206661                
+         696C6564                
+         20746F20                
+         636F6E76                
+         65726765                
+00000BFF 00                      		.byte	00H
+00000C00                         __$stat_206:
+00000C00 323036                  		.byte	"206"
+00000C03 00                      		.byte	00H
+00000C04                         __$stat_207:
+00000C04 323037                  		.byte	"207"
+00000C07 00                      		.byte	00H
+00000C08                         __$stat_208:
+00000C08 323038                  		.byte	"208"
+00000C0B 00                      		.byte	00H
+00000C0C                         __$stat_209:
+00000C0C 323039                  		.byte	"209"
+00000C0F 00                      		.byte	00H
+00000C10                         __$stat_210:
+00000C10 323130                  		.byte	"210"
+00000C13 00                      		.byte	00H
+00000C14                         __$stat_211:
+00000C14 323131                  		.byte	"211"
+00000C17 00                      		.byte	00H
+00000C18                         __$stat_212:
+00000C18 323132                  		.byte	"212"
+00000C1B 00                      		.byte	00H
+00000C1C                         __$stat_213:
+00000C1C 323133                  		.byte	"213"
+00000C1F 00                      		.byte	00H
+00000C20                         __$stat_214:
+00000C20 323134                  		.byte	"214"
+00000C23 00                      		.byte	00H
+00000C24                         __$stat_215:
+00000C24 323135                  		.byte	"215"
+00000C27 00                      		.byte	00H
+00000C28                         __$stat_216:
+00000C28 323136                  		.byte	"216"
+00000C2B 00                      		.byte	00H
+00000C2C                         __$stat_217:
+00000C2C 323137                  		.byte	"217"
+00000C2F 00                      		.byte	00H
+00000C30                         __$stat_218:
+00000C30 323138                  		.byte	"218"
+00000C33 00                      		.byte	00H
+00000C34                         __$stat_219:
+00000C34 323139                  		.byte	"219"
+00000C37 00                      		.byte	00H
+00000C38                         __$stat_220:
+00000C38 536F6674                		.byte	"Soft limit exceeded"
+         206C696D                
+         69742065                
+         78636565                
+         646564                  
+00000C4B 00                      		.byte	00H
+00000C4C                         __$stat_221:
+00000C4C 536F6674                		.byte	"Soft limit exceeded - X min"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D205820                
+         6D696E                  
+00000C67 00                      		.byte	00H
+00000C68                         __$stat_222:
+00000C68 536F6674                		.byte	"Soft limit exceeded - X max"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D205820                
+         6D6178                  
+00000C83 00                      		.byte	00H
+00000C84                         __$stat_223:
+00000C84 536F6674                		.byte	"Soft limit exceeded - Y min"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D205920                
+         6D696E                  
+00000C9F 00                      		.byte	00H
+00000CA0                         __$stat_224:
+00000CA0 536F6674                		.byte	"Soft limit exceeded - Y max"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D205920                
+         6D6178                  
+00000CBB 00                      		.byte	00H
+00000CBC                         __$stat_225:
+00000CBC 536F6674                		.byte	"Soft limit exceeded - Z min"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D205A20                
+         6D696E                  
+00000CD7 00                      		.byte	00H
+00000CD8                         __$stat_226:
+00000CD8 536F6674                		.byte	"Soft limit exceeded - Z max"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D205A20                
+         6D6178                  
+00000CF3 00                      		.byte	00H
+00000CF4                         __$stat_227:
+00000CF4 536F6674                		.byte	"Soft limit exceeded - A min"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D204120                
+         6D696E                  
+00000D0F 00                      		.byte	00H
+00000D10                         __$stat_228:
+00000D10 536F6674                		.byte	"Soft limit exceeded - A max"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D204120                
+         6D6178                  
+00000D2B 00                      		.byte	00H
+00000D2C                         __$stat_229:
+00000D2C 536F6674                		.byte	"Soft limit exceeded - B min"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D204220                
+         6D696E                  
+00000D47 00                      		.byte	00H
+00000D48                         __$stat_230:
+00000D48 536F6674                		.byte	"Soft limit exceeded - B max"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D204220                
+         6D6178                  
+00000D63 00                      		.byte	00H
+00000D64                         __$stat_231:
+00000D64 536F6674                		.byte	"Soft limit exceeded - C min"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D204320                
+         6D696E                  
+00000D7F 00                      		.byte	00H
+00000D80                         __$stat_232:
+00000D80 536F6674                		.byte	"Soft limit exceeded - C max"
+         206C696D                
+         69742065                
+         78636565                
+         64656420                
+         2D204320                
+         6D6178                  
+00000D9B 00                      		.byte	00H
+00000D9C                         __$stat_233:
+00000D9C 323333                  		.byte	"233"
+00000D9F 00                      		.byte	00H
+00000DA0                         __$stat_234:
+00000DA0 323334                  		.byte	"234"
+00000DA3 00                      		.byte	00H
+00000DA4                         __$stat_235:
+00000DA4 323335                  		.byte	"235"
+00000DA7 00                      		.byte	00H
+00000DA8                         __$stat_236:
+00000DA8 323336                  		.byte	"236"
+00000DAB 00                      		.byte	00H
+00000DAC                         __$stat_237:
+00000DAC 323337                  		.byte	"237"
+00000DAF 00                      		.byte	00H
+00000DB0                         __$stat_238:
+00000DB0 323338                  		.byte	"238"
+00000DB3 00                      		.byte	00H
+00000DB4                         __$stat_239:
+00000DB4 323339                  		.byte	"239"
+00000DB7 00                      		.byte	00H
+00000DB8                         __$stat_240:
+00000DB8 486F6D69                		.byte	"Homing cycle failed"
+         6E672063                
+         79636C65                
+         20666169                
+         6C6564                  
+00000DCB 00                      		.byte	00H
+00000DCC                         __$stat_241:
+00000DCC 486F6D69                		.byte	"Homing Error - Bad or no axis specified"
+         6E672045                
+         72726F72                
+         202D2042                
+         6164206F                
+         72206E6F                
+         20617869                
+         73207370                
+         65636966                
+         696564                  
+00000DF3 00                      		.byte	00H
+00000DF4                         __$stat_242:
+00000DF4 486F6D69                		.byte	"Homing Error - Search velocity is zero"
+         6E672045                
+         72726F72                
+         202D2053                
+         65617263                
+         68207665                
+         6C6F6369                
+         74792069                
+         73207A65                
+         726F                    
+00000E1A 00                      		.byte	00H
+00000E1B                         __$stat_243:
+00000E1B 486F6D69                		.byte	"Homing Error - Latch velocity is zero"
+         6E672045                
+         72726F72                
+         202D204C                
+         61746368                
+         2076656C                
+         6F636974                
+         79206973                
+         207A6572                
+         6F                      
+00000E40 00                      		.byte	00H
+00000E41                         __$stat_244:
+00000E41 486F6D69                		.byte	"Homing Error - Travel min & max are the same"
+         6E672045                
+         72726F72                
+         202D2054                
+         72617665                
+         6C206D69                
+         6E202620                
+         6D617820                
+         61726520                
+         74686520                
+         73616D65                
+00000E6D 00                      		.byte	00H
+00000E6E                         __$stat_245:
+00000E6E 486F6D69                		.byte	"Homing Error - Negative latch backoff"
+         6E672045                
+         72726F72                
+         202D204E                
+         65676174                
+         69766520                
+         6C617463                
+         68206261                
+         636B6F66                
+         66                      
+00000E93 00                      		.byte	00H
+00000E94                         __$stat_246:
+00000E94 486F6D69                		.byte	"Homing Error - Homing switches misconfigured"
+         6E672045                
+         72726F72                
+         202D2048                
+         6F6D696E                
+         67207377                
+         69746368                
+         6573206D                
+         6973636F                
+         6E666967                
+         75726564                
+00000EC0 00                      		.byte	00H
+00000EC1                         __$stat_247:
+00000EC1 323437                  		.byte	"247"
+00000EC4 00                      		.byte	00H
+00000EC5                         __$stat_248:
+00000EC5 323438                  		.byte	"248"
+00000EC8 00                      		.byte	00H
+00000EC9                         __$stat_249:
+00000EC9 323439                  		.byte	"249"
+00000ECC 00                      		.byte	00H
+00000ECD                         __$stat_250:
+00000ECD 50726F62                		.byte	"Probe cycle failed"
+         65206379                
+         636C6520                
+         6661696C                
+         6564                    
+00000EDF 00                      		.byte	00H
+00000EE0                         __$stat_251:
+00000EE0 50726F62                		.byte	"Probe endpoint is starting point"
+         6520656E                
+         64706F69                
+         6E742069                
+         73207374                
+         61727469                
+         6E672070                
+         6F696E74                
+00000F00 00                      		.byte	00H
+00000F01                         __$stat_252:
+00000F01 4A6F6767                		.byte	"Jogging cycle failed"
+         696E6720                
+         6379636C                
+         65206661                
+         696C6564                
+00000F15 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _xCncTaskHandle:
+00000000(00000004H)              		.blkl	1
+                                 		.SECTION	B_1,DATA
+00000000                         _status_code:
+00000000(00000001H)              		.blkb	1
+00000001                         _global_string_buf:
+00000001(00000050H)              		.blkb	80
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01636   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000089(00000059H)  P
+ROMDATA  0000001012(000003F4H)  C
+ROMDATA  0000003862(00000F16H)  C_1
+DATA     0000000004(00000004H)  B
+DATA     0000000081(00000051H)  B_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\maincnc_task.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\maincnc_task.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\cnc\maincnc_task.obj

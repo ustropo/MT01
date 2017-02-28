@@ -1,0 +1,1409 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:03 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:03
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=config_kernel.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=config_kernel.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;config_kernel.c
+                                 
+                                 		.glb	_xCncTaskHandle
+                                 		.glb	_task_main_handle
+                                 		.glb	_task_handle0
+                                 		.glb	_task_handle1
+                                 		.glb	_task_handle2
+                                 		.glb	_task_handle3
+                                 		.glb	_task_handle4
+                                 		.glb	_task_handle5
+                                 		.glb	_task_handle6
+                                 		.glb	_task_table
+                                 		.glb	_mbox_handle0
+                                 		.glb	_mbox_handle1
+                                 		.glb	_mbox_handle2
+                                 		.glb	_mbox_handle3
+                                 		.glb	_mbox_handle4
+                                 		.glb	_mbox_handle5
+                                 		.glb	_mbox_handle6
+                                 		.glb	_mbox_handle7
+                                 		.glb	_mbox_table
+                                 		.glb	_mpl_handle0
+                                 		.glb	_mpl_handle1
+                                 		.glb	_mpl_handle2
+                                 		.glb	_mpl_handle3
+                                 		.glb	_mpl_handle4
+                                 		.glb	_mpl_handle5
+                                 		.glb	_mpl_handle6
+                                 		.glb	_mpl_handle7
+                                 		.glb	_mpl_table
+                                 		.glb	_qKeyboard
+                                 		.glb	_vApplicationMallocFailedHook
+                                 		.glb	_vApplicationStackOverflowHook
+                                 		.glb	_vAssertCalled
+                                 		.glb	_vTaskEnterCritical
+                                 		.glb	_vTaskExitCritical
+                                 		.glb	_vApplicationIdleHook
+                                 		.glb	_vApplicationTickHook
+                                 		.glb	_vApplicationSetupTimerInterrupt
+                                 		.glb	_FreeRTOSConfig
+                                 		.glb	_xQueueGenericCreate
+                                 		.glb	_pvPortMalloc
+                                 		.glb	_xQueueGenericSend
+                                 		.glb	_xTaskGenericCreate
+                                 		.glb	_R_usb_hstd_HcdTask
+                                 		.glb	_R_usb_hstd_MgrTask
+                                 		.glb	_R_usb_hhub_Task
+                                 		.glb	_R_usb_hmsc_Task
+                                 		.glb	_R_usb_hmsc_StrgDriveTask
+                                 		.glb	_hmsc_cstd_task_start
+                                 		.glb	_keyboard_task
+                                 		.glb	_states_task
+                                 		.glb	_main_cnc_task
+                                 		.glb	_UsbTaskDelete
+                                 		.glb	_vTaskDelete
+                                 		.glb	_UsbTaskCreate
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _vApplicationMallocFailedHook:
+                                 		.STACK	_vApplicationMallocFailedHook=4
+                                 ;       1 /*******************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only
+                                 ;       4 * intended for use with Renesas products. No other uses are authorized. This
+                                 ;       5 * software is owned by Renesas Electronics Corporation and is protected under
+                                 ;       6 * all applicable laws, including copyright laws.
+                                 ;       7 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       8 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+                                 ;       9 * LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+                                 ;      10 * AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+                                 ;      11 * TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+                                 ;      12 * ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+                                 ;      13 * FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+                                 ;      14 * ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+                                 ;      15 * BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      16 * Renesas reserves the right, without notice, to make changes to this software
+                                 ;      17 * and to discontinue the availability of this software. By using this software,
+                                 ;      18 * you agree to the additional terms and conditions found by accessing the
+                                 ;      19 * following link:
+                                 ;      20 * http://www.renesas.com/disclaimer
+                                 ;      21 * Copyright (C) 2014 Renesas Electronics Corporation
+                                 ;      22 * and Renesas Solutions Corp. All rights reserved.
+                                 ;      23 *******************************************************************************/
+                                 ;      24 /******************************************************************************
+                                 ;      25 * File Name    : config_kernel.c
+                                 ;      26 * Version      : 1.00
+                                 ;      27 * Device(s)    : Renesas RX-Series
+                                 ;      28 * Tool-Chain   : Renesas RX Standard Toolchain
+                                 ;      29 * OS           : FreeRTOS V7.4.0
+                                 ;      30 * H/W Platform :
+                                 ;      31 * Description  : FreeRTOS configuration
+                                 ;      32 ******************************************************************************
+                                 ;      33 * History : DD.MM.YYYY Version Description
+                                 ;      34 *         : 11.06.2013 0.50    First Release
+                                 ;      35 ******************************************************************************/
+                                 ;      36 
+                                 ;      37 #ifdef FREE_RTOS_PP
+                                 ;      38 #include "platform.h"
+                                 ;      39 #include "FreeRTOS.h"
+                                 ;      40 #include "task.h"
+                                 ;      41 #include "queue.h"
+                                 ;      42 #include "semphr.h"
+                                 ;      43 
+                                 ;      44 
+                                 ;      45 #include "ut_state.h"
+                                 ;      46 
+                                 ;      47 #include "r_usb_basic_if.h"
+                                 ;      48 #include "r_usb_hmsc_if.h"
+                                 ;      49 #include "r_flash_loader_rx_if.h"
+                                 ;      50 #include "ff.h"
+                                 ;      51 
+                                 ;      52 #include "plasma.h"
+                                 ;      53 
+                                 ;      54 extern TaskHandle_t xCncTaskHandle;
+                                 ;      55 
+                                 ;      56 /******************************************************************************
+                                 ;      57 Private global variables and functions
+                                 ;      58 ******************************************************************************/
+                                 ;      59 
+                                 ;      60 #if SOCKET_IF_USE_SEMP
+                                 ;      61 xSemaphoreHandle r_socket_semaphore;
+                                 ;      62 #endif
+                                 ;      63 
+                                 ;      64 xTaskHandle task_main_handle;
+                                 ;      65 xTaskHandle task_handle0;
+                                 ;      66 xTaskHandle task_handle1;
+                                 ;      67 xTaskHandle task_handle2;
+                                 ;      68 xTaskHandle task_handle3;
+                                 ;      69 xTaskHandle task_handle4;
+                                 ;      70 xTaskHandle task_handle5;
+                                 ;      71 xTaskHandle task_handle6;
+                                 ;      72 
+                                 ;      73 xTaskHandle* task_table[] = {
+                                 ;      74     &task_handle0,  /* USB_PCD_TASK   */
+                                 ;      75     &task_handle1,  /* USB_HCD_TASK   */
+                                 ;      76     &task_handle2,  /* USB_MGR_TASK   */
+                                 ;      77     &task_handle3,  /* USB_HUB_TASK   */
+                                 ;      78     &task_handle4,  /* USB_HMSC_TASK  */
+                                 ;      79     &task_handle5,  /* USB_HSTRG_TASK */
+                                 ;      80 };
+                                 ;      81 
+                                 ;      82 xQueueHandle mbox_handle0;
+                                 ;      83 xQueueHandle mbox_handle1;
+                                 ;      84 xQueueHandle mbox_handle2;
+                                 ;      85 xQueueHandle mbox_handle3;
+                                 ;      86 xQueueHandle mbox_handle4;
+                                 ;      87 xQueueHandle mbox_handle5;
+                                 ;      88 xQueueHandle mbox_handle6;
+                                 ;      89 xQueueHandle mbox_handle7;
+                                 ;      90 
+                                 ;      91 xQueueHandle* mbox_table[] = {
+                                 ;      92     &mbox_handle0,  /* USB_PCD_MBX     */
+                                 ;      93     &mbox_handle1,  /* USB_HCD_MBX     */
+                                 ;      94     &mbox_handle2,  /* USB_MGR_MBX     */
+                                 ;      95     &mbox_handle3,  /* USB_HUB_MBX     */
+                                 ;      96     &mbox_handle4,  /* USB_HMSC_MBX    */
+                                 ;      97     &mbox_handle5,  /* USB_HSTRG_MBX   */
+                                 ;      98     &mbox_handle6, /* USB_HMSCSMP_MBX  */
+                                 ;      99     &mbox_handle7, /* USB_TFAT_MBX    */
+                                 ;     100 };
+                                 ;     101 
+                                 ;     102 xQueueHandle mpl_handle0;
+                                 ;     103 xQueueHandle mpl_handle1;
+                                 ;     104 xQueueHandle mpl_handle2;
+                                 ;     105 xQueueHandle mpl_handle3;
+                                 ;     106 xQueueHandle mpl_handle4;
+                                 ;     107 xQueueHandle mpl_handle5;
+                                 ;     108 xQueueHandle mpl_handle6;
+                                 ;     109 xQueueHandle mpl_handle7;
+                                 ;     110 
+                                 ;     111 xQueueHandle* mpl_table[] = {
+                                 ;     112     &mpl_handle0,   /* USB_PCD_MPL     */
+                                 ;     113     &mpl_handle1,   /* USB_HCD_MPL     */
+                                 ;     114     &mpl_handle2,   /* USB_MGR_MPL     */
+                                 ;     115     &mpl_handle3,   /* USB_HUB_MPL     */
+                                 ;     116     &mpl_handle4,   /* USB_HMSC_MPL    */
+                                 ;     117     &mpl_handle5,   /* USB_HSTRG_MPL   */
+                                 ;     118     &mpl_handle6,   /* USB_HMSCSMP_MPL   */
+                                 ;     119     &mpl_handle7,   /* USB_TFAT_MPL   */
+                                 ;     120 };
+                                 ;     121 
+                                 ;     122 xQueueHandle qKeyboard;
+                                 ;     123 
+                                 ;     124 /***********************************************************************************************************************
+                                 ;     125 External function Prototypes
+                                 ;     126 ***********************************************************************************************************************/
+                                 ;     127 extern void main_task( void * pvParameters);
+                                 ;     128 extern void R_httpd(void);
+                                 ;     129 extern void usb_hmsc_Task(void);
+                                 ;     130 extern void usb_hmsc_StrgDriveTask(void);
+                                 ;     131 extern void hmsc_cstd_task_start( void );
+                                 ;     132 extern void keyboard_task(void);
+                                 ;     133 extern void states_task(void);
+                                 ;     134 extern void main_cnc_task(void);
+                                 ;     135 void usb_hmsc_main_task(USB_VP_INT stacd);
+                                 ;     136 
+                                 ;     137 /******************************************************************************
+                                 ;     138 Function Name   : vApplicationMallocFailedHook
+                                 ;     139 Description     : Hook function
+                                 ;     140 Arguments       : none
+                                 ;     141 Return value    : none
+                                 ;     142 ******************************************************************************/
+                                 ;     143 void vApplicationMallocFailedHook( void )
+                                 ;     144 {
+                                 ;     145     /* Called if a call to pvPortMalloc() fails because there is insufficient
+                                 ;     146     free memory available in the FreeRTOS heap.  pvPortMalloc() is called
+                                 ;     147     internally by FreeRTOS API functions that create tasks, queues, software
+                                 ;     148     timers, and semaphores.  The size of the FreeRTOS heap is set by the
+                                 ;     149     configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
+                                 ;     150     taskDISABLE_INTERRUPTS();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",150
+00000000 FD6A0E                  		MVFC PSW, R14
+00000003 FD67EE                  		REVL R14, R14
+00000006 64FE                    		AND #0FH, R14
+00000008 614E                    		CMP #04H, R14
+0000000A 2Arr                    		BGT L21
+0000000C                         L20:	; bb1
+0000000C 757005                  		MVTIPL #05H
+0000000F                         L21:	; bb8
+                                 ;     151     for( ;; );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",151
+0000000F 2Err                 B  		BRA L21
+00000011                         _vApplicationStackOverflowHook:
+                                 		.STACK	_vApplicationStackOverflowHook=12
+                                 ;     152 }
+                                 ;     153 /******************************************************************************
+                                 ;     154 End of function vApplicationMallocFailedHook()
+                                 ;     155 ******************************************************************************/
+                                 ;     156 
+                                 ;     157 /******************************************************************************
+                                 ;     158 Function Name   : vApplicationStackOverflowHook
+                                 ;     159 Description     : Hook function
+                                 ;     160 Arguments       : xTaskHandle pxTask, signed char *pcTaskName
+                                 ;     161 Return value    : none
+                                 ;     162 ******************************************************************************/
+                                 ;     163 void vApplicationStackOverflowHook( xTaskHandle pxTask, signed char *pcTaskName )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",163
+00000011 6080                    		SUB #08H, R0
+00000013 A009                    		MOV.L R1, 04H[R0]
+00000015 E302                    		MOV.L R2, [R0]
+00000017                         L23:	; entry.split1
+                                 ;     164 {
+                                 ;     165     ( void ) pcTaskName;
+                                 ;     166     ( void ) pxTask;
+                                 ;     167 
+                                 ;     168     /* Run time stack overflow checking is performed if
+                                 ;     169     configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
+                                 ;     170     function is called if a stack overflow is detected. */
+                                 ;     171     taskDISABLE_INTERRUPTS();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",171
+00000017 FD6A0E                  		MVFC PSW, R14
+0000001A FD67EE                  		REVL R14, R14
+0000001D 64FE                    		AND #0FH, R14
+0000001F 614E                    		CMP #04H, R14
+00000021 2Arr                    		BGT L25
+00000023                         L24:	; bb4
+00000023 757005                  		MVTIPL #05H
+00000026                         L25:	; bb12
+                                 ;     172     for( ;; );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",172
+00000026 2Err                 B  		BRA L25
+00000028                         _vAssertCalled:
+                                 		.STACK	_vAssertCalled=8
+                                 ;     173 }
+                                 ;     174 /******************************************************************************
+                                 ;     175 End of function vApplicationStackOverflowHook()
+                                 ;     176 ******************************************************************************/
+                                 ;     177 void vAssertCalled( void )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",177
+00000028 6040                    		SUB #04H, R0
+                                 ;     178 {
+                                 ;     179 volatile unsigned long ul = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",179
+0000002A F80600                  		MOV.L #00000000H, [R0]
+0000002D                         L27:	; entry.split
+                                 ;     180 
+                                 ;     181 	taskENTER_CRITICAL();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",181
+0000002D 05rrrrrr             A  		BSR _vTaskEnterCritical
+00000031 2Err                 B  		BRA L29
+00000033                         L28:	; bb
+                                 ;     182 	{
+                                 ;     183 		/* Use the debugger to set ul to a non-zero value in order to step out
+                                 ;     184 		of this function to determine why it was called. */
+                                 ;     185 		while( ul == 0 )
+                                 ;     186 		{
+                                 ;     187 			portNOP();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",187
+00000033 03                      		NOP
+00000034                         L29:	; bb2
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",185
+00000034 EC01                    		MOV.L [R0], R1
+00000036 6101                    		CMP #00H, R1
+00000038 20rr                    		BEQ L28
+0000003A                         L30:	; bb5
+                                 ;     188 		}
+                                 ;     189 	}
+                                 ;     190 	taskEXIT_CRITICAL();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",190
+0000003A 05rrrrrr             A  		BSR _vTaskExitCritical
+0000003E 6701                    		RTSD #04H
+00000040                         _vApplicationIdleHook:
+                                 		.STACK	_vApplicationIdleHook=4
+                                 ;     191 }
+                                 ;     192 /*-----------------------------------------------------------*/
+                                 ;     193 
+                                 ;     194 void vApplicationIdleHook( void )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",194
+00000040 02                      		RTS
+00000041                         _vApplicationTickHook:
+                                 		.STACK	_vApplicationTickHook=4
+                                 ;     195 {
+                                 ;     196 
+                                 ;     197 }
+                                 ;     198 
+                                 ;     199 void vApplicationTickHook( void )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",199
+00000041 02                      		RTS
+00000042                         _vApplicationSetupTimerInterrupt:
+                                 		.STACK	_vApplicationSetupTimerInterrupt=4
+                                 ;     200 {
+                                 ;     201 }
+                                 ;     202 
+                                 ;     203 /******************************************************************************
+                                 ;     204 Function Name   : vApplicationSetupTimerInterrupt
+                                 ;     205 Description     : setup tick timer
+                                 ;     206 Arguments       : none
+                                 ;     207 Return value    : none
+                                 ;     208 ******************************************************************************/
+                                 ;     209 void vApplicationSetupTimerInterrupt( void )
+                                 ;     210 {
+                                 ;     211     /* protect off */
+                                 ;     212     SYSTEM.PRCR.WORD = 0xA502;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",212
+00000042 FBEE100008              		MOV.L #00080010H, R14
+00000047 FAE9F70102A5            		MOV.W #0A502H, 03EEH[R14]
+0000004D                         L34:	; entry.split
+                                 ;     213 
+                                 ;     214     /* Enable compare match timer 0. */
+                                 ;     215     MSTP( CMT0 ) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",215
+0000004D FBEE100008              		MOV.L #00080010H, R14
+00000052 ECEF                    		MOV.L [R14], R15
+00000054 7AFF                    		BCLR #0FH, R15
+00000056 E3EF                    		MOV.L R15, [R14]
+00000058                         L35:	; entry.split1
+                                 ;     216 
+                                 ;     217     /* Interrupt on compare match. */
+                                 ;     218     //CMT0.CMCR.BIT.CMIE = 1;
+                                 ;     219     /* Divide the PCLK by 8. */
+                                 ;     220     //CMT0.CMCR.BIT.CKS = 0;
+                                 ;     221     CMT0.CMCR.WORD = 0x00C0; // CKS=00b,CMIE=1; PCLK/8,Compare match interrupt (CMIn) enabled @48MHz
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",221
+00000058 FB1E028008              		MOV.L #00088002H, R1
+0000005D 3D10C0                  		MOV.W #00C0H, 00H[R1]
+00000060                         L36:	; entry.split2
+                                 ;     222     /* Set the compare match value. */
+                                 ;     223     CMT0.CMCOR = ( unsigned short ) ( ( ( configPERIPHERAL_CLOCK_HZ / configTICK_RATE_HZ )) / 8 - 1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",223
+00000060 FBEE028008              		MOV.L #00088002H, R14
+00000065 F9E9026F17              		MOV.W #176FH, 04H[R14]
+0000006A                         L37:	; entry.split3
+                                 ;     224 
+                                 ;     225     /* Enable the interrupt... */
+                                 ;     226     _IEN( _CMT0_CMI0 ) = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",226
+0000006A FBEE037208              		MOV.L #00087203H, R14
+0000006F F0E4                    		BSET #04H, [R14].B
+00000071                         L38:	; entry.split4
+                                 ;     227     
+                                 ;     228     /* ...and set its priority to the application defined kernel priority. */
+                                 ;     229     _IPR( _CMT0_CMI0 ) = configKERNEL_INTERRUPT_PRIORITY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",229
+00000071 FBEE037208              		MOV.L #00087203H, R14
+00000076 5AEF0101                		MOVU.B 0101H[R14], R15
+0000007A 780F                    		BSET #00H, R15
+0000007C 762FF100                		AND #0F1H, R15
+00000080 CBEF0101                		MOV.B R15, 0101H[R14]
+00000084                         L39:	; entry.split5
+00000084 FBEE008008              		MOV.L #00088000H, R14
+                                 ;     230     
+                                 ;     231     /* Start the timer. */
+                                 ;     232     CMT.CMSTR0.BIT.STR0 = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",232
+00000089 DCEF                    		MOV.W [R14], R15
+0000008B 780F                    		BSET #00H, R15
+0000008D D3EF                    		MOV.W R15, [R14]
+0000008F                         L40:	; entry.split6
+                                 ;     233 
+                                 ;     234     /* protect on */
+                                 ;     235     SYSTEM.PRCR.WORD = 0xA500;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",235
+0000008F FBEE100008              		MOV.L #00080010H, R14
+00000094 FAE9F70100A5            		MOV.W #0A500H, 03EEH[R14]
+0000009A 02                      		RTS
+0000009B                         _FreeRTOSConfig:
+                                 		.STACK	_FreeRTOSConfig=28
+                                 ;     236 
+                                 ;     237 }
+                                 ;     238 /******************************************************************************
+                                 ;     239 End of function vApplicationSetupTimerInterrupt()
+                                 ;     240 ******************************************************************************/
+                                 ;     241 #define NUM 10
+                                 ;     242 /******************************************************************************
+                                 ;     243 Function Name   : FreeRTOSConfig
+                                 ;     244 Description     : create task
+                                 ;     245 Arguments       : none
+                                 ;     246 Return value    : none
+                                 ;     247 ******************************************************************************/
+                                 ;     248 void FreeRTOSConfig( void )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",248
+0000009B 6080                    		SUB #08H, R0
+                                 ;     249 {
+                                 ;     250     int8_t i;
+                                 ;     251     void *tmpPtr = NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",251
+0000009D 3E0100                  		MOV.L #00000000H, 04H[R0]
+000000A0                         L42:	; entry.split
+                                 ;     252 
+                                 ;     253     /* Mail box */
+                                 ;     254 #if 0
+                                 ;     255     mbox_handle0  = xQueueCreate( 10, sizeof(void *) ); /* USB_PCD_MBX     */
+                                 ;     256 #else
+                                 ;     257     mbox_handle0 = NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",257
+000000A0 FBE2rrrrrrrr            		MOV.L #_mbox_handle0, R14
+000000A6 F8E600                  		MOV.L #00000000H, [R14]
+000000A9                         L43:	; entry.split1
+000000A9 6603                    		MOV.L #00000000H, R3
+000000AB 6642                    		MOV.L #00000004H, R2
+000000AD 66A1                    		MOV.L #0000000AH, R1
+                                 ;     258 #endif
+                                 ;     259     mbox_handle1  = xQueueCreate( NUM, sizeof(void *) ); /* USB_HCD_MBX     */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",259
+000000AF 05rrrrrr             A  		BSR _xQueueGenericCreate
+000000B3 FBE2rrrrrrrr            		MOV.L #_mbox_handle1, R14
+000000B9 E3E1                    		MOV.L R1, [R14]
+000000BB                         L44:	; entry.split2
+000000BB 6603                    		MOV.L #00000000H, R3
+000000BD 6642                    		MOV.L #00000004H, R2
+000000BF 66A1                    		MOV.L #0000000AH, R1
+                                 ;     260     mbox_handle2  = xQueueCreate( NUM, sizeof(void *) ); /* USB_MGR_MBX     */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",260
+000000C1 05rrrrrr             A  		BSR _xQueueGenericCreate
+000000C5 FBE2rrrrrrrr            		MOV.L #_mbox_handle2, R14
+000000CB E3E1                    		MOV.L R1, [R14]
+000000CD                         L45:	; entry.split3
+000000CD 6603                    		MOV.L #00000000H, R3
+000000CF 6642                    		MOV.L #00000004H, R2
+000000D1 66A1                    		MOV.L #0000000AH, R1
+                                 ;     261     mbox_handle3  = xQueueCreate( NUM, sizeof(void *) ); /* USB_HUB_MBX     */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",261
+000000D3 05rrrrrr             A  		BSR _xQueueGenericCreate
+000000D7 FBE2rrrrrrrr            		MOV.L #_mbox_handle3, R14
+000000DD E3E1                    		MOV.L R1, [R14]
+000000DF                         L46:	; entry.split4
+000000DF 6603                    		MOV.L #00000000H, R3
+000000E1 6642                    		MOV.L #00000004H, R2
+000000E3 66A1                    		MOV.L #0000000AH, R1
+                                 ;     262     mbox_handle4  = xQueueCreate( NUM, sizeof(void *) ); /* USB_HMSC_MBX    */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",262
+000000E5 05rrrrrr             A  		BSR _xQueueGenericCreate
+000000E9 FBE2rrrrrrrr            		MOV.L #_mbox_handle4, R14
+000000EF E3E1                    		MOV.L R1, [R14]
+000000F1                         L47:	; entry.split5
+000000F1 6603                    		MOV.L #00000000H, R3
+000000F3 6642                    		MOV.L #00000004H, R2
+000000F5 66A1                    		MOV.L #0000000AH, R1
+                                 ;     263     mbox_handle5  = xQueueCreate( NUM, sizeof(void *) ); /* USB_HSTRG_MBX   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",263
+000000F7 05rrrrrr             A  		BSR _xQueueGenericCreate
+000000FB FBE2rrrrrrrr            		MOV.L #_mbox_handle5, R14
+00000101 E3E1                    		MOV.L R1, [R14]
+00000103                         L48:	; entry.split6
+00000103 6603                    		MOV.L #00000000H, R3
+00000105 6642                    		MOV.L #00000004H, R2
+00000107 66A1                    		MOV.L #0000000AH, R1
+                                 ;     264     mbox_handle6  = xQueueCreate( NUM, sizeof(void *) ); /* USB_HMSCSMP_MBX   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",264
+00000109 05rrrrrr             A  		BSR _xQueueGenericCreate
+0000010D FBE2rrrrrrrr            		MOV.L #_mbox_handle6, R14
+00000113 E3E1                    		MOV.L R1, [R14]
+00000115                         L49:	; entry.split7
+00000115 6603                    		MOV.L #00000000H, R3
+00000117 6642                    		MOV.L #00000004H, R2
+00000119 6611                    		MOV.L #00000001H, R1
+                                 ;     265     mbox_handle7  = xQueueCreate( 1, sizeof(void *) ); /* USB_TFAT_MBX   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",265
+0000011B 05rrrrrr             A  		BSR _xQueueGenericCreate
+0000011F FBE2rrrrrrrr            		MOV.L #_mbox_handle7, R14
+00000125 E3E1                    		MOV.L R1, [R14]
+00000127                         L50:	; entry.split8
+00000127 6603                    		MOV.L #00000000H, R3
+00000129 6642                    		MOV.L #00000004H, R2
+0000012B 66A1                    		MOV.L #0000000AH, R1
+                                 ;     266 
+                                 ;     267     /* Memory pool */
+                                 ;     268 #if 0
+                                 ;     269     /* USB_PCD_MPL     */
+                                 ;     270     mpl_handle0 = xQueueCreate( NUM, sizeof(void *) );
+                                 ;     271 
+                                 ;     272     for (i = 0; i < 10; i++ )
+                                 ;     273     {
+                                 ;     274     	tmpPtr = pvPortMalloc( sizeof( USB_UTR_t ) );
+                                 ;     275     	if ( tmpPtr == NULL )
+                                 ;     276     	{
+                                 ;     277     		for( ;; );
+                                 ;     278     	}
+                                 ;     279     	else
+                                 ;     280     	{
+                                 ;     281     		xQueueSend( mpl_handle0, &tmpPtr, 0 );
+                                 ;     282     	}
+                                 ;     283     }
+                                 ;     284 #endif
+                                 ;     285     /* USB_HCD_MPL     */
+                                 ;     286     mpl_handle1 = xQueueCreate( NUM, sizeof(void *) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",286
+0000012D 05rrrrrr             A  		BSR _xQueueGenericCreate
+00000131 FBE2rrrrrrrr            		MOV.L #_mpl_handle1, R14
+00000137 E3E1                    		MOV.L R1, [R14]
+00000139                         L51:	; entry.split9
+                                 ;     287 
+                                 ;     288     for ( i = 0; i < NUM; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",288
+00000139 3C0300                  		MOV.B #00H, 03H[R0]
+0000013C 2Err                 B  		BRA L56
+0000013E                         L52:	; bb
+0000013E 75412C                  		MOV.L #0000002CH, R1
+                                 ;     289     {
+                                 ;     290         tmpPtr = pvPortMalloc( sizeof( USB_UTR_t ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",290
+00000141 05rrrrrr             A  		BSR _pvPortMalloc
+00000145 A009                    		MOV.L R1, 04H[R0]
+00000147                         L53:	; bb.split
+                                 ;     291         if ( tmpPtr == NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",291
+00000147 A809                    		MOV.L 04H[R0], R1
+00000149 6101                    		CMP #00H, R1
+0000014B 18                   S  		BNE L55
+0000014C                         L54:	; bb14
+                                 ;     292         {
+                                 ;     293             for( ;; );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",293
+0000014C 2Err                 B  		BRA L54
+0000014E                         L55:	; bb16
+                                 ;     294         }
+                                 ;     295         else
+                                 ;     296         {
+                                 ;     297             xQueueSend( mpl_handle1, &tmpPtr, 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",297
+0000014E FBE2rrrrrrrr            		MOV.L #_mpl_handle1, R14
+00000154 ECE1                    		MOV.L [R14], R1
+00000156 6603                    		MOV.L #00000000H, R3
+00000158 710204                  		ADD #04H, R0, R2
+0000015B EF34                    		MOV.L R3, R4
+0000015D 05rrrrrr             A  		BSR _xQueueGenericSend
+00000161 B089                    		MOVU.B 03H[R0], R1
+00000163 6211                    		ADD #01H, R1
+00000165 8089                    		MOV.B R1, 03H[R0]
+00000167                         L56:	; bb26
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",288
+00000167 8889                    		MOV.B 03H[R0], R1
+00000169 61A1                    		CMP #0AH, R1
+0000016B 29rr                    		BLT L52
+0000016D                         L57:	; bb32
+0000016D 6603                    		MOV.L #00000000H, R3
+0000016F 6642                    		MOV.L #00000004H, R2
+00000171 66A1                    		MOV.L #0000000AH, R1
+                                 ;     298         }
+                                 ;     299     }
+                                 ;     300 
+                                 ;     301     /* USB_MGR_MPL     */
+                                 ;     302     mpl_handle2 = xQueueCreate( NUM, sizeof(void *) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",302
+00000173 05rrrrrr             A  		BSR _xQueueGenericCreate
+00000177 FBE2rrrrrrrr            		MOV.L #_mpl_handle2, R14
+0000017D E3E1                    		MOV.L R1, [R14]
+0000017F                         L58:	; bb32.split
+                                 ;     303 
+                                 ;     304     for ( i = 0; i < NUM; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",304
+0000017F 3C0300                  		MOV.B #00H, 03H[R0]
+00000182 2Err                 B  		BRA L63
+00000184                         L59:	; bb34
+00000184 75412C                  		MOV.L #0000002CH, R1
+                                 ;     305     {
+                                 ;     306         tmpPtr = pvPortMalloc( sizeof( USB_UTR_t ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",306
+00000187 05rrrrrr             A  		BSR _pvPortMalloc
+0000018B A009                    		MOV.L R1, 04H[R0]
+0000018D                         L60:	; bb34.split
+                                 ;     307         if ( tmpPtr == NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",307
+0000018D A809                    		MOV.L 04H[R0], R1
+0000018F 6101                    		CMP #00H, R1
+00000191 18                   S  		BNE L62
+00000192                         L61:	; bb39
+                                 ;     308         {
+                                 ;     309             for( ;; );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",309
+00000192 2Err                 B  		BRA L61
+00000194                         L62:	; bb41
+                                 ;     310         }
+                                 ;     311         else
+                                 ;     312         {
+                                 ;     313             xQueueSend( mpl_handle2, &tmpPtr, 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",313
+00000194 FBE2rrrrrrrr            		MOV.L #_mpl_handle2, R14
+0000019A ECE1                    		MOV.L [R14], R1
+0000019C 6603                    		MOV.L #00000000H, R3
+0000019E 710204                  		ADD #04H, R0, R2
+000001A1 EF34                    		MOV.L R3, R4
+000001A3 05rrrrrr             A  		BSR _xQueueGenericSend
+000001A7 B089                    		MOVU.B 03H[R0], R1
+000001A9 6211                    		ADD #01H, R1
+000001AB 8089                    		MOV.B R1, 03H[R0]
+000001AD                         L63:	; bb52
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",304
+000001AD 8889                    		MOV.B 03H[R0], R1
+000001AF 61A1                    		CMP #0AH, R1
+000001B1 29rr                    		BLT L59
+000001B3                         L64:	; bb58
+000001B3 6603                    		MOV.L #00000000H, R3
+000001B5 6642                    		MOV.L #00000004H, R2
+000001B7 66A1                    		MOV.L #0000000AH, R1
+                                 ;     314         }
+                                 ;     315     }
+                                 ;     316 
+                                 ;     317     /* USB_HUB_MPL     */
+                                 ;     318     mpl_handle3 = xQueueCreate( NUM, sizeof(void *) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",318
+000001B9 05rrrrrr             A  		BSR _xQueueGenericCreate
+000001BD FBE2rrrrrrrr            		MOV.L #_mpl_handle3, R14
+000001C3 E3E1                    		MOV.L R1, [R14]
+000001C5                         L65:	; bb58.split
+                                 ;     319 
+                                 ;     320     for ( i = 0; i < NUM; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",320
+000001C5 3C0300                  		MOV.B #00H, 03H[R0]
+000001C8 2Err                 B  		BRA L70
+000001CA                         L66:	; bb60
+000001CA 75412C                  		MOV.L #0000002CH, R1
+                                 ;     321     {
+                                 ;     322         tmpPtr = pvPortMalloc( sizeof( USB_UTR_t ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",322
+000001CD 05rrrrrr             A  		BSR _pvPortMalloc
+000001D1 A009                    		MOV.L R1, 04H[R0]
+000001D3                         L67:	; bb60.split
+                                 ;     323         if ( tmpPtr == NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",323
+000001D3 A809                    		MOV.L 04H[R0], R1
+000001D5 6101                    		CMP #00H, R1
+000001D7 18                   S  		BNE L69
+000001D8                         L68:	; bb65
+                                 ;     324         {
+                                 ;     325             for( ;; );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",325
+000001D8 2Err                 B  		BRA L68
+000001DA                         L69:	; bb67
+                                 ;     326         }
+                                 ;     327         else
+                                 ;     328         {
+                                 ;     329             xQueueSend( mpl_handle3, &tmpPtr, 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",329
+000001DA FBE2rrrrrrrr            		MOV.L #_mpl_handle3, R14
+000001E0 ECE1                    		MOV.L [R14], R1
+000001E2 6603                    		MOV.L #00000000H, R3
+000001E4 710204                  		ADD #04H, R0, R2
+000001E7 EF34                    		MOV.L R3, R4
+000001E9 05rrrrrr             A  		BSR _xQueueGenericSend
+000001ED B089                    		MOVU.B 03H[R0], R1
+000001EF 6211                    		ADD #01H, R1
+000001F1 8089                    		MOV.B R1, 03H[R0]
+000001F3                         L70:	; bb78
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",320
+000001F3 8889                    		MOV.B 03H[R0], R1
+000001F5 61A1                    		CMP #0AH, R1
+000001F7 29rr                    		BLT L66
+000001F9                         L71:	; bb84
+000001F9 6603                    		MOV.L #00000000H, R3
+000001FB 6642                    		MOV.L #00000004H, R2
+000001FD 66A1                    		MOV.L #0000000AH, R1
+                                 ;     330         }
+                                 ;     331     }
+                                 ;     332 
+                                 ;     333     /* USB_HMSC_MPL    */
+                                 ;     334     mpl_handle4 = xQueueCreate( NUM, sizeof(void *) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",334
+000001FF 05rrrrrr             A  		BSR _xQueueGenericCreate
+00000203 FBE2rrrrrrrr            		MOV.L #_mpl_handle4, R14
+00000209 E3E1                    		MOV.L R1, [R14]
+0000020B                         L72:	; bb84.split
+                                 ;     335 
+                                 ;     336     for ( i = 0; i < NUM; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",336
+0000020B 3C0300                  		MOV.B #00H, 03H[R0]
+0000020E 2Err                 B  		BRA L77
+00000210                         L73:	; bb86
+00000210 75412C                  		MOV.L #0000002CH, R1
+                                 ;     337     {
+                                 ;     338         tmpPtr = pvPortMalloc( sizeof( USB_UTR_t ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",338
+00000213 05rrrrrr             A  		BSR _pvPortMalloc
+00000217 A009                    		MOV.L R1, 04H[R0]
+00000219                         L74:	; bb86.split
+                                 ;     339         if ( tmpPtr == NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",339
+00000219 A809                    		MOV.L 04H[R0], R1
+0000021B 6101                    		CMP #00H, R1
+0000021D 18                   S  		BNE L76
+0000021E                         L75:	; bb91
+                                 ;     340         {
+                                 ;     341             for( ;; );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",341
+0000021E 2Err                 B  		BRA L75
+00000220                         L76:	; bb93
+                                 ;     342         }
+                                 ;     343         else
+                                 ;     344         {
+                                 ;     345             xQueueSend( mpl_handle4, &tmpPtr, 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",345
+00000220 FBE2rrrrrrrr            		MOV.L #_mpl_handle4, R14
+00000226 ECE1                    		MOV.L [R14], R1
+00000228 6603                    		MOV.L #00000000H, R3
+0000022A 710204                  		ADD #04H, R0, R2
+0000022D EF34                    		MOV.L R3, R4
+0000022F 05rrrrrr             A  		BSR _xQueueGenericSend
+00000233 B089                    		MOVU.B 03H[R0], R1
+00000235 6211                    		ADD #01H, R1
+00000237 8089                    		MOV.B R1, 03H[R0]
+00000239                         L77:	; bb104
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",336
+00000239 8889                    		MOV.B 03H[R0], R1
+0000023B 61A1                    		CMP #0AH, R1
+0000023D 29rr                    		BLT L73
+0000023F                         L78:	; bb110
+0000023F 6603                    		MOV.L #00000000H, R3
+00000241 6642                    		MOV.L #00000004H, R2
+00000243 66A1                    		MOV.L #0000000AH, R1
+                                 ;     346         }
+                                 ;     347     }
+                                 ;     348 
+                                 ;     349     /* USB_HSTRG_MPL   */
+                                 ;     350     mpl_handle5 = xQueueCreate( NUM, sizeof(void *) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",350
+00000245 05rrrrrr             A  		BSR _xQueueGenericCreate
+00000249 FBE2rrrrrrrr            		MOV.L #_mpl_handle5, R14
+0000024F E3E1                    		MOV.L R1, [R14]
+00000251                         L79:	; bb110.split
+                                 ;     351 
+                                 ;     352     for ( i = 0; i < NUM; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",352
+00000251 3C0300                  		MOV.B #00H, 03H[R0]
+00000254 2Err                 B  		BRA L84
+00000256                         L80:	; bb112
+00000256 75412C                  		MOV.L #0000002CH, R1
+                                 ;     353     {
+                                 ;     354         tmpPtr = pvPortMalloc( sizeof( USB_UTR_t ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",354
+00000259 05rrrrrr             A  		BSR _pvPortMalloc
+0000025D A009                    		MOV.L R1, 04H[R0]
+0000025F                         L81:	; bb112.split
+                                 ;     355         if ( tmpPtr == NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",355
+0000025F A809                    		MOV.L 04H[R0], R1
+00000261 6101                    		CMP #00H, R1
+00000263 18                   S  		BNE L83
+00000264                         L82:	; bb117
+                                 ;     356         {
+                                 ;     357             for( ;; );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",357
+00000264 2Err                 B  		BRA L82
+00000266                         L83:	; bb119
+                                 ;     358         }
+                                 ;     359         else
+                                 ;     360         {
+                                 ;     361             xQueueSend( mpl_handle5, &tmpPtr, 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",361
+00000266 FBE2rrrrrrrr            		MOV.L #_mpl_handle5, R14
+0000026C ECE1                    		MOV.L [R14], R1
+0000026E 6603                    		MOV.L #00000000H, R3
+00000270 710204                  		ADD #04H, R0, R2
+00000273 EF34                    		MOV.L R3, R4
+00000275 05rrrrrr             A  		BSR _xQueueGenericSend
+00000279 B089                    		MOVU.B 03H[R0], R1
+0000027B 6211                    		ADD #01H, R1
+0000027D 8089                    		MOV.B R1, 03H[R0]
+0000027F                         L84:	; bb130
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",352
+0000027F 8889                    		MOV.B 03H[R0], R1
+00000281 61A1                    		CMP #0AH, R1
+00000283 29rr                    		BLT L80
+00000285                         L85:	; bb136
+00000285 6603                    		MOV.L #00000000H, R3
+00000287 6642                    		MOV.L #00000004H, R2
+00000289 66A1                    		MOV.L #0000000AH, R1
+                                 ;     362         }
+                                 ;     363     }
+                                 ;     364     /* USB_HMSCSMP_MPL    */
+                                 ;     365     mpl_handle6 = xQueueCreate(  NUM, sizeof(void *) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",365
+0000028B 05rrrrrr             A  		BSR _xQueueGenericCreate
+0000028F FBE2rrrrrrrr            		MOV.L #_mpl_handle6, R14
+00000295 E3E1                    		MOV.L R1, [R14]
+00000297                         L86:	; bb136.split
+                                 ;     366 
+                                 ;     367     for ( i = 0; i < NUM; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",367
+00000297 3C0300                  		MOV.B #00H, 03H[R0]
+0000029A 2Err                 B  		BRA L91
+0000029C                         L87:	; bb138
+0000029C 75412C                  		MOV.L #0000002CH, R1
+                                 ;     368     {
+                                 ;     369         tmpPtr = pvPortMalloc( sizeof( USB_UTR_t ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",369
+0000029F 05rrrrrr             A  		BSR _pvPortMalloc
+000002A3 A009                    		MOV.L R1, 04H[R0]
+000002A5                         L88:	; bb138.split
+                                 ;     370         if ( tmpPtr == NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",370
+000002A5 A809                    		MOV.L 04H[R0], R1
+000002A7 6101                    		CMP #00H, R1
+000002A9 18                   S  		BNE L90
+000002AA                         L89:	; bb143
+                                 ;     371         {
+                                 ;     372             for( ;; );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",372
+000002AA 2Err                 B  		BRA L89
+000002AC                         L90:	; bb145
+                                 ;     373         }
+                                 ;     374         else
+                                 ;     375         {
+                                 ;     376             xQueueSend( mpl_handle6, &tmpPtr, 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",376
+000002AC FBE2rrrrrrrr            		MOV.L #_mpl_handle6, R14
+000002B2 ECE1                    		MOV.L [R14], R1
+000002B4 6603                    		MOV.L #00000000H, R3
+000002B6 710204                  		ADD #04H, R0, R2
+000002B9 EF34                    		MOV.L R3, R4
+000002BB 05rrrrrr             A  		BSR _xQueueGenericSend
+000002BF B089                    		MOVU.B 03H[R0], R1
+000002C1 6211                    		ADD #01H, R1
+000002C3 8089                    		MOV.B R1, 03H[R0]
+000002C5                         L91:	; bb156
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",367
+000002C5 8889                    		MOV.B 03H[R0], R1
+000002C7 61A1                    		CMP #0AH, R1
+000002C9 29rr                    		BLT L87
+000002CB                         L92:	; bb162
+000002CB 6603                    		MOV.L #00000000H, R3
+000002CD 6642                    		MOV.L #00000004H, R2
+000002CF 6611                    		MOV.L #00000001H, R1
+                                 ;     377         }
+                                 ;     378     }
+                                 ;     379     /* USB_TFAT_MPL    */
+                                 ;     380     mpl_handle7 = xQueueCreate(  1, sizeof(void *) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",380
+000002D1 05rrrrrr             A  		BSR _xQueueGenericCreate
+000002D5 FBE2rrrrrrrr            		MOV.L #_mpl_handle7, R14
+000002DB E3E1                    		MOV.L R1, [R14]
+000002DD                         L93:	; bb162.split
+                                 ;     381 
+                                 ;     382     for ( i = 0; i < 1; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",382
+000002DD 3C0300                  		MOV.B #00H, 03H[R0]
+000002E0 2Err                 B  		BRA L98
+000002E2                         L94:	; bb164
+000002E2 75412C                  		MOV.L #0000002CH, R1
+                                 ;     383     {
+                                 ;     384         tmpPtr = pvPortMalloc( sizeof( USB_UTR_t ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",384
+000002E5 05rrrrrr             A  		BSR _pvPortMalloc
+000002E9 A009                    		MOV.L R1, 04H[R0]
+000002EB                         L95:	; bb164.split
+                                 ;     385         if ( tmpPtr == NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",385
+000002EB A809                    		MOV.L 04H[R0], R1
+000002ED 6101                    		CMP #00H, R1
+000002EF 18                   S  		BNE L97
+000002F0                         L96:	; bb169
+                                 ;     386         {
+                                 ;     387             for( ;; );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",387
+000002F0 2Err                 B  		BRA L96
+000002F2                         L97:	; bb171
+                                 ;     388         }
+                                 ;     389         else
+                                 ;     390         {
+                                 ;     391             xQueueSend( mpl_handle7, &tmpPtr, 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",391
+000002F2 FBE2rrrrrrrr            		MOV.L #_mpl_handle7, R14
+000002F8 ECE1                    		MOV.L [R14], R1
+000002FA 6603                    		MOV.L #00000000H, R3
+000002FC 710204                  		ADD #04H, R0, R2
+000002FF EF34                    		MOV.L R3, R4
+00000301 05rrrrrr             A  		BSR _xQueueGenericSend
+00000305 B089                    		MOVU.B 03H[R0], R1
+00000307 6211                    		ADD #01H, R1
+00000309 8089                    		MOV.B R1, 03H[R0]
+0000030B                         L98:	; bb182
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",382
+0000030B 8889                    		MOV.B 03H[R0], R1
+0000030D 6101                    		CMP #00H, R1
+0000030F 2Brr                    		BLE L94
+00000311                         L99:	; bb188
+00000311 6603                    		MOV.L #00000000H, R3
+00000313 6642                    		MOV.L #00000004H, R2
+00000315 6611                    		MOV.L #00000001H, R1
+                                 ;     392         }
+                                 ;     393     }
+                                 ;     394 
+                                 ;     395 	qKeyboard = xQueueCreate(1, sizeof(uint32_t));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",395
+00000317 05rrrrrr             A  		BSR _xQueueGenericCreate
+0000031B FBE2rrrrrrrr            		MOV.L #_qKeyboard, R14
+00000321 E3E1                    		MOV.L R1, [R14]
+00000323                         L100:	; bb188.split
+00000323 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     396     /* Task */
+                                 ;     397 #if 0
+                                 ;     398     xTaskCreate( (pdTASK_CODE)R_usb_pstd_PcdTask,     "USB_PCD_TSK     ",  512, NULL, 5, &task_handle0 ); /* USB_PCD_TASK   */
+                                 ;     399 #endif
+                                 ;     400 
+                                 ;     401     /* USB tasks */
+                                 ;     402 //    xTaskCreate( (pdTASK_CODE)R_usb_hstd_HcdTask,     "USB_HCD_TSK     ",  128, NULL, 5, &task_handle1 ); /* USB_HCD_TASK   */
+                                 ;     403 //    xTaskCreate( (pdTASK_CODE)R_usb_hstd_MgrTask,     "USB_MGR_TSK     ",  128, NULL, 4, &task_handle2 ); /* USB_MGR_TASK   */
+                                 ;     404 //    xTaskCreate( (pdTASK_CODE)R_usb_hhub_Task,        "USB_HUB_TSK     ",  128, NULL, 3, &task_handle3 ); /* USB_HUB_TASK   */
+                                 ;     405 //
+                                 ;     406 //    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_Task,          "USB_HMSC_TSK    ",  128, NULL, 3, &task_handle4 ); /* USB_HMSC_TASK  */
+                                 ;     407 //    xTaskCreate( (pdTASK_CODE)R_usb_hmsc_StrgDriveTask, "USB_HSTRG_TSK   ",  128, NULL, 3, &task_handle5 ); /* USB_HSTRG_TASK */
+                                 ;     408 //    xTaskCreate( (pdTASK_CODE)hmsc_cstd_task_start,     "HMSC_MAIN_TSK   ",  128, NULL, 2, NULL); /* HMSC_MAIN_TASK      */
+                                 ;     409 
+                                 ;     410     xTaskCreate( (pdTASK_CODE)R_usb_hstd_HcdTask,     "USB_HCD_TSK     ",  128, NULL, 6, &task_handle1 ); /* USB_HCD_TASK   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",410
+00000326 FB12rrrrrrrr            		MOV.L #_task_handle1, R1
+0000032C A009                    		MOV.L R1, 04H[R0]
+0000032E 3E0300                  		MOV.L #00000000H, 0CH[R0]
+00000331 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000334 F80606                  		MOV.L #00000006H, [R0]
+00000337 6604                    		MOV.L #00000000H, R4
+00000339 754380                  		MOV.L #00000080H, R3
+0000033C FB22rrrrrrrr            		MOV.L #_L10, R2
+00000342 FB12rrrrrrrr            		MOV.L #_R_usb_hstd_HcdTask, R1
+00000348 05rrrrrr             A  		BSR _xTaskGenericCreate
+0000034C 710010                  		ADD #10H, R0
+0000034F                         L101:	; bb188.split10
+0000034F 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     411     xTaskCreate( (pdTASK_CODE)R_usb_hstd_MgrTask,     "USB_MGR_TSK     ",  128, NULL, 5, &task_handle2 ); /* USB_MGR_TASK   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",411
+00000352 FB12rrrrrrrr            		MOV.L #_task_handle2, R1
+00000358 A009                    		MOV.L R1, 04H[R0]
+0000035A 3E0300                  		MOV.L #00000000H, 0CH[R0]
+0000035D 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000360 F80605                  		MOV.L #00000005H, [R0]
+00000363 6604                    		MOV.L #00000000H, R4
+00000365 754380                  		MOV.L #00000080H, R3
+00000368 FB22rrrrrrrr            		MOV.L #_L11, R2
+0000036E FB12rrrrrrrr            		MOV.L #_R_usb_hstd_MgrTask, R1
+00000374 05rrrrrr             A  		BSR _xTaskGenericCreate
+00000378 710010                  		ADD #10H, R0
+0000037B                         L102:	; bb188.split11
+0000037B 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     412     xTaskCreate( (pdTASK_CODE)R_usb_hhub_Task,        "USB_HUB_TSK     ",  128, NULL, 4, &task_handle3 ); /* USB_HUB_TASK   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",412
+0000037E FB12rrrrrrrr            		MOV.L #_task_handle3, R1
+00000384 A009                    		MOV.L R1, 04H[R0]
+00000386 3E0300                  		MOV.L #00000000H, 0CH[R0]
+00000389 3E0200                  		MOV.L #00000000H, 08H[R0]
+0000038C F80604                  		MOV.L #00000004H, [R0]
+0000038F 6604                    		MOV.L #00000000H, R4
+00000391 754380                  		MOV.L #00000080H, R3
+00000394 FB22rrrrrrrr            		MOV.L #_L12, R2
+0000039A FB12rrrrrrrr            		MOV.L #_R_usb_hhub_Task, R1
+000003A0 05rrrrrr             A  		BSR _xTaskGenericCreate
+000003A4 710010                  		ADD #10H, R0
+000003A7                         L103:	; bb188.split12
+000003A7 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     413 
+                                 ;     414     xTaskCreate( (pdTASK_CODE)R_usb_hmsc_Task,          "USB_HMSC_TSK    ",  128, NULL, 4, &task_handle4 ); /* USB_HMSC_TASK  */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",414
+000003AA FB12rrrrrrrr            		MOV.L #_task_handle4, R1
+000003B0 A009                    		MOV.L R1, 04H[R0]
+000003B2 3E0300                  		MOV.L #00000000H, 0CH[R0]
+000003B5 3E0200                  		MOV.L #00000000H, 08H[R0]
+000003B8 F80604                  		MOV.L #00000004H, [R0]
+000003BB 6604                    		MOV.L #00000000H, R4
+000003BD 754380                  		MOV.L #00000080H, R3
+000003C0 FB22rrrrrrrr            		MOV.L #_L13, R2
+000003C6 FB12rrrrrrrr            		MOV.L #_R_usb_hmsc_Task, R1
+000003CC 05rrrrrr             A  		BSR _xTaskGenericCreate
+000003D0 710010                  		ADD #10H, R0
+000003D3                         L104:	; bb188.split13
+000003D3 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     415     xTaskCreate( (pdTASK_CODE)R_usb_hmsc_StrgDriveTask, "USB_HSTRG_TSK   ",  128, NULL, 4, &task_handle5 ); /* USB_HSTRG_TASK */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",415
+000003D6 FB12rrrrrrrr            		MOV.L #_task_handle5, R1
+000003DC A009                    		MOV.L R1, 04H[R0]
+000003DE 3E0300                  		MOV.L #00000000H, 0CH[R0]
+000003E1 3E0200                  		MOV.L #00000000H, 08H[R0]
+000003E4 F80604                  		MOV.L #00000004H, [R0]
+000003E7 6604                    		MOV.L #00000000H, R4
+000003E9 754380                  		MOV.L #00000080H, R3
+000003EC FB22rrrrrrrr            		MOV.L #_L14, R2
+000003F2 FB12rrrrrrrr            		MOV.L #_R_usb_hmsc_StrgDriveTask, R1
+000003F8 05rrrrrr             A  		BSR _xTaskGenericCreate
+000003FC 710010                  		ADD #10H, R0
+000003FF                         L105:	; bb188.split14
+000003FF 7100F0                  		ADD #0FFFFFFF0H, R0
+00000402 6604                    		MOV.L #00000000H, R4
+                                 ;     416     xTaskCreate( (pdTASK_CODE)hmsc_cstd_task_start,     "HMSC_MAIN_TSK   ",  128, NULL, 3, NULL); /* HMSC_MAIN_TASK      */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",416
+00000404 A08C                    		MOV.L R4, 0CH[R0]
+00000406 A084                    		MOV.L R4, 08H[R0]
+00000408 A00C                    		MOV.L R4, 04H[R0]
+0000040A F80603                  		MOV.L #00000003H, [R0]
+0000040D 754380                  		MOV.L #00000080H, R3
+00000410 FB22rrrrrrrr            		MOV.L #_L15, R2
+00000416 FB12rrrrrrrr            		MOV.L #_hmsc_cstd_task_start, R1
+0000041C 05rrrrrr             A  		BSR _xTaskGenericCreate
+00000420 710010                  		ADD #10H, R0
+00000423                         L106:	; bb188.split15
+00000423 7100F0                  		ADD #0FFFFFFF0H, R0
+00000426 6604                    		MOV.L #00000000H, R4
+                                 ;     417 
+                                 ;     418 //    UsbTaskCreate();
+                                 ;     419 
+                                 ;     420     /*User interface task*/
+                                 ;     421     xTaskCreate( (pdTASK_CODE)keyboard_task,     "keyboard_task    ",  512, NULL, 2, NULL); /* keyboard_task      */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",421
+00000428 A08C                    		MOV.L R4, 0CH[R0]
+0000042A A084                    		MOV.L R4, 08H[R0]
+0000042C A00C                    		MOV.L R4, 04H[R0]
+0000042E F80602                  		MOV.L #00000002H, [R0]
+00000431 FB3A0002                		MOV.L #00000200H, R3
+00000435 FB22rrrrrrrr            		MOV.L #_L16, R2
+0000043B FB12rrrrrrrr            		MOV.L #_keyboard_task, R1
+00000441 05rrrrrr             A  		BSR _xTaskGenericCreate
+00000445 710010                  		ADD #10H, R0
+00000448                         L107:	; bb188.split16
+00000448 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     422     xTaskCreate( (pdTASK_CODE)states_task,     "states_task    ",  2048, NULL, 1, &task_main_handle); /* states_task      */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",422
+0000044B FB12rrrrrrrr            		MOV.L #_task_main_handle, R1
+00000451 A009                    		MOV.L R1, 04H[R0]
+00000453 3E0300                  		MOV.L #00000000H, 0CH[R0]
+00000456 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000459 F80601                  		MOV.L #00000001H, [R0]
+0000045C 6604                    		MOV.L #00000000H, R4
+0000045E FB3A0008                		MOV.L #00000800H, R3
+00000462 FB22rrrrrrrr            		MOV.L #_L17, R2
+00000468 FB12rrrrrrrr            		MOV.L #_states_task, R1
+0000046E 05rrrrrr             A  		BSR _xTaskGenericCreate
+00000472 710010                  		ADD #10H, R0
+00000475                         L108:	; bb188.split17
+00000475 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     423     xTaskCreate( (pdTASK_CODE)main_cnc_task,     "CNC_task   ",  2048, NULL, 1, &xCncTaskHandle); /* CNC_task      */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",423
+00000478 FB12rrrrrrrr            		MOV.L #_xCncTaskHandle, R1
+0000047E A009                    		MOV.L R1, 04H[R0]
+00000480 3E0300                  		MOV.L #00000000H, 0CH[R0]
+00000483 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000486 F80601                  		MOV.L #00000001H, [R0]
+00000489 6604                    		MOV.L #00000000H, R4
+0000048B FB3A0008                		MOV.L #00000800H, R3
+0000048F FB22rrrrrrrr            		MOV.L #_L18, R2
+00000495 FB12rrrrrrrr            		MOV.L #_main_cnc_task, R1
+0000049B 05rrrrrr             A  		BSR _xTaskGenericCreate
+0000049F 710010                  		ADD #10H, R0
+000004A2 6702                    		RTSD #08H
+000004A4                         _UsbTaskDelete:
+                                 		.STACK	_UsbTaskDelete=4
+                                 ;     424 
+                                 ;     425 }
+                                 ;     426 
+                                 ;     427 void UsbTaskDelete(void)
+                                 ;     428 {
+                                 ;     429 	vTaskDelete( task_handle1); /* USB_HCD_TASK   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",429
+000004A4 FBE2rrrrrrrr            		MOV.L #_task_handle1, R14
+000004AA ECE1                    		MOV.L [R14], R1
+000004AC 05rrrrrr             A  		BSR _vTaskDelete
+000004B0                         L110:	; entry.split
+                                 ;     430 	vTaskDelete( task_handle2); /* USB_MGR_TASK   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",430
+000004B0 FBE2rrrrrrrr            		MOV.L #_task_handle2, R14
+000004B6 ECE1                    		MOV.L [R14], R1
+000004B8 05rrrrrr             A  		BSR _vTaskDelete
+000004BC                         L111:	; entry.split1
+                                 ;     431 	vTaskDelete( task_handle3); /* USB_HUB_TASK   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",431
+000004BC FBE2rrrrrrrr            		MOV.L #_task_handle3, R14
+000004C2 ECE1                    		MOV.L [R14], R1
+000004C4 05rrrrrr             A  		BSR _vTaskDelete
+000004C8                         L112:	; entry.split2
+                                 ;     432 
+                                 ;     433 	vTaskDelete( task_handle4); /* USB_HMSC_TASK  */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",433
+000004C8 FBE2rrrrrrrr            		MOV.L #_task_handle4, R14
+000004CE ECE1                    		MOV.L [R14], R1
+000004D0 05rrrrrr             A  		BSR _vTaskDelete
+000004D4                         L113:	; entry.split3
+                                 ;     434 	vTaskDelete( task_handle5); /* USB_HSTRG_TASK */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",434
+000004D4 FBE2rrrrrrrr            		MOV.L #_task_handle5, R14
+000004DA ECE1                    		MOV.L [R14], R1
+000004DC 05rrrrrr             A  		BSR _vTaskDelete
+000004E0                         L114:	; entry.split4
+                                 ;     435 	vTaskDelete( task_handle6); /* HMSC_MAIN_TASK      */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",435
+000004E0 FBE2rrrrrrrr            		MOV.L #_task_handle6, R14
+000004E6 ECE1                    		MOV.L [R14], R1
+000004E8 05rrrrrr             A  		BSR _vTaskDelete
+000004EC 02                      		RTS
+000004ED                         _UsbTaskCreate:
+                                 		.STACK	_UsbTaskCreate=20
+                                 ;     436 }
+                                 ;     437 
+                                 ;     438 void UsbTaskCreate(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",438
+000004ED 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     439 {
+                                 ;     440     xTaskCreate( (pdTASK_CODE)R_usb_hstd_HcdTask,     "USB_HCD_TSK     ",  128, NULL, 6, &task_handle1 ); /* USB_HCD_TASK   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",440
+000004F0 FB12rrrrrrrr            		MOV.L #_task_handle1, R1
+000004F6 A009                    		MOV.L R1, 04H[R0]
+000004F8 3E0300                  		MOV.L #00000000H, 0CH[R0]
+000004FB 3E0200                  		MOV.L #00000000H, 08H[R0]
+000004FE F80606                  		MOV.L #00000006H, [R0]
+00000501 6604                    		MOV.L #00000000H, R4
+00000503 754380                  		MOV.L #00000080H, R3
+00000506 FB22rrrrrrrr            		MOV.L #_L10, R2
+0000050C FB12rrrrrrrr            		MOV.L #_R_usb_hstd_HcdTask, R1
+00000512 05rrrrrr             A  		BSR _xTaskGenericCreate
+00000516 710010                  		ADD #10H, R0
+00000519                         L116:	; entry.split
+00000519 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     441     xTaskCreate( (pdTASK_CODE)R_usb_hstd_MgrTask,     "USB_MGR_TSK     ",  128, NULL, 5, &task_handle2 ); /* USB_MGR_TASK   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",441
+0000051C FB12rrrrrrrr            		MOV.L #_task_handle2, R1
+00000522 A009                    		MOV.L R1, 04H[R0]
+00000524 3E0300                  		MOV.L #00000000H, 0CH[R0]
+00000527 3E0200                  		MOV.L #00000000H, 08H[R0]
+0000052A F80605                  		MOV.L #00000005H, [R0]
+0000052D 6604                    		MOV.L #00000000H, R4
+0000052F 754380                  		MOV.L #00000080H, R3
+00000532 FB22rrrrrrrr            		MOV.L #_L11, R2
+00000538 FB12rrrrrrrr            		MOV.L #_R_usb_hstd_MgrTask, R1
+0000053E 05rrrrrr             A  		BSR _xTaskGenericCreate
+00000542 710010                  		ADD #10H, R0
+00000545                         L117:	; entry.split1
+00000545 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     442     xTaskCreate( (pdTASK_CODE)R_usb_hhub_Task,        "USB_HUB_TSK     ",  128, NULL, 4, &task_handle3 ); /* USB_HUB_TASK   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",442
+00000548 FB12rrrrrrrr            		MOV.L #_task_handle3, R1
+0000054E A009                    		MOV.L R1, 04H[R0]
+00000550 3E0300                  		MOV.L #00000000H, 0CH[R0]
+00000553 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000556 F80604                  		MOV.L #00000004H, [R0]
+00000559 6604                    		MOV.L #00000000H, R4
+0000055B 754380                  		MOV.L #00000080H, R3
+0000055E FB22rrrrrrrr            		MOV.L #_L12, R2
+00000564 FB12rrrrrrrr            		MOV.L #_R_usb_hhub_Task, R1
+0000056A 05rrrrrr             A  		BSR _xTaskGenericCreate
+0000056E 710010                  		ADD #10H, R0
+00000571                         L118:	; entry.split2
+00000571 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     443 
+                                 ;     444     xTaskCreate( (pdTASK_CODE)R_usb_hmsc_Task,          "USB_HMSC_TSK    ",  128, NULL, 4, &task_handle4 ); /* USB_HMSC_TASK  */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",444
+00000574 FB12rrrrrrrr            		MOV.L #_task_handle4, R1
+0000057A A009                    		MOV.L R1, 04H[R0]
+0000057C 3E0300                  		MOV.L #00000000H, 0CH[R0]
+0000057F 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000582 F80604                  		MOV.L #00000004H, [R0]
+00000585 6604                    		MOV.L #00000000H, R4
+00000587 754380                  		MOV.L #00000080H, R3
+0000058A FB22rrrrrrrr            		MOV.L #_L13, R2
+00000590 FB12rrrrrrrr            		MOV.L #_R_usb_hmsc_Task, R1
+00000596 05rrrrrr             A  		BSR _xTaskGenericCreate
+0000059A 710010                  		ADD #10H, R0
+0000059D                         L119:	; entry.split3
+0000059D 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     445     xTaskCreate( (pdTASK_CODE)R_usb_hmsc_StrgDriveTask, "USB_HSTRG_TSK   ",  128, NULL, 4, &task_handle5 ); /* USB_HSTRG_TASK */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",445
+000005A0 FB12rrrrrrrr            		MOV.L #_task_handle5, R1
+000005A6 A009                    		MOV.L R1, 04H[R0]
+000005A8 3E0300                  		MOV.L #00000000H, 0CH[R0]
+000005AB 3E0200                  		MOV.L #00000000H, 08H[R0]
+000005AE F80604                  		MOV.L #00000004H, [R0]
+000005B1 6604                    		MOV.L #00000000H, R4
+000005B3 754380                  		MOV.L #00000080H, R3
+000005B6 FB22rrrrrrrr            		MOV.L #_L14, R2
+000005BC FB12rrrrrrrr            		MOV.L #_R_usb_hmsc_StrgDriveTask, R1
+000005C2 05rrrrrr             A  		BSR _xTaskGenericCreate
+000005C6 710010                  		ADD #10H, R0
+000005C9                         L120:	; entry.split4
+000005C9 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     446     xTaskCreate( (pdTASK_CODE)hmsc_cstd_task_start,     "HMSC_MAIN_TSK   ",  128, NULL, 3, &task_handle6 ); /* HMSC_MAIN_TASK      */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\config_kernel.c",446
+000005CC FB12rrrrrrrr            		MOV.L #_task_handle6, R1
+000005D2 A009                    		MOV.L R1, 04H[R0]
+000005D4 3E0300                  		MOV.L #00000000H, 0CH[R0]
+000005D7 3E0200                  		MOV.L #00000000H, 08H[R0]
+000005DA F80603                  		MOV.L #00000003H, [R0]
+000005DD 6604                    		MOV.L #00000000H, R4
+000005DF 754380                  		MOV.L #00000080H, R3
+000005E2 FB22rrrrrrrr            		MOV.L #_L15, R2
+000005E8 FB12rrrrrrrr            		MOV.L #_hmsc_cstd_task_start, R1
+000005EE 05rrrrrr             A  		BSR _xTaskGenericCreate
+000005F2 710010                  		ADD #10H, R0
+000005F5 02                      		RTS
+                                 ;     447 }
+                                 ;     448 
+                                 ;     449 /******************************************************************************/
+                                 ;     450 #endif /* FREE_RTOS_PP */
+                                 ;     451 /******************************************************************************
+                                 ;     452 End  Of File
+                                 ;     453 ******************************************************************************/
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 5553425F                		.byte	"USB_HCD_TSK     "
+         4843445F                
+         54534B20                
+         20202020                
+00000010 00                      		.byte	00H
+00000011                         _L11:
+00000011 5553425F                		.byte	"USB_MGR_TSK     "
+         4D47525F                
+         54534B20                
+         20202020                
+00000021 00                      		.byte	00H
+00000022                         _L12:
+00000022 5553425F                		.byte	"USB_HUB_TSK     "
+         4855425F                
+         54534B20                
+         20202020                
+00000032 00                      		.byte	00H
+00000033                         _L13:
+00000033 5553425F                		.byte	"USB_HMSC_TSK    "
+         484D5343                
+         5F54534B                
+         20202020                
+00000043 00                      		.byte	00H
+00000044                         _L14:
+00000044 5553425F                		.byte	"USB_HSTRG_TSK   "
+         48535452                
+         475F5453                
+         4B202020                
+00000054 00                      		.byte	00H
+00000055                         _L15:
+00000055 484D5343                		.byte	"HMSC_MAIN_TSK   "
+         5F4D4149                
+         4E5F5453                
+         4B202020                
+00000065 00                      		.byte	00H
+00000066                         _L16:
+00000066 6B657962                		.byte	"keyboard_task    "
+         6F617264                
+         5F746173                
+         6B202020                
+         20                      
+00000077 00                      		.byte	00H
+00000078                         _L17:
+00000078 73746174                		.byte	"states_task    "
+         65735F74                
+         61736B20                
+         202020                  
+00000087 00                      		.byte	00H
+00000088                         _L18:
+00000088 434E435F                		.byte	"CNC_task   "
+         7461736B                
+         202020                  
+00000093 00                      		.byte	00H
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         _task_table:
+00000000 rrrrrrrr                		.lword	_task_handle0
+00000004 rrrrrrrr                		.lword	_task_handle1
+00000008 rrrrrrrr                		.lword	_task_handle2
+0000000C rrrrrrrr                		.lword	_task_handle3
+00000010 rrrrrrrr                		.lword	_task_handle4
+00000014 rrrrrrrr                		.lword	_task_handle5
+00000018                         _mbox_table:
+00000018 rrrrrrrr                		.lword	_mbox_handle0
+0000001C rrrrrrrr                		.lword	_mbox_handle1
+00000020 rrrrrrrr                		.lword	_mbox_handle2
+00000024 rrrrrrrr                		.lword	_mbox_handle3
+00000028 rrrrrrrr                		.lword	_mbox_handle4
+0000002C rrrrrrrr                		.lword	_mbox_handle5
+00000030 rrrrrrrr                		.lword	_mbox_handle6
+00000034 rrrrrrrr                		.lword	_mbox_handle7
+00000038                         _mpl_table:
+00000038 rrrrrrrr                		.lword	_mpl_handle0
+0000003C rrrrrrrr                		.lword	_mpl_handle1
+00000040 rrrrrrrr                		.lword	_mpl_handle2
+00000044 rrrrrrrr                		.lword	_mpl_handle3
+00000048 rrrrrrrr                		.lword	_mpl_handle4
+0000004C rrrrrrrr                		.lword	_mpl_handle5
+00000050 rrrrrrrr                		.lword	_mpl_handle6
+00000054 rrrrrrrr                		.lword	_mpl_handle7
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _task_main_handle:
+00000000(00000004H)              		.blkl	1
+00000004                         _task_handle0:
+00000004(00000004H)              		.blkl	1
+00000008                         _task_handle1:
+00000008(00000004H)              		.blkl	1
+0000000C                         _task_handle2:
+0000000C(00000004H)              		.blkl	1
+00000010                         _task_handle3:
+00000010(00000004H)              		.blkl	1
+00000014                         _task_handle4:
+00000014(00000004H)              		.blkl	1
+00000018                         _task_handle5:
+00000018(00000004H)              		.blkl	1
+0000001C                         _task_handle6:
+0000001C(00000004H)              		.blkl	1
+00000020                         _mbox_handle0:
+00000020(00000004H)              		.blkl	1
+00000024                         _mbox_handle1:
+00000024(00000004H)              		.blkl	1
+00000028                         _mbox_handle2:
+00000028(00000004H)              		.blkl	1
+0000002C                         _mbox_handle3:
+0000002C(00000004H)              		.blkl	1
+00000030                         _mbox_handle4:
+00000030(00000004H)              		.blkl	1
+00000034                         _mbox_handle5:
+00000034(00000004H)              		.blkl	1
+00000038                         _mbox_handle6:
+00000038(00000004H)              		.blkl	1
+0000003C                         _mbox_handle7:
+0000003C(00000004H)              		.blkl	1
+00000040                         _mpl_handle0:
+00000040(00000004H)              		.blkl	1
+00000044                         _mpl_handle1:
+00000044(00000004H)              		.blkl	1
+00000048                         _mpl_handle2:
+00000048(00000004H)              		.blkl	1
+0000004C                         _mpl_handle3:
+0000004C(00000004H)              		.blkl	1
+00000050                         _mpl_handle4:
+00000050(00000004H)              		.blkl	1
+00000054                         _mpl_handle5:
+00000054(00000004H)              		.blkl	1
+00000058                         _mpl_handle6:
+00000058(00000004H)              		.blkl	1
+0000005C                         _mpl_handle7:
+0000005C(00000004H)              		.blkl	1
+00000060                         _qKeyboard:
+00000060(00000004H)              		.blkl	1
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01346   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001526(000005F6H)  P
+ROMDATA  0000000148(00000094H)  L
+ROMDATA  0000000088(00000058H)  D
+DATA     0000000100(00000064H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\config_kernel.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\config_kernel.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\config\config_kernel.obj

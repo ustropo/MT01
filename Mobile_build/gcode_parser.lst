@@ -1,0 +1,3170 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:53:59 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:53:59
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=gcode_parser.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=gcode_parser.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;gcode_parser.c
+                                 
+                                 		.glb	__Ctype
+                                 		.glb	__Tolotab
+                                 		.glb	__Touptab
+                                 		.glb	_status_code
+                                 		.glb	_cs
+                                 		.glb	_cm
+                                 		.glb	_configFlags
+                                 		.glb	_macro_func_ptr
+                                 		.glb	_linenumMacro
+                                 		.glb	_currentLineSel
+                                 		.glb	_LineM5
+                                 		.glb	_selecionarLinhas
+                                 		.glb	_gp
+                                 		.glb	_parse_gcode_func_selection
+                                 		.glb	_gc_gcode_parser
+                                 		.glb	_cm_message
+                                 		.glb	_strchr
+                                 		.glb	__Stof
+                                 		.glb	_trunc
+                                 		.glb	__execute_gcode_block
+                                 		.glb	_cm_get_motion_mode
+                                 		.glb	_M3_Macro
+                                 		.glb	_M4_Macro
+                                 		.glb	_M5_Macro
+                                 		.glb	_cm_set_model_linenum
+                                 		.glb	_cm_set_feed_rate_mode
+                                 		.glb	_cm_set_feed_rate
+                                 		.glb	_cm_feed_rate_override_factor
+                                 		.glb	_cm_traverse_override_factor
+                                 		.glb	_cm_set_spindle_speed
+                                 		.glb	_cm_spindle_override_factor
+                                 		.glb	_cm_select_tool
+                                 		.glb	_cm_change_tool
+                                 		.glb	_cm_spindle_control
+                                 		.glb	_cm_mist_coolant_control
+                                 		.glb	_cm_flood_coolant_control
+                                 		.glb	_cm_feed_rate_override_enable
+                                 		.glb	_cm_traverse_override_enable
+                                 		.glb	_cm_spindle_override_enable
+                                 		.glb	_cm_override_enables
+                                 		.glb	_cm_dwell
+                                 		.glb	_cm_select_plane
+                                 		.glb	_cm_set_units_mode
+                                 		.glb	_cm_set_coord_system
+                                 		.glb	_cm_set_path_control
+                                 		.glb	_cm_set_distance_mode
+                                 		.glb	_cm_set_g28_position
+                                 		.glb	_cm_goto_g28_position
+                                 		.glb	_cm_set_g30_position
+                                 		.glb	_cm_goto_g30_position
+                                 		.glb	_cm_homing_cycle_start
+                                 		.glb	_cm_set_absolute_origin
+                                 		.glb	_cm_homing_cycle_start_no_set
+                                 		.glb	_cm_straight_probe
+                                 		.glb	_cm_straight_wait
+                                 		.glb	_cm_set_coord_offsets
+                                 		.glb	_cm_set_origin_offsets
+                                 		.glb	_cm_reset_origin_offsets
+                                 		.glb	_cm_suspend_origin_offsets
+                                 		.glb	_cm_resume_origin_offsets
+                                 		.glb	_cm_set_absolute_override
+                                 		.glb	_cm_straight_traverse
+                                 		.glb	_cm_straight_feed
+                                 		.glb	_cm_arc_feed
+                                 		.glb	_cm_program_stop
+                                 		.glb	_cm_program_end
+                                 		.glb	_gc_get_gc
+                                 		.glb	_nv_copy_string
+                                 		.glb	_gc_run_gc
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _parse_gcode_func_selection:
+                                 		.STACK	_parse_gcode_func_selection=8
+                                 ;       1 /*
+                                 ;       2  * gcode_parser.c - rs274/ngc Gcode parser
+                                 ;       3  * This file is part of the TinyG project
+                                 ;       4  *
+                                 ;       5  * Copyright (c) 2010 - 2015 Alden S. Hart, Jr.
+                                 ;       6  *
+                                 ;       7  * This file ("the software") is free software: you can redistribute it and/or modify
+                                 ;       8  * it under the terms of the GNU General Public License, version 2 as published by the
+                                 ;       9  * Free Software Foundation. You should have received a copy of the GNU General Public
+                                 ;      10  * License, version 2 along with the software.  If not, see <http://www.gnu.org/licenses/>.
+                                 ;      11  *
+                                 ;      12  * THE SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY
+                                 ;      13  * WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                 ;      14  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+                                 ;      15  * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                 ;      16  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+                                 ;      17  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                                 ;      18  */
+                                 ;      19 #include "tinyg.h"			// #1
+                                 ;      20 #include "config.h"			// #2
+                                 ;      21 #include "controller.h"
+                                 ;      22 #include "gcode_parser.h"
+                                 ;      23 #include "canonical_machine.h"
+                                 ;      24 #include "spindle.h"
+                                 ;      25 #include "util.h"
+                                 ;      26 #include "xio.h"			// for char definitions
+                                 ;      27 #include "macros/macros.h"
+                                 ;      28 
+                                 ;      29 #ifdef __cplusplus
+                                 ;      30 extern "C"{
+                                 ;      31 #endif
+                                 ;      32 
+                                 ;      33 extern uint32_t currentLineSel;
+                                 ;      34 extern uint32_t LineM5;
+                                 ;      35 extern float selecionarLinhas;
+                                 ;      36 
+                                 ;      37 struct gcodeParserSingleton {	 	  // struct to manage globals
+                                 ;      38 	uint8_t modals[MODAL_GROUP_COUNT];// collects modal groups in a block
+                                 ;      39 };
+                                 ;      40 
+                                 ;      41 struct gcodeParserSingleton gp;
+                                 ;      42 
+                                 ;      43 // local helper functions and macros
+                                 ;      44 static void _normalize_gcode_block(char_t *str, char_t **com, char_t **msg, uint8_t *block_delete_flag);
+                                 ;      45 static stat_t _get_next_gcode_word(char **pstr, char *letter, float *value);
+                                 ;      46 static stat_t _point(float value);
+                                 ;      47 static stat_t _validate_gcode_block(void);
+                                 ;      48 static stat_t _parse_gcode_block(char_t *line);	// Parse the block into the GN/GF structs
+                                 ;      49 static stat_t _parse_gcode_block_selection_line(char_t *buf);
+                                 ;      50 static stat_t (*parse_gcode_func)(char_t *buf);
+                                 ;      51 
+                                 ;      52 
+                                 ;      53 //RXMOD	#define SET_MODAL(m,parm,val) ({cm.gn.parm=val; cm.gf.parm=1; gp.modals[m]+=1; break;})
+                                 ;      54 //RXMOD	#define SET_NON_MODAL(parm,val) ({cm.gn.parm=val; cm.gf.parm=1; break;})
+                                 ;      55 //RXMOD	#define EXEC_FUNC(f,v) if((uint8_t)cm.gf.v != false) { status = f(cm.gn.v);}
+                                 ;      56 #define SET_MODAL(m,parm,val) cm.gn.parm=val; cm.gf.parm=1; gp.modals[m]+=1; break;
+                                 ;      57 #define SET_NON_MODAL(parm,val) cm.gn.parm=val; cm.gf.parm=1; break;
+                                 ;      58 #define EXEC_FUNC(f,v) if((uint8_t)cm.gf.v != false) { status = f(cm.gn.v);}
+                                 ;      59 
+                                 ;      60 void parse_gcode_func_selection(gc_parser_t funcSel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",60
+00000000 6040                    		SUB #04H, R0
+00000002 E301                    		MOV.L R1, [R0]
+                                 ;      61 {
+                                 ;      62 	switch(funcSel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",62
+00000004 6111                    		CMP #01H, R1
+00000006 20rr                    		BEQ L14
+00000008                         L12:	; entry
+00000008 6101                    		CMP #00H, R1
+0000000A 21rr                    		BNE L15
+0000000C                         L13:	; bb
+                                 ;      63 	{
+                                 ;      64 		case CODE_PARSER: parse_gcode_func = _parse_gcode_block; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",64
+0000000C FBE2rrrrrrrr            		MOV.L #__$parse_gcode_func, R14
+00000012 FBF2rrrrrrrr            		MOV.L #__$_parse_gcode_block, R15
+00000018 E3EF                    		MOV.L R15, [R14]
+0000001A 6701                    		RTSD #04H
+0000001C                         L14:	; bb2
+                                 ;      65 		case LINE_PARSER: parse_gcode_func = _parse_gcode_block_selection_line; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",65
+0000001C FBE2rrrrrrrr            		MOV.L #__$parse_gcode_func, R14
+00000022 FBF2rrrrrrrr            		MOV.L #__$_parse_gcode_block_selection_line, R15
+00000028 E3EF                    		MOV.L R15, [R14]
+0000002A 6701                    		RTSD #04H
+0000002C                         L15:	; return
+                                 ;      66 		default: break;
+                                 ;      67 	}
+                                 ;      68 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",68
+0000002C 6701                    		RTSD #04H
+0000002E                         _gc_gcode_parser:
+                                 		.STACK	_gc_gcode_parser=32
+                                 ;      69 
+                                 ;      70 /*
+                                 ;      71  * gc_gcode_parser() - parse a block (line) of gcode
+                                 ;      72  *
+                                 ;      73  *	Top level of gcode parser. Normalizes block and looks for special cases
+                                 ;      74  */
+                                 ;      75 stat_t gc_gcode_parser(char_t *block)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",75
+0000002E 7100E4                  		ADD #0FFFFFFE4H, R0
+00000031 A181                    		MOV.L R1, 18H[R0]
+                                 ;      76 {
+                                 ;      77 	char_t *str = block;					// gcode command or NUL string
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",77
+00000033 A009                    		MOV.L R1, 04H[R0]
+00000035                         L17:	; entry.split
+                                 ;      78 	char_t none = NUL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",78
+00000035 3C0B00                  		MOV.B #00H, 0BH[R0]
+00000038                         L18:	; entry.split1
+00000038 71010B                  		ADD #0BH, R0, R1
+                                 ;      79 	char_t *com = &none;					// gcode comment or NUL string
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",79
+0000003B A089                    		MOV.L R1, 0CH[R0]
+0000003D                         L19:	; entry.split2
+0000003D 71010B                  		ADD #0BH, R0, R1
+                                 ;      80 	char_t *msg = &none;					// gcode message or NUL string
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",80
+00000040 A101                    		MOV.L R1, 10H[R0]
+00000042                         L20:	; entry.split3
+                                 ;      81 	uint8_t block_delete_flag;
+                                 ;      82 
+                                 ;      83 	// don't process Gcode blocks if in alarmed state
+                                 ;      84 	if (cm.machine_state == MACHINE_ALARM) return (STAT_MACHINE_ALARMED);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",84
+00000042 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000048 5AEE1D02                		MOVU.B 021DH[R14], R14
+0000004C 612E                    		CMP #02H, R14
+0000004E 18                   S  		BNE L22
+0000004F                         L21:	; bb8
+0000004F 3C03CB                  		MOV.B #0CBH, 03H[R0]
+00000052 2Err                 B  		BRA L28
+00000054                         L22:	; bb14
+                                 ;      85 
+                                 ;      86 	_normalize_gcode_block(str, &com, &msg, &block_delete_flag);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",86
+00000054 A809                    		MOV.L 04H[R0], R1
+00000056 710416                  		ADD #16H, R0, R4
+00000059 710310                  		ADD #10H, R0, R3
+0000005C 71020C                  		ADD #0CH, R0, R2
+0000005F 39rrrr               W  		BSR __$_normalize_gcode_block
+00000062                         L23:	; bb14.split
+                                 ;      87 
+                                 ;      88 	// Block delete omits the line if a / char is present in the first space
+                                 ;      89 	// For now this is unconditional and will always delete
+                                 ;      90 //	if ((block_delete_flag == true) && (cm_get_block_delete_switch() == true)) {
+                                 ;      91 	if (block_delete_flag == true) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",91
+00000062 B581                    		MOVU.B 16H[R0], R1
+00000064 6111                    		CMP #01H, R1
+00000066 18                   S  		BNE L25
+00000067                         L24:	; bb17
+                                 ;      92 		return (STAT_NOOP);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",92
+00000067 3C0303                  		MOV.B #03H, 03H[R0]
+0000006A 2Err                 B  		BRA L28
+0000006C                         L25:	; bb25
+                                 ;      93 	}
+                                 ;      94 
+                                 ;      95 	// queue a "(MSG" response
+                                 ;      96 	if (*msg != NUL) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",96
+0000006C A901                    		MOV.L 10H[R0], R1
+0000006E 581E                    		MOVU.B [R1], R14
+00000070 610E                    		CMP #00H, R14
+00000072 10                   S  		BEQ L27
+00000073                         L26:	; bb26
+                                 ;      97 		(void)cm_message(msg);				// queue the message
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",97
+00000073 A901                    		MOV.L 10H[R0], R1
+00000075 05rrrrrr             A  		BSR _cm_message
+00000079                         L27:	; bb34
+                                 ;      98 	}
+                                 ;      99 
+                                 ;     100 	return(parse_gcode_func(block));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",100
+00000079 FBE2rrrrrrrr            		MOV.L #__$parse_gcode_func, R14
+0000007F ECEE                    		MOV.L [R14], R14
+00000081 A981                    		MOV.L 18H[R0], R1
+00000083 7F1E                    		JSR R14
+00000085 8089                    		MOV.B R1, 03H[R0]
+00000087                         L28:	; bb39
+00000087 C5000317                		MOV.B 03H[R0], 17H[R0]
+                                 ;     101 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",101
+0000008B B589                    		MOVU.B 17H[R0], R1
+0000008D 6707                    		RTSD #1CH
+0000008F                         __$_normalize_gcode_block:
+                                 		.STACK	__$_normalize_gcode_block=32
+                                 ;     102 
+                                 ;     103 /*
+                                 ;     104  * _normalize_gcode_block() - normalize a block (line) of gcode in place
+                                 ;     105  *
+                                 ;     106  *	Normalization functions:
+                                 ;     107  *   - convert all letters to upper case
+                                 ;     108  *	 - remove white space, control and other invalid characters
+                                 ;     109  *	 - remove (erroneous) leading zeros that might be taken to mean Octal
+                                 ;     110  *	 - identify and return start of comments and messages
+                                 ;     111  *	 - signal if a block-delete character (/) was encountered in the first space
+                                 ;     112  *
+                                 ;     113  *	So this: "  g1 x100 Y100 f400" becomes this: "G1X100Y100F400"
+                                 ;     114  *
+                                 ;     115  *	Comment and message handling:
+                                 ;     116  *	 - Comments field start with a '(' char or alternately a semicolon ';'
+                                 ;     117  *	 - Comments and messages are not normalized - they are left alone
+                                 ;     118  *	 - The 'MSG' specifier in comment can have mixed case but cannot cannot have embedded white spaces
+                                 ;     119  *	 - Normalization returns true if there was a message to display, false otherwise
+                                 ;     120  *	 - Comments always terminate the block - i.e. leading or embedded comments are not supported
+                                 ;     121  *	 	- Valid cases (examples)			Notes:
+                                 ;     122  *		    G0X10							 - command only - no comment
+                                 ;     123  *		    (comment text)                   - There is no command on this line
+                                 ;     124  *		    G0X10 (comment text)
+                                 ;     125  *		    G0X10 (comment text				 - It's OK to drop the trailing paren
+                                 ;     126  *		    G0X10 ;comment text				 - It's OK to drop the trailing paren
+                                 ;     127  *
+                                 ;     128  *	 	- Invalid cases (examples)			Notes:
+                                 ;     129  *		    G0X10 comment text				 - Comment with no separator
+                                 ;     130  *		    N10 (comment) G0X10 			 - embedded comment. G0X10 will be ignored
+                                 ;     131  *		    (comment) G0X10 				 - leading comment. G0X10 will be ignored
+                                 ;     132  * 			G0X10 # comment					 - invalid separator
+                                 ;     133  *
+                                 ;     134  *	Returns:
+                                 ;     135  *	 - com points to comment string or to NUL if no comment
+                                 ;     136  *	 - msg points to message string or to NUL if no comment
+                                 ;     137  *	 - block_delete_flag is set true if block delete encountered, false otherwise
+                                 ;     138  */
+                                 ;     139 
+                                 ;     140 static void _normalize_gcode_block(char_t *str, char_t **com, char_t **msg, uint8_t *block_delete_flag)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",140
+0000008F 7100E4                  		ADD #0FFFFFFE4H, R0
+00000092 A181                    		MOV.L R1, 18H[R0]
+00000094 A10A                    		MOV.L R2, 14H[R0]
+00000096 A103                    		MOV.L R3, 10H[R0]
+00000098 A08C                    		MOV.L R4, 0CH[R0]
+                                 ;     141 {
+                                 ;     142 	char_t *rd = str;				// read pointer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",142
+0000009A E5000601                		MOV.L 18H[R0], 04H[R0]
+0000009E                         L30:	; entry.split
+                                 ;     143 	char_t *wr = str;				// write pointer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",143
+0000009E E5000602                		MOV.L 18H[R0], 08H[R0]
+000000A2                         L31:	; entry.split1
+                                 ;     144 
+                                 ;     145 	// Preset comments and messages to NUL string
+                                 ;     146 	// Not required if com and msg already point to NUL on entry
+                                 ;     147 //	for (rd = str; *rd != NUL; rd++) { if (*rd == NUL) { *com = rd; *msg = rd; rd = str;} }
+                                 ;     148 
+                                 ;     149 	// mark block deletes
+                                 ;     150 	if (*rd == '/') { *block_delete_flag = true; }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",150
+000000A2 A809                    		MOV.L 04H[R0], R1
+000000A4 581E                    		MOVU.B [R1], R14
+000000A6 755E2F                  		CMP #2FH, R14
+000000A9 A889                    		MOV.L 0CH[R0], R1
+000000AB 18                   S  		BNE L33
+000000AC                         L32:	; bb8
+000000AC F81401                  		MOV.B #01H, [R1]
+000000AF 38rrrr               W  		BRA L49
+000000B2                         L33:	; bb10
+                                 ;     151 	else { *block_delete_flag = false; }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",151
+000000B2 F81400                  		MOV.B #00H, [R1]
+000000B5 38rrrr               W  		BRA L49
+000000B8                         L34:	; bb19
+                                 ;     152 
+                                 ;     153 	// normalize the command block & find the comment (if any)
+                                 ;     154 	for (; *wr != NUL; rd++) {
+                                 ;     155 		if (*rd == NUL) { *wr = NUL; }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",155
+000000B8 A809                    		MOV.L 04H[R0], R1
+000000BA 581E                    		MOVU.B [R1], R14
+000000BC 610E                    		CMP #00H, R14
+000000BE 18                   S  		BNE L36
+000000BF                         L35:	; bb20
+000000BF A881                    		MOV.L 08H[R0], R1
+000000C1 F81400                  		MOV.B #00H, [R1]
+000000C4 38rrrr               W  		BRA L48
+000000C7                         L36:	; bb23
+                                 ;     156 		else if ((*rd == '(') || (*rd == ';')) { *wr = NUL; *com = rd+1; }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",156
+000000C7 A809                    		MOV.L 04H[R0], R1
+000000C9 581E                    		MOVU.B [R1], R14
+000000CB 755E28                  		CMP #28H, R14
+000000CE 20rr                    		BEQ L45
+000000D0 2Err                 B  		BRA L44
+000000D2                         L37:	; bb24
+000000D2 A881                    		MOV.L 08H[R0], R1
+000000D4 F81400                  		MOV.B #00H, [R1]
+000000D7 A809                    		MOV.L 04H[R0], R1
+000000D9 6211                    		ADD #01H, R1
+000000DB A90A                    		MOV.L 14H[R0], R2
+000000DD E321                    		MOV.L R1, [R2]
+000000DF 2Err                 B  		BRA L48
+000000E1                         L38:	; bb30
+                                 ;     157 		else if ((isalnum((char)*rd)) || (strchr("-.", *rd))) { // all valid characters
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",157
+000000E1 FBE2rrrrrrrr            		MOV.L #__Ctype, R14
+000000E7 ECEE                    		MOV.L [R14], R14
+000000E9 A809                    		MOV.L 04H[R0], R1
+000000EB 581F                    		MOVU.B [R1], R15
+000000ED FEDFEE                  		MOVU.W [R15,R14], R14
+000000F0 FBFA3202                		MOV.L #00000232H, R15
+000000F4 FC33EF                  		TST R14, R15
+000000F7 21rr                    		BNE L41
+000000F9 2Err                 B  		BRA L40
+000000FB                         L39:	; bb31
+                                 ;     158 			*(wr++) = (char_t)toupper((char)*(rd));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",158
+000000FB FBE2rrrrrrrr            		MOV.L #__Touptab, R14
+00000101 ECEE                    		MOV.L [R14], R14
+00000103 A809                    		MOV.L 04H[R0], R1
+00000105 581F                    		MOVU.B [R1], R15
+00000107 6C1F                    		SHLL #01H, R15
+00000109 FECEFE                  		MOVU.B [R14,R15], R14
+0000010C A881                    		MOV.L 08H[R0], R1
+0000010E C31E                    		MOV.B R14, [R1]
+00000110 A881                    		MOV.L 08H[R0], R1
+00000112 6211                    		ADD #01H, R1
+00000114 A081                    		MOV.L R1, 08H[R0]
+00000116 2Err                 B  		BRA L48
+00000118                         L40:	; bb52
+00000118 A809                    		MOV.L 04H[R0], R1
+0000011A 5812                    		MOVU.B [R1], R2
+0000011C FB12rrrrrrrr            		MOV.L #_L10, R1
+00000122 05rrrrrr             A  		BSR _strchr
+00000126 6101                    		CMP #00H, R1
+00000128 10                   S  		BEQ L42
+00000129                         L41:	; bb59
+00000129 F80601                  		MOV.L #00000001H, [R0]
+0000012C 08                   S  		BRA L43
+0000012D                         L42:	; bb60
+0000012D F80600                  		MOV.L #00000000H, [R0]
+00000130                         L43:	; bb61
+00000130 EC01                    		MOV.L [R0], R1
+00000132 6101                    		CMP #00H, R1
+00000134 21rr                    		BNE L39
+00000136 2Err                 B  		BRA L48
+00000138                         L44:	; bb72
+00000138 A809                    		MOV.L 04H[R0], R1
+0000013A 581E                    		MOVU.B [R1], R14
+0000013C 755E3B                  		CMP #3BH, R14
+0000013F 18                   S  		BNE L46
+00000140                         L45:	; bb78
+00000140 F80601                  		MOV.L #00000001H, [R0]
+00000143 08                   S  		BRA L47
+00000144                         L46:	; bb79
+00000144 F80600                  		MOV.L #00000000H, [R0]
+00000147                         L47:	; bb80
+00000147 EC01                    		MOV.L [R0], R1
+00000149 6101                    		CMP #00H, R1
+0000014B 21rr                    		BNE L37
+0000014D 2Err                 B  		BRA L38
+0000014F                         L48:	; bb92
+0000014F A809                    		MOV.L 04H[R0], R1
+00000151 6211                    		ADD #01H, R1
+00000153 A009                    		MOV.L R1, 04H[R0]
+00000155                         L49:	; bb95
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",154
+00000155 A881                    		MOV.L 08H[R0], R1
+00000157 581E                    		MOVU.B [R1], R14
+00000159 610E                    		CMP #00H, R14
+0000015B 3Brrrr               W  		BNE L34
+0000015E                         L50:	; bb102
+                                 ;     159 		}
+                                 ;     160 	}
+                                 ;     161 
+                                 ;     162 	// Perform Octal stripping - remove invalid leading zeros in number strings
+                                 ;     163 	rd = str;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",163
+0000015E E5000601                		MOV.L 18H[R0], 04H[R0]
+00000162 38rrrr               W  		BRA L68
+00000165                         L51:	; bb105
+                                 ;     164 	while (*rd != NUL) {
+                                 ;     165 		if (*rd == '.') break;							// don't strip past a decimal point
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",165
+00000165 A809                    		MOV.L 04H[R0], R1
+00000167 581E                    		MOVU.B [R1], R14
+00000169 755E2E                  		CMP #2EH, R14
+0000016C 3Arrrr               W  		BEQ L69
+0000016F                         L52:	; bb115
+                                 ;     166 		if ((!isdigit(*rd)) && (*(rd+1) == '0') && (isdigit(*(rd+2)))) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",166
+0000016F FBE2rrrrrrrr            		MOV.L #__Ctype, R14
+00000175 ECEE                    		MOV.L [R14], R14
+00000177 A809                    		MOV.L 04H[R0], R1
+00000179 581F                    		MOVU.B [R1], R15
+0000017B FEDFEE                  		MOVU.W [R15,R14], R14
+0000017E 7C5E                    		BTST #05H, R14
+00000180 21rr                    		BNE L56
+00000182 2Err                 B  		BRA L57
+00000184                         L53:	; bb116
+                                 ;     167 			wr = rd+1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",167
+00000184 6211                    		ADD #01H, R1
+00000186 A081                    		MOV.L R1, 08H[R0]
+00000188 2Err                 B  		BRA L55
+0000018A                         L54:	; bb119
+0000018A A881                    		MOV.L 08H[R0], R1
+0000018C C11101                  		MOV.B 01H[R1], [R1]
+0000018F A881                    		MOV.L 08H[R0], R1
+00000191 6211                    		ADD #01H, R1
+00000193 A081                    		MOV.L R1, 08H[R0]
+00000195                         L55:	; bb126
+                                 ;     168 			while (*wr != NUL) { *wr = *(wr+1); wr++;}	// copy forward w/overwrite
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",168
+00000195 A881                    		MOV.L 08H[R0], R1
+00000197 581E                    		MOVU.B [R1], R14
+00000199 610E                    		CMP #00H, R14
+0000019B 21rr                    		BNE L54
+0000019D 2Err                 B  		BRA L68
+0000019F                         L56:	; bb145
+0000019F F80600                  		MOV.L #00000000H, [R0]
+000001A2 08                   S  		BRA L58
+000001A3                         L57:	; bb146
+000001A3 F80601                  		MOV.L #00000001H, [R0]
+000001A6                         L58:	; bb147
+000001A6 EC01                    		MOV.L [R0], R1
+000001A8 6101                    		CMP #00H, R1
+000001AA 20rr                    		BEQ L61
+000001AC                         L59:	; bb150
+000001AC A809                    		MOV.L 04H[R0], R1
+000001AE B019                    		MOVU.B 01H[R1], R1
+000001B0 755130                  		CMP #30H, R1
+000001B3 18                   S  		BNE L61
+000001B4                         L60:	; bb157
+000001B4 F80601                  		MOV.L #00000001H, [R0]
+000001B7 08                   S  		BRA L62
+000001B8                         L61:	; bb158
+000001B8 F80600                  		MOV.L #00000000H, [R0]
+000001BB                         L62:	; bb159
+000001BB EC01                    		MOV.L [R0], R1
+000001BD 6101                    		CMP #00H, R1
+000001BF 20rr                    		BEQ L65
+000001C1                         L63:	; bb163
+000001C1 FBE2rrrrrrrr            		MOV.L #__Ctype, R14
+000001C7 ECEE                    		MOV.L [R14], R14
+000001C9 A809                    		MOV.L 04H[R0], R1
+000001CB B091                    		MOVU.B 02H[R1], R1
+000001CD FED1EE                  		MOVU.W [R1,R14], R14
+000001D0 7C5E                    		BTST #05H, R14
+000001D2 10                   S  		BEQ L65
+000001D3                         L64:	; bb175
+000001D3 F80601                  		MOV.L #00000001H, [R0]
+000001D6 08                   S  		BRA L66
+000001D7                         L65:	; bb176
+000001D7 F80600                  		MOV.L #00000000H, [R0]
+000001DA                         L66:	; bb177
+000001DA EC01                    		MOV.L [R0], R1
+000001DC 6101                    		CMP #00H, R1
+000001DE A809                    		MOV.L 04H[R0], R1
+000001E0 21rr                    		BNE L53
+000001E2                         L67:	; bb182
+                                 ;     169 			continue;
+                                 ;     170 		}
+                                 ;     171 		rd++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",171
+000001E2 6211                    		ADD #01H, R1
+000001E4 A009                    		MOV.L R1, 04H[R0]
+000001E6                         L68:	; bb186
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",164
+000001E6 A809                    		MOV.L 04H[R0], R1
+000001E8 581E                    		MOVU.B [R1], R14
+000001EA 610E                    		CMP #00H, R14
+000001EC 3Brrrr               W  		BNE L51
+000001EF                         L69:	; bb195
+                                 ;     172 	}
+                                 ;     173 
+                                 ;     174 	// process comments and messages
+                                 ;     175 	if (**com != NUL) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",175
+000001EF A909                    		MOV.L 14H[R0], R1
+000001F1 EC1E                    		MOV.L [R1], R14
+000001F3 58EE                    		MOVU.B [R14], R14
+000001F5 610E                    		CMP #00H, R14
+000001F7 3Arrrr               W  		BEQ L87
+000001FA                         L70:	; bb196
+                                 ;     176 		rd = *com;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",176
+000001FA A909                    		MOV.L 14H[R0], R1
+000001FC E41001                  		MOV.L [R1], 04H[R0]
+000001FF 08                   S  		BRA L72
+00000200                         L71:	; bb199
+00000200 A809                    		MOV.L 04H[R0], R1
+00000202 6211                    		ADD #01H, R1
+00000204 A009                    		MOV.L R1, 04H[R0]
+00000206                         L72:	; bb202
+                                 ;     177 		while (isspace(*rd)) { rd++; }		// skip any leading spaces before "msg"
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",177
+00000206 FBE2rrrrrrrr            		MOV.L #__Ctype, R14
+0000020C ECEE                    		MOV.L [R14], R14
+0000020E A809                    		MOV.L 04H[R0], R1
+00000210 581F                    		MOVU.B [R1], R15
+00000212 FEDFEE                  		MOVU.W [R15,R14], R14
+00000215 FBFA4401                		MOV.L #00000144H, R15
+00000219 FC33EF                  		TST R14, R15
+0000021C 21rr                    		BNE L71
+0000021E                         L73:	; bb215
+                                 ;     178 		if ((tolower(*rd) == 'm') && (tolower(*(rd+1)) == 's') && (tolower(*(rd+2)) == 'g')) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",178
+0000021E FBE2rrrrrrrr            		MOV.L #__Tolotab, R14
+00000224 ECEE                    		MOV.L [R14], R14
+00000226 A809                    		MOV.L 04H[R0], R1
+00000228 581F                    		MOVU.B [R1], R15
+0000022A FE5FEE                  		MOV.W [R15,R14], R14
+0000022D 755E6D                  		CMP #6DH, R14
+00000230 20rr                    		BEQ L75
+00000232 2Err                 B  		BRA L77
+00000234                         L74:	; bb216
+                                 ;     179 			*msg = rd+3;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",179
+00000234 A809                    		MOV.L 04H[R0], R1
+00000236 6231                    		ADD #03H, R1
+00000238 A902                    		MOV.L 10H[R0], R2
+0000023A E321                    		MOV.L R1, [R2]
+0000023C 2Err                 B  		BRA L86
+0000023E                         L75:	; bb229
+0000023E FBE2rrrrrrrr            		MOV.L #__Tolotab, R14
+00000244 ECEE                    		MOV.L [R14], R14
+00000246 A809                    		MOV.L 04H[R0], R1
+00000248 B019                    		MOVU.B 01H[R1], R1
+0000024A FE51EE                  		MOV.W [R1,R14], R14
+0000024D 755E73                  		CMP #73H, R14
+00000250 18                   S  		BNE L77
+00000251                         L76:	; bb240
+00000251 F80601                  		MOV.L #00000001H, [R0]
+00000254 08                   S  		BRA L78
+00000255                         L77:	; bb241
+00000255 F80600                  		MOV.L #00000000H, [R0]
+00000258                         L78:	; bb242
+00000258 EC01                    		MOV.L [R0], R1
+0000025A 6101                    		CMP #00H, R1
+0000025C 20rr                    		BEQ L81
+0000025E                         L79:	; bb246
+0000025E FBE2rrrrrrrr            		MOV.L #__Tolotab, R14
+00000264 ECEE                    		MOV.L [R14], R14
+00000266 A809                    		MOV.L 04H[R0], R1
+00000268 B091                    		MOVU.B 02H[R1], R1
+0000026A FE51EE                  		MOV.W [R1,R14], R14
+0000026D 755E67                  		CMP #67H, R14
+00000270 18                   S  		BNE L81
+00000271                         L80:	; bb257
+00000271 F80601                  		MOV.L #00000001H, [R0]
+00000274 08                   S  		BRA L82
+00000275                         L81:	; bb258
+00000275 F80600                  		MOV.L #00000000H, [R0]
+00000278                         L82:	; bb259
+00000278 EC01                    		MOV.L [R0], R1
+0000027A 6101                    		CMP #00H, R1
+0000027C 21rr                    		BNE L74
+0000027E 2Err                 B  		BRA L86
+00000280                         L83:	; bb266
+                                 ;     180 		}
+                                 ;     181 		for (; *rd != NUL; rd++) {
+                                 ;     182 			if (*rd == ')') *rd = NUL;		// NUL terminate on trailing parenthesis, if any
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",182
+00000280 A809                    		MOV.L 04H[R0], R1
+00000282 581E                    		MOVU.B [R1], R14
+00000284 755E29                  		CMP #29H, R14
+00000287 18                   S  		BNE L85
+00000288                         L84:	; bb267
+00000288 A809                    		MOV.L 04H[R0], R1
+0000028A F81400                  		MOV.B #00H, [R1]
+0000028D                         L85:	; bb275
+0000028D A809                    		MOV.L 04H[R0], R1
+0000028F 6211                    		ADD #01H, R1
+00000291 A009                    		MOV.L R1, 04H[R0]
+00000293                         L86:	; bb278
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",181
+00000293 A809                    		MOV.L 04H[R0], R1
+00000295 581E                    		MOVU.B [R1], R14
+00000297 610E                    		CMP #00H, R14
+00000299 21rr                    		BNE L83
+0000029B                         L87:	; return
+                                 ;     183 		}
+                                 ;     184 	}
+                                 ;     185 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",185
+0000029B 6707                    		RTSD #1CH
+0000029D                         __$_get_next_gcode_word:
+                                 		.STACK	__$_get_next_gcode_word=36
+                                 ;     186 
+                                 ;     187 /*
+                                 ;     188  * _get_next_gcode_word() - get gcode word consisting of a letter and a value
+                                 ;     189  *
+                                 ;     190  *	This function requires the Gcode string to be normalized.
+                                 ;     191  *	Normalization must remove any leading zeros or they will be converted to Octal
+                                 ;     192  *	G0X... is not interpreted as hexadecimal. This is trapped.
+                                 ;     193  */
+                                 ;     194 static stat_t _get_next_gcode_word(char **pstr, char *letter, float *value)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",194
+0000029D 7EA6                    		PUSH.L R6
+0000029F 7100E4                  		ADD #0FFFFFFE4H, R0
+000002A2 A181                    		MOV.L R1, 18H[R0]
+000002A4 A10A                    		MOV.L R2, 14H[R0]
+000002A6 A103                    		MOV.L R3, 10H[R0]
+                                 ;     195 {
+                                 ;     196 	if (**pstr == NUL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",196
+000002A8 A981                    		MOV.L 18H[R0], R1
+000002AA EC1E                    		MOV.L [R1], R14
+000002AC 58EE                    		MOVU.B [R14], R14
+000002AE 610E                    		CMP #00H, R14
+000002B0 18                   S  		BNE L90
+000002B1                         L89:	; bb5
+                                 ;     197         return (STAT_COMPLETE);    // no more words to process
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",197
+000002B1 3C0704                  		MOV.B #04H, 07H[R0]
+000002B4 38rrrr               W  		BRA L107
+000002B7                         L90:	; bb14
+                                 ;     198 
+                                 ;     199 	// get letter part
+                                 ;     200 	if(isupper(**pstr) == false)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",200
+000002B7 FBE2rrrrrrrr            		MOV.L #__Ctype, R14
+000002BD ECEE                    		MOV.L [R14], R14
+000002BF A981                    		MOV.L 18H[R0], R1
+000002C1 EC1F                    		MOV.L [R1], R15
+000002C3 58FF                    		MOVU.B [R15], R15
+000002C5 FEDFEE                  		MOVU.W [R15,R14], R14
+000002C8 7C1E                    		BTST #01H, R14
+000002CA 18                   S  		BNE L92
+000002CB                         L91:	; bb15
+                                 ;     201         return (STAT_INVALID_OR_MALFORMED_COMMAND);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",201
+000002CB 3C0765                  		MOV.B #65H, 07H[R0]
+000002CE 2Err                 B  		BRA L107
+000002D0                         L92:	; bb29
+                                 ;     202 	*letter = **pstr;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",202
+000002D0 A981                    		MOV.L 18H[R0], R1
+000002D2 EC1E                    		MOV.L [R1], R14
+000002D4 A909                    		MOV.L 14H[R0], R1
+000002D6 C0E1                    		MOV.B [R14], [R1]
+000002D8                         L93:	; bb29.split
+                                 ;     203 	(*pstr)++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",203
+000002D8 A981                    		MOV.L 18H[R0], R1
+000002DA EC1E                    		MOV.L [R1], R14
+000002DC 621E                    		ADD #01H, R14
+000002DE E31E                    		MOV.L R14, [R1]
+000002E0                         L94:	; bb29.split1
+                                 ;     204 
+                                 ;     205 	// X-axis-becomes-a-hexadecimal-number get-value case, e.g. G0X100 --> G255
+                                 ;     206 	if ((**pstr == '0') && (*(*pstr+1) == 'X')) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",206
+000002E0 A981                    		MOV.L 18H[R0], R1
+000002E2 EC1E                    		MOV.L [R1], R14
+000002E4 58EE                    		MOVU.B [R14], R14
+000002E6 755E30                  		CMP #30H, R14
+000002E9 20rr                    		BEQ L98
+000002EB 2Err                 B  		BRA L100
+000002ED                         L95:	; bb38
+                                 ;     207 		*value = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",207
+000002ED F86600                  		MOV.L #00000000H, [R6]
+000002F0                         L96:	; bb38.split
+                                 ;     208 		(*pstr)++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",208
+000002F0 A986                    		MOV.L 18H[R0], R6
+000002F2 EC6E                    		MOV.L [R6], R14
+000002F4 621E                    		ADD #01H, R14
+000002F6 E36E                    		MOV.L R14, [R6]
+000002F8                         L97:	; bb38.split2
+                                 ;     209 		return (STAT_OK);		// pointer points to X
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",209
+000002F8 3C0700                  		MOV.B #00H, 07H[R0]
+000002FB 2Err                 B  		BRA L107
+000002FD                         L98:	; bb50
+000002FD A986                    		MOV.L 18H[R0], R6
+000002FF EC66                    		MOV.L [R6], R6
+00000301 B06E                    		MOVU.B 01H[R6], R6
+00000303 755658                  		CMP #58H, R6
+00000306 18                   S  		BNE L100
+00000307                         L99:	; bb58
+00000307 F80601                  		MOV.L #00000001H, [R0]
+0000030A 08                   S  		BRA L101
+0000030B                         L100:	; bb59
+0000030B F80600                  		MOV.L #00000000H, [R0]
+0000030E                         L101:	; bb60
+0000030E EC06                    		MOV.L [R0], R6
+00000310 6106                    		CMP #00H, R6
+00000312 A906                    		MOV.L 10H[R0], R6
+00000314 21rr                    		BNE L95
+00000316                         L102:	; bb65
+                                 ;     210 	}
+                                 ;     211 
+                                 ;     212 	// get-value general case
+                                 ;     213 	char *end;
+                                 ;     214 	*value = strtof(*pstr, &end);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",214
+00000316 A981                    		MOV.L 18H[R0], R1
+00000318 EC11                    		MOV.L [R1], R1
+0000031A 6603                    		MOV.L #00000000H, R3
+0000031C 710208                  		ADD #08H, R0, R2
+0000031F 05rrrrrr             A  		BSR __Stof
+00000323 E361                    		MOV.L R1, [R6]
+00000325                         L103:	; bb65.split
+                                 ;     215 	if(end == *pstr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",215
+00000325 A981                    		MOV.L 18H[R0], R1
+00000327 A882                    		MOV.L 08H[R0], R2
+00000329 068412                  		CMP [R1].L, R2
+0000032C 18                   S  		BNE L105
+0000032D                         L104:	; bb71
+                                 ;     216         return(STAT_BAD_NUMBER_FORMAT); // more robust test then checking for value=0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",216
+0000032D 3C0766                  		MOV.B #66H, 07H[R0]
+00000330 08                   S  		BRA L107
+00000331                         L105:	; bb79
+                                 ;     217 	*pstr = end;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",217
+00000331 A881                    		MOV.L 08H[R0], R1
+00000333 A982                    		MOV.L 18H[R0], R2
+00000335 E321                    		MOV.L R1, [R2]
+00000337                         L106:	; bb79.split
+                                 ;     218 	return (STAT_OK);			// pointer points to next character after the word
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",218
+00000337 3C0700                  		MOV.B #00H, 07H[R0]
+0000033A                         L107:	; bb83
+0000033A C500070F                		MOV.B 07H[R0], 0FH[R0]
+                                 ;     219 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",219
+0000033E B389                    		MOVU.B 0FH[R0], R1
+00000340 3F6608                  		RTSD #20H, R6-R6
+00000343                         __$_point:
+                                 		.STACK	__$_point=16
+                                 ;     220 
+                                 ;     221 /*
+                                 ;     222  * _point() - isolate the decimal point value as an integer
+                                 ;     223  */
+                                 ;     224 static uint8_t _point(float value)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",224
+00000343 7EA6                    		PUSH.L R6
+00000345 6080                    		SUB #08H, R0
+00000347 EF16                    		MOV.L R1, R6
+00000349 A00E                    		MOV.L R6, 04H[R0]
+                                 ;     225 {
+                                 ;     226 	return((uint8_t)(value*10 - trunc(value)*10));	// isolate the decimal point as an int
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",226
+0000034B 05rrrrrr             A  		BSR _trunc
+0000034F FD723600002041          		FMUL #41200000H, R6
+00000356 FD723100002041          		FMUL #41200000H, R1
+0000035D FC8316                  		FSUB R1, R6
+00000360 FD72160000004F          		FCMP #4F000000H, R6
+00000367 29rr                    		BLT L110
+00000369                         L109:	; entry
+00000369 FD7226000080CF          		FADD #0CF800000H, R6
+00000370                         L110:	; entry
+00000370 FC9761                  		FTOI R6, R1
+00000373 8089                    		MOV.B R1, 03H[R0]
+00000375 B089                    		MOVU.B 03H[R0], R1
+00000377                         L111:	; entry.split
+                                 ;     227 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",227
+00000377 5B11                    		MOVU.B R1, R1
+00000379 3F6603                  		RTSD #0CH, R6-R6
+0000037C                         __$_validate_gcode_block:
+                                 		.STACK	__$_validate_gcode_block=8
+                                 ;     228 
+                                 ;     229 /*
+                                 ;     230  * _validate_gcode_block() - check for some gross Gcode block semantic violations
+                                 ;     231  */
+                                 ;     232 
+                                 ;     233 static stat_t _validate_gcode_block()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",233
+0000037C 6040                    		SUB #04H, R0
+                                 ;     234 {
+                                 ;     235 	//	Check for modal group violations. From NIST, section 3.4 "It is an error to put
+                                 ;     236 	//	a G-code from group 1 and a G-code from group 0 on the same line if both of them
+                                 ;     237 	//	use axis words. If an axis word-using G-code from group 1 is implicitly in effect
+                                 ;     238 	//	on a line (by having been activated on an earlier line), and a group 0 G-code that
+                                 ;     239 	//	uses axis words appears on the line, the activity of the group 1 G-code is suspended
+                                 ;     240 	//	for that line. The axis word-using G-codes from group 0 are G10, G28, G30, and G92"
+                                 ;     241 
+                                 ;     242 //	if ((gp.modals[MODAL_GROUP_G0] == true) && (gp.modals[MODAL_GROUP_G1] == true)) {
+                                 ;     243 //		return (STAT_MODAL_GROUP_VIOLATION);
+                                 ;     244 //	}
+                                 ;     245 
+                                 ;     246 	// look for commands that require an axis word to be present
+                                 ;     247 //	if ((gp.modals[MODAL_GROUP_G0] == true) || (gp.modals[MODAL_GROUP_G1] == true)) {
+                                 ;     248 //		if (_axis_changed() == false)
+                                 ;     249 //		return (STAT_GCODE_AXIS_IS_MISSING);
+                                 ;     250 //	}
+                                 ;     251 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",251
+0000037E 3C0300                  		MOV.B #00H, 03H[R0]
+00000381 B089                    		MOVU.B 03H[R0], R1
+00000383                         L113:	; entry.split
+                                 ;     252 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",252
+00000383 5B11                    		MOVU.B R1, R1
+00000385 6701                    		RTSD #04H
+00000387                         __$_parse_gcode_block:
+                                 		.STACK	__$_parse_gcode_block=36
+                                 ;     253 
+                                 ;     254 /*
+                                 ;     255  * _parse_gcode_block() - parses one line of NULL terminated G-Code.
+                                 ;     256  *
+                                 ;     257  *	All the parser does is load the state values in gn (next model state) and set flags
+                                 ;     258  *	in gf (model state flags). The execute routine applies them. The buffer is assumed to
+                                 ;     259  *	contain only uppercase characters and signed floats (no whitespace).
+                                 ;     260  *
+                                 ;     261  *	A number of implicit things happen when the gn struct is zeroed:
+                                 ;     262  *	  - inverse feed rate mode is canceled - set back to units_per_minute mode
+                                 ;     263  */
+                                 ;     264 static stat_t _parse_gcode_block(char_t *buf)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",264
+00000387 7EA6                    		PUSH.L R6
+00000389 7100E4                  		ADD #0FFFFFFE4H, R0
+0000038C A181                    		MOV.L R1, 18H[R0]
+                                 ;     265 {
+                                 ;     266 	char *pstr = (char *)buf;		// persistent pointer into gcode block for parsing words
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",266
+0000038E A081                    		MOV.L R1, 08H[R0]
+00000390                         L115:	; entry.split
+                                 ;     267   	char letter;					// parsed letter, eg.g. G or X or Y
+                                 ;     268 	float value = 0;				// value parsed from letter (e.g. 2 for G2)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",268
+00000390 3E0400                  		MOV.L #00000000H, 10H[R0]
+00000393                         L116:	; entry.split1
+                                 ;     269 	stat_t status = STAT_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",269
+00000393 3C8600                  		MOV.B #00H, 16H[R0]
+00000396                         L117:	; entry.split2
+                                 ;     270 
+                                 ;     271 	// set initial state for new move
+                                 ;     272 	memset(&gp, 0, sizeof(gp));						// clear all parser values
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",272
+00000396 FB12rrrrrrrr            		MOV.L #_gp, R1
+0000039C 6602                    		MOV.L #00000000H, R2
+0000039E A09A                    		MOV.L R2, 0CH[R1]
+000003A0 A092                    		MOV.L R2, 08H[R1]
+000003A2 A01A                    		MOV.L R2, 04H[R1]
+000003A4 E312                    		MOV.L R2, [R1]
+000003A6                         L118:	; entry.split3
+                                 ;     273 	memset(&cm.gf, 0, sizeof(GCodeInput_t));		// clear all next-state flags
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",273
+000003A6 FB12rrrrrrrr            		MOV.L #_cm, R1
+000003AC 72118C03                		ADD #038CH, R1
+000003B0 754360                  		MOV.L #00000060H, R3
+000003B3 6602                    		MOV.L #00000000H, R2
+000003B5 7F88                    		SSTR.B
+000003B7                         L119:	; entry.split4
+                                 ;     274 	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",274
+000003B7 FB12rrrrrrrr            		MOV.L #_cm, R1
+000003BD 72112C03                		ADD #032CH, R1
+000003C1 754360                  		MOV.L #00000060H, R3
+000003C4 6602                    		MOV.L #00000000H, R2
+000003C6 7F88                    		SSTR.B
+000003C8                         L120:	; entry.split5
+                                 ;     275 	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",275
+000003C8 FB62rrrrrrrr            		MOV.L #_cm, R6
+000003CE 72615402                		ADD #0254H, R6, R1
+000003D2 05rrrrrr             A  		BSR _cm_get_motion_mode
+000003D6 CB612D03                		MOV.B R1, 032DH[R6]
+000003DA 38rrrr               W  		BRA L382
+000003DD                         L121:	; bb
+                                 ;     276 
+                                 ;     277 	// extract commands and parameters
+                                 ;     278 	while((status = _get_next_gcode_word(&pstr, &letter, &value)) == STAT_OK) {
+                                 ;     279 		switch(letter) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",279
+000003DD B389                    		MOVU.B 0FH[R0], R1
+000003DF 7111BF                  		ADD #0FFFFFFBFH, R1
+000003E2 755119                  		CMP #19H, R1
+000003E5 25rr                  * 		BGTU L379
+         38rrrr                  
+000003EA                         L122:	; bb
+000003EA FBE2rrrrrrrr            		MOV.L #L393, R14
+000003F0 FE51EE                  		.swmov L393, R1, R14, R14
+000003F3                         L394:
+000003F3 7F4E                    		BRA.L R14
+000003F5                         L123:	; bb10
+                                 ;     280 			case 'G':
+                                 ;     281 			switch((uint8_t)value) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",281
+000003F5 A901                    		MOV.L 10H[R0], R1
+000003F7 FD72110000004F          		FCMP #4F000000H, R1
+000003FE 29rr                    		BLT L125
+00000400                         L124:	; bb10
+00000400 FD7221000080CF          		FADD #0CF800000H, R1
+00000407                         L125:	; bb10
+00000407 FC971E                  		FTOI R1, R14
+0000040A 5BEE                    		MOVU.B R14, R14
+0000040C 755E5E                  		CMP #5EH, R14
+0000040F 3Arrrr               W  		BEQ L289
+00000412                         L126:	; bb10
+00000412 611E                    		CMP #01H, R14
+00000414 3Arrrr               W  		BEQ L159
+00000417                         L127:	; bb10
+00000417 612E                    		CMP #02H, R14
+00000419 3Arrrr               W  		BEQ L162
+0000041C                         L128:	; bb10
+0000041C 613E                    		CMP #03H, R14
+0000041E 3Arrrr               W  		BEQ L165
+00000421                         L129:	; bb10
+00000421 614E                    		CMP #04H, R14
+00000423 3Arrrr               W  		BEQ L168
+00000426                         L130:	; bb10
+00000426 61AE                    		CMP #0AH, R14
+00000428 3Arrrr               W  		BEQ L170
+0000042B                         L131:	; bb10
+0000042B 755E11                  		CMP #11H, R14
+0000042E 3Arrrr               W  		BEQ L173
+00000431                         L132:	; bb10
+00000431 755E12                  		CMP #12H, R14
+00000434 3Arrrr               W  		BEQ L176
+00000437                         L133:	; bb10
+00000437 755E13                  		CMP #13H, R14
+0000043A 3Arrrr               W  		BEQ L179
+0000043D                         L134:	; bb10
+0000043D 755E14                  		CMP #14H, R14
+00000440 3Arrrr               W  		BEQ L182
+00000443                         L135:	; bb10
+00000443 755E15                  		CMP #15H, R14
+00000446 3Arrrr               W  		BEQ L185
+00000449                         L136:	; bb10
+00000449 755E1C                  		CMP #1CH, R14
+0000044C 3Arrrr               W  		BEQ L188
+0000044F                         L137:	; bb10
+0000044F 755E1E                  		CMP #1EH, R14
+00000452 3Arrrr               W  		BEQ L206
+00000455                         L138:	; bb10
+00000455 755E26                  		CMP #26H, R14
+00000458 3Arrrr               W  		BEQ L215
+0000045B                         L139:	; bb10
+0000045B 755E28                  		CMP #28H, R14
+0000045E 3Arrrr               W  		BEQ L380
+00000461                         L140:	; bb10
+00000461 755E31                  		CMP #31H, R14
+00000464 3Arrrr               W  		BEQ L380
+00000467                         L141:	; bb10
+00000467 755E35                  		CMP #35H, R14
+0000046A 3Arrrr               W  		BEQ L219
+0000046D                         L142:	; bb10
+0000046D 755E36                  		CMP #36H, R14
+00000470 3Arrrr               W  		BEQ L221
+00000473                         L143:	; bb10
+00000473 755E37                  		CMP #37H, R14
+00000476 3Arrrr               W  		BEQ L224
+00000479                         L144:	; bb10
+00000479 755E38                  		CMP #38H, R14
+0000047C 3Arrrr               W  		BEQ L227
+0000047F                         L145:	; bb10
+0000047F 755E39                  		CMP #39H, R14
+00000482 3Arrrr               W  		BEQ L230
+00000485                         L146:	; bb10
+00000485 755E3A                  		CMP #3AH, R14
+00000488 3Arrrr               W  		BEQ L233
+0000048B                         L147:	; bb10
+0000048B 755E3B                  		CMP #3BH, R14
+0000048E 3Arrrr               W  		BEQ L236
+00000491                         L148:	; bb10
+00000491 755E3D                  		CMP #3DH, R14
+00000494 3Arrrr               W  		BEQ L239
+00000497                         L149:	; bb10
+00000497 755E40                  		CMP #40H, R14
+0000049A 3Arrrr               W  		BEQ L248
+0000049D                         L150:	; bb10
+0000049D 755E50                  		CMP #50H, R14
+000004A0 3Arrrr               W  		BEQ L251
+000004A3                         L151:	; bb10
+000004A3 755E5A                  		CMP #5AH, R14
+000004A6 3Arrrr               W  		BEQ L254
+000004A9                         L152:	; bb10
+000004A9 755E5B                  		CMP #5BH, R14
+000004AC 3Arrrr               W  		BEQ L263
+000004AF                         L153:	; bb10
+000004AF 755E5C                  		CMP #5CH, R14
+000004B2 3Arrrr               W  		BEQ L272
+000004B5                         L154:	; bb10
+000004B5 755E5D                  		CMP #5DH, R14
+000004B8 3Arrrr               W  		BEQ L286
+000004BB                         L155:	; bb10
+000004BB 610E                    		CMP #00H, R14
+000004BD 3Brrrr               W  		BNE L292
+000004C0                         L156:	; bb14
+                                 ;     282 				case 0:  SET_MODAL (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",282
+000004C0 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000004C6 FAE42D0300              		MOV.B #00H, 032DH[R14]
+000004CB                         L157:	; bb14.split
+000004CB FBE2rrrrrrrr            		MOV.L #_cm, R14
+000004D1 FAE48D0301              		MOV.B #01H, 038DH[R14]
+000004D6                         L158:	; bb14.split6
+000004D6 FB12rrrrrrrr            		MOV.L #_gp, R1
+000004DC B01A                    		MOVU.B 01H[R1], R2
+000004DE 6212                    		ADD #01H, R2
+000004E0 801A                    		MOV.B R2, 01H[R1]
+000004E2 38rrrr               W  		BRA L380
+000004E5                         L159:	; bb19
+                                 ;     283 				case 1:  SET_MODAL (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",283
+000004E5 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000004EB FAE42D0301              		MOV.B #01H, 032DH[R14]
+000004F0                         L160:	; bb19.split
+000004F0 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000004F6 FAE48D0301              		MOV.B #01H, 038DH[R14]
+000004FB                         L161:	; bb19.split7
+000004FB FB12rrrrrrrr            		MOV.L #_gp, R1
+00000501 B01A                    		MOVU.B 01H[R1], R2
+00000503 6212                    		ADD #01H, R2
+00000505 801A                    		MOV.B R2, 01H[R1]
+00000507 38rrrr               W  		BRA L380
+0000050A                         L162:	; bb24
+                                 ;     284 				case 2:  SET_MODAL (MODAL_GROUP_G1, motion_mode, MOTION_MODE_CW_ARC);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",284
+0000050A FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000510 FAE42D0302              		MOV.B #02H, 032DH[R14]
+00000515                         L163:	; bb24.split
+00000515 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000051B FAE48D0301              		MOV.B #01H, 038DH[R14]
+00000520                         L164:	; bb24.split8
+00000520 FB12rrrrrrrr            		MOV.L #_gp, R1
+00000526 B01A                    		MOVU.B 01H[R1], R2
+00000528 6212                    		ADD #01H, R2
+0000052A 801A                    		MOV.B R2, 01H[R1]
+0000052C 38rrrr               W  		BRA L380
+0000052F                         L165:	; bb29
+                                 ;     285 				case 3:  SET_MODAL (MODAL_GROUP_G1, motion_mode, MOTION_MODE_CCW_ARC);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",285
+0000052F FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000535 FAE42D0303              		MOV.B #03H, 032DH[R14]
+0000053A                         L166:	; bb29.split
+0000053A FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000540 FAE48D0301              		MOV.B #01H, 038DH[R14]
+00000545                         L167:	; bb29.split9
+00000545 FB12rrrrrrrr            		MOV.L #_gp, R1
+0000054B B01A                    		MOVU.B 01H[R1], R2
+0000054D 6212                    		ADD #01H, R2
+0000054F 801A                    		MOV.B R2, 01H[R1]
+00000551 38rrrr               W  		BRA L380
+00000554                         L168:	; bb34
+                                 ;     286 				case 4:  SET_NON_MODAL (next_action, NEXT_ACTION_DWELL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",286
+00000554 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000055A FAE42C030D              		MOV.B #0DH, 032CH[R14]
+0000055F                         L169:	; bb34.split
+0000055F FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000565 FAE48C0301              		MOV.B #01H, 038CH[R14]
+0000056A 38rrrr               W  		BRA L380
+0000056D                         L170:	; bb35
+                                 ;     287 				case 10: SET_MODAL (MODAL_GROUP_G0, next_action, NEXT_ACTION_SET_COORD_DATA);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",287
+0000056D FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000573 FAE42C0308              		MOV.B #08H, 032CH[R14]
+00000578                         L171:	; bb35.split
+00000578 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000057E FAE48C0301              		MOV.B #01H, 038CH[R14]
+00000583                         L172:	; bb35.split10
+00000583 FBE2rrrrrrrr            		MOV.L #_gp, R14
+00000589 58EF                    		MOVU.B [R14], R15
+0000058B 621F                    		ADD #01H, R15
+0000058D C3EF                    		MOV.B R15, [R14]
+0000058F 38rrrr               W  		BRA L380
+00000592                         L173:	; bb40
+                                 ;     288 				case 17: SET_MODAL (MODAL_GROUP_G2, select_plane, CANON_PLANE_XY);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",288
+00000592 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000598 FAE45D0300              		MOV.B #00H, 035DH[R14]
+0000059D                         L174:	; bb40.split
+0000059D FBE2rrrrrrrr            		MOV.L #_cm, R14
+000005A3 FAE4BD0301              		MOV.B #01H, 03BDH[R14]
+000005A8                         L175:	; bb40.split11
+000005A8 FB12rrrrrrrr            		MOV.L #_gp, R1
+000005AE B092                    		MOVU.B 02H[R1], R2
+000005B0 6212                    		ADD #01H, R2
+000005B2 8092                    		MOV.B R2, 02H[R1]
+000005B4 38rrrr               W  		BRA L380
+000005B7                         L176:	; bb45
+                                 ;     289 				case 18: SET_MODAL (MODAL_GROUP_G2, select_plane, CANON_PLANE_XZ);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",289
+000005B7 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000005BD FAE45D0301              		MOV.B #01H, 035DH[R14]
+000005C2                         L177:	; bb45.split
+000005C2 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000005C8 FAE4BD0301              		MOV.B #01H, 03BDH[R14]
+000005CD                         L178:	; bb45.split12
+000005CD FB12rrrrrrrr            		MOV.L #_gp, R1
+000005D3 B092                    		MOVU.B 02H[R1], R2
+000005D5 6212                    		ADD #01H, R2
+000005D7 8092                    		MOV.B R2, 02H[R1]
+000005D9 38rrrr               W  		BRA L380
+000005DC                         L179:	; bb50
+                                 ;     290 				case 19: SET_MODAL (MODAL_GROUP_G2, select_plane, CANON_PLANE_YZ);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",290
+000005DC FBE2rrrrrrrr            		MOV.L #_cm, R14
+000005E2 FAE45D0302              		MOV.B #02H, 035DH[R14]
+000005E7                         L180:	; bb50.split
+000005E7 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000005ED FAE4BD0301              		MOV.B #01H, 03BDH[R14]
+000005F2                         L181:	; bb50.split13
+000005F2 FB12rrrrrrrr            		MOV.L #_gp, R1
+000005F8 B092                    		MOVU.B 02H[R1], R2
+000005FA 6212                    		ADD #01H, R2
+000005FC 8092                    		MOV.B R2, 02H[R1]
+000005FE 38rrrr               W  		BRA L380
+00000601                         L182:	; bb55
+                                 ;     291 				case 20: SET_MODAL (MODAL_GROUP_G6, units_mode, INCHES);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",291
+00000601 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000607 FAE45E0300              		MOV.B #00H, 035EH[R14]
+0000060C                         L183:	; bb55.split
+0000060C FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000612 FAE4BE0301              		MOV.B #01H, 03BEH[R14]
+00000617                         L184:	; bb55.split14
+00000617 FB12rrrrrrrr            		MOV.L #_gp, R1
+0000061D B11A                    		MOVU.B 05H[R1], R2
+0000061F 6212                    		ADD #01H, R2
+00000621 811A                    		MOV.B R2, 05H[R1]
+00000623 38rrrr               W  		BRA L380
+00000626                         L185:	; bb60
+                                 ;     292 				case 21: SET_MODAL (MODAL_GROUP_G6, units_mode, MILLIMETERS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",292
+00000626 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000062C FAE45E0301              		MOV.B #01H, 035EH[R14]
+00000631                         L186:	; bb60.split
+00000631 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000637 FAE4BE0301              		MOV.B #01H, 03BEH[R14]
+0000063C                         L187:	; bb60.split15
+0000063C FB12rrrrrrrr            		MOV.L #_gp, R1
+00000642 B11A                    		MOVU.B 05H[R1], R2
+00000644 6212                    		ADD #01H, R2
+00000646 811A                    		MOV.B R2, 05H[R1]
+00000648 38rrrr               W  		BRA L380
+0000064B                         L188:	; bb65
+                                 ;     293 				case 28: {
+                                 ;     294 					switch (_point(value)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",294
+0000064B A901                    		MOV.L 10H[R0], R1
+0000064D 39rrrr               W  		BSR __$_point
+00000650 6141                    		CMP #04H, R1
+00000652 3Arrrr               W  		BEQ L203
+00000655                         L189:	; bb65
+00000655 6111                    		CMP #01H, R1
+00000657 20rr                    		BEQ L196
+00000659                         L190:	; bb65
+00000659 6121                    		CMP #02H, R1
+0000065B 20rr                    		BEQ L199
+0000065D                         L191:	; bb65
+0000065D 6131                    		CMP #03H, R1
+0000065F 20rr                    		BEQ L201
+00000661                         L192:	; bb65
+00000661 6101                    		CMP #00H, R1
+00000663 3Brrrr               W  		BNE L205
+00000666                         L193:	; bb69
+                                 ;     295 						case 0: SET_MODAL (MODAL_GROUP_G0, next_action, NEXT_ACTION_GOTO_G28_POSITION);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",295
+00000666 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000066C FAE42C0305              		MOV.B #05H, 032CH[R14]
+00000671                         L194:	; bb69.split
+00000671 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000677 FAE48C0301              		MOV.B #01H, 038CH[R14]
+0000067C                         L195:	; bb69.split16
+0000067C FBE2rrrrrrrr            		MOV.L #_gp, R14
+00000682 58EF                    		MOVU.B [R14], R15
+00000684 621F                    		ADD #01H, R15
+00000686 C3EF                    		MOV.B R15, [R14]
+00000688 38rrrr               W  		BRA L380
+0000068B                         L196:	; bb74
+                                 ;     296 						case 1: SET_MODAL (MODAL_GROUP_G0, next_action, NEXT_ACTION_SET_G28_POSITION);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",296
+0000068B FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000691 FAE42C0304              		MOV.B #04H, 032CH[R14]
+00000696                         L197:	; bb74.split
+00000696 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000069C FAE48C0301              		MOV.B #01H, 038CH[R14]
+000006A1                         L198:	; bb74.split17
+000006A1 FBE2rrrrrrrr            		MOV.L #_gp, R14
+000006A7 58EF                    		MOVU.B [R14], R15
+000006A9 621F                    		ADD #01H, R15
+000006AB C3EF                    		MOV.B R15, [R14]
+000006AD 38rrrr               W  		BRA L380
+000006B0                         L199:	; bb79
+                                 ;     297 						case 2: SET_NON_MODAL (next_action, NEXT_ACTION_SEARCH_HOME);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",297
+000006B0 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006B6 FAE42C0301              		MOV.B #01H, 032CH[R14]
+000006BB                         L200:	; bb79.split
+000006BB FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006C1 FAE48C0301              		MOV.B #01H, 038CH[R14]
+000006C6 38rrrr               W  		BRA L380
+000006C9                         L201:	; bb80
+                                 ;     298 						case 3: SET_NON_MODAL (next_action, NEXT_ACTION_SET_ABSOLUTE_ORIGIN);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",298
+000006C9 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006CF FAE42C0302              		MOV.B #02H, 032CH[R14]
+000006D4                         L202:	; bb80.split
+000006D4 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006DA FAE48C0301              		MOV.B #01H, 038CH[R14]
+000006DF 38rrrr               W  		BRA L380
+000006E2                         L203:	; bb81
+                                 ;     299 						case 4: SET_NON_MODAL (next_action, NEXT_ACTION_HOMING_NO_SET);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",299
+000006E2 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006E8 FAE42C0303              		MOV.B #03H, 032CH[R14]
+000006ED                         L204:	; bb81.split
+000006ED FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006F3 FAE48C0301              		MOV.B #01H, 038CH[R14]
+000006F8 38rrrr               W  		BRA L380
+000006FB                         L205:	; bb82
+                                 ;     300 						default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",300
+000006FB 3C8683                  		MOV.B #83H, 16H[R0]
+000006FE 38rrrr               W  		BRA L380
+00000701                         L206:	; bb85
+                                 ;     301 					}
+                                 ;     302 					break;
+                                 ;     303 				}
+                                 ;     304 				case 30: {
+                                 ;     305 					switch (_point(value)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",305
+00000701 A901                    		MOV.L 10H[R0], R1
+00000703 39rrrr               W  		BSR __$_point
+00000706 6111                    		CMP #01H, R1
+00000708 20rr                    		BEQ L211
+0000070A                         L207:	; bb85
+0000070A 6101                    		CMP #00H, R1
+0000070C 21rr                    		BNE L214
+0000070E                         L208:	; bb89
+                                 ;     306 						case 0: SET_MODAL (MODAL_GROUP_G0, next_action, NEXT_ACTION_GOTO_G30_POSITION);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",306
+0000070E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000714 FAE42C0307              		MOV.B #07H, 032CH[R14]
+00000719                         L209:	; bb89.split
+00000719 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000071F FAE48C0301              		MOV.B #01H, 038CH[R14]
+00000724                         L210:	; bb89.split18
+00000724 FBE2rrrrrrrr            		MOV.L #_gp, R14
+0000072A 58EF                    		MOVU.B [R14], R15
+0000072C 621F                    		ADD #01H, R15
+0000072E C3EF                    		MOV.B R15, [R14]
+00000730 38rrrr               W  		BRA L380
+00000733                         L211:	; bb94
+                                 ;     307 						case 1: SET_MODAL (MODAL_GROUP_G0, next_action, NEXT_ACTION_SET_G30_POSITION);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",307
+00000733 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000739 FAE42C0306              		MOV.B #06H, 032CH[R14]
+0000073E                         L212:	; bb94.split
+0000073E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000744 FAE48C0301              		MOV.B #01H, 038CH[R14]
+00000749                         L213:	; bb94.split19
+00000749 FBE2rrrrrrrr            		MOV.L #_gp, R14
+0000074F 58EF                    		MOVU.B [R14], R15
+00000751 621F                    		ADD #01H, R15
+00000753 C3EF                    		MOV.B R15, [R14]
+00000755 38rrrr               W  		BRA L380
+00000758                         L214:	; bb99
+                                 ;     308 						default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",308
+00000758 3C8683                  		MOV.B #83H, 16H[R0]
+0000075B 38rrrr               W  		BRA L380
+0000075E                         L215:	; bb102
+                                 ;     309 					}
+                                 ;     310 					break;
+                                 ;     311 				}
+                                 ;     312 				case 38: {
+                                 ;     313 					switch (_point(value)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",313
+0000075E A901                    		MOV.L 10H[R0], R1
+00000760 39rrrr               W  		BSR __$_point
+00000763 6121                    		CMP #02H, R1
+00000765 21rr                    		BNE L218
+00000767                         L216:	; bb106
+                                 ;     314 						case 2: SET_NON_MODAL (next_action, NEXT_ACTION_STRAIGHT_PROBE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",314
+00000767 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000076D FAE42C030E              		MOV.B #0EH, 032CH[R14]
+00000772                         L217:	; bb106.split
+00000772 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000778 FAE48C0301              		MOV.B #01H, 038CH[R14]
+0000077D 38rrrr               W  		BRA L380
+00000780                         L218:	; bb107
+                                 ;     315 						default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",315
+00000780 3C8683                  		MOV.B #83H, 16H[R0]
+00000783 38rrrr               W  		BRA L380
+00000786                         L219:	; bb112
+                                 ;     316 					}
+                                 ;     317 					break;
+                                 ;     318 				}
+                                 ;     319 				case 40: break;	// ignore cancel cutter radius compensation
+                                 ;     320 				case 49: break;	// ignore cancel tool length offset comp.
+                                 ;     321 				case 53: SET_NON_MODAL (absolute_override, true);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",321
+00000786 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000078C FAE4600301              		MOV.B #01H, 0360H[R14]
+00000791                         L220:	; bb112.split
+00000791 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000797 FAE4C00301              		MOV.B #01H, 03C0H[R14]
+0000079C 38rrrr               W  		BRA L380
+0000079F                         L221:	; bb113
+                                 ;     322 				case 54: SET_MODAL (MODAL_GROUP_G12, coord_system, G54);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",322
+0000079F FBE2rrrrrrrr            		MOV.L #_cm, R14
+000007A5 FAE45F0301              		MOV.B #01H, 035FH[R14]
+000007AA                         L222:	; bb113.split
+000007AA FBE2rrrrrrrr            		MOV.L #_cm, R14
+000007B0 FAE4BF0301              		MOV.B #01H, 03BFH[R14]
+000007B5                         L223:	; bb113.split20
+000007B5 FB12rrrrrrrr            		MOV.L #_gp, R1
+000007BB B21A                    		MOVU.B 09H[R1], R2
+000007BD 6212                    		ADD #01H, R2
+000007BF 821A                    		MOV.B R2, 09H[R1]
+000007C1 38rrrr               W  		BRA L380
+000007C4                         L224:	; bb118
+                                 ;     323 				case 55: SET_MODAL (MODAL_GROUP_G12, coord_system, G55);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",323
+000007C4 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000007CA FAE45F0302              		MOV.B #02H, 035FH[R14]
+000007CF                         L225:	; bb118.split
+000007CF FBE2rrrrrrrr            		MOV.L #_cm, R14
+000007D5 FAE4BF0301              		MOV.B #01H, 03BFH[R14]
+000007DA                         L226:	; bb118.split21
+000007DA FB12rrrrrrrr            		MOV.L #_gp, R1
+000007E0 B21A                    		MOVU.B 09H[R1], R2
+000007E2 6212                    		ADD #01H, R2
+000007E4 821A                    		MOV.B R2, 09H[R1]
+000007E6 38rrrr               W  		BRA L380
+000007E9                         L227:	; bb123
+                                 ;     324 				case 56: SET_MODAL (MODAL_GROUP_G12, coord_system, G56);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",324
+000007E9 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000007EF FAE45F0303              		MOV.B #03H, 035FH[R14]
+000007F4                         L228:	; bb123.split
+000007F4 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000007FA FAE4BF0301              		MOV.B #01H, 03BFH[R14]
+000007FF                         L229:	; bb123.split22
+000007FF FB12rrrrrrrr            		MOV.L #_gp, R1
+00000805 B21A                    		MOVU.B 09H[R1], R2
+00000807 6212                    		ADD #01H, R2
+00000809 821A                    		MOV.B R2, 09H[R1]
+0000080B 38rrrr               W  		BRA L380
+0000080E                         L230:	; bb128
+                                 ;     325 				case 57: SET_MODAL (MODAL_GROUP_G12, coord_system, G57);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",325
+0000080E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000814 FAE45F0304              		MOV.B #04H, 035FH[R14]
+00000819                         L231:	; bb128.split
+00000819 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000081F FAE4BF0301              		MOV.B #01H, 03BFH[R14]
+00000824                         L232:	; bb128.split23
+00000824 FB12rrrrrrrr            		MOV.L #_gp, R1
+0000082A B21A                    		MOVU.B 09H[R1], R2
+0000082C 6212                    		ADD #01H, R2
+0000082E 821A                    		MOV.B R2, 09H[R1]
+00000830 38rrrr               W  		BRA L380
+00000833                         L233:	; bb133
+                                 ;     326 				case 58: SET_MODAL (MODAL_GROUP_G12, coord_system, G58);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",326
+00000833 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000839 FAE45F0305              		MOV.B #05H, 035FH[R14]
+0000083E                         L234:	; bb133.split
+0000083E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000844 FAE4BF0301              		MOV.B #01H, 03BFH[R14]
+00000849                         L235:	; bb133.split24
+00000849 FB12rrrrrrrr            		MOV.L #_gp, R1
+0000084F B21A                    		MOVU.B 09H[R1], R2
+00000851 6212                    		ADD #01H, R2
+00000853 821A                    		MOV.B R2, 09H[R1]
+00000855 38rrrr               W  		BRA L380
+00000858                         L236:	; bb138
+                                 ;     327 				case 59: SET_MODAL (MODAL_GROUP_G12, coord_system, G59);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",327
+00000858 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000085E FAE45F0306              		MOV.B #06H, 035FH[R14]
+00000863                         L237:	; bb138.split
+00000863 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000869 FAE4BF0301              		MOV.B #01H, 03BFH[R14]
+0000086E                         L238:	; bb138.split25
+0000086E FB12rrrrrrrr            		MOV.L #_gp, R1
+00000874 B21A                    		MOVU.B 09H[R1], R2
+00000876 6212                    		ADD #01H, R2
+00000878 821A                    		MOV.B R2, 09H[R1]
+0000087A 38rrrr               W  		BRA L380
+0000087D                         L239:	; bb143
+                                 ;     328 				case 61: {
+                                 ;     329 					switch (_point(value)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",329
+0000087D A901                    		MOV.L 10H[R0], R1
+0000087F 39rrrr               W  		BSR __$_point
+00000882 6111                    		CMP #01H, R1
+00000884 20rr                    		BEQ L244
+00000886                         L240:	; bb143
+00000886 6101                    		CMP #00H, R1
+00000888 21rr                    		BNE L247
+0000088A                         L241:	; bb147
+                                 ;     330 						case 0: SET_MODAL (MODAL_GROUP_G13, path_control, PATH_EXACT_PATH);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",330
+0000088A FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000890 FAE4620300              		MOV.B #00H, 0362H[R14]
+00000895                         L242:	; bb147.split
+00000895 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000089B FAE4C20301              		MOV.B #01H, 03C2H[R14]
+000008A0                         L243:	; bb147.split26
+000008A0 FB12rrrrrrrr            		MOV.L #_gp, R1
+000008A6 B292                    		MOVU.B 0AH[R1], R2
+000008A8 6212                    		ADD #01H, R2
+000008AA 8292                    		MOV.B R2, 0AH[R1]
+000008AC 38rrrr               W  		BRA L380
+000008AF                         L244:	; bb152
+                                 ;     331 						case 1: SET_MODAL (MODAL_GROUP_G13, path_control, PATH_EXACT_STOP);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",331
+000008AF FBE2rrrrrrrr            		MOV.L #_cm, R14
+000008B5 FAE4620301              		MOV.B #01H, 0362H[R14]
+000008BA                         L245:	; bb152.split
+000008BA FBE2rrrrrrrr            		MOV.L #_cm, R14
+000008C0 FAE4C20301              		MOV.B #01H, 03C2H[R14]
+000008C5                         L246:	; bb152.split27
+000008C5 FB12rrrrrrrr            		MOV.L #_gp, R1
+000008CB B292                    		MOVU.B 0AH[R1], R2
+000008CD 6212                    		ADD #01H, R2
+000008CF 8292                    		MOV.B R2, 0AH[R1]
+000008D1 38rrrr               W  		BRA L380
+000008D4                         L247:	; bb157
+                                 ;     332 						default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",332
+000008D4 3C8683                  		MOV.B #83H, 16H[R0]
+000008D7 38rrrr               W  		BRA L380
+000008DA                         L248:	; bb160
+                                 ;     333 					}
+                                 ;     334 					break;
+                                 ;     335 				}
+                                 ;     336 				case 64: SET_MODAL (MODAL_GROUP_G13,path_control, PATH_CONTINUOUS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",336
+000008DA FBE2rrrrrrrr            		MOV.L #_cm, R14
+000008E0 FAE4620302              		MOV.B #02H, 0362H[R14]
+000008E5                         L249:	; bb160.split
+000008E5 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000008EB FAE4C20301              		MOV.B #01H, 03C2H[R14]
+000008F0                         L250:	; bb160.split28
+000008F0 FB12rrrrrrrr            		MOV.L #_gp, R1
+000008F6 B292                    		MOVU.B 0AH[R1], R2
+000008F8 6212                    		ADD #01H, R2
+000008FA 8292                    		MOV.B R2, 0AH[R1]
+000008FC 38rrrr               W  		BRA L380
+000008FF                         L251:	; bb165
+                                 ;     337 				case 80: SET_MODAL (MODAL_GROUP_G1, motion_mode,  MOTION_MODE_CANCEL_MOTION_MODE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",337
+000008FF FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000905 FAE42D0304              		MOV.B #04H, 032DH[R14]
+0000090A                         L252:	; bb165.split
+0000090A FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000910 FAE48D0301              		MOV.B #01H, 038DH[R14]
+00000915                         L253:	; bb165.split29
+00000915 FB12rrrrrrrr            		MOV.L #_gp, R1
+0000091B B01A                    		MOVU.B 01H[R1], R2
+0000091D 6212                    		ADD #01H, R2
+0000091F 801A                    		MOV.B R2, 01H[R1]
+00000921 38rrrr               W  		BRA L380
+00000924                         L254:	; bb170
+                                 ;     338 //				case 90: SET_MODAL (MODAL_GROUP_G3, distance_mode, ABSOLUTE_MODE);
+                                 ;     339 //				case 91: SET_MODAL (MODAL_GROUP_G3, distance_mode, INCREMENTAL_MODE);
+                                 ;     340 				case 90: {
+                                 ;     341     				switch (_point(value)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",341
+00000924 A901                    		MOV.L 10H[R0], R1
+00000926 39rrrr               W  		BSR __$_point
+00000929 6111                    		CMP #01H, R1
+0000092B 20rr                    		BEQ L259
+0000092D                         L255:	; bb170
+0000092D 6101                    		CMP #00H, R1
+0000092F 21rr                    		BNE L262
+00000931                         L256:	; bb174
+                                 ;     342         				case 0: SET_MODAL (MODAL_GROUP_G3, distance_mode, ABSOLUTE_MODE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",342
+00000931 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000937 FAE4630300              		MOV.B #00H, 0363H[R14]
+0000093C                         L257:	; bb174.split
+0000093C FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000942 FAE4C30301              		MOV.B #01H, 03C3H[R14]
+00000947                         L258:	; bb174.split30
+00000947 FB12rrrrrrrr            		MOV.L #_gp, R1
+0000094D B09A                    		MOVU.B 03H[R1], R2
+0000094F 6212                    		ADD #01H, R2
+00000951 809A                    		MOV.B R2, 03H[R1]
+00000953 38rrrr               W  		BRA L380
+00000956                         L259:	; bb179
+                                 ;     343         				case 1: SET_MODAL (MODAL_GROUP_G3, arc_distance_mode, ABSOLUTE_MODE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",343
+00000956 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000095C FAE4640300              		MOV.B #00H, 0364H[R14]
+00000961                         L260:	; bb179.split
+00000961 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000967 FAE4C40301              		MOV.B #01H, 03C4H[R14]
+0000096C                         L261:	; bb179.split31
+0000096C FB12rrrrrrrr            		MOV.L #_gp, R1
+00000972 B09A                    		MOVU.B 03H[R1], R2
+00000974 6212                    		ADD #01H, R2
+00000976 809A                    		MOV.B R2, 03H[R1]
+00000978 38rrrr               W  		BRA L380
+0000097B                         L262:	; bb184
+                                 ;     344         				default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",344
+0000097B 3C8683                  		MOV.B #83H, 16H[R0]
+0000097E 38rrrr               W  		BRA L380
+00000981                         L263:	; bb187
+                                 ;     345     				}
+                                 ;     346     				break;
+                                 ;     347 				}
+                                 ;     348 				case 91: {
+                                 ;     349     				switch (_point(value)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",349
+00000981 A901                    		MOV.L 10H[R0], R1
+00000983 39rrrr               W  		BSR __$_point
+00000986 6111                    		CMP #01H, R1
+00000988 20rr                    		BEQ L268
+0000098A                         L264:	; bb187
+0000098A 6101                    		CMP #00H, R1
+0000098C 21rr                    		BNE L271
+0000098E                         L265:	; bb191
+                                 ;     350         				case 0: SET_MODAL (MODAL_GROUP_G3, distance_mode, INCREMENTAL_MODE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",350
+0000098E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000994 FAE4630301              		MOV.B #01H, 0363H[R14]
+00000999                         L266:	; bb191.split
+00000999 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000099F FAE4C30301              		MOV.B #01H, 03C3H[R14]
+000009A4                         L267:	; bb191.split32
+000009A4 FB12rrrrrrrr            		MOV.L #_gp, R1
+000009AA B09A                    		MOVU.B 03H[R1], R2
+000009AC 6212                    		ADD #01H, R2
+000009AE 809A                    		MOV.B R2, 03H[R1]
+000009B0 38rrrr               W  		BRA L380
+000009B3                         L268:	; bb196
+                                 ;     351         				case 1: SET_MODAL (MODAL_GROUP_G3, arc_distance_mode, INCREMENTAL_MODE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",351
+000009B3 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000009B9 FAE4640301              		MOV.B #01H, 0364H[R14]
+000009BE                         L269:	; bb196.split
+000009BE FBE2rrrrrrrr            		MOV.L #_cm, R14
+000009C4 FAE4C40301              		MOV.B #01H, 03C4H[R14]
+000009C9                         L270:	; bb196.split33
+000009C9 FB12rrrrrrrr            		MOV.L #_gp, R1
+000009CF B09A                    		MOVU.B 03H[R1], R2
+000009D1 6212                    		ADD #01H, R2
+000009D3 809A                    		MOV.B R2, 03H[R1]
+000009D5 38rrrr               W  		BRA L380
+000009D8                         L271:	; bb201
+                                 ;     352         				default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",352
+000009D8 3C8683                  		MOV.B #83H, 16H[R0]
+000009DB 38rrrr               W  		BRA L380
+000009DE                         L272:	; bb204
+                                 ;     353     				}
+                                 ;     354     				break;
+                                 ;     355 				}
+                                 ;     356 				case 92: {
+                                 ;     357 					switch (_point(value)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",357
+000009DE A901                    		MOV.L 10H[R0], R1
+000009E0 39rrrr               W  		BSR __$_point
+000009E3 6131                    		CMP #03H, R1
+000009E5 20rr                    		BEQ L283
+000009E7                         L273:	; bb204
+000009E7 6111                    		CMP #01H, R1
+000009E9 20rr                    		BEQ L279
+000009EB                         L274:	; bb204
+000009EB 6121                    		CMP #02H, R1
+000009ED 20rr                    		BEQ L281
+000009EF                         L275:	; bb204
+000009EF 6101                    		CMP #00H, R1
+000009F1 21rr                    		BNE L285
+000009F3                         L276:	; bb208
+                                 ;     358 						case 0: SET_MODAL (MODAL_GROUP_G0, next_action, NEXT_ACTION_SET_ORIGIN_OFFSETS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",358
+000009F3 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000009F9 FAE42C0309              		MOV.B #09H, 032CH[R14]
+000009FE                         L277:	; bb208.split
+000009FE FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A04 FAE48C0301              		MOV.B #01H, 038CH[R14]
+00000A09                         L278:	; bb208.split34
+00000A09 FBE2rrrrrrrr            		MOV.L #_gp, R14
+00000A0F 58EF                    		MOVU.B [R14], R15
+00000A11 621F                    		ADD #01H, R15
+00000A13 C3EF                    		MOV.B R15, [R14]
+00000A15 38rrrr               W  		BRA L380
+00000A18                         L279:	; bb213
+                                 ;     359 						case 1: SET_NON_MODAL (next_action, NEXT_ACTION_RESET_ORIGIN_OFFSETS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",359
+00000A18 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A1E FAE42C030A              		MOV.B #0AH, 032CH[R14]
+00000A23                         L280:	; bb213.split
+00000A23 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A29 FAE48C0301              		MOV.B #01H, 038CH[R14]
+00000A2E 38rrrr               W  		BRA L380
+00000A31                         L281:	; bb214
+                                 ;     360 						case 2: SET_NON_MODAL (next_action, NEXT_ACTION_SUSPEND_ORIGIN_OFFSETS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",360
+00000A31 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A37 FAE42C030B              		MOV.B #0BH, 032CH[R14]
+00000A3C                         L282:	; bb214.split
+00000A3C FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A42 FAE48C0301              		MOV.B #01H, 038CH[R14]
+00000A47 38rrrr               W  		BRA L380
+00000A4A                         L283:	; bb215
+                                 ;     361 						case 3: SET_NON_MODAL (next_action, NEXT_ACTION_RESUME_ORIGIN_OFFSETS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",361
+00000A4A FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A50 FAE42C030C              		MOV.B #0CH, 032CH[R14]
+00000A55                         L284:	; bb215.split
+00000A55 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A5B FAE48C0301              		MOV.B #01H, 038CH[R14]
+00000A60 38rrrr               W  		BRA L380
+00000A63                         L285:	; bb216
+                                 ;     362 						default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",362
+00000A63 3C8683                  		MOV.B #83H, 16H[R0]
+00000A66 38rrrr               W  		BRA L380
+00000A69                         L286:	; bb219
+                                 ;     363 					}
+                                 ;     364 					break;
+                                 ;     365 				}
+                                 ;     366 				case 93: SET_MODAL (MODAL_GROUP_G5, feed_rate_mode, INVERSE_TIME_MODE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",366
+00000A69 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A6F FAE4580300              		MOV.B #00H, 0358H[R14]
+00000A74                         L287:	; bb219.split
+00000A74 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A7A FAE4B80301              		MOV.B #01H, 03B8H[R14]
+00000A7F                         L288:	; bb219.split35
+00000A7F FB12rrrrrrrr            		MOV.L #_gp, R1
+00000A85 B112                    		MOVU.B 04H[R1], R2
+00000A87 6212                    		ADD #01H, R2
+00000A89 8112                    		MOV.B R2, 04H[R1]
+00000A8B 38rrrr               W  		BRA L380
+00000A8E                         L289:	; bb224
+                                 ;     367 				case 94: SET_MODAL (MODAL_GROUP_G5, feed_rate_mode, UNITS_PER_MINUTE_MODE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",367
+00000A8E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A94 FAE4580301              		MOV.B #01H, 0358H[R14]
+00000A99                         L290:	; bb224.split
+00000A99 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000A9F FAE4B80301              		MOV.B #01H, 03B8H[R14]
+00000AA4                         L291:	; bb224.split36
+00000AA4 FB12rrrrrrrr            		MOV.L #_gp, R1
+00000AAA B112                    		MOVU.B 04H[R1], R2
+00000AAC 6212                    		ADD #01H, R2
+00000AAE 8112                    		MOV.B R2, 04H[R1]
+00000AB0 38rrrr               W  		BRA L380
+00000AB3                         L292:	; bb229
+                                 ;     368 //				case 95: SET_MODAL (MODAL_GROUP_G5, feed_rate_mode, UNITS_PER_REVOLUTION_MODE);
+                                 ;     369 				default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",369
+00000AB3 3C8683                  		MOV.B #83H, 16H[R0]
+00000AB6 38rrrr               W  		BRA L380
+00000AB9                         L293:	; bb232
+                                 ;     370 			}
+                                 ;     371 			break;
+                                 ;     372 
+                                 ;     373 			case 'M':
+                                 ;     374 			switch((uint8_t)value) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",374
+00000AB9 A901                    		MOV.L 10H[R0], R1
+00000ABB FD72110000004F          		FCMP #4F000000H, R1
+00000AC2 29rr                    		BLT L295
+00000AC4                         L294:	; bb232
+00000AC4 FD7221000080CF          		FADD #0CF800000H, R1
+00000ACB                         L295:	; bb232
+00000ACB FC971E                  		FTOI R1, R14
+00000ACE 5BEE                    		MOVU.B R14, R14
+00000AD0 612E                    		CMP #02H, R14
+00000AD2 23rr                    		BLTU L310
+00000AD4                         L296:	; bb232
+00000AD4 612E                    		CMP #02H, R14
+00000AD6 20rr                    		BEQ L313
+00000AD8                         L297:	; bb232
+00000AD8 613E                    		CMP #03H, R14
+00000ADA 3Arrrr               W  		BEQ L316
+00000ADD                         L298:	; bb232
+00000ADD 614E                    		CMP #04H, R14
+00000ADF 3Arrrr               W  		BEQ L317
+00000AE2                         L299:	; bb232
+00000AE2 615E                    		CMP #05H, R14
+00000AE4 3Arrrr               W  		BEQ L320
+00000AE7                         L300:	; bb232
+00000AE7 616E                    		CMP #06H, R14
+00000AE9 3Arrrr               W  		BEQ L321
+00000AEC                         L301:	; bb232
+00000AEC 617E                    		CMP #07H, R14
+00000AEE 3Arrrr               W  		BEQ L323
+00000AF1                         L302:	; bb232
+00000AF1 618E                    		CMP #08H, R14
+00000AF3 3Arrrr               W  		BEQ L326
+00000AF6                         L303:	; bb232
+00000AF6 619E                    		CMP #09H, R14
+00000AF8 3Arrrr               W  		BEQ L329
+00000AFB                         L304:	; bb232
+00000AFB 755E1E                  		CMP #1EH, R14
+00000AFE 20rr                    		BEQ L313
+00000B00                         L305:	; bb232
+00000B00 755E30                  		CMP #30H, R14
+00000B03 3Arrrr               W  		BEQ L332
+00000B06                         L306:	; bb232
+00000B06 755E31                  		CMP #31H, R14
+00000B09 3Arrrr               W  		BEQ L335
+00000B0C                         L307:	; bb232
+00000B0C 755E32                  		CMP #32H, R14
+00000B0F 3Arrrr               W  		BEQ L338
+00000B12                         L308:	; bb232
+00000B12 755E33                  		CMP #33H, R14
+00000B15 3Arrrr               W  		BEQ L341
+00000B18                         L309:	; bb232
+00000B18 755E3C                  		CMP #3CH, R14
+00000B1B 3Brrrr               W  		BNE L344
+00000B1E                         L310:	; bb236
+                                 ;     375 				case 0: case 1: case 60:
+                                 ;     376 						SET_MODAL (MODAL_GROUP_M4, program_flow, PROGRAM_STOP);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",376
+00000B1E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000B24 FAE42E0300              		MOV.B #00H, 032EH[R14]
+00000B29                         L311:	; bb236.split
+00000B29 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000B2F FAE48E0301              		MOV.B #01H, 038EH[R14]
+00000B34                         L312:	; bb236.split37
+00000B34 FB12rrrrrrrr            		MOV.L #_gp, R1
+00000B3A B29A                    		MOVU.B 0BH[R1], R2
+00000B3C 6212                    		ADD #01H, R2
+00000B3E 829A                    		MOV.B R2, 0BH[R1]
+00000B40 38rrrr               W  		BRA L380
+00000B43                         L313:	; bb241
+                                 ;     377 				case 2: case 30:
+                                 ;     378 						SET_MODAL (MODAL_GROUP_M4, program_flow, PROGRAM_END);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",378
+00000B43 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000B49 FAE42E0301              		MOV.B #01H, 032EH[R14]
+00000B4E                         L314:	; bb241.split
+00000B4E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000B54 FAE48E0301              		MOV.B #01H, 038EH[R14]
+00000B59                         L315:	; bb241.split38
+00000B59 FB12rrrrrrrr            		MOV.L #_gp, R1
+00000B5F B29A                    		MOVU.B 0BH[R1], R2
+00000B61 6212                    		ADD #01H, R2
+00000B63 829A                    		MOV.B R2, 0BH[R1]
+00000B65 38rrrr               W  		BRA L380
+00000B68                         L316:	; bb246
+                                 ;     379 				case 3: macro_func_ptr = M3_Macro;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",379
+00000B68 FBE2rrrrrrrr            		MOV.L #_macro_func_ptr, R14
+00000B6E FBF2rrrrrrrr            		MOV.L #_M3_Macro, R15
+00000B74 E3EF                    		MOV.L R15, [R14]
+00000B76 38rrrr               W  		BRA L380
+00000B79                         L317:	; bb248
+                                 ;     380 						break;
+                                 ;     381 				case 4:
+                                 ;     382 						if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",382
+00000B79 FBE2rrrrrrrr            		MOV.L #_configFlags, R14
+00000B7F ECEE                    		MOV.L [R14], R14
+00000B81 610E                    		CMP #00H, R14
+00000B83 21rr                    		BNE L319
+00000B85                         L318:	; bb249
+                                 ;     383 						{
+                                 ;     384 							macro_func_ptr = M4_Macro;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",384
+00000B85 FBE2rrrrrrrr            		MOV.L #_macro_func_ptr, R14
+00000B8B FBF2rrrrrrrr            		MOV.L #_M4_Macro, R15
+00000B91 E3EF                    		MOV.L R15, [R14]
+00000B93 38rrrr               W  		BRA L380
+00000B96                         L319:	; bb250
+                                 ;     385 						}
+                                 ;     386 						else
+                                 ;     387 						{
+                                 ;     388 							status = STAT_GCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",388
+00000B96 3C8683                  		MOV.B #83H, 16H[R0]
+00000B99 38rrrr               W  		BRA L380
+00000B9C                         L320:	; bb255
+                                 ;     389 						}
+                                 ;     390 						break;
+                                 ;     391 				case 5:	macro_func_ptr = M5_Macro;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",391
+00000B9C FBE2rrrrrrrr            		MOV.L #_macro_func_ptr, R14
+00000BA2 FBF2rrrrrrrr            		MOV.L #_M5_Macro, R15
+00000BA8 E3EF                    		MOV.L R15, [R14]
+00000BAA 38rrrr               W  		BRA L380
+00000BAD                         L321:	; bb256
+                                 ;     392 						break;
+                                 ;     393 				case 6: SET_NON_MODAL (tool_change, true);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",393
+00000BAD FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000BB3 FAE4670301              		MOV.B #01H, 0367H[R14]
+00000BB8                         L322:	; bb256.split
+00000BB8 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000BBE FAE4C70301              		MOV.B #01H, 03C7H[R14]
+00000BC3 38rrrr               W  		BRA L380
+00000BC6                         L323:	; bb257
+                                 ;     394 				case 7: SET_MODAL (MODAL_GROUP_M8, mist_coolant, true);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",394
+00000BC6 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000BCC FAE4680301              		MOV.B #01H, 0368H[R14]
+00000BD1                         L324:	; bb257.split
+00000BD1 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000BD7 FAE4C80301              		MOV.B #01H, 03C8H[R14]
+00000BDC                         L325:	; bb257.split39
+00000BDC FB12rrrrrrrr            		MOV.L #_gp, R1
+00000BE2 B392                    		MOVU.B 0EH[R1], R2
+00000BE4 6212                    		ADD #01H, R2
+00000BE6 8392                    		MOV.B R2, 0EH[R1]
+00000BE8 38rrrr               W  		BRA L380
+00000BEB                         L326:	; bb262
+                                 ;     395 				case 8: SET_MODAL (MODAL_GROUP_M8, flood_coolant, true);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",395
+00000BEB FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000BF1 FAE4690301              		MOV.B #01H, 0369H[R14]
+00000BF6                         L327:	; bb262.split
+00000BF6 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000BFC FAE4C90301              		MOV.B #01H, 03C9H[R14]
+00000C01                         L328:	; bb262.split40
+00000C01 FB12rrrrrrrr            		MOV.L #_gp, R1
+00000C07 B392                    		MOVU.B 0EH[R1], R2
+00000C09 6212                    		ADD #01H, R2
+00000C0B 8392                    		MOV.B R2, 0EH[R1]
+00000C0D 38rrrr               W  		BRA L380
+00000C10                         L329:	; bb267
+                                 ;     396 				case 9: SET_MODAL (MODAL_GROUP_M8, flood_coolant, false);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",396
+00000C10 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000C16 FAE4690300              		MOV.B #00H, 0369H[R14]
+00000C1B                         L330:	; bb267.split
+00000C1B FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000C21 FAE4C90301              		MOV.B #01H, 03C9H[R14]
+00000C26                         L331:	; bb267.split41
+00000C26 FB12rrrrrrrr            		MOV.L #_gp, R1
+00000C2C B392                    		MOVU.B 0EH[R1], R2
+00000C2E 6212                    		ADD #01H, R2
+00000C30 8392                    		MOV.B R2, 0EH[R1]
+00000C32 38rrrr               W  		BRA L380
+00000C35                         L332:	; bb272
+                                 ;     397 				case 48: SET_MODAL (MODAL_GROUP_M9, override_enables, true);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",397
+00000C35 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000C3B FAE45B0301              		MOV.B #01H, 035BH[R14]
+00000C40                         L333:	; bb272.split
+00000C40 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000C46 FAE4BB0301              		MOV.B #01H, 03BBH[R14]
+00000C4B                         L334:	; bb272.split42
+00000C4B FB12rrrrrrrr            		MOV.L #_gp, R1
+00000C51 B39A                    		MOVU.B 0FH[R1], R2
+00000C53 6212                    		ADD #01H, R2
+00000C55 839A                    		MOV.B R2, 0FH[R1]
+00000C57 38rrrr               W  		BRA L380
+00000C5A                         L335:	; bb277
+                                 ;     398 				case 49: SET_MODAL (MODAL_GROUP_M9, override_enables, false);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",398
+00000C5A FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000C60 FAE45B0300              		MOV.B #00H, 035BH[R14]
+00000C65                         L336:	; bb277.split
+00000C65 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000C6B FAE4BB0301              		MOV.B #01H, 03BBH[R14]
+00000C70                         L337:	; bb277.split43
+00000C70 FB12rrrrrrrr            		MOV.L #_gp, R1
+00000C76 B39A                    		MOVU.B 0FH[R1], R2
+00000C78 6212                    		ADD #01H, R2
+00000C7A 839A                    		MOV.B R2, 0FH[R1]
+00000C7C 38rrrr               W  		BRA L380
+00000C7F                         L338:	; bb282
+                                 ;     399 				case 50: SET_MODAL (MODAL_GROUP_M9, feed_rate_override_enable, true); // conditionally true
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",399
+00000C7F FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000C85 FAE4590301              		MOV.B #01H, 0359H[R14]
+00000C8A                         L339:	; bb282.split
+00000C8A FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000C90 FAE4B90301              		MOV.B #01H, 03B9H[R14]
+00000C95                         L340:	; bb282.split44
+00000C95 FB12rrrrrrrr            		MOV.L #_gp, R1
+00000C9B B39A                    		MOVU.B 0FH[R1], R2
+00000C9D 6212                    		ADD #01H, R2
+00000C9F 839A                    		MOV.B R2, 0FH[R1]
+00000CA1 38rrrr               W  		BRA L380
+00000CA4                         L341:	; bb287
+                                 ;     400 				case 51: SET_MODAL (MODAL_GROUP_M9, spindle_override_enable, true);	  // conditionally true
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",400
+00000CA4 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000CAA FAE4740301              		MOV.B #01H, 0374H[R14]
+00000CAF                         L342:	; bb287.split
+00000CAF FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000CB5 FAE4D40301              		MOV.B #01H, 03D4H[R14]
+00000CBA                         L343:	; bb287.split45
+00000CBA FB12rrrrrrrr            		MOV.L #_gp, R1
+00000CC0 B39A                    		MOVU.B 0FH[R1], R2
+00000CC2 6212                    		ADD #01H, R2
+00000CC4 839A                    		MOV.B R2, 0FH[R1]
+00000CC6 38rrrr               W  		BRA L380
+00000CC9                         L344:	; bb292
+                                 ;     401 				default: status = STAT_MCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",401
+00000CC9 3C8684                  		MOV.B #84H, 16H[R0]
+00000CCC 38rrrr               W  		BRA L380
+00000CCF                         L345:	; bb294
+                                 ;     402 			}
+                                 ;     403 			break;
+                                 ;     404 
+                                 ;     405 			case 'T': SET_NON_MODAL (tool_select, (uint8_t)trunc(value));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",405
+00000CCF A901                    		MOV.L 10H[R0], R1
+00000CD1 05rrrrrr             A  		BSR _trunc
+00000CD5 FD72110000004F          		FCMP #4F000000H, R1
+00000CDC 29rr                    		BLT L347
+00000CDE                         L346:	; bb294
+00000CDE FD7221000080CF          		FADD #0CF800000H, R1
+00000CE5                         L347:	; bb294
+00000CE5 FC971E                  		FTOI R1, R14
+00000CE8 FBF2rrrrrrrr            		MOV.L #_cm, R15
+00000CEE CBFE6603                		MOV.B R14, 0366H[R15]
+00000CF2                         L348:	; bb294.split
+00000CF2 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000CF8 FAE4C60301              		MOV.B #01H, 03C6H[R14]
+00000CFD 38rrrr               W  		BRA L380
+00000D00                         L349:	; bb298
+                                 ;     406 			case 'F': SET_NON_MODAL (feed_rate, value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",406
+00000D00 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D06 E50E04D3                		MOV.L 10H[R0], 034CH[R14]
+00000D0A                         L350:	; bb298.split
+00000D0A FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D10 F9E2EB0000803F          		MOV.L #3F800000H, 03ACH[R14]
+00000D17 38rrrr               W  		BRA L380
+00000D1A                         L351:	; bb300
+                                 ;     407 			case 'P': SET_NON_MODAL (parameter, value);				// used for dwell time, G10 coord select, rotations
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",407
+00000D1A FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D20 E50E04DE                		MOV.L 10H[R0], 0378H[R14]
+00000D24                         L352:	; bb300.split
+00000D24 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D2A F9E2F60000803F          		MOV.L #3F800000H, 03D8H[R14]
+00000D31 38rrrr               W  		BRA L380
+00000D34                         L353:	; bb302
+                                 ;     408 			case 'S': SET_NON_MODAL (spindle_speed, value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",408
+00000D34 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D3A E50E04DB                		MOV.L 10H[R0], 036CH[R14]
+00000D3E                         L354:	; bb302.split
+00000D3E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D44 F9E2F30000803F          		MOV.L #3F800000H, 03CCH[R14]
+00000D4B 38rrrr               W  		BRA L380
+00000D4E                         L355:	; bb304
+                                 ;     409 			case 'X': SET_NON_MODAL (target[AXIS_X], value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",409
+00000D4E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D54 E50E04CD                		MOV.L 10H[R0], 0334H[R14]
+00000D58                         L356:	; bb304.split
+00000D58 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D5E F9E2E50000803F          		MOV.L #3F800000H, 0394H[R14]
+00000D65 38rrrr               W  		BRA L380
+00000D68                         L357:	; bb306
+                                 ;     410 			case 'Y': SET_NON_MODAL (target[AXIS_Y], value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",410
+00000D68 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D6E E50E04CE                		MOV.L 10H[R0], 0338H[R14]
+00000D72                         L358:	; bb306.split
+00000D72 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D78 F9E2E60000803F          		MOV.L #3F800000H, 0398H[R14]
+00000D7F 38rrrr               W  		BRA L380
+00000D82                         L359:	; bb308
+                                 ;     411 			case 'Z': SET_NON_MODAL (target[AXIS_Z], value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",411
+00000D82 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D88 E50E04CF                		MOV.L 10H[R0], 033CH[R14]
+00000D8C                         L360:	; bb308.split
+00000D8C FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000D92 F9E2E70000803F          		MOV.L #3F800000H, 039CH[R14]
+00000D99 38rrrr               W  		BRA L380
+00000D9C                         L361:	; bb310
+                                 ;     412 			case 'A': SET_NON_MODAL (target[AXIS_A], value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",412
+00000D9C FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000DA2 E50E04D0                		MOV.L 10H[R0], 0340H[R14]
+00000DA6                         L362:	; bb310.split
+00000DA6 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000DAC F9E2E80000803F          		MOV.L #3F800000H, 03A0H[R14]
+00000DB3 38rrrr               W  		BRA L380
+00000DB6                         L363:	; bb312
+                                 ;     413 			case 'B': SET_NON_MODAL (target[AXIS_B], value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",413
+00000DB6 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000DBC E50E04D1                		MOV.L 10H[R0], 0344H[R14]
+00000DC0                         L364:	; bb312.split
+00000DC0 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000DC6 F9E2E90000803F          		MOV.L #3F800000H, 03A4H[R14]
+00000DCD 38rrrr               W  		BRA L380
+00000DD0                         L365:	; bb314
+                                 ;     414 			case 'C': SET_NON_MODAL (target[AXIS_C], value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",414
+00000DD0 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000DD6 E50E04D2                		MOV.L 10H[R0], 0348H[R14]
+00000DDA                         L366:	; bb314.split
+00000DDA FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000DE0 F9E2EA0000803F          		MOV.L #3F800000H, 03A8H[R14]
+00000DE7 38rrrr               W  		BRA L380
+00000DEA                         L367:	; bb316
+                                 ;     415 		//	case 'U': SET_NON_MODAL (target[AXIS_U], value);		// reserved
+                                 ;     416 		//	case 'V': SET_NON_MODAL (target[AXIS_V], value);		// reserved
+                                 ;     417 		//	case 'W': SET_NON_MODAL (target[AXIS_W], value);		// reserved
+                                 ;     418 			case 'I': SET_NON_MODAL (arc_offset[0], value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",418
+00000DEA FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000DF0 E50E04E0                		MOV.L 10H[R0], 0380H[R14]
+00000DF4                         L368:	; bb316.split
+00000DF4 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000DFA F9E2F80000803F          		MOV.L #3F800000H, 03E0H[R14]
+00000E01 2Err                 B  		BRA L380
+00000E03                         L369:	; bb318
+                                 ;     419 			case 'J': SET_NON_MODAL (arc_offset[1], value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",419
+00000E03 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000E09 E50E04E1                		MOV.L 10H[R0], 0384H[R14]
+00000E0D                         L370:	; bb318.split
+00000E0D FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000E13 F9E2F90000803F          		MOV.L #3F800000H, 03E4H[R14]
+00000E1A 2Err                 B  		BRA L380
+00000E1C                         L371:	; bb320
+                                 ;     420 			case 'K': SET_NON_MODAL (arc_offset[2], value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",420
+00000E1C FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000E22 E50E04E2                		MOV.L 10H[R0], 0388H[R14]
+00000E26                         L372:	; bb320.split
+00000E26 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000E2C F9E2FA0000803F          		MOV.L #3F800000H, 03E8H[R14]
+00000E33 2Err                 B  		BRA L380
+00000E35                         L373:	; bb322
+                                 ;     421 			case 'R': SET_NON_MODAL (arc_radius, value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",421
+00000E35 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000E3B E50E04DF                		MOV.L 10H[R0], 037CH[R14]
+00000E3F                         L374:	; bb322.split
+00000E3F FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000E45 F9E2F70000803F          		MOV.L #3F800000H, 03DCH[R14]
+00000E4C 2Err                 B  		BRA L380
+00000E4E                         L375:	; bb324
+                                 ;     422 			case 'N': SET_NON_MODAL (linenum,(uint32_t)value);		// line number
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",422
+00000E4E A901                    		MOV.L 10H[R0], R1
+00000E50 FD72110000004F          		FCMP #4F000000H, R1
+00000E57 29rr                    		BLT L377
+00000E59                         L376:	; bb324
+00000E59 FD7221000080CF          		FADD #0CF800000H, R1
+00000E60                         L377:	; bb324
+00000E60 FC971E                  		FTOI R1, R14
+00000E63 FBF2rrrrrrrr            		MOV.L #_cm, R15
+00000E69 E7FECC                  		MOV.L R14, 0330H[R15]
+00000E6C                         L378:	; bb324.split
+00000E6C FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000E72 F9E6E401                		MOV.L #00000001H, 0390H[R14]
+00000E76 08                   S  		BRA L380
+00000E77                         L379:	; bb328
+                                 ;     423 			case 'L': break;										// not used for anything
+                                 ;     424 			default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",424
+00000E77 3C8683                  		MOV.B #83H, 16H[R0]
+00000E7A                         L380:	; bb330
+                                 ;     425 		}
+                                 ;     426 		if(status != STAT_OK) break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",426
+00000E7A B581                    		MOVU.B 16H[R0], R1
+00000E7C 6101                    		CMP #00H, R1
+00000E7E 21rr                    		BNE L383
+00000E80                         L381:	; bb338
+                                 ;     427 		linenumMacro = cm.gn.linenum;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",427
+00000E80 FBE2rrrrrrrr            		MOV.L #_linenumMacro, R14
+00000E86 FBF2rrrrrrrr            		MOV.L #_cm, R15
+00000E8C E1FECC                  		MOV.L 0330H[R15], [R14]
+00000E8F                         L382:	; bb340
+00000E8F 710310                  		ADD #10H, R0, R3
+00000E92 71020F                  		ADD #0FH, R0, R2
+00000E95 710108                  		ADD #08H, R0, R1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",278
+00000E98 39rrrr               W  		BSR __$_get_next_gcode_word
+00000E9B 8581                    		MOV.B R1, 16H[R0]
+00000E9D 6101                    		CMP #00H, R1
+00000E9F 3Arrrr               W  		BEQ L121
+00000EA2                         L383:	; bb349
+                                 ;     428 	}
+                                 ;     429 	if ((status != STAT_OK) && (status != STAT_COMPLETE)) return (status);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",429
+00000EA2 B581                    		MOVU.B 16H[R0], R1
+00000EA4 6101                    		CMP #00H, R1
+00000EA6 18                   S  		BNE L385
+00000EA7 2Err                 B  		BRA L387
+00000EA9                         L384:	; bb350
+00000EA9 C5001607                		MOV.B 16H[R0], 07H[R0]
+00000EAD 2Err                 B  		BRA L392
+00000EAF                         L385:	; bb357
+00000EAF B581                    		MOVU.B 16H[R0], R1
+00000EB1 6141                    		CMP #04H, R1
+00000EB3 10                   S  		BEQ L387
+00000EB4                         L386:	; bb362
+00000EB4 F80601                  		MOV.L #00000001H, [R0]
+00000EB7 08                   S  		BRA L388
+00000EB8                         L387:	; bb363
+00000EB8 F80600                  		MOV.L #00000000H, [R0]
+00000EBB                         L388:	; bb364
+00000EBB EC01                    		MOV.L [R0], R1
+00000EBD 6101                    		CMP #00H, R1
+00000EBF 21rr                    		BNE L384
+00000EC1                         L389:	; bb370
+                                 ;     430 	ritorno(_validate_gcode_block());
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",430
+00000EC1 39rrrr               W  		BSR __$_validate_gcode_block
+00000EC4 FBE2rrrrrrrr            		MOV.L #_status_code, R14
+00000ECA C3E1                    		MOV.B R1, [R14]
+00000ECC 6101                    		CMP #00H, R1
+00000ECE 20rr                    		BEQ L391
+00000ED0                         L390:	; bb371
+00000ED0 FBE2rrrrrrrr            		MOV.L #_status_code, R14
+00000ED6 C4E007                  		MOV.B [R14], 07H[R0]
+00000ED9 08                   S  		BRA L392
+00000EDA                         L391:	; bb380
+                                 ;     431 	return (_execute_gcode_block());		// if successful execute the block
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",431
+00000EDA 39rrrr               W  		BSR __execute_gcode_block
+00000EDD 8189                    		MOV.B R1, 07H[R0]
+00000EDF                         L392:	; bb383
+00000EDF C5000717                		MOV.B 07H[R0], 17H[R0]
+                                 ;     432 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",432
+00000EE3 B589                    		MOVU.B 17H[R0], R1
+00000EE5 3F6608                  		RTSD #20H, R6-R6
+00000EE8                         __$_parse_gcode_block_selection_line:
+                                 		.STACK	__$_parse_gcode_block_selection_line=32
+                                 ;     433 
+                                 ;     434 static stat_t _parse_gcode_block_selection_line(char_t *buf)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",434
+00000EE8 7100E4                  		ADD #0FFFFFFE4H, R0
+00000EEB A181                    		MOV.L R1, 18H[R0]
+                                 ;     435 {
+                                 ;     436 	static bool next = false;
+                                 ;     437 	char *pstr = (char *)buf;		// persistent pointer into gcode block for parsing words
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",437
+00000EED E301                    		MOV.L R1, [R0]
+00000EEF                         L396:	; entry.split
+                                 ;     438   	char letter;					// parsed letter, eg.g. G or X or Y
+                                 ;     439 	float value = 0;				// value parsed from letter (e.g. 2 for G2)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",439
+00000EEF 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000EF2                         L397:	; entry.split1
+                                 ;     440 	stat_t ret = STAT_NOOP;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",440
+00000EF2 3C0F03                  		MOV.B #03H, 0FH[R0]
+00000EF5                         L398:	; entry.split2
+                                 ;     441 	uint32_t lineNum = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",441
+00000EF5 3E0400                  		MOV.L #00000000H, 10H[R0]
+00000EF8 38rrrr               W  		BRA L417
+00000EFB                         L399:	; bb
+                                 ;     442 
+                                 ;     443 	// extract commands and parameters
+                                 ;     444 	while(_get_next_gcode_word(&pstr, &letter, &value) == STAT_OK) {
+                                 ;     445 		switch(letter) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",445
+00000EFB B189                    		MOVU.B 07H[R0], R1
+00000EFD 75514D                  		CMP #4DH, R1
+00000F00 20rr                    		BEQ L409
+00000F02                         L400:	; bb
+00000F02 75514E                  		CMP #4EH, R1
+00000F05 3Brrrr               W  		BNE L417
+00000F08                         L401:	; bb10
+                                 ;     446 			case 'N':
+                                 ;     447 				lineNum = value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",447
+00000F08 A881                    		MOV.L 08H[R0], R1
+00000F0A FD72110000004F          		FCMP #4F000000H, R1
+00000F11 29rr                    		BLT L403
+00000F13                         L402:	; bb10
+00000F13 FD7221000080CF          		FADD #0CF800000H, R1
+00000F1A                         L403:	; bb10
+00000F1A FC9711                  		FTOI R1, R1
+00000F1D A101                    		MOV.L R1, 10H[R0]
+00000F1F                         L404:	; bb10.split
+                                 ;     448 				currentLineSel = lineNum;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",448
+00000F1F FBE2rrrrrrrr            		MOV.L #_currentLineSel, R14
+00000F25 E10E04                  		MOV.L 10H[R0], [R14]
+00000F28                         L405:	; bb10.split3
+                                 ;     449 				if (lineNum == (uint32_t)selecionarLinhas)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",449
+00000F28 FBE2rrrrrrrr            		MOV.L #_selecionarLinhas, R14
+00000F2E ECEE                    		MOV.L [R14], R14
+00000F30 FD721E0000004F          		FCMP #4F000000H, R14
+00000F37 29rr                    		BLT L407
+00000F39                         L406:	; bb10.split3
+00000F39 FD722E000080CF          		FADD #0CF800000H, R14
+00000F40                         L407:	; bb10.split3
+00000F40 FC97EE                  		FTOI R14, R14
+00000F43 06850E04                		CMP 10H[R0].L, R14
+00000F47 21rr                    		BNE L417
+00000F49                         L408:	; bb15
+                                 ;     450 				{
+                                 ;     451 					next = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",451
+00000F49 FBE2rrrrrrrr            		MOV.L #__$next$1, R14
+00000F4F F8E401                  		MOV.B #01H, [R14]
+00000F52 2Err                 B  		BRA L417
+00000F54                         L409:	; bb22
+                                 ;     452 				}
+                                 ;     453 			break;
+                                 ;     454 			case 'M':
+                                 ;     455 				switch((uint8_t)value) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",455
+00000F54 A881                    		MOV.L 08H[R0], R1
+00000F56 FD72110000004F          		FCMP #4F000000H, R1
+00000F5D 29rr                    		BLT L411
+00000F5F                         L410:	; bb22
+00000F5F FD7221000080CF          		FADD #0CF800000H, R1
+00000F66                         L411:	; bb22
+00000F66 FC971E                  		FTOI R1, R14
+00000F69 5BEE                    		MOVU.B R14, R14
+00000F6B 604E                    		SUB #04H, R14
+00000F6D 611E                    		CMP #01H, R14
+00000F6F 24rr                    		BGTU L417
+00000F71                         L412:	; bb26
+                                 ;     456 					case 4:
+                                 ;     457 					case 5: LineM5 = lineNum;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",457
+00000F71 FBE2rrrrrrrr            		MOV.L #_LineM5, R14
+00000F77 E10E04                  		MOV.L 10H[R0], [R14]
+00000F7A                         L413:	; bb26.split
+                                 ;     458 							ret = STAT_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",458
+00000F7A 3C0F00                  		MOV.B #00H, 0FH[R0]
+00000F7D                         L414:	; bb26.split4
+                                 ;     459 							if(next)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",459
+00000F7D FBE2rrrrrrrr            		MOV.L #__$next$1, R14
+00000F83 58EE                    		MOVU.B [R14], R14
+00000F85 610E                    		CMP #00H, R14
+00000F87 20rr                    		BEQ L417
+00000F89                         L415:	; bb29
+                                 ;     460 							{
+                                 ;     461 								ret = STAT_COMPLETE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",461
+00000F89 3C0F04                  		MOV.B #04H, 0FH[R0]
+00000F8C                         L416:	; bb29.split
+                                 ;     462 								next = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",462
+00000F8C FBE2rrrrrrrr            		MOV.L #__$next$1, R14
+00000F92 F8E400                  		MOV.B #00H, [R14]
+00000F95                         L417:	; bb38
+00000F95 710308                  		ADD #08H, R0, R3
+00000F98 710207                  		ADD #07H, R0, R2
+00000F9B EF01                    		MOV.L R0, R1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",444
+00000F9D 39rrrr               W  		BSR __$_get_next_gcode_word
+00000FA0 6101                    		CMP #00H, R1
+00000FA2 3Arrrr               W  		BEQ L399
+00000FA5                         L418:	; bb44
+                                 ;     463 							}
+                                 ;     464 							break;
+                                 ;     465 				}
+                                 ;     466 				break;
+                                 ;     467 		}
+                                 ;     468 	}
+                                 ;     469 	return (ret);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",469
+00000FA5 C5000F17                		MOV.B 0FH[R0], 17H[R0]
+00000FA9 B589                    		MOVU.B 17H[R0], R1
+00000FAB                         L419:	; bb44.split
+                                 ;     470 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",470
+00000FAB 5B11                    		MOVU.B R1, R1
+00000FAD 6707                    		RTSD #1CH
+00000FAF                         __execute_gcode_block:
+                                 		.STACK	__execute_gcode_block=20
+                                 ;     471 
+                                 ;     472 /*
+                                 ;     473  * _execute_gcode_block() - execute parsed block
+                                 ;     474  *
+                                 ;     475  *  Conditionally (based on whether a flag is set in gf) call the canonical
+                                 ;     476  *	machining functions in order of execution as per RS274NGC_3 table 8
+                                 ;     477  *  (below, with modifications):
+                                 ;     478  *
+                                 ;     479  *	    0. record the line number
+                                 ;     480  *		1. comment (includes message) [handled during block normalization]
+                                 ;     481  *		2. set feed rate mode (G93, G94 - inverse time or per minute)
+                                 ;     482  *		3. set feed rate (F)
+                                 ;     483  *		3a. set feed override rate (M50.1)
+                                 ;     484  *		3a. set traverse override rate (M50.2)
+                                 ;     485  *		4. set spindle speed (S)
+                                 ;     486  *		4a. set spindle override rate (M51.1)
+                                 ;     487  *		5. select tool (T)
+                                 ;     488  *		6. change tool (M6)
+                                 ;     489  *		7. spindle on or off (M3, M4, M5)
+                                 ;     490  *		8. coolant on or off (M7, M8, M9)
+                                 ;     491  *		9. enable or disable overrides (M48, M49, M50, M51)
+                                 ;     492  *		10. dwell (G4)
+                                 ;     493  *		11. set active plane (G17, G18, G19)
+                                 ;     494  *		12. set length units (G20, G21)
+                                 ;     495  *		13. cutter radius compensation on or off (G40, G41, G42)
+                                 ;     496  *		14. cutter length compensation on or off (G43, G49)
+                                 ;     497  *		15. coordinate system selection (G54, G55, G56, G57, G58, G59)
+                                 ;     498  *		16. set path control mode (G61, G61.1, G64)
+                                 ;     499  *		17. set distance mode (G90, G91)
+                                 ;     500  *		18. set retract mode (G98, G99)
+                                 ;     501  *		19a. homing functions (G28.2, G28.3, G28.1, G28, G30)
+                                 ;     502  *		19b. update system data (G10)
+                                 ;     503  *		19c. set axis offsets (G92, G92.1, G92.2, G92.3)
+                                 ;     504  *		20. perform motion (G0 to G3, G80-G89) as modified (possibly) by G53
+                                 ;     505  *		21. stop and end (M0, M1, M2, M30, M60)
+                                 ;     506  *
+                                 ;     507  *	Values in gn are in original units and should not be unit converted prior
+                                 ;     508  *	to calling the canonical functions (which do the unit conversions)
+                                 ;     509  */
+                                 ;     510 
+                                 ;     511 stat_t _execute_gcode_block()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",511
+00000FAF 6040                    		SUB #04H, R0
+                                 ;     512 {
+                                 ;     513 	stat_t status = STAT_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",513
+00000FB1 3C0200                  		MOV.B #00H, 02H[R0]
+00000FB4                         L421:	; entry.split
+                                 ;     514 
+                                 ;     515 	cm_set_model_linenum(cm.gn.linenum);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",515
+00000FB4 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000FBA EDE1CC                  		MOV.L 0330H[R14], R1
+00000FBD 05rrrrrr             A  		BSR _cm_set_model_linenum
+00000FC1                         L422:	; entry.split1
+                                 ;     516 	EXEC_FUNC(cm_set_feed_rate_mode, feed_rate_mode);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",516
+00000FC1 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000FC7 5AEEB803                		MOVU.B 03B8H[R14], R14
+00000FCB 610E                    		CMP #00H, R14
+00000FCD 20rr                    		BEQ L424
+00000FCF                         L423:	; bb3
+00000FCF FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000FD5 5AE15803                		MOVU.B 0358H[R14], R1
+00000FD9 05rrrrrr             A  		BSR _cm_set_feed_rate_mode
+00000FDD 8081                    		MOV.B R1, 02H[R0]
+00000FDF                         L424:	; bb11
+                                 ;     517 	EXEC_FUNC(cm_set_feed_rate, feed_rate);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",517
+00000FDF FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000FE5 EDEEEB                  		MOV.L 03ACH[R14], R14
+00000FE8 FD721E0000004F          		FCMP #4F000000H, R14
+00000FEF 29rr                    		BLT L426
+00000FF1                         L425:	; bb11
+00000FF1 FD722E000080CF          		FADD #0CF800000H, R14
+00000FF8                         L426:	; bb11
+00000FF8 FC97EE                  		FTOI R14, R14
+00000FFB 5BEE                    		MOVU.B R14, R14
+00000FFD 610E                    		CMP #00H, R14
+00000FFF 20rr                    		BEQ L428
+00001001                         L427:	; bb12
+00001001 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001007 EDE1D3                  		MOV.L 034CH[R14], R1
+0000100A 05rrrrrr             A  		BSR _cm_set_feed_rate
+0000100E 8081                    		MOV.B R1, 02H[R0]
+00001010                         L428:	; bb22
+                                 ;     518 	EXEC_FUNC(cm_feed_rate_override_factor, feed_rate_override_factor);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",518
+00001010 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001016 EDEEEC                  		MOV.L 03B0H[R14], R14
+00001019 FD721E0000004F          		FCMP #4F000000H, R14
+00001020 29rr                    		BLT L430
+00001022                         L429:	; bb22
+00001022 FD722E000080CF          		FADD #0CF800000H, R14
+00001029                         L430:	; bb22
+00001029 FC97EE                  		FTOI R14, R14
+0000102C 5BEE                    		MOVU.B R14, R14
+0000102E 610E                    		CMP #00H, R14
+00001030 20rr                    		BEQ L434
+00001032                         L431:	; bb23
+00001032 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001038 EDEED4                  		MOV.L 0350H[R14], R14
+0000103B FD721E0000004F          		FCMP #4F000000H, R14
+00001042 29rr                    		BLT L433
+00001044                         L432:	; bb23
+00001044 FD722E000080CF          		FADD #0CF800000H, R14
+0000104B                         L433:	; bb23
+0000104B FC97EE                  		FTOI R14, R14
+0000104E 5BE1                    		MOVU.B R14, R1
+00001050 05rrrrrr             A  		BSR _cm_feed_rate_override_factor
+00001054 8081                    		MOV.B R1, 02H[R0]
+00001056                         L434:	; bb34
+                                 ;     519 	EXEC_FUNC(cm_traverse_override_factor, traverse_override_factor);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",519
+00001056 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000105C EDEEED                  		MOV.L 03B4H[R14], R14
+0000105F FD721E0000004F          		FCMP #4F000000H, R14
+00001066 29rr                    		BLT L436
+00001068                         L435:	; bb34
+00001068 FD722E000080CF          		FADD #0CF800000H, R14
+0000106F                         L436:	; bb34
+0000106F FC97EE                  		FTOI R14, R14
+00001072 5BEE                    		MOVU.B R14, R14
+00001074 610E                    		CMP #00H, R14
+00001076 20rr                    		BEQ L440
+00001078                         L437:	; bb35
+00001078 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000107E EDEED5                  		MOV.L 0354H[R14], R14
+00001081 FD721E0000004F          		FCMP #4F000000H, R14
+00001088 29rr                    		BLT L439
+0000108A                         L438:	; bb35
+0000108A FD722E000080CF          		FADD #0CF800000H, R14
+00001091                         L439:	; bb35
+00001091 FC97EE                  		FTOI R14, R14
+00001094 5BE1                    		MOVU.B R14, R1
+00001096 05rrrrrr             A  		BSR _cm_traverse_override_factor
+0000109A 8081                    		MOV.B R1, 02H[R0]
+0000109C                         L440:	; bb46
+                                 ;     520 	EXEC_FUNC(cm_set_spindle_speed, spindle_speed);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",520
+0000109C FBE2rrrrrrrr            		MOV.L #_cm, R14
+000010A2 EDEEF3                  		MOV.L 03CCH[R14], R14
+000010A5 FD721E0000004F          		FCMP #4F000000H, R14
+000010AC 29rr                    		BLT L442
+000010AE                         L441:	; bb46
+000010AE FD722E000080CF          		FADD #0CF800000H, R14
+000010B5                         L442:	; bb46
+000010B5 FC97EE                  		FTOI R14, R14
+000010B8 5BEE                    		MOVU.B R14, R14
+000010BA 610E                    		CMP #00H, R14
+000010BC 20rr                    		BEQ L444
+000010BE                         L443:	; bb47
+000010BE FBE2rrrrrrrr            		MOV.L #_cm, R14
+000010C4 EDE1DB                  		MOV.L 036CH[R14], R1
+000010C7 05rrrrrr             A  		BSR _cm_set_spindle_speed
+000010CB 8081                    		MOV.B R1, 02H[R0]
+000010CD                         L444:	; bb57
+                                 ;     521 	EXEC_FUNC(cm_spindle_override_factor, spindle_override_factor);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",521
+000010CD FBE2rrrrrrrr            		MOV.L #_cm, R14
+000010D3 EDEEF4                  		MOV.L 03D0H[R14], R14
+000010D6 FD721E0000004F          		FCMP #4F000000H, R14
+000010DD 29rr                    		BLT L446
+000010DF                         L445:	; bb57
+000010DF FD722E000080CF          		FADD #0CF800000H, R14
+000010E6                         L446:	; bb57
+000010E6 FC97EE                  		FTOI R14, R14
+000010E9 5BEE                    		MOVU.B R14, R14
+000010EB 610E                    		CMP #00H, R14
+000010ED 20rr                    		BEQ L450
+000010EF                         L447:	; bb58
+000010EF FBE2rrrrrrrr            		MOV.L #_cm, R14
+000010F5 EDEEDC                  		MOV.L 0370H[R14], R14
+000010F8 FD721E0000004F          		FCMP #4F000000H, R14
+000010FF 29rr                    		BLT L449
+00001101                         L448:	; bb58
+00001101 FD722E000080CF          		FADD #0CF800000H, R14
+00001108                         L449:	; bb58
+00001108 FC97EE                  		FTOI R14, R14
+0000110B 5BE1                    		MOVU.B R14, R1
+0000110D 05rrrrrr             A  		BSR _cm_spindle_override_factor
+00001111 8081                    		MOV.B R1, 02H[R0]
+00001113                         L450:	; bb69
+                                 ;     522 	EXEC_FUNC(cm_select_tool, tool_select);					// tool_select is where it's written
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",522
+00001113 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001119 5AEEC603                		MOVU.B 03C6H[R14], R14
+0000111D 610E                    		CMP #00H, R14
+0000111F 20rr                    		BEQ L452
+00001121                         L451:	; bb70
+00001121 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001127 5AE16603                		MOVU.B 0366H[R14], R1
+0000112B 05rrrrrr             A  		BSR _cm_select_tool
+0000112F 8081                    		MOV.B R1, 02H[R0]
+00001131                         L452:	; bb79
+                                 ;     523 	EXEC_FUNC(cm_change_tool, tool_change);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",523
+00001131 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001137 5AEEC703                		MOVU.B 03C7H[R14], R14
+0000113B 610E                    		CMP #00H, R14
+0000113D 20rr                    		BEQ L454
+0000113F                         L453:	; bb80
+0000113F FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001145 5AE16703                		MOVU.B 0367H[R14], R1
+00001149 05rrrrrr             A  		BSR _cm_change_tool
+0000114D 8081                    		MOV.B R1, 02H[R0]
+0000114F                         L454:	; bb89
+                                 ;     524 	EXEC_FUNC(cm_spindle_control, spindle_mode); 			// spindle on or off
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",524
+0000114F FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001155 5AEECA03                		MOVU.B 03CAH[R14], R14
+00001159 610E                    		CMP #00H, R14
+0000115B 20rr                    		BEQ L456
+0000115D                         L455:	; bb90
+0000115D FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001163 5AE16A03                		MOVU.B 036AH[R14], R1
+00001167 05rrrrrr             A  		BSR _cm_spindle_control
+0000116B 8081                    		MOV.B R1, 02H[R0]
+0000116D                         L456:	; bb99
+                                 ;     525 	EXEC_FUNC(cm_mist_coolant_control, mist_coolant);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",525
+0000116D FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001173 5AEEC803                		MOVU.B 03C8H[R14], R14
+00001177 610E                    		CMP #00H, R14
+00001179 20rr                    		BEQ L458
+0000117B                         L457:	; bb100
+0000117B FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001181 5AE16803                		MOVU.B 0368H[R14], R1
+00001185 05rrrrrr             A  		BSR _cm_mist_coolant_control
+00001189 8081                    		MOV.B R1, 02H[R0]
+0000118B                         L458:	; bb109
+                                 ;     526 	EXEC_FUNC(cm_flood_coolant_control, flood_coolant);		// also disables mist coolant if OFF
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",526
+0000118B FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001191 5AEEC903                		MOVU.B 03C9H[R14], R14
+00001195 610E                    		CMP #00H, R14
+00001197 20rr                    		BEQ L460
+00001199                         L459:	; bb110
+00001199 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000119F 5AE16903                		MOVU.B 0369H[R14], R1
+000011A3 05rrrrrr             A  		BSR _cm_flood_coolant_control
+000011A7 8081                    		MOV.B R1, 02H[R0]
+000011A9                         L460:	; bb119
+                                 ;     527 	EXEC_FUNC(cm_feed_rate_override_enable, feed_rate_override_enable);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",527
+000011A9 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000011AF 5AEEB903                		MOVU.B 03B9H[R14], R14
+000011B3 610E                    		CMP #00H, R14
+000011B5 20rr                    		BEQ L462
+000011B7                         L461:	; bb120
+000011B7 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000011BD 5AE15903                		MOVU.B 0359H[R14], R1
+000011C1 05rrrrrr             A  		BSR _cm_feed_rate_override_enable
+000011C5 8081                    		MOV.B R1, 02H[R0]
+000011C7                         L462:	; bb129
+                                 ;     528 	EXEC_FUNC(cm_traverse_override_enable, traverse_override_enable);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",528
+000011C7 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000011CD 5AEEBA03                		MOVU.B 03BAH[R14], R14
+000011D1 610E                    		CMP #00H, R14
+000011D3 20rr                    		BEQ L464
+000011D5                         L463:	; bb130
+000011D5 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000011DB 5AE15A03                		MOVU.B 035AH[R14], R1
+000011DF 05rrrrrr             A  		BSR _cm_traverse_override_enable
+000011E3 8081                    		MOV.B R1, 02H[R0]
+000011E5                         L464:	; bb139
+                                 ;     529 	EXEC_FUNC(cm_spindle_override_enable, spindle_override_enable);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",529
+000011E5 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000011EB 5AEED403                		MOVU.B 03D4H[R14], R14
+000011EF 610E                    		CMP #00H, R14
+000011F1 20rr                    		BEQ L466
+000011F3                         L465:	; bb140
+000011F3 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000011F9 5AE17403                		MOVU.B 0374H[R14], R1
+000011FD 05rrrrrr             A  		BSR _cm_spindle_override_enable
+00001201 8081                    		MOV.B R1, 02H[R0]
+00001203                         L466:	; bb149
+                                 ;     530 	EXEC_FUNC(cm_override_enables, override_enables);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",530
+00001203 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001209 5AEEBB03                		MOVU.B 03BBH[R14], R14
+0000120D 610E                    		CMP #00H, R14
+0000120F 20rr                    		BEQ L468
+00001211                         L467:	; bb150
+00001211 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001217 5AE15B03                		MOVU.B 035BH[R14], R1
+0000121B 05rrrrrr             A  		BSR _cm_override_enables
+0000121F 8081                    		MOV.B R1, 02H[R0]
+00001221                         L468:	; bb159
+                                 ;     531 
+                                 ;     532 	if (cm.gn.next_action == NEXT_ACTION_DWELL) { 			// G4 - dwell
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",532
+00001221 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001227 5AEE2C03                		MOVU.B 032CH[R14], R14
+0000122B 61DE                    		CMP #0DH, R14
+0000122D 21rr                    		BNE L471
+0000122F                         L469:	; bb161
+                                 ;     533 		ritorno(cm_dwell(cm.gn.parameter));					// return if error, otherwise complete the block
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",533
+0000122F FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001235 EDE1DE                  		MOV.L 0378H[R14], R1
+00001238 05rrrrrr             A  		BSR _cm_dwell
+0000123C FBE2rrrrrrrr            		MOV.L #_status_code, R14
+00001242 C3E1                    		MOV.B R1, [R14]
+00001244 6101                    		CMP #00H, R1
+00001246 20rr                    		BEQ L471
+00001248                         L470:	; bb162
+00001248 FBE2rrrrrrrr            		MOV.L #_status_code, R14
+0000124E C4E001                  		MOV.B [R14], 01H[R0]
+00001251 38rrrr               W  		BRA L514
+00001254                         L471:	; bb179
+                                 ;     534 	}
+                                 ;     535 	EXEC_FUNC(cm_select_plane, select_plane);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",535
+00001254 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000125A 5AEEBD03                		MOVU.B 03BDH[R14], R14
+0000125E 610E                    		CMP #00H, R14
+00001260 20rr                    		BEQ L473
+00001262                         L472:	; bb180
+00001262 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001268 5AE15D03                		MOVU.B 035DH[R14], R1
+0000126C 05rrrrrr             A  		BSR _cm_select_plane
+00001270 8081                    		MOV.B R1, 02H[R0]
+00001272                         L473:	; bb189
+                                 ;     536 	EXEC_FUNC(cm_set_units_mode, units_mode);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",536
+00001272 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001278 5AEEBE03                		MOVU.B 03BEH[R14], R14
+0000127C 610E                    		CMP #00H, R14
+0000127E 20rr                    		BEQ L475
+00001280                         L474:	; bb190
+00001280 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001286 5AE15E03                		MOVU.B 035EH[R14], R1
+0000128A 05rrrrrr             A  		BSR _cm_set_units_mode
+0000128E 8081                    		MOV.B R1, 02H[R0]
+00001290                         L475:	; bb199
+                                 ;     537 	//--> cutter radius compensation goes here
+                                 ;     538 	//--> cutter length compensation goes here
+                                 ;     539 	EXEC_FUNC(cm_set_coord_system, coord_system);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",539
+00001290 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001296 5AEEBF03                		MOVU.B 03BFH[R14], R14
+0000129A 610E                    		CMP #00H, R14
+0000129C 20rr                    		BEQ L477
+0000129E                         L476:	; bb200
+0000129E FBE2rrrrrrrr            		MOV.L #_cm, R14
+000012A4 5AE15F03                		MOVU.B 035FH[R14], R1
+000012A8 05rrrrrr             A  		BSR _cm_set_coord_system
+000012AC 8081                    		MOV.B R1, 02H[R0]
+000012AE                         L477:	; bb209
+                                 ;     540 	EXEC_FUNC(cm_set_path_control, path_control);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",540
+000012AE FBE2rrrrrrrr            		MOV.L #_cm, R14
+000012B4 5AEEC203                		MOVU.B 03C2H[R14], R14
+000012B8 610E                    		CMP #00H, R14
+000012BA 20rr                    		BEQ L479
+000012BC                         L478:	; bb210
+000012BC FBE2rrrrrrrr            		MOV.L #_cm, R14
+000012C2 5AE16203                		MOVU.B 0362H[R14], R1
+000012C6 05rrrrrr             A  		BSR _cm_set_path_control
+000012CA 8081                    		MOV.B R1, 02H[R0]
+000012CC                         L479:	; bb219
+                                 ;     541 	EXEC_FUNC(cm_set_distance_mode, distance_mode);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",541
+000012CC FBE2rrrrrrrr            		MOV.L #_cm, R14
+000012D2 5AEEC303                		MOVU.B 03C3H[R14], R14
+000012D6 610E                    		CMP #00H, R14
+000012D8 20rr                    		BEQ L481
+000012DA                         L480:	; bb220
+000012DA FBE2rrrrrrrr            		MOV.L #_cm, R14
+000012E0 5AE16303                		MOVU.B 0363H[R14], R1
+000012E4 05rrrrrr             A  		BSR _cm_set_distance_mode
+000012E8 8081                    		MOV.B R1, 02H[R0]
+000012EA                         L481:	; bb228
+                                 ;     542 	//--> set retract mode goes here
+                                 ;     543 
+                                 ;     544 	switch (cm.gn.next_action) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",544
+000012EA FBE2rrrrrrrr            		MOV.L #_cm, R14
+000012F0 5AEE2C03                		MOVU.B 032CH[R14], R14
+000012F4 61FE                    		CMP #0FH, R14
+000012F6 25rr                  * 		BGTU L508
+         38rrrr                  
+000012FB                         L482:	; bb228
+000012FB FBF2rrrrrrrr            		MOV.L #L515, R15
+00001301 FE5EFE                  		.swmov L515, R14, R15, R14
+00001304                         L516:
+00001304 7F4E                    		BRA.L R14
+00001306                         L483:	; bb231
+                                 ;     545 		case NEXT_ACTION_SET_G28_POSITION:  { status = cm_set_g28_position(); break;}								// G28.1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",545
+00001306 05rrrrrr             A  		BSR _cm_set_g28_position
+0000130A 8081                    		MOV.B R1, 02H[R0]
+0000130C 38rrrr               W  		BRA L508
+0000130F                         L484:	; bb234
+                                 ;     546 		case NEXT_ACTION_GOTO_G28_POSITION: { status = cm_goto_g28_position(cm.gn.target, cm.gf.target); break;}	// G28
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",546
+0000130F FB12rrrrrrrr            		MOV.L #_cm, R1
+00001315 72129403                		ADD #0394H, R1, R2
+00001319 72113403                		ADD #0334H, R1
+0000131D 05rrrrrr             A  		BSR _cm_goto_g28_position
+00001321 8081                    		MOV.B R1, 02H[R0]
+00001323 38rrrr               W  		BRA L508
+00001326                         L485:	; bb237
+                                 ;     547 		case NEXT_ACTION_SET_G30_POSITION:  { status = cm_set_g30_position(); break;}								// G30.1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",547
+00001326 05rrrrrr             A  		BSR _cm_set_g30_position
+0000132A 8081                    		MOV.B R1, 02H[R0]
+0000132C 38rrrr               W  		BRA L508
+0000132F                         L486:	; bb240
+                                 ;     548 		case NEXT_ACTION_GOTO_G30_POSITION: { status = cm_goto_g30_position(cm.gn.target, cm.gf.target); break;}	// G30
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",548
+0000132F FB12rrrrrrrr            		MOV.L #_cm, R1
+00001335 72129403                		ADD #0394H, R1, R2
+00001339 72113403                		ADD #0334H, R1
+0000133D 05rrrrrr             A  		BSR _cm_goto_g30_position
+00001341 8081                    		MOV.B R1, 02H[R0]
+00001343 38rrrr               W  		BRA L508
+00001346                         L487:	; bb243
+                                 ;     549 
+                                 ;     550 		case NEXT_ACTION_SEARCH_HOME: { status = cm_homing_cycle_start(); break;}									
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",550
+00001346 05rrrrrr             A  		BSR _cm_homing_cycle_start
+0000134A 8081                    		MOV.B R1, 02H[R0]
+0000134C 38rrrr               W  		BRA L508
+0000134F                         L488:	; bb246
+                                 ;     551 		case NEXT_ACTION_SET_ABSOLUTE_ORIGIN: { status = cm_set_absolute_origin(cm.gn.target, cm.gf.target); break;}// G28.3
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",551
+0000134F FB12rrrrrrrr            		MOV.L #_cm, R1
+00001355 72129403                		ADD #0394H, R1, R2
+00001359 72113403                		ADD #0334H, R1
+0000135D 05rrrrrr             A  		BSR _cm_set_absolute_origin
+00001361 8081                    		MOV.B R1, 02H[R0]
+00001363 38rrrr               W  		BRA L508
+00001366                         L489:	; bb249
+                                 ;     552 		case NEXT_ACTION_HOMING_NO_SET: { status = cm_homing_cycle_start_no_set(); break;}							// G28.4
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",552
+00001366 05rrrrrr             A  		BSR _cm_homing_cycle_start_no_set
+0000136A 8081                    		MOV.B R1, 02H[R0]
+0000136C 38rrrr               W  		BRA L508
+0000136F                         L490:	; bb252
+                                 ;     553 
+                                 ;     554 		case NEXT_ACTION_STRAIGHT_PROBE: { status = cm_straight_probe(cm.gn.target, cm.gf.target); break;}			// G38.2
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",554
+0000136F FB12rrrrrrrr            		MOV.L #_cm, R1
+00001375 72129403                		ADD #0394H, R1, R2
+00001379 72113403                		ADD #0334H, R1
+0000137D 05rrrrrr             A  		BSR _cm_straight_probe
+00001381 8081                    		MOV.B R1, 02H[R0]
+00001383 38rrrr               W  		BRA L508
+00001386                         L491:	; bb255
+                                 ;     555 
+                                 ;     556 		case NEXT_ACTION_WAIT_SWITCH: { status = cm_straight_wait(cm.gn.parameter); break;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",556
+00001386 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000138C EDE1DE                  		MOV.L 0378H[R14], R1
+0000138F 05rrrrrr             A  		BSR _cm_straight_wait
+00001393 8081                    		MOV.B R1, 02H[R0]
+00001395 38rrrr               W  		BRA L508
+00001398                         L492:	; bb259
+                                 ;     557 
+                                 ;     558 		case NEXT_ACTION_SET_COORD_DATA: { status = cm_set_coord_offsets(cm.gn.parameter, cm.gn.target, cm.gf.target); break;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",558
+00001398 FB22rrrrrrrr            		MOV.L #_cm, R2
+0000139E ED2EDE                  		MOV.L 0378H[R2], R14
+000013A1 72239403                		ADD #0394H, R2, R3
+000013A5 72223403                		ADD #0334H, R2
+000013A9 FD721E0000004F          		FCMP #4F000000H, R14
+000013B0 29rr                    		BLT L494
+000013B2                         L493:	; bb259
+000013B2 FD722E000080CF          		FADD #0CF800000H, R14
+000013B9                         L494:	; bb259
+000013B9 FC97EE                  		FTOI R14, R14
+000013BC 5BE1                    		MOVU.B R14, R1
+000013BE 05rrrrrr             A  		BSR _cm_set_coord_offsets
+000013C2 8081                    		MOV.B R1, 02H[R0]
+000013C4 38rrrr               W  		BRA L508
+000013C7                         L495:	; bb264
+                                 ;     559 		case NEXT_ACTION_SET_ORIGIN_OFFSETS: { status = cm_set_origin_offsets(cm.gn.target, cm.gf.target); break;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",559
+000013C7 FB12rrrrrrrr            		MOV.L #_cm, R1
+000013CD 72129403                		ADD #0394H, R1, R2
+000013D1 72113403                		ADD #0334H, R1
+000013D5 05rrrrrr             A  		BSR _cm_set_origin_offsets
+000013D9 8081                    		MOV.B R1, 02H[R0]
+000013DB 38rrrr               W  		BRA L508
+000013DE                         L496:	; bb267
+                                 ;     560 		case NEXT_ACTION_RESET_ORIGIN_OFFSETS: { status = cm_reset_origin_offsets(); break;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",560
+000013DE 05rrrrrr             A  		BSR _cm_reset_origin_offsets
+000013E2 8081                    		MOV.B R1, 02H[R0]
+000013E4 38rrrr               W  		BRA L508
+000013E7                         L497:	; bb270
+                                 ;     561 		case NEXT_ACTION_SUSPEND_ORIGIN_OFFSETS: { status = cm_suspend_origin_offsets(); break;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",561
+000013E7 05rrrrrr             A  		BSR _cm_suspend_origin_offsets
+000013EB 8081                    		MOV.B R1, 02H[R0]
+000013ED 38rrrr               W  		BRA L508
+000013F0                         L498:	; bb273
+                                 ;     562 		case NEXT_ACTION_RESUME_ORIGIN_OFFSETS: { status = cm_resume_origin_offsets(); break;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",562
+000013F0 05rrrrrr             A  		BSR _cm_resume_origin_offsets
+000013F4 8081                    		MOV.B R1, 02H[R0]
+000013F6 38rrrr               W  		BRA L508
+000013F9                         L499:	; bb276
+                                 ;     563 
+                                 ;     564 		case NEXT_ACTION_DEFAULT: {
+                                 ;     565 			cm_set_absolute_override(MODEL, cm.gn.absolute_override);	// apply override setting to gm struct
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",565
+000013F9 FB12rrrrrrrr            		MOV.L #_cm, R1
+000013FF 5A126003                		MOVU.B 0360H[R1], R2
+00001403 72115402                		ADD #0254H, R1
+00001407 05rrrrrr             A  		BSR _cm_set_absolute_override
+0000140B                         L500:	; bb276.split
+                                 ;     566 			switch (cm.gn.motion_mode) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",566
+0000140B FBE2rrrrrrrr            		MOV.L #_cm, R14
+00001411 5AEE2D03                		MOVU.B 032DH[R14], R14
+00001415 610E                    		CMP #00H, R14
+00001417 20rr                    		BEQ L505
+00001419                         L501:	; bb276.split
+00001419 611E                    		CMP #01H, R14
+0000141B 20rr                    		BEQ L506
+0000141D                         L502:	; bb276.split
+0000141D 71EFFE                  		ADD #0FFFFFFFEH, R14, R15
+00001420 612F                    		CMP #02H, R15
+00001422 23rr                    		BLTU L507
+00001424                         L503:	; bb276.split
+00001424 614E                    		CMP #04H, R14
+00001426 21rr                    		BNE L508
+00001428                         L504:	; bb280
+                                 ;     567 				case MOTION_MODE_CANCEL_MOTION_MODE: { cm.gm.motion_mode = cm.gn.motion_mode; break;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",567
+00001428 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000142E CAEE2D035802            		MOV.B 032DH[R14], 0258H[R14]
+00001434 2Err                 B  		BRA L508
+00001436                         L505:	; bb283
+                                 ;     568 				case MOTION_MODE_STRAIGHT_TRAVERSE: { status = cm_straight_traverse(cm.gn.target, cm.gf.target); break;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",568
+00001436 FB12rrrrrrrr            		MOV.L #_cm, R1
+0000143C 72129403                		ADD #0394H, R1, R2
+00001440 72113403                		ADD #0334H, R1
+00001444 05rrrrrr             A  		BSR _cm_straight_traverse
+00001448 8081                    		MOV.B R1, 02H[R0]
+0000144A 2Err                 B  		BRA L508
+0000144C                         L506:	; bb286
+                                 ;     569 				case MOTION_MODE_STRAIGHT_FEED: { status = cm_straight_feed(cm.gn.target, cm.gf.target); break;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",569
+0000144C FB12rrrrrrrr            		MOV.L #_cm, R1
+00001452 72129403                		ADD #0394H, R1, R2
+00001456 72113403                		ADD #0334H, R1
+0000145A 05rrrrrr             A  		BSR _cm_straight_feed
+0000145E 8081                    		MOV.B R1, 02H[R0]
+00001460 2Err                 B  		BRA L508
+00001462                         L507:	; bb289
+                                 ;     570 				case MOTION_MODE_CW_ARC: case MOTION_MODE_CCW_ARC:
+                                 ;     571 					// gf.radius sets radius mode if radius was collected in gn
+                                 ;     572 					{ status = cm_arc_feed(cm.gn.target, cm.gf.target, cm.gn.arc_offset[0], cm.gn.arc_offset[1],
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",572
+00001462 FB12rrrrrrrr            		MOV.L #_cm, R1
+00001468 ED12DF                  		MOV.L 037CH[R1], R2
+0000146B ED1EE2                  		MOV.L 0388H[R1], R14
+0000146E ED14E1                  		MOV.L 0384H[R1], R4
+00001471 ED13E0                  		MOV.L 0380H[R1], R3
+00001474 60C0                    		SUB #0CH, R0
+00001476 C6102D0308              		MOV.B 032DH[R1], 08H[R0]
+0000147B A00A                    		MOV.L R2, 04H[R0]
+0000147D E30E                    		MOV.L R14, [R0]
+0000147F 72129403                		ADD #0394H, R1, R2
+00001483 72113403                		ADD #0334H, R1
+00001487 05rrrrrr             A  		BSR _cm_arc_feed
+0000148B 62C0                    		ADD #0CH, R0
+0000148D 8081                    		MOV.B R1, 02H[R0]
+0000148F                         L508:	; bb300
+                                 ;     573 										   cm.gn.arc_offset[2], cm.gn.arc_radius, cm.gn.motion_mode); break;}
+                                 ;     574 			}
+                                 ;     575 		}
+                                 ;     576 	}
+                                 ;     577 	cm_set_absolute_override(MODEL, false);	 // un-set absolute override once the move is planned
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",577
+0000148F FB12rrrrrrrr            		MOV.L #_cm, R1
+00001495 72115402                		ADD #0254H, R1
+00001499 6602                    		MOV.L #00000000H, R2
+0000149B 05rrrrrr             A  		BSR _cm_set_absolute_override
+0000149F                         L509:	; bb300.split
+                                 ;     578 
+                                 ;     579 	// do the program stops and ends : M0, M1, M2, M30, M60
+                                 ;     580 	if (cm.gf.program_flow == true) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",580
+0000149F FBE2rrrrrrrr            		MOV.L #_cm, R14
+000014A5 5AEE8E03                		MOVU.B 038EH[R14], R14
+000014A9 611E                    		CMP #01H, R14
+000014AB 21rr                    		BNE L513
+000014AD                         L510:	; bb303
+                                 ;     581 		if (cm.gn.program_flow == PROGRAM_STOP) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",581
+000014AD FBE2rrrrrrrr            		MOV.L #_cm, R14
+000014B3 5AEE2E03                		MOVU.B 032EH[R14], R14
+000014B7 610E                    		CMP #00H, R14
+000014B9 18                   S  		BNE L512
+000014BA                         L511:	; bb304
+                                 ;     582 			cm_program_stop();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",582
+000014BA 05rrrrrr             A  		BSR _cm_program_stop
+000014BE 08                   S  		BRA L513
+000014BF                         L512:	; bb305
+                                 ;     583 		} else {
+                                 ;     584 			cm_program_end();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",584
+000014BF 05rrrrrr             A  		BSR _cm_program_end
+000014C3                         L513:	; bb317
+                                 ;     585 		}
+                                 ;     586 	}
+                                 ;     587 	return (status);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",587
+000014C3 C5000201                		MOV.B 02H[R0], 01H[R0]
+000014C7                         L514:	; bb320
+000014C7 C5000103                		MOV.B 01H[R0], 03H[R0]
+                                 ;     588 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",588
+000014CB B089                    		MOVU.B 03H[R0], R1
+000014CD 6701                    		RTSD #04H
+000014CF                         _gc_get_gc:
+                                 		.STACK	_gc_get_gc=12
+                                 ;     589 
+                                 ;     590 
+                                 ;     591 /***********************************************************************************
+                                 ;     592  * CONFIGURATION AND INTERFACE FUNCTIONS
+                                 ;     593  * Functions to get and set variables from the cfgArray table
+                                 ;     594  ***********************************************************************************/
+                                 ;     595 
+                                 ;     596 stat_t gc_get_gc(nvObj_t *nv)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",596
+000014CF 6080                    		SUB #08H, R0
+000014D1 A009                    		MOV.L R1, 04H[R0]
+                                 ;     597 {
+                                 ;     598 	ritorno(nv_copy_string(nv, cs.saved_buf));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",598
+000014D3 FB22rrrrrrrr            		MOV.L #_cs, R2
+000014D9 72224303                		ADD #0343H, R2
+000014DD 05rrrrrr             A  		BSR _nv_copy_string
+000014E1 FBE2rrrrrrrr            		MOV.L #_status_code, R14
+000014E7 C3E1                    		MOV.B R1, [R14]
+000014E9 6101                    		CMP #00H, R1
+000014EB 20rr                    		BEQ L519
+000014ED                         L518:	; bb2
+000014ED FBE2rrrrrrrr            		MOV.L #_status_code, R14
+000014F3 C4E002                  		MOV.B [R14], 02H[R0]
+000014F6 08                   S  		BRA L521
+000014F7                         L519:	; bb11
+                                 ;     599 	nv->valuetype = TYPE_STRING;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",599
+000014F7 A809                    		MOV.L 04H[R0], R1
+000014F9 3C1B05                  		MOV.B #05H, 0BH[R1]
+000014FC                         L520:	; bb11.split
+                                 ;     600 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",600
+000014FC 3C0200                  		MOV.B #00H, 02H[R0]
+000014FF                         L521:	; bb15
+000014FF C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     601 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",601
+00001503 B089                    		MOVU.B 03H[R0], R1
+00001505 6702                    		RTSD #08H
+00001507                         _gc_run_gc:
+                                 		.STACK	_gc_run_gc=12
+                                 ;     602 
+                                 ;     603 stat_t gc_run_gc(nvObj_t *nv)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",603
+00001507 6080                    		SUB #08H, R0
+00001509 A009                    		MOV.L R1, 04H[R0]
+                                 ;     604 {
+                                 ;     605 	return(gc_gcode_parser(*nv->stringp));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",605
+0000150B AA11                    		MOV.L 20H[R1], R1
+0000150D 39rrrr               W  		BSR _gc_gcode_parser
+00001510 8089                    		MOV.B R1, 03H[R0]
+00001512 B089                    		MOVU.B 03H[R0], R1
+00001514                         L523:	; entry.split
+                                 ;     606 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\gcode_parser.c",606
+00001514 5B11                    		MOVU.B R1, R1
+00001516 6702                    		RTSD #08H
+                                 ;     607 
+                                 ;     608 /***********************************************************************************
+                                 ;     609  * TEXT MODE SUPPORT
+                                 ;     610  * Functions to print variables from the cfgArray table
+                                 ;     611  ***********************************************************************************/
+                                 ;     612 
+                                 ;     613 #ifdef __TEXT_MODE
+                                 ;     614 
+                                 ;     615 // no text mode functions here. Move along
+                                 ;     616 
+                                 ;     617 #endif // __TEXT_MODE
+                                 ;     618 
+                                 ;     619 #ifdef __cplusplus
+                                 ;     620 }
+                                 ;     621 #endif
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 2D2E                    		.byte	"-."
+00000002 00                      		.byte	00H
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$next$1:
+00000000 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         __$parse_gcode_func:
+00000000(00000004H)              		.blkl	1
+                                 		.SECTION	B_1,DATA
+00000000                         _gp:
+00000000(00000010H)              		.blkb	16
+                                 		.swsection	W,stuff
+00000000                         L393:
+00000000 rrrr                    		.switch		L361-L394
+00000002 rrrr                    		.switch		L363-L394
+00000004 rrrr                    		.switch		L365-L394
+00000006 rrrr                    		.switch		L379-L394
+00000008 rrrr                    		.switch		L379-L394
+0000000A rrrr                    		.switch		L349-L394
+0000000C rrrr                    		.switch		L123-L394
+0000000E rrrr                    		.switch		L379-L394
+00000010 rrrr                    		.switch		L367-L394
+00000012 rrrr                    		.switch		L369-L394
+00000014 rrrr                    		.switch		L371-L394
+00000016 rrrr                    		.switch		L380-L394
+00000018 rrrr                    		.switch		L293-L394
+0000001A rrrr                    		.switch		L375-L394
+0000001C rrrr                    		.switch		L379-L394
+0000001E rrrr                    		.switch		L351-L394
+00000020 rrrr                    		.switch		L379-L394
+00000022 rrrr                    		.switch		L373-L394
+00000024 rrrr                    		.switch		L353-L394
+00000026 rrrr                    		.switch		L345-L394
+00000028 rrrr                    		.switch		L379-L394
+0000002A rrrr                    		.switch		L379-L394
+0000002C rrrr                    		.switch		L379-L394
+0000002E rrrr                    		.switch		L355-L394
+00000030 rrrr                    		.switch		L357-L394
+00000032 rrrr                    		.switch		L359-L394
+                                 		.swsection	W,stuff
+00000034                         L515:
+00000034 rrrr                    		.switch		L499-L516
+00000036 rrrr                    		.switch		L487-L516
+00000038 rrrr                    		.switch		L488-L516
+0000003A rrrr                    		.switch		L489-L516
+0000003C rrrr                    		.switch		L483-L516
+0000003E rrrr                    		.switch		L484-L516
+00000040 rrrr                    		.switch		L485-L516
+00000042 rrrr                    		.switch		L486-L516
+00000044 rrrr                    		.switch		L492-L516
+00000046 rrrr                    		.switch		L495-L516
+00000048 rrrr                    		.switch		L496-L516
+0000004A rrrr                    		.switch		L497-L516
+0000004C rrrr                    		.switch		L498-L516
+0000004E rrrr                    		.switch		L508-L516
+00000050 rrrr                    		.switch		L490-L516
+00000052 rrrr                    		.switch		L491-L516
+                                 		.SECTION	W,ROMDATA,ALIGN=4
+                                 		.SECTION	W_1,ROMDATA
+                                 		.SECTION	W_2,ROMDATA,ALIGN=2
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     03128   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000005400(00001518H)  P
+ROMDATA  0000000003(00000003H)  L
+ROMDATA  0000000001(00000001H)  D_1
+DATA     0000000004(00000004H)  B
+DATA     0000000016(00000010H)  B_1
+ROMDATA  0000000000(00000000H)  W
+ROMDATA  0000000000(00000000H)  W_1
+ROMDATA  0000000084(00000054H)  W_2
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\gcode_parser.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\gcode_parser.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\src\cnc\gcode_parser.obj

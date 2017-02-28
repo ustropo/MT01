@@ -1,0 +1,600 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:18 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:18
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=u8g_pb16v2.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=u8g_pb16v2.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;u8g_pb16v2.c
+                                 
+                                 		.glb	_u8g_pb16v2_Clear
+                                 		.glb	_u8g_pb16v2Init
+                                 		.glb	_u8g_pb16v2_set_pixel
+                                 		.glb	_u8g_pb16v2_SetPixel
+                                 		.glb	_u8g_pb16v2_Set8PixelStd
+                                 		.glb	_u8g_dev_pb16v2_base_fn
+                                 		.glb	_u8g_pb_Is8PixelVisible
+                                 		.glb	_u8g_page_First
+                                 		.glb	_u8g_page_Next
+                                 		.glb	_u8g_pb_GetPageBox
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _u8g_pb16v2_Clear:
+                                 		.STACK	_u8g_pb16v2_Clear=16
+                                 ;       1 /*
+                                 ;       2 
+                                 ;       3   u8g_pb16v2.c
+                                 ;       4   
+                                 ;       5   16 bit height 2 bit per pixel page buffer
+                                 ;       6   byte has vertical orientation
+                                 ;       7 
+                                 ;       8   Universal 8bit Graphics Library
+                                 ;       9   
+                                 ;      10   Copyright (c) 2012, olikraus@gmail.com
+                                 ;      11   All rights reserved.
+                                 ;      12 
+                                 ;      13   Redistribution and use in source and binary forms, with or without modification, 
+                                 ;      14   are permitted provided that the following conditions are met:
+                                 ;      15 
+                                 ;      16   * Redistributions of source code must retain the above copyright notice, this list 
+                                 ;      17     of conditions and the following disclaimer.
+                                 ;      18     
+                                 ;      19   * Redistributions in binary form must reproduce the above copyright notice, this 
+                                 ;      20     list of conditions and the following disclaimer in the documentation and/or other 
+                                 ;      21     materials provided with the distribution.
+                                 ;      22 
+                                 ;      23   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+                                 ;      24   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+                                 ;      25   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+                                 ;      26   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+                                 ;      27   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+                                 ;      28   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+                                 ;      29   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+                                 ;      30   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+                                 ;      31   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+                                 ;      32   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+                                 ;      33   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+                                 ;      34   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+                                 ;      35   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+                                 ;      36   
+                                 ;      37 
+                                 ;      38 */
+                                 ;      39 
+                                 ;      40 #include "u8g.h"
+                                 ;      41 #include <string.h>
+                                 ;      42 
+                                 ;      43 
+                                 ;      44 void u8g_pb16v2_Clear(u8g_pb_t *b)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",44
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
+                                 ;      45 {
+                                 ;      46   uint8_t *ptr = (uint8_t *)b->buf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",46
+00000004 E11002                  		MOV.L 08H[R1], [R0]
+00000007                         L11:	; entry.split
+                                 ;      47   uint8_t *end_ptr = ptr;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",47
+00000007 E40001                  		MOV.L [R0], 04H[R0]
+0000000A                         L12:	; entry.split1
+                                 ;      48   
+                                 ;      49   /* two bits per pixel, 16 bits height --> 8 pixel --> 4 pixel per byte */
+                                 ;      50   end_ptr += b->width;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",50
+0000000A A881                    		MOV.L 08H[R0], R1
+0000000C B119                    		MOVU.B 05H[R1], R1
+0000000E 06890101                		ADD 04H[R0].L, R1
+00000012 A009                    		MOV.L R1, 04H[R0]
+00000014                         L13:	; entry.split2
+                                 ;      51   end_ptr += b->width;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",51
+00000014 A881                    		MOV.L 08H[R0], R1
+00000016 B119                    		MOVU.B 05H[R1], R1
+00000018 06890101                		ADD 04H[R0].L, R1
+0000001C A009                    		MOV.L R1, 04H[R0]
+0000001E                         L14:	; bb
+                                 ;      52   
+                                 ;      53   do
+                                 ;      54   {
+                                 ;      55     *ptr++ = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",55
+0000001E EC01                    		MOV.L [R0], R1
+00000020 F81400                  		MOV.B #00H, [R1]
+00000023 EC01                    		MOV.L [R0], R1
+00000025 6211                    		ADD #01H, R1
+00000027 E301                    		MOV.L R1, [R0]
+00000029                         L15:	; bb.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",53
+00000029 EC01                    		MOV.L [R0], R1
+0000002B 06850101                		CMP 04H[R0].L, R1
+0000002F 21rr                    		BNE L14
+00000031                         L16:	; return
+                                 ;      56   } while( ptr != end_ptr );
+                                 ;      57 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",57
+00000031 6703                    		RTSD #0CH
+00000033                         _u8g_pb16v2Init:
+                                 		.STACK	_u8g_pb16v2Init=16
+                                 ;      58 
+                                 ;      59 void u8g_pb16v2Init(u8g_pb_t *b, void *buf, u8g_uint_t width)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",59
+00000033 60C0                    		SUB #0CH, R0
+00000035 A081                    		MOV.L R1, 08H[R0]
+00000037 A00A                    		MOV.L R2, 04H[R0]
+00000039 808B                    		MOV.B R3, 03H[R0]
+                                 ;      60 {
+                                 ;      61   b->buf = buf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",61
+0000003B A809                    		MOV.L 04H[R0], R1
+0000003D A882                    		MOV.L 08H[R0], R2
+0000003F A0A1                    		MOV.L R1, 08H[R2]
+00000041                         L18:	; entry.split
+                                 ;      62   b->width = width;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",62
+00000041 B089                    		MOVU.B 03H[R0], R1
+00000043 A882                    		MOV.L 08H[R0], R2
+00000045 8129                    		MOV.B R1, 05H[R2]
+00000047                         L19:	; entry.split1
+                                 ;      63   u8g_pb16v2_Clear(b);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",63
+00000047 A881                    		MOV.L 08H[R0], R1
+00000049 39rrrr               W  		BSR _u8g_pb16v2_Clear
+0000004C 6703                    		RTSD #0CH
+0000004E                         _u8g_pb16v2_set_pixel:
+                                 		.STACK	_u8g_pb16v2_set_pixel=20
+                                 ;      64 }
+                                 ;      65 
+                                 ;      66 void u8g_pb16v2_set_pixel(u8g_pb_t *b, u8g_uint_t x, u8g_uint_t y, uint8_t color_index)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",66
+0000004E 7100F0                  		ADD #0FFFFFFF0H, R0
+00000051 A089                    		MOV.L R1, 0CH[R0]
+00000053 828A                    		MOV.B R2, 0BH[R0]
+00000055 8283                    		MOV.B R3, 0AH[R0]
+00000057 820C                    		MOV.B R4, 09H[R0]
+                                 ;      67 {
+                                 ;      68   register uint8_t mask;
+                                 ;      69   uint8_t *ptr = b->buf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",69
+00000059 A889                    		MOV.L 0CH[R0], R1
+0000005B E5100201                		MOV.L 08H[R1], 04H[R0]
+0000005F                         L21:	; entry.split
+                                 ;      70   y -= b->p.page_y0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",70
+0000005F B281                    		MOVU.B 0AH[R0], R1
+00000061 A88A                    		MOV.L 0CH[R0], R2
+00000063 412102                  		SUB 02H[R2].UB, R1
+00000066 8281                    		MOV.B R1, 0AH[R0]
+00000068                         L22:	; entry.split1
+                                 ;      71   if ( y >= 4 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",71
+00000068 B281                    		MOVU.B 0AH[R0], R1
+0000006A 6141                    		CMP #04H, R1
+0000006C 29rr                    		BLT L24
+0000006E                         L23:	; bb18
+                                 ;      72   {
+                                 ;      73     ptr += b->width;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",73
+0000006E A889                    		MOV.L 0CH[R0], R1
+00000070 B119                    		MOVU.B 05H[R1], R1
+00000072 06890101                		ADD 04H[R0].L, R1
+00000076 A009                    		MOV.L R1, 04H[R0]
+00000078                         L24:	; bb29
+                                 ;      74   }
+                                 ;      75   mask = 0x03;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",75
+00000078 3C0303                  		MOV.B #03H, 03H[R0]
+0000007B                         L25:	; bb29.split
+                                 ;      76   y &= 0x03;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",76
+0000007B B281                    		MOVU.B 0AH[R0], R1
+0000007D 6431                    		AND #03H, R1
+0000007F 8281                    		MOV.B R1, 0AH[R0]
+00000081                         L26:	; bb29.split2
+                                 ;      77   y <<= 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",77
+00000081 B281                    		MOVU.B 0AH[R0], R1
+00000083 6C11                    		SHLL #01H, R1
+00000085 8281                    		MOV.B R1, 0AH[R0]
+00000087                         L27:	; bb29.split3
+                                 ;      78   mask <<= y;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",78
+00000087 B089                    		MOVU.B 03H[R0], R1
+00000089 B282                    		MOVU.B 0AH[R0], R2
+0000008B FD6221                  		SHLL R2, R1
+0000008E 8089                    		MOV.B R1, 03H[R0]
+00000090                         L28:	; bb29.split4
+                                 ;      79   mask ^=0xff;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",79
+00000090 B089                    		MOVU.B 03H[R0], R1
+00000092 7E01                    		NOT R1
+00000094 8089                    		MOV.B R1, 03H[R0]
+00000096                         L29:	; bb29.split5
+                                 ;      80   color_index &= 3;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",80
+00000096 B209                    		MOVU.B 09H[R0], R1
+00000098 6431                    		AND #03H, R1
+0000009A 8209                    		MOV.B R1, 09H[R0]
+0000009C                         L30:	; bb29.split6
+                                 ;      81   color_index <<= y;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",81
+0000009C B209                    		MOVU.B 09H[R0], R1
+0000009E B282                    		MOVU.B 0AH[R0], R2
+000000A0 FD6221                  		SHLL R2, R1
+000000A3 8209                    		MOV.B R1, 09H[R0]
+000000A5                         L31:	; bb29.split7
+                                 ;      82   ptr += x;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",82
+000000A5 A809                    		MOV.L 04H[R0], R1
+000000A7 49010B                  		ADD 0BH[R0].UB, R1
+000000AA A009                    		MOV.L R1, 04H[R0]
+000000AC                         L32:	; bb29.split8
+                                 ;      83   *ptr &= mask;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",83
+000000AC A809                    		MOV.L 04H[R0], R1
+000000AE 581E                    		MOVU.B [R1], R14
+000000B0 510E03                  		AND 03H[R0].UB, R14
+000000B3 C31E                    		MOV.B R14, [R1]
+000000B5                         L33:	; bb29.split9
+                                 ;      84   *ptr |= color_index;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",84
+000000B5 A809                    		MOV.L 04H[R0], R1
+000000B7 581E                    		MOVU.B [R1], R14
+000000B9 550E09                  		OR 09H[R0].UB, R14
+000000BC C31E                    		MOV.B R14, [R1]
+000000BE 6704                    		RTSD #10H
+000000C0                         _u8g_pb16v2_SetPixel:
+                                 		.STACK	_u8g_pb16v2_SetPixel=12
+                                 ;      85 }
+                                 ;      86 
+                                 ;      87 
+                                 ;      88 void u8g_pb16v2_SetPixel(u8g_pb_t *b, const u8g_dev_arg_pixel_t * const arg_pixel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",88
+000000C0 6080                    		SUB #08H, R0
+000000C2 A009                    		MOV.L R1, 04H[R0]
+000000C4 E302                    		MOV.L R2, [R0]
+                                 ;      89 {
+                                 ;      90   if ( arg_pixel->y < b->p.page_y0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",90
+000000C6 A809                    		MOV.L 04H[R0], R1
+000000C8 B02A                    		MOVU.B 01H[R2], R2
+000000CA 451202                  		CMP 02H[R1].UB, R2
+000000CD 29rr                    		BLT L38
+000000CF                         L35:	; bb16
+                                 ;      91     return;
+                                 ;      92   if ( arg_pixel->y > b->p.page_y1 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",92
+000000CF EC01                    		MOV.L [R0], R1
+000000D1 B019                    		MOVU.B 01H[R1], R1
+000000D3 A80A                    		MOV.L 04H[R0], R2
+000000D5 452103                  		CMP 03H[R2].UB, R1
+000000D8 2Arr                    		BGT L38
+000000DA                         L36:	; bb32
+                                 ;      93     return;
+                                 ;      94   if ( arg_pixel->x >= b->width )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",94
+000000DA EC01                    		MOV.L [R0], R1
+000000DC 581E                    		MOVU.B [R1], R14
+000000DE A809                    		MOV.L 04H[R0], R1
+000000E0 451E05                  		CMP 05H[R1].UB, R14
+000000E3 28rr                    		BGE L38
+000000E5                         L37:	; bb46
+                                 ;      95     return;
+                                 ;      96   u8g_pb16v2_set_pixel(b, arg_pixel->x, arg_pixel->y, arg_pixel->color);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",96
+000000E5 EC01                    		MOV.L [R0], R1
+000000E7 B114                    		MOVU.B 04H[R1], R4
+000000E9 B01B                    		MOVU.B 01H[R1], R3
+000000EB 5812                    		MOVU.B [R1], R2
+000000ED A809                    		MOV.L 04H[R0], R1
+000000EF 39rrrr               W  		BSR _u8g_pb16v2_set_pixel
+000000F2 6702                    		RTSD #08H
+000000F4                         L38:	; return
+                                 ;      97 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",97
+000000F4 6702                    		RTSD #08H
+000000F6                         _u8g_pb16v2_Set8PixelStd:
+                                 		.STACK	_u8g_pb16v2_Set8PixelStd=16
+                                 ;      98 
+                                 ;      99 
+                                 ;     100 void u8g_pb16v2_Set8PixelStd(u8g_pb_t *b, u8g_dev_arg_pixel_t *arg_pixel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",100
+000000F6 60C0                    		SUB #0CH, R0
+000000F8 A081                    		MOV.L R1, 08H[R0]
+000000FA A00A                    		MOV.L R2, 04H[R0]
+                                 ;     101 {
+                                 ;     102   register uint8_t pixel = arg_pixel->pixel;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",102
+000000FC C5200203                		MOV.B 02H[R2], 03H[R0]
+00000100                         L40:	; bb6
+                                 ;     103   do
+                                 ;     104   {
+                                 ;     105     if ( pixel & 128 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",105
+00000100 F50703                  		BTST #07H, 03H[R0].B
+00000103 10                   S  		BEQ L42
+00000104                         L41:	; bb7
+                                 ;     106     {
+                                 ;     107       u8g_pb16v2_SetPixel(b, arg_pixel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",107
+00000104 A80A                    		MOV.L 04H[R0], R2
+00000106 A881                    		MOV.L 08H[R0], R1
+00000108 39rrrr               W  		BSR _u8g_pb16v2_SetPixel
+0000010B                         L42:	; bb15
+                                 ;     108     }
+                                 ;     109     switch( arg_pixel->dir )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",109
+0000010B A809                    		MOV.L 04H[R0], R1
+0000010D B099                    		MOVU.B 03H[R1], R1
+0000010F 6131                    		CMP #03H, R1
+00000111 20rr                    		BEQ L49
+00000113                         L43:	; bb15
+00000113 6111                    		CMP #01H, R1
+00000115 20rr                    		BEQ L47
+00000117                         L44:	; bb15
+00000117 6121                    		CMP #02H, R1
+00000119 20rr                    		BEQ L48
+0000011B                         L45:	; bb15
+0000011B 6101                    		CMP #00H, R1
+0000011D 21rr                    		BNE L50
+0000011F                         L46:	; bb20
+                                 ;     110     {
+                                 ;     111       case 0: arg_pixel->x++; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",111
+0000011F A809                    		MOV.L 04H[R0], R1
+00000121 581E                    		MOVU.B [R1], R14
+00000123 621E                    		ADD #01H, R14
+00000125 C31E                    		MOV.B R14, [R1]
+00000127 2Err                 B  		BRA L50
+00000129                         L47:	; bb25
+                                 ;     112       case 1: arg_pixel->y++; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",112
+00000129 A809                    		MOV.L 04H[R0], R1
+0000012B B01A                    		MOVU.B 01H[R1], R2
+0000012D 6212                    		ADD #01H, R2
+0000012F 801A                    		MOV.B R2, 01H[R1]
+00000131 2Err                 B  		BRA L50
+00000133                         L48:	; bb30
+                                 ;     113       case 2: arg_pixel->x--; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",113
+00000133 A809                    		MOV.L 04H[R0], R1
+00000135 581E                    		MOVU.B [R1], R14
+00000137 601E                    		SUB #01H, R14
+00000139 C31E                    		MOV.B R14, [R1]
+0000013B 08                   S  		BRA L50
+0000013C                         L49:	; bb35
+                                 ;     114       case 3: arg_pixel->y--; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",114
+0000013C A809                    		MOV.L 04H[R0], R1
+0000013E B01A                    		MOVU.B 01H[R1], R2
+00000140 6012                    		SUB #01H, R2
+00000142 801A                    		MOV.B R2, 01H[R1]
+00000144                         L50:	; bb40
+                                 ;     115     }
+                                 ;     116     pixel <<= 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",116
+00000144 B089                    		MOVU.B 03H[R0], R1
+00000146 6C11                    		SHLL #01H, R1
+00000148 8089                    		MOV.B R1, 03H[R0]
+0000014A                         L51:	; bb40.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",103
+0000014A B089                    		MOVU.B 03H[R0], R1
+0000014C 6101                    		CMP #00H, R1
+0000014E 21rr                    		BNE L40
+00000150                         L52:	; return
+                                 ;     117   } while( pixel != 0  );
+                                 ;     118 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",118
+00000150 6703                    		RTSD #0CH
+00000152                         _u8g_dev_pb16v2_base_fn:
+                                 		.STACK	_u8g_dev_pb16v2_base_fn=32
+                                 ;     119 
+                                 ;     120 
+                                 ;     121 
+                                 ;     122 uint8_t u8g_dev_pb16v2_base_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, void *arg)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",122
+00000152 7100E4                  		ADD #0FFFFFFE4H, R0
+00000155 A181                    		MOV.L R1, 18H[R0]
+00000157 A10A                    		MOV.L R2, 14H[R0]
+00000159 848B                    		MOV.B R3, 13H[R0]
+0000015B A08C                    		MOV.L R4, 0CH[R0]
+                                 ;     123 {
+                                 ;     124   u8g_pb_t *pb = (u8g_pb_t *)(dev->dev_mem);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",124
+0000015D A909                    		MOV.L 14H[R0], R1
+0000015F E5100101                		MOV.L 04H[R1], 04H[R0]
+00000163                         L54:	; entry.split
+                                 ;     125   switch(msg)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",125
+00000163 B489                    		MOVU.B 13H[R0], R1
+00000165 755114                  		CMP #14H, R1
+00000168 20rr                    		BEQ L65
+0000016A                         L55:	; entry.split
+0000016A 755115                  		CMP #15H, R1
+0000016D 20rr                    		BEQ L67
+0000016F                         L56:	; entry.split
+0000016F 755117                  		CMP #17H, R1
+00000172 20rr                    		BEQ L70
+00000174                         L57:	; entry.split
+00000174 755132                  		CMP #32H, R1
+00000177 20rr                    		BEQ L64
+00000179                         L58:	; entry.split
+00000179 755148                  		CMP #48H, R1
+0000017C 20rr                    		BEQ L73
+0000017E                         L59:	; entry.split
+0000017E 755146                  		CMP #46H, R1
+00000181 20rr                    		BEQ L71
+00000183                         L60:	; entry.split
+00000183 755147                  		CMP #47H, R1
+00000186 20rr                    		BEQ L72
+00000188                         L61:	; entry.split
+00000188 75513B                  		CMP #3BH, R1
+0000018B 21rr                    		BNE L74
+0000018D                         L62:	; bb12
+                                 ;     126   {
+                                 ;     127     case U8G_DEV_MSG_SET_8PIXEL:
+                                 ;     128       if ( u8g_pb_Is8PixelVisible(pb, (u8g_dev_arg_pixel_t *)arg) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",128
+0000018D A88A                    		MOV.L 0CH[R0], R2
+0000018F A809                    		MOV.L 04H[R0], R1
+00000191 05rrrrrr             A  		BSR _u8g_pb_Is8PixelVisible
+00000195 6101                    		CMP #00H, R1
+00000197 20rr                    		BEQ L74
+00000199                         L63:	; bb13
+                                 ;     129       {
+                                 ;     130         u8g_pb16v2_Set8PixelStd(pb, (u8g_dev_arg_pixel_t *)arg);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",130
+00000199 A88A                    		MOV.L 0CH[R0], R2
+0000019B A809                    		MOV.L 04H[R0], R1
+0000019D 39rrrr               W  		BSR _u8g_pb16v2_Set8PixelStd
+000001A0 2Err                 B  		BRA L74
+000001A2                         L64:	; bb25
+                                 ;     131       }
+                                 ;     132       break;
+                                 ;     133     case U8G_DEV_MSG_SET_PIXEL:
+                                 ;     134       u8g_pb16v2_SetPixel(pb, (u8g_dev_arg_pixel_t *)arg);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",134
+000001A2 A88A                    		MOV.L 0CH[R0], R2
+000001A4 A809                    		MOV.L 04H[R0], R1
+000001A6 39rrrr               W  		BSR _u8g_pb16v2_SetPixel
+000001A9 2Err                 B  		BRA L74
+000001AB                         L65:	; bb31
+                                 ;     135       break;
+                                 ;     136     case U8G_DEV_MSG_INIT:
+                                 ;     137       break;
+                                 ;     138     case U8G_DEV_MSG_STOP:
+                                 ;     139       break;
+                                 ;     140     case U8G_DEV_MSG_PAGE_FIRST:
+                                 ;     141       u8g_pb16v2_Clear(pb);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",141
+000001AB A809                    		MOV.L 04H[R0], R1
+000001AD 39rrrr               W  		BSR _u8g_pb16v2_Clear
+000001B0                         L66:	; bb31.split
+                                 ;     142       u8g_page_First(&(pb->p));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",142
+000001B0 A809                    		MOV.L 04H[R0], R1
+000001B2 05rrrrrr             A  		BSR _u8g_page_First
+000001B6 2Err                 B  		BRA L74
+000001B8                         L67:	; bb36
+                                 ;     143       break;
+                                 ;     144     case U8G_DEV_MSG_PAGE_NEXT:
+                                 ;     145       if ( u8g_page_Next(&(pb->p)) == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",145
+000001B8 A809                    		MOV.L 04H[R0], R1
+000001BA 05rrrrrr             A  		BSR _u8g_page_Next
+000001BE 6101                    		CMP #00H, R1
+000001C0 18                   S  		BNE L69
+000001C1                         L68:	; bb37
+                                 ;     146         return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",146
+000001C1 3C0300                  		MOV.B #00H, 03H[R0]
+000001C4 2Err                 B  		BRA L75
+000001C6                         L69:	; bb46
+                                 ;     147       u8g_pb16v2_Clear(pb);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",147
+000001C6 A809                    		MOV.L 04H[R0], R1
+000001C8 39rrrr               W  		BSR _u8g_pb16v2_Clear
+000001CB 2Err                 B  		BRA L74
+000001CD                         L70:	; bb48
+                                 ;     148       break;
+                                 ;     149 #ifdef U8G_DEV_MSG_IS_BBX_INTERSECTION
+                                 ;     150     case U8G_DEV_MSG_IS_BBX_INTERSECTION:
+                                 ;     151       return u8g_pb_IsIntersection(pb, (u8g_dev_arg_bbx_t *)arg);
+                                 ;     152 #endif
+                                 ;     153     case U8G_DEV_MSG_GET_PAGE_BOX:
+                                 ;     154       u8g_pb_GetPageBox(pb, (u8g_box_t *)arg);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",154
+000001CD A88A                    		MOV.L 0CH[R0], R2
+000001CF A809                    		MOV.L 04H[R0], R1
+000001D1 05rrrrrr             A  		BSR _u8g_pb_GetPageBox
+000001D5 2Err                 B  		BRA L74
+000001D7                         L71:	; bb52
+                                 ;     155       break;
+                                 ;     156     case U8G_DEV_MSG_GET_WIDTH:
+                                 ;     157       *((u8g_uint_t *)arg) = pb->width;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",157
+000001D7 A809                    		MOV.L 04H[R0], R1
+000001D9 A88A                    		MOV.L 0CH[R0], R2
+000001DB C11205                  		MOV.B 05H[R1], [R2]
+000001DE 2Err                 B  		BRA L74
+000001E0                         L72:	; bb57
+                                 ;     158       break;
+                                 ;     159     case U8G_DEV_MSG_GET_HEIGHT:
+                                 ;     160       *((u8g_uint_t *)arg) = pb->p.total_height;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",160
+000001E0 A809                    		MOV.L 04H[R0], R1
+000001E2 A88A                    		MOV.L 0CH[R0], R2
+000001E4 C11201                  		MOV.B 01H[R1], [R2]
+000001E7 08                   S  		BRA L74
+000001E8                         L73:	; bb65
+                                 ;     161       break;
+                                 ;     162     case U8G_DEV_MSG_SET_COLOR_ENTRY:
+                                 ;     163       break;
+                                 ;     164     case U8G_DEV_MSG_SET_XY_CB:
+                                 ;     165       break;
+                                 ;     166     case U8G_DEV_MSG_GET_MODE:
+                                 ;     167       return U8G_MODE_GRAY2BIT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",167
+000001E8 3C0302                  		MOV.B #02H, 03H[R0]
+000001EB 08                   S  		BRA L75
+000001EC                         L74:	; bb67
+                                 ;     168   }
+                                 ;     169   return 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",169
+000001EC 3C0301                  		MOV.B #01H, 03H[R0]
+000001EF                         L75:	; bb69
+000001EF C500030B                		MOV.B 03H[R0], 0BH[R0]
+                                 ;     170 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_pb16v2.c",170
+000001F3 B289                    		MOVU.B 0BH[R0], R1
+000001F5 6707                    		RTSD #1CH
+                                 ;     171  
+                                 ;     172   
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00567   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000503(000001F7H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\u8g_pb16v2.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\u8g_pb16v2.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\Display\u8g_pb16v2.obj

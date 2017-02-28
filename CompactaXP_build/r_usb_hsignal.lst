@@ -1,0 +1,530 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:30 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:29
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_usb_hsignal.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_usb_hsignal.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;r_usb_hsignal.c
+                                 
+                                 		.glb	_usb_ghstd_RemortPort
+                                 		.glb	_usb_hstd_VbusControl
+                                 		.glb	_usb_creg_set_vbout
+                                 		.glb	_usb_creg_clr_vbout
+                                 		.glb	_usb_hstd_SuspendProcess
+                                 		.glb	_usb_hreg_clr_uact
+                                 		.glb	_usb_cpu_DelayXms
+                                 		.glb	_usb_hstd_ChkSof
+                                 		.glb	_usb_hreg_set_rwupe
+                                 		.glb	_usb_hstd_BchgEnable
+                                 		.glb	_usb_hstd_Attach
+                                 		.glb	_usb_hstd_DtchEnable
+                                 		.glb	_usb_cstd_BerneEnable
+                                 		.glb	_usb_hstd_NotifAtorDetach
+                                 		.glb	_usb_hstd_Detach
+                                 		.glb	_usb_creg_clr_dvstctr
+                                 		.glb	_usb_hstd_AttchEnable
+                                 		.glb	_usb_hstd_InitConnect
+                                 		.glb	_usb_hreg_clr_sts_attch
+                                 		.glb	_usb_hreg_clr_sts_dtch
+                                 		.glb	_usb_hstd_ChkAttach
+                                 		.glb	_usb_hstd_ChkClk
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _usb_hstd_VbusControl:
+                                 		.STACK	_usb_hstd_VbusControl=12
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_usb_hsignal.c
+                                 ;      21 * Description  : Host USB signalling
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Support Multi device.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 /******************************************************************************
+                                 ;      30 Includes   <System Includes> , "Project Includes"
+                                 ;      31 ******************************************************************************/
+                                 ;      32 #include "r_usb_basic_if.h"
+                                 ;      33 #include "r_usb_reg_access.h"
+                                 ;      34 
+                                 ;      35 
+                                 ;      36 #if (USB_FUNCSEL_USBIP0_PP == USB_HOST_PP) || (USB_FUNCSEL_USBIP1_PP == USB_HOST_PP)
+                                 ;      37 
+                                 ;      38 /******************************************************************************
+                                 ;      39 Constant macro definitions
+                                 ;      40 ******************************************************************************/
+                                 ;      41 
+                                 ;      42 /******************************************************************************
+                                 ;      43 External variables and functions
+                                 ;      44 ******************************************************************************/
+                                 ;      45 
+                                 ;      46 /******************************************************************************
+                                 ;      47 Private global variables and functions
+                                 ;      48 ******************************************************************************/
+                                 ;      49 
+                                 ;      50 /******************************************************************************
+                                 ;      51 Renesas Abstracted Host Signal functions
+                                 ;      52 ******************************************************************************/
+                                 ;      53 
+                                 ;      54 /******************************************************************************
+                                 ;      55 Function Name   : usb_hstd_VbusControl
+                                 ;      56 Description     : USB VBUS ON/OFF setting.
+                                 ;      57 Arguments       : USB_UTR_t *ptr : USB internal structure. Selects e.g. channel.
+                                 ;      58                 : uint16_t port     : Port number.
+                                 ;      59                 : uint16_t command  : ON / OFF.
+                                 ;      60 Return value    : none
+                                 ;      61 ******************************************************************************/
+                                 ;      62 void usb_hstd_VbusControl(USB_UTR_t *ptr, uint16_t port, uint16_t command)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",62
+00000000 6080                    		SUB #08H, R0
+00000002 A009                    		MOV.L R1, 04H[R0]
+00000004 900A                    		MOV.W R2, 02H[R0]
+00000006 D303                    		MOV.W R3, [R0]
+                                 ;      63 {
+                                 ;      64     if( command == USB_VBON )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",64
+00000008 6103                    		CMP #00H, R3
+0000000A 980A                    		MOV.W 02H[R0], R2
+0000000C A809                    		MOV.L 04H[R0], R1
+0000000E 18                   S  		BNE L12
+0000000F                         L11:	; bb4
+                                 ;      65     {
+                                 ;      66         usb_creg_set_vbout( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",66
+0000000F 5F22                    		MOVU.W R2, R2
+00000011 05rrrrrr             A  		BSR _usb_creg_set_vbout
+00000015 6702                    		RTSD #08H
+00000017                         L12:	; bb6
+                                 ;      67 #ifdef USB_HOST_BC_ENABLE
+                                 ;      68         if(USB_BC_SUPPORT_IP == ptr->ip)
+                                 ;      69         {
+                                 ;      70             usb_hstd_bc_func[g_usb_hstd_bc[ptr->ip].state][USB_BC_EVENT_VB](ptr, port);
+                                 ;      71         }
+                                 ;      72 #endif
+                                 ;      73     }
+                                 ;      74     else
+                                 ;      75     {
+                                 ;      76         usb_creg_clr_vbout( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",76
+00000017 5F22                    		MOVU.W R2, R2
+00000019 05rrrrrr             A  		BSR _usb_creg_clr_vbout
+0000001D 6702                    		RTSD #08H
+0000001F                         _usb_hstd_SuspendProcess:
+                                 		.STACK	_usb_hstd_SuspendProcess=12
+                                 ;      77     }
+                                 ;      78 }
+                                 ;      79 /******************************************************************************
+                                 ;      80 End of function usb_hstd_VbusControl
+                                 ;      81 ******************************************************************************/
+                                 ;      82 
+                                 ;      83 /******************************************************************************
+                                 ;      84 Function Name   : usb_hstd_SuspendProcess
+                                 ;      85 Description     : Set USB registers as required when USB Device status is moved
+                                 ;      86                 : to "Suspend".  
+                                 ;      87 Arguments       : USB_UTR_t *ptr : USB internal structure. Selects e.g. channel.
+                                 ;      88                 : uint16_t port  : Port number.
+                                 ;      89 Return value    : none
+                                 ;      90 ******************************************************************************/
+                                 ;      91 void usb_hstd_SuspendProcess(USB_UTR_t *ptr, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",91
+0000001F 6080                    		SUB #08H, R0
+00000021 A009                    		MOV.L R1, 04H[R0]
+00000023 900A                    		MOV.W R2, 02H[R0]
+                                 ;      92 {
+                                 ;      93     /* SUSPENDED check */
+                                 ;      94     if( usb_ghstd_RemortPort[port] == USB_SUSPENDED )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",94
+00000025 FBE2rrrrrrrr            		MOV.L #_usb_ghstd_RemortPort, R14
+0000002B FED2EE                  		MOVU.W [R2,R14], R14
+0000002E 755E50                  		CMP #50H, R14
+00000031 A809                    		MOV.L 04H[R0], R1
+00000033 21rr                    		BNE L20
+00000035                         L14:	; bb3
+                                 ;      95     {
+                                 ;      96         /* SOF OFF */
+                                 ;      97         usb_hreg_clr_uact( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",97
+00000035 5F22                    		MOVU.W R2, R2
+00000037 05rrrrrr             A  		BSR _usb_hreg_clr_uact
+0000003B                         L15:	; bb3.split
+0000003B 6611                    		MOV.L #00000001H, R1
+                                 ;      98 
+                                 ;      99         /* Wait */
+                                 ;     100         usb_cpu_DelayXms((uint16_t)1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",100
+0000003D 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+00000041                         L16:	; bb3.split1
+                                 ;     101         usb_hstd_ChkSof(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",101
+00000041 B80A                    		MOVU.W 02H[R0], R2
+00000043 A809                    		MOV.L 04H[R0], R1
+00000045 05rrrrrr             A  		BSR _usb_hstd_ChkSof
+00000049                         L17:	; bb3.split2
+                                 ;     102         /* RWUPE=1, UACT=0 */
+                                 ;     103         usb_hreg_set_rwupe( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",103
+00000049 B80A                    		MOVU.W 02H[R0], R2
+0000004B A809                    		MOV.L 04H[R0], R1
+0000004D 05rrrrrr             A  		BSR _usb_hreg_set_rwupe
+00000051                         L18:	; bb3.split3
+                                 ;     104 
+                                 ;     105         /* Enable port BCHG interrupt */
+                                 ;     106         usb_hstd_BchgEnable(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",106
+00000051 B80A                    		MOVU.W 02H[R0], R2
+00000053 A809                    		MOV.L 04H[R0], R1
+00000055 05rrrrrr             A  		BSR _usb_hstd_BchgEnable
+00000059                         L19:	; bb3.split4
+00000059 6651                    		MOV.L #00000005H, R1
+                                 ;     107         /* Wait */
+                                 ;     108         usb_cpu_DelayXms((uint16_t)5);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",108
+0000005B 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+0000005F 6702                    		RTSD #08H
+00000061                         L20:	; bb11
+                                 ;     109     }
+                                 ;     110     else
+                                 ;     111     {
+                                 ;     112         /* SOF OFF */
+                                 ;     113         usb_hreg_clr_uact( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",113
+00000061 5F22                    		MOVU.W R2, R2
+00000063 05rrrrrr             A  		BSR _usb_hreg_clr_uact
+00000067                         L21:	; bb11.split
+00000067 6651                    		MOV.L #00000005H, R1
+                                 ;     114         /* Wait */
+                                 ;     115         usb_cpu_DelayXms((uint16_t)5);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",115
+00000069 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+0000006D 6702                    		RTSD #08H
+0000006F                         _usb_hstd_Attach:
+                                 		.STACK	_usb_hstd_Attach=12
+                                 ;     116     }
+                                 ;     117 }
+                                 ;     118 /******************************************************************************
+                                 ;     119 End of function usb_hstd_SuspendProcess
+                                 ;     120 ******************************************************************************/
+                                 ;     121 
+                                 ;     122 /******************************************************************************
+                                 ;     123 Function Name   : usb_hstd_Attach
+                                 ;     124 Description     : Set USB registers as required when USB device is attached, 
+                                 ;     125                 : and notify MGR (manager) task that attach event occurred.
+                                 ;     126 Arguments       : USB_UTR_t *ptr : USB internal structure. Selects e.g. channel.
+                                 ;     127                 : uint16_t result       : Result.
+                                 ;     128                 : uint16_t port         : Port number.
+                                 ;     129 Return value    : none
+                                 ;     130 ******************************************************************************/
+                                 ;     131 void usb_hstd_Attach(USB_UTR_t *ptr, uint16_t result, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",131
+0000006F 6080                    		SUB #08H, R0
+00000071 A009                    		MOV.L R1, 04H[R0]
+00000073 900A                    		MOV.W R2, 02H[R0]
+00000075 D303                    		MOV.W R3, [R0]
+                                 ;     132 {
+                                 ;     133     /* DTCH  interrupt enable */
+                                 ;     134     usb_hstd_DtchEnable(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",134
+00000077 5C02                    		MOVU.W [R0], R2
+00000079 A809                    		MOV.L 04H[R0], R1
+0000007B 05rrrrrr             A  		BSR _usb_hstd_DtchEnable
+0000007F                         L23:	; entry.split
+                                 ;     135     /* Interrupt Enable */
+                                 ;     136     usb_cstd_BerneEnable(ptr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",136
+0000007F A809                    		MOV.L 04H[R0], R1
+00000081 05rrrrrr             A  		BSR _usb_cstd_BerneEnable
+00000085                         L24:	; entry.split1
+                                 ;     137     /* USB Mng API */
+                                 ;     138     usb_hstd_NotifAtorDetach(ptr, result, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",138
+00000085 5C03                    		MOVU.W [R0], R3
+00000087 B80A                    		MOVU.W 02H[R0], R2
+00000089 A809                    		MOV.L 04H[R0], R1
+0000008B 05rrrrrr             A  		BSR _usb_hstd_NotifAtorDetach
+0000008F 6702                    		RTSD #08H
+00000091                         _usb_hstd_Detach:
+                                 		.STACK	_usb_hstd_Detach=12
+                                 ;     139 #ifdef USB_HOST_BC_ENABLE
+                                 ;     140     if(USB_BC_SUPPORT_IP == ptr->ip)
+                                 ;     141     {
+                                 ;     142         usb_hstd_bc_func[g_usb_hstd_bc[ptr->ip].state][USB_BC_EVENT_AT](ptr, port);
+                                 ;     143     }
+                                 ;     144 #endif /* USB_HOST_BC_ENABLE */
+                                 ;     145 }
+                                 ;     146 /******************************************************************************
+                                 ;     147 End of function usb_hstd_Attach
+                                 ;     148 ******************************************************************************/
+                                 ;     149 
+                                 ;     150 /******************************************************************************
+                                 ;     151 Function Name   : usb_hstd_Detach
+                                 ;     152 Description     : Set USB register as required when USB device is detached, and 
+                                 ;     153                   notify MGR (manager) task that detach occurred.
+                                 ;     154 Arguments       : uint16_t port         : Port number.
+                                 ;     155 Return value    : none
+                                 ;     156 ******************************************************************************/
+                                 ;     157 void usb_hstd_Detach(USB_UTR_t *ptr, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",157
+00000091 6080                    		SUB #08H, R0
+00000093 A009                    		MOV.L R1, 04H[R0]
+00000095 900A                    		MOV.W R2, 02H[R0]
+                                 ;     158 {
+                                 ;     159 #ifdef USB_HOST_BC_ENABLE
+                                 ;     160     if(USB_BC_SUPPORT_IP == ptr->ip)
+                                 ;     161     {
+                                 ;     162         usb_hstd_bc_func[g_usb_hstd_bc[ptr->ip].state][USB_BC_EVENT_DT](ptr, port);
+                                 ;     163     }
+                                 ;     164 #endif /* USB_HOST_BC_ENABLE */
+                                 ;     165 
+                                 ;     166     /* DVSTCTR clear */
+                                 ;     167     usb_creg_clr_dvstctr( ptr, port, (uint16_t)(USB_RWUPE | USB_USBRST | USB_RESUME | USB_UACT) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",167
+00000097 B80A                    		MOVU.W 02H[R0], R2
+00000099 A809                    		MOV.L 04H[R0], R1
+0000009B 7543F0                  		MOV.L #000000F0H, R3
+0000009E 05rrrrrr             A  		BSR _usb_creg_clr_dvstctr
+000000A2                         L26:	; entry.split
+                                 ;     168 
+                                 ;     169     /* ATTCH interrupt enable */
+                                 ;     170     usb_hstd_AttchEnable(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",170
+000000A2 B80A                    		MOVU.W 02H[R0], R2
+000000A4 A809                    		MOV.L 04H[R0], R1
+000000A6 05rrrrrr             A  		BSR _usb_hstd_AttchEnable
+000000AA                         L27:	; entry.split1
+                                 ;     171 
+                                 ;     172     /* USB Mng API */
+                                 ;     173     usb_hstd_NotifAtorDetach(ptr, (uint16_t)USB_DETACH, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",173
+000000AA B80B                    		MOVU.W 02H[R0], R3
+000000AC A809                    		MOV.L 04H[R0], R1
+000000AE 754243                  		MOV.L #00000043H, R2
+000000B1 05rrrrrr             A  		BSR _usb_hstd_NotifAtorDetach
+000000B5 6702                    		RTSD #08H
+000000B7                         _usb_hstd_InitConnect:
+                                 		.STACK	_usb_hstd_InitConnect=16
+                                 ;     174 }
+                                 ;     175 /******************************************************************************
+                                 ;     176 End of function usb_hstd_Detach
+                                 ;     177 ******************************************************************************/
+                                 ;     178 
+                                 ;     179 /******************************************************************************
+                                 ;     180 Function Name   : usb_hstd_InitConnect
+                                 ;     181 Description     : Execute attach or detach and return USB connect status.
+                                 ;     182 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel.
+                                 ;     183                 : uint16_t port   : Port number.
+                                 ;     184                 : uint16_t else_connect_inf : Else USB Port connect Information.
+                                 ;     185 Return value    : uint16_t         ; connection status
+                                 ;     186                 :                  ; (USB_ATTACHF/USB_ATTACHL/USB_DETACH/USB_DONE)
+                                 ;     187 ******************************************************************************/
+                                 ;     188 uint16_t usb_hstd_InitConnect(USB_UTR_t *ptr, uint16_t port, uint16_t else_connect_inf )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",188
+000000B7 60C0                    		SUB #0CH, R0
+000000B9 A081                    		MOV.L R1, 08H[R0]
+000000BB 908A                    		MOV.W R2, 06H[R0]
+000000BD 9083                    		MOV.W R3, 04H[R0]
+                                 ;     189 {
+                                 ;     190     uint16_t        connect_inf;
+                                 ;     191 
+                                 ;     192     usb_hreg_clr_sts_attch( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",192
+000000BF B88A                    		MOVU.W 06H[R0], R2
+000000C1 A881                    		MOV.L 08H[R0], R1
+000000C3 05rrrrrr             A  		BSR _usb_hreg_clr_sts_attch
+000000C7                         L29:	; entry.split
+                                 ;     193     usb_hreg_clr_sts_dtch( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",193
+000000C7 B88A                    		MOVU.W 06H[R0], R2
+000000C9 A881                    		MOV.L 08H[R0], R1
+000000CB 05rrrrrr             A  		BSR _usb_hreg_clr_sts_dtch
+000000CF                         L30:	; entry.split1
+                                 ;     194 
+                                 ;     195     /* VBUS out */
+                                 ;     196     usb_hstd_VbusControl(ptr, port, (uint16_t)USB_VBON);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",196
+000000CF B88A                    		MOVU.W 06H[R0], R2
+000000D1 A881                    		MOV.L 08H[R0], R1
+000000D3 6603                    		MOV.L #00000000H, R3
+000000D5 39rrrr               W  		BSR _usb_hstd_VbusControl
+000000D8                         L31:	; entry.split2
+000000D8 754164                  		MOV.L #00000064H, R1
+                                 ;     197     
+                                 ;     198 #ifndef USB_HOST_BC_ENABLE
+                                 ;     199     usb_cpu_DelayXms((uint16_t)100);    /* 100ms wait */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",199
+000000DB 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+000000DF                         L32:	; entry.split3
+                                 ;     200 #endif /* ! USB_HOST_BC_ENABLE */
+                                 ;     201     
+                                 ;     202     connect_inf = usb_hstd_ChkAttach(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",202
+000000DF B88A                    		MOVU.W 06H[R0], R2
+000000E1 A881                    		MOV.L 08H[R0], R1
+000000E3 05rrrrrr             A  		BSR _usb_hstd_ChkAttach
+000000E7 D301                    		MOV.W R1, [R0]
+000000E9                         L33:	; entry.split4
+                                 ;     203 
+                                 ;     204     switch( connect_inf )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",204
+000000E9 5C01                    		MOVU.W [R0], R1
+000000EB 755143                  		CMP #43H, R1
+000000EE 20rr                    		BEQ L38
+000000F0                         L34:	; entry.split4
+000000F0 755142                  		CMP #42H, R1
+000000F3 20rr                    		BEQ L37
+000000F5                         L35:	; entry.split4
+000000F5 755141                  		CMP #41H, R1
+000000F8 21rr                    		BNE L40
+000000FA                         L36:	; bb
+                                 ;     205     {
+                                 ;     206     case USB_ATTACHL:
+                                 ;     207         usb_hstd_Attach(ptr, connect_inf, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",207
+000000FA B88B                    		MOVU.W 06H[R0], R3
+000000FC 5C02                    		MOVU.W [R0], R2
+000000FE A881                    		MOV.L 08H[R0], R1
+00000100 39rrrr               W  		BSR _usb_hstd_Attach
+00000103 2Err                 B  		BRA L42
+00000105                         L37:	; bb19
+                                 ;     208         break;
+                                 ;     209     case USB_ATTACHF:
+                                 ;     210         usb_hstd_Attach(ptr, connect_inf, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",210
+00000105 B88B                    		MOVU.W 06H[R0], R3
+00000107 5C02                    		MOVU.W [R0], R2
+00000109 A881                    		MOV.L 08H[R0], R1
+0000010B 39rrrr               W  		BSR _usb_hstd_Attach
+0000010E 2Err                 B  		BRA L42
+00000110                         L38:	; bb23
+                                 ;     211         break;
+                                 ;     212     case USB_DETACH:
+                                 ;     213         /* USB detach */
+                                 ;     214         usb_hstd_Detach(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",214
+00000110 B88A                    		MOVU.W 06H[R0], R2
+00000112 A881                    		MOV.L 08H[R0], R1
+00000114 39rrrr               W  		BSR _usb_hstd_Detach
+00000117                         L39:	; bb23.split
+                                 ;     215         /* Check clock */
+                                 ;     216 #if USB_PORTSEL_PP == USB_1PORT_PP
+                                 ;     217         usb_hstd_ChkClk(ptr, port, (uint16_t)USB_DETACHED);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",217
+00000117 B88A                    		MOVU.W 06H[R0], R2
+00000119 A881                    		MOV.L 08H[R0], R1
+0000011B 66A3                    		MOV.L #0000000AH, R3
+0000011D 05rrrrrr             A  		BSR _usb_hstd_ChkClk
+00000121 2Err                 B  		BRA L42
+00000123                         L40:	; bb28
+                                 ;     218 #else   /* USB_PORTSEL_PP == USB_1PORT_PP */
+                                 ;     219         usb_hstd_ChkClk2(ptr, else_connect_inf );
+                                 ;     220 #endif  /* USB_PORTSEL_PP == USB_1PORT_PP */
+                                 ;     221         break;
+                                 ;     222     default:
+                                 ;     223         /* USB detach */
+                                 ;     224         usb_hstd_Detach(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",224
+00000123 B88A                    		MOVU.W 06H[R0], R2
+00000125 A881                    		MOV.L 08H[R0], R1
+00000127 39rrrr               W  		BSR _usb_hstd_Detach
+0000012A                         L41:	; bb28.split
+                                 ;     225         /* Check clock */
+                                 ;     226 #if USB_PORTSEL_PP == USB_1PORT_PP
+                                 ;     227         usb_hstd_ChkClk(ptr, port, (uint16_t)USB_DETACHED);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",227
+0000012A B88A                    		MOVU.W 06H[R0], R2
+0000012C A881                    		MOV.L 08H[R0], R1
+0000012E 66A3                    		MOV.L #0000000AH, R3
+00000130 05rrrrrr             A  		BSR _usb_hstd_ChkClk
+00000134                         L42:	; bb33
+                                 ;     228 #else   /* USB_PORTSEL_PP == USB_1PORT_PP */
+                                 ;     229         usb_hstd_ChkClk2(ptr, else_connect_inf );
+                                 ;     230 #endif  /* USB_PORTSEL_PP == USB_1PORT_PP */
+                                 ;     231         break;
+                                 ;     232     }
+                                 ;     233 
+                                 ;     234     return connect_inf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",234
+00000134 D40001                  		MOV.W [R0], 02H[R0]
+00000137 9809                    		MOV.W 02H[R0], R1
+00000139                         L43:	; bb33.split
+                                 ;     235 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hsignal.c",235
+00000139 5F11                    		MOVU.W R1, R1
+0000013B 6703                    		RTSD #0CH
+                                 ;     236 /******************************************************************************
+                                 ;     237 End of function usb_hstd_InitConnect
+                                 ;     238 ******************************************************************************/
+                                 ;     239 
+                                 ;     240 #endif  /* (USB_FUNCSEL_USBIP0_PP == USB_HOST_PP) || (USB_FUNCSEL_USBIP1_PP == USB_HOST_PP) */
+                                 ;     241 
+                                 ;     242 /******************************************************************************
+                                 ;     243 End  Of File
+                                 ;     244 ******************************************************************************/
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00497   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000317(0000013DH)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\r_usb_hsignal.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_usb_hsignal.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_usb_basic\src\driver\host\r_usb_hsignal.obj

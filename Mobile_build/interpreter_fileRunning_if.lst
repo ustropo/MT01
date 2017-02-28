@@ -1,0 +1,903 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:53:55 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:53:55
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=interpreter_fileRunning_if.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=interpreter_fileRunning_if.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;interpreter_fileRunning_if.c
+                                 
+                                 		.glb	_configVarOx
+                                 		.glb	_configVarPl
+                                 		.glb	_configFlags
+                                 		.glb	_tempoDwell
+                                 		.glb	_isDwell
+                                 		.glb	_swTimers
+                                 		.glb	_iif_func_enter
+                                 		.glb	_iif_func_esc
+                                 		.glb	_iif_func_down
+                                 		.glb	_iif_func_up
+                                 		.glb	_iif_func_left
+                                 		.glb	_iif_func_right
+                                 		.glb	_iif_func_zdown
+                                 		.glb	_iif_func_zup
+                                 		.glb	_iif_func_released
+                                 		.glb	_iif_func_cycleStop
+                                 		.glb	_sim
+                                 		.glb	_zmove
+                                 		.glb	_feedratepercent
+                                 		.glb	_cm_request_cycle_start
+                                 		.glb	_cm_request_feedhold
+                                 		.glb	_xTimerGenericCommand
+                                 		.glb	_xTaskGetTickCount
+                                 		.glb	_iif_bind_filerunning
+                                 		.glb	_xTimerCreate
+                                 		.glb	_iif_idle
+                                 		.glb	_iif_bind_filerunning_stop
+                                 		.glb	_iif_bind_warning
+                                 		.glb	_vTimerCallback
+                                 		.glb	_vAssertCalled
+                                 		.glb	_pvTimerGetTimerID
+                                 		.glb	_st_set_dwell_elapsed_time
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         __$iif_enter_filerunning:
+                                 		.STACK	__$iif_enter_filerunning=4
+                                 ;       1 /*
+                                 ;       2  * interpreter_fileRunning_if.c
+                                 ;       3  *
+                                 ;       4  *  Created on: 22/12/2015
+                                 ;       5  *      Author: leocafonso
+                                 ;       6  */
+                                 ;       7 #include "tinyg.h"
+                                 ;       8 #include "config.h"
+                                 ;       9 #include "canonical_machine.h"
+                                 ;      10 #include "plan_arc.h"
+                                 ;      11 #include "planner.h"
+                                 ;      12 #include "macros.h"
+                                 ;      13 #include "stepper.h"
+                                 ;      14 
+                                 ;      15 #include "FreeRTOS.h"
+                                 ;      16 #include "task.h"
+                                 ;      17 #include "timers.h"
+                                 ;      18 #include "config_SwTimers.h"
+                                 ;      19 
+                                 ;      20 #include "platform.h"
+                                 ;      21 #include "interpreter_if.h"
+                                 ;      22 #include "eeprom.h"
+                                 ;      23 #include "ut_state_config_var.h"
+                                 ;      24 
+                                 ;      25 extern bool sim;
+                                 ;      26 
+                                 ;      27 static void iif_enter_filerunning(void);
+                                 ;      28 static void iif_esc_filerunning(void);
+                                 ;      29 static void iif_down_filerunning(void);
+                                 ;      30 static void iif_up_filerunning(void);
+                                 ;      31 static void iif_left_filerunning(void);
+                                 ;      32 static void iif_right_filerunning(void);
+                                 ;      33 static void iif_zdown_filerunning(void);
+                                 ;      34 static void iif_zup_filerunning(void);
+                                 ;      35 static void iif_released_filerunning(void);
+                                 ;      36 
+                                 ;      37 static void iif_enter_warning(void);
+                                 ;      38 static void iif_esc_warning(void);
+                                 ;      39 static void iif_down_warning(void);
+                                 ;      40 static void iif_up_warning(void);
+                                 ;      41 
+                                 ;      42 float zmove = 0;
+                                 ;      43 float feedratepercent = 0.05;
+                                 ;      44 void vTimerCallback( TimerHandle_t pxTimer );
+                                 ;      45 void vTimerCallbackVelocity( TimerHandle_t pxTimer );
+                                 ;      46 
+                                 ;      47 void iif_enter_filerunning(void)
+                                 ;      48 {
+                                 ;      49 	cm_request_cycle_start();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",49
+00000000 05rrrrrr             A  		BSR _cm_request_cycle_start
+00000004 02                      		RTS
+00000005                         __$iif_esc_filerunning:
+                                 		.STACK	__$iif_esc_filerunning=4
+                                 ;      50 }
+                                 ;      51 
+                                 ;      52 void iif_esc_filerunning(void)
+                                 ;      53 {
+                                 ;      54 	cm_request_feedhold();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",54
+00000005 05rrrrrr             A  		BSR _cm_request_feedhold
+00000009 02                      		RTS
+0000000A                         __$iif_zdown_filerunning:
+                                 		.STACK	__$iif_zdown_filerunning=12
+                                 ;      55 }
+                                 ;      56 
+                                 ;      57 void iif_zdown_filerunning(void) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",57
+0000000A 7EA6                    		PUSH.L R6
+                                 ;      58 
+                                 ;      59 	  xTimerStart( swTimers[ZDOWN_FILERUNNING_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",59
+0000000C FBE2rrrrrrrr            		MOV.L #_swTimers, R14
+00000012 ECE6                    		MOV.L [R14], R6
+00000014 05rrrrrr             A  		BSR _xTaskGetTickCount
+00000018 EF13                    		MOV.L R1, R3
+0000001A 6040                    		SUB #04H, R0
+0000001C F80600                  		MOV.L #00000000H, [R0]
+0000001F 6604                    		MOV.L #00000000H, R4
+00000021 6612                    		MOV.L #00000001H, R2
+00000023 EF61                    		MOV.L R6, R1
+00000025 05rrrrrr             A  		BSR _xTimerGenericCommand
+00000029 6240                    		ADD #04H, R0
+0000002B 3F6601                  		RTSD #04H, R6-R6
+0000002E                         __$iif_zup_filerunning:
+                                 		.STACK	__$iif_zup_filerunning=12
+                                 ;      60 }
+                                 ;      61 void iif_zup_filerunning(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",61
+0000002E 7EA6                    		PUSH.L R6
+                                 ;      62 {
+                                 ;      63 	  xTimerStart( swTimers[ZUP_FILERUNNING_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",63
+00000030 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+00000036 A81E                    		MOV.L 04H[R1], R6
+00000038 05rrrrrr             A  		BSR _xTaskGetTickCount
+0000003C EF13                    		MOV.L R1, R3
+0000003E 6040                    		SUB #04H, R0
+00000040 F80600                  		MOV.L #00000000H, [R0]
+00000043 6604                    		MOV.L #00000000H, R4
+00000045 6612                    		MOV.L #00000001H, R2
+00000047 EF61                    		MOV.L R6, R1
+00000049 05rrrrrr             A  		BSR _xTimerGenericCommand
+0000004D 6240                    		ADD #04H, R0
+0000004F 3F6601                  		RTSD #04H, R6-R6
+00000052                         __$iif_left_filerunning:
+                                 		.STACK	__$iif_left_filerunning=12
+                                 ;      64 }
+                                 ;      65 void iif_left_filerunning(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",65
+00000052 7EA6                    		PUSH.L R6
+                                 ;      66 {
+                                 ;      67 	xTimerStart( swTimers[LEFT_FILERUNNING_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",67
+00000054 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+0000005A A91E                    		MOV.L 14H[R1], R6
+0000005C 05rrrrrr             A  		BSR _xTaskGetTickCount
+00000060 EF13                    		MOV.L R1, R3
+00000062 6040                    		SUB #04H, R0
+00000064 F80600                  		MOV.L #00000000H, [R0]
+00000067 6604                    		MOV.L #00000000H, R4
+00000069 6612                    		MOV.L #00000001H, R2
+0000006B EF61                    		MOV.L R6, R1
+0000006D 05rrrrrr             A  		BSR _xTimerGenericCommand
+00000071 6240                    		ADD #04H, R0
+00000073 3F6601                  		RTSD #04H, R6-R6
+00000076                         __$iif_right_filerunning:
+                                 		.STACK	__$iif_right_filerunning=12
+                                 ;      68 
+                                 ;      69 }
+                                 ;      70 void iif_right_filerunning(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",70
+00000076 7EA6                    		PUSH.L R6
+                                 ;      71 {
+                                 ;      72 	xTimerStart( swTimers[RIGHT_FILERUNNING_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",72
+00000078 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+0000007E A916                    		MOV.L 10H[R1], R6
+00000080 05rrrrrr             A  		BSR _xTaskGetTickCount
+00000084 EF13                    		MOV.L R1, R3
+00000086 6040                    		SUB #04H, R0
+00000088 F80600                  		MOV.L #00000000H, [R0]
+0000008B 6604                    		MOV.L #00000000H, R4
+0000008D 6612                    		MOV.L #00000001H, R2
+0000008F EF61                    		MOV.L R6, R1
+00000091 05rrrrrr             A  		BSR _xTimerGenericCommand
+00000095 6240                    		ADD #04H, R0
+00000097 3F6601                  		RTSD #04H, R6-R6
+0000009A                         __$iif_down_filerunning:
+                                 		.STACK	__$iif_down_filerunning=4
+                                 ;      73 }
+                                 ;      74 
+                                 ;      75 void iif_down_filerunning(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",75
+0000009A 02                      		RTS
+0000009B                         __$iif_up_filerunning:
+                                 		.STACK	__$iif_up_filerunning=4
+                                 ;      76 {
+                                 ;      77 #ifdef VEL_CHANGE
+                                 ;      78 	  xTimerStart( swTimers[DOWN_FILERUNNING_TIMER], 0 );
+                                 ;      79 #endif
+                                 ;      80 }
+                                 ;      81 void iif_up_filerunning(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",81
+0000009B 02                      		RTS
+0000009C                         __$iif_released_filerunning:
+                                 		.STACK	__$iif_released_filerunning=8
+                                 ;      82 {
+                                 ;      83 #ifdef VEL_CHANGE
+                                 ;      84 	  xTimerStart( swTimers[UP_FILERUNNING_TIMER], 0 );
+                                 ;      85 #endif
+                                 ;      86 }
+                                 ;      87 
+                                 ;      88 void iif_released_filerunning(void)
+                                 ;      89 {
+                                 ;      90 	zmove = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",90
+0000009C FBE2rrrrrrrr            		MOV.L #_zmove, R14
+000000A2 F8E600                  		MOV.L #00000000H, [R14]
+000000A5                         L20:	; entry.split
+                                 ;      91 	xTimerStop(swTimers[ZDOWN_FILERUNNING_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",91
+000000A5 FBE2rrrrrrrr            		MOV.L #_swTimers, R14
+000000AB ECE1                    		MOV.L [R14], R1
+000000AD 6040                    		SUB #04H, R0
+000000AF F80600                  		MOV.L #00000000H, [R0]
+000000B2 6603                    		MOV.L #00000000H, R3
+000000B4 6632                    		MOV.L #00000003H, R2
+000000B6 EF34                    		MOV.L R3, R4
+000000B8 05rrrrrr             A  		BSR _xTimerGenericCommand
+000000BC 6240                    		ADD #04H, R0
+000000BE                         L21:	; entry.split1
+                                 ;      92 	xTimerStop(swTimers[ZUP_FILERUNNING_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",92
+000000BE FB12rrrrrrrr            		MOV.L #_swTimers, R1
+000000C4 A819                    		MOV.L 04H[R1], R1
+000000C6 6040                    		SUB #04H, R0
+000000C8 F80600                  		MOV.L #00000000H, [R0]
+000000CB 6603                    		MOV.L #00000000H, R3
+000000CD 6632                    		MOV.L #00000003H, R2
+000000CF EF34                    		MOV.L R3, R4
+000000D1 05rrrrrr             A  		BSR _xTimerGenericCommand
+000000D5 6240                    		ADD #04H, R0
+000000D7                         L22:	; entry.split2
+                                 ;      93 	xTimerStop(swTimers[LEFT_FILERUNNING_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",93
+000000D7 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+000000DD A919                    		MOV.L 14H[R1], R1
+000000DF 6040                    		SUB #04H, R0
+000000E1 F80600                  		MOV.L #00000000H, [R0]
+000000E4 6603                    		MOV.L #00000000H, R3
+000000E6 6632                    		MOV.L #00000003H, R2
+000000E8 EF34                    		MOV.L R3, R4
+000000EA 05rrrrrr             A  		BSR _xTimerGenericCommand
+000000EE 6240                    		ADD #04H, R0
+000000F0                         L23:	; entry.split3
+                                 ;      94 	xTimerStop(swTimers[RIGHT_FILERUNNING_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",94
+000000F0 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+000000F6 A911                    		MOV.L 10H[R1], R1
+000000F8 6040                    		SUB #04H, R0
+000000FA F80600                  		MOV.L #00000000H, [R0]
+000000FD 6603                    		MOV.L #00000000H, R3
+000000FF 6632                    		MOV.L #00000003H, R2
+00000101 EF34                    		MOV.L R3, R4
+00000103 05rrrrrr             A  		BSR _xTimerGenericCommand
+00000107 6240                    		ADD #04H, R0
+00000109 02                      		RTS
+0000010A                         _iif_bind_filerunning:
+                                 		.STACK	_iif_bind_filerunning=8
+                                 ;      95 #ifdef VEL_CHANGE
+                                 ;      96 	xTimerStop(swTimers[DOWN_FILERUNNING_TIMER], 0 );
+                                 ;      97 	xTimerStop(swTimers[UP_FILERUNNING_TIMER], 0 );
+                                 ;      98 #endif
+                                 ;      99 }
+                                 ;     100 
+                                 ;     101 void iif_bind_filerunning(void)
+                                 ;     102 {
+                                 ;     103 	if(swTimers[ZUP_FILERUNNING_TIMER] == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",103
+0000010A FB12rrrrrrrr            		MOV.L #_swTimers, R1
+00000110 A819                    		MOV.L 04H[R1], R1
+00000112 6101                    		CMP #00H, R1
+00000114 21rr                    		BNE L26
+00000116                         L25:	; bb1
+00000116 6040                    		SUB #04H, R0
+                                 ;     104 	{
+                                 ;     105 	swTimers[ZUP_FILERUNNING_TIMER] = xTimerCreate
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",105
+00000118 FBE2rrrrrrrr            		MOV.L #_vTimerCallback, R14
+0000011E E30E                    		MOV.L R14, [R0]
+00000120 6613                    		MOV.L #00000001H, R3
+00000122 FB2AF401                		MOV.L #000001F4H, R2
+00000126 FB12rrrrrrrr            		MOV.L #_L10, R1
+0000012C EF34                    		MOV.L R3, R4
+0000012E 05rrrrrr             A  		BSR _xTimerCreate
+00000132 6240                    		ADD #04H, R0
+00000134 FB22rrrrrrrr            		MOV.L #_swTimers, R2
+0000013A A029                    		MOV.L R1, 04H[R2]
+0000013C                         L26:	; bb6
+                                 ;     106 	                   ( "Timer 1",
+                                 ;     107 	                     ( 500 ),
+                                 ;     108 	                     pdTRUE,
+                                 ;     109 	                     ( void * ) ZUP_FILERUNNING_TIMER,
+                                 ;     110 	                     vTimerCallback
+                                 ;     111 	                   );
+                                 ;     112 	}
+                                 ;     113 	if(swTimers[ZDOWN_FILERUNNING_TIMER] == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",113
+0000013C FBE2rrrrrrrr            		MOV.L #_swTimers, R14
+00000142 ECEE                    		MOV.L [R14], R14
+00000144 610E                    		CMP #00H, R14
+00000146 21rr                    		BNE L28
+00000148                         L27:	; bb7
+00000148 6040                    		SUB #04H, R0
+                                 ;     114 	{
+                                 ;     115 	swTimers[ZDOWN_FILERUNNING_TIMER] = xTimerCreate
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",115
+0000014A FBE2rrrrrrrr            		MOV.L #_vTimerCallback, R14
+00000150 E30E                    		MOV.L R14, [R0]
+00000152 6604                    		MOV.L #00000000H, R4
+00000154 6613                    		MOV.L #00000001H, R3
+00000156 FB2AF401                		MOV.L #000001F4H, R2
+0000015A FB12rrrrrrrr            		MOV.L #_L10, R1
+00000160 05rrrrrr             A  		BSR _xTimerCreate
+00000164 6240                    		ADD #04H, R0
+00000166 FBE2rrrrrrrr            		MOV.L #_swTimers, R14
+0000016C E3E1                    		MOV.L R1, [R14]
+0000016E                         L28:	; bb14
+                                 ;     116 	                   ( "Timer 1",
+                                 ;     117 	                     ( 500 ),
+                                 ;     118 	                     pdTRUE,
+                                 ;     119 	                     ( void * ) ZDOWN_FILERUNNING_TIMER,
+                                 ;     120 	                     vTimerCallback
+                                 ;     121 	                   );
+                                 ;     122 	}
+                                 ;     123 	if(swTimers[RIGHT_FILERUNNING_TIMER] == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",123
+0000016E FB12rrrrrrrr            		MOV.L #_swTimers, R1
+00000174 A911                    		MOV.L 10H[R1], R1
+00000176 6101                    		CMP #00H, R1
+00000178 21rr                    		BNE L30
+0000017A                         L29:	; bb15
+0000017A 6040                    		SUB #04H, R0
+                                 ;     124 	{
+                                 ;     125 	swTimers[RIGHT_FILERUNNING_TIMER] = xTimerCreate
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",125
+0000017C FBE2rrrrrrrr            		MOV.L #_vTimerCallback, R14
+00000182 E30E                    		MOV.L R14, [R0]
+00000184 6644                    		MOV.L #00000004H, R4
+00000186 6613                    		MOV.L #00000001H, R3
+00000188 754296                  		MOV.L #00000096H, R2
+0000018B FB12rrrrrrrr            		MOV.L #_L10, R1
+00000191 05rrrrrr             A  		BSR _xTimerCreate
+00000195 6240                    		ADD #04H, R0
+00000197 FB22rrrrrrrr            		MOV.L #_swTimers, R2
+0000019D A121                    		MOV.L R1, 10H[R2]
+0000019F                         L30:	; bb22
+                                 ;     126 	                   ( "Timer 1",
+                                 ;     127 	                     ( 150 ),
+                                 ;     128 	                     pdTRUE,
+                                 ;     129 	                     ( void * ) RIGHT_FILERUNNING_TIMER,
+                                 ;     130 	                     vTimerCallback
+                                 ;     131 	                   );
+                                 ;     132 	}
+                                 ;     133 	if(swTimers[LEFT_FILERUNNING_TIMER] == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",133
+0000019F FB12rrrrrrrr            		MOV.L #_swTimers, R1
+000001A5 A919                    		MOV.L 14H[R1], R1
+000001A7 6101                    		CMP #00H, R1
+000001A9 21rr                    		BNE L32
+000001AB                         L31:	; bb23
+000001AB 6040                    		SUB #04H, R0
+                                 ;     134 	{
+                                 ;     135 	swTimers[LEFT_FILERUNNING_TIMER] = xTimerCreate
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",135
+000001AD FBE2rrrrrrrr            		MOV.L #_vTimerCallback, R14
+000001B3 E30E                    		MOV.L R14, [R0]
+000001B5 6654                    		MOV.L #00000005H, R4
+000001B7 6613                    		MOV.L #00000001H, R3
+000001B9 754296                  		MOV.L #00000096H, R2
+000001BC FB12rrrrrrrr            		MOV.L #_L10, R1
+000001C2 05rrrrrr             A  		BSR _xTimerCreate
+000001C6 6240                    		ADD #04H, R0
+000001C8 FB22rrrrrrrr            		MOV.L #_swTimers, R2
+000001CE A129                    		MOV.L R1, 14H[R2]
+000001D0                         L32:	; bb29
+                                 ;     136 	                   ( "Timer 1",
+                                 ;     137 	                     ( 150 ),
+                                 ;     138 	                     pdTRUE,
+                                 ;     139 	                     ( void * ) LEFT_FILERUNNING_TIMER,
+                                 ;     140 	                     vTimerCallback
+                                 ;     141 	                   );
+                                 ;     142 	}
+                                 ;     143 #ifdef VEL_CHANGE
+                                 ;     144 	swTimers[DOWN_FILERUNNING_TIMER] = xTimerCreate
+                                 ;     145 	                   ( "Timer 1",
+                                 ;     146 	                     ( 500 ),
+                                 ;     147 	                     pdTRUE,
+                                 ;     148 	                     ( void * ) DOWN_FILERUNNING_TIMER,
+                                 ;     149 						 vTimerCallbackVelocity
+                                 ;     150 	                   );
+                                 ;     151 	swTimers[UP_FILERUNNING_TIMER] = xTimerCreate
+                                 ;     152 	                   ( "Timer 1",
+                                 ;     153 	                     ( 500 ),
+                                 ;     154 	                     pdTRUE,
+                                 ;     155 	                     ( void * ) UP_FILERUNNING_TIMER,
+                                 ;     156 						 vTimerCallbackVelocity
+                                 ;     157 	                   );
+                                 ;     158 #endif
+                                 ;     159 	iif_func_enter = &iif_enter_filerunning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",159
+000001D0 FBE2rrrrrrrr            		MOV.L #_iif_func_enter, R14
+000001D6 FBF2rrrrrrrr            		MOV.L #__$iif_enter_filerunning, R15
+000001DC E3EF                    		MOV.L R15, [R14]
+000001DE                         L33:	; bb29.split
+                                 ;     160 	iif_func_esc = &iif_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",160
+000001DE FBE2rrrrrrrr            		MOV.L #_iif_func_esc, R14
+000001E4 FBF2rrrrrrrr            		MOV.L #_iif_idle, R15
+000001EA E3EF                    		MOV.L R15, [R14]
+000001EC                         L34:	; bb29.split1
+                                 ;     161 	iif_func_down = &iif_down_filerunning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",161
+000001EC FBE2rrrrrrrr            		MOV.L #_iif_func_down, R14
+000001F2 FBF2rrrrrrrr            		MOV.L #__$iif_down_filerunning, R15
+000001F8 E3EF                    		MOV.L R15, [R14]
+000001FA                         L35:	; bb29.split2
+                                 ;     162 	iif_func_up = &iif_up_filerunning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",162
+000001FA FBE2rrrrrrrr            		MOV.L #_iif_func_up, R14
+00000200 FBF2rrrrrrrr            		MOV.L #__$iif_up_filerunning, R15
+00000206 E3EF                    		MOV.L R15, [R14]
+00000208                         L36:	; bb29.split3
+                                 ;     163 	iif_func_left = &iif_left_filerunning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",163
+00000208 FBE2rrrrrrrr            		MOV.L #_iif_func_left, R14
+0000020E FBF2rrrrrrrr            		MOV.L #__$iif_left_filerunning, R15
+00000214 E3EF                    		MOV.L R15, [R14]
+00000216                         L37:	; bb29.split4
+                                 ;     164 	iif_func_right = &iif_right_filerunning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",164
+00000216 FBE2rrrrrrrr            		MOV.L #_iif_func_right, R14
+0000021C FBF2rrrrrrrr            		MOV.L #__$iif_right_filerunning, R15
+00000222 E3EF                    		MOV.L R15, [R14]
+00000224                         L38:	; bb29.split5
+                                 ;     165 	iif_func_zdown = &iif_zdown_filerunning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",165
+00000224 FBE2rrrrrrrr            		MOV.L #_iif_func_zdown, R14
+0000022A FBF2rrrrrrrr            		MOV.L #__$iif_zdown_filerunning, R15
+00000230 E3EF                    		MOV.L R15, [R14]
+00000232                         L39:	; bb29.split6
+                                 ;     166 	iif_func_zup = &iif_zup_filerunning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",166
+00000232 FBE2rrrrrrrr            		MOV.L #_iif_func_zup, R14
+00000238 FBF2rrrrrrrr            		MOV.L #__$iif_zup_filerunning, R15
+0000023E E3EF                    		MOV.L R15, [R14]
+00000240                         L40:	; bb29.split7
+                                 ;     167 	iif_func_released = &iif_released_filerunning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",167
+00000240 FBE2rrrrrrrr            		MOV.L #_iif_func_released, R14
+00000246 FBF2rrrrrrrr            		MOV.L #__$iif_released_filerunning, R15
+0000024C E3EF                    		MOV.L R15, [R14]
+0000024E                         L41:	; bb29.split8
+                                 ;     168 	iif_func_cycleStop = &iif_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",168
+0000024E FBE2rrrrrrrr            		MOV.L #_iif_func_cycleStop, R14
+00000254 FBF2rrrrrrrr            		MOV.L #_iif_idle, R15
+0000025A E3EF                    		MOV.L R15, [R14]
+0000025C 02                      		RTS
+0000025D                         _iif_bind_filerunning_stop:
+                                 		.STACK	_iif_bind_filerunning_stop=8
+                                 ;     169 }
+                                 ;     170 
+                                 ;     171 void iif_bind_filerunning_stop(bool stop)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",171
+0000025D 6040                    		SUB #04H, R0
+0000025F 8089                    		MOV.B R1, 03H[R0]
+                                 ;     172 {
+                                 ;     173 	if(stop)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",173
+00000261 6101                    		CMP #00H, R1
+00000263 20rr                    		BEQ L44
+00000265                         L43:	; bb2
+                                 ;     174 	{
+                                 ;     175 		iif_func_esc = &iif_esc_filerunning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",175
+00000265 FBE2rrrrrrrr            		MOV.L #_iif_func_esc, R14
+0000026B FBF2rrrrrrrr            		MOV.L #__$iif_esc_filerunning, R15
+00000271 E3EF                    		MOV.L R15, [R14]
+00000273 6701                    		RTSD #04H
+00000275                         L44:	; bb3
+                                 ;     176 	}
+                                 ;     177 	else
+                                 ;     178 	{
+                                 ;     179 		iif_func_esc =  &iif_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",179
+00000275 FBE2rrrrrrrr            		MOV.L #_iif_func_esc, R14
+0000027B FBF2rrrrrrrr            		MOV.L #_iif_idle, R15
+00000281 E3EF                    		MOV.L R15, [R14]
+00000283 6701                    		RTSD #04H
+00000285                         _iif_bind_warning:
+                                 		.STACK	_iif_bind_warning=4
+                                 ;     180 	}
+                                 ;     181 }
+                                 ;     182 
+                                 ;     183 void iif_bind_warning(void)
+                                 ;     184 {
+                                 ;     185 	iif_func_enter = &iif_enter_warning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",185
+00000285 FBE2rrrrrrrr            		MOV.L #_iif_func_enter, R14
+0000028B FBF2rrrrrrrr            		MOV.L #__$iif_enter_warning, R15
+00000291 E3EF                    		MOV.L R15, [R14]
+00000293                         L46:	; entry.split
+                                 ;     186 	iif_func_esc = &iif_esc_warning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",186
+00000293 FBE2rrrrrrrr            		MOV.L #_iif_func_esc, R14
+00000299 FBF2rrrrrrrr            		MOV.L #__$iif_esc_warning, R15
+0000029F E3EF                    		MOV.L R15, [R14]
+000002A1                         L47:	; entry.split1
+                                 ;     187 	iif_func_down = &iif_down_warning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",187
+000002A1 FBE2rrrrrrrr            		MOV.L #_iif_func_down, R14
+000002A7 FBF2rrrrrrrr            		MOV.L #__$iif_down_warning, R15
+000002AD E3EF                    		MOV.L R15, [R14]
+000002AF                         L48:	; entry.split2
+                                 ;     188 	iif_func_up = &iif_up_warning;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",188
+000002AF FBE2rrrrrrrr            		MOV.L #_iif_func_up, R14
+000002B5 FBF2rrrrrrrr            		MOV.L #__$iif_up_warning, R15
+000002BB E3EF                    		MOV.L R15, [R14]
+000002BD                         L49:	; entry.split3
+                                 ;     189 	iif_func_left = &iif_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",189
+000002BD FBE2rrrrrrrr            		MOV.L #_iif_func_left, R14
+000002C3 FBF2rrrrrrrr            		MOV.L #_iif_idle, R15
+000002C9 E3EF                    		MOV.L R15, [R14]
+000002CB                         L50:	; entry.split4
+                                 ;     190 	iif_func_right = &iif_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",190
+000002CB FBE2rrrrrrrr            		MOV.L #_iif_func_right, R14
+000002D1 FBF2rrrrrrrr            		MOV.L #_iif_idle, R15
+000002D7 E3EF                    		MOV.L R15, [R14]
+000002D9                         L51:	; entry.split5
+                                 ;     191 	iif_func_zdown = &iif_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",191
+000002D9 FBE2rrrrrrrr            		MOV.L #_iif_func_zdown, R14
+000002DF FBF2rrrrrrrr            		MOV.L #_iif_idle, R15
+000002E5 E3EF                    		MOV.L R15, [R14]
+000002E7                         L52:	; entry.split6
+                                 ;     192 	iif_func_zup = &iif_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",192
+000002E7 FBE2rrrrrrrr            		MOV.L #_iif_func_zup, R14
+000002ED FBF2rrrrrrrr            		MOV.L #_iif_idle, R15
+000002F3 E3EF                    		MOV.L R15, [R14]
+000002F5                         L53:	; entry.split7
+                                 ;     193 	iif_func_released = &iif_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",193
+000002F5 FBE2rrrrrrrr            		MOV.L #_iif_func_released, R14
+000002FB FBF2rrrrrrrr            		MOV.L #_iif_idle, R15
+00000301 E3EF                    		MOV.L R15, [R14]
+00000303                         L54:	; entry.split8
+                                 ;     194 	iif_func_cycleStop = &iif_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",194
+00000303 FBE2rrrrrrrr            		MOV.L #_iif_func_cycleStop, R14
+00000309 FBF2rrrrrrrr            		MOV.L #_iif_idle, R15
+0000030F E3EF                    		MOV.L R15, [R14]
+00000311 02                      		RTS
+00000312                         __$iif_enter_warning:
+                                 		.STACK	__$iif_enter_warning=4
+                                 ;     195 }
+                                 ;     196 
+                                 ;     197 static void iif_enter_warning(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",197
+00000312 02                      		RTS
+00000313                         __$iif_esc_warning:
+                                 		.STACK	__$iif_esc_warning=4
+                                 ;     198 {
+                                 ;     199 
+                                 ;     200 }
+                                 ;     201 static void iif_esc_warning(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",201
+00000313 02                      		RTS
+00000314                         __$iif_down_warning:
+                                 		.STACK	__$iif_down_warning=4
+                                 ;     202 {
+                                 ;     203 
+                                 ;     204 }
+                                 ;     205 static void iif_down_warning(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",205
+00000314 02                      		RTS
+00000315                         __$iif_up_warning:
+                                 		.STACK	__$iif_up_warning=4
+                                 ;     206 {
+                                 ;     207 
+                                 ;     208 }
+                                 ;     209 static void iif_up_warning(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",209
+00000315 02                      		RTS
+00000316                         _vTimerCallback:
+                                 		.STACK	_vTimerCallback=16
+                                 ;     210 {
+                                 ;     211 
+                                 ;     212 }
+                                 ;     213 
+                                 ;     214 
+                                 ;     215 void vTimerCallback( TimerHandle_t pxTimer )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",215
+00000316 60C0                    		SUB #0CH, R0
+00000318 A081                    		MOV.L R1, 08H[R0]
+                                 ;     216 {
+                                 ;     217 	long lArrayIndex;
+                                 ;     218 
+                                 ;     219 	/* Optionally do something if the pxTimer parameter is NULL. */
+                                 ;     220 	configASSERT( pxTimer );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",220
+0000031A 6101                    		CMP #00H, R1
+0000031C 18                   S  		BNE L61
+0000031D                         L60:	; bb3
+0000031D 05rrrrrr             A  		BSR _vAssertCalled
+00000321                         L61:	; bb6
+                                 ;     221 
+                                 ;     222 	/* Which timer expired? */
+                                 ;     223 	lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",223
+00000321 A881                    		MOV.L 08H[R0], R1
+00000323 05rrrrrr             A  		BSR _pvTimerGetTimerID
+00000327 A009                    		MOV.L R1, 04H[R0]
+00000329                         L62:	; bb6.split
+                                 ;     224 	if(configFlags[MODOMAQUINA] == MODO_OXICORTE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",224
+00000329 FBE2rrrrrrrr            		MOV.L #_configFlags, R14
+0000032F ECEE                    		MOV.L [R14], R14
+00000331 611E                    		CMP #01H, R14
+00000333 21rr                    		BNE L71
+00000335                         L63:	; bb11
+                                 ;     225 	{
+                                 ;     226 		switch (lArrayIndex)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",226
+00000335 A809                    		MOV.L 04H[R0], R1
+00000337 6151                    		CMP #05H, R1
+00000339 20rr                    		BEQ L68
+0000033B                         L64:	; bb11
+0000033B 6141                    		CMP #04H, R1
+0000033D 21rr                    		BNE L71
+0000033F                         L65:	; bb14
+                                 ;     227 		{
+                                 ;     228 			case RIGHT_FILERUNNING_TIMER:
+                                 ;     229 				if(isDwell)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",229
+0000033F FBE2rrrrrrrr            		MOV.L #_isDwell, R14
+00000345 58EE                    		MOVU.B [R14], R14
+00000347 610E                    		CMP #00H, R14
+00000349 20rr                    		BEQ L71
+0000034B                         L66:	; bb15
+0000034B FB120000803F            		MOV.L #3F800000H, R1
+                                 ;     230 				{
+                                 ;     231 					st_set_dwell_elapsed_time(1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",231
+00000351 05rrrrrr             A  		BSR _st_set_dwell_elapsed_time
+00000355                         L67:	; bb15.split
+                                 ;     232 					configVarOx[tempoDwell] += 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",232
+00000355 FBE2rrrrrrrr            		MOV.L #_tempoDwell, R14
+0000035B ECEE                    		MOV.L [R14], R14
+0000035D FBF2rrrrrrrr            		MOV.L #_configVarOx, R15
+00000363 FE6EF5                  		MOV.L [R14,R15], R5
+00000366 FD72250000803F          		FADD #3F800000H, R5
+0000036D FE2EF5                  		MOV.L R5, [R14,R15]
+00000370 2Err                 B  		BRA L71
+00000372                         L68:	; bb27
+                                 ;     233 				}
+                                 ;     234 			break;
+                                 ;     235 			case LEFT_FILERUNNING_TIMER:
+                                 ;     236 				if(isDwell)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",236
+00000372 FBE2rrrrrrrr            		MOV.L #_isDwell, R14
+00000378 58EE                    		MOVU.B [R14], R14
+0000037A 610E                    		CMP #00H, R14
+0000037C 20rr                    		BEQ L71
+0000037E                         L69:	; bb28
+0000037E FB12000080BF            		MOV.L #0BF800000H, R1
+                                 ;     237 				{
+                                 ;     238 					st_set_dwell_elapsed_time(-1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",238
+00000384 05rrrrrr             A  		BSR _st_set_dwell_elapsed_time
+00000388                         L70:	; bb28.split
+                                 ;     239 					configVarOx[tempoDwell] -= 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",239
+00000388 FBE2rrrrrrrr            		MOV.L #_tempoDwell, R14
+0000038E ECEE                    		MOV.L [R14], R14
+00000390 FBF2rrrrrrrr            		MOV.L #_configVarOx, R15
+00000396 FE6EF5                  		MOV.L [R14,R15], R5
+00000399 FD7225000080BF          		FADD #0BF800000H, R5
+000003A0 FE2EF5                  		MOV.L R5, [R14,R15]
+000003A3                         L71:	; bb45
+                                 ;     240 				}
+                                 ;     241 			break;
+                                 ;     242 		}
+                                 ;     243 	}
+                                 ;     244 
+                                 ;     245 	if (configFlags[MODOMAQUINA] == MODO_OXICORTE || sim){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",245
+000003A3 FBE2rrrrrrrr            		MOV.L #_configFlags, R14
+000003A9 ECEE                    		MOV.L [R14], R14
+000003AB 611E                    		CMP #01H, R14
+000003AD 3Arrrr               W  		BEQ L85
+000003B0 38rrrr               W  		BRA L84
+000003B3                         L72:	; bb46
+                                 ;     246 		switch (lArrayIndex)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",246
+000003B3 6101                    		CMP #00H, R1
+000003B5 20rr                    		BEQ L75
+000003B7                         L73:	; bb46
+000003B7 6111                    		CMP #01H, R1
+000003B9 3Brrrr               W  		BNE L88
+000003BC                         L74:	; bb48
+                                 ;     247 		{
+                                 ;     248 			case ZUP_FILERUNNING_TIMER: zmove = 0.005;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",248
+000003BC FBE2rrrrrrrr            		MOV.L #_zmove, R14
+000003C2 F8E20AD7A33B            		MOV.L #3BA3D70AH, [R14]
+000003C8 6703                    		RTSD #0CH
+000003CA                         L75:	; bb49
+                                 ;     249 			break;
+                                 ;     250 			case ZDOWN_FILERUNNING_TIMER: zmove = -0.005;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",250
+000003CA FBE2rrrrrrrr            		MOV.L #_zmove, R14
+000003D0 F8E20AD7A3BB            		MOV.L #0BBA3D70AH, [R14]
+000003D6 6703                    		RTSD #0CH
+000003D8                         L76:	; bb51
+                                 ;     251 			break;
+                                 ;     252 		}
+                                 ;     253 	}
+                                 ;     254 	else
+                                 ;     255 	{
+                                 ;     256 		switch (lArrayIndex)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",256
+000003D8 6101                    		CMP #00H, R1
+000003DA 20rr                    		BEQ L81
+000003DC                         L77:	; bb51
+000003DC 6111                    		CMP #01H, R1
+000003DE 3Brrrr               W  		BNE L88
+000003E1                         L78:	; bb53
+                                 ;     257 		{
+                                 ;     258 			case ZUP_FILERUNNING_TIMER: configVarPl[PL_CONFIG_TENSAO_THC] += 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",258
+000003E1 FB12rrrrrrrr            		MOV.L #_configVarPl, R1
+000003E7 A912                    		MOV.L 10H[R1], R2
+000003E9 FD72220000803F          		FADD #3F800000H, R2
+000003F0 A112                    		MOV.L R2, 10H[R1]
+000003F2                         L79:	; bb53.split
+                                 ;     259 										if(configVarPl[PL_CONFIG_TENSAO_THC] > THC_VMAX)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",259
+000003F2 FBE2rrrrrrrr            		MOV.L #_configVarPl, R14
+000003F8 FBF200009643            		MOV.L #43960000H, R15
+000003FE FC85EF04                		FCMP 10H[R14].L, R15
+00000402 26rr                    		BPZ L88
+00000404                         L80:	; bb57
+                                 ;     260 											configVarPl[PL_CONFIG_TENSAO_THC] = THC_VMAX;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",260
+00000404 FBE2rrrrrrrr            		MOV.L #_configVarPl, R14
+0000040A F9E20400009643          		MOV.L #43960000H, 10H[R14]
+00000411 6703                    		RTSD #0CH
+00000413                         L81:	; bb63
+                                 ;     261 			break;
+                                 ;     262 			case ZDOWN_FILERUNNING_TIMER: configVarPl[PL_CONFIG_TENSAO_THC] -= 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",262
+00000413 FB12rrrrrrrr            		MOV.L #_configVarPl, R1
+00000419 A912                    		MOV.L 10H[R1], R2
+0000041B FD7222000080BF          		FADD #0BF800000H, R2
+00000422 A112                    		MOV.L R2, 10H[R1]
+00000424                         L82:	; bb63.split
+                                 ;     263 										  if(configVarPl[PL_CONFIG_TENSAO_THC] < THC_VMIN)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",263
+00000424 FB12rrrrrrrr            		MOV.L #_configVarPl, R1
+0000042A A911                    		MOV.L 10H[R1], R1
+0000042C FD72110000A041          		FCMP #41A00000H, R1
+00000433 26rr                    		BPZ L88
+00000435                         L83:	; bb67
+                                 ;     264 											  configVarPl[PL_CONFIG_TENSAO_THC] = THC_VMIN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",264
+00000435 FBE2rrrrrrrr            		MOV.L #_configVarPl, R14
+0000043B F9E2040000A041          		MOV.L #41A00000H, 10H[R14]
+00000442 6703                    		RTSD #0CH
+00000444                         L84:	; bb77
+00000444 FBE2rrrrrrrr            		MOV.L #_sim, R14
+0000044A 58EE                    		MOVU.B [R14], R14
+0000044C 610E                    		CMP #00H, R14
+0000044E 10                   S  		BEQ L86
+0000044F                         L85:	; bb82
+0000044F F80601                  		MOV.L #00000001H, [R0]
+00000452 08                   S  		BRA L87
+00000453                         L86:	; bb83
+00000453 F80600                  		MOV.L #00000000H, [R0]
+00000456                         L87:	; bb84
+00000456 EC01                    		MOV.L [R0], R1
+00000458 6101                    		CMP #00H, R1
+0000045A A809                    		MOV.L 04H[R0], R1
+0000045C 3Brrrr               W  		BNE L72
+0000045F 38rrrr               W  		BRA L76
+00000462                         L88:	; return
+                                 ;     265 			break;
+                                 ;     266 		}
+                                 ;     267 	}
+                                 ;     268 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\config\interpreter_fileRunning_if.c",268
+00000462 6703                    		RTSD #0CH
+                                 ;     269 
+                                 ;     270 #ifdef VEL_CHANGE
+                                 ;     271 void vTimerCallbackVelocity( TimerHandle_t pxTimer )
+                                 ;     272 {
+                                 ;     273 	long lArrayIndex;
+                                 ;     274 	mpBuf_t *bf = mp_get_run_buffer();
+                                 ;     275 	/* Optionally do something if the pxTimer parameter is NULL. */
+                                 ;     276 	configASSERT( pxTimer );
+                                 ;     277 	if (bf->gm.motion_mode == MOTION_MODE_STRAIGHT_FEED ||
+                                 ;     278 		bf->gm.motion_mode == MOTION_MODE_CW_ARC ||
+                                 ;     279 		bf->gm.motion_mode == MOTION_MODE_CCW_ARC)
+                                 ;     280 	{
+                                 ;     281 		if(mr.section == SECTION_BODY)
+                                 ;     282 		{
+                                 ;     283 			/* Which timer expired? */
+                                 ;     284 			lArrayIndex = ( long ) pvTimerGetTimerID( pxTimer );
+                                 ;     285 			switch (lArrayIndex)
+                                 ;     286 			{
+                                 ;     287 				case DOWN_FILERUNNING_TIMER: cm.gmx.feed_rate_override_factor -= feedratepercent;
+                                 ;     288 				break;
+                                 ;     289 				case UP_FILERUNNING_TIMER: cm.gmx.feed_rate_override_factor += feedratepercent;
+                                 ;     290 				break;
+                                 ;     291 			}
+                                 ;     292 			mp_plan_feedrateoverride_callback(mp_get_run_buffer());
+                                 ;     293 		}
+                                 ;     294 	}
+                                 ;     295 
+                                 ;     296 }
+                                 ;     297 #endif
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 54696D65                		.byte	"Timer 1"
+         722031                  
+00000007 00                      		.byte	00H
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         _zmove:
+00000000 00000000                		.lword	00000000H
+00000004                         _feedratepercent:
+00000004 CDCC4C3D                		.lword	3D4CCCCDH	; float 0.05
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00867   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001124(00000464H)  P
+ROMDATA  0000000008(00000008H)  L
+ROMDATA  0000000008(00000008H)  D
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\interpreter_fileRunning_if.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\interpreter_fileRunning_if.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\src\config\interpreter_fileRunning_if.obj

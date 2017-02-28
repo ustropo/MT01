@@ -1,0 +1,1144 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:49:14 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:49:14
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_tmr_rx.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_tmr_rx.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;r_tmr_rx.c
+                                 
+                                 		.glb	_R_TMR_CreatePeriodic
+                                 		.glb	_R_TMR_CreateOneShot
+                                 		.glb	_R_TMR_Stop
+                                 		.glb	_R_TMR_Control
+                                 		.glb	_R_BSP_RegisterProtectDisable
+                                 		.glb	_R_BSP_RegisterProtectEnable
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _R_TMR_CreatePeriodic:
+                                 		.STACK	_R_TMR_CreatePeriodic=24
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2013, 2014 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_cmt_rx.c
+                                 ;      21 * Description  : This module creates timer ticks using CMT channels or one-shot events based on period in uS. 
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 06.11.2013 2.10    First GSCE Release.
+                                 ;      26 *         : 11.03.2014 2.20    Added support for RX110.
+                                 ;      27 *                              Fixes bug in R_CMT_Control CMT_RX_CMD_GET_NUM_CHANNELS command.
+                                 ;      28 *         : 22.04.2014 2.30    Added support for RX64M.
+                                 ;      29 *         : 10.11.2014 2.40    Added support for RX113M.
+                                 ;      30 ***********************************************************************************************************************/
+                                 ;      31 
+                                 ;      32 /***********************************************************************************************************************
+                                 ;      33 Includes   <System Includes> , "Project Includes"
+                                 ;      34 ***********************************************************************************************************************/
+                                 ;      35 #include "platform.h"
+                                 ;      36 /* Configuration for this package. */
+                                 ;      37 //#include "r_tmr_rx_config.h"
+                                 ;      38 /* Header file for this package. */
+                                 ;      39 #include "r_tmr_rx_if.h"
+                                 ;      40 
+                                 ;      41 /***********************************************************************************************************************
+                                 ;      42 Macro definitions
+                                 ;      43 ***********************************************************************************************************************/
+                                 ;      44 #define TMR_RX_NUM_CHANNELS 4
+                                 ;      45 
+                                 ;      46 /***********************************************************************************************************************
+                                 ;      47 Typedef definitions
+                                 ;      48 ***********************************************************************************************************************/
+                                 ;      49 
+                                 ;      50 typedef enum{
+                                 ;      51 	TMR_PERIODIC = 0,
+                                 ;      52 	TMR_ONESHOOT
+                                 ;      53 }tmr_behavior_t;
+                                 ;      54 
+                                 ;      55 /***********************************************************************************************************************
+                                 ;      56 Private global variables and functions
+                                 ;      57 ***********************************************************************************************************************/
+                                 ;      58 static uint8_t g_tmrbehavior[TMR_RX_NUM_CHANNELS] = {TMR_PERIODIC,TMR_PERIODIC,TMR_PERIODIC,TMR_PERIODIC};
+                                 ;      59 
+                                 ;      60 static void power_on(tmr_ch_t  channel);
+                                 ;      61 static void power_off(tmr_ch_t  channel);
+                                 ;      62 static bool create(uint8_t period_us, void (* callback)(void * pdata), tmr_ch_t  channel,tmr_behavior_t behavior);
+                                 ;      63 static void  (* g_tmr_callbacks[TMR_RX_NUM_CHANNELS])(void * pdata);
+                                 ;      64 
+                                 ;      65 /***********************************************************************************************************************
+                                 ;      66 * Function Name: R_CMT_CreatePeriodic
+                                 ;      67 * Description  : Sets up a CMT channel and calls a callback function at a set frequency.
+                                 ;      68 * Arguments    : frequency_hz -
+                                 ;      69 *                    Frequency in Hz of how often to call the callback function.
+                                 ;      70 *                callback -
+                                 ;      71 *                    Which function to call when timer expires. If you wish to use R_CMT_Control() to check the status 
+                                 ;      72 *                    of a channel instead of using a callback then use FIT_NO_FUNC for this parameter.
+                                 ;      73 *                channel -
+                                 ;      74 *                    Pointer of where to store which channel was used.
+                                 ;      75 * Return Value : true - 
+                                 ;      76 *                    Channel initialized successfully.
+                                 ;      77 *                false -
+                                 ;      78 *                    Invalid channel or frequency could not be used.
+                                 ;      79 ***********************************************************************************************************************/
+                                 ;      80 bool R_TMR_CreatePeriodic(uint32_t frequency_hz, void (* callback)(void * pdata), tmr_ch_t  channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",80
+00000000 7100EC                  		ADD #0FFFFFFECH, R0
+00000003 A101                    		MOV.L R1, 10H[R0]
+00000005 A08A                    		MOV.L R2, 0CH[R0]
+00000007 A083                    		MOV.L R3, 08H[R0]
+                                 ;      81 {
+                                 ;      82 	tmr_behavior_t behavior = TMR_PERIODIC;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",82
+00000009 F80600                  		MOV.L #00000000H, [R0]
+0000000C                         L11:	; entry.split
+0000000C FB1E40420F              		MOV.L #000F4240H, R1
+                                 ;      83 	uint8_t period_us = (uint8_t)(1000000/frequency_hz);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",83
+00000011 06A1090104              		DIVU 10H[R0].L, R1
+00000016 8181                    		MOV.B R1, 06H[R0]
+00000018                         L12:	; entry.split1
+                                 ;      84 	return create(period_us, callback, channel, behavior);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",84
+00000018 EC04                    		MOV.L [R0], R4
+0000001A A883                    		MOV.L 08H[R0], R3
+0000001C A88A                    		MOV.L 0CH[R0], R2
+0000001E B181                    		MOVU.B 06H[R0], R1
+00000020 39rrrr               W  		BSR __$create
+00000023 8189                    		MOV.B R1, 07H[R0]
+00000025 B189                    		MOVU.B 07H[R0], R1
+00000027                         L13:	; entry.split2
+                                 ;      85 } 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",85
+00000027 5B11                    		MOVU.B R1, R1
+00000029 6705                    		RTSD #14H
+0000002B                         _R_TMR_CreateOneShot:
+                                 		.STACK	_R_TMR_CreateOneShot=24
+                                 ;      86 
+                                 ;      87 /***********************************************************************************************************************
+                                 ;      88 * Function Name: R_CMT_CreateOneShot
+                                 ;      89 * Description  : Sets up a CMT channel and calls a callback function once after a user-defined amount of time.
+                                 ;      90 * Arguments    : period_us -
+                                 ;      91 *                    How long until compare match occurs. Unit is microseconds.
+                                 ;      92 *                callback -
+                                 ;      93 *                    Which function to call when timer expires. If you wish to use R_CMT_Control() to check the status 
+                                 ;      94 *                    of a channel instead of using a callback then use FIT_NO_FUNC for this parameter.
+                                 ;      95 *                channel -
+                                 ;      96 *                    Pointer of where to store which channel was used.
+                                 ;      97 * Return Value : true - 
+                                 ;      98 *                    Channel initialized successfully.
+                                 ;      99 *                false -
+                                 ;     100 *                    Invalid channel or period could not be used.
+                                 ;     101 ***********************************************************************************************************************/
+                                 ;     102 bool R_TMR_CreateOneShot(uint8_t period_us, void (* callback)(void * pdata), tmr_ch_t  channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",102
+0000002B 7100EC                  		ADD #0FFFFFFECH, R0
+0000002E 8489                    		MOV.B R1, 13H[R0]
+00000030 A08A                    		MOV.L R2, 0CH[R0]
+00000032 A083                    		MOV.L R3, 08H[R0]
+                                 ;     103 {
+                                 ;     104 	tmr_behavior_t behavior = TMR_ONESHOOT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",104
+00000034 F80601                  		MOV.L #00000001H, [R0]
+00000037                         L15:	; entry.split
+                                 ;     105 	return create(period_us, callback, channel, behavior);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",105
+00000037 EC04                    		MOV.L [R0], R4
+00000039 A883                    		MOV.L 08H[R0], R3
+0000003B A88A                    		MOV.L 0CH[R0], R2
+0000003D B489                    		MOVU.B 13H[R0], R1
+0000003F 39rrrr               W  		BSR __$create
+00000042 8189                    		MOV.B R1, 07H[R0]
+00000044 B189                    		MOVU.B 07H[R0], R1
+00000046                         L16:	; entry.split1
+                                 ;     106 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",106
+00000046 5B11                    		MOVU.B R1, R1
+00000048 6705                    		RTSD #14H
+0000004A                         _R_TMR_Stop:
+                                 		.STACK	_R_TMR_Stop=12
+                                 ;     107 
+                                 ;     108 /***********************************************************************************************************************
+                                 ;     109 * Function Name: R_CMT_Stop
+                                 ;     110 * Description  : Stop a counter and puts it in module stop state to conserve power.
+                                 ;     111 * Arguments    : channel - 
+                                 ;     112 *                    Which channel to use.
+                                 ;     113 * Return Value : true - 
+                                 ;     114 *                    Counter stopped.
+                                 ;     115 *                false -
+                                 ;     116 *                    Could not obtain lock to control CMT. Try again later. 
+                                 ;     117 ***********************************************************************************************************************/
+                                 ;     118 bool R_TMR_Stop (tmr_ch_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",118
+0000004A 6080                    		SUB #08H, R0
+0000004C A009                    		MOV.L R1, 04H[R0]
+                                 ;     119 {
+                                 ;     120 	bool res = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",120
+0000004E 3C0201                  		MOV.B #01H, 02H[R0]
+00000051                         L18:	; entry.split
+                                 ;     121 	power_off(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",121
+00000051 A809                    		MOV.L 04H[R0], R1
+00000053 39rrrr               W  		BSR __$power_off
+00000056                         L19:	; entry.split1
+                                 ;     122 	return res;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",122
+00000056 C5000203                		MOV.B 02H[R0], 03H[R0]
+0000005A B089                    		MOVU.B 03H[R0], R1
+0000005C                         L20:	; entry.split2
+                                 ;     123 } 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",123
+0000005C 5B11                    		MOVU.B R1, R1
+0000005E 6702                    		RTSD #08H
+00000060                         _R_TMR_Control:
+                                 		.STACK	_R_TMR_Control=20
+                                 ;     124 
+                                 ;     125 /***********************************************************************************************************************
+                                 ;     126 * Function Name: R_CMT_Control
+                                 ;     127 * Description  : Handles minor functions of this module.
+                                 ;     128 * Arguments    : channel - 
+                                 ;     129 *                    Which channel is being referenced. If not channel is needed input CMT_RX_NO_CHANNEL.
+                                 ;     130 *                command -
+                                 ;     131 *                    What command is being input.
+                                 ;     132 *                pdata - 
+                                 ;     133 *                    Pointer to data to be input or filled in if needed.
+                                 ;     134 * Return Value : true - 
+                                 ;     135 *                    Command completed successfully.
+                                 ;     136 *                false -
+                                 ;     137 *                    Invalid command. 
+                                 ;     138 ***********************************************************************************************************************/
+                                 ;     139 bool R_TMR_Control(tmr_ch_t channel, tmr_commands_t command, void * pdata)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",139
+00000060 7100F0                  		ADD #0FFFFFFF0H, R0
+00000063 A089                    		MOV.L R1, 0CH[R0]
+00000065 A082                    		MOV.L R2, 08H[R0]
+00000067 A00B                    		MOV.L R3, 04H[R0]
+                                 ;     140 {
+                                 ;     141 	switch(command)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",141
+00000069 A881                    		MOV.L 08H[R0], R1
+0000006B 6111                    		CMP #01H, R1
+0000006D 20rr                    		BEQ L35
+0000006F                         L22:	; entry
+0000006F 6101                    		CMP #00H, R1
+00000071 3Brrrr               W  		BNE L47
+00000074                         L23:	; bb
+                                 ;     142 	{
+                                 ;     143 	case TMR_START:
+                                 ;     144 		switch(channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",144
+00000074 A889                    		MOV.L 0CH[R0], R1
+00000076 6131                    		CMP #03H, R1
+00000078 20rr                    		BEQ L33
+0000007A                         L24:	; bb
+0000007A 6111                    		CMP #01H, R1
+0000007C 20rr                    		BEQ L29
+0000007E                         L25:	; bb
+0000007E 6121                    		CMP #02H, R1
+00000080 20rr                    		BEQ L31
+00000082                         L26:	; bb
+00000082 6101                    		CMP #00H, R1
+00000084 3Brrrr               W  		BNE L47
+00000087                         L27:	; bb6
+                                 ;     145 		{
+                                 ;     146 		case TMR_CH0:
+                                 ;     147 			TMR0.TCR.BYTE = 0x48;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",147
+00000087 FBEE008208              		MOV.L #00088200H, R14
+0000008C F8E448                  		MOV.B #48H, [R14]
+0000008F                         L28:	; bb6.split
+                                 ;     148 			TMR0.TCNT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",148
+0000008F FB1E008208              		MOV.L #00088200H, R1
+00000094 3C1800                  		MOV.B #00H, 08H[R1]
+00000097 38rrrr               W  		BRA L47
+0000009A                         L29:	; bb7
+                                 ;     149 			break;
+                                 ;     150 		case TMR_CH1:
+                                 ;     151 			TMR1.TCR.BYTE = 0x48;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",151
+0000009A FBEE018208              		MOV.L #00088201H, R14
+0000009F F8E448                  		MOV.B #48H, [R14]
+000000A2                         L30:	; bb7.split
+                                 ;     152 			TMR1.TCNT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",152
+000000A2 FB1E018208              		MOV.L #00088201H, R1
+000000A7 3C1800                  		MOV.B #00H, 08H[R1]
+000000AA 2Err                 B  		BRA L47
+000000AC                         L31:	; bb8
+                                 ;     153 			break;
+                                 ;     154 		case TMR_CH2:
+                                 ;     155 			TMR2.TCR.BYTE = 0x48;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",155
+000000AC FBEE108208              		MOV.L #00088210H, R14
+000000B1 F8E448                  		MOV.B #48H, [R14]
+000000B4                         L32:	; bb8.split
+                                 ;     156 			TMR2.TCNT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",156
+000000B4 FB1E108208              		MOV.L #00088210H, R1
+000000B9 3C1800                  		MOV.B #00H, 08H[R1]
+000000BC 2Err                 B  		BRA L47
+000000BE                         L33:	; bb9
+                                 ;     157 			break;
+                                 ;     158 		case TMR_CH3:
+                                 ;     159 			TMR3.TCR.BYTE = 0x48;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",159
+000000BE FBEE118208              		MOV.L #00088211H, R14
+000000C3 F8E448                  		MOV.B #48H, [R14]
+000000C6                         L34:	; bb9.split
+                                 ;     160 			TMR3.TCNT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",160
+000000C6 FB1E118208              		MOV.L #00088211H, R1
+000000CB 3C1800                  		MOV.B #00H, 08H[R1]
+000000CE 2Err                 B  		BRA L47
+000000D0                         L35:	; bb11
+                                 ;     161 			break;
+                                 ;     162 		}
+                                 ;     163 		break;
+                                 ;     164 	case TMR_CLEAR:
+                                 ;     165 		switch(channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",165
+000000D0 A889                    		MOV.L 0CH[R0], R1
+000000D2 6131                    		CMP #03H, R1
+000000D4 20rr                    		BEQ L45
+000000D6                         L36:	; bb11
+000000D6 6111                    		CMP #01H, R1
+000000D8 20rr                    		BEQ L41
+000000DA                         L37:	; bb11
+000000DA 6121                    		CMP #02H, R1
+000000DC 20rr                    		BEQ L43
+000000DE                         L38:	; bb11
+000000DE 6101                    		CMP #00H, R1
+000000E0 21rr                    		BNE L47
+000000E2                         L39:	; bb13
+                                 ;     166 		{
+                                 ;     167 		case TMR_CH0:
+                                 ;     168 			TMR0.TCR.BYTE = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",168
+000000E2 FBEE008208              		MOV.L #00088200H, R14
+000000E7 F8E408                  		MOV.B #08H, [R14]
+000000EA                         L40:	; bb13.split
+                                 ;     169 			TMR0.TCNT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",169
+000000EA FB1E008208              		MOV.L #00088200H, R1
+000000EF 3C1800                  		MOV.B #00H, 08H[R1]
+000000F2 2Err                 B  		BRA L47
+000000F4                         L41:	; bb14
+                                 ;     170 			break;
+                                 ;     171 		case TMR_CH1:
+                                 ;     172 			TMR1.TCR.BYTE = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",172
+000000F4 FBEE018208              		MOV.L #00088201H, R14
+000000F9 F8E408                  		MOV.B #08H, [R14]
+000000FC                         L42:	; bb14.split
+                                 ;     173 			TMR1.TCNT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",173
+000000FC FB1E018208              		MOV.L #00088201H, R1
+00000101 3C1800                  		MOV.B #00H, 08H[R1]
+00000104 2Err                 B  		BRA L47
+00000106                         L43:	; bb15
+                                 ;     174 			break;
+                                 ;     175 		case TMR_CH2:
+                                 ;     176 			TMR2.TCR.BYTE = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",176
+00000106 FBEE108208              		MOV.L #00088210H, R14
+0000010B F8E408                  		MOV.B #08H, [R14]
+0000010E                         L44:	; bb15.split
+                                 ;     177 			TMR2.TCNT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",177
+0000010E FB1E108208              		MOV.L #00088210H, R1
+00000113 3C1800                  		MOV.B #00H, 08H[R1]
+00000116 2Err                 B  		BRA L47
+00000118                         L45:	; bb16
+                                 ;     178 			break;
+                                 ;     179 		case TMR_CH3:
+                                 ;     180 			TMR3.TCR.BYTE = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",180
+00000118 FBEE118208              		MOV.L #00088211H, R14
+0000011D F8E408                  		MOV.B #08H, [R14]
+00000120                         L46:	; bb16.split
+                                 ;     181 			TMR3.TCNT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",181
+00000120 FB1E118208              		MOV.L #00088211H, R1
+00000125 3C1800                  		MOV.B #00H, 08H[R1]
+00000128                         L47:	; bb18
+                                 ;     182 			break;
+                                 ;     183 		}
+                                 ;     184 	}
+                                 ;     185 	return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",185
+00000128 3C0301                  		MOV.B #01H, 03H[R0]
+0000012B B089                    		MOVU.B 03H[R0], R1
+0000012D                         L48:	; bb18.split
+                                 ;     186 } 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",186
+0000012D 5B11                    		MOVU.B R1, R1
+0000012F 6704                    		RTSD #10H
+00000131                         __$create:
+                                 		.STACK	__$create=24
+                                 ;     187 
+                                 ;     188 static bool create(uint8_t period_us, void (* callback)(void * pdata), tmr_ch_t  channel,tmr_behavior_t behavior)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",188
+00000131 7100EC                  		ADD #0FFFFFFECH, R0
+00000134 8489                    		MOV.B R1, 13H[R0]
+00000136 A08A                    		MOV.L R2, 0CH[R0]
+00000138 A083                    		MOV.L R3, 08H[R0]
+0000013A A00C                    		MOV.L R4, 04H[R0]
+                                 ;     189 {
+                                 ;     190 	bool res = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",190
+0000013C 3C0201                  		MOV.B #01H, 02H[R0]
+0000013F                         L50:	; entry.split
+                                 ;     191 	switch(channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",191
+0000013F A881                    		MOV.L 08H[R0], R1
+00000141 6131                    		CMP #03H, R1
+00000143 3Arrrr               W  		BEQ L75
+00000146                         L51:	; entry.split
+00000146 6111                    		CMP #01H, R1
+00000148 20rr                    		BEQ L61
+0000014A                         L52:	; entry.split
+0000014A 6121                    		CMP #02H, R1
+0000014C 3Arrrr               W  		BEQ L68
+0000014F                         L53:	; entry.split
+0000014F 6101                    		CMP #00H, R1
+00000151 3Brrrr               W  		BNE L82
+00000154                         L54:	; bb
+                                 ;     192 	{
+                                 ;     193 	case TMR_CH0:
+                                 ;     194 		power_on(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",194
+00000154 A881                    		MOV.L 08H[R0], R1
+00000156 39rrrr               W  		BSR __$power_on
+00000159                         L55:	; bb.split
+                                 ;     195 		TMR0.TCSR.BYTE = 0x00;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",195
+00000159 FB1E008208              		MOV.L #00088200H, R1
+0000015E 3C1200                  		MOV.B #00H, 02H[R1]
+00000161                         L56:	; bb.split1
+                                 ;     196 		TMR0.TCCR.BYTE = 0x89;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",196
+00000161 FB1E008208              		MOV.L #00088200H, R1
+00000166 3C1A89                  		MOV.B #89H, 0AH[R1]
+00000169                         L57:	; bb.split2
+                                 ;     197 		TMR0.TCR.BYTE = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",197
+00000169 FBEE008208              		MOV.L #00088200H, R14
+0000016E F8E408                  		MOV.B #08H, [R14]
+00000171                         L58:	; bb.split3
+                                 ;     198 		TMR0.TCORA = 24*period_us;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",198
+00000171 B489                    		MOVU.B 13H[R0], R1
+00000173 751118                  		MUL #18H, R1
+00000176 FB2E008208              		MOV.L #00088200H, R2
+0000017B 8121                    		MOV.B R1, 04H[R2]
+0000017D                         L59:	; bb.split4
+                                 ;     199 		g_tmr_callbacks[channel] = callback;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",199
+0000017D FBE2rrrrrrrr            		MOV.L #__$g_tmr_callbacks, R14
+00000183 A889                    		MOV.L 0CH[R0], R1
+00000185 A882                    		MOV.L 08H[R0], R2
+00000187 FE22E1                  		MOV.L R1, [R2,R14]
+0000018A                         L60:	; bb.split5
+                                 ;     200 		g_tmrbehavior[channel] = behavior;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",200
+0000018A FBE2rrrrrrrr            		MOV.L #__$g_tmrbehavior, R14
+00000190 A809                    		MOV.L 04H[R0], R1
+00000192 A882                    		MOV.L 08H[R0], R2
+00000194 FE0E21                  		MOV.B R1, [R14,R2]
+00000197 38rrrr               W  		BRA L83
+0000019A                         L61:	; bb19
+                                 ;     201 		break;
+                                 ;     202 	case TMR_CH1:
+                                 ;     203 		power_on(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",203
+0000019A A881                    		MOV.L 08H[R0], R1
+0000019C 39rrrr               W  		BSR __$power_on
+0000019F                         L62:	; bb19.split
+                                 ;     204 		TMR1.TCSR.BYTE = 0x00;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",204
+0000019F FB1E018208              		MOV.L #00088201H, R1
+000001A4 3C1200                  		MOV.B #00H, 02H[R1]
+000001A7                         L63:	; bb19.split6
+                                 ;     205 		TMR1.TCCR.BYTE = 0x89;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",205
+000001A7 FB1E018208              		MOV.L #00088201H, R1
+000001AC 3C1A89                  		MOV.B #89H, 0AH[R1]
+000001AF                         L64:	; bb19.split7
+                                 ;     206 		TMR1.TCR.BYTE = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",206
+000001AF FBEE018208              		MOV.L #00088201H, R14
+000001B4 F8E408                  		MOV.B #08H, [R14]
+000001B7                         L65:	; bb19.split8
+                                 ;     207 		TMR1.TCORA = 24*period_us;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",207
+000001B7 B489                    		MOVU.B 13H[R0], R1
+000001B9 751118                  		MUL #18H, R1
+000001BC FB2E018208              		MOV.L #00088201H, R2
+000001C1 8121                    		MOV.B R1, 04H[R2]
+000001C3                         L66:	; bb19.split9
+                                 ;     208 		g_tmr_callbacks[channel] = callback;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",208
+000001C3 FBE2rrrrrrrr            		MOV.L #__$g_tmr_callbacks, R14
+000001C9 A889                    		MOV.L 0CH[R0], R1
+000001CB A882                    		MOV.L 08H[R0], R2
+000001CD FE22E1                  		MOV.L R1, [R2,R14]
+000001D0                         L67:	; bb19.split10
+                                 ;     209 		g_tmrbehavior[channel] = behavior;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",209
+000001D0 FBE2rrrrrrrr            		MOV.L #__$g_tmrbehavior, R14
+000001D6 A809                    		MOV.L 04H[R0], R1
+000001D8 A882                    		MOV.L 08H[R0], R2
+000001DA FE0E21                  		MOV.B R1, [R14,R2]
+000001DD 38rrrr               W  		BRA L83
+000001E0                         L68:	; bb32
+                                 ;     210 		break;
+                                 ;     211 	case TMR_CH2:
+                                 ;     212 		power_on(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",212
+000001E0 A881                    		MOV.L 08H[R0], R1
+000001E2 39rrrr               W  		BSR __$power_on
+000001E5                         L69:	; bb32.split
+                                 ;     213 		TMR2.TCSR.BYTE = 0x00;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",213
+000001E5 FB1E108208              		MOV.L #00088210H, R1
+000001EA 3C1200                  		MOV.B #00H, 02H[R1]
+000001ED                         L70:	; bb32.split11
+                                 ;     214 		TMR2.TCCR.BYTE = 0x89;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",214
+000001ED FB1E108208              		MOV.L #00088210H, R1
+000001F2 3C1A89                  		MOV.B #89H, 0AH[R1]
+000001F5                         L71:	; bb32.split12
+                                 ;     215 		TMR2.TCR.BYTE = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",215
+000001F5 FBEE108208              		MOV.L #00088210H, R14
+000001FA F8E408                  		MOV.B #08H, [R14]
+000001FD                         L72:	; bb32.split13
+                                 ;     216 		TMR2.TCORA = 24*period_us;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",216
+000001FD B489                    		MOVU.B 13H[R0], R1
+000001FF 751118                  		MUL #18H, R1
+00000202 FB2E108208              		MOV.L #00088210H, R2
+00000207 8121                    		MOV.B R1, 04H[R2]
+00000209                         L73:	; bb32.split14
+                                 ;     217 		g_tmr_callbacks[channel] = callback;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",217
+00000209 FBE2rrrrrrrr            		MOV.L #__$g_tmr_callbacks, R14
+0000020F A889                    		MOV.L 0CH[R0], R1
+00000211 A882                    		MOV.L 08H[R0], R2
+00000213 FE22E1                  		MOV.L R1, [R2,R14]
+00000216                         L74:	; bb32.split15
+                                 ;     218 		g_tmrbehavior[channel] = behavior;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",218
+00000216 FBE2rrrrrrrr            		MOV.L #__$g_tmrbehavior, R14
+0000021C A809                    		MOV.L 04H[R0], R1
+0000021E A882                    		MOV.L 08H[R0], R2
+00000220 FE0E21                  		MOV.B R1, [R14,R2]
+00000223 2Err                 B  		BRA L83
+00000225                         L75:	; bb45
+                                 ;     219 		break;
+                                 ;     220 	case TMR_CH3:
+                                 ;     221 		power_on(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",221
+00000225 A881                    		MOV.L 08H[R0], R1
+00000227 39rrrr               W  		BSR __$power_on
+0000022A                         L76:	; bb45.split
+                                 ;     222 		TMR3.TCSR.BYTE = 0x00;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",222
+0000022A FB1E118208              		MOV.L #00088211H, R1
+0000022F 3C1200                  		MOV.B #00H, 02H[R1]
+00000232                         L77:	; bb45.split16
+                                 ;     223 		TMR3.TCCR.BYTE = 0x89;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",223
+00000232 FB1E118208              		MOV.L #00088211H, R1
+00000237 3C1A89                  		MOV.B #89H, 0AH[R1]
+0000023A                         L78:	; bb45.split17
+                                 ;     224 		TMR3.TCR.BYTE = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",224
+0000023A FBEE118208              		MOV.L #00088211H, R14
+0000023F F8E408                  		MOV.B #08H, [R14]
+00000242                         L79:	; bb45.split18
+                                 ;     225 		TMR3.TCORA = 24*period_us;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",225
+00000242 B489                    		MOVU.B 13H[R0], R1
+00000244 751118                  		MUL #18H, R1
+00000247 FB2E118208              		MOV.L #00088211H, R2
+0000024C 8121                    		MOV.B R1, 04H[R2]
+0000024E                         L80:	; bb45.split19
+                                 ;     226 		g_tmr_callbacks[channel] = callback;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",226
+0000024E FBE2rrrrrrrr            		MOV.L #__$g_tmr_callbacks, R14
+00000254 A889                    		MOV.L 0CH[R0], R1
+00000256 A882                    		MOV.L 08H[R0], R2
+00000258 FE22E1                  		MOV.L R1, [R2,R14]
+0000025B                         L81:	; bb45.split20
+                                 ;     227 		g_tmrbehavior[channel] = behavior;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",227
+0000025B FBE2rrrrrrrr            		MOV.L #__$g_tmrbehavior, R14
+00000261 A809                    		MOV.L 04H[R0], R1
+00000263 A882                    		MOV.L 08H[R0], R2
+00000265 FE0E21                  		MOV.B R1, [R14,R2]
+00000268 08                   S  		BRA L83
+00000269                         L82:	; bb58
+                                 ;     228 		break;
+                                 ;     229 		default:
+                                 ;     230 			res = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",230
+00000269 3C0200                  		MOV.B #00H, 02H[R0]
+0000026C                         L83:	; bb59
+                                 ;     231 		break;
+                                 ;     232 	}
+                                 ;     233 	return res;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",233
+0000026C C5000203                		MOV.B 02H[R0], 03H[R0]
+00000270 B089                    		MOVU.B 03H[R0], R1
+00000272                         L84:	; bb59.split
+                                 ;     234 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",234
+00000272 5B11                    		MOVU.B R1, R1
+00000274 6705                    		RTSD #14H
+00000276                         __$power_on:
+                                 		.STACK	__$power_on=8
+                                 ;     235 
+                                 ;     236 
+                                 ;     237 static void power_on(tmr_ch_t  channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",237
+00000276 6040                    		SUB #04H, R0
+00000278 E301                    		MOV.L R1, [R0]
+0000027A 6611                    		MOV.L #00000001H, R1
+                                 ;     238 {
+                                 ;     239 	R_BSP_RegisterProtectDisable (BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",239
+0000027C 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+00000280                         L86:	; entry.split
+                                 ;     240 	switch(channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",240
+00000280 EC01                    		MOV.L [R0], R1
+00000282 6131                    		CMP #03H, R1
+00000284 3Arrrr               W  		BEQ L102
+00000287                         L87:	; entry.split
+00000287 6111                    		CMP #01H, R1
+00000289 20rr                    		BEQ L94
+0000028B                         L88:	; entry.split
+0000028B 6121                    		CMP #02H, R1
+0000028D 20rr                    		BEQ L98
+0000028F                         L89:	; entry.split
+0000028F 6101                    		CMP #00H, R1
+00000291 3Brrrr               W  		BNE L106
+00000294                         L90:	; bb
+00000294 FBEE100008              		MOV.L #00080010H, R14
+                                 ;     241 	{
+                                 ;     242 		case TMR_CH0:
+                                 ;     243 			MSTP(TMR0) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",243
+00000299 ECEF                    		MOV.L [R14], R15
+0000029B 7A5F                    		BCLR #05H, R15
+0000029D E3EF                    		MOV.L R15, [R14]
+0000029F                         L91:	; bb.split
+                                 ;     244 			IR(TMR0, CMIA0)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",244
+0000029F FBEEAA7008              		MOV.L #000870AAH, R14
+000002A4 F0E8                    		BCLR #00H, [R14].B
+000002A6                         L92:	; bb.split1
+                                 ;     245 			IPR(TMR0, CMIA0) = 5;   			 //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",245
+000002A6 FBEEAA7008              		MOV.L #000870AAH, R14
+000002AB 5AEF0003                		MOVU.B 0300H[R14], R15
+000002AF 655F                    		OR #05H, R15
+000002B1 762FF500                		AND #0F5H, R15
+000002B5 CBEF0003                		MOV.B R15, 0300H[R14]
+000002B9                         L93:	; bb.split2
+                                 ;     246 			IEN(TMR0, CMIA0) = 1;                //Enable compare match interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",246
+000002B9 FBEEAA7008              		MOV.L #000870AAH, R14
+000002BE F2E26B01                		BSET #02H, 016BH[R14].B
+000002C2 38rrrr               W  		BRA L106
+000002C5                         L94:	; bb14
+000002C5 FBEE100008              		MOV.L #00080010H, R14
+                                 ;     247 		break;
+                                 ;     248 		case TMR_CH1:
+                                 ;     249 			MSTP(TMR1) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",249
+000002CA ECEF                    		MOV.L [R14], R15
+000002CC 7A5F                    		BCLR #05H, R15
+000002CE E3EF                    		MOV.L R15, [R14]
+000002D0                         L95:	; bb14.split
+                                 ;     250 			IR(TMR1, CMIA1)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",250
+000002D0 FBEEAA7008              		MOV.L #000870AAH, R14
+000002D5 F1E803                  		BCLR #00H, 03H[R14].B
+000002D8                         L96:	; bb14.split3
+                                 ;     251 			IPR(TMR1, CMIA1) = 5;   			 //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",251
+000002D8 FBEEAA7008              		MOV.L #000870AAH, R14
+000002DD 5AEF0303                		MOVU.B 0303H[R14], R15
+000002E1 655F                    		OR #05H, R15
+000002E3 762FF500                		AND #0F5H, R15
+000002E7 CBEF0303                		MOV.B R15, 0303H[R14]
+000002EB                         L97:	; bb14.split4
+                                 ;     252 			IEN(TMR1, CMIA1) = 1;                //Enable compare match interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",252
+000002EB FBEEAA7008              		MOV.L #000870AAH, R14
+000002F0 F2E56B01                		BSET #05H, 016BH[R14].B
+000002F4 2Err                 B  		BRA L106
+000002F6                         L98:	; bb27
+000002F6 FBEE100008              		MOV.L #00080010H, R14
+                                 ;     253 		break;
+                                 ;     254 		case TMR_CH2:
+                                 ;     255 			MSTP(TMR2) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",255
+000002FB ECEF                    		MOV.L [R14], R15
+000002FD 7A4F                    		BCLR #04H, R15
+000002FF E3EF                    		MOV.L R15, [R14]
+00000301                         L99:	; bb27.split
+                                 ;     256 			IR(TMR2, CMIA2)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",256
+00000301 FBEEAA7008              		MOV.L #000870AAH, R14
+00000306 F1E806                  		BCLR #00H, 06H[R14].B
+00000309                         L100:	; bb27.split5
+                                 ;     257 			IPR(TMR2, CMIA2) = 5;   			 //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",257
+00000309 FBEEAA7008              		MOV.L #000870AAH, R14
+0000030E 5AEF0603                		MOVU.B 0306H[R14], R15
+00000312 655F                    		OR #05H, R15
+00000314 762FF500                		AND #0F5H, R15
+00000318 CBEF0603                		MOV.B R15, 0306H[R14]
+0000031C                         L101:	; bb27.split6
+                                 ;     258 			IEN(TMR2, CMIA2) = 1;                //Enable compare match interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",258
+0000031C FBEEAA7008              		MOV.L #000870AAH, R14
+00000321 F2E06C01                		BSET #00H, 016CH[R14].B
+00000325 2Err                 B  		BRA L106
+00000327                         L102:	; bb40
+00000327 FBEE100008              		MOV.L #00080010H, R14
+                                 ;     259 		break;
+                                 ;     260 		case TMR_CH3:
+                                 ;     261 			MSTP(TMR3) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",261
+0000032C ECEF                    		MOV.L [R14], R15
+0000032E 7A4F                    		BCLR #04H, R15
+00000330 E3EF                    		MOV.L R15, [R14]
+00000332                         L103:	; bb40.split
+                                 ;     262 			IR(TMR3, CMIA3)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",262
+00000332 FBEEAA7008              		MOV.L #000870AAH, R14
+00000337 F1E809                  		BCLR #00H, 09H[R14].B
+0000033A                         L104:	; bb40.split7
+                                 ;     263 			IPR(TMR3, CMIA3) = 5;   			 //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",263
+0000033A FBEEAA7008              		MOV.L #000870AAH, R14
+0000033F 5AEF0903                		MOVU.B 0309H[R14], R15
+00000343 655F                    		OR #05H, R15
+00000345 762FF500                		AND #0F5H, R15
+00000349 CBEF0903                		MOV.B R15, 0309H[R14]
+0000034D                         L105:	; bb40.split8
+                                 ;     264 			IEN(TMR3, CMIA3) = 1;                //Enable compare match interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",264
+0000034D FBEEAA7008              		MOV.L #000870AAH, R14
+00000352 F2E36C01                		BSET #03H, 016CH[R14].B
+00000356                         L106:	; bb54
+00000356 6611                    		MOV.L #00000001H, R1
+                                 ;     265 		break;
+                                 ;     266 		default:
+                                 ;     267 		break;
+                                 ;     268 	}
+                                 ;     269 	R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",269
+00000358 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+0000035C 6701                    		RTSD #04H
+0000035E                         __$power_off:
+                                 		.STACK	__$power_off=8
+                                 ;     270 }
+                                 ;     271 
+                                 ;     272 static void power_off(tmr_ch_t  channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",272
+0000035E 6040                    		SUB #04H, R0
+00000360 E301                    		MOV.L R1, [R0]
+00000362 6611                    		MOV.L #00000001H, R1
+                                 ;     273 {
+                                 ;     274 	R_BSP_RegisterProtectDisable (BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",274
+00000364 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+00000368                         L108:	; entry.split
+                                 ;     275 	switch(channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",275
+00000368 EC01                    		MOV.L [R0], R1
+0000036A 6131                    		CMP #03H, R1
+0000036C 3Arrrr               W  		BEQ L124
+0000036F                         L109:	; entry.split
+0000036F 6111                    		CMP #01H, R1
+00000371 20rr                    		BEQ L116
+00000373                         L110:	; entry.split
+00000373 6121                    		CMP #02H, R1
+00000375 20rr                    		BEQ L120
+00000377                         L111:	; entry.split
+00000377 6101                    		CMP #00H, R1
+00000379 3Brrrr               W  		BNE L128
+0000037C                         L112:	; bb
+0000037C FBEE100008              		MOV.L #00080010H, R14
+                                 ;     276 	{
+                                 ;     277 	case TMR_CH0:
+                                 ;     278 		MSTP(TMR0) = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",278
+00000381 ECEF                    		MOV.L [R14], R15
+00000383 785F                    		BSET #05H, R15
+00000385 E3EF                    		MOV.L R15, [R14]
+00000387                         L113:	; bb.split
+                                 ;     279 		/* Setup ICU registers. */
+                                 ;     280 		IR(TMR0, CMIA0)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",280
+00000387 FBEEAA7008              		MOV.L #000870AAH, R14
+0000038C F0E8                    		BCLR #00H, [R14].B
+0000038E                         L114:	; bb.split1
+                                 ;     281 		IPR(TMR0, CMIA0) = 0;   			 //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",281
+0000038E FBEEAA7008              		MOV.L #000870AAH, R14
+00000393 754FF0                  		MOV.L #000000F0H, R15
+00000396 52EF0003                		AND 0300H[R14].UB, R15
+0000039A CBEF0003                		MOV.B R15, 0300H[R14]
+0000039E                         L115:	; bb.split2
+                                 ;     282 		IEN(TMR0, CMIA0) = 0;                //Enable compare match interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",282
+0000039E FBEEAA7008              		MOV.L #000870AAH, R14
+000003A3 F2EA6B01                		BCLR #02H, 016BH[R14].B
+000003A7 38rrrr               W  		BRA L128
+000003AA                         L116:	; bb14
+000003AA FBEE100008              		MOV.L #00080010H, R14
+                                 ;     283 		break;
+                                 ;     284 	case TMR_CH1:
+                                 ;     285 		MSTP(TMR1) = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",285
+000003AF ECEF                    		MOV.L [R14], R15
+000003B1 785F                    		BSET #05H, R15
+000003B3 E3EF                    		MOV.L R15, [R14]
+000003B5                         L117:	; bb14.split
+                                 ;     286 		/* Setup ICU registers. */
+                                 ;     287 		IR(TMR1, CMIA1)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",287
+000003B5 FBEEAA7008              		MOV.L #000870AAH, R14
+000003BA F1E803                  		BCLR #00H, 03H[R14].B
+000003BD                         L118:	; bb14.split3
+                                 ;     288 		IPR(TMR1, CMIA1) = 0;   			 //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",288
+000003BD FBEEAA7008              		MOV.L #000870AAH, R14
+000003C2 754FF0                  		MOV.L #000000F0H, R15
+000003C5 52EF0303                		AND 0303H[R14].UB, R15
+000003C9 CBEF0303                		MOV.B R15, 0303H[R14]
+000003CD                         L119:	; bb14.split4
+                                 ;     289 		IEN(TMR1, CMIA1) = 0;                //Enable compare match interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",289
+000003CD FBEEAA7008              		MOV.L #000870AAH, R14
+000003D2 F2ED6B01                		BCLR #05H, 016BH[R14].B
+000003D6 2Err                 B  		BRA L128
+000003D8                         L120:	; bb27
+000003D8 FBEE100008              		MOV.L #00080010H, R14
+                                 ;     290 		break;
+                                 ;     291 	case TMR_CH2:
+                                 ;     292 		MSTP(TMR2) = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",292
+000003DD ECEF                    		MOV.L [R14], R15
+000003DF 784F                    		BSET #04H, R15
+000003E1 E3EF                    		MOV.L R15, [R14]
+000003E3                         L121:	; bb27.split
+                                 ;     293 		/* Setup ICU registers. */
+                                 ;     294 		IR(TMR2, CMIA2)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",294
+000003E3 FBEEAA7008              		MOV.L #000870AAH, R14
+000003E8 F1E806                  		BCLR #00H, 06H[R14].B
+000003EB                         L122:	; bb27.split5
+                                 ;     295 		IPR(TMR2, CMIA2) = 0;   			 //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",295
+000003EB FBEEAA7008              		MOV.L #000870AAH, R14
+000003F0 754FF0                  		MOV.L #000000F0H, R15
+000003F3 52EF0603                		AND 0306H[R14].UB, R15
+000003F7 CBEF0603                		MOV.B R15, 0306H[R14]
+000003FB                         L123:	; bb27.split6
+                                 ;     296 		IEN(TMR2, CMIA2) = 0;                //Enable compare match interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",296
+000003FB FBEEAA7008              		MOV.L #000870AAH, R14
+00000400 F2E86C01                		BCLR #00H, 016CH[R14].B
+00000404 2Err                 B  		BRA L128
+00000406                         L124:	; bb40
+00000406 FBEE100008              		MOV.L #00080010H, R14
+                                 ;     297 		break;
+                                 ;     298 	case TMR_CH3:
+                                 ;     299 		MSTP(TMR3) = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",299
+0000040B ECEF                    		MOV.L [R14], R15
+0000040D 784F                    		BSET #04H, R15
+0000040F E3EF                    		MOV.L R15, [R14]
+00000411                         L125:	; bb40.split
+                                 ;     300 		/* Setup ICU registers. */
+                                 ;     301 		IR(TMR3, CMIA3)  = 0;                //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",301
+00000411 FBEEAA7008              		MOV.L #000870AAH, R14
+00000416 F1E809                  		BCLR #00H, 09H[R14].B
+00000419                         L126:	; bb40.split7
+                                 ;     302 		IPR(TMR3, CMIA3) = 0;   			 //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",302
+00000419 FBEEAA7008              		MOV.L #000870AAH, R14
+0000041E 754FF0                  		MOV.L #000000F0H, R15
+00000421 52EF0903                		AND 0309H[R14].UB, R15
+00000425 CBEF0903                		MOV.B R15, 0309H[R14]
+00000429                         L127:	; bb40.split8
+                                 ;     303 		IEN(TMR3, CMIA3) = 0;                //Enable compare match interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",303
+00000429 FBEEAA7008              		MOV.L #000870AAH, R14
+0000042E F2EB6C01                		BCLR #03H, 016CH[R14].B
+00000432                         L128:	; bb54
+00000432 6611                    		MOV.L #00000001H, R1
+                                 ;     304 		break;
+                                 ;     305 	default:
+                                 ;     306 		break;
+                                 ;     307 	}
+                                 ;     308 	R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",308
+00000434 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+00000438 6701                    		RTSD #04H
+0000043A                         __$tmr0_isr:
+                                 		.STACK	__$tmr0_isr=36
+                                 		.RVECTOR	170,__$tmr0_isr
+                                 ;     309 }
+                                 ;     310 
+                                 ;     311 /***********************************************************************************************************************
+                                 ;     312 * Function Name: tmr0_isr
+                                 ;     313 * Description  : Interrupt when compare match for this channel occurs.
+                                 ;     314 * Arguments    : none
+                                 ;     315 * Return Value : none
+                                 ;     316 ***********************************************************************************************************************/
+                                 ;     317 #pragma interrupt tmr0_isr(vect=VECT(TMR0, CMIA0))
+                                 ;     318 static void tmr0_isr (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",318
+0000043A 6EEF                    		PUSHM R14-R15
+0000043C 6E15                    		PUSHM R1-R5
+                                 ;     319 {
+                                 ;     320 	if (g_tmrbehavior[TMR_CH0] == TMR_ONESHOOT)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",320
+0000043E FB12rrrrrrrr            		MOV.L #__$g_tmrbehavior, R1
+00000444 5811                    		MOVU.B [R1], R1
+00000446 6111                    		CMP #01H, R1
+00000448 18                   S  		BNE L131
+00000449                         L130:	; bb1
+00000449 6612                    		MOV.L #00000001H, R2
+0000044B 6601                    		MOV.L #00000000H, R1
+                                 ;     321 	{
+                                 ;     322 		R_TMR_Control(TMR_CH0, TMR_CLEAR, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",322
+0000044D EF13                    		MOV.L R1, R3
+0000044F 39rrrr               W  		BSR _R_TMR_Control
+00000452                         L131:	; bb6
+                                 ;     323 	}
+                                 ;     324 	 g_tmr_callbacks[TMR_CH0]((void *)0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",324
+00000452 FB12rrrrrrrr            		MOV.L #__$g_tmr_callbacks, R1
+00000458 EC12                    		MOV.L [R1], R2
+0000045A 6601                    		MOV.L #00000000H, R1
+0000045C 7F12                    		JSR R2
+0000045E 6F15                    		POPM R1-R5
+00000460 6FEF                    		POPM R14-R15
+00000462 7F95                    		RTE
+00000464                         __$tmr1_isr:
+                                 		.STACK	__$tmr1_isr=36
+                                 		.RVECTOR	173,__$tmr1_isr
+                                 ;     325 }
+                                 ;     326 
+                                 ;     327 /***********************************************************************************************************************
+                                 ;     328 * Function Name: tmr1_isr
+                                 ;     329 * Description  : Interrupt when compare match for this channel occurs.
+                                 ;     330 * Arguments    : none
+                                 ;     331 * Return Value : none
+                                 ;     332 ***********************************************************************************************************************/
+                                 ;     333 #pragma interrupt tmr1_isr(vect=VECT(TMR1, CMIA1))
+                                 ;     334 static void tmr1_isr (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",334
+00000464 6EEF                    		PUSHM R14-R15
+00000466 6E15                    		PUSHM R1-R5
+                                 ;     335 {
+                                 ;     336 	if (g_tmrbehavior[TMR_CH1] == TMR_ONESHOOT)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",336
+00000468 FB12rrrrrrrr            		MOV.L #__$g_tmrbehavior, R1
+0000046E B019                    		MOVU.B 01H[R1], R1
+00000470 6111                    		CMP #01H, R1
+00000472 18                   S  		BNE L134
+00000473                         L133:	; bb1
+00000473 6603                    		MOV.L #00000000H, R3
+00000475 6611                    		MOV.L #00000001H, R1
+                                 ;     337 	{
+                                 ;     338 		R_TMR_Control(TMR_CH1, TMR_CLEAR, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",338
+00000477 EF12                    		MOV.L R1, R2
+00000479 39rrrr               W  		BSR _R_TMR_Control
+0000047C                         L134:	; bb6
+                                 ;     339 	}
+                                 ;     340 	g_tmr_callbacks[TMR_CH1]((void *)1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",340
+0000047C FB12rrrrrrrr            		MOV.L #__$g_tmr_callbacks, R1
+00000482 A81A                    		MOV.L 04H[R1], R2
+00000484 6611                    		MOV.L #00000001H, R1
+00000486 7F12                    		JSR R2
+00000488 6F15                    		POPM R1-R5
+0000048A 6FEF                    		POPM R14-R15
+0000048C 7F95                    		RTE
+0000048E                         __$tmr2_isr:
+                                 		.STACK	__$tmr2_isr=36
+                                 		.RVECTOR	176,__$tmr2_isr
+                                 ;     341 }
+                                 ;     342 
+                                 ;     343 /***********************************************************************************************************************
+                                 ;     344 * Function Name: tmr2_isr
+                                 ;     345 * Description  : Interrupt when compare match for this channel occurs.
+                                 ;     346 * Arguments    : none
+                                 ;     347 * Return Value : none
+                                 ;     348 ***********************************************************************************************************************/
+                                 ;     349 #pragma interrupt tmr2_isr(vect=VECT(TMR2, CMIA2))
+                                 ;     350 static void tmr2_isr (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",350
+0000048E 6EEF                    		PUSHM R14-R15
+00000490 6E15                    		PUSHM R1-R5
+                                 ;     351 {
+                                 ;     352 	if (g_tmrbehavior[TMR_CH2] == TMR_ONESHOOT)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",352
+00000492 FB12rrrrrrrr            		MOV.L #__$g_tmrbehavior, R1
+00000498 B091                    		MOVU.B 02H[R1], R1
+0000049A 6111                    		CMP #01H, R1
+0000049C 18                   S  		BNE L137
+0000049D                         L136:	; bb1
+0000049D 6603                    		MOV.L #00000000H, R3
+0000049F 6612                    		MOV.L #00000001H, R2
+000004A1 6621                    		MOV.L #00000002H, R1
+                                 ;     353 	{
+                                 ;     354 		R_TMR_Control(TMR_CH2, TMR_CLEAR, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",354
+000004A3 39rrrr               W  		BSR _R_TMR_Control
+000004A6                         L137:	; bb6
+                                 ;     355 	}
+                                 ;     356 	g_tmr_callbacks[TMR_CH2]((void *)2);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",356
+000004A6 FB12rrrrrrrr            		MOV.L #__$g_tmr_callbacks, R1
+000004AC A892                    		MOV.L 08H[R1], R2
+000004AE 6621                    		MOV.L #00000002H, R1
+000004B0 7F12                    		JSR R2
+000004B2 6F15                    		POPM R1-R5
+000004B4 6FEF                    		POPM R14-R15
+000004B6 7F95                    		RTE
+000004B8                         __$tmr3_isr:
+                                 		.STACK	__$tmr3_isr=36
+                                 		.RVECTOR	179,__$tmr3_isr
+                                 ;     357 }
+                                 ;     358 
+                                 ;     359 /***********************************************************************************************************************
+                                 ;     360 * Function Name: tmr1_isr
+                                 ;     361 * Description  : Interrupt when compare match for this channel occurs.
+                                 ;     362 * Arguments    : none
+                                 ;     363 * Return Value : none
+                                 ;     364 ***********************************************************************************************************************/
+                                 ;     365 #pragma interrupt tmr3_isr(vect=VECT(TMR3, CMIA3))
+                                 ;     366 static void tmr3_isr (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",366
+000004B8 6EEF                    		PUSHM R14-R15
+000004BA 6E15                    		PUSHM R1-R5
+                                 ;     367 {
+                                 ;     368 	if (g_tmrbehavior[TMR_CH3] == TMR_ONESHOOT)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",368
+000004BC FB12rrrrrrrr            		MOV.L #__$g_tmrbehavior, R1
+000004C2 B099                    		MOVU.B 03H[R1], R1
+000004C4 6111                    		CMP #01H, R1
+000004C6 18                   S  		BNE L140
+000004C7                         L139:	; bb1
+000004C7 6603                    		MOV.L #00000000H, R3
+000004C9 6612                    		MOV.L #00000001H, R2
+000004CB 6631                    		MOV.L #00000003H, R1
+                                 ;     369 	{
+                                 ;     370 		R_TMR_Control(TMR_CH3, TMR_CLEAR, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",370
+000004CD 39rrrr               W  		BSR _R_TMR_Control
+000004D0                         L140:	; bb6
+                                 ;     371 	}
+                                 ;     372 	g_tmr_callbacks[TMR_CH3]((void *)3);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tmr_rx\src\r_tmr_rx.c",372
+000004D0 FB12rrrrrrrr            		MOV.L #__$g_tmr_callbacks, R1
+000004D6 A89A                    		MOV.L 0CH[R1], R2
+000004D8 6631                    		MOV.L #00000003H, R1
+000004DA 7F12                    		JSR R2
+000004DC 6F15                    		POPM R1-R5
+000004DE 6FEF                    		POPM R14-R15
+000004E0 7F95                    		RTE
+                                 ;     373 }
+                                 ;     374 
+                                 ;     375 
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$g_tmrbehavior:
+00000000 00                      		.byte	0
+00000001 00                      		.byte	0
+00000002 00                      		.byte	0
+00000003 00                      		.byte	0
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         __$g_tmr_callbacks:
+00000000(00000010H)              		.blkl	4
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01109   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001250(000004E2H)  P
+ROMDATA  0000000004(00000004H)  D_1
+DATA     0000000016(00000010H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\r_tmr_rx.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\r_tmr_rx.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\r_tmr_rx\src\r_tmr_rx.obj

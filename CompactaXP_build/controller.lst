@@ -1,0 +1,1261 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:05 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:05
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=controller.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=controller.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;controller.c
+                                 
+                                 		.glb	__Touptab
+                                 		.glb	__Stderr
+                                 		.glb	_cfg
+                                 		.glb	_mr
+                                 		.glb	_macro_func_ptr
+                                 		.glb	_cs
+                                 		.glb	_intepreterRunning
+                                 		.glb	_controller_init
+                                 		.glb	_controller_init_assertions
+                                 		.glb	_controller_test_assertions
+                                 		.glb	_controller_run
+                                 		.glb	_xio_init
+                                 		.glb	_ulTaskNotifyTake
+                                 		.glb	_cm_feedhold_sequencing_callback
+                                 		.glb	_mp_plan_hold_callback
+                                 		.glb	_st_motor_power_callback
+                                 		.glb	_sr_status_report_callback
+                                 		.glb	_qr_queue_report_callback
+                                 		.glb	_rx_report_callback
+                                 		.glb	_arcoOK_Macro
+                                 		.glb	_cm_arc_callback
+                                 		.glb	_cm_homing_callback
+                                 		.glb	_cm_jogging_callback
+                                 		.glb	_cm_probe_callback
+                                 		.glb	_cm_wait_callback
+                                 		.glb	_cm_deferred_write_callback
+                                 		.glb	_printf
+                                 		.glb	_cm_get_linenum
+                                 		.glb	__command_dispatch
+                                 		.glb	_tg_reset_source
+                                 		.glb	_tg_set_primary_source
+                                 		.glb	_parse_gcode_func_selection
+                                 		.glb	_xio_gets
+                                 		.glb	_xio_close
+                                 		.glb	_fprintf
+                                 		.glb	_rpt_exception
+                                 		.glb	_cm_request_feedhold
+                                 		.glb	_cm_request_queue_flush
+                                 		.glb	_cm_request_cycle_start
+                                 		.glb	_text_response
+                                 		.glb	_text_parser
+                                 		.glb	_json_parser
+                                 		.glb	_sprintf
+                                 		.glb	_gc_gcode_parser
+                                 		.glb	_cm_get_machine_state
+                                 		.glb	_SysTickTimer_getValue
+                                 		.glb	_IndicatorLed_toggle
+                                 		.glb	_tg_set_secondary_source
+                                 		.glb	_command_idle
+                                 		.glb	_mp_get_planner_buffers_available
+                                 		.glb	_get_limit_switch_thrown
+                                 		.glb	_cm_hard_alarm
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _controller_init:
+                                 		.STACK	_controller_init=8
+                                 ;       1 /*
+                                 ;       2  * controller.c - tinyg controller and top level parser
+                                 ;       3  * This file is part of the TinyG project
+                                 ;       4  *
+                                 ;       5  * Copyright (c) 2010 - 2015 Alden S. Hart, Jr.
+                                 ;       6  * Copyright (c) 2013 - 2015 Robert Giseburt
+                                 ;       7  *
+                                 ;       8  * This file ("the software") is free software: you can redistribute it and/or modify
+                                 ;       9  * it under the terms of the GNU General Public License, version 2 as published by the
+                                 ;      10  * Free Software Foundation. You should have received a copy of the GNU General Public
+                                 ;      11  * License, version 2 along with the software.  If not, see <http://www.gnu.org/licenses/>.
+                                 ;      12  *
+                                 ;      13  * As a special exception, you may use this file as part of a software library without
+                                 ;      14  * restriction. Specifically, if other files instantiate templates or use macros or
+                                 ;      15  * inline functions from this file, or you compile this file and link it with  other
+                                 ;      16  * files to produce an executable, this file does not by itself cause the resulting
+                                 ;      17  * executable to be covered by the GNU General Public License. This exception does not
+                                 ;      18  * however invalidate any other reasons why the executable file might be covered by the
+                                 ;      19  * GNU General Public License.
+                                 ;      20  *
+                                 ;      21  * THE SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY
+                                 ;      22  * WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                 ;      23  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+                                 ;      24  * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                 ;      25  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+                                 ;      26  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                                 ;      27  */
+                                 ;      28 
+                                 ;      29 #include "tinyg.h"				// #1
+                                 ;      30 #include "config.h"				// #2
+                                 ;      31 #include "controller.h"
+                                 ;      32 #include "json_parser.h"
+                                 ;      33 #include "text_parser.h"
+                                 ;      34 #include "gcode_parser.h"
+                                 ;      35 #include "canonical_machine.h"
+                                 ;      36 #include "plan_arc.h"
+                                 ;      37 #include "planner.h"
+                                 ;      38 #include "stepper.h"
+                                 ;      39 #include "macros.h"
+                                 ;      40 #include "plasma.h"
+                                 ;      41 
+                                 ;      42 
+                                 ;      43 #include "encoder.h"
+                                 ;      44 #include "hardware.h"
+                                 ;      45 #include "switch.h"
+                                 ;      46 #include "gpio.h"
+                                 ;      47 #include "report.h"
+                                 ;      48 #include "help.h"
+                                 ;      49 #include "util.h"
+                                 ;      50 #include "xio.h"
+                                 ;      51 
+                                 ;      52 #ifdef FREE_RTOS_PP
+                                 ;      53 #include "FreeRTOS.h"
+                                 ;      54 #include "task.h"
+                                 ;      55 #endif
+                                 ;      56 
+                                 ;      57 #include "keyboard.h"
+                                 ;      58 
+                                 ;      59 #ifdef __ARM
+                                 ;      60 #include "Reset.h"
+                                 ;      61 #endif
+                                 ;      62 
+                                 ;      63 /***********************************************************************************
+                                 ;      64  **** STRUCTURE ALLOCATIONS *********************************************************
+                                 ;      65  ***********************************************************************************/
+                                 ;      66 
+                                 ;      67 controller_t cs;		// controller state structure
+                                 ;      68 
+                                 ;      69 /***********************************************************************************
+                                 ;      70  **** STATICS AND LOCALS ***********************************************************
+                                 ;      71  ***********************************************************************************/
+                                 ;      72 
+                                 ;      73 static void _controller_HSM(void);
+                                 ;      74 static stat_t _shutdown_idler(void);
+                                 ;      75 static stat_t _normal_idler(void);
+                                 ;      76 static stat_t _limit_switch_handler(void);
+                                 ;      77 static stat_t _system_assertions(void);
+                                 ;      78 static stat_t _sync_to_planner(void);
+                                 ;      79 static stat_t _sync_to_tx_buffer(void);
+                                 ;      80 bool intepreterRunning = false;
+                                 ;      81 
+                                 ;      82 
+                                 ;      83 // prep for export to other modules:
+                                 ;      84 stat_t hardware_hard_reset_handler(void);
+                                 ;      85 stat_t hardware_bootloader_handler(void);
+                                 ;      86 
+                                 ;      87 /***********************************************************************************
+                                 ;      88  **** CODE *************************************************************************
+                                 ;      89  ***********************************************************************************/
+                                 ;      90 /*
+                                 ;      91  * controller_init() - controller init
+                                 ;      92  */
+                                 ;      93 
+                                 ;      94 void controller_init(uint8_t std_in, uint8_t std_out, uint8_t std_err)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",94
+00000000 6040                    		SUB #04H, R0
+00000002 8089                    		MOV.B R1, 03H[R0]
+00000004 8082                    		MOV.B R2, 02H[R0]
+00000006 800B                    		MOV.B R3, 01H[R0]
+00000008 FB3AAC03                		MOV.L #000003ACH, R3
+0000000C 6602                    		MOV.L #00000000H, R2
+                                 ;      95 {
+                                 ;      96 	memset(&cs, 0, sizeof(controller_t));			// clear all values, job_id's, pointers and status
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",96
+0000000E FB12rrrrrrrr            		MOV.L #_cs, R1
+00000014 7F88                    		SSTR.B
+00000016                         L14:	; entry.split
+                                 ;      97 	controller_init_assertions();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",97
+00000016 39rrrr               W  		BSR _controller_init_assertions
+00000019                         L15:	; entry.split1
+                                 ;      98 	macro_func_ptr = command_idle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",98
+00000019 FBE2rrrrrrrr            		MOV.L #_macro_func_ptr, R14
+0000001F FBF2rrrrrrrr            		MOV.L #_command_idle, R15
+00000025 E3EF                    		MOV.L R15, [R14]
+00000027                         L16:	; entry.split2
+                                 ;      99 	cs.fw_build = TINYG_FIRMWARE_BUILD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",99
+00000027 FBE2rrrrrrrr            		MOV.L #_cs, R14
+0000002D F9E2025218DC43          		MOV.L #43DC1852H, 08H[R14]
+00000034                         L17:	; entry.split3
+                                 ;     100 	cs.fw_version = TINYG_FIRMWARE_VERSION;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",100
+00000034 FBE2rrrrrrrr            		MOV.L #_cs, R14
+0000003A F9E203EC51783F          		MOV.L #3F7851ECH, 0CH[R14]
+00000041                         L18:	; entry.split4
+                                 ;     101 	cs.hw_platform = TINYG_HARDWARE_PLATFORM;		// NB: HW version is set from EEPROM
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",101
+00000041 FBE2rrrrrrrr            		MOV.L #_cs, R14
+00000047 F9E2040000803F          		MOV.L #3F800000H, 10H[R14]
+0000004E                         L19:	; entry.split5
+                                 ;     102 
+                                 ;     103 #ifdef __AVR
+                                 ;     104 	cs.state = CONTROLLER_STARTUP;					// ready to run startup lines
+                                 ;     105 	xio_set_stdin(std_in);
+                                 ;     106 	xio_set_stdout(std_out);
+                                 ;     107 	xio_set_stderr(std_err);
+                                 ;     108 	cs.default_src = std_in;
+                                 ;     109 	tg_set_primary_source(cs.default_src);
+                                 ;     110 #endif
+                                 ;     111 
+                                 ;     112 #ifdef __ARM
+                                 ;     113 	cs.state = CONTROLLER_NOT_CONNECTED;			// find USB next
+                                 ;     114 	IndicatorLed.setFrequency(100000);
+                                 ;     115 #endif
+                                 ;     116 
+                                 ;     117 #ifdef __RX
+                                 ;     118 	cs.default_src = std_in;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",118
+0000004E FBE2rrrrrrrr            		MOV.L #_cs, R14
+00000054 C50E031A                		MOV.B 03H[R0], 1AH[R14]
+00000058                         L20:	; entry.split6
+                                 ;     119 	tg_set_primary_source(cs.default_src);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",119
+00000058 FB12rrrrrrrr            		MOV.L #_cs, R1
+0000005E B691                    		MOVU.B 1AH[R1], R1
+00000060 39rrrr               W  		BSR _tg_set_primary_source
+00000063 6701                    		RTSD #04H
+00000065                         _controller_init_assertions:
+                                 		.STACK	_controller_init_assertions=4
+                                 ;     120 #endif
+                                 ;     121 }
+                                 ;     122 
+                                 ;     123 /*
+                                 ;     124  * controller_init_assertions()
+                                 ;     125  * controller_test_assertions() - check memory integrity of controller
+                                 ;     126  */
+                                 ;     127 
+                                 ;     128 void controller_init_assertions()
+                                 ;     129 {
+                                 ;     130 	cs.magic_start = MAGICNUM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",130
+00000065 FBE2rrrrrrrr            		MOV.L #_cs, R14
+0000006B F8E9EF12                		MOV.W #12EFH, [R14]
+0000006F                         L22:	; entry.split
+                                 ;     131 	cs.magic_end = MAGICNUM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",131
+0000006F FBE2rrrrrrrr            		MOV.L #_cs, R14
+00000075 FAE9D401EF12            		MOV.W #12EFH, 03A8H[R14]
+0000007B 02                      		RTS
+0000007C                         _controller_test_assertions:
+                                 		.STACK	_controller_test_assertions=12
+                                 ;     132 }
+                                 ;     133 
+                                 ;     134 stat_t controller_test_assertions()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",134
+0000007C 6080                    		SUB #08H, R0
+                                 ;     135 {
+                                 ;     136 	if ((cs.magic_start != MAGICNUM) || (cs.magic_end != MAGICNUM)) return (STAT_CONTROLLER_ASSERTION_FAILURE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",136
+0000007E FBE2rrrrrrrr            		MOV.L #_cs, R14
+00000084 5CEE                    		MOVU.W [R14], R14
+00000086 760EEF12                		CMP #12EFH, R14
+0000008A 21rr                    		BNE L26
+0000008C 08                   S  		BRA L25
+0000008D                         L24:	; bb1
+0000008D 3C0660                  		MOV.B #60H, 06H[R0]
+00000090 2Err                 B  		BRA L30
+00000092                         L25:	; bb7
+00000092 FBE2rrrrrrrr            		MOV.L #_cs, R14
+00000098 5EEED401                		MOVU.W 03A8H[R14], R14
+0000009C 760EEF12                		CMP #12EFH, R14
+000000A0 10                   S  		BEQ L27
+000000A1                         L26:	; bb12
+000000A1 F80601                  		MOV.L #00000001H, [R0]
+000000A4 08                   S  		BRA L28
+000000A5                         L27:	; bb13
+000000A5 F80600                  		MOV.L #00000000H, [R0]
+000000A8                         L28:	; bb14
+000000A8 EC01                    		MOV.L [R0], R1
+000000AA 6101                    		CMP #00H, R1
+000000AC 21rr                    		BNE L24
+000000AE                         L29:	; bb18
+                                 ;     137 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",137
+000000AE 3C0600                  		MOV.B #00H, 06H[R0]
+000000B1                         L30:	; bb20
+000000B1 C5000607                		MOV.B 06H[R0], 07H[R0]
+                                 ;     138 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",138
+000000B5 B189                    		MOVU.B 07H[R0], R1
+000000B7 6702                    		RTSD #08H
+000000B9                         _controller_run:
+                                 		.STACK	_controller_run=4
+                                 ;     139 
+                                 ;     140 /*
+                                 ;     141  * controller_run() - MAIN LOOP - top-level controller
+                                 ;     142  *
+                                 ;     143  * The order of the dispatched tasks is very important.
+                                 ;     144  * Tasks are ordered by increasing dependency (blocking hierarchy).
+                                 ;     145  * Tasks that are dependent on completion of lower-level tasks must be
+                                 ;     146  * later in the list than the task(s) they are dependent upon.
+                                 ;     147  *
+                                 ;     148  * Tasks must be written as continuations as they will be called repeatedly,
+                                 ;     149  * and are called even if they are not currently active.
+                                 ;     150  *
+                                 ;     151  * The DISPATCH macro calls the function and returns to the controller parent
+                                 ;     152  * if not finished (STAT_EAGAIN), preventing later routines from running
+                                 ;     153  * (they remain blocked). Any other condition - OK or ERR - drops through
+                                 ;     154  * and runs the next routine in the list.
+                                 ;     155  *
+                                 ;     156  * A routine that had no action (i.e. is OFF or idle) should return STAT_NOOP
+                                 ;     157  */
+                                 ;     158 
+                                 ;     159 void controller_run()
+                                 ;     160 {
+                                 ;     161 	xio_init();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",161
+000000B9 05rrrrrr             A  		BSR _xio_init
+000000BD                         L32:	; entry.split
+000000BD 6602                    		MOV.L #00000000H, R2
+000000BF 6621                    		MOV.L #00000002H, R1
+                                 ;     162 	controller_init(CNC_MEDIA,0,0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",162
+000000C1 EF23                    		MOV.L R2, R3
+000000C3 39rrrr               W  		BSR _controller_init
+000000C6 2Err                 B  		BRA L35
+000000C8                         L33:	; bb1
+                                 ;     163 	while (true) {
+                                 ;     164 	    /* Block to wait for prvTask1() to notify this task. */
+                                 ;     165 
+                                 ;     166 		ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+                                 ;     167 		intepreterRunning = true;
+                                 ;     168 		while(intepreterRunning)
+                                 ;     169 			_controller_HSM();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",169
+000000C8 39rrrr               W  		BSR __$_controller_HSM
+000000CB                         L34:	; bb2
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",168
+000000CB FBE2rrrrrrrr            		MOV.L #_intepreterRunning, R14
+000000D1 58EE                    		MOVU.B [R14], R14
+000000D3 610E                    		CMP #00H, R14
+000000D5 21rr                    		BNE L33
+000000D7                         L35:	; bb8.split
+000000D7 FB26FF                  		MOV.L #0FFFFFFFFH, R2
+000000DA 6611                    		MOV.L #00000001H, R1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",166
+000000DC 05rrrrrr             A  		BSR _ulTaskNotifyTake
+000000E0                         L36:	; bb8.split1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",167
+000000E0 FBE2rrrrrrrr            		MOV.L #_intepreterRunning, R14
+000000E6 F8E401                  		MOV.B #01H, [R14]
+000000E9 2Err                 B  		BRA L34
+000000EB                         __$_controller_HSM:
+                                 		.STACK	__$_controller_HSM=16
+                                 ;     170 //		vTaskDelay(10 / portTICK_PERIOD_MS);
+                                 ;     171 	}
+                                 ;     172 }
+                                 ;     173 
+                                 ;     174 #define	DISPATCH(func) if (func == STAT_EAGAIN) return;
+                                 ;     175 static void _controller_HSM()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",175
+000000EB 7EA6                    		PUSH.L R6
+                                 ;     176 {
+                                 ;     177 //----- Interrupt Service Routines are the highest priority controller functions ----//
+                                 ;     178 //      See hardware.h for a list of ISRs and their priorities.
+                                 ;     179 //
+                                 ;     180 //----- kernel level ISR handlers ----(flags are set in ISRs)------------------------//
+                                 ;     181 												// Order is important:
+                                 ;     182 //RXMOD		DISPATCH(hw_hard_reset_handler());			// 1. handle hard reset requests
+                                 ;     183 //RXMOD		DISPATCH(hw_bootloader_handler());			// 2. handle requests to enter bootloader
+                                 ;     184 
+                                 ;     185 	DISPATCH(_shutdown_idler());				// 3. idle in shutdown state
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",185
+000000ED 39rrrr               W  		BSR __$_shutdown_idler
+000000F0 6121                    		CMP #02H, R1
+000000F2 3Arrrr               W  		BEQ L60
+000000F5                         L38:	; bb7
+                                 ;     186 //	DISPATCH( poll_switches());					// 4. run a switch polling cycle
+                                 ;     187 	DISPATCH(_limit_switch_handler());			// 5. limit switch has been thrown
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",187
+000000F5 39rrrr               W  		BSR __$_limit_switch_handler
+000000F8 6121                    		CMP #02H, R1
+000000FA 3Arrrr               W  		BEQ L60
+000000FD                         L39:	; bb16
+                                 ;     188 
+                                 ;     189 	DISPATCH(cm_feedhold_sequencing_callback());// 6a. feedhold state machine runner
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",189
+000000FD 05rrrrrr             A  		BSR _cm_feedhold_sequencing_callback
+00000101 6121                    		CMP #02H, R1
+00000103 3Arrrr               W  		BEQ L60
+00000106                         L40:	; bb25
+                                 ;     190 	DISPATCH(mp_plan_hold_callback());			// 6b. plan a feedhold from line runtime
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",190
+00000106 05rrrrrr             A  		BSR _mp_plan_hold_callback
+0000010A 6121                    		CMP #02H, R1
+0000010C 3Arrrr               W  		BEQ L60
+0000010F                         L41:	; bb34
+                                 ;     191 	DISPATCH(_system_assertions());				// 7. system integrity assertions
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",191
+0000010F 39rrrr               W  		BSR __$_system_assertions
+00000112 6121                    		CMP #02H, R1
+00000114 3Arrrr               W  		BEQ L60
+00000117                         L42:	; bb43
+                                 ;     192 
+                                 ;     193 //----- planner hierarchy for gcode and cycles ---------------------------------------//
+                                 ;     194 	DISPATCH(st_motor_power_callback());		// stepper motor power sequencing
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",194
+00000117 05rrrrrr             A  		BSR _st_motor_power_callback
+0000011B 6121                    		CMP #02H, R1
+0000011D 3Arrrr               W  		BEQ L60
+00000120                         L43:	; bb52
+                                 ;     195 //	DISPATCH(switch_debounce_callback());		// debounce switches
+                                 ;     196 	DISPATCH(sr_status_report_callback());		// conditionally send status report
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",196
+00000120 05rrrrrr             A  		BSR _sr_status_report_callback
+00000124 6121                    		CMP #02H, R1
+00000126 3Arrrr               W  		BEQ L60
+00000129                         L44:	; bb61
+                                 ;     197 	DISPATCH(qr_queue_report_callback());		// conditionally send queue report
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",197
+00000129 05rrrrrr             A  		BSR _qr_queue_report_callback
+0000012D 6121                    		CMP #02H, R1
+0000012F 3Arrrr               W  		BEQ L60
+00000132                         L45:	; bb70
+                                 ;     198 	DISPATCH(rx_report_callback());             // conditionally send rx report
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",198
+00000132 05rrrrrr             A  		BSR _rx_report_callback
+00000136 6121                    		CMP #02H, R1
+00000138 3Arrrr               W  		BEQ L60
+0000013B                         L46:	; bb79
+                                 ;     199 	DISPATCH(arcoOK_Macro());
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",199
+0000013B 05rrrrrr             A  		BSR _arcoOK_Macro
+0000013F 6121                    		CMP #02H, R1
+00000141 3Arrrr               W  		BEQ L60
+00000144                         L47:	; bb88
+                                 ;     200 	DISPATCH(cm_arc_callback());				// arc generation runs behind lines
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",200
+00000144 05rrrrrr             A  		BSR _cm_arc_callback
+00000148 6121                    		CMP #02H, R1
+0000014A 3Arrrr               W  		BEQ L60
+0000014D                         L48:	; bb97
+                                 ;     201 	DISPATCH(cm_homing_callback());				// G28.2 continuation
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",201
+0000014D 05rrrrrr             A  		BSR _cm_homing_callback
+00000151 6121                    		CMP #02H, R1
+00000153 3Arrrr               W  		BEQ L60
+00000156                         L49:	; bb106
+                                 ;     202 	DISPATCH(cm_jogging_callback());			// jog function
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",202
+00000156 05rrrrrr             A  		BSR _cm_jogging_callback
+0000015A 6121                    		CMP #02H, R1
+0000015C 3Arrrr               W  		BEQ L60
+0000015F                         L50:	; bb115
+                                 ;     203 	DISPATCH(cm_probe_callback());				// G38.2 continuation
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",203
+0000015F 05rrrrrr             A  		BSR _cm_probe_callback
+00000163 6121                    		CMP #02H, R1
+00000165 3Arrrr               W  		BEQ L60
+00000168                         L51:	; bb124
+                                 ;     204 	DISPATCH(cm_wait_callback());				//
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",204
+00000168 05rrrrrr             A  		BSR _cm_wait_callback
+0000016C 6121                    		CMP #02H, R1
+0000016E 20rr                    		BEQ L60
+00000170                         L52:	; bb133
+                                 ;     205 	DISPATCH(cm_deferred_write_callback());		// persist G10 changes when not in machining cycle
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",205
+00000170 05rrrrrr             A  		BSR _cm_deferred_write_callback
+00000174 6121                    		CMP #02H, R1
+00000176 20rr                    		BEQ L60
+00000178                         L53:	; bb142
+                                 ;     206 
+                                 ;     207 //----- command readers and parsers --------------------------------------------------//
+                                 ;     208 
+                                 ;     209 	DISPATCH(_sync_to_planner());				// ensure there is at least one free buffer in planning queue
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",209
+00000178 39rrrr               W  		BSR __$_sync_to_planner
+0000017B 6121                    		CMP #02H, R1
+0000017D 20rr                    		BEQ L60
+0000017F                         L54:	; bb151
+                                 ;     210 	DISPATCH(_sync_to_tx_buffer());				// sync with TX buffer (pseudo-blocking)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",210
+0000017F 39rrrr               W  		BSR __$_sync_to_tx_buffer
+00000182 6121                    		CMP #02H, R1
+00000184 20rr                    		BEQ L60
+00000186                         L55:	; bb160
+                                 ;     211 #ifdef __AVR
+                                 ;     212 	DISPATCH(set_baud_callback());				// perform baud rate update (must be after TX sync)
+                                 ;     213 #endif
+                                 ;     214 
+                                 ;     215 	static uint32_t  linebuffer = 0;
+                                 ;     216 	if (linebuffer != cm_get_linenum(RUNTIME))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",216
+00000186 FBE2rrrrrrrr            		MOV.L #__$linebuffer$1, R14
+0000018C ECE6                    		MOV.L [R14], R6
+0000018E FB12rrrrrrrr            		MOV.L #_mr, R1
+00000194 72114001                		ADD #0140H, R1
+00000198 05rrrrrr             A  		BSR _cm_get_linenum
+0000019C 4761                    		CMP R6, R1
+0000019E 20rr                    		BEQ L57
+000001A0                         L56:	; bb161
+                                 ;     217 		printf("line - %d\n", cm_get_linenum(RUNTIME));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",217
+000001A0 FB12rrrrrrrr            		MOV.L #_mr, R1
+000001A6 72114001                		ADD #0140H, R1
+000001AA 05rrrrrr             A  		BSR _cm_get_linenum
+000001AE 6080                    		SUB #08H, R0
+000001B0 FBE2rrrrrrrr            		MOV.L #_L10, R14
+000001B6 E30E                    		MOV.L R14, [R0]
+000001B8 A009                    		MOV.L R1, 04H[R0]
+000001BA 05rrrrrr             A  		BSR _printf
+000001BE 6280                    		ADD #08H, R0
+000001C0                         L57:	; bb169
+                                 ;     218 	linebuffer = cm_get_linenum(RUNTIME);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",218
+000001C0 FB12rrrrrrrr            		MOV.L #_mr, R1
+000001C6 72114001                		ADD #0140H, R1
+000001CA 05rrrrrr             A  		BSR _cm_get_linenum
+000001CE FBE2rrrrrrrr            		MOV.L #__$linebuffer$1, R14
+000001D4 E3E1                    		MOV.L R1, [R14]
+000001D6                         L58:	; bb169.split
+                                 ;     219 
+                                 ;     220 	DISPATCH(macro_func_ptr());				// read and execute next command
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",220
+000001D6 FBE2rrrrrrrr            		MOV.L #_macro_func_ptr, R14
+000001DC ECEE                    		MOV.L [R14], R14
+000001DE 7F1E                    		JSR R14
+000001E0 6121                    		CMP #02H, R1
+000001E2 10                   S  		BEQ L60
+000001E3                         L59:	; bb181
+                                 ;     221 	DISPATCH(_normal_idler());					// blink LEDs slowly to show everything is OK
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",221
+000001E3 39rrrr               W  		BSR __$_normal_idler
+000001E6 3F6601                  		RTSD #04H, R6-R6
+000001E9                         L60:	; return
+                                 ;     222 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",222
+000001E9 3F6601                  		RTSD #04H, R6-R6
+000001EC                         __command_dispatch:
+                                 		.STACK	__command_dispatch=20
+                                 ;     223 
+                                 ;     224 /*****************************************************************************
+                                 ;     225  * _command_dispatch() - dispatch line received from active input device
+                                 ;     226  *
+                                 ;     227  *	Reads next command line and dispatches to relevant parser or action
+                                 ;     228  *	Accepts commands if the move queue has room - EAGAINS if it doesn't
+                                 ;     229  *	Manages cutback to serial input from file devices (EOF)
+                                 ;     230  *	Also responsible for prompts and for flow control
+                                 ;     231  */
+                                 ;     232 
+                                 ;     233 stat_t _command_dispatch()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",233
+000001EC 7EA6                    		PUSH.L R6
+000001EE 6040                    		SUB #04H, R0
+000001F0 6601                    		MOV.L #00000000H, R1
+                                 ;     234 {
+                                 ;     235 #ifdef __AVR
+                                 ;     236 	stat_t status;
+                                 ;     237 
+                                 ;     238 	// read input line or return if not a completed line
+                                 ;     239 	// xio_gets() is a non-blocking workalike of fgets()
+                                 ;     240 	while (true) {
+                                 ;     241 		if ((status = xio_gets(cs.primary_src, cs.in_buf, sizeof(cs.in_buf))) == STAT_OK) {
+                                 ;     242 			cs.bufp = cs.in_buf;
+                                 ;     243 			break;
+                                 ;     244 		}
+                                 ;     245 		// handle end-of-file from file devices
+                                 ;     246 		if (status == STAT_EOF) {						// EOF can come from file devices only
+                                 ;     247 			if (cfg.comm_mode == TEXT_MODE) {
+                                 ;     248 				fprintf_P(stderr, PSTR("End of command file\n"));
+                                 ;     249 			} else {
+                                 ;     250 				rpt_exception(STAT_EOF);				// not really an exception
+                                 ;     251 			}
+                                 ;     252 			tg_reset_source();							// reset to default source
+                                 ;     253 		}
+                                 ;     254 		return (status);								// Note: STAT_EAGAIN, errors, etc. will drop through
+                                 ;     255 	}
+                                 ;     256 #endif // __AVR
+                                 ;     257 #ifdef __ARM
+                                 ;     258 	// detect USB connection and transition to disconnected state if it disconnected
+                                 ;     259 	if (SerialUSB.isConnected() == false) cs.state = CONTROLLER_NOT_CONNECTED;
+                                 ;     260 
+                                 ;     261 	// read input line and return if not a completed line
+                                 ;     262 	if (cs.state == CONTROLLER_READY) {
+                                 ;     263 		if (read_line(cs.in_buf, &cs.read_index, sizeof(cs.in_buf)) != STAT_OK) {
+                                 ;     264 			cs.bufp = cs.in_buf;
+                                 ;     265 			return (STAT_OK);	// This is an exception: returns OK for anything NOT OK, so the idler always runs
+                                 ;     266 		}
+                                 ;     267 	} else if (cs.state == CONTROLLER_NOT_CONNECTED) {
+                                 ;     268 		if (SerialUSB.isConnected() == false) return (STAT_OK);
+                                 ;     269 		cm_request_queue_flush();
+                                 ;     270 		rpt_print_system_ready_message();
+                                 ;     271 		cs.state = CONTROLLER_STARTUP;
+                                 ;     272 
+                                 ;     273 	} else if (cs.state == CONTROLLER_STARTUP) {		// run startup code
+                                 ;     274 		cs.state = CONTROLLER_READY;
+                                 ;     275 
+                                 ;     276 	} else {
+                                 ;     277 		return (STAT_OK);
+                                 ;     278 	}
+                                 ;     279 	cs.read_index = 0;
+                                 ;     280 #endif // __ARM
+                                 ;     281 #ifdef __RX
+                                 ;     282 	stat_t status;
+                                 ;     283 	parse_gcode_func_selection(CODE_PARSER);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",283
+000001F2 05rrrrrr             A  		BSR _parse_gcode_func_selection
+000001F6                         L62:	; entry.split1
+                                 ;     284 	// read input line or return if not a completed line
+                                 ;     285 	// xio_gets() is a non-blocking workalike of fgets()
+                                 ;     286 	while (true) {
+                                 ;     287 		if ((status = xio_gets(cs.primary_src, cs.in_buf, sizeof(cs.in_buf))) == STAT_OK) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",287
+000001F6 FB22rrrrrrrr            		MOV.L #_cs, R2
+000001FC B621                    		MOVU.B 18H[R2], R1
+000001FE 712244                  		ADD #44H, R2
+00000201 7543FF                  		MOV.L #000000FFH, R3
+00000204 05rrrrrr             A  		BSR _xio_gets
+00000208 8081                    		MOV.B R1, 02H[R0]
+0000020A 5B1E                    		MOVU.B R1, R14
+0000020C 610E                    		CMP #00H, R14
+0000020E 3Brrrr               W  		BNE L74
+00000211                         L63:	; bb3
+                                 ;     288 			cs.bufp = cs.in_buf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",288
+00000211 FB12rrrrrrrr            		MOV.L #_cs, R1
+00000217 711244                  		ADD #44H, R1, R2
+0000021A A412                    		MOV.L R2, 40H[R1]
+0000021C                         L64:	; bb3.split2
+                                 ;     289 			break;
+                                 ;     290 		}
+                                 ;     291 		// handle end-of-file from file devices
+                                 ;     292 		if (status == STAT_EOF) {						// EOF can come from file devices only
+                                 ;     293 			//gfilerunning = false;
+                                 ;     294 			xio_close(cs.primary_src);
+                                 ;     295 //			macro_func_ptr = command_idle;
+                                 ;     296 			if (cfg.comm_mode == TEXT_MODE) {
+                                 ;     297 				fprintf_P(stderr, PSTR("End of command file\n"));
+                                 ;     298 			} else {
+                                 ;     299 				rpt_exception(STAT_EOF);				// not really an exception
+                                 ;     300 			}
+                                 ;     301 			tg_reset_source();							// reset to default source
+                                 ;     302 		}
+                                 ;     303 		return (status);								// Note: STAT_EAGAIN, errors, etc. will drop through
+                                 ;     304 	}
+                                 ;     305 #endif // __AVR
+                                 ;     306 	// set up the buffers
+                                 ;     307 	cs.linelen = strlen(cs.in_buf)+1;					// linelen only tracks primary input
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",307
+0000021C FB42rrrrrrrr            		MOV.L #_cs, R4
+00000222 714144                  		ADD #44H, R4, R1
+00000225 FB56FF                  		MOV.L #0FFFFFFFFH, R5
+00000228 6602                    		MOV.L #00000000H, R2
+0000022A EF53                    		MOV.L R5, R3
+0000022C 7F80                    		SUNTIL.B
+0000022E 4335                    		SUB R3, R5
+00000230 93C5                    		MOV.W R5, 1CH[R4]
+00000232                         L65:	; bb3.split3
+                                 ;     308 	strncpy(cs.saved_buf, cs.bufp, SAVED_BUFFER_LEN-1);	// save input buffer for reporting
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",308
+00000232 FB42rrrrrrrr            		MOV.L #_cs, R4
+00000238 AC42                    		MOV.L 40H[R4], R2
+0000023A 72414303                		ADD #0343H, R4, R1
+0000023E 754363                  		MOV.L #00000063H, R3
+00000241 7F87                    		SMOVU
+00000243 7244A603                		ADD #03A6H, R4
+00000247 EF41                    		MOV.L R4, R1
+00000249 4331                    		SUB R3, R1
+0000024B 6602                    		MOV.L #00000000H, R2
+0000024D 7F88                    		SSTR.B
+0000024F                         L66:	; bb3.split4
+                                 ;     309 
+                                 ;     310 	// dispatch the new text line
+                                 ;     311 	switch (toupper(*cs.bufp)) {						// first char
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",311
+0000024F FBE2rrrrrrrr            		MOV.L #__Touptab, R14
+00000255 ECEE                    		MOV.L [R14], R14
+00000257 FB12rrrrrrrr            		MOV.L #_cs, R1
+0000025D AC11                    		MOV.L 40H[R1], R1
+0000025F 581F                    		MOVU.B [R1], R15
+00000261 FE5FEE                  		MOV.W [R15,R14], R14
+00000264 610E                    		CMP #00H, R14
+00000266 3Arrrr               W  		BEQ L84
+00000269                         L67:	; bb3.split4
+00000269 755E21                  		CMP #21H, R14
+0000026C 20rr                    		BEQ L81
+0000026E                         L68:	; bb3.split4
+0000026E 755E24                  		CMP #24H, R14
+00000271 3Arrrr               W  		BEQ L86
+00000274                         L69:	; bb3.split4
+00000274 755E25                  		CMP #25H, R14
+00000277 20rr                    		BEQ L82
+00000279                         L70:	; bb3.split4
+00000279 755E3F                  		CMP #3FH, R14
+0000027C 3Arrrr               W  		BEQ L86
+0000027F                         L71:	; bb3.split4
+0000027F 755E48                  		CMP #48H, R14
+00000282 3Arrrr               W  		BEQ L86
+00000285                         L72:	; bb3.split4
+00000285 755E7B                  		CMP #7BH, R14
+00000288 3Arrrr               W  		BEQ L88
+0000028B                         L73:	; bb3.split4
+0000028B 755E7E                  		CMP #7EH, R14
+0000028E 20rr                    		BEQ L83
+00000290 38rrrr               W  		BRA L90
+00000293                         L74:	; bb13
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",292
+00000293 B081                    		MOVU.B 02H[R0], R1
+00000295 6181                    		CMP #08H, R1
+00000297 21rr                    		BNE L80
+00000299                         L75:	; bb14
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",294
+00000299 FB12rrrrrrrr            		MOV.L #_cs, R1
+0000029F B611                    		MOVU.B 18H[R1], R1
+000002A1 05rrrrrr             A  		BSR _xio_close
+000002A5                         L76:	; bb14.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",296
+000002A5 FB12rrrrrrrr            		MOV.L #_cfg, R1
+000002AB B091                    		MOVU.B 02H[R1], R1
+000002AD 6101                    		CMP #00H, R1
+000002AF 21rr                    		BNE L78
+000002B1                         L77:	; bb17
+000002B1 6040                    		SUB #04H, R0
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",297
+000002B3 FBE2rrrrrrrr            		MOV.L #_L11, R14
+000002B9 E30E                    		MOV.L R14, [R0]
+000002BB FB12rrrrrrrr            		MOV.L #__Stderr, R1
+000002C1 05rrrrrr             A  		BSR _fprintf
+000002C5 6240                    		ADD #04H, R0
+000002C7 08                   S  		BRA L79
+000002C8                         L78:	; bb19
+000002C8 6681                    		MOV.L #00000008H, R1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",299
+000002CA 05rrrrrr             A  		BSR _rpt_exception
+000002CE                         L79:	; bb26
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",301
+000002CE 39rrrr               W  		BSR _tg_reset_source
+000002D1                         L80:	; bb32
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",303
+000002D1 C5000201                		MOV.B 02H[R0], 01H[R0]
+000002D5 38rrrr               W  		BRA L96
+000002D8                         L81:	; bb49
+                                 ;     312 
+                                 ;     313 		case '!': { cm_request_feedhold(); break; }		// include for AVR diagnostics and ARM serial
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",313
+000002D8 05rrrrrr             A  		BSR _cm_request_feedhold
+000002DC 38rrrr               W  		BRA L95
+000002DF                         L82:	; bb51
+                                 ;     314 		case '%': { cm_request_queue_flush(); break; }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",314
+000002DF 05rrrrrr             A  		BSR _cm_request_queue_flush
+000002E3 38rrrr               W  		BRA L95
+000002E6                         L83:	; bb53
+                                 ;     315 		case '~': { cm_request_cycle_start(); break; }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",315
+000002E6 05rrrrrr             A  		BSR _cm_request_cycle_start
+000002EA 38rrrr               W  		BRA L95
+000002ED                         L84:	; bb56
+                                 ;     316 
+                                 ;     317 		case NUL: { 									// blank line (just a CR)
+                                 ;     318 			if (cfg.comm_mode != JSON_MODE) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",318
+000002ED FB12rrrrrrrr            		MOV.L #_cfg, R1
+000002F3 B091                    		MOVU.B 02H[R1], R1
+000002F5 6111                    		CMP #01H, R1
+000002F7 3Arrrr               W  		BEQ L95
+000002FA                         L85:	; bb57
+                                 ;     319 				text_response(STAT_OK, cs.saved_buf);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",319
+000002FA FB22rrrrrrrr            		MOV.L #_cs, R2
+00000300 72224303                		ADD #0343H, R2
+00000304 6601                    		MOV.L #00000000H, R1
+00000306 05rrrrrr             A  		BSR _text_response
+0000030A 38rrrr               W  		BRA L95
+0000030D                         L86:	; bb65
+                                 ;     320 			}
+                                 ;     321 			break;
+                                 ;     322 		}
+                                 ;     323 		case '$': case '?': case 'H': { 				// text mode input
+                                 ;     324 			cfg.comm_mode = TEXT_MODE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",324
+0000030D FB12rrrrrrrr            		MOV.L #_cfg, R1
+00000313 3C1200                  		MOV.B #00H, 02H[R1]
+00000316                         L87:	; bb65.split
+                                 ;     325 			text_response(text_parser(cs.bufp), cs.saved_buf);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",325
+00000316 FB62rrrrrrrr            		MOV.L #_cs, R6
+0000031C AC61                    		MOV.L 40H[R6], R1
+0000031E 05rrrrrr             A  		BSR _text_parser
+00000322 EF62                    		MOV.L R6, R2
+00000324 72224303                		ADD #0343H, R2
+00000328 05rrrrrr             A  		BSR _text_response
+0000032C 38rrrr               W  		BRA L95
+0000032F                         L88:	; bb70
+                                 ;     326 			break;
+                                 ;     327 		}
+                                 ;     328 		case '{': { 									// JSON input
+                                 ;     329 			cfg.comm_mode = JSON_MODE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",329
+0000032F FB12rrrrrrrr            		MOV.L #_cfg, R1
+00000335 3C1201                  		MOV.B #01H, 02H[R1]
+00000338                         L89:	; bb70.split
+                                 ;     330 			json_parser(cs.bufp);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",330
+00000338 FB12rrrrrrrr            		MOV.L #_cs, R1
+0000033E AC11                    		MOV.L 40H[R1], R1
+00000340 05rrrrrr             A  		BSR _json_parser
+00000344 2Err                 B  		BRA L95
+00000346                         L90:	; bb74
+                                 ;     331 			break;
+                                 ;     332 		}
+                                 ;     333 		default: {										// anything else must be Gcode
+                                 ;     334 			if (cfg.comm_mode == JSON_MODE) {			// run it as JSON...
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",334
+00000346 FB12rrrrrrrr            		MOV.L #_cfg, R1
+0000034C B091                    		MOVU.B 02H[R1], R1
+0000034E 6111                    		CMP #01H, R1
+00000350 21rr                    		BNE L94
+00000352                         L91:	; bb75
+                                 ;     335 				strncpy(cs.out_buf, cs.bufp, INPUT_BUFFER_LEN -8);					// use out_buf as temp
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",335
+00000352 FB42rrrrrrrr            		MOV.L #_cs, R4
+00000358 AC42                    		MOV.L 40H[R4], R2
+0000035A 72414301                		ADD #0143H, R4, R1
+0000035E 7543F7                  		MOV.L #000000F7H, R3
+00000361 7F87                    		SMOVU
+00000363 72443A02                		ADD #023AH, R4
+00000367 EF41                    		MOV.L R4, R1
+00000369 4331                    		SUB R3, R1
+0000036B 6602                    		MOV.L #00000000H, R2
+0000036D 7F88                    		SSTR.B
+0000036F                         L92:	; bb75.split
+                                 ;     336 				sprintf((char *)cs.bufp,"{\"gc\":\"%s\"}\n", (char *)cs.out_buf);	// '-8' is used for JSON chars
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",336
+0000036F FB22rrrrrrrr            		MOV.L #_cs, R2
+00000375 AC21                    		MOV.L 40H[R2], R1
+00000377 6080                    		SUB #08H, R0
+00000379 72224301                		ADD #0143H, R2
+0000037D A00A                    		MOV.L R2, 04H[R0]
+0000037F FBE2rrrrrrrr            		MOV.L #_L12, R14
+00000385 E30E                    		MOV.L R14, [R0]
+00000387 05rrrrrr             A  		BSR _sprintf
+0000038B 6280                    		ADD #08H, R0
+0000038D                         L93:	; bb75.split7
+                                 ;     337 				json_parser(cs.bufp);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",337
+0000038D FB12rrrrrrrr            		MOV.L #_cs, R1
+00000393 AC11                    		MOV.L 40H[R1], R1
+00000395 05rrrrrr             A  		BSR _json_parser
+00000399 2Err                 B  		BRA L95
+0000039B                         L94:	; bb80
+                                 ;     338 			} else {									//...or run it as text
+                                 ;     339 				text_response(gc_gcode_parser(cs.bufp), cs.saved_buf);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",339
+0000039B FB62rrrrrrrr            		MOV.L #_cs, R6
+000003A1 AC61                    		MOV.L 40H[R6], R1
+000003A3 05rrrrrr             A  		BSR _gc_gcode_parser
+000003A7 EF62                    		MOV.L R6, R2
+000003A9 72224303                		ADD #0343H, R2
+000003AD 05rrrrrr             A  		BSR _text_response
+000003B1                         L95:	; bb90
+                                 ;     340 			}
+                                 ;     341 		}
+                                 ;     342 	}
+                                 ;     343 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",343
+000003B1 3C0100                  		MOV.B #00H, 01H[R0]
+000003B4                         L96:	; bb92
+000003B4 C5000103                		MOV.B 01H[R0], 03H[R0]
+                                 ;     344 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",344
+000003B8 B089                    		MOVU.B 03H[R0], R1
+000003BA 3F6602                  		RTSD #08H, R6-R6
+000003BD                         __$_shutdown_idler:
+                                 		.STACK	__$_shutdown_idler=8
+                                 ;     345 
+                                 ;     346 
+                                 ;     347 /**** Local Utilities ********************************************************/
+                                 ;     348 /*
+                                 ;     349  * _shutdown_idler() - blink rapidly and prevent further activity from occurring
+                                 ;     350  * _normal_idler() - blink Indicator LED slowly to show everything is OK
+                                 ;     351  *
+                                 ;     352  *	Shutdown idler flashes indicator LED rapidly to show everything is not OK.
+                                 ;     353  *	Shutdown idler returns EAGAIN causing the control loop to never advance beyond
+                                 ;     354  *	this point. It's important that the reset handler is still called so a SW reset
+                                 ;     355  *	(ctrl-x) or bootloader request can be processed.
+                                 ;     356  */
+                                 ;     357 
+                                 ;     358 static stat_t _shutdown_idler()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",358
+000003BD 6040                    		SUB #04H, R0
+                                 ;     359 {
+                                 ;     360 	if (cm_get_machine_state() != MACHINE_SHUTDOWN) { return (STAT_OK);}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",360
+000003BF 05rrrrrr             A  		BSR _cm_get_machine_state
+000003C3 6161                    		CMP #06H, R1
+000003C5 10                   S  		BEQ L99
+000003C6                         L98:	; bb1
+000003C6 3C0200                  		MOV.B #00H, 02H[R0]
+000003C9 2Err                 B  		BRA L103
+000003CB                         L99:	; bb8
+                                 ;     361 
+                                 ;     362 	if (SysTickTimer_getValue() > cs.led_timer) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",362
+000003CB 05rrrrrr             A  		BSR _SysTickTimer_getValue
+000003CF FBE2rrrrrrrr            		MOV.L #_cs, R14
+000003D5 0685E10A                		CMP 28H[R14].L, R1
+000003D9 25rr                    		BLEU L102
+000003DB                         L100:	; bb9
+                                 ;     363 		cs.led_timer = SysTickTimer_getValue() + LED_ALARM_TIMER;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",363
+000003DB 05rrrrrr             A  		BSR _SysTickTimer_getValue
+000003DF 711164                  		ADD #64H, R1
+000003E2 FB22rrrrrrrr            		MOV.L #_cs, R2
+000003E8 A2A1                    		MOV.L R1, 28H[R2]
+000003EA                         L101:	; bb9.split
+                                 ;     364 		IndicatorLed_toggle();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",364
+000003EA 05rrrrrr             A  		BSR _IndicatorLed_toggle
+000003EE                         L102:	; bb17
+                                 ;     365 	}
+                                 ;     366 	return (STAT_EAGAIN);	// EAGAIN prevents any lower-priority actions from running
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",366
+000003EE 3C0202                  		MOV.B #02H, 02H[R0]
+000003F1                         L103:	; bb19
+000003F1 C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     367 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",367
+000003F5 B089                    		MOVU.B 03H[R0], R1
+000003F7 6701                    		RTSD #04H
+000003F9                         __$_normal_idler:
+                                 		.STACK	__$_normal_idler=8
+                                 ;     368 
+                                 ;     369 static stat_t _normal_idler()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",369
+000003F9 6040                    		SUB #04H, R0
+                                 ;     370 {
+                                 ;     371 #ifdef __ARM
+                                 ;     372 	/*
+                                 ;     373 	 * S-curve heartbeat code. Uses forward-differencing math from the stepper code.
+                                 ;     374 	 * See plan_line.cpp for explanations.
+                                 ;     375 	 * Here, the "velocity" goes from 0.0 to 1.0, then back.
+                                 ;     376 	 * t0 = 0, t1 = 0, t2 = 0.5, and we'll complete the S in 100 segments.
+                                 ;     377 	 */
+                                 ;     378 
+                                 ;     379 	// These are statics, and the assignments will only evaluate once.
+                                 ;     380 	static float indicator_led_value = 0.0;
+                                 ;     381 	static float indicator_led_forward_diff_1 = 50.0 * square(1.0/100.0);
+                                 ;     382 	static float indicator_led_forward_diff_2 = indicator_led_forward_diff_1 * 2.0;
+                                 ;     383 
+                                 ;     384 
+                                 ;     385 	if (SysTickTimer.getValue() > cs.led_timer) {
+                                 ;     386 		cs.led_timer = SysTickTimer.getValue() + LED_NORMAL_TIMER / 100;
+                                 ;     387 
+                                 ;     388 		indicator_led_value += indicator_led_forward_diff_1;
+                                 ;     389 		if (indicator_led_value > 100.0)
+                                 ;     390 			indicator_led_value = 100.0;
+                                 ;     391 
+                                 ;     392 		if ((indicator_led_forward_diff_2 > 0.0 && indicator_led_value >= 50.0) || (indicator_led_forward_diff_2 < 0.0 && indicator_led_value <= 50.0)) 
+                                 ;     393 			indicator_led_forward_diff_2 = -indicator_led_forward_diff_2;
+                                 ;     394 		}
+                                 ;     395 		else if (indicator_led_value <= 0.0) {
+                                 ;     396 			indicator_led_value = 0.0;
+                                 ;     397 
+                                 ;     398 			// Reset to account for rounding errors
+                                 ;     399 			indicator_led_forward_diff_1 = 50.0 * square(1.0/100.0);
+                                 ;     400 		} else {
+                                 ;     401 			indicator_led_forward_diff_1 += indicator_led_forward_diff_2;
+                                 ;     402 		}
+                                 ;     403 
+                                 ;     404 		IndicatorLed = indicator_led_value/100.0;
+                                 ;     405 	}
+                                 ;     406 #endif
+                                 ;     407 #ifdef __AVR
+                                 ;     408 /*
+                                 ;     409 	if (SysTickTimer_getValue() > cs.led_timer) {
+                                 ;     410 		cs.led_timer = SysTickTimer_getValue() + LED_NORMAL_TIMER;
+                                 ;     411 //		IndicatorLed_toggle();
+                                 ;     412 	}
+                                 ;     413 */
+                                 ;     414 #endif
+                                 ;     415 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",415
+000003FB 3C0300                  		MOV.B #00H, 03H[R0]
+000003FE B089                    		MOVU.B 03H[R0], R1
+00000400                         L105:	; entry.split
+                                 ;     416 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",416
+00000400 5B11                    		MOVU.B R1, R1
+00000402 6701                    		RTSD #04H
+00000404                         _tg_reset_source:
+                                 		.STACK	_tg_reset_source=4
+                                 ;     417 
+                                 ;     418 /*
+                                 ;     419  * tg_reset_source() 		 - reset source to default input device (see note)
+                                 ;     420  * tg_set_primary_source() 	 - set current primary input source
+                                 ;     421  * tg_set_secondary_source() - set current primary input source
+                                 ;     422  *
+                                 ;     423  * Note: Once multiple serial devices are supported reset_source() should
+                                 ;     424  * be expanded to also set the stdout/stderr console device so the prompt
+                                 ;     425  * and other messages are sent to the active device.
+                                 ;     426  */
+                                 ;     427 
+                                 ;     428 void tg_reset_source() { tg_set_primary_source(cs.default_src);}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",428
+00000404 FB12rrrrrrrr            		MOV.L #_cs, R1
+0000040A B691                    		MOVU.B 1AH[R1], R1
+0000040C 39rrrr               W  		BSR _tg_set_primary_source
+0000040F 02                      		RTS
+00000410                         _tg_set_primary_source:
+                                 		.STACK	_tg_set_primary_source=8
+                                 ;     429 void tg_set_primary_source(uint8_t dev) { cs.primary_src = dev;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",429
+00000410 6040                    		SUB #04H, R0
+00000412 8089                    		MOV.B R1, 03H[R0]
+00000414 FB22rrrrrrrr            		MOV.L #_cs, R2
+0000041A 8621                    		MOV.B R1, 18H[R2]
+0000041C 6701                    		RTSD #04H
+0000041E                         _tg_set_secondary_source:
+                                 		.STACK	_tg_set_secondary_source=8
+                                 ;     430 void tg_set_secondary_source(uint8_t dev) { cs.secondary_src = dev;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",430
+0000041E 6040                    		SUB #04H, R0
+00000420 8089                    		MOV.B R1, 03H[R0]
+00000422 FB22rrrrrrrr            		MOV.L #_cs, R2
+00000428 8629                    		MOV.B R1, 19H[R2]
+0000042A 6701                    		RTSD #04H
+0000042C                         __$_sync_to_tx_buffer:
+                                 		.STACK	__$_sync_to_tx_buffer=8
+                                 ;     431 
+                                 ;     432 /*
+                                 ;     433  * _sync_to_tx_buffer() - return eagain if TX queue is backed up
+                                 ;     434  * _sync_to_planner() - return eagain if planner is not ready for a new command
+                                 ;     435  * _sync_to_time() - return eagain if planner is not ready for a new command
+                                 ;     436  */
+                                 ;     437 static stat_t _sync_to_tx_buffer()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",437
+0000042C 6040                    		SUB #04H, R0
+                                 ;     438 {
+                                 ;     439 //RXMOD		if ((xio_get_tx_bufcount_usart(ds[XIO_DEV_USB].x) >= XOFF_TX_LO_WATER_MARK)) {
+                                 ;     440 //		return (STAT_EAGAIN);
+                                 ;     441 //	}
+                                 ;     442 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",442
+0000042E 3C0300                  		MOV.B #00H, 03H[R0]
+00000431 B089                    		MOVU.B 03H[R0], R1
+00000433                         L110:	; entry.split
+                                 ;     443 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",443
+00000433 5B11                    		MOVU.B R1, R1
+00000435 6701                    		RTSD #04H
+00000437                         __$_sync_to_planner:
+                                 		.STACK	__$_sync_to_planner=8
+                                 ;     444 
+                                 ;     445 static stat_t _sync_to_planner()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",445
+00000437 6040                    		SUB #04H, R0
+                                 ;     446 {
+                                 ;     447 	if (mp_get_planner_buffers_available() < PLANNER_BUFFER_HEADROOM) { // allow up to N planner buffers for this line
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",447
+00000439 05rrrrrr             A  		BSR _mp_get_planner_buffers_available
+0000043D 6131                    		CMP #03H, R1
+0000043F 2Arr                    		BGT L113
+00000441                         L112:	; bb1
+                                 ;     448 		return (STAT_EAGAIN);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",448
+00000441 3C0202                  		MOV.B #02H, 02H[R0]
+00000444 08                   S  		BRA L114
+00000445                         L113:	; bb7
+                                 ;     449 	}
+                                 ;     450 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",450
+00000445 3C0200                  		MOV.B #00H, 02H[R0]
+00000448                         L114:	; bb9
+00000448 C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     451 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",451
+0000044C B089                    		MOVU.B 03H[R0], R1
+0000044E 6701                    		RTSD #04H
+00000450                         __$_limit_switch_handler:
+                                 		.STACK	__$_limit_switch_handler=8
+                                 ;     452 
+                                 ;     453 /*
+                                 ;     454 static stat_t _sync_to_time()
+                                 ;     455 {
+                                 ;     456 	if (cs.sync_to_time_time == 0) {		// initial pass
+                                 ;     457 		cs.sync_to_time_time = SysTickTimer_getValue() + 100; //ms
+                                 ;     458 		return (STAT_OK);
+                                 ;     459 	}
+                                 ;     460 	if (SysTickTimer_getValue() < cs.sync_to_time_time) {
+                                 ;     461 		return (STAT_EAGAIN);
+                                 ;     462 	}
+                                 ;     463 	return (STAT_OK);
+                                 ;     464 }
+                                 ;     465 */
+                                 ;     466 /*
+                                 ;     467  * _limit_switch_handler() - shut down system if limit switch fired
+                                 ;     468  */
+                                 ;     469 static stat_t _limit_switch_handler(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",469
+00000450 6040                    		SUB #04H, R0
+                                 ;     470 {
+                                 ;     471 	if (cm_get_machine_state() == MACHINE_ALARM) { return (STAT_NOOP);}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",471
+00000452 05rrrrrr             A  		BSR _cm_get_machine_state
+00000456 6121                    		CMP #02H, R1
+00000458 18                   S  		BNE L117
+00000459                         L116:	; bb1
+00000459 3C0203                  		MOV.B #03H, 02H[R0]
+0000045C 2Err                 B  		BRA L120
+0000045E                         L117:	; bb8
+                                 ;     472 
+                                 ;     473 	if (get_limit_switch_thrown() == false) return (STAT_NOOP);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",473
+0000045E 05rrrrrr             A  		BSR _get_limit_switch_thrown
+00000462 6101                    		CMP #00H, R1
+00000464 18                   S  		BNE L119
+00000465                         L118:	; bb9
+00000465 3C0203                  		MOV.B #03H, 02H[R0]
+00000468 08                   S  		BRA L120
+00000469                         L119:	; bb16
+00000469 7541CC                  		MOV.L #000000CCH, R1
+                                 ;     474 	return(cm_hard_alarm(STAT_LIMIT_SWITCH_HIT));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",474
+0000046C 05rrrrrr             A  		BSR _cm_hard_alarm
+00000470 8081                    		MOV.B R1, 02H[R0]
+00000472                         L120:	; bb20
+00000472 C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     475 	return (STAT_OK);
+                                 ;     476 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",476
+00000476 B089                    		MOVU.B 03H[R0], R1
+00000478 6701                    		RTSD #04H
+0000047A                         __$_system_assertions:
+                                 		.STACK	__$_system_assertions=8
+                                 ;     477 
+                                 ;     478 /*
+                                 ;     479  * _system_assertions() - check memory integrity and other assertions
+                                 ;     480  */
+                                 ;     481 #define emergency___everybody_to_get_from_street(a) if((status_code=a) != STAT_OK) return (cm_hard_alarm(status_code));
+                                 ;     482 
+                                 ;     483 stat_t _system_assertions()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",483
+0000047A 6040                    		SUB #04H, R0
+                                 ;     484 {
+                                 ;     485 //	emergency___everybody_to_get_from_street(config_test_assertions());
+                                 ;     486 //	emergency___everybody_to_get_from_street(controller_test_assertions());
+                                 ;     487 //	emergency___everybody_to_get_from_street(canonical_machine_test_assertions());
+                                 ;     488 //	emergency___everybody_to_get_from_street(planner_test_assertions());
+                                 ;     489 //	emergency___everybody_to_get_from_street(stepper_test_assertions());
+                                 ;     490 //	emergency___everybody_to_get_from_street(encoder_test_assertions());
+                                 ;     491 //	emergency___everybody_to_get_from_street(xio_test_assertions());
+                                 ;     492 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",492
+0000047C 3C0300                  		MOV.B #00H, 03H[R0]
+0000047F B089                    		MOVU.B 03H[R0], R1
+00000481                         L122:	; entry.split
+                                 ;     493 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",493
+00000481 5B11                    		MOVU.B R1, R1
+00000483 6701                    		RTSD #04H
+00000485                         _command_idle:
+                                 		.STACK	_command_idle=8
+                                 ;     494 
+                                 ;     495 stat_t command_idle(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",495
+00000485 6040                    		SUB #04H, R0
+                                 ;     496 {
+                                 ;     497 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",497
+00000487 3C0300                  		MOV.B #00H, 03H[R0]
+0000048A B089                    		MOVU.B 03H[R0], R1
+0000048C                         L124:	; entry.split
+                                 ;     498 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\controller.c",498
+0000048C 5B11                    		MOVU.B R1, R1
+0000048E 6701                    		RTSD #04H
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 6C696E65                		.byte	"line - %d"
+         202D2025                
+         64                      
+00000009 0A00                    		.byte	0AH,00H
+0000000B                         _L11:
+0000000B 456E6420                		.byte	"End of command file"
+         6F662063                
+         6F6D6D61                
+         6E642066                
+         696C65                  
+0000001E 0A00                    		.byte	0AH,00H
+00000020                         _L12:
+00000020 7B                      		.byte	"{"
+00000021 22                      		.byte	22H
+00000022 6763                    		.byte	"gc"
+00000024 22                      		.byte	22H
+00000025 3A                      		.byte	":"
+00000026 22                      		.byte	22H
+00000027 2573                    		.byte	"%s"
+00000029 22                      		.byte	22H
+0000002A 7D                      		.byte	"}"
+0000002B 0A00                    		.byte	0AH,00H
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         __$linebuffer$1:
+00000000 00000000                		.lword	00000000H
+                                 		.SECTION	D_1,ROMDATA
+00000000                         _intepreterRunning:
+00000000 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _cs:
+00000000(000003ACH)              		.blkl	235
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01218   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001168(00000490H)  P
+ROMDATA  0000000045(0000002DH)  L
+ROMDATA  0000000004(00000004H)  D
+ROMDATA  0000000001(00000001H)  D_1
+DATA     0000000940(000003ACH)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\controller.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\controller.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\cnc\controller.obj

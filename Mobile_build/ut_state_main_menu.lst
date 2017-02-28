@@ -1,0 +1,372 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:53:52 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:53:52
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=ut_state_main_menu.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=ut_state_main_menu.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;ut_state_main_menu.c
+                                 
+                                 		.glb	_configsVar
+                                 		.glb	_configFlags
+                                 		.glb	_configs_main
+                                 		.glb	_ut_state_main_menu
+                                 		.glb	_ut_menu_init
+                                 		.glb	_vTaskDelay
+                                 		.glb	_ut_menu_browse
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _ut_state_main_menu:
+                                 		.STACK	_ut_state_main_menu=440
+                                 ;       1 /*
+                                 ;       2  * ut_states_main_menu.c
+                                 ;       3  *
+                                 ;       4  *  Created on: Nov 1, 2015
+                                 ;       5  *      Author: Fernando
+                                 ;       6  */
+                                 ;       7 
+                                 ;       8 
+                                 ;       9 #include "ut_context.h"
+                                 ;      10 #include "ut_state.h"
+                                 ;      11 
+                                 ;      12 #include "lcd_menu.h"
+                                 ;      13 
+                                 ;      14 #include "FreeRTOS.h"
+                                 ;      15 #include "task.h"
+                                 ;      16 
+                                 ;      17 #include "ut_context.h"
+                                 ;      18 #include "ut_state.h"
+                                 ;      19 #include "ut_state_config_var.h"
+                                 ;      20 #include "interpreter_if.h"
+                                 ;      21 #include "eeprom.h"
+                                 ;      22 #include "macros.h"
+                                 ;      23 
+                                 ;      24 /**
+                                 ;      25  * Menu options
+                                 ;      26  */
+                                 ;      27 static const char* gszMainMenuLabels[MAIN_MENU_NUMBER] =
+                                 ;      28 {
+                                 ;      29 	" CARREGAR ARQUIVO",
+                                 ;      30 	" MODO MANUAL",
+                                 ;      31 	" CORTE AUTOMÁTICO",
+                                 ;      32 	" CONFIG. DE CORTE",
+                                 ;      33 	" CONFIG. DE MÁQUINA"
+                                 ;      34 };
+                                 ;      35 static const char* gszMainMenuTitle = "PRINCIPAL";
+                                 ;      36 
+                                 ;      37 /**
+                                 ;      38  * Next states
+                                 ;      39  */
+                                 ;      40 static const ut_state geNextState[MAIN_MENU_NUMBER] =
+                                 ;      41 {
+                                 ;      42 	STATE_CHOOSE_FILE,
+                                 ;      43 	STATE_CONFIG_MANUAL_MODE,
+                                 ;      44 	STATE_CONFIG_AUTO_MODE,
+                                 ;      45 	STATE_CONFIG_MENU_PL,
+                                 ;      46 	STATE_CONFIG_MAQUINA,
+                                 ;      47 };
+                                 ;      48 
+                                 ;      49 ut_config_var configs_main;
+                                 ;      50 
+                                 ;      51 /**
+                                 ;      52  * Main menu options.
+                                 ;      53  *
+                                 ;      54  * This should be the main option and the idle state.
+                                 ;      55  *
+                                 ;      56  * @param pContext
+                                 ;      57  * @return Next state
+                                 ;      58  */
+                                 ;      59 ut_state ut_state_main_menu(ut_context* pContext)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",59
+00000000 72004CFE                		ADD #0FFFFFE4CH, R0
+00000004 E7016C                  		MOV.L R1, 01B0H[R0]
+                                 ;      60 {
+                                 ;      61 	ut_state lreturn;
+                                 ;      62 	ut_menu main_menu;
+                                 ;      63 	uint8_t i = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",63
+00000007 FA04AB0100              		MOV.B #00H, 01ABH[R0]
+0000000C                         L17:	; entry.split
+0000000C 710104                  		ADD #04H, R0, R1
+                                 ;      64 
+                                 ;      65 	/* Init menu */
+                                 ;      66 	ut_menu_init(&main_menu);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",66
+0000000F 05rrrrrr             A  		BSR _ut_menu_init
+00000013                         L18:	; entry.split1
+                                 ;      67 	main_menu.maxItemsPerPage = 4;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",67
+00000013 FA049E0104              		MOV.B #04H, 019EH[R0]
+00000018                         L19:	; entry.split2
+                                 ;      68 
+                                 ;      69 	configs_main.type = UT_CONFIG_BOOL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",69
+00000018 FBE2rrrrrrrr            		MOV.L #_configs_main, R14
+0000001E F8E601                  		MOV.L #00000001H, [R14]
+00000021                         L20:	; entry.split3
+                                 ;      70 	configs_main.value = &configFlags[MODOMAQUINA];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",70
+00000021 FB12rrrrrrrr            		MOV.L #_configs_main, R1
+00000027 FB22rrrrrrrr            		MOV.L #_configFlags, R2
+0000002D A01A                    		MOV.L R2, 04H[R1]
+0000002F                         L21:	; entry.split4
+                                 ;      71 	configs_main.name = gszMainMenuLabels[MAIN_MENU_MODOMAQUINA];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",71
+0000002F FBE2rrrrrrrr            		MOV.L #_configs_main, R14
+00000035 FBF2rrrrrrrr            		MOV.L #__$gszMainMenuLabels, R15
+0000003B E5FE0407                		MOV.L 10H[R15], 1CH[R14]
+0000003F                         L22:	; entry.split5
+                                 ;      72 	configs_main.func_var = NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",72
+0000003F FB12rrrrrrrr            		MOV.L #_configs_main, R1
+00000045 3E1A00                  		MOV.L #00000000H, 28H[R1]
+00000048                         L23:	; entry.split6
+                                 ;      73 	configs_main.currentState = STATE_MAIN_MENU;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",73
+00000048 FB12rrrrrrrr            		MOV.L #_configs_main, R1
+0000004E 3E1802                  		MOV.L #00000002H, 20H[R1]
+00000051                         L24:	; entry.split7
+                                 ;      74 	configs_main.currentItem = MAIN_MENU_MODOMAQUINA;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",74
+00000051 FBE2rrrrrrrr            		MOV.L #_configs_main, R14
+00000057 F9E42404                		MOV.B #04H, 24H[R14]
+0000005B                         L25:	; entry.split8
+                                 ;      75 
+                                 ;      76 	/* Options */
+                                 ;      77 	main_menu.title = gszMainMenuTitle;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",77
+0000005B FBE2rrrrrrrr            		MOV.L #__$gszMainMenuTitle, R14
+00000061 E4E065                  		MOV.L [R14], 0194H[R0]
+00000064                         L26:	; entry.split9
+                                 ;      78 	main_menu.currentState = STATE_MAIN_MENU;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",78
+00000064 F9066902                		MOV.L #00000002H, 01A4H[R0]
+00000068                         L27:	; entry.split10
+                                 ;      79 	/* Items */
+                                 ;      80 	for(i = 0; i < MAIN_MENU_NUMBER; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",80
+00000068 FA04AB0100              		MOV.B #00H, 01ABH[R0]
+0000006D 2Err                 B  		BRA L29
+0000006F                         L28:	; bb
+                                 ;      81 	{
+                                 ;      82 		main_menu.items[main_menu.numItems++].text = gszMainMenuLabels[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",82
+0000006F 5D0ECD                  		MOVU.W 019AH[R0], R14
+00000072 751E14                  		MUL #14H, R14
+00000075 710104                  		ADD #04H, R0, R1
+00000078 4BE1                    		ADD R14, R1
+0000007A FBE2rrrrrrrr            		MOV.L #__$gszMainMenuLabels, R14
+00000080 5A02AB01                		MOVU.B 01ABH[R0], R2
+00000084 FE62E2                  		MOV.L [R2,R14], R2
+00000087 A09A                    		MOV.L R2, 0CH[R1]
+00000089 DD0ECD                  		MOV.W 019AH[R0], R14
+0000008C 621E                    		ADD #01H, R14
+0000008E D70ECD                  		MOV.W R14, 019AH[R0]
+00000091 5A01AB01                		MOVU.B 01ABH[R0], R1
+00000095 6211                    		ADD #01H, R1
+00000097 CB01AB01                		MOV.B R1, 01ABH[R0]
+0000009B                         L29:	; bb25
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",80
+0000009B 5A01AB01                		MOVU.B 01ABH[R0], R1
+0000009F 6151                    		CMP #05H, R1
+000000A1 29rr                    		BLT L28
+000000A3                         L30:	; bb30
+                                 ;      83 	}
+                                 ;      84 
+                                 ;      85 	/* Show menu - it waits here until a valid
+                                 ;      86 	 * option is selected */
+                                 ;      87 	main_menu.selectedItem = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",87
+000000A3 F905CC00                		MOV.W #0000H, 0198H[R0]
+000000A7 08                   S  		BRA L32
+000000A8                         L31:	; bb32
+000000A8 754164                  		MOV.L #00000064H, R1
+                                 ;      88 	while(ut_menu_browse(&main_menu, portMAX_DELAY) < 0)
+                                 ;      89 	{
+                                 ;      90 		vTaskDelay(100 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",90
+000000AB 05rrrrrr             A  		BSR _vTaskDelay
+000000AF                         L32:	; bb33
+000000AF FB26FF                  		MOV.L #0FFFFFFFFH, R2
+000000B2 710104                  		ADD #04H, R0, R1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",88
+000000B5 05rrrrrr             A  		BSR _ut_menu_browse
+000000B9 6101                    		CMP #00H, R1
+000000BB 29rr                    		BLT L31
+000000BD                         L33:	; bb39
+                                 ;      91 	}
+                                 ;      92 	/* Set selected item */
+                                 ;      93 	pContext->value[0] = STATE_MAIN_MENU;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",93
+000000BD ED016C                  		MOV.L 01B0H[R0], R1
+000000C0 3C1202                  		MOV.B #02H, 02H[R1]
+000000C3                         L34:	; bb39.split
+                                 ;      94 	if(main_menu.selectedItem == MAIN_MENU_MODOMAQUINA)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",94
+000000C3 5D0ECC                  		MOVU.W 0198H[R0], R14
+000000C6 614E                    		CMP #04H, R14
+000000C8 21rr                    		BNE L36
+000000CA                         L35:	; bb45
+                                 ;      95 		configsVar = &configs_main;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",95
+000000CA FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000000D0 FBF2rrrrrrrr            		MOV.L #_configs_main, R15
+000000D6 E3EF                    		MOV.L R15, [R14]
+000000D8                         L36:	; bb53
+                                 ;      96 	if(main_menu.selectedItem == MAIN_MENU_CONFIG)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",96
+000000D8 5D0ECC                  		MOVU.W 0198H[R0], R14
+000000DB 613E                    		CMP #03H, R14
+000000DD 21rr                    		BNE L40
+000000DF                         L37:	; bb55
+                                 ;      97 	{
+                                 ;      98 		if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",98
+000000DF FBE2rrrrrrrr            		MOV.L #_configFlags, R14
+000000E5 ECEE                    		MOV.L [R14], R14
+000000E7 610E                    		CMP #00H, R14
+000000E9 18                   S  		BNE L39
+000000EA                         L38:	; bb56
+                                 ;      99 			lreturn = STATE_CONFIG_MENU_PL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",99
+000000EA F80605                  		MOV.L #00000005H, [R0]
+000000ED 2Err                 B  		BRA L41
+000000EF                         L39:	; bb57
+                                 ;     100 		else
+                                 ;     101 			lreturn = STATE_CONFIG_MENU_OX;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",101
+000000EF F80604                  		MOV.L #00000004H, [R0]
+000000F2 2Err                 B  		BRA L41
+000000F4                         L40:	; bb63
+                                 ;     102 	}
+                                 ;     103 	else
+                                 ;     104 	{
+                                 ;     105 		lreturn = geNextState[main_menu.selectedItem];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",105
+000000F4 FBE2rrrrrrrr            		MOV.L #__$geNextState, R14
+000000FA 5D0FCC                  		MOVU.W 0198H[R0], R15
+000000FD FE6FE1                  		MOV.L [R15,R14], R1
+00000100 E301                    		MOV.L R1, [R0]
+00000102                         L41:	; bb75
+                                 ;     106 	}
+                                 ;     107 	return lreturn;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",107
+00000102 EC01                    		MOV.L [R0], R1
+00000104 E7016B                  		MOV.L R1, 01ACH[R0]
+00000107                         L42:	; bb75.split
+                                 ;     108 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_main_menu.c",108
+00000107 676D                    		RTSD #01B4H
+                                 		.SECTION	C,ROMDATA,ALIGN=4
+00000000                         __$geNextState:
+00000000 03000000                		.lword	00000003H
+00000004 06000000                		.lword	00000006H
+00000008 08000000                		.lword	00000008H
+0000000C 05000000                		.lword	00000005H
+00000010 09000000                		.lword	00000009H
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 20434152                		.byte	" CARREGAR ARQUIVO"
+         52454741                
+         52204152                
+         51554956                
+         4F                      
+00000011 00                      		.byte	00H
+00000012                         _L11:
+00000012 204D4F44                		.byte	" MODO MANUAL"
+         4F204D41                
+         4E55414C                
+0000001E 00                      		.byte	00H
+0000001F                         _L12:
+0000001F 20434F52                		.byte	" CORTE AUTOM"
+         54452041                
+         55544F4D                
+0000002B C1                      		.byte	0C1H
+0000002C 5449434F                		.byte	"TICO"
+00000030 00                      		.byte	00H
+00000031                         _L13:
+00000031 20434F4E                		.byte	" CONFIG. DE CORTE"
+         4649472E                
+         20444520                
+         434F5254                
+         45                      
+00000042 00                      		.byte	00H
+00000043                         _L14:
+00000043 20434F4E                		.byte	" CONFIG. DE M"
+         4649472E                
+         20444520                
+         4D                      
+00000050 C1                      		.byte	0C1H
+00000051 5155494E                		.byte	"QUINA"
+         41                      
+00000056 00                      		.byte	00H
+00000057                         _L15:
+00000057 5052494E                		.byte	"PRINCIPAL"
+         43495041                
+         4C                      
+00000060 00                      		.byte	00H
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         __$gszMainMenuLabels:
+00000000 rrrrrrrr                		.lword	_L10
+00000004 rrrrrrrr                		.lword	_L11
+00000008 rrrrrrrr                		.lword	_L12
+0000000C rrrrrrrr                		.lword	_L13
+00000010 rrrrrrrr                		.lword	_L14
+00000014                         __$gszMainMenuTitle:
+00000014 rrrrrrrr                		.lword	_L15
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _configs_main:
+00000000(0000002CH)              		.blkl	11
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00317   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000265(00000109H)  P
+ROMDATA  0000000020(00000014H)  C
+ROMDATA  0000000097(00000061H)  L
+ROMDATA  0000000024(00000018H)  D
+DATA     0000000044(0000002CH)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\ut_state_main_menu.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\ut_state_main_menu.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\src\states\ut_state_main_menu.obj

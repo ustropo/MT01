@@ -1,0 +1,1264 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:48:36 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:48:36
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=eeprom.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=eeprom.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;eeprom.c
+                                 
+                                 		.glb	_pl_init_max
+                                 		.glb	_pl_init_min
+                                 		.glb	_ox_init_max
+                                 		.glb	_ox_init_min
+                                 		.glb	_pm_init_max
+                                 		.glb	_pm_init_min
+                                 		.glb	_sample_state
+                                 		.glb	_configVarOxInit
+                                 		.glb	_configVarPlInit
+                                 		.glb	_configVarJogInit
+                                 		.glb	_configVarMaqInit
+                                 		.glb	_configVarParMaqInit
+                                 		.glb	_configFlagsInit
+                                 		.glb	_configFlags
+                                 		.glb	_configVarOx
+                                 		.glb	_configVarPl
+                                 		.glb	_configVarMaq
+                                 		.glb	_configVarParMaq
+                                 		.glb	_configVarJog
+                                 		.glb	_zeroPieceInit
+                                 		.glb	_zeroPiece
+                                 		.glb	_dataRecord
+                                 		.glb	_eepromInit
+                                 		.glb	_R_VEE_Open
+                                 		.glb	_eepromWriteConfig
+                                 		.glb	_eepromReadConfig
+                                 		.glb	_R_VEE_GenerateCheck
+                                 		.glb	_R_VEE_Write
+                                 		.glb	_R_VEE_Read
+                                 		.glb	_R_VEE_ReleaseState
+                                 		.glb	_VEE_OperationDone_Callback
+                                 		.glb	_eepromConsistencyCheck
+                                 		.glb	_eepromFormat
+                                 		.glb	_R_FlashDataAreaAccess
+                                 		.glb	_R_FlashErase
+                                 		.glb	_R_FlashGetStatus
+                                 		.glb	_eepromIntegrityCheck
+                                 		.glb	_memcmp
+                                 		.glb	_FlashError
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _eepromInit:
+                                 		.STACK	_eepromInit=4
+                                 ;       1 #include "platform.h"
+                                 ;       2 #include "eeprom.h"
+                                 ;       3 #include "r_vee_if.h"
+                                 ;       4 #include <string.h>
+                                 ;       5 #include "settings.h"
+                                 ;       6 
+                                 ;       7 //#define VEE_DEMO_ERASE_FIRST
+                                 ;       8 
+                                 ;       9 
+                                 ;      10 
+                                 ;      11 enum { READY, NOT_READY } sample_state;
+                                 ;      12 
+                                 ;      13 /*! configVarOxInit - Constante inicial de parametrização para Oxicorte */
+                                 ;      14 const float configVarOxInit[OX_CONFIG_MAX] = {
+                                 ;      15 	15,                               //!< Altura de perfuração
+                                 ;      16 	5,                               //!< Altura de corte
+                                 ;      17 	500,                            //!< Velocidade de corte
+                                 ;      18 	30,                               //!< Tempo de aquecimento
+                                 ;      19 	1                                //!< Tempo de Perfuração
+                                 ;      20 };
+                                 ;      21 
+                                 ;      22 /*! configVarPlInit - Constante inicial de parametrização para Plasma */
+                                 ;      23 const float configVarPlInit[PL_CONFIG_MAX] = {
+                                 ;      24 	4.8,                               //!< Altura de perfuração
+                                 ;      25 	2.8,                               //!< Altura de corte
+                                 ;      26 	2500,                            //!< Velocidade de corte
+                                 ;      27 	0.1,                               //!< Tempo de Perfuração
+                                 ;      28 	120                              //!< Tensao do THC
+                                 ;      29 };
+                                 ;      30 
+                                 ;      31 /*! configVarJogInit - Constante inicial de velocidade de jog*/
+                                 ;      32 const float configVarJogInit[JOG_MAX] = {
+                                 ;      33 	6000,                              //!< Velocidade inicial de jog rapido
+                                 ;      34 	500,                              //!< Velocidade inicial de jog lento
+                                 ;      35 };
+                                 ;      36 
+                                 ;      37 /*! configVarJogInit - Constante inicial de config de maquina*/
+                                 ;      38 const float configVarMaqInit[CFG_MAQUINA_MAX - 1] = {
+                                 ;      39 	25,                               //!< Altura de deslocamento
+                                 ;      40 };
+                                 ;      41 
+                                 ;      42 /*! configVarParMaqInit - Constante inicial de parametrização da maquina */
+                                 ;      43 const float configVarParMaqInit[CFG_PAR_MAQ_MAX] = {
+                                 ;      44 	TRAVELX,                            //!< EIXO_X1
+                                 ;      45 	TRAVELX,                            //!< EIXO_X2
+                                 ;      46 	TRAVELY,                            //!< EIXO_Y
+                                 ;      47 	X_JERK_MAX,                         //!< JERK X
+                                 ;      48 	Y_JERK_MAX,                         //!< JERK Y
+                                 ;      49 	X_VELOCITY_MAX,                     //!< VEL X
+                                 ;      50 	Y_VELOCITY_MAX,                     //!< VEL Y
+                                 ;      51 	Z_VELOCITY_MAX,                     //!< VEL Z
+                                 ;      52 	JUNCTION_DEVIATION,                  //!< JUNCTION DEV
+                                 ;      53 	JUNCTION_ACCELERATION,               //!< JUNCTION ACCEL
+                                 ;      54 	CHORDAL_TOLERANCE,
+                                 ;      55 	0
+                                 ;      56 };
+                                 ;      57 
+                                 ;      58 uint32_t configFlagsInit[FLAG_MAX] = {MODO_PLASMA,1,DESABILITADO,HABILITADO};
+                                 ;      59 uint32_t configFlags[FLAG_MAX];
+                                 ;      60 
+                                 ;      61 float configVarOx[OX_CONFIG_MAX];
+                                 ;      62 float configVarPl[PL_CONFIG_MAX];
+                                 ;      63 float configVarMaq[CFG_MAQUINA_MAX - 1]; // retirado o modo maquina
+                                 ;      64 float configVarParMaq[CFG_PAR_MAQ_MAX];
+                                 ;      65 float configVarJog[JOG_MAX];
+                                 ;      66 
+                                 ;      67 float zeroPieceInit[3] = {0,0,0};
+                                 ;      68 float zeroPiece[3];
+                                 ;      69 
+                                 ;      70 vee_record_t dataRecord;
+                                 ;      71 
+                                 ;      72 void eepromInit(void)
+                                 ;      73 {
+                                 ;      74 #if defined(VEE_DEMO_ERASE_FIRST)
+                                 ;      75 	eepromFormat();
+                                 ;      76 #else
+                                 ;      77 	R_VEE_Open();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",77
+00000000 05rrrrrr             A  		BSR _R_VEE_Open
+00000004                         L11:	; entry.split
+00000004 6601                    		MOV.L #00000000H, R1
+                                 ;      78 	eepromReadConfig(CONFIGVAR_OX);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",78
+00000006 39rrrr               W  		BSR _eepromReadConfig
+00000009                         L12:	; entry.split1
+00000009 6611                    		MOV.L #00000001H, R1
+                                 ;      79 	eepromReadConfig(CONFIGVAR_PL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",79
+0000000B 39rrrr               W  		BSR _eepromReadConfig
+0000000E                         L13:	; entry.split2
+0000000E 6621                    		MOV.L #00000002H, R1
+                                 ;      80 	eepromReadConfig(CONFIGVAR_JOG);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",80
+00000010 39rrrr               W  		BSR _eepromReadConfig
+00000013                         L14:	; entry.split3
+00000013 6651                    		MOV.L #00000005H, R1
+                                 ;      81 	eepromReadConfig(CONFIGVAR_MAQ);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",81
+00000015 39rrrr               W  		BSR _eepromReadConfig
+00000018                         L15:	; entry.split4
+00000018 6661                    		MOV.L #00000006H, R1
+                                 ;      82 	eepromReadConfig(CONFIGVAR_PAR_MAQ);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",82
+0000001A 39rrrr               W  		BSR _eepromReadConfig
+0000001D                         L16:	; entry.split5
+0000001D 6631                    		MOV.L #00000003H, R1
+                                 ;      83 	eepromReadConfig(CONFIGFLAG);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",83
+0000001F 39rrrr               W  		BSR _eepromReadConfig
+00000022                         L17:	; entry.split6
+00000022 6641                    		MOV.L #00000004H, R1
+                                 ;      84 	eepromReadConfig(ZEROPIECE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",84
+00000024 39rrrr               W  		BSR _eepromReadConfig
+00000027 02                      		RTS
+00000028                         _eepromWriteConfig:
+                                 		.STACK	_eepromWriteConfig=12
+                                 ;      85 #endif
+                                 ;      86 }
+                                 ;      87 
+                                 ;      88 void eepromWriteConfig(uint8_t varType)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",88
+00000028 6080                    		SUB #08H, R0
+0000002A 8189                    		MOV.B R1, 07H[R0]
+                                 ;      89 {
+                                 ;      90     uint32_t ret;
+                                 ;      91     switch (varType)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",91
+0000002C B189                    		MOVU.B 07H[R0], R1
+0000002E 6161                    		CMP #06H, R1
+00000030 3Arrrr               W  		BEQ L37
+00000033                         L19:	; entry
+00000033 6111                    		CMP #01H, R1
+00000035 20rr                    		BEQ L28
+00000037                         L20:	; entry
+00000037 6121                    		CMP #02H, R1
+00000039 20rr                    		BEQ L31
+0000003B                         L21:	; entry
+0000003B 6131                    		CMP #03H, R1
+0000003D 3Arrrr               W  		BEQ L40
+00000040                         L22:	; entry
+00000040 6141                    		CMP #04H, R1
+00000042 3Arrrr               W  		BEQ L43
+00000045                         L23:	; entry
+00000045 6151                    		CMP #05H, R1
+00000047 20rr                    		BEQ L34
+00000049                         L24:	; entry
+00000049 6101                    		CMP #00H, R1
+0000004B 3Brrrr               W  		BNE L46
+0000004E                         L25:	; bb
+                                 ;      92     {
+                                 ;      93     	case CONFIGVAR_OX:  dataRecord.ID = CONFIGVAR_OX;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",93
+0000004E FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+00000054 F8E500                  		MOV.W #0000H, [R14]
+00000057                         L26:	; bb.split
+                                 ;      94         				 dataRecord.pData = (uint8_t*)configVarOx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",94
+00000057 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+0000005D FB22rrrrrrrr            		MOV.L #_configVarOx, R2
+00000063 A092                    		MOV.L R2, 08H[R1]
+00000065                         L27:	; bb.split1
+                                 ;      95         				 dataRecord.size =sizeof(configVarOx);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",95
+00000065 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+0000006B 3D1114                  		MOV.W #0014H, 02H[R1]
+0000006E 38rrrr               W  		BRA L46
+00000071                         L28:	; bb4
+                                 ;      96         				 break;
+                                 ;      97     	case CONFIGVAR_PL:  dataRecord.ID = CONFIGVAR_PL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",97
+00000071 FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+00000077 F8E501                  		MOV.W #0001H, [R14]
+0000007A                         L29:	; bb4.split
+                                 ;      98         				 dataRecord.pData = (uint8_t*)configVarPl;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",98
+0000007A FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+00000080 FB22rrrrrrrr            		MOV.L #_configVarPl, R2
+00000086 A092                    		MOV.L R2, 08H[R1]
+00000088                         L30:	; bb4.split2
+                                 ;      99         				 dataRecord.size =sizeof(configVarPl);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",99
+00000088 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+0000008E 3D1114                  		MOV.W #0014H, 02H[R1]
+00000091 38rrrr               W  		BRA L46
+00000094                         L31:	; bb5
+                                 ;     100         				 break;
+                                 ;     101     	case CONFIGVAR_JOG:  dataRecord.ID = CONFIGVAR_JOG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",101
+00000094 FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+0000009A F8E502                  		MOV.W #0002H, [R14]
+0000009D                         L32:	; bb5.split
+                                 ;     102         				 dataRecord.pData = (uint8_t*)configVarJog;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",102
+0000009D FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+000000A3 FB22rrrrrrrr            		MOV.L #_configVarJog, R2
+000000A9 A092                    		MOV.L R2, 08H[R1]
+000000AB                         L33:	; bb5.split3
+                                 ;     103         				 dataRecord.size =sizeof(configVarJog);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",103
+000000AB FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+000000B1 3D1108                  		MOV.W #0008H, 02H[R1]
+000000B4 38rrrr               W  		BRA L46
+000000B7                         L34:	; bb6
+                                 ;     104         				 break;
+                                 ;     105     	case CONFIGVAR_MAQ:  dataRecord.ID = CONFIGVAR_MAQ;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",105
+000000B7 FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+000000BD F8E505                  		MOV.W #0005H, [R14]
+000000C0                         L35:	; bb6.split
+                                 ;     106         				 dataRecord.pData = (uint8_t*)configVarMaq;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",106
+000000C0 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+000000C6 FB22rrrrrrrr            		MOV.L #_configVarMaq, R2
+000000CC A092                    		MOV.L R2, 08H[R1]
+000000CE                         L36:	; bb6.split4
+                                 ;     107         				 dataRecord.size =sizeof(configVarMaq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",107
+000000CE FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+000000D4 3D110C                  		MOV.W #000CH, 02H[R1]
+000000D7 2Err                 B  		BRA L46
+000000D9                         L37:	; bb7
+                                 ;     108         				 break;
+                                 ;     109     	case CONFIGVAR_PAR_MAQ:  dataRecord.ID = CONFIGVAR_PAR_MAQ;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",109
+000000D9 FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+000000DF F8E506                  		MOV.W #0006H, [R14]
+000000E2                         L38:	; bb7.split
+                                 ;     110         				 dataRecord.pData = (uint8_t*)configVarParMaq;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",110
+000000E2 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+000000E8 FB22rrrrrrrr            		MOV.L #_configVarParMaq, R2
+000000EE A092                    		MOV.L R2, 08H[R1]
+000000F0                         L39:	; bb7.split5
+                                 ;     111         				 dataRecord.size =sizeof(configVarParMaq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",111
+000000F0 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+000000F6 3D1130                  		MOV.W #0030H, 02H[R1]
+000000F9 2Err                 B  		BRA L46
+000000FB                         L40:	; bb8
+                                 ;     112         				 break;
+                                 ;     113     	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",113
+000000FB FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+00000101 F8E503                  		MOV.W #0003H, [R14]
+00000104                         L41:	; bb8.split
+                                 ;     114 						 dataRecord.pData = (uint8_t*)configFlags;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",114
+00000104 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+0000010A FB22rrrrrrrr            		MOV.L #_configFlags, R2
+00000110 A092                    		MOV.L R2, 08H[R1]
+00000112                         L42:	; bb8.split6
+                                 ;     115 						 dataRecord.size =sizeof(configFlags);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",115
+00000112 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+00000118 3D1110                  		MOV.W #0010H, 02H[R1]
+0000011B 2Err                 B  		BRA L46
+0000011D                         L43:	; bb9
+                                 ;     116 						 break;
+                                 ;     117     	case ZEROPIECE:  dataRecord.ID = ZEROPIECE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",117
+0000011D FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+00000123 F8E504                  		MOV.W #0004H, [R14]
+00000126                         L44:	; bb9.split
+                                 ;     118 						 dataRecord.pData = (uint8_t*)&zeroPiece;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",118
+00000126 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+0000012C FB22rrrrrrrr            		MOV.L #_zeroPiece, R2
+00000132 A092                    		MOV.L R2, 08H[R1]
+00000134                         L45:	; bb9.split7
+                                 ;     119 						 dataRecord.size =sizeof(zeroPiece);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",119
+00000134 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+0000013A 3D110C                  		MOV.W #000CH, 02H[R1]
+0000013D                         L46:	; bb11
+                                 ;     120 						 break;
+                                 ;     121     	default:		 break;
+                                 ;     122     }
+                                 ;     123 
+                                 ;     124 
+                                 ;     125     /* Generate check for data */
+                                 ;     126     ret = R_VEE_GenerateCheck(&dataRecord);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",126
+0000013D FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+00000143 05rrrrrr             A  		BSR _R_VEE_GenerateCheck
+00000147 E301                    		MOV.L R1, [R0]
+00000149                         L47:	; bb11.split
+                                 ;     127     /* Check result */
+                                 ;     128     if( ret != VEE_SUCCESS )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",128
+00000149 EC01                    		MOV.L [R0], R1
+0000014B 6101                    		CMP #00H, R1
+0000014D 10                   S  		BEQ L49
+0000014E                         L48:	; bb17
+                                 ;     129     {
+                                 ;     130         while(1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",130
+0000014E 2Err                 B  		BRA L48
+00000150                         L49:	; bb22
+                                 ;     131         {
+                                 ;     132             /* Error */
+                                 ;     133         }
+                                 ;     134     }
+                                 ;     135 	sample_state = NOT_READY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",135
+00000150 FBE2rrrrrrrr            		MOV.L #_sample_state, R14
+00000156 F8E601                  		MOV.L #00000001H, [R14]
+00000159                         L50:	; bb22.split
+                                 ;     136 	ret = R_VEE_Write(&dataRecord);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",136
+00000159 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+0000015F 05rrrrrr             A  		BSR _R_VEE_Write
+00000163 E301                    		MOV.L R1, [R0]
+00000165                         L51:	; bb22.split8
+                                 ;     137 	/* Check result */
+                                 ;     138 	if( ret != VEE_SUCCESS )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",138
+00000165 EC01                    		MOV.L [R0], R1
+00000167 6101                    		CMP #00H, R1
+00000169 10                   S  		BEQ L53
+0000016A                         L52:	; bb28
+                                 ;     139 	{
+                                 ;     140 	    while(1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",140
+0000016A 2Err                 B  		BRA L52
+0000016C                         L53:	; bb36
+                                 ;     141 	    {
+                                 ;     142 	        /* Error */
+                                 ;     143 	    }
+                                 ;     144 	}
+                                 ;     145 
+                                 ;     146 
+                                 ;     147     while(sample_state == NOT_READY)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",147
+0000016C FBE2rrrrrrrr            		MOV.L #_sample_state, R14
+00000172 ECEE                    		MOV.L [R14], R14
+00000174 611E                    		CMP #01H, R14
+00000176 20rr                    		BEQ L53
+00000178                         L54:	; return
+                                 ;     148        {
+                                 ;     149            /* Wait for write to finish. When write finishes it will call the VEE_OperationDone_Callback() callback
+                                 ;     150               function below. The user also has the option of just polling by disabling the callback functions in
+                                 ;     151               r_vee_config.h */
+                                 ;     152        }
+                                 ;     153 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",153
+00000178 6702                    		RTSD #08H
+0000017A                         _eepromReadConfig:
+                                 		.STACK	_eepromReadConfig=12
+                                 ;     154 
+                                 ;     155 void eepromReadConfig(uint8_t varType)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",155
+0000017A 6080                    		SUB #08H, R0
+0000017C 8189                    		MOV.B R1, 07H[R0]
+                                 ;     156 {
+                                 ;     157     uint32_t ret;
+                                 ;     158 
+                                 ;     159     switch (varType)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",159
+0000017E B189                    		MOVU.B 07H[R0], R1
+00000180 6161                    		CMP #06H, R1
+00000182 20rr                    		BEQ L66
+00000184                         L56:	; entry
+00000184 6111                    		CMP #01H, R1
+00000186 20rr                    		BEQ L63
+00000188                         L57:	; entry
+00000188 6121                    		CMP #02H, R1
+0000018A 20rr                    		BEQ L64
+0000018C                         L58:	; entry
+0000018C 6131                    		CMP #03H, R1
+0000018E 20rr                    		BEQ L67
+00000190                         L59:	; entry
+00000190 6141                    		CMP #04H, R1
+00000192 20rr                    		BEQ L68
+00000194                         L60:	; entry
+00000194 6151                    		CMP #05H, R1
+00000196 20rr                    		BEQ L65
+00000198                         L61:	; entry
+00000198 6101                    		CMP #00H, R1
+0000019A 21rr                    		BNE L69
+0000019C                         L62:	; bb
+                                 ;     160     {
+                                 ;     161     	case CONFIGVAR_OX: dataRecord.ID = CONFIGVAR_OX; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",161
+0000019C FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+000001A2 F8E500                  		MOV.W #0000H, [R14]
+000001A5 2Err                 B  		BRA L69
+000001A7                         L63:	; bb4
+                                 ;     162     	case CONFIGVAR_PL: dataRecord.ID = CONFIGVAR_PL; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",162
+000001A7 FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+000001AD F8E501                  		MOV.W #0001H, [R14]
+000001B0 2Err                 B  		BRA L69
+000001B2                         L64:	; bb5
+                                 ;     163     	case CONFIGVAR_JOG: dataRecord.ID = CONFIGVAR_JOG; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",163
+000001B2 FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+000001B8 F8E502                  		MOV.W #0002H, [R14]
+000001BB 2Err                 B  		BRA L69
+000001BD                         L65:	; bb6
+                                 ;     164     	case CONFIGVAR_MAQ: dataRecord.ID = CONFIGVAR_MAQ; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",164
+000001BD FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+000001C3 F8E505                  		MOV.W #0005H, [R14]
+000001C6 2Err                 B  		BRA L69
+000001C8                         L66:	; bb7
+                                 ;     165     	case CONFIGVAR_PAR_MAQ: dataRecord.ID = CONFIGVAR_PAR_MAQ; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",165
+000001C8 FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+000001CE F8E506                  		MOV.W #0006H, [R14]
+000001D1 2Err                 B  		BRA L69
+000001D3                         L67:	; bb8
+                                 ;     166     	case CONFIGFLAG: dataRecord.ID = CONFIGFLAG; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",166
+000001D3 FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+000001D9 F8E503                  		MOV.W #0003H, [R14]
+000001DC 08                   S  		BRA L69
+000001DD                         L68:	; bb9
+                                 ;     167     	case ZEROPIECE: dataRecord.ID = ZEROPIECE; break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",167
+000001DD FBE2rrrrrrrr            		MOV.L #_dataRecord, R14
+000001E3 F8E504                  		MOV.W #0004H, [R14]
+000001E6                         L69:	; bb11
+                                 ;     168     	default: break;
+                                 ;     169     }
+                                 ;     170 	ret = R_VEE_Read(&dataRecord);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",170
+000001E6 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+000001EC 05rrrrrr             A  		BSR _R_VEE_Read
+000001F0 E301                    		MOV.L R1, [R0]
+000001F2                         L70:	; bb11.split
+                                 ;     171 	/* Check result */
+                                 ;     172 	if( ret == VEE_NOT_FOUND )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",172
+000001F2 EC01                    		MOV.L [R0], R1
+000001F4 6141                    		CMP #04H, R1
+000001F6 18                   S  		BNE L72
+000001F7                         L71:	; bb15
+                                 ;     173 	{
+                                 ;     174 		eepromFormat();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",174
+000001F7 39rrrr               W  		BSR _eepromFormat
+000001FA                         L72:	; bb20
+                                 ;     175 	}
+                                 ;     176 	if( ret != VEE_SUCCESS )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",176
+000001FA EC01                    		MOV.L [R0], R1
+000001FC 6101                    		CMP #00H, R1
+000001FE 10                   S  		BEQ L74
+000001FF                         L73:	; bb23
+                                 ;     177 	{
+                                 ;     178 	    while(1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",178
+000001FF 2Err                 B  		BRA L73
+00000201                         L74:	; bb29
+                                 ;     179 	    {
+                                 ;     180 	        /* Error */
+                                 ;     181 	    }
+                                 ;     182 	}
+                                 ;     183     R_VEE_ReleaseState();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",183
+00000201 05rrrrrr             A  		BSR _R_VEE_ReleaseState
+00000205                         L75:	; bb29.split
+                                 ;     184     switch (varType)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",184
+00000205 B189                    		MOVU.B 07H[R0], R1
+00000207 6161                    		CMP #06H, R1
+00000209 20rr                    		BEQ L86
+0000020B                         L76:	; bb29.split
+0000020B 6111                    		CMP #01H, R1
+0000020D 20rr                    		BEQ L83
+0000020F                         L77:	; bb29.split
+0000020F 6121                    		CMP #02H, R1
+00000211 20rr                    		BEQ L84
+00000213                         L78:	; bb29.split
+00000213 6131                    		CMP #03H, R1
+00000215 20rr                    		BEQ L87
+00000217                         L79:	; bb29.split
+00000217 6141                    		CMP #04H, R1
+00000219 3Arrrr               W  		BEQ L88
+0000021C                         L80:	; bb29.split
+0000021C 6151                    		CMP #05H, R1
+0000021E 20rr                    		BEQ L85
+00000220                         L81:	; bb29.split
+00000220 6101                    		CMP #00H, R1
+00000222 3Brrrr               W  		BNE L89
+00000225                         L82:	; bb33
+                                 ;     185     {
+                                 ;     186     	case CONFIGVAR_OX: memcpy(configVarOx,dataRecord.pData,sizeof(configVarOx)); break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",186
+00000225 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+0000022B A892                    		MOV.L 08H[R1], R2
+0000022D 754314                  		MOV.L #00000014H, R3
+00000230 FB12rrrrrrrr            		MOV.L #_configVarOx, R1
+00000236 7F8F                    		SMOVF
+00000238 6702                    		RTSD #08H
+0000023A                         L83:	; bb35
+                                 ;     187     	case CONFIGVAR_PL: memcpy(configVarPl,dataRecord.pData,sizeof(configVarPl)); break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",187
+0000023A FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+00000240 A892                    		MOV.L 08H[R1], R2
+00000242 754314                  		MOV.L #00000014H, R3
+00000245 FB12rrrrrrrr            		MOV.L #_configVarPl, R1
+0000024B 7F8F                    		SMOVF
+0000024D 6702                    		RTSD #08H
+0000024F                         L84:	; bb37
+                                 ;     188     	case CONFIGVAR_JOG: memcpy(configVarJog,dataRecord.pData,sizeof(configVarJog)); break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",188
+0000024F FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+00000255 A891                    		MOV.L 08H[R1], R1
+00000257 FBE2rrrrrrrr            		MOV.L #_configVarJog, R14
+0000025D E51E0101                		MOV.L 04H[R1], 04H[R14]
+00000261 E01E                    		MOV.L [R1], [R14]
+00000263 6702                    		RTSD #08H
+00000265                         L85:	; bb39
+                                 ;     189     	case CONFIGVAR_MAQ: memcpy(configVarMaq,dataRecord.pData,sizeof(configVarMaq)); break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",189
+00000265 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+0000026B A891                    		MOV.L 08H[R1], R1
+0000026D FBE2rrrrrrrr            		MOV.L #_configVarMaq, R14
+00000273 E51E0202                		MOV.L 08H[R1], 08H[R14]
+00000277 E51E0101                		MOV.L 04H[R1], 04H[R14]
+0000027B E01E                    		MOV.L [R1], [R14]
+0000027D 6702                    		RTSD #08H
+0000027F                         L86:	; bb41
+                                 ;     190     	case CONFIGVAR_PAR_MAQ: memcpy(configVarParMaq,dataRecord.pData,sizeof(configVarParMaq)); break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",190
+0000027F FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+00000285 A892                    		MOV.L 08H[R1], R2
+00000287 754330                  		MOV.L #00000030H, R3
+0000028A FB12rrrrrrrr            		MOV.L #_configVarParMaq, R1
+00000290 7F8F                    		SMOVF
+00000292 6702                    		RTSD #08H
+00000294                         L87:	; bb43
+                                 ;     191     	case CONFIGFLAG: memcpy(&configFlags,dataRecord.pData,sizeof(configFlags)); break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",191
+00000294 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+0000029A A892                    		MOV.L 08H[R1], R2
+0000029C 754310                  		MOV.L #00000010H, R3
+0000029F FB12rrrrrrrr            		MOV.L #_configFlags, R1
+000002A5 7F8F                    		SMOVF
+000002A7 6702                    		RTSD #08H
+000002A9                         L88:	; bb45
+                                 ;     192     	case ZEROPIECE: memcpy(&zeroPiece,dataRecord.pData,sizeof(zeroPiece)); break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",192
+000002A9 FB12rrrrrrrr            		MOV.L #_dataRecord, R1
+000002AF A891                    		MOV.L 08H[R1], R1
+000002B1 FBE2rrrrrrrr            		MOV.L #_zeroPiece, R14
+000002B7 E51E0202                		MOV.L 08H[R1], 08H[R14]
+000002BB E51E0101                		MOV.L 04H[R1], 04H[R14]
+000002BF E01E                    		MOV.L [R1], [R14]
+000002C1 6702                    		RTSD #08H
+000002C3                         L89:	; return
+                                 ;     193     	default: break;
+                                 ;     194     }
+                                 ;     195 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",195
+000002C3 6702                    		RTSD #08H
+000002C5                         _VEE_OperationDone_Callback:
+                                 		.STACK	_VEE_OperationDone_Callback=4
+                                 ;     196 
+                                 ;     197 /***********************************************************************************************************************
+                                 ;     198 * Function Name: VEE_OperationDone_Callback
+                                 ;     199 * Description  : Callback function from VEE that signifies that VEE operation
+                                 ;     200 *                has finished.
+                                 ;     201 * Arguments    : none
+                                 ;     202 * Return Value : none
+                                 ;     203 ***********************************************************************************************************************/
+                                 ;     204 void VEE_OperationDone_Callback(void)
+                                 ;     205 {
+                                 ;     206 	sample_state = READY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",206
+000002C5 FBE2rrrrrrrr            		MOV.L #_sample_state, R14
+000002CB F8E600                  		MOV.L #00000000H, [R14]
+000002CE 02                      		RTS
+000002CF                         _eepromConsistencyCheck:
+                                 		.STACK	_eepromConsistencyCheck=12
+                                 ;     207 }
+                                 ;     208 /***********************************************************************************************************************
+                                 ;     209 End of VEE_OperationDone_Callback function
+                                 ;     210 ***********************************************************************************************************************/
+                                 ;     211 
+                                 ;     212 void eepromConsistencyCheck(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",212
+000002CF 6080                    		SUB #08H, R0
+                                 ;     213 {
+                                 ;     214 	uint8_t i;
+                                 ;     215 	for (i = 0; i < OX_CONFIG_MAX; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",215
+000002D1 3C0700                  		MOV.B #00H, 07H[R0]
+000002D4 2Err                 B  		BRA L99
+000002D6                         L92:	; bb2
+                                 ;     216 	{
+                                 ;     217 		if (configVarOx[i] > ox_init_max[i] || configVarOx[i] < ox_init_min[i])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",217
+000002D6 B189                    		MOVU.B 07H[R0], R1
+000002D8 FBE2rrrrrrrr            		MOV.L #_ox_init_max, R14
+000002DE FE61EE                  		MOV.L [R1,R14], R14
+000002E1 FBF2rrrrrrrr            		MOV.L #_configVarOx, R15
+000002E7 FE61FF                  		MOV.L [R1,R15], R15
+000002EA FC87FE                  		FCMP R15, R14
+000002ED 27rr                    		BN L95
+000002EF 08                   S  		BRA L94
+000002F0                         L93:	; bb3
+                                 ;     218 		{
+                                 ;     219 			eepromFormat();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",219
+000002F0 39rrrr               W  		BSR _eepromFormat
+000002F3 2Err                 B  		BRA L98
+000002F5                         L94:	; bb13
+000002F5 B189                    		MOVU.B 07H[R0], R1
+000002F7 FBE2rrrrrrrr            		MOV.L #_configVarOx, R14
+000002FD FE61EE                  		MOV.L [R1,R14], R14
+00000300 FBF2rrrrrrrr            		MOV.L #_ox_init_min, R15
+00000306 FE61FF                  		MOV.L [R1,R15], R15
+00000309 FC87FE                  		FCMP R15, R14
+0000030C 26rr                    		BPZ L96
+0000030E                         L95:	; bb24
+0000030E F80601                  		MOV.L #00000001H, [R0]
+00000311 08                   S  		BRA L97
+00000312                         L96:	; bb25
+00000312 F80600                  		MOV.L #00000000H, [R0]
+00000315                         L97:	; bb26
+00000315 EC01                    		MOV.L [R0], R1
+00000317 6101                    		CMP #00H, R1
+00000319 21rr                    		BNE L93
+0000031B                         L98:	; bb30
+0000031B B189                    		MOVU.B 07H[R0], R1
+0000031D 6211                    		ADD #01H, R1
+0000031F 8189                    		MOV.B R1, 07H[R0]
+00000321                         L99:	; bb33
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",215
+00000321 B189                    		MOVU.B 07H[R0], R1
+00000323 6151                    		CMP #05H, R1
+00000325 29rr                    		BLT L92
+00000327                         L100:	; bb39
+                                 ;     220 		}
+                                 ;     221 	}
+                                 ;     222 	for (i = 0; i < PL_CONFIG_MAX; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",222
+00000327 3C0700                  		MOV.B #00H, 07H[R0]
+0000032A 2Err                 B  		BRA L108
+0000032C                         L101:	; bb41
+                                 ;     223 	{
+                                 ;     224 		if (configVarPl[i] > pl_init_max[i] || configVarPl[i] < pl_init_min[i])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",224
+0000032C B189                    		MOVU.B 07H[R0], R1
+0000032E FBE2rrrrrrrr            		MOV.L #_pl_init_max, R14
+00000334 FE61EE                  		MOV.L [R1,R14], R14
+00000337 FBF2rrrrrrrr            		MOV.L #_configVarPl, R15
+0000033D FE61FF                  		MOV.L [R1,R15], R15
+00000340 FC87FE                  		FCMP R15, R14
+00000343 27rr                    		BN L104
+00000345 08                   S  		BRA L103
+00000346                         L102:	; bb42
+                                 ;     225 		{
+                                 ;     226 			eepromFormat();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",226
+00000346 39rrrr               W  		BSR _eepromFormat
+00000349 2Err                 B  		BRA L107
+0000034B                         L103:	; bb53
+0000034B B189                    		MOVU.B 07H[R0], R1
+0000034D FBE2rrrrrrrr            		MOV.L #_configVarPl, R14
+00000353 FE61EE                  		MOV.L [R1,R14], R14
+00000356 FBF2rrrrrrrr            		MOV.L #_pl_init_min, R15
+0000035C FE61FF                  		MOV.L [R1,R15], R15
+0000035F FC87FE                  		FCMP R15, R14
+00000362 26rr                    		BPZ L105
+00000364                         L104:	; bb64
+00000364 F80601                  		MOV.L #00000001H, [R0]
+00000367 08                   S  		BRA L106
+00000368                         L105:	; bb65
+00000368 F80600                  		MOV.L #00000000H, [R0]
+0000036B                         L106:	; bb66
+0000036B EC01                    		MOV.L [R0], R1
+0000036D 6101                    		CMP #00H, R1
+0000036F 21rr                    		BNE L102
+00000371                         L107:	; bb71
+00000371 B189                    		MOVU.B 07H[R0], R1
+00000373 6211                    		ADD #01H, R1
+00000375 8189                    		MOV.B R1, 07H[R0]
+00000377                         L108:	; bb74
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",222
+00000377 B189                    		MOVU.B 07H[R0], R1
+00000379 6151                    		CMP #05H, R1
+0000037B 29rr                    		BLT L101
+0000037D                         L109:	; bb81
+                                 ;     227 		}
+                                 ;     228 	}
+                                 ;     229 
+                                 ;     230 	for (i = 0; i < FLAG_MAX; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",230
+0000037D 3C0700                  		MOV.B #00H, 07H[R0]
+00000380 2Err                 B  		BRA L113
+00000382                         L110:	; bb83
+                                 ;     231 	{
+                                 ;     232 		if (configFlags[i] > 1 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",232
+00000382 FBE2rrrrrrrr            		MOV.L #_configFlags, R14
+00000388 B189                    		MOVU.B 07H[R0], R1
+0000038A FE61EE                  		MOV.L [R1,R14], R14
+0000038D 612E                    		CMP #02H, R14
+0000038F 23rr                    		BLTU L112
+00000391                         L111:	; bb84
+                                 ;     233 		{
+                                 ;     234 			eepromFormat();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",234
+00000391 39rrrr               W  		BSR _eepromFormat
+00000394                         L112:	; bb92
+00000394 B189                    		MOVU.B 07H[R0], R1
+00000396 6211                    		ADD #01H, R1
+00000398 8189                    		MOV.B R1, 07H[R0]
+0000039A                         L113:	; bb95
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",230
+0000039A B189                    		MOVU.B 07H[R0], R1
+0000039C 6141                    		CMP #04H, R1
+0000039E 29rr                    		BLT L110
+000003A0                         L114:	; bb101
+                                 ;     235 		}
+                                 ;     236 	}
+                                 ;     237 
+                                 ;     238 	for (i = 0; i < CFG_PAR_MAQ_MAX - 1; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",238
+000003A0 3C0700                  		MOV.B #00H, 07H[R0]
+000003A3 2Err                 B  		BRA L122
+000003A5                         L115:	; bb103
+                                 ;     239 	{
+                                 ;     240 		if (configVarParMaq[i] > pm_init_max[i] || configVarParMaq[i] <= pm_init_min[i])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",240
+000003A5 B189                    		MOVU.B 07H[R0], R1
+000003A7 FBE2rrrrrrrr            		MOV.L #_pm_init_max, R14
+000003AD FE61EE                  		MOV.L [R1,R14], R14
+000003B0 FBF2rrrrrrrr            		MOV.L #_configVarParMaq, R15
+000003B6 FE61FF                  		MOV.L [R1,R15], R15
+000003B9 FC87FE                  		FCMP R15, R14
+000003BC 27rr                    		BN L118
+000003BE 08                   S  		BRA L117
+000003BF                         L116:	; bb104
+                                 ;     241 		{
+                                 ;     242 			eepromFormat();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",242
+000003BF 39rrrr               W  		BSR _eepromFormat
+000003C2 2Err                 B  		BRA L121
+000003C4                         L117:	; bb115
+000003C4 B189                    		MOVU.B 07H[R0], R1
+000003C6 FBE2rrrrrrrr            		MOV.L #_pm_init_min, R14
+000003CC FE61EE                  		MOV.L [R1,R14], R14
+000003CF FBF2rrrrrrrr            		MOV.L #_configVarParMaq, R15
+000003D5 FE61FF                  		MOV.L [R1,R15], R15
+000003D8 FC87FE                  		FCMP R15, R14
+000003DB 29rr                    		BLT L119
+000003DD                         L118:	; bb126
+000003DD F80601                  		MOV.L #00000001H, [R0]
+000003E0 08                   S  		BRA L120
+000003E1                         L119:	; bb127
+000003E1 F80600                  		MOV.L #00000000H, [R0]
+000003E4                         L120:	; bb128
+000003E4 EC01                    		MOV.L [R0], R1
+000003E6 6101                    		CMP #00H, R1
+000003E8 21rr                    		BNE L116
+000003EA                         L121:	; bb133
+000003EA B189                    		MOVU.B 07H[R0], R1
+000003EC 6211                    		ADD #01H, R1
+000003EE 8189                    		MOV.B R1, 07H[R0]
+000003F0                         L122:	; bb136
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",238
+000003F0 B189                    		MOVU.B 07H[R0], R1
+000003F2 61B1                    		CMP #0BH, R1
+000003F4 29rr                    		BLT L115
+000003F6                         L123:	; return
+                                 ;     243 		}
+                                 ;     244 	}
+                                 ;     245 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",245
+000003F6 6702                    		RTSD #08H
+000003F8                         _eepromFormat:
+                                 		.STACK	_eepromFormat=12
+                                 ;     246 
+                                 ;     247 void eepromFormat(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",247
+000003F8 6080                    		SUB #08H, R0
+000003FA FB1EFFFF00              		MOV.L #0000FFFFH, R1
+                                 ;     248 {
+                                 ;     249 
+                                 ;     250 		uint32_t loop1;
+                                 ;     251 		uint32_t ret;
+                                 ;     252 		/* Enable data flash access. */
+                                 ;     253 		R_FlashDataAreaAccess(0xFFFF, 0xFFFF);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",253
+000003FF EF12                    		MOV.L R1, R2
+00000401 05rrrrrr             A  		BSR _R_FlashDataAreaAccess
+00000405                         L125:	; entry.split
+                                 ;     254 
+                                 ;     255 		for (loop1 = 0; loop1 < DF_NUM_BLOCKS; loop1++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",255
+00000405 F80600                  		MOV.L #00000000H, [R0]
+00000408 2Err                 B  		BRA L131
+0000040A                         L126:	; bb
+                                 ;     256 		{
+                                 ;     257 			/* Erase data flash. */
+                                 ;     258 			ret = R_FlashErase(BLOCK_DB0 + loop1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",258
+0000040A EC01                    		MOV.L [R0], R1
+0000040C 711146                  		ADD #46H, R1
+0000040F 05rrrrrr             A  		BSR _R_FlashErase
+00000413 A009                    		MOV.L R1, 04H[R0]
+00000415                         L127:	; bb.split
+                                 ;     259 
+                                 ;     260 			/* Check for errors */
+                                 ;     261 			if(ret != FLASH_SUCCESS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",261
+00000415 A809                    		MOV.L 04H[R0], R1
+00000417 6101                    		CMP #00H, R1
+00000419 10                   S  		BEQ L129
+0000041A                         L128:	; bb9
+                                 ;     262 			{
+                                 ;     263 				while(1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",263
+0000041A 2Err                 B  		BRA L128
+0000041C                         L129:	; bb16
+                                 ;     264 				{
+                                 ;     265 					/* Failure in erasing data flash. Something is not setup right. */
+                                 ;     266 				}
+                                 ;     267 			}
+                                 ;     268 
+                                 ;     269 			/* Wait for flash operation to finish. */
+                                 ;     270 			while(FLASH_SUCCESS != R_FlashGetStatus());
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",270
+0000041C 05rrrrrr             A  		BSR _R_FlashGetStatus
+00000420 6101                    		CMP #00H, R1
+00000422 21rr                    		BNE L129
+00000424                         L130:	; bb22
+00000424 EC01                    		MOV.L [R0], R1
+00000426 6211                    		ADD #01H, R1
+00000428 E301                    		MOV.L R1, [R0]
+0000042A                         L131:	; bb25
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",255
+0000042A EC01                    		MOV.L [R0], R1
+0000042C 755110                  		CMP #10H, R1
+0000042F 23rr                    		BLTU L126
+00000431                         L132:	; bb30
+00000431 754314                  		MOV.L #00000014H, R3
+                                 ;     271 		}
+                                 ;     272 		memcpy(configVarOx,configVarOxInit,sizeof(configVarOx));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",272
+00000434 FB22rrrrrrrr            		MOV.L #_configVarOxInit, R2
+0000043A FB12rrrrrrrr            		MOV.L #_configVarOx, R1
+00000440 7F8F                    		SMOVF
+00000442                         L133:	; bb30.split
+00000442 754314                  		MOV.L #00000014H, R3
+                                 ;     273 		memcpy(configVarPl,configVarPlInit,sizeof(configVarPl));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",273
+00000445 FB22rrrrrrrr            		MOV.L #_configVarPlInit, R2
+0000044B FB12rrrrrrrr            		MOV.L #_configVarPl, R1
+00000451 7F8F                    		SMOVF
+00000453                         L134:	; bb30.split1
+                                 ;     274 		memcpy(configVarJog,configVarJogInit,sizeof(configVarJog));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",274
+00000453 FBE2rrrrrrrr            		MOV.L #_configVarJog, R14
+00000459 FBF2rrrrrrrr            		MOV.L #_configVarJogInit, R15
+0000045F E5FE0101                		MOV.L 04H[R15], 04H[R14]
+00000463 E0FE                    		MOV.L [R15], [R14]
+00000465                         L135:	; bb30.split2
+00000465 754310                  		MOV.L #00000010H, R3
+                                 ;     275 		memcpy(&configFlags,&configFlagsInit,sizeof(configFlags));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",275
+00000468 FB22rrrrrrrr            		MOV.L #_configFlagsInit, R2
+0000046E FB12rrrrrrrr            		MOV.L #_configFlags, R1
+00000474 7F8F                    		SMOVF
+00000476                         L136:	; bb30.split3
+                                 ;     276 		memcpy(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",276
+00000476 FBE2rrrrrrrr            		MOV.L #_zeroPiece, R14
+0000047C FBF2rrrrrrrr            		MOV.L #_zeroPieceInit, R15
+00000482 E5FE0202                		MOV.L 08H[R15], 08H[R14]
+00000486 E5FE0101                		MOV.L 04H[R15], 04H[R14]
+0000048A E0FE                    		MOV.L [R15], [R14]
+0000048C                         L137:	; bb30.split4
+                                 ;     277 		memcpy(configVarMaq,configVarMaqInit,sizeof(configVarMaq));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",277
+0000048C FBE2rrrrrrrr            		MOV.L #_configVarMaq, R14
+00000492 FBF2rrrrrrrr            		MOV.L #_configVarMaqInit, R15
+00000498 E5FE0202                		MOV.L 08H[R15], 08H[R14]
+0000049C E5FE0101                		MOV.L 04H[R15], 04H[R14]
+000004A0 E0FE                    		MOV.L [R15], [R14]
+000004A2                         L138:	; bb30.split5
+000004A2 754330                  		MOV.L #00000030H, R3
+                                 ;     278 		memcpy(configVarParMaq,configVarParMaqInit,sizeof(configVarParMaq));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",278
+000004A5 FB22rrrrrrrr            		MOV.L #_configVarParMaqInit, R2
+000004AB FB12rrrrrrrr            		MOV.L #_configVarParMaq, R1
+000004B1 7F8F                    		SMOVF
+000004B3                         L139:	; bb30.split6
+                                 ;     279 		R_VEE_Open();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",279
+000004B3 05rrrrrr             A  		BSR _R_VEE_Open
+000004B7                         L140:	; bb30.split7
+000004B7 6601                    		MOV.L #00000000H, R1
+                                 ;     280 		eepromWriteConfig(CONFIGVAR_OX);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",280
+000004B9 39rrrr               W  		BSR _eepromWriteConfig
+000004BC                         L141:	; bb30.split8
+000004BC 6611                    		MOV.L #00000001H, R1
+                                 ;     281 		eepromWriteConfig(CONFIGVAR_PL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",281
+000004BE 39rrrr               W  		BSR _eepromWriteConfig
+000004C1                         L142:	; bb30.split9
+000004C1 6621                    		MOV.L #00000002H, R1
+                                 ;     282 		eepromWriteConfig(CONFIGVAR_JOG);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",282
+000004C3 39rrrr               W  		BSR _eepromWriteConfig
+000004C6                         L143:	; bb30.split10
+000004C6 6651                    		MOV.L #00000005H, R1
+                                 ;     283 		eepromWriteConfig(CONFIGVAR_MAQ);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",283
+000004C8 39rrrr               W  		BSR _eepromWriteConfig
+000004CB                         L144:	; bb30.split11
+000004CB 6661                    		MOV.L #00000006H, R1
+                                 ;     284 		eepromWriteConfig(CONFIGVAR_PAR_MAQ);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",284
+000004CD 39rrrr               W  		BSR _eepromWriteConfig
+000004D0                         L145:	; bb30.split12
+000004D0 6631                    		MOV.L #00000003H, R1
+                                 ;     285 		eepromWriteConfig(CONFIGFLAG);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",285
+000004D2 39rrrr               W  		BSR _eepromWriteConfig
+000004D5                         L146:	; bb30.split13
+000004D5 6641                    		MOV.L #00000004H, R1
+                                 ;     286 		eepromWriteConfig(ZEROPIECE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",286
+000004D7 39rrrr               W  		BSR _eepromWriteConfig
+000004DA 6702                    		RTSD #08H
+000004DC                         _eepromIntegrityCheck:
+                                 		.STACK	_eepromIntegrityCheck=12
+                                 ;     287 }
+                                 ;     288 
+                                 ;     289 mem_check eepromIntegrityCheck(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",289
+000004DC 6080                    		SUB #08H, R0
+                                 ;     290 {
+                                 ;     291 	uint8_t i = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",291
+000004DE 3C0200                  		MOV.B #00H, 02H[R0]
+000004E1                         L148:	; entry.split
+                                 ;     292 	bool res = MEM_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",292
+000004E1 3C0300                  		MOV.B #00H, 03H[R0]
+000004E4                         L149:	; entry.split1
+                                 ;     293 
+                                 ;     294 	for (i = 0; i < CONFIGVAR_MAX; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",294
+000004E4 3C0200                  		MOV.B #00H, 02H[R0]
+000004E7 2Err                 B  		BRA L151
+000004E9                         L150:	; bb
+                                 ;     295 	{
+                                 ;     296 		eepromReadConfig(i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",296
+000004E9 B081                    		MOVU.B 02H[R0], R1
+000004EB 39rrrr               W  		BSR _eepromReadConfig
+000004EE B081                    		MOVU.B 02H[R0], R1
+000004F0 6211                    		ADD #01H, R1
+000004F2 8081                    		MOV.B R1, 02H[R0]
+000004F4                         L151:	; bb6
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",294
+000004F4 B081                    		MOVU.B 02H[R0], R1
+000004F6 6171                    		CMP #07H, R1
+000004F8 29rr                    		BLT L150
+000004FA                         L152:	; bb12
+000004FA 754314                  		MOV.L #00000014H, R3
+                                 ;     297 	}
+                                 ;     298 	if(memcmp(configVarOx,configVarOxInit,sizeof(configVarOx)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",298
+000004FD FB22rrrrrrrr            		MOV.L #_configVarOxInit, R2
+00000503 FB12rrrrrrrr            		MOV.L #_configVarOx, R1
+00000509 05rrrrrr             A  		BSR _memcmp
+0000050D 6101                    		CMP #00H, R1
+0000050F 10                   S  		BEQ L154
+00000510                         L153:	; bb13
+                                 ;     299 		res = MEM_FAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",299
+00000510 3C0301                  		MOV.B #01H, 03H[R0]
+00000513                         L154:	; bb19
+00000513 754314                  		MOV.L #00000014H, R3
+                                 ;     300 	if(memcmp(configVarPl,configVarPlInit,sizeof(configVarPl)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",300
+00000516 FB22rrrrrrrr            		MOV.L #_configVarPlInit, R2
+0000051C FB12rrrrrrrr            		MOV.L #_configVarPl, R1
+00000522 05rrrrrr             A  		BSR _memcmp
+00000526 6101                    		CMP #00H, R1
+00000528 10                   S  		BEQ L156
+00000529                         L155:	; bb20
+                                 ;     301 		res = MEM_FAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",301
+00000529 3C0301                  		MOV.B #01H, 03H[R0]
+0000052C                         L156:	; bb26
+0000052C 6683                    		MOV.L #00000008H, R3
+                                 ;     302 	if(memcmp(configVarJog,configVarJogInit,sizeof(configVarJog)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",302
+0000052E FB22rrrrrrrr            		MOV.L #_configVarJogInit, R2
+00000534 FB12rrrrrrrr            		MOV.L #_configVarJog, R1
+0000053A 05rrrrrr             A  		BSR _memcmp
+0000053E 6101                    		CMP #00H, R1
+00000540 10                   S  		BEQ L158
+00000541                         L157:	; bb27
+                                 ;     303 		res = MEM_FAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",303
+00000541 3C0301                  		MOV.B #01H, 03H[R0]
+00000544                         L158:	; bb33
+00000544 754310                  		MOV.L #00000010H, R3
+                                 ;     304 	if(memcmp(&configFlags,&configFlagsInit,sizeof(configFlags)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",304
+00000547 FB22rrrrrrrr            		MOV.L #_configFlagsInit, R2
+0000054D FB12rrrrrrrr            		MOV.L #_configFlags, R1
+00000553 05rrrrrr             A  		BSR _memcmp
+00000557 6101                    		CMP #00H, R1
+00000559 10                   S  		BEQ L160
+0000055A                         L159:	; bb34
+                                 ;     305 		res = MEM_FAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",305
+0000055A 3C0301                  		MOV.B #01H, 03H[R0]
+0000055D                         L160:	; bb40
+0000055D 66C3                    		MOV.L #0000000CH, R3
+                                 ;     306 	if(memcmp(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",306
+0000055F FB22rrrrrrrr            		MOV.L #_zeroPieceInit, R2
+00000565 FB12rrrrrrrr            		MOV.L #_zeroPiece, R1
+0000056B 05rrrrrr             A  		BSR _memcmp
+0000056F 6101                    		CMP #00H, R1
+00000571 10                   S  		BEQ L162
+00000572                         L161:	; bb41
+                                 ;     307 		res = MEM_FAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",307
+00000572 3C0301                  		MOV.B #01H, 03H[R0]
+00000575                         L162:	; bb47
+00000575 66C3                    		MOV.L #0000000CH, R3
+                                 ;     308 	if(memcmp(configVarMaq,configVarMaqInit,sizeof(configVarMaq)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",308
+00000577 FB22rrrrrrrr            		MOV.L #_configVarMaqInit, R2
+0000057D FB12rrrrrrrr            		MOV.L #_configVarMaq, R1
+00000583 05rrrrrr             A  		BSR _memcmp
+00000587 6101                    		CMP #00H, R1
+00000589 10                   S  		BEQ L164
+0000058A                         L163:	; bb48
+                                 ;     309 		res = MEM_FAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",309
+0000058A 3C0301                  		MOV.B #01H, 03H[R0]
+0000058D                         L164:	; bb54
+0000058D 754330                  		MOV.L #00000030H, R3
+                                 ;     310 	if(memcmp(configVarParMaq,configVarParMaqInit,sizeof(configVarParMaq)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",310
+00000590 FB22rrrrrrrr            		MOV.L #_configVarParMaqInit, R2
+00000596 FB12rrrrrrrr            		MOV.L #_configVarParMaq, R1
+0000059C 05rrrrrr             A  		BSR _memcmp
+000005A0 6101                    		CMP #00H, R1
+000005A2 10                   S  		BEQ L166
+000005A3                         L165:	; bb55
+                                 ;     311 		res = MEM_FAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",311
+000005A3 3C0301                  		MOV.B #01H, 03H[R0]
+000005A6                         L166:	; bb60
+                                 ;     312 
+                                 ;     313 	return res;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",313
+000005A6 B089                    		MOVU.B 03H[R0], R1
+000005A8 A009                    		MOV.L R1, 04H[R0]
+000005AA                         L167:	; bb60.split
+                                 ;     314 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",314
+000005AA 6702                    		RTSD #08H
+000005AC                         _FlashError:
+                                 		.STACK	_FlashError=4
+000005AC                         L169:	; bb1
+                                 ;     315 
+                                 ;     316 /***********************************************************************************************************************
+                                 ;     317 * Function Name: FlashError
+                                 ;     318 * Description  : This function is called either from the FlashAPI, or from a VEE interrupt to signal that an error has
+                                 ;     319 *                occurred during a flash operation. Whatever the user decides to do in this case should be in this
+                                 ;     320 *                function.
+                                 ;     321 * Arguments    : none
+                                 ;     322 * Return Value : none
+                                 ;     323 ***********************************************************************************************************************/
+                                 ;     324 void FlashError(void)
+                                 ;     325 {
+                                 ;     326     /* The user can check the g_vee_state variable to see what state the error occurred in. User could also have
+                                 ;     327        recovery code here. */
+                                 ;     328     while(1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\eeprom\eeprom.c",328
+000005AC 2Err                 B  		BRA L169
+                                 ;     329 }
+                                 		.SECTION	C,ROMDATA,ALIGN=4
+00000000                         _configVarOxInit:
+00000000 00007041                		.lword	41700000H	; float 15
+00000004 0000A040                		.lword	40A00000H	; float 5
+00000008 0000FA43                		.lword	43FA0000H	; float 500
+0000000C 0000F041                		.lword	41F00000H	; float 30
+00000010 0000803F                		.lword	3F800000H	; float 1
+00000014                         _configVarPlInit:
+00000014 9A999940                		.lword	4099999AH	; float 4.8
+00000018 33333340                		.lword	40333333H	; float 2.8
+0000001C 00401C45                		.lword	451C4000H	; float 2500
+00000020 CDCCCC3D                		.lword	3DCCCCCDH	; float 0.1
+00000024 0000F042                		.lword	42F00000H	; float 120
+00000028                         _configVarJogInit:
+00000028 0080BB45                		.lword	45BB8000H	; float 6000
+0000002C 0000FA43                		.lword	43FA0000H	; float 500
+00000030                         _configVarMaqInit:
+00000030 0000C841                		.lword	41C80000H	; float 25
+00000034 00000000                		.lword	00000000H
+00000038 00000000                		.lword	00000000H
+0000003C                         _configVarParMaqInit:
+0000003C E4CB9642                		.lword	4296CBE4H	; float 75.3982
+00000040 E4CB9642                		.lword	4296CBE4H	; float 75.3982
+00000044 E4CB9642                		.lword	4296CBE4H	; float 75.3982
+00000048 0000C843                		.lword	43C80000H	; float 400
+0000004C 0000C843                		.lword	43C80000H	; float 400
+00000050 00401C46                		.lword	461C4000H	; float 10000
+00000054 00401C46                		.lword	461C4000H	; float 10000
+00000058 00006144                		.lword	44610000H	; float 900
+0000005C CDCC4C3E                		.lword	3E4CCCCDH	; float 0.2
+00000060 00401C48                		.lword	481C4000H	; float 160000
+00000064 0AD7233C                		.lword	3C23D70AH	; float 0.01
+00000068 00000000                		.lword	00000000H
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         _configFlagsInit:
+00000000 00000000                		.lword	00000000H
+00000004 01000000                		.lword	00000001H
+00000008 00000000                		.lword	00000000H
+0000000C 01000000                		.lword	00000001H
+00000010                         _zeroPieceInit:
+00000010 00                      		.byte	0
+00000011 00                      		.byte	0
+00000012 00                      		.byte	0
+00000013 00                      		.byte	0
+00000014 00                      		.byte	0
+00000015 00                      		.byte	0
+00000016 00                      		.byte	0
+00000017 00                      		.byte	0
+00000018 00                      		.byte	0
+00000019 00                      		.byte	0
+0000001A 00                      		.byte	0
+0000001B 00                      		.byte	0
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _sample_state:
+00000000(00000004H)              		.blkl	1
+00000004                         _configFlags:
+00000004(00000010H)              		.blkl	4
+00000014                         _configVarOx:
+00000014(00000014H)              		.blkl	5
+00000028                         _configVarPl:
+00000028(00000014H)              		.blkl	5
+0000003C                         _configVarMaq:
+0000003C(0000000CH)              		.blkl	3
+00000048                         _configVarParMaq:
+00000048(00000030H)              		.blkl	12
+00000078                         _configVarJog:
+00000078(00000008H)              		.blkl	2
+00000080                         _zeroPiece:
+00000080(0000000CH)              		.blkl	3
+0000008C                         _dataRecord:
+0000008C(0000000CH)              		.blkl	3
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01228   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001454(000005AEH)  P
+ROMDATA  0000000108(0000006CH)  C
+ROMDATA  0000000028(0000001CH)  D
+DATA     0000000152(00000098H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\eeprom.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\eeprom.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\src\eeprom\eeprom.obj

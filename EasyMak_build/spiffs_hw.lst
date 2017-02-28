@@ -1,0 +1,357 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:49:01 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:49:01
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=spiffs_hw.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=spiffs_hw.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;spiffs_hw.c
+                                 
+                                 		.glb	_uspiffs
+                                 		.glb	_spiffs_init
+                                 		.glb	_FS_spi_hw_init
+                                 		.glb	_SPIFFS_mount
+                                 		.glb	_spiffs_format
+                                 		.glb	_my_spi_read
+                                 		.glb	_my_spi_write
+                                 		.glb	_my_spi_erase
+                                 		.glb	_R_SF_Erase
+                                 		.glb	_SPIFFS_unmount
+                                 		.glb	_SPIFFS_format
+                                 		.glb	_FS_spi_read_blocking
+                                 		.glb	_FS_spi_write_blocking
+                                 		.glb	_FS_spi_erase_blocking
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _spiffs_init:
+                                 		.STACK	_spiffs_init=28
+                                 ;       1 /*
+                                 ;       2  * spiffs_hw.c
+                                 ;       3  *
+                                 ;       4  *  Created on: Jul 25, 2016
+                                 ;       5  *      Author: LAfonso01
+                                 ;       6  */
+                                 ;       7 #include "platform.h"
+                                 ;       8 #include "fsystem_spi.h"
+                                 ;       9 #include "spiffs.h"
+                                 ;      10 #include "r_spi_flash_if.h"
+                                 ;      11 #include "spiffs_hw.h"
+                                 ;      12 #include "xio.h"
+                                 ;      13 
+                                 ;      14 #define LOG_PAGE_SIZE       256
+                                 ;      15 
+                                 ;      16 static u8_t spiffs_work_buf[LOG_PAGE_SIZE*2];
+                                 ;      17 static u8_t spiffs_fds[32*4];
+                                 ;      18 static u8_t spiffs_cache_buf[(LOG_PAGE_SIZE+32)*4];
+                                 ;      19 
+                                 ;      20 static spiffs *fs = (spiffs *)&uspiffs[0].gSPIFFS;
+                                 ;      21 static spiffs_config cfg;
+                                 ;      22 
+                                 ;      23 s32_t spiffs_init(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",23
+00000000 6080                    		SUB #08H, R0
+                                 ;      24 {
+                                 ;      25 	int res;
+                                 ;      26 
+                                 ;      27 	FS_spi_hw_init();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",27
+00000002 05rrrrrr             A  		BSR _FS_spi_hw_init
+00000006                         L11:	; entry.split
+                                 ;      28 
+                                 ;      29 //	R_SF_Erase(1, 0, SF_ERASE_BULK);
+                                 ;      30 
+                                 ;      31 	cfg.hal_read_f = my_spi_read;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",31
+00000006 FBE2rrrrrrrr            		MOV.L #__$cfg, R14
+0000000C FBF2rrrrrrrr            		MOV.L #_my_spi_read, R15
+00000012 E3EF                    		MOV.L R15, [R14]
+00000014                         L12:	; entry.split1
+                                 ;      32 	cfg.hal_write_f = my_spi_write;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",32
+00000014 FB12rrrrrrrr            		MOV.L #__$cfg, R1
+0000001A FB22rrrrrrrr            		MOV.L #_my_spi_write, R2
+00000020 A01A                    		MOV.L R2, 04H[R1]
+00000022                         L13:	; entry.split2
+                                 ;      33 	cfg.hal_erase_f = my_spi_erase;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",33
+00000022 FB12rrrrrrrr            		MOV.L #__$cfg, R1
+00000028 FB22rrrrrrrr            		MOV.L #_my_spi_erase, R2
+0000002E A092                    		MOV.L R2, 08H[R1]
+00000030                         L14:	; entry.split3
+                                 ;      34 
+                                 ;      35 	res = SPIFFS_mount(fs,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",35
+00000030 FBE2rrrrrrrr            		MOV.L #__$fs, R14
+00000036 ECE1                    		MOV.L [R14], R1
+00000038 7100F0                  		ADD #0FFFFFFF0H, R0
+0000003B FB22rrrrrrrr            		MOV.L #__$spiffs_cache_buf, R2
+00000041 A00A                    		MOV.L R2, 04H[R0]
+00000043 3E0300                  		MOV.L #00000000H, 0CH[R0]
+00000046 F90A028004              		MOV.L #00000480H, 08H[R0]
+0000004B 3E0080                  		MOV.L #00000080H, 00H[R0]
+0000004E FB42rrrrrrrr            		MOV.L #__$spiffs_fds, R4
+00000054 FB32rrrrrrrr            		MOV.L #__$spiffs_work_buf, R3
+0000005A FB22rrrrrrrr            		MOV.L #__$cfg, R2
+00000060 05rrrrrr             A  		BSR _SPIFFS_mount
+00000064 710010                  		ADD #10H, R0
+00000067 E301                    		MOV.L R1, [R0]
+00000069                         L15:	; entry.split4
+                                 ;      36 			&cfg,
+                                 ;      37 			spiffs_work_buf,
+                                 ;      38 			spiffs_fds,
+                                 ;      39 			sizeof(spiffs_fds),
+                                 ;      40 			spiffs_cache_buf,
+                                 ;      41 			sizeof(spiffs_cache_buf),
+                                 ;      42 			0);
+                                 ;      43 
+                                 ;      44 	return res;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",44
+00000069 EC01                    		MOV.L [R0], R1
+0000006B A009                    		MOV.L R1, 04H[R0]
+0000006D                         L16:	; entry.split5
+                                 ;      45 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",45
+0000006D 6702                    		RTSD #08H
+0000006F                         _spiffs_format:
+                                 		.STACK	_spiffs_format=32
+                                 ;      46 
+                                 ;      47 s32_t spiffs_format(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",47
+0000006F 60C0                    		SUB #0CH, R0
+                                 ;      48 {
+                                 ;      49 	s32_t res = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",49
+00000071 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000074                         L18:	; entry.split
+00000074 6602                    		MOV.L #00000000H, R2
+00000076 6611                    		MOV.L #00000001H, R1
+                                 ;      50 
+                                 ;      51 	R_SF_Erase(1, 0, SF_ERASE_BULK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",51
+00000078 EF13                    		MOV.L R1, R3
+0000007A 05rrrrrr             A  		BSR _R_SF_Erase
+0000007E                         L19:	; entry.split1
+                                 ;      52 
+                                 ;      53 	res = SPIFFS_mount(fs,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",53
+0000007E FBE2rrrrrrrr            		MOV.L #__$fs, R14
+00000084 ECE1                    		MOV.L [R14], R1
+00000086 7100F0                  		ADD #0FFFFFFF0H, R0
+00000089 FB22rrrrrrrr            		MOV.L #__$spiffs_cache_buf, R2
+0000008F A00A                    		MOV.L R2, 04H[R0]
+00000091 3E0300                  		MOV.L #00000000H, 0CH[R0]
+00000094 F90A028004              		MOV.L #00000480H, 08H[R0]
+00000099 3E0080                  		MOV.L #00000080H, 00H[R0]
+0000009C FB42rrrrrrrr            		MOV.L #__$spiffs_fds, R4
+000000A2 FB32rrrrrrrr            		MOV.L #__$spiffs_work_buf, R3
+000000A8 FB22rrrrrrrr            		MOV.L #__$cfg, R2
+000000AE 05rrrrrr             A  		BSR _SPIFFS_mount
+000000B2 710010                  		ADD #10H, R0
+000000B5 A009                    		MOV.L R1, 04H[R0]
+000000B7                         L20:	; entry.split2
+                                 ;      54 			&cfg,
+                                 ;      55 			spiffs_work_buf,
+                                 ;      56 			spiffs_fds,
+                                 ;      57 			sizeof(spiffs_fds),
+                                 ;      58 			spiffs_cache_buf,
+                                 ;      59 			sizeof(spiffs_cache_buf),
+                                 ;      60 			0);
+                                 ;      61 
+                                 ;      62 	SPIFFS_unmount(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",62
+000000B7 FBE2rrrrrrrr            		MOV.L #__$fs, R14
+000000BD ECE1                    		MOV.L [R14], R1
+000000BF 05rrrrrr             A  		BSR _SPIFFS_unmount
+000000C3                         L21:	; entry.split3
+                                 ;      63 
+                                 ;      64 	res = SPIFFS_format(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",64
+000000C3 FBE2rrrrrrrr            		MOV.L #__$fs, R14
+000000C9 ECE1                    		MOV.L [R14], R1
+000000CB 05rrrrrr             A  		BSR _SPIFFS_format
+000000CF A009                    		MOV.L R1, 04H[R0]
+000000D1                         L22:	; entry.split4
+                                 ;      65 	if (res != SPIFFS_OK)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",65
+000000D1 A809                    		MOV.L 04H[R0], R1
+000000D3 6101                    		CMP #00H, R1
+000000D5 10                   S  		BEQ L24
+000000D6                         L23:	; bb8
+                                 ;      66 	{
+                                 ;      67 		return res;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",67
+000000D6 E10001                  		MOV.L 04H[R0], [R0]
+000000D9 2Err                 B  		BRA L26
+000000DB                         L24:	; bb14
+                                 ;      68 	}
+                                 ;      69 
+                                 ;      70 	res = SPIFFS_mount(fs,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",70
+000000DB FBE2rrrrrrrr            		MOV.L #__$fs, R14
+000000E1 ECE1                    		MOV.L [R14], R1
+000000E3 7100F0                  		ADD #0FFFFFFF0H, R0
+000000E6 FB22rrrrrrrr            		MOV.L #__$spiffs_cache_buf, R2
+000000EC A00A                    		MOV.L R2, 04H[R0]
+000000EE 3E0300                  		MOV.L #00000000H, 0CH[R0]
+000000F1 F90A028004              		MOV.L #00000480H, 08H[R0]
+000000F6 3E0080                  		MOV.L #00000080H, 00H[R0]
+000000F9 FB42rrrrrrrr            		MOV.L #__$spiffs_fds, R4
+000000FF FB32rrrrrrrr            		MOV.L #__$spiffs_work_buf, R3
+00000105 FB22rrrrrrrr            		MOV.L #__$cfg, R2
+0000010B 05rrrrrr             A  		BSR _SPIFFS_mount
+0000010F 710010                  		ADD #10H, R0
+00000112 A009                    		MOV.L R1, 04H[R0]
+00000114                         L25:	; bb14.split
+                                 ;      71 			&cfg,
+                                 ;      72 			spiffs_work_buf,
+                                 ;      73 			spiffs_fds,
+                                 ;      74 			sizeof(spiffs_fds),
+                                 ;      75 			spiffs_cache_buf,
+                                 ;      76 			sizeof(spiffs_cache_buf),
+                                 ;      77 			0);
+                                 ;      78 	return res;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",78
+00000114 E10001                  		MOV.L 04H[R0], [R0]
+00000117                         L26:	; bb19
+00000117 EC01                    		MOV.L [R0], R1
+00000119 A081                    		MOV.L R1, 08H[R0]
+                                 ;      79 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",79
+0000011B 6703                    		RTSD #0CH
+0000011D                         _my_spi_read:
+                                 		.STACK	_my_spi_read=20
+                                 ;      80 
+                                 ;      81 s32_t my_spi_read(u32_t addr, u32_t size, u8_t *buf)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",81
+0000011D 7100F0                  		ADD #0FFFFFFF0H, R0
+00000120 A089                    		MOV.L R1, 0CH[R0]
+00000122 A082                    		MOV.L R2, 08H[R0]
+00000124 A00B                    		MOV.L R3, 04H[R0]
+                                 ;      82 {
+                                 ;      83 	FS_spi_read_blocking(addr,(uint8_t *)buf,size);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",83
+00000126 A884                    		MOV.L 08H[R0], R4
+00000128 A889                    		MOV.L 0CH[R0], R1
+0000012A EF32                    		MOV.L R3, R2
+0000012C EF43                    		MOV.L R4, R3
+0000012E 05rrrrrr             A  		BSR _FS_spi_read_blocking
+00000132                         L28:	; entry.split
+                                 ;      84 	return SPIFFS_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",84
+00000132 F80600                  		MOV.L #00000000H, [R0]
+00000135 6601                    		MOV.L #00000000H, R1
+00000137                         L29:	; entry.split1
+                                 ;      85 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",85
+00000137 6704                    		RTSD #10H
+00000139                         _my_spi_write:
+                                 		.STACK	_my_spi_write=20
+                                 ;      86 s32_t my_spi_write(u32_t addr, u32_t size, u8_t *buf)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",86
+00000139 7100F0                  		ADD #0FFFFFFF0H, R0
+0000013C A089                    		MOV.L R1, 0CH[R0]
+0000013E A082                    		MOV.L R2, 08H[R0]
+00000140 A00B                    		MOV.L R3, 04H[R0]
+                                 ;      87 {
+                                 ;      88 	FS_spi_write_blocking(addr,(uint8_t *)buf,size);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",88
+00000142 A884                    		MOV.L 08H[R0], R4
+00000144 A889                    		MOV.L 0CH[R0], R1
+00000146 EF32                    		MOV.L R3, R2
+00000148 EF43                    		MOV.L R4, R3
+0000014A 05rrrrrr             A  		BSR _FS_spi_write_blocking
+0000014E                         L31:	; entry.split
+                                 ;      89 	return SPIFFS_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",89
+0000014E F80600                  		MOV.L #00000000H, [R0]
+00000151 6601                    		MOV.L #00000000H, R1
+00000153                         L32:	; entry.split1
+                                 ;      90 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",90
+00000153 6704                    		RTSD #10H
+00000155                         _my_spi_erase:
+                                 		.STACK	_my_spi_erase=16
+                                 ;      91 s32_t my_spi_erase(u32_t addr, u32_t size)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",91
+00000155 60C0                    		SUB #0CH, R0
+00000157 A081                    		MOV.L R1, 08H[R0]
+00000159 A00A                    		MOV.L R2, 04H[R0]
+                                 ;      92 {
+                                 ;      93 	FS_spi_erase_blocking(addr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",93
+0000015B A881                    		MOV.L 08H[R0], R1
+0000015D 05rrrrrr             A  		BSR _FS_spi_erase_blocking
+00000161                         L34:	; entry.split
+                                 ;      94 	return SPIFFS_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",94
+00000161 F80600                  		MOV.L #00000000H, [R0]
+00000164 6601                    		MOV.L #00000000H, R1
+00000166                         L35:	; entry.split1
+                                 ;      95 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\spiffs\spiffs_hw.c",95
+00000166 6703                    		RTSD #0CH
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         __$fs:
+00000000 rrrrrrrr                		.lword	_uspiffs
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         __$cfg:
+00000000(0000000CH)              		.blkl	3
+                                 		.SECTION	B_1,DATA
+00000000                         __$spiffs_work_buf:
+00000000(00000200H)              		.blkb	512
+00000200                         __$spiffs_fds:
+00000200(00000080H)              		.blkb	128
+00000280                         __$spiffs_cache_buf:
+00000280(00000480H)              		.blkb	1152
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00321   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000360(00000168H)  P
+ROMDATA  0000000004(00000004H)  D
+DATA     0000000012(0000000CH)  B
+DATA     0000001792(00000700H)  B_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\spiffs_hw.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\spiffs_hw.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\spiffs\spiffs_hw.obj

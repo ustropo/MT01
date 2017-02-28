@@ -1,0 +1,1647 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:54:29 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:54:29
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_usb_hreg_abs.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_usb_hreg_abs.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;r_usb_hreg_abs.c
+                                 
+                                 		.glb	_usb_gcstd_HsEnable
+                                 		.glb	_usb_ghstd_Ctsq
+                                 		.glb	_usb_ghstd_MgrMode
+                                 		.glb	_usb_hstd_SetHubPort
+                                 		.glb	_usb_hreg_rmw_devadd
+                                 		.glb	_usb_hstd_RwupeEnable
+                                 		.glb	_usb_hreg_set_rwupe
+                                 		.glb	_usb_hstd_RwupeDisable
+                                 		.glb	_usb_hreg_clr_rwupe
+                                 		.glb	_usb_hstd_InterruptHandler
+                                 		.glb	_usb_hstd_BusIntDisable
+                                 		.glb	_usb_hstd_BchgDisable
+                                 		.glb	_usb_hstd_ChkAttach
+                                 		.glb	_usb_cstd_SetHse
+                                 		.glb	_usb_hstd_ChkClk
+                                 		.glb	_usb_hstd_BchgEnable
+                                 		.glb	_usb_cstd_StopClock
+                                 		.glb	_usb_hstd_DetachProcess
+                                 		.glb	_usb_hstd_ReadLnst
+                                 		.glb	_usb_hstd_AttchDisable
+                                 		.glb	_usb_hstd_DtchDisable
+                                 		.glb	_usb_hstd_ControlEnd
+                                 		.glb	_usb_cstd_ForcedTermination
+                                 		.glb	_usb_cstd_GetPid
+                                 		.glb	_usb_cstd_ClrPipeCnfg
+                                 		.glb	_usb_cstd_GetDevsel
+                                 		.glb	_usb_hstd_SetDevAddr
+                                 		.glb	_usb_hstd_ChkDevAddr
+                                 		.glb	_usb_hstd_Attach
+                                 		.glb	_usb_hstd_Detach
+                                 		.glb	_usb_creg_read_syssts
+                                 		.glb	_usb_cpu_DelayXms
+                                 		.glb	_usb_creg_read_dvstctr
+                                 		.glb	_usb_hstd_AttachProcess
+                                 		.glb	_usb_hstd_ChkSof
+                                 		.glb	_usb_cpu_Delay1us
+                                 		.glb	_usb_hstd_BusReset
+                                 		.glb	_usb_creg_rmw_dvstctr
+                                 		.glb	_usb_creg_clr_dvstctr
+                                 		.glb	_usb_hstd_SetUact
+                                 		.glb	_usb_hstd_ResumeProcess
+                                 		.glb	_usb_hstd_support_speed_check
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _usb_hstd_SetHubPort:
+                                 		.STACK	_usb_hstd_SetHubPort=16
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_usb_hreg_abs.c
+                                 ;      21 * Description  : Call USB Host register access function 
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Added RX71M.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 
+                                 ;      30 /******************************************************************************
+                                 ;      31 Includes   <System Includes> , "Project Includes"
+                                 ;      32 ******************************************************************************/
+                                 ;      33 #include "r_usb_basic_if.h"
+                                 ;      34 #include "r_usb_reg_access.h"
+                                 ;      35 
+                                 ;      36 
+                                 ;      37 /******************************************************************************
+                                 ;      38 Constant macro definitions
+                                 ;      39 ******************************************************************************/
+                                 ;      40 /* Condition compilation by the difference of the endian */
+                                 ;      41 #if USB_CPUBYTE_PP == USB_BYTE_LITTLE_PP
+                                 ;      42     #define USB_FIFOENDIAN      USB_FIFO_LITTLE
+                                 ;      43 #else   /* USB_CPUBYTE_PP == USB_BYTE_LITTLE_PP */
+                                 ;      44     #define USB_FIFOENDIAN      USB_FIFO_BIG
+                                 ;      45 #endif  /* USB_CPUBYTE_PP == USB_BYTE_LITTLE_PP */
+                                 ;      46 
+                                 ;      47 
+                                 ;      48 #if (USB_FUNCSEL_USBIP0_PP == USB_HOST_PP) || (USB_FUNCSEL_USBIP1_PP == USB_HOST_PP)
+                                 ;      49 
+                                 ;      50 /******************************************************************************
+                                 ;      51 External variables and functions
+                                 ;      52 ******************************************************************************/
+                                 ;      53 extern uint16_t usb_ghstd_RemortPort[];
+                                 ;      54 
+                                 ;      55 /******************************************************************************
+                                 ;      56 Function Name   : usb_hstd_SetHubPort
+                                 ;      57 Description     : Set up-port hub
+                                 ;      58 Arguments       : USB_UTR_t *ptr    : USB system internal structure. Selects channel.
+                                 ;      59                 : uint16_t addr     : device address
+                                 ;      60                 : uint16_t upphub   : up-port hub address
+                                 ;      61                 : uint16_t hubport  : hub port number
+                                 ;      62 Return value    : none
+                                 ;      63 ******************************************************************************/
+                                 ;      64 void usb_hstd_SetHubPort(USB_UTR_t *ptr, uint16_t addr, uint16_t upphub, uint16_t hubport)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",64
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
+00000004 908A                    		MOV.W R2, 06H[R0]
+00000006 9083                    		MOV.W R3, 04H[R0]
+00000008 900C                    		MOV.W R4, 02H[R0]
+                                 ;      65 {
+                                 ;      66     if(ptr->ip == USB_USBIP_1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",66
+0000000A A881                    		MOV.L 08H[R0], R1
+0000000C B991                    		MOVU.W 0CH[R1], R1
+0000000E 6111                    		CMP #01H, R1
+00000010 21rr                    		BNE L12
+00000012                         L11:	; bb5
+                                 ;      67     {
+                                 ;      68         usb_hreg_rmw_devadd( ptr, addr, (upphub|hubport), (uint16_t)(USB_UPPHUB | USB_HUBPORT) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",68
+00000012 9883                    		MOV.W 04H[R0], R3
+00000014 06550301                		OR 02H[R0].W, R3
+00000018 B88A                    		MOVU.W 06H[R0], R2
+0000001A A881                    		MOV.L 08H[R0], R1
+0000001C 5F33                    		MOVU.W R3, R3
+0000001E FB4A007F                		MOV.L #00007F00H, R4
+00000022 05rrrrrr             A  		BSR _usb_hreg_rmw_devadd
+00000026 6703                    		RTSD #0CH
+00000028                         L12:	; return
+                                 ;      69     }
+                                 ;      70 } /* eof usb_hstd_SetHubPort */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",70
+00000028 6703                    		RTSD #0CH
+0000002A                         _usb_hstd_RwupeEnable:
+                                 		.STACK	_usb_hstd_RwupeEnable=12
+                                 ;      71 
+                                 ;      72 /******************************************************************************
+                                 ;      73 Function Name   : usb_hstd_RwupeEnable
+                                 ;      74 Description     : Remote wakeup signal detection enable setting from USB Device
+                                 ;      75 Arguments       : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;      76                 : uint16_t port    ; root port
+                                 ;      77 Return value    : none
+                                 ;      78 ******************************************************************************/
+                                 ;      79 void usb_hstd_RwupeEnable(USB_UTR_t *ptr, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",79
+0000002A 6080                    		SUB #08H, R0
+0000002C A009                    		MOV.L R1, 04H[R0]
+0000002E 900A                    		MOV.W R2, 02H[R0]
+                                 ;      80 {
+                                 ;      81 
+                                 ;      82     usb_hreg_set_rwupe( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",82
+00000030 B80A                    		MOVU.W 02H[R0], R2
+00000032 A809                    		MOV.L 04H[R0], R1
+00000034 05rrrrrr             A  		BSR _usb_hreg_set_rwupe
+00000038 6702                    		RTSD #08H
+0000003A                         _usb_hstd_RwupeDisable:
+                                 		.STACK	_usb_hstd_RwupeDisable=12
+                                 ;      83 
+                                 ;      84 } /* eof usb_hstd_RwupeEnable */
+                                 ;      85 
+                                 ;      86 
+                                 ;      87 /******************************************************************************
+                                 ;      88 Function Name   : usb_hstd_RwupeDisable
+                                 ;      89 Description     : Remote wakeup signal detection disable setting from USB Device
+                                 ;      90 Arguments       : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;      91                 : uint16_t port    ; root port
+                                 ;      92 Return value    : none
+                                 ;      93 ******************************************************************************/
+                                 ;      94 void usb_hstd_RwupeDisable(USB_UTR_t *ptr, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",94
+0000003A 6080                    		SUB #08H, R0
+0000003C A009                    		MOV.L R1, 04H[R0]
+0000003E 900A                    		MOV.W R2, 02H[R0]
+                                 ;      95 {
+                                 ;      96 
+                                 ;      97     usb_hreg_clr_rwupe( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",97
+00000040 B80A                    		MOVU.W 02H[R0], R2
+00000042 A809                    		MOV.L 04H[R0], R1
+00000044 05rrrrrr             A  		BSR _usb_hreg_clr_rwupe
+00000048 6702                    		RTSD #08H
+0000004A                         _usb_hstd_InterruptHandler:
+                                 		.STACK	_usb_hstd_InterruptHandler=40
+                                 ;      98 
+                                 ;      99 } /* eof of usb_hstd_RwupeDisable */
+                                 ;     100 
+                                 ;     101 /******************************************************************************
+                                 ;     102 Function Name   : usb_hstd_InterruptHandler
+                                 ;     103 Description     : Analyzes which USB interrupt is generated
+                                 ;     104 Argument        : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;     105 Return          : none
+                                 ;     106 ******************************************************************************/
+                                 ;     107 void usb_hstd_InterruptHandler(USB_UTR_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",107
+0000004A 7100DC                  		ADD #0FFFFFFDCH, R0
+0000004D A201                    		MOV.L R1, 20H[R0]
+                                 ;     108 {
+                                 ;     109     uint16_t    intsts0, intenb0, ists0;
+                                 ;     110     uint16_t    intsts1, intenb1, ists1;
+                                 ;     111     uint16_t    brdysts, brdyenb, bsts;
+                                 ;     112     uint16_t    nrdysts, nrdyenb, nsts;
+                                 ;     113     uint16_t    bempsts, bempenb, ests;
+                                 ;     114 
+                                 ;     115 
+                                 ;     116     intsts0 = ptr->ipp->INTSTS0.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",116
+0000004F A891                    		MOV.L 08H[R1], R1
+00000051 D5102001                		MOV.W 40H[R1], 02H[R0]
+00000055                         L16:	; entry.split
+                                 ;     117     intsts1 = ptr->ipp->INTSTS1.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",117
+00000055 AA01                    		MOV.L 20H[R0], R1
+00000057 A891                    		MOV.L 08H[R1], R1
+00000059 D5102104                		MOV.W 42H[R1], 08H[R0]
+0000005D                         L17:	; entry.split1
+                                 ;     118     brdysts = ptr->ipp->BRDYSTS.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",118
+0000005D AA01                    		MOV.L 20H[R0], R1
+0000005F A891                    		MOV.L 08H[R1], R1
+00000061 D5102307                		MOV.W 46H[R1], 0EH[R0]
+00000065                         L18:	; entry.split2
+                                 ;     119     nrdysts = ptr->ipp->NRDYSTS.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",119
+00000065 AA01                    		MOV.L 20H[R0], R1
+00000067 A891                    		MOV.L 08H[R1], R1
+00000069 D510240A                		MOV.W 48H[R1], 14H[R0]
+0000006D                         L19:	; entry.split3
+                                 ;     120     bempsts = ptr->ipp->BEMPSTS.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",120
+0000006D AA01                    		MOV.L 20H[R0], R1
+0000006F A891                    		MOV.L 08H[R1], R1
+00000071 D510250D                		MOV.W 4AH[R1], 1AH[R0]
+00000075                         L20:	; entry.split4
+                                 ;     121     intenb0 = ptr->ipp->INTENB0.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",121
+00000075 AA01                    		MOV.L 20H[R0], R1
+00000077 A891                    		MOV.L 08H[R1], R1
+00000079 D5101802                		MOV.W 30H[R1], 04H[R0]
+0000007D                         L21:	; entry.split5
+                                 ;     122     intenb1 = ptr->ipp->INTENB1.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",122
+0000007D AA01                    		MOV.L 20H[R0], R1
+0000007F A891                    		MOV.L 08H[R1], R1
+00000081 D5101905                		MOV.W 32H[R1], 0AH[R0]
+00000085                         L22:	; entry.split6
+                                 ;     123     brdyenb = ptr->ipp->BRDYENB.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",123
+00000085 AA01                    		MOV.L 20H[R0], R1
+00000087 A891                    		MOV.L 08H[R1], R1
+00000089 D5101B08                		MOV.W 36H[R1], 10H[R0]
+0000008D                         L23:	; entry.split7
+                                 ;     124     nrdyenb = ptr->ipp->NRDYENB.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",124
+0000008D AA01                    		MOV.L 20H[R0], R1
+0000008F A891                    		MOV.L 08H[R1], R1
+00000091 D5101C0B                		MOV.W 38H[R1], 16H[R0]
+00000095                         L24:	; entry.split8
+                                 ;     125     bempenb = ptr->ipp->BEMPENB.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",125
+00000095 AA01                    		MOV.L 20H[R0], R1
+00000097 A891                    		MOV.L 08H[R1], R1
+00000099 D5101D0E                		MOV.W 3AH[R1], 1CH[R0]
+0000009D                         L25:	; entry.split9
+                                 ;     126 
+                                 ;     127     /* Interrupt Status Get */
+                                 ;     128     ptr->keyword = USB_INT_UNKNOWN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",128
+0000009D AA01                    		MOV.L 20H[R0], R1
+0000009F 3D1300                  		MOV.W #0000H, 06H[R1]
+000000A2                         L26:	; entry.split10
+                                 ;     129     ptr->status  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",129
+000000A2 AA01                    		MOV.L 20H[R0], R1
+000000A4 3D9000                  		MOV.W #0000H, 20H[R1]
+000000A7                         L27:	; entry.split11
+                                 ;     130 
+                                 ;     131     ists0 = (uint16_t)(intsts0 & intenb0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",131
+000000A7 9809                    		MOV.W 02H[R0], R1
+000000A9 06510102                		AND 04H[R0].W, R1
+000000AD 9089                    		MOV.W R1, 06H[R0]
+000000AF                         L28:	; entry.split12
+                                 ;     132     ists1 = (uint16_t)(intsts1 & intenb1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",132
+000000AF 9901                    		MOV.W 08H[R0], R1
+000000B1 06510105                		AND 0AH[R0].W, R1
+000000B5 9181                    		MOV.W R1, 0CH[R0]
+000000B7                         L29:	; entry.split13
+                                 ;     133 //  ists2 = (uint16_t)(intsts2 & intenb2);
+                                 ;     134     bsts  = (uint16_t)(brdysts & brdyenb);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",134
+000000B7 9989                    		MOV.W 0EH[R0], R1
+000000B9 06510108                		AND 10H[R0].W, R1
+000000BD 9209                    		MOV.W R1, 12H[R0]
+000000BF                         L30:	; entry.split14
+                                 ;     135     nsts  = (uint16_t)(nrdysts & nrdyenb);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",135
+000000BF 9A81                    		MOV.W 14H[R0], R1
+000000C1 0651010B                		AND 16H[R0].W, R1
+000000C5 9301                    		MOV.W R1, 18H[R0]
+000000C7                         L31:	; entry.split15
+                                 ;     136     ests  = (uint16_t)(bempsts & bempenb);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",136
+000000C7 9B09                    		MOV.W 1AH[R0], R1
+000000C9 0651010E                		AND 1CH[R0].W, R1
+000000CD 9389                    		MOV.W R1, 1EH[R0]
+000000CF                         L32:	; entry.split16
+                                 ;     137 
+                                 ;     138     /***** Processing Setup transaction *****/
+                                 ;     139     if( (ists1 & USB_SACK) == USB_SACK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",139
+000000CF B981                    		MOVU.W 0CH[R0], R1
+000000D1 752110                  		AND #10H, R1
+000000D4 755110                  		CMP #10H, R1
+000000D7 21rr                    		BNE L36
+000000D9                         L33:	; bb120
+                                 ;     140     {
+                                 ;     141         /***** Setup ACK *****/
+                                 ;     142         /* SACK Clear */
+                                 ;     143         ptr->ipp->INTSTS1.WORD = (uint16_t)~USB_SACK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",143
+000000D9 AA01                    		MOV.L 20H[R0], R1
+000000DB A891                    		MOV.L 08H[R1], R1
+000000DD F91921EFFF              		MOV.W #0FFEFH, 42H[R1]
+000000E2                         L34:	; bb120.split
+                                 ;     144         /* Setup Ignore,Setup Acknowledge disable */
+                                 ;     145         ptr->ipp->INTENB1.WORD &= (uint16_t)~(USB_SIGNE | USB_SACKE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",145
+000000E2 AA01                    		MOV.L 20H[R0], R1
+000000E4 A891                    		MOV.L 08H[R1], R1
+000000E6 BE1A                    		MOVU.W 32H[R1], R2
+000000E8 7722CFFF00              		AND #0FFCFH, R2
+000000ED 961A                    		MOV.W R2, 32H[R1]
+000000EF                         L35:	; bb120.split17
+                                 ;     146         ptr->keyword = USB_INT_SACK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",146
+000000EF AA01                    		MOV.L 20H[R0], R1
+000000F1 3D1361                  		MOV.W #0061H, 06H[R1]
+000000F4 6709                    		RTSD #24H
+000000F6                         L36:	; bb140
+                                 ;     147     }
+                                 ;     148     else if( (ists1 & USB_SIGN) == USB_SIGN )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",148
+000000F6 B981                    		MOVU.W 0CH[R0], R1
+000000F8 752120                  		AND #20H, R1
+000000FB 755120                  		CMP #20H, R1
+000000FE 21rr                    		BNE L40
+00000100                         L37:	; bb141
+                                 ;     149     {
+                                 ;     150         /***** Setup Ignore *****/
+                                 ;     151         /* SIGN Clear */
+                                 ;     152         ptr->ipp->INTSTS1.WORD = (uint16_t)~USB_SIGN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",152
+00000100 AA01                    		MOV.L 20H[R0], R1
+00000102 A891                    		MOV.L 08H[R1], R1
+00000104 F91921DFFF              		MOV.W #0FFDFH, 42H[R1]
+00000109                         L38:	; bb141.split
+                                 ;     153         /* Setup Ignore,Setup Acknowledge disable */
+                                 ;     154         ptr->ipp->INTENB1.WORD &= (uint16_t)~(USB_SIGNE | USB_SACKE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",154
+00000109 AA01                    		MOV.L 20H[R0], R1
+0000010B A891                    		MOV.L 08H[R1], R1
+0000010D BE1A                    		MOVU.W 32H[R1], R2
+0000010F 7722CFFF00              		AND #0FFCFH, R2
+00000114 961A                    		MOV.W R2, 32H[R1]
+00000116                         L39:	; bb141.split18
+                                 ;     155         ptr->keyword = USB_INT_SIGN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",155
+00000116 AA01                    		MOV.L 20H[R0], R1
+00000118 3D1362                  		MOV.W #0062H, 06H[R1]
+0000011B 6709                    		RTSD #24H
+0000011D                         L40:	; bb161
+                                 ;     156     }
+                                 ;     157     /***** Processing PIPE0-MAX_PIPE_NO data *****/
+                                 ;     158     else if( (ists0 & USB_BRDY) == USB_BRDY )       /***** EP0-7 BRDY *****/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",158
+0000011D B889                    		MOVU.W 06H[R0], R1
+0000011F 76210001                		AND #0100H, R1
+00000123 76010001                		CMP #0100H, R1
+00000127 21rr                    		BNE L44
+00000129                         L41:	; bb162
+                                 ;     159     {
+                                 ;     160         ptr->ipp->BRDYSTS.WORD = (uint16_t)~bsts;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",160
+00000129 9A09                    		MOV.W 12H[R0], R1
+0000012B 7E01                    		NOT R1
+0000012D AA02                    		MOV.L 20H[R0], R2
+0000012F A8A2                    		MOV.L 08H[R2], R2
+00000131 D72123                  		MOV.W R1, 46H[R2]
+00000134                         L42:	; bb162.split
+                                 ;     161         ptr->keyword = USB_INT_BRDY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",161
+00000134 AA01                    		MOV.L 20H[R0], R1
+00000136 3D1301                  		MOV.W #0001H, 06H[R1]
+00000139                         L43:	; bb162.split19
+                                 ;     162         ptr->status  = bsts;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",162
+00000139 9A09                    		MOV.W 12H[R0], R1
+0000013B AA02                    		MOV.L 20H[R0], R2
+0000013D 9421                    		MOV.W R1, 20H[R2]
+0000013F 6709                    		RTSD #24H
+00000141                         L44:	; bb178
+                                 ;     163     }
+                                 ;     164     else if( (ists0 & USB_BEMP) == USB_BEMP )       /***** EP0-7 BEMP *****/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",164
+00000141 B889                    		MOVU.W 06H[R0], R1
+00000143 76210004                		AND #0400H, R1
+00000147 76010004                		CMP #0400H, R1
+0000014B 21rr                    		BNE L48
+0000014D                         L45:	; bb179
+                                 ;     165     {
+                                 ;     166         ptr->ipp->BEMPSTS.WORD = (uint16_t)~ests;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",166
+0000014D 9B89                    		MOV.W 1EH[R0], R1
+0000014F 7E01                    		NOT R1
+00000151 AA02                    		MOV.L 20H[R0], R2
+00000153 A8A2                    		MOV.L 08H[R2], R2
+00000155 D72125                  		MOV.W R1, 4AH[R2]
+00000158                         L46:	; bb179.split
+                                 ;     167         ptr->keyword = USB_INT_BEMP;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",167
+00000158 AA01                    		MOV.L 20H[R0], R1
+0000015A 3D1302                  		MOV.W #0002H, 06H[R1]
+0000015D                         L47:	; bb179.split20
+                                 ;     168         ptr->status  = ests;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",168
+0000015D 9B89                    		MOV.W 1EH[R0], R1
+0000015F AA02                    		MOV.L 20H[R0], R2
+00000161 9421                    		MOV.W R1, 20H[R2]
+00000163 6709                    		RTSD #24H
+00000165                         L48:	; bb195
+                                 ;     169     }
+                                 ;     170     else if( (ists0 & USB_NRDY) == USB_NRDY )       /***** EP0-7 NRDY *****/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",170
+00000165 B889                    		MOVU.W 06H[R0], R1
+00000167 76210002                		AND #0200H, R1
+0000016B 76010002                		CMP #0200H, R1
+0000016F 21rr                    		BNE L52
+00000171                         L49:	; bb196
+                                 ;     171     {
+                                 ;     172         ptr->ipp->NRDYSTS.WORD = (uint16_t)~nsts;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",172
+00000171 9B01                    		MOV.W 18H[R0], R1
+00000173 7E01                    		NOT R1
+00000175 AA02                    		MOV.L 20H[R0], R2
+00000177 A8A2                    		MOV.L 08H[R2], R2
+00000179 D72124                  		MOV.W R1, 48H[R2]
+0000017C                         L50:	; bb196.split
+                                 ;     173         ptr->keyword = USB_INT_NRDY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",173
+0000017C AA01                    		MOV.L 20H[R0], R1
+0000017E 3D1303                  		MOV.W #0003H, 06H[R1]
+00000181                         L51:	; bb196.split21
+                                 ;     174         ptr->status  = nsts;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",174
+00000181 9B01                    		MOV.W 18H[R0], R1
+00000183 AA02                    		MOV.L 20H[R0], R2
+00000185 9421                    		MOV.W R1, 20H[R2]
+00000187 6709                    		RTSD #24H
+00000189                         L52:	; bb212
+                                 ;     175     }
+                                 ;     176 
+                                 ;     177     /***** Processing rootport0 *****/
+                                 ;     178     else if( (ists1 & USB_OVRCR) == USB_OVRCR )     /***** OVER CURRENT *****/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",178
+00000189 B981                    		MOVU.W 0CH[R0], R1
+0000018B 7721008000              		AND #8000H, R1
+00000190 7701008000              		CMP #8000H, R1
+00000195 21rr                    		BNE L55
+00000197                         L53:	; bb213
+                                 ;     179     {
+                                 ;     180         /* OVRCR Clear */
+                                 ;     181         ptr->ipp->INTSTS1.WORD = (uint16_t)~USB_OVRCR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",181
+00000197 AA01                    		MOV.L 20H[R0], R1
+00000199 A891                    		MOV.L 08H[R1], R1
+0000019B F91921FF7F              		MOV.W #7FFFH, 42H[R1]
+000001A0                         L54:	; bb213.split
+                                 ;     182         ptr->keyword = USB_INT_OVRCR0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",182
+000001A0 AA01                    		MOV.L 20H[R0], R1
+000001A2 3D1341                  		MOV.W #0041H, 06H[R1]
+000001A5 6709                    		RTSD #24H
+000001A7                         L55:	; bb223
+                                 ;     183     }
+                                 ;     184     else if( (ists1 & USB_ATTCH) == USB_ATTCH )     /***** ATTCH INT *****/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",184
+000001A7 B981                    		MOVU.W 0CH[R0], R1
+000001A9 76210008                		AND #0800H, R1
+000001AD 76010008                		CMP #0800H, R1
+000001B1 21rr                    		BNE L58
+000001B3                         L56:	; bb224
+                                 ;     185     {
+                                 ;     186         /* DTCH  interrupt disable */
+                                 ;     187         usb_hstd_BusIntDisable(ptr, (uint16_t)USB_PORT0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",187
+000001B3 AA01                    		MOV.L 20H[R0], R1
+000001B5 6602                    		MOV.L #00000000H, R2
+000001B7 05rrrrrr             A  		BSR _usb_hstd_BusIntDisable
+000001BB                         L57:	; bb224.split
+                                 ;     188         ptr->keyword = USB_INT_ATTCH0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",188
+000001BB AA01                    		MOV.L 20H[R0], R1
+000001BD 3D1344                  		MOV.W #0044H, 06H[R1]
+000001C0 6709                    		RTSD #24H
+000001C2                         L58:	; bb229
+                                 ;     189     }
+                                 ;     190     else if( (ists1 & USB_EOFERR) == USB_EOFERR )   /***** EOFERR INT *****/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",190
+000001C2 B981                    		MOVU.W 0CH[R0], R1
+000001C4 752140                  		AND #40H, R1
+000001C7 755140                  		CMP #40H, R1
+000001CA 21rr                    		BNE L61
+000001CC                         L59:	; bb230
+                                 ;     191     {
+                                 ;     192         /* EOFERR Clear */
+                                 ;     193         ptr->ipp->INTSTS1.WORD = (uint16_t)~USB_EOFERR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",193
+000001CC AA01                    		MOV.L 20H[R0], R1
+000001CE A891                    		MOV.L 08H[R1], R1
+000001D0 F91921BFFF              		MOV.W #0FFBFH, 42H[R1]
+000001D5                         L60:	; bb230.split
+                                 ;     194         ptr->keyword = USB_INT_EOFERR0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",194
+000001D5 AA01                    		MOV.L 20H[R0], R1
+000001D7 3D1345                  		MOV.W #0045H, 06H[R1]
+000001DA 6709                    		RTSD #24H
+000001DC                         L61:	; bb240
+                                 ;     195     }
+                                 ;     196     else if( (ists1 & USB_BCHG) == USB_BCHG )       /***** BCHG INT *****/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",196
+000001DC B981                    		MOVU.W 0CH[R0], R1
+000001DE 76210040                		AND #4000H, R1
+000001E2 76010040                		CMP #4000H, R1
+000001E6 21rr                    		BNE L64
+000001E8                         L62:	; bb241
+                                 ;     197     {
+                                 ;     198         /* BCHG  interrupt disable */
+                                 ;     199         usb_hstd_BchgDisable(ptr, (uint16_t)USB_PORT0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",199
+000001E8 AA01                    		MOV.L 20H[R0], R1
+000001EA 6602                    		MOV.L #00000000H, R2
+000001EC 05rrrrrr             A  		BSR _usb_hstd_BchgDisable
+000001F0                         L63:	; bb241.split
+                                 ;     200         ptr->keyword = USB_INT_BCHG0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",200
+000001F0 AA01                    		MOV.L 20H[R0], R1
+000001F2 3D1342                  		MOV.W #0042H, 06H[R1]
+000001F5 6709                    		RTSD #24H
+000001F7                         L64:	; bb246
+                                 ;     201     }
+                                 ;     202     else if( (ists1 & USB_DTCH) == USB_DTCH )       /***** DETACH *****/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",202
+000001F7 B981                    		MOVU.W 0CH[R0], R1
+000001F9 76210010                		AND #1000H, R1
+000001FD 76010010                		CMP #1000H, R1
+00000201 21rr                    		BNE L67
+00000203                         L65:	; bb247
+                                 ;     203     {
+                                 ;     204         /* DTCH  interrupt disable */
+                                 ;     205         usb_hstd_BusIntDisable(ptr, (uint16_t)USB_PORT0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",205
+00000203 AA01                    		MOV.L 20H[R0], R1
+00000205 6602                    		MOV.L #00000000H, R2
+00000207 05rrrrrr             A  		BSR _usb_hstd_BusIntDisable
+0000020B                         L66:	; bb247.split
+                                 ;     206         ptr->keyword = USB_INT_DTCH0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",206
+0000020B AA01                    		MOV.L 20H[R0], R1
+0000020D 3D1343                  		MOV.W #0043H, 06H[R1]
+00000210 6709                    		RTSD #24H
+00000212                         L67:	; bb252
+                                 ;     207     }
+                                 ;     208 #ifdef USB_HOST_BC_ENABLE
+                                 ;     209     else if( (ists1 & USB_PDDETINT) == USB_PDDETINT )        /***** PDDETINT INT *****/
+                                 ;     210     {
+                                 ;     211         if(ptr -> ip == USB_USBIP_1)
+                                 ;     212         {
+                                 ;     213             /* PDDETINT  interrupt disable */
+                                 ;     214             ptr->ipp1->INTSTS1.WORD = (uint16_t)~USB_PDDETINT;
+                                 ;     215             ptr->keyword = USB_INT_PDDETINT0;
+                                 ;     216         }
+                                 ;     217     }
+                                 ;     218 #endif
+                                 ;     219     /***** Processing VBUS/SOF *****/
+                                 ;     220     else if( (ists0 & USB_VBINT) == USB_VBINT )     /***** VBUS change *****/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",220
+00000212 B889                    		MOVU.W 06H[R0], R1
+00000214 7721008000              		AND #8000H, R1
+00000219 7701008000              		CMP #8000H, R1
+0000021E 21rr                    		BNE L70
+00000220                         L68:	; bb253
+                                 ;     221     {
+                                 ;     222         /* Status Clear */
+                                 ;     223         ptr->ipp->INTSTS0.WORD = (uint16_t)~USB_VBINT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",223
+00000220 AA01                    		MOV.L 20H[R0], R1
+00000222 A891                    		MOV.L 08H[R1], R1
+00000224 F91920FF7F              		MOV.W #7FFFH, 40H[R1]
+00000229                         L69:	; bb253.split
+                                 ;     224         ptr->keyword = USB_INT_VBINT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",224
+00000229 AA01                    		MOV.L 20H[R0], R1
+0000022B 3D1311                  		MOV.W #0011H, 06H[R1]
+0000022E 6709                    		RTSD #24H
+00000230                         L70:	; bb263
+                                 ;     225     }
+                                 ;     226     else if( (ists0 & USB_SOFR) == USB_SOFR )       /***** SOFR change *****/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",226
+00000230 B889                    		MOVU.W 06H[R0], R1
+00000232 76210020                		AND #2000H, R1
+00000236 76010020                		CMP #2000H, R1
+0000023A 21rr                    		BNE L73
+0000023C                         L71:	; bb264
+                                 ;     227     {
+                                 ;     228         /* SOFR Clear */
+                                 ;     229         ptr->ipp->INTSTS0.WORD = (uint16_t)~USB_SOFR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",229
+0000023C AA01                    		MOV.L 20H[R0], R1
+0000023E A891                    		MOV.L 08H[R1], R1
+00000240 F91920FFDF              		MOV.W #0DFFFH, 40H[R1]
+00000245                         L72:	; bb264.split
+                                 ;     230         ptr->keyword = USB_INT_SOFR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",230
+00000245 AA01                    		MOV.L 20H[R0], R1
+00000247 3D1313                  		MOV.W #0013H, 06H[R1]
+0000024A 6709                    		RTSD #24H
+0000024C                         L73:	; return
+                                 ;     231     }
+                                 ;     232 
+                                 ;     233     else
+                                 ;     234     {
+                                 ;     235     }
+                                 ;     236 } /* eof of usb_hstd_InterruptHandler */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",236
+0000024C 6709                    		RTSD #24H
+0000024E                         _usb_hstd_ChkAttach:
+                                 		.STACK	_usb_hstd_ChkAttach=20
+                                 ;     237 
+                                 ;     238 /******************************************************************************
+                                 ;     239 Function Name   : usb_hstd_ChkAttach
+                                 ;     240 Description     : Checks whether USB Device is attached or not and return USB speed
+                                 ;     241                 : of USB Device
+                                 ;     242 Arguments       : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;     243                 : uint16_t port    ; port number
+                                 ;     244 Return value    : uint16_t         ; connection status
+                                 ;     245                 :                  ; (USB_ATTACHF/USB_ATTACHL/USB_DETACH/USB_DONE)
+                                 ;     246 Note            : Please change for your SYSTEM
+                                 ;     247 ******************************************************************************/
+                                 ;     248 uint16_t usb_hstd_ChkAttach(USB_UTR_t *ptr, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",248
+0000024E 7100F0                  		ADD #0FFFFFFF0H, R0
+00000251 A089                    		MOV.L R1, 0CH[R0]
+00000253 910A                    		MOV.W R2, 0AH[R0]
+                                 ;     249 {
+                                 ;     250     uint16_t    buf[3];
+                                 ;     251 
+                                 ;     252     usb_hstd_ReadLnst(ptr, port, buf);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",252
+00000255 B90A                    		MOVU.W 0AH[R0], R2
+00000257 A889                    		MOV.L 0CH[R0], R1
+00000259 710302                  		ADD #02H, R0, R3
+0000025C 39rrrr               W  		BSR _usb_hstd_ReadLnst
+0000025F                         L75:	; entry.split
+0000025F 667E                    		MOV.L #00000007H, R14
+                                 ;     253 
+                                 ;     254     if( (uint16_t)(buf[1] & USB_RHST) == USB_UNDECID )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",254
+00000261 06E10C0E02              		TST 04H[R0].UW, R14
+00000266 21rr                    		BNE L83
+00000268                         L76:	; bb8
+                                 ;     255     {
+                                 ;     256         if( (buf[0] & USB_LNST) == USB_FS_JSTS )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",256
+00000268 B809                    		MOVU.W 02H[R0], R1
+0000026A 6431                    		AND #03H, R1
+0000026C 6111                    		CMP #01H, R1
+0000026E 21rr                    		BNE L79
+00000270                         L77:	; bb9
+                                 ;     257         {
+                                 ;     258             /* High/Full speed device */
+                                 ;     259             USB_PRINTF0(" Detect FS-J\n");
+                                 ;     260             usb_cstd_SetHse(ptr, port, usb_gcstd_HsEnable[ptr->ip]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",260
+00000270 A889                    		MOV.L 0CH[R0], R1
+00000272 B992                    		MOVU.W 0CH[R1], R2
+00000274 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_HsEnable, R14
+0000027A FED2E3                  		MOVU.W [R2,R14], R3
+0000027D B90A                    		MOVU.W 0AH[R0], R2
+0000027F 05rrrrrr             A  		BSR _usb_cstd_SetHse
+00000283                         L78:	; bb9.split
+                                 ;     261             return USB_ATTACHF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",261
+00000283 F80542                  		MOV.W #0042H, [R0]
+00000286 2Err                 B  		BRA L84
+00000288                         L79:	; bb20
+                                 ;     262         }
+                                 ;     263         else if( (buf[0] & USB_LNST) == USB_LS_JSTS )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",263
+00000288 B809                    		MOVU.W 02H[R0], R1
+0000028A 6431                    		AND #03H, R1
+0000028C 6121                    		CMP #02H, R1
+0000028E 21rr                    		BNE L82
+00000290                         L80:	; bb21
+                                 ;     264         {
+                                 ;     265             /* Low speed device */
+                                 ;     266             USB_PRINTF0(" Attach LS device\n");
+                                 ;     267             usb_cstd_SetHse(ptr, port, USB_HS_DISABLE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",267
+00000290 B90A                    		MOVU.W 0AH[R0], R2
+00000292 A889                    		MOV.L 0CH[R0], R1
+00000294 6603                    		MOV.L #00000000H, R3
+00000296 05rrrrrr             A  		BSR _usb_cstd_SetHse
+0000029A                         L81:	; bb21.split
+                                 ;     268             return USB_ATTACHL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",268
+0000029A F80541                  		MOV.W #0041H, [R0]
+0000029D 08                   S  		BRA L84
+0000029E                         L82:	; bb26.split
+                                 ;     269         }
+                                 ;     270         else if( (buf[0] & USB_LNST) == USB_SE0 )
+                                 ;     271         {
+                                 ;     272             USB_PRINTF0(" Detach device\n");
+                                 ;     273         }
+                                 ;     274         else
+                                 ;     275         {
+                                 ;     276             USB_PRINTF0(" Attach unknown speed device\n");
+                                 ;     277         }
+                                 ;     278     }
+                                 ;     279     else
+                                 ;     280     {
+                                 ;     281         USB_PRINTF0(" Already device attached\n");
+                                 ;     282         return USB_DONE;
+                                 ;     283     }
+                                 ;     284     return USB_DETACH;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",284
+0000029E F80543                  		MOV.W #0043H, [R0]
+000002A1 08                   S  		BRA L84
+000002A2                         L83:	; bb55
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",282
+000002A2 F80500                  		MOV.W #0000H, [R0]
+000002A5                         L84:	; bb69
+000002A5 D40004                  		MOV.W [R0], 08H[R0]
+                                 ;     285 } /* eof of usb_hstd_ChkAttach */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",285
+000002A8 B901                    		MOVU.W 08H[R0], R1
+000002AA 6704                    		RTSD #10H
+000002AC                         _usb_hstd_ChkClk:
+                                 		.STACK	_usb_hstd_ChkClk=16
+                                 ;     286 
+                                 ;     287 /******************************************************************************
+                                 ;     288 Function Name   : usb_hstd_ChkClk
+                                 ;     289 Description     : Checks SOF sending setting when USB Device is detached or suspended
+                                 ;     290                 : , BCHG interrupt enable setting and clock stop processing
+                                 ;     291 Arguments       : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;     292                 : uint16_t port    ; port number
+                                 ;     293                 : uint16_t event   ; device state
+                                 ;     294 Return value    : none
+                                 ;     295 ******************************************************************************/
+                                 ;     296 void usb_hstd_ChkClk(USB_UTR_t *ptr, uint16_t port, uint16_t event)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",296
+000002AC 60C0                    		SUB #0CH, R0
+000002AE A081                    		MOV.L R1, 08H[R0]
+000002B0 908A                    		MOV.W R2, 06H[R0]
+000002B2 9083                    		MOV.W R3, 04H[R0]
+                                 ;     297 {
+                                 ;     298 
+                                 ;     299     if( (usb_ghstd_MgrMode[ptr->ip][USB_PORT0] == USB_DETACHED) 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",299
+000002B4 A881                    		MOV.L 08H[R0], R1
+000002B6 B991                    		MOVU.W 0CH[R1], R1
+000002B8 6C21                    		SHLL #02H, R1
+000002BA FBE2rrrrrrrr            		MOV.L #_usb_ghstd_MgrMode, R14
+000002C0 4B1E                    		ADD R1, R14
+000002C2 5CEE                    		MOVU.W [R14], R14
+000002C4 61AE                    		CMP #0AH, R14
+000002C6 20rr                    		BEQ L90
+000002C8 2Err                 B  		BRA L89
+000002CA                         L86:	; bb4
+                                 ;     300         || (usb_ghstd_MgrMode[ptr->ip][USB_PORT0] == USB_SUSPENDED) )
+                                 ;     301     {
+                                 ;     302         usb_hstd_ChkSof( ptr, (uint16_t)USB_PORT0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",302
+000002CA A881                    		MOV.L 08H[R0], R1
+000002CC 6602                    		MOV.L #00000000H, R2
+000002CE 39rrrr               W  		BSR _usb_hstd_ChkSof
+000002D1                         L87:	; bb4.split
+                                 ;     303         /* Enable port BCHG interrupt */
+                                 ;     304         usb_hstd_BchgEnable( ptr, (uint16_t)USB_PORT0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",304
+000002D1 A881                    		MOV.L 08H[R0], R1
+000002D3 6602                    		MOV.L #00000000H, R2
+000002D5 05rrrrrr             A  		BSR _usb_hstd_BchgEnable
+000002D9                         L88:	; bb4.split1
+                                 ;     305         usb_cstd_StopClock( ptr );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",305
+000002D9 A881                    		MOV.L 08H[R0], R1
+000002DB 05rrrrrr             A  		BSR _usb_cstd_StopClock
+000002DF 6703                    		RTSD #0CH
+000002E1                         L89:	; bb18
+000002E1 A881                    		MOV.L 08H[R0], R1
+000002E3 B991                    		MOVU.W 0CH[R1], R1
+000002E5 6C21                    		SHLL #02H, R1
+000002E7 FBE2rrrrrrrr            		MOV.L #_usb_ghstd_MgrMode, R14
+000002ED 4B1E                    		ADD R1, R14
+000002EF 5CEE                    		MOVU.W [R14], R14
+000002F1 755E50                  		CMP #50H, R14
+000002F4 18                   S  		BNE L91
+000002F5                         L90:	; bb30
+000002F5 F80601                  		MOV.L #00000001H, [R0]
+000002F8 08                   S  		BRA L92
+000002F9                         L91:	; bb31
+000002F9 F80600                  		MOV.L #00000000H, [R0]
+000002FC                         L92:	; bb32
+000002FC EC01                    		MOV.L [R0], R1
+000002FE 6101                    		CMP #00H, R1
+00000300 21rr                    		BNE L86
+00000302                         L93:	; return
+                                 ;     306     }
+                                 ;     307 
+                                 ;     308 } /* eof of usb_hstd_ChkClk */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",308
+00000302 6703                    		RTSD #0CH
+00000304                         _usb_hstd_DetachProcess:
+                                 		.STACK	_usb_hstd_DetachProcess=20
+                                 ;     309 
+                                 ;     310 /******************************************************************************
+                                 ;     311 Function Name   : usb_hstd_DetachProcess
+                                 ;     312 Description     : Handles the require processing when USB device is detached
+                                 ;     313                 : (Data transfer forcibly termination processing to the connected USB Device,
+                                 ;     314                 : the clock supply stop setting and the USB interrupt dissable setteing etc)
+                                 ;     315 Arguments       : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;     316                 : uint16_t port    ; port number
+                                 ;     317 Return value    : none
+                                 ;     318 ******************************************************************************/
+                                 ;     319 void usb_hstd_DetachProcess(USB_UTR_t *ptr, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",319
+00000304 7100F0                  		ADD #0FFFFFFF0H, R0
+00000307 A089                    		MOV.L R1, 0CH[R0]
+00000309 910A                    		MOV.W R2, 0AH[R0]
+                                 ;     320 {
+                                 ;     321     uint16_t        connect_inf, md, i, addr;
+                                 ;     322 
+                                 ;     323     /* ATTCH interrupt disable */
+                                 ;     324     usb_hstd_AttchDisable( ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",324
+0000030B B90A                    		MOVU.W 0AH[R0], R2
+0000030D A889                    		MOV.L 0CH[R0], R1
+0000030F 05rrrrrr             A  		BSR _usb_hstd_AttchDisable
+00000313                         L95:	; entry.split
+                                 ;     325     /* DTCH  interrupt disable */
+                                 ;     326     usb_hstd_DtchDisable( ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",326
+00000313 B90A                    		MOVU.W 0AH[R0], R2
+00000315 A889                    		MOV.L 0CH[R0], R1
+00000317 05rrrrrr             A  		BSR _usb_hstd_DtchDisable
+0000031B                         L96:	; entry.split1
+                                 ;     327     usb_hstd_BchgDisable( ptr, (uint16_t)USB_PORT0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",327
+0000031B A889                    		MOV.L 0CH[R0], R1
+0000031D 6602                    		MOV.L #00000000H, R2
+0000031F 05rrrrrr             A  		BSR _usb_hstd_BchgDisable
+00000323                         L97:	; entry.split2
+                                 ;     328 
+                                 ;     329     for( md = 1u; md < (USB_MAXDEVADDR + 1u); md++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",329
+00000323 3D0201                  		MOV.W #0001H, 04H[R0]
+00000326 38rrrr               W  		BRA L112
+00000329                         L98:	; bb
+                                 ;     330     {
+                                 ;     331         addr = (uint16_t)(md << USB_DEVADDRBIT);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",331
+00000329 9881                    		MOV.W 04H[R0], R1
+0000032B 6CC1                    		SHLL #0CH, R1
+0000032D 9101                    		MOV.W R1, 08H[R0]
+0000032F                         L99:	; bb.split
+                                 ;     332         if( usb_hstd_ChkDevAddr(ptr, addr, port) != USB_NOCONNECT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",332
+0000032F B90B                    		MOVU.W 0AH[R0], R3
+00000331 B902                    		MOVU.W 08H[R0], R2
+00000333 A889                    		MOV.L 0CH[R0], R1
+00000335 05rrrrrr             A  		BSR _usb_hstd_ChkDevAddr
+00000339 6101                    		CMP #00H, R1
+0000033B 20rr                    		BEQ L111
+0000033D                         L100:	; bb17
+                                 ;     333         {
+                                 ;     334             if( usb_ghstd_Ctsq[ptr->ip] != USB_IDLEST )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",334
+0000033D A889                    		MOV.L 0CH[R0], R1
+0000033F B991                    		MOVU.W 0CH[R1], R1
+00000341 FBE2rrrrrrrr            		MOV.L #_usb_ghstd_Ctsq, R14
+00000347 FED1EE                  		MOVU.W [R1,R14], R14
+0000034A 610E                    		CMP #00H, R14
+0000034C 10                   S  		BEQ L102
+0000034D                         L101:	; bb18
+                                 ;     335             {
+                                 ;     336                 /* Control Read/Write End */
+                                 ;     337                 usb_hstd_ControlEnd(ptr, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",337
+0000034D A889                    		MOV.L 0CH[R0], R1
+0000034F 6672                    		MOV.L #00000007H, R2
+00000351 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+00000355                         L102:	; bb29
+                                 ;     338             }
+                                 ;     339             for( i = USB_MIN_PIPE_NO; i <= USB_MAX_PIPE_NO; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",339
+00000355 3D0301                  		MOV.W #0001H, 06H[R0]
+00000358 2Err                 B  		BRA L108
+0000035A                         L103:	; bb31
+                                 ;     340             {
+                                 ;     341                 /* Not control transfer */
+                                 ;     342                 /* Agreement device address */
+                                 ;     343                 if( usb_cstd_GetDevsel(ptr, i) == addr )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",343
+0000035A B88A                    		MOVU.W 06H[R0], R2
+0000035C 05rrrrrr             A  		BSR _usb_cstd_GetDevsel
+00000360 06C50104                		CMP 08H[R0].UW, R1
+00000364 21rr                    		BNE L107
+00000366                         L104:	; bb33
+                                 ;     344                 {
+                                 ;     345                     /* PID=BUF ? */
+                                 ;     346                     if( usb_cstd_GetPid(ptr, i) == USB_PID_BUF )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",346
+00000366 B88A                    		MOVU.W 06H[R0], R2
+00000368 A889                    		MOV.L 0CH[R0], R1
+0000036A 05rrrrrr             A  		BSR _usb_cstd_GetPid
+0000036E 6111                    		CMP #01H, R1
+00000370 21rr                    		BNE L106
+00000372                         L105:	; bb34
+                                 ;     347                     {
+                                 ;     348                         /* End of data transfer (IN/OUT) */
+                                 ;     349                         usb_cstd_ForcedTermination(ptr, i, (uint16_t)USB_DATA_STOP);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",349
+00000372 B88A                    		MOVU.W 06H[R0], R2
+00000374 A889                    		MOV.L 0CH[R0], R1
+00000376 6683                    		MOV.L #00000008H, R3
+00000378 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+0000037C                         L106:	; bb44
+                                 ;     350                     }
+                                 ;     351                     usb_cstd_ClrPipeCnfg(ptr, i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",351
+0000037C B88A                    		MOVU.W 06H[R0], R2
+0000037E A889                    		MOV.L 0CH[R0], R1
+00000380 05rrrrrr             A  		BSR _usb_cstd_ClrPipeCnfg
+00000384                         L107:	; bb56
+00000384 9889                    		MOV.W 06H[R0], R1
+00000386 6211                    		ADD #01H, R1
+00000388 9089                    		MOV.W R1, 06H[R0]
+0000038A                         L108:	; bb59
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",339
+0000038A B889                    		MOVU.W 06H[R0], R1
+0000038C 61A1                    		CMP #0AH, R1
+0000038E A889                    		MOV.L 0CH[R0], R1
+00000390 23rr                    		BLTU L103
+00000392                         L109:	; bb65
+                                 ;     352                 }
+                                 ;     353             }
+                                 ;     354             usb_hstd_SetDevAddr(ptr, addr, USB_DONE, USB_DONE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",354
+00000392 B902                    		MOVU.W 08H[R0], R2
+00000394 6603                    		MOV.L #00000000H, R3
+00000396 EF34                    		MOV.L R3, R4
+00000398 05rrrrrr             A  		BSR _usb_hstd_SetDevAddr
+0000039C                         L110:	; bb65.split
+                                 ;     355             usb_hstd_SetHubPort(ptr, addr, USB_DONE, USB_DONE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",355
+0000039C B902                    		MOVU.W 08H[R0], R2
+0000039E A889                    		MOV.L 0CH[R0], R1
+000003A0 6603                    		MOV.L #00000000H, R3
+000003A2 EF34                    		MOV.L R3, R4
+000003A4 39rrrr               W  		BSR _usb_hstd_SetHubPort
+000003A7                         L111:	; bb78
+000003A7 9881                    		MOV.W 04H[R0], R1
+000003A9 6211                    		ADD #01H, R1
+000003AB 9081                    		MOV.W R1, 04H[R0]
+000003AD                         L112:	; bb81
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",329
+000003AD B881                    		MOVU.W 04H[R0], R1
+000003AF 61B1                    		CMP #0BH, R1
+000003B1 22rr                  * 		BLTU L98
+         38rrrr                  
+000003B6                         L113:	; bb87
+                                 ;     356             USB_PRINTF1("*** Device address %d clear.\n",md);
+                                 ;     357         }
+                                 ;     358     }
+                                 ;     359     /* Decide USB Line state (ATTACH) */
+                                 ;     360     connect_inf = usb_hstd_ChkAttach(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",360
+000003B6 B90A                    		MOVU.W 0AH[R0], R2
+000003B8 A889                    		MOV.L 0CH[R0], R1
+000003BA 39rrrr               W  		BSR _usb_hstd_ChkAttach
+000003BD 9009                    		MOV.W R1, 02H[R0]
+000003BF                         L114:	; bb87.split
+                                 ;     361     switch( connect_inf )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",361
+000003BF B809                    		MOVU.W 02H[R0], R1
+000003C1 755143                  		CMP #43H, R1
+000003C4 20rr                    		BEQ L119
+000003C6                         L115:	; bb87.split
+000003C6 755142                  		CMP #42H, R1
+000003C9 20rr                    		BEQ L118
+000003CB                         L116:	; bb87.split
+000003CB 755141                  		CMP #41H, R1
+000003CE 21rr                    		BNE L121
+000003D0                         L117:	; bb93
+                                 ;     362     {
+                                 ;     363     case USB_ATTACHL:
+                                 ;     364         usb_hstd_Attach(ptr, connect_inf, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",364
+000003D0 B90B                    		MOVU.W 0AH[R0], R3
+000003D2 B80A                    		MOVU.W 02H[R0], R2
+000003D4 A889                    		MOV.L 0CH[R0], R1
+000003D6 05rrrrrr             A  		BSR _usb_hstd_Attach
+000003DA 6704                    		RTSD #10H
+000003DC                         L118:	; bb97
+                                 ;     365         break;
+                                 ;     366     case USB_ATTACHF:
+                                 ;     367         usb_hstd_Attach(ptr, connect_inf, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",367
+000003DC B90B                    		MOVU.W 0AH[R0], R3
+000003DE B80A                    		MOVU.W 02H[R0], R2
+000003E0 A889                    		MOV.L 0CH[R0], R1
+000003E2 05rrrrrr             A  		BSR _usb_hstd_Attach
+000003E6 6704                    		RTSD #10H
+000003E8                         L119:	; bb101
+                                 ;     368         break;
+                                 ;     369     case USB_DETACH:
+                                 ;     370         /* USB detach */
+                                 ;     371         usb_hstd_Detach(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",371
+000003E8 B90A                    		MOVU.W 0AH[R0], R2
+000003EA A889                    		MOV.L 0CH[R0], R1
+000003EC 05rrrrrr             A  		BSR _usb_hstd_Detach
+000003F0                         L120:	; bb101.split
+                                 ;     372         /* Check clock */
+                                 ;     373         usb_hstd_ChkClk(ptr, port, (uint16_t)USB_DETACHED);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",373
+000003F0 B90A                    		MOVU.W 0AH[R0], R2
+000003F2 A889                    		MOV.L 0CH[R0], R1
+000003F4 66A3                    		MOV.L #0000000AH, R3
+000003F6 39rrrr               W  		BSR _usb_hstd_ChkClk
+000003F9 6704                    		RTSD #10H
+000003FB                         L121:	; bb106
+                                 ;     374         break;
+                                 ;     375     default:
+                                 ;     376         /* USB detach */
+                                 ;     377         usb_hstd_Detach(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",377
+000003FB B90A                    		MOVU.W 0AH[R0], R2
+000003FD A889                    		MOV.L 0CH[R0], R1
+000003FF 05rrrrrr             A  		BSR _usb_hstd_Detach
+00000403                         L122:	; bb106.split
+                                 ;     378         /* Check clock */
+                                 ;     379         usb_hstd_ChkClk(ptr, port, (uint16_t)USB_DETACHED);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",379
+00000403 B90A                    		MOVU.W 0AH[R0], R2
+00000405 A889                    		MOV.L 0CH[R0], R1
+00000407 66A3                    		MOV.L #0000000AH, R3
+00000409 39rrrr               W  		BSR _usb_hstd_ChkClk
+0000040C 6704                    		RTSD #10H
+0000040E                         _usb_hstd_ReadLnst:
+                                 		.STACK	_usb_hstd_ReadLnst=20
+                                 ;     380         break;
+                                 ;     381     }
+                                 ;     382 } /* eof of usb_hstd_DetachProcess */
+                                 ;     383 
+                                 ;     384 /******************************************************************************
+                                 ;     385 Function Name   : usb_hstd_ReadLnst
+                                 ;     386 Description     : Reads LNST register two times, checks whether these values
+                                 ;     387                 : are equal and returns the value of DVSTCTR register that correspond to
+                                 ;     388                 : the port specified by 2nd argument.
+                                 ;     389 Arguments       : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;     390                 : uint16_t port    ; port number
+                                 ;     391                 : uint16_t *buf    ; Pointer to the buffer to store DVSTCTR register
+                                 ;     392 Return value    : none
+                                 ;     393 Note            : Please change for your SYSTEM
+                                 ;     394 ******************************************************************************/
+                                 ;     395 void usb_hstd_ReadLnst(USB_UTR_t *ptr, uint16_t port, uint16_t *buf)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",395
+0000040E 7EA6                    		PUSH.L R6
+00000410 60C0                    		SUB #0CH, R0
+00000412 A081                    		MOV.L R1, 08H[R0]
+00000414 908A                    		MOV.W R2, 06H[R0]
+00000416 E303                    		MOV.L R3, [R0]
+00000418                         L124:	; bb
+                                 ;     396 {
+                                 ;     397     do
+                                 ;     398     {
+                                 ;     399         buf[0] = usb_creg_read_syssts( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",399
+00000418 B88A                    		MOVU.W 06H[R0], R2
+0000041A A881                    		MOV.L 08H[R0], R1
+0000041C EC06                    		MOV.L [R0], R6
+0000041E 05rrrrrr             A  		BSR _usb_creg_read_syssts
+00000422 D361                    		MOV.W R1, [R6]
+00000424                         L125:	; bb.split
+00000424 75411E                  		MOV.L #0000001EH, R1
+                                 ;     400         /* 30ms wait */
+                                 ;     401         usb_cpu_DelayXms((uint16_t)30);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",401
+00000427 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+0000042B                         L126:	; bb.split1
+                                 ;     402         buf[1] = usb_creg_read_syssts( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",402
+0000042B B88A                    		MOVU.W 06H[R0], R2
+0000042D A881                    		MOV.L 08H[R0], R1
+0000042F EC06                    		MOV.L [R0], R6
+00000431 05rrrrrr             A  		BSR _usb_creg_read_syssts
+00000435 9069                    		MOV.W R1, 02H[R6]
+00000437                         L127:	; bb.split2
+                                 ;     403         if( (buf[0] & USB_LNST) == (buf[1] & USB_LNST) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",403
+00000437 EC01                    		MOV.L [R0], R1
+00000439 5C1E                    		MOVU.W [R1], R14
+0000043B 643E                    		AND #03H, R14
+0000043D B819                    		MOVU.W 02H[R1], R1
+0000043F 6431                    		AND #03H, R1
+00000441 471E                    		CMP R1, R14
+00000443 21rr                    		BNE L130
+00000445                         L128:	; bb14
+00000445 754114                  		MOV.L #00000014H, R1
+                                 ;     404         {
+                                 ;     405             /* 20ms wait */
+                                 ;     406             usb_cpu_DelayXms((uint16_t)20);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",406
+00000448 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+0000044C                         L129:	; bb14.split
+                                 ;     407             buf[1] = usb_creg_read_syssts( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",407
+0000044C B88A                    		MOVU.W 06H[R0], R2
+0000044E A881                    		MOV.L 08H[R0], R1
+00000450 EC06                    		MOV.L [R0], R6
+00000452 05rrrrrr             A  		BSR _usb_creg_read_syssts
+00000456 9069                    		MOV.W R1, 02H[R6]
+00000458                         L130:	; bb32
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",397
+00000458 EC01                    		MOV.L [R0], R1
+0000045A 5C1E                    		MOVU.W [R1], R14
+0000045C 643E                    		AND #03H, R14
+0000045E B819                    		MOVU.W 02H[R1], R1
+00000460 6431                    		AND #03H, R1
+00000462 471E                    		CMP R1, R14
+00000464 21rr                    		BNE L124
+00000466                         L131:	; bb46
+                                 ;     408         }
+                                 ;     409     }
+                                 ;     410     while( (buf[0] & USB_LNST) != (buf[1] & USB_LNST) );
+                                 ;     411     buf[1] = usb_creg_read_dvstctr( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",411
+00000466 B88A                    		MOVU.W 06H[R0], R2
+00000468 A881                    		MOV.L 08H[R0], R1
+0000046A EC06                    		MOV.L [R0], R6
+0000046C 05rrrrrr             A  		BSR _usb_creg_read_dvstctr
+00000470 9069                    		MOV.W R1, 02H[R6]
+00000472 3F6604                  		RTSD #10H, R6-R6
+00000475                         _usb_hstd_AttachProcess:
+                                 		.STACK	_usb_hstd_AttachProcess=12
+                                 ;     412 } /* eof of usb_hstd_ReadLnst */
+                                 ;     413 
+                                 ;     414 /******************************************************************************
+                                 ;     415 Function Name   : usb_hstd_AttachProcess
+                                 ;     416 Description     : Interrupt disable setting when USB Device is attached and
+                                 ;     417                 : handles the required interrupt disable setting etc when USB device
+                                 ;     418                 : is attached.
+                                 ;     419 Arguments       : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;     420                 : uint16_t port    ; port number
+                                 ;     421 Return value    : none
+                                 ;     422 Note            : Please change for your SYSTEM
+                                 ;     423 ******************************************************************************/
+                                 ;     424 void usb_hstd_AttachProcess(USB_UTR_t *ptr, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",424
+00000475 6080                    		SUB #08H, R0
+00000477 A009                    		MOV.L R1, 04H[R0]
+00000479 900A                    		MOV.W R2, 02H[R0]
+                                 ;     425 {
+                                 ;     426     uint16_t        connect_inf;
+                                 ;     427 
+                                 ;     428     /* ATTCH interrupt disable */
+                                 ;     429     usb_hstd_AttchDisable(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",429
+0000047B B80A                    		MOVU.W 02H[R0], R2
+0000047D A809                    		MOV.L 04H[R0], R1
+0000047F 05rrrrrr             A  		BSR _usb_hstd_AttchDisable
+00000483                         L133:	; entry.split
+                                 ;     430     /* DTCH  interrupt disable */
+                                 ;     431     usb_hstd_DtchDisable(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",431
+00000483 B80A                    		MOVU.W 02H[R0], R2
+00000485 A809                    		MOV.L 04H[R0], R1
+00000487 05rrrrrr             A  		BSR _usb_hstd_DtchDisable
+0000048B                         L134:	; entry.split1
+                                 ;     432     usb_hstd_BchgDisable(ptr, (uint16_t)USB_PORT0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",432
+0000048B A809                    		MOV.L 04H[R0], R1
+0000048D 6602                    		MOV.L #00000000H, R2
+0000048F 05rrrrrr             A  		BSR _usb_hstd_BchgDisable
+00000493                         L135:	; entry.split2
+                                 ;     433     /* Decide USB Line state (ATTACH) */
+                                 ;     434     connect_inf = usb_hstd_ChkAttach(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",434
+00000493 B80A                    		MOVU.W 02H[R0], R2
+00000495 A809                    		MOV.L 04H[R0], R1
+00000497 39rrrr               W  		BSR _usb_hstd_ChkAttach
+0000049A D301                    		MOV.W R1, [R0]
+0000049C                         L136:	; entry.split3
+                                 ;     435     switch( connect_inf )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",435
+0000049C 5C01                    		MOVU.W [R0], R1
+0000049E 755143                  		CMP #43H, R1
+000004A1 20rr                    		BEQ L141
+000004A3                         L137:	; entry.split3
+000004A3 755142                  		CMP #42H, R1
+000004A6 20rr                    		BEQ L140
+000004A8                         L138:	; entry.split3
+000004A8 755141                  		CMP #41H, R1
+000004AB 21rr                    		BNE L143
+000004AD                         L139:	; bb
+                                 ;     436     {
+                                 ;     437     case USB_ATTACHL:
+                                 ;     438         usb_hstd_Attach(ptr, connect_inf, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",438
+000004AD B80B                    		MOVU.W 02H[R0], R3
+000004AF 5C02                    		MOVU.W [R0], R2
+000004B1 A809                    		MOV.L 04H[R0], R1
+000004B3 05rrrrrr             A  		BSR _usb_hstd_Attach
+000004B7 6702                    		RTSD #08H
+000004B9                         L140:	; bb16
+                                 ;     439         break;
+                                 ;     440     case USB_ATTACHF:
+                                 ;     441         usb_hstd_Attach(ptr, connect_inf, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",441
+000004B9 B80B                    		MOVU.W 02H[R0], R3
+000004BB 5C02                    		MOVU.W [R0], R2
+000004BD A809                    		MOV.L 04H[R0], R1
+000004BF 05rrrrrr             A  		BSR _usb_hstd_Attach
+000004C3 6702                    		RTSD #08H
+000004C5                         L141:	; bb20
+                                 ;     442         break;
+                                 ;     443     case USB_DETACH:
+                                 ;     444         /* USB detach */
+                                 ;     445         usb_hstd_Detach(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",445
+000004C5 B80A                    		MOVU.W 02H[R0], R2
+000004C7 A809                    		MOV.L 04H[R0], R1
+000004C9 05rrrrrr             A  		BSR _usb_hstd_Detach
+000004CD                         L142:	; bb20.split
+                                 ;     446         /* Check clock */
+                                 ;     447         usb_hstd_ChkClk(ptr, port, (uint16_t)USB_DETACHED);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",447
+000004CD B80A                    		MOVU.W 02H[R0], R2
+000004CF A809                    		MOV.L 04H[R0], R1
+000004D1 66A3                    		MOV.L #0000000AH, R3
+000004D3 39rrrr               W  		BSR _usb_hstd_ChkClk
+000004D6 6702                    		RTSD #08H
+000004D8                         L143:	; bb25
+                                 ;     448         break;
+                                 ;     449     default:
+                                 ;     450         usb_hstd_Attach(ptr, (uint16_t)USB_ATTACHF, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",450
+000004D8 B80B                    		MOVU.W 02H[R0], R3
+000004DA A809                    		MOV.L 04H[R0], R1
+000004DC 754242                  		MOV.L #00000042H, R2
+000004DF 05rrrrrr             A  		BSR _usb_hstd_Attach
+000004E3 6702                    		RTSD #08H
+000004E5                         _usb_hstd_ChkSof:
+                                 		.STACK	_usb_hstd_ChkSof=12
+                                 ;     451         break;
+                                 ;     452     }
+                                 ;     453 } /* eof of usb_hstd_AttachProcess */
+                                 ;     454 
+                                 ;     455 /******************************************************************************
+                                 ;     456 Function Name   : usb_hstd_ChkSof
+                                 ;     457 Description     : Checks whether SOF is sended or not
+                                 ;     458 Arguments       : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;     459                 : uint16_t port    ; port number
+                                 ;     460 Return value    : none
+                                 ;     461 ******************************************************************************/
+                                 ;     462 void usb_hstd_ChkSof(USB_UTR_t *ptr, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",462
+000004E5 6080                    		SUB #08H, R0
+000004E7 A009                    		MOV.L R1, 04H[R0]
+000004E9 900A                    		MOV.W R2, 02H[R0]
+000004EB 6611                    		MOV.L #00000001H, R1
+                                 ;     463 {
+                                 ;     464 #if 0
+                                 ;     465     uint16_t    buf;
+                                 ;     466 
+                                 ;     467     do
+                                 ;     468     {
+                                 ;     469         /* Wait 640ns */
+                                 ;     470         usb_cpu_Delay1us((uint16_t)1);
+                                 ;     471 
+                                 ;     472         buf = usb_creg_read_syssts( ptr, port );
+                                 ;     473     }
+                                 ;     474     while( (uint16_t)(buf & USB_SOFEA) == USB_SOFEA );
+                                 ;     475 #endif
+                                 ;     476     usb_cpu_Delay1us((uint16_t)1);  /* Wait 640ns */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",476
+000004ED 05rrrrrr             A  		BSR _usb_cpu_Delay1us
+000004F1 6702                    		RTSD #08H
+000004F3                         _usb_hstd_BusReset:
+                                 		.STACK	_usb_hstd_BusReset=20
+                                 ;     477 } /* eof of usb_hstd_ChkSof */
+                                 ;     478 
+                                 ;     479 /******************************************************************************
+                                 ;     480 Function Name   : usb_hstd_BusReset
+                                 ;     481 Description     : Setting USB register when BUS Reset
+                                 ;     482 Arguments       : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;     483                 : uint16_t port    ; port number
+                                 ;     484 Return value    : none
+                                 ;     485 ******************************************************************************/
+                                 ;     486 void usb_hstd_BusReset(USB_UTR_t *ptr, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",486
+000004F3 7100F0                  		ADD #0FFFFFFF0H, R0
+000004F6 A089                    		MOV.L R1, 0CH[R0]
+000004F8 910A                    		MOV.W R2, 0AH[R0]
+                                 ;     487 {
+                                 ;     488     uint16_t        buf, i;
+                                 ;     489 
+                                 ;     490     /* USBRST=1, UACT=0 */
+                                 ;     491     usb_creg_rmw_dvstctr( ptr, port, USB_USBRST, (USB_USBRST | USB_UACT) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",491
+000004FA B90A                    		MOVU.W 0AH[R0], R2
+000004FC A889                    		MOV.L 0CH[R0], R1
+000004FE 754450                  		MOV.L #00000050H, R4
+00000501 754340                  		MOV.L #00000040H, R3
+00000504 05rrrrrr             A  		BSR _usb_creg_rmw_dvstctr
+00000508                         L146:	; entry.split
+00000508 754132                  		MOV.L #00000032H, R1
+                                 ;     492 
+                                 ;     493     /* Wait 50ms */
+                                 ;     494     usb_cpu_DelayXms((uint16_t)50);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",494
+0000050B 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+0000050F                         L147:	; entry.split1
+                                 ;     495     if(ptr->ip == USB_USBIP_1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",495
+0000050F A889                    		MOV.L 0CH[R0], R1
+00000511 B991                    		MOVU.W 0CH[R1], R1
+00000513 6111                    		CMP #01H, R1
+00000515 21rr                    		BNE L150
+00000517                         L148:	; bb6
+                                 ;     496     {
+                                 ;     497         /* USBRST=0 */
+                                 ;     498         usb_creg_clr_dvstctr( ptr, USB_PORT0, USB_USBRST ); //for UTMI
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",498
+00000517 A889                    		MOV.L 0CH[R0], R1
+00000519 754340                  		MOV.L #00000040H, R3
+0000051C 6602                    		MOV.L #00000000H, R2
+0000051E 05rrrrrr             A  		BSR _usb_creg_clr_dvstctr
+00000522                         L149:	; bb6.split
+00000522 FB1A2C01                		MOV.L #0000012CH, R1
+                                 ;     499         usb_cpu_Delay1us( 300 );                            //for UTMI
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",499
+00000526 05rrrrrr             A  		BSR _usb_cpu_Delay1us
+0000052A                         L150:	; bb14
+                                 ;     500     }
+                                 ;     501     /* USBRST=0, RESUME=0, UACT=1 */
+                                 ;     502     usb_hstd_SetUact(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",502
+0000052A B90A                    		MOVU.W 0AH[R0], R2
+0000052C A889                    		MOV.L 0CH[R0], R1
+0000052E 05rrrrrr             A  		BSR _usb_hstd_SetUact
+00000532                         L151:	; bb14.split
+00000532 754114                  		MOV.L #00000014H, R1
+                                 ;     503     /* Wait 10ms or more (USB reset recovery) */
+                                 ;     504     usb_cpu_DelayXms((uint16_t)20);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",504
+00000535 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+00000539                         L152:	; bb14.split2
+                                 ;     505     for( i = 0, buf = USB_HSPROC; (i < 3) && (buf == USB_HSPROC); ++i )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",505
+00000539 3D0400                  		MOV.W #0000H, 08H[R0]
+0000053C 3D0304                  		MOV.W #0004H, 06H[R0]
+0000053F 2Err                 B  		BRA L158
+00000541                         L153:	; bb19
+                                 ;     506     {
+                                 ;     507         /* DeviceStateControlRegister - ResetHandshakeStatusCheck */
+                                 ;     508         buf = usb_creg_read_dvstctr( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",508
+00000541 B90A                    		MOVU.W 0AH[R0], R2
+00000543 A889                    		MOV.L 0CH[R0], R1
+00000545 05rrrrrr             A  		BSR _usb_creg_read_dvstctr
+00000549 9089                    		MOV.W R1, 06H[R0]
+0000054B                         L154:	; bb19.split
+                                 ;     509         buf = (uint16_t)(buf & USB_RHST);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",509
+0000054B B889                    		MOVU.W 06H[R0], R1
+0000054D 6471                    		AND #07H, R1
+0000054F 9089                    		MOV.W R1, 06H[R0]
+00000551                         L155:	; bb19.split3
+                                 ;     510         if( buf == USB_HSPROC )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",510
+00000551 B889                    		MOVU.W 06H[R0], R1
+00000553 6141                    		CMP #04H, R1
+00000555 18                   S  		BNE L157
+00000556                         L156:	; bb28
+00000556 66A1                    		MOV.L #0000000AH, R1
+                                 ;     511         {
+                                 ;     512             /* Wait */
+                                 ;     513             usb_cpu_DelayXms((uint16_t)10);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",513
+00000558 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+0000055C                         L157:	; bb34
+0000055C 9901                    		MOV.W 08H[R0], R1
+0000055E 6211                    		ADD #01H, R1
+00000560 9101                    		MOV.W R1, 08H[R0]
+00000562                         L158:	; bb37
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",505
+00000562 B901                    		MOVU.W 08H[R0], R1
+00000564 6121                    		CMP #02H, R1
+00000566 2Arr                    		BGT L161
+00000568                         L159:	; bb42
+00000568 B889                    		MOVU.W 06H[R0], R1
+0000056A 6141                    		CMP #04H, R1
+0000056C 18                   S  		BNE L161
+0000056D                         L160:	; bb47
+0000056D F80601                  		MOV.L #00000001H, [R0]
+00000570 08                   S  		BRA L162
+00000571                         L161:	; bb48
+00000571 F80600                  		MOV.L #00000000H, [R0]
+00000574                         L162:	; bb49
+00000574 EC01                    		MOV.L [R0], R1
+00000576 6101                    		CMP #00H, R1
+00000578 21rr                    		BNE L153
+0000057A                         L163:	; bb54
+0000057A 75411E                  		MOV.L #0000001EH, R1
+                                 ;     514         }
+                                 ;     515     }
+                                 ;     516     /* 30ms wait */
+                                 ;     517     usb_cpu_DelayXms((uint16_t)30);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",517
+0000057D 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+00000581 6704                    		RTSD #10H
+00000583                         _usb_hstd_ResumeProcess:
+                                 		.STACK	_usb_hstd_ResumeProcess=12
+                                 ;     518 } /* eof of usb_hstd_BusReset */
+                                 ;     519 
+                                 ;     520 /******************************************************************************
+                                 ;     521 Function Name   : usb_hstd_ResumeProcess
+                                 ;     522 Description     : Setting USB register when RESUME signal is detected
+                                 ;     523 Arguments       : USB_UTR_t *ptr   ; USB system internal structure. Selects channel.
+                                 ;     524                 : uint16_t port    ; port number
+                                 ;     525 Return value    : none
+                                 ;     526 ******************************************************************************/
+                                 ;     527 void usb_hstd_ResumeProcess(USB_UTR_t *ptr, uint16_t port)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",527
+00000583 6080                    		SUB #08H, R0
+00000585 A009                    		MOV.L R1, 04H[R0]
+00000587 900A                    		MOV.W R2, 02H[R0]
+                                 ;     528 {
+                                 ;     529     usb_hstd_BchgDisable( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",529
+00000589 B80A                    		MOVU.W 02H[R0], R2
+0000058B A809                    		MOV.L 04H[R0], R1
+0000058D 05rrrrrr             A  		BSR _usb_hstd_BchgDisable
+00000591                         L165:	; entry.split
+                                 ;     530     /* RESUME=1, RWUPE=0 */
+                                 ;     531     usb_creg_rmw_dvstctr( ptr, port, USB_RESUME, (USB_RESUME | USB_RWUPE) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",531
+00000591 B80A                    		MOVU.W 02H[R0], R2
+00000593 A809                    		MOV.L 04H[R0], R1
+00000595 7544A0                  		MOV.L #000000A0H, R4
+00000598 754320                  		MOV.L #00000020H, R3
+0000059B 05rrrrrr             A  		BSR _usb_creg_rmw_dvstctr
+0000059F                         L166:	; entry.split1
+0000059F 754114                  		MOV.L #00000014H, R1
+                                 ;     532     /* Wait */
+                                 ;     533     usb_cpu_DelayXms((uint16_t)20);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",533
+000005A2 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+000005A6                         L167:	; entry.split2
+                                 ;     534     /* USBRST=0, RESUME=0, UACT=1 */
+                                 ;     535     usb_hstd_SetUact(ptr, port);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",535
+000005A6 B80A                    		MOVU.W 02H[R0], R2
+000005A8 A809                    		MOV.L 04H[R0], R1
+000005AA 05rrrrrr             A  		BSR _usb_hstd_SetUact
+000005AE                         L168:	; entry.split3
+000005AE 6651                    		MOV.L #00000005H, R1
+                                 ;     536     /* Wait */
+                                 ;     537     usb_cpu_DelayXms((uint16_t)5);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",537
+000005B0 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+000005B4 6702                    		RTSD #08H
+000005B6                         _usb_hstd_support_speed_check:
+                                 		.STACK	_usb_hstd_support_speed_check=16
+                                 ;     538 } /* eof of usb_hstd_ResumeProcess */
+                                 ;     539 
+                                 ;     540 /******************************************************************************
+                                 ;     541 Function Name   : usb_hstd_support_speed_check
+                                 ;     542 Description     : Get USB-speed of the specified port.
+                                 ;     543 Arguments       : USB_UTR_t *ptr : USB internal structure. Selects e.g. channel.
+                                 ;     544                 : uint16_t port  : Root port
+                                 ;     545 Return value    : uint16_t       : HSCONNECT : Hi-Speed
+                                 ;     546                 :                : FSCONNECT : Full-Speed
+                                 ;     547                 :                : LSCONNECT : Low-Speed
+                                 ;     548                 :                : NOCONNECT : not connect
+                                 ;     549 ******************************************************************************/
+                                 ;     550 uint16_t usb_hstd_support_speed_check( USB_UTR_t *ptr, uint16_t port )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",550
+000005B6 60C0                    		SUB #0CH, R0
+000005B8 A081                    		MOV.L R1, 08H[R0]
+000005BA 908A                    		MOV.W R2, 06H[R0]
+                                 ;     551 {
+                                 ;     552     uint16_t    buf, ConnInf;
+                                 ;     553 
+                                 ;     554     buf = usb_creg_read_dvstctr( ptr, port );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",554
+000005BC B88A                    		MOVU.W 06H[R0], R2
+000005BE A881                    		MOV.L 08H[R0], R1
+000005C0 05rrrrrr             A  		BSR _usb_creg_read_dvstctr
+000005C4 D301                    		MOV.W R1, [R0]
+000005C6                         L170:	; entry.split
+                                 ;     555 
+                                 ;     556     /* Reset handshake status get */
+                                 ;     557     buf = (uint16_t)(buf & USB_RHST);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",557
+000005C6 5C01                    		MOVU.W [R0], R1
+000005C8 6471                    		AND #07H, R1
+000005CA D301                    		MOV.W R1, [R0]
+000005CC                         L171:	; entry.split1
+                                 ;     558 
+                                 ;     559     switch( buf )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",559
+000005CC 5C01                    		MOVU.W [R0], R1
+000005CE 6111                    		CMP #01H, R1
+000005D0 20rr                    		BEQ L177
+000005D2                         L172:	; entry.split1
+000005D2 6121                    		CMP #02H, R1
+000005D4 20rr                    		BEQ L176
+000005D6                         L173:	; entry.split1
+000005D6 6141                    		CMP #04H, R1
+000005D8 20rr                    		BEQ L178
+000005DA                         L174:	; entry.split1
+000005DA 6131                    		CMP #03H, R1
+000005DC 21rr                    		BNE L179
+000005DE                         L175:	; bb
+                                 ;     560     {
+                                 ;     561     /* Get port speed */
+                                 ;     562     case USB_HSMODE:    ConnInf = USB_HSCONNECT;    break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",562
+000005DE 3D01C0                  		MOV.W #00C0H, 02H[R0]
+000005E1 2Err                 B  		BRA L180
+000005E3                         L176:	; bb14
+                                 ;     563     case USB_FSMODE:    ConnInf = USB_FSCONNECT;    break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",563
+000005E3 3D0180                  		MOV.W #0080H, 02H[R0]
+000005E6 2Err                 B  		BRA L180
+000005E8                         L177:	; bb15
+                                 ;     564     case USB_LSMODE:    ConnInf = USB_LSCONNECT;    break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",564
+000005E8 3D0140                  		MOV.W #0040H, 02H[R0]
+000005EB 08                   S  		BRA L180
+000005EC                         L178:	; bb16
+                                 ;     565     case USB_HSPROC:    ConnInf = USB_NOCONNECT;    break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",565
+000005EC 3D0100                  		MOV.W #0000H, 02H[R0]
+000005EF 08                   S  		BRA L180
+000005F0                         L179:	; bb17
+                                 ;     566     default:        ConnInf = USB_NOCONNECT;    break;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",566
+000005F0 3D0100                  		MOV.W #0000H, 02H[R0]
+000005F3                         L180:	; bb18
+                                 ;     567     }
+                                 ;     568 
+                                 ;     569     return (ConnInf);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",569
+000005F3 D5000102                		MOV.W 02H[R0], 04H[R0]
+000005F7 9881                    		MOV.W 04H[R0], R1
+000005F9                         L181:	; bb18.split
+                                 ;     570 } /* eof of usb_hstd_support_speed_check */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\host\r_usb_hreg_abs.c",570
+000005F9 5F11                    		MOVU.W R1, R1
+000005FB 6703                    		RTSD #0CH
+                                 ;     571 
+                                 ;     572 #endif  /* (USB_FUNCSEL_USBIP0_PP == USB_HOST_PP) || (USB_FUNCSEL_USBIP1_PP == USB_HOST_PP) */
+                                 ;     573 
+                                 ;     574 /******************************************************************************
+                                 ;     575 End of file
+                                 ;     576 ******************************************************************************/
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01613   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001533(000005FDH)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\r_usb_hreg_abs.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\r_usb_hreg_abs.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\r_usb_basic\src\HW\host\r_usb_hreg_abs.obj

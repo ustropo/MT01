@@ -1,0 +1,1704 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:54:03 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:54:03
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=plasma.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=plasma.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;plasma.c
+                                 
+                                 		.glb	_timerMotorPower
+                                 		.glb	_qKeyboard
+                                 		.glb	_configVarPl
+                                 		.glb	_configFlags
+                                 		.glb	_swTimers
+                                 		.glb	_xCncTaskHandle
+                                 		.glb	_simTorch
+                                 		.glb	_lstop
+                                 		.glb	_xPlasmaTaskHandle
+                                 		.glb	_xEmergenciaTaskHandle
+                                 		.glb	_emergenciaFlag
+                                 		.glb	_xArcoOkSync
+                                 		.glb	_ArcoOktaskIdle
+                                 		.glb	_data
+                                 		.glb	_THC_real
+                                 		.glb	_THC_err
+                                 		.glb	_THC_integral
+                                 		.glb	_currentLine
+                                 		.glb	_pl_arcook_init
+                                 		.glb	_xTaskGenericCreate
+                                 		.glb	_xQueueGenericCreate
+                                 		.glb	_pl_thc_init
+                                 		.glb	_R_ADC_Open
+                                 		.glb	_R_ADC_Control
+                                 		.glb	_pl_thc_read
+                                 		.glb	_R_ADC_Read
+                                 		.glb	_pl_thc_pid
+                                 		.glb	_mp_get_runtime_velocity
+                                 		.glb	_pl_emergencia_init
+                                 		.glb	_R_CMT_CreatePeriodic
+                                 		.glb	_pl_arcook_start
+                                 		.glb	_xTaskGenericNotify
+                                 		.glb	_pl_arcook_stop
+                                 		.glb	_plasma_task
+                                 		.glb	_emergencia_task
+                                 		.glb	_timer_motorPower_callback
+                                 		.glb	_vTaskNotifyGiveFromISR
+                                 		.glb	_ulTaskNotifyTake
+                                 		.glb	_vTaskDelay
+                                 		.glb	_xQueueGenericSend
+                                 		.glb	_xTimerGenericCommand
+                                 		.glb	_vTaskPrioritySet
+                                 		.glb	_warm_stop
+                                 		.glb	_uxTaskPriorityGet
+                                 		.glb	_ut_lcd_output_warning
+                                 		.glb	_xQueueGenericReceive
+                                 		.glb	_sprintf
+                                 		.glb	_delay_thcStartStop
+                                 		.glb	_isCuttingSet
+                                 		.glb	_isCuttingGet
+                                 		.glb	_arcoOkSet
+                                 		.glb	_arcoOkGet
+                                 		.glb	_THC_realGet
+                                 		.glb	_delay_thcSet
+                                 		.glb	_delay_thcGet
+                                 		.glb	_stopDuringCut_Set
+                                 		.glb	_stopDuringCut_Get
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _pl_arcook_init:
+                                 		.STACK	_pl_arcook_init=20
+                                 ;       1 /*
+                                 ;       2  * plasma.c
+                                 ;       3  *
+                                 ;       4  *  Created on: 14/03/2016
+                                 ;       5  *      Author: leocafonso
+                                 ;       6  */
+                                 ;       7 #include "FreeRTOS.h"
+                                 ;       8 #include "task.h"
+                                 ;       9 #include "semphr.h"
+                                 ;      10 #include "tinyg.h"
+                                 ;      11 #include "config.h"
+                                 ;      12 #include "controller.h"
+                                 ;      13 #include "plasma.h"
+                                 ;      14 #include "planner.h"
+                                 ;      15 #include "spindle.h"
+                                 ;      16 #include "hardware.h"
+                                 ;      17 #include "switch.h"
+                                 ;      18 #include "canonical_machine.h"
+                                 ;      19 #include "text_parser.h"
+                                 ;      20 #include "keyboard.h"
+                                 ;      21 #include "lcd.h"
+                                 ;      22 #include "eeprom.h"
+                                 ;      23 #include "config_SwTimers.h"
+                                 ;      24 #include "macros.h"
+                                 ;      25 #include "ut_state_config_var.h"
+                                 ;      26 
+                                 ;      27 #include "platform.h"
+                                 ;      28 #include "r_s12ad_rx_if.h"
+                                 ;      29 #include "r_mtu_rx_if.h"
+                                 ;      30 
+                                 ;      31 #define DEBOUNCE_COUNT 15
+                                 ;      32 #define ARCOOK_DELAY_COUNT 33
+                                 ;      33 
+                                 ;      34 #define THC_HISTERESE 1.5
+                                 ;      35 #define THC_KERF_PORCENTAGE 0.18
+                                 ;      36 #define THC_MERGULHO_PORCENTAGE 0.80
+                                 ;      37 
+                                 ;      38 #define THC_MULT  (0.000001428*1.15)
+                                 ;      39 #define THC_MULT_RAP (THC_MULT*1.25)
+                                 ;      40 #define THC_MAX 0.01
+                                 ;      41 
+                                 ;      42 
+                                 ;      43 /* Lento */
+                                 ;      44 #define KI 0.000000125
+                                 ;      45 #define KP 0.00025
+                                 ;      46 /* Rapido */
+                                 ;      47 //#define KI 0.0000005
+                                 ;      48 //#define KP 0.001
+                                 ;      49 
+                                 ;      50 void timer_motorPower_callback(void *pdata);
+                                 ;      51 void emergencia_task(void);
+                                 ;      52 extern void warm_stop(uint8_t flag);
+                                 ;      53 
+                                 ;      54 extern TaskHandle_t xCncTaskHandle;
+                                 ;      55 extern bool simTorch;
+                                 ;      56 extern bool lstop;
+                                 ;      57 
+                                 ;      58 static bool stopDuringCut = false;
+                                 ;      59 static bool isCutting = false;
+                                 ;      60 static bool arcoOk = false;
+                                 ;      61 static uint16_t delay_thc = 0;
+                                 ;      62 static uint16_t delay_thcStart = false;
+                                 ;      63 TaskHandle_t xPlasmaTaskHandle;
+                                 ;      64 TaskHandle_t xEmergenciaTaskHandle;
+                                 ;      65 bool emergenciaFlag = false;
+                                 ;      66 SemaphoreHandle_t xArcoOkSync;
+                                 ;      67 bool ArcoOktaskIdle = false;
+                                 ;      68 volatile uint16_t    data;
+                                 ;      69 float THC_real;
+                                 ;      70 float THC_err;
+                                 ;      71 float THC_integral;
+                                 ;      72 static char Str[50];
+                                 ;      73 
+                                 ;      74 #pragma section B NOINIT
+                                 ;      75 uint32_t currentLine;
+                                 ;      76 #pragma section
+                                 ;      77 
+                                 ;      78 void pl_arcook_init(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",78
+00000000 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;      79 {
+                                 ;      80 	xTaskCreate((pdTASK_CODE)plasma_task, "Plasma task", 512, NULL, 3, &xPlasmaTaskHandle );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",80
+00000003 FB12rrrrrrrr            		MOV.L #_xPlasmaTaskHandle, R1
+00000009 A009                    		MOV.L R1, 04H[R0]
+0000000B 3E0300                  		MOV.L #00000000H, 0CH[R0]
+0000000E 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000011 F80603                  		MOV.L #00000003H, [R0]
+00000014 6604                    		MOV.L #00000000H, R4
+00000016 FB3A0002                		MOV.L #00000200H, R3
+0000001A FB22rrrrrrrr            		MOV.L #_L10, R2
+00000020 FB12rrrrrrrr            		MOV.L #_plasma_task, R1
+00000026 05rrrrrr             A  		BSR _xTaskGenericCreate
+0000002A 710010                  		ADD #10H, R0
+0000002D                         L16:	; entry.split
+0000002D 6633                    		MOV.L #00000003H, R3
+0000002F 6602                    		MOV.L #00000000H, R2
+00000031 6611                    		MOV.L #00000001H, R1
+                                 ;      81     /* Attempt to create a semaphore. */
+                                 ;      82 	xArcoOkSync = xSemaphoreCreateBinary();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",82
+00000033 05rrrrrr             A  		BSR _xQueueGenericCreate
+00000037 FBE2rrrrrrrr            		MOV.L #_xArcoOkSync, R14
+0000003D E3E1                    		MOV.L R1, [R14]
+0000003F 02                      		RTS
+00000040                         _pl_thc_init:
+                                 		.STACK	_pl_thc_init=36
+                                 ;      83 }
+                                 ;      84 
+                                 ;      85 void pl_thc_init(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",85
+00000040 7100E0                  		ADD #0FFFFFFE0H, R0
+                                 ;      86 {
+                                 ;      87     adc_cfg_t config;
+                                 ;      88     adc_ch_cfg_t ch_cfg;
+                                 ;      89 
+                                 ;      90     config.trigger = ADC_TRIG_SOFTWARE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",90
+00000043 3E0410                  		MOV.L #00000010H, 10H[R0]
+00000046                         L18:	; entry.split
+                                 ;      91     config.priority = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",91
+00000046 3C8400                  		MOV.B #00H, 14H[R0]
+00000049                         L19:	; entry.split1
+                                 ;      92     config.add_cnt = ADC_ADD_OFF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",92
+00000049 F80600                  		MOV.L #00000000H, [R0]
+0000004C                         L20:	; entry.split2
+                                 ;      93     config.alignment = ADC_ALIGN_RIGHT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",93
+0000004C 3E0100                  		MOV.L #00000000H, 04H[R0]
+0000004F                         L21:	; entry.split3
+                                 ;      94     config.clearing = ADC_CLEAR_AFTER_READ_ON;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",94
+0000004F 3E0220                  		MOV.L #00000020H, 08H[R0]
+00000052                         L22:	; entry.split4
+                                 ;      95     config.conv_speed = ADC_CONVERT_SPEED_PCLK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",95
+00000052 3E0303                  		MOV.L #00000003H, 0CH[R0]
+00000055                         L23:	; entry.split5
+00000055 FB3200000010            		MOV.L #10000000H, R3
+0000005B EF02                    		MOV.L R0, R2
+0000005D 6621                    		MOV.L #00000002H, R1
+                                 ;      96     R_ADC_Open(ADC_MODE_SS_ONE_CH, &config, FIT_NO_FUNC);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",96
+0000005F 05rrrrrr             A  		BSR _R_ADC_Open
+00000063                         L24:	; entry.split6
+                                 ;      97 
+                                 ;      98     ch_cfg.chan_mask = ADC_MASK_CH3;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",98
+00000063 3E0608                  		MOV.L #00000008H, 18H[R0]
+00000066                         L25:	; entry.split7
+00000066 710218                  		ADD #18H, R0, R2
+00000069 6611                    		MOV.L #00000001H, R1
+                                 ;      99     R_ADC_Control(ADC_CMD_ENABLE_CHANS, &ch_cfg);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",99
+0000006B 05rrrrrr             A  		BSR _R_ADC_Control
+0000006F 6708                    		RTSD #20H
+00000071                         _pl_thc_read:
+                                 		.STACK	_pl_thc_read=12
+                                 ;     100 }
+                                 ;     101 
+                                 ;     102 void pl_thc_read(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",102
+00000071 6080                    		SUB #08H, R0
+                                 ;     103 {
+                                 ;     104 	uint16_t u16thc_read;
+                                 ;     105 	uint16_t u16thc_sum = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",105
+00000073 3D0100                  		MOV.W #0000H, 02H[R0]
+00000076                         L27:	; entry.split
+                                 ;     106 	uint16_t u16thc_value;
+                                 ;     107 	for(uint8_t i = 0; i < 8;i++){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",107
+00000076 3C0700                  		MOV.B #00H, 07H[R0]
+00000079 2Err                 B  		BRA L33
+0000007B                         L28:	; bb
+0000007B 6602                    		MOV.L #00000000H, R2
+0000007D 6651                    		MOV.L #00000005H, R1
+                                 ;     108 		/* CAUSE SOFTWARE TRIGGER */
+                                 ;     109 		R_ADC_Control(ADC_CMD_SCAN_NOW, NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",109
+0000007F 05rrrrrr             A  		BSR _R_ADC_Control
+00000083 2Err                 B  		BRA L30
+00000085                         L29:	; bb5
+                                 ;     110 		/* WAIT FOR SCAN TO COMPLETE */
+                                 ;     111 		while (R_ADC_Control(ADC_CMD_CHECK_SCAN_DONE, NULL) == ADC_ERR_SCAN_NOT_DONE)
+                                 ;     112 		nop();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",112
+00000085 03                      		NOP
+00000086                         L30:	; bb6
+00000086 6602                    		MOV.L #00000000H, R2
+00000088 6661                    		MOV.L #00000006H, R1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",111
+0000008A 05rrrrrr             A  		BSR _R_ADC_Control
+0000008E 6161                    		CMP #06H, R1
+00000090 20rr                    		BEQ L29
+00000092                         L31:	; bb10
+00000092 EF02                    		MOV.L R0, R2
+00000094 6631                    		MOV.L #00000003H, R1
+                                 ;     113 		/* READ RESULT */
+                                 ;     114 		R_ADC_Read(ADC_REG_CH3, &u16thc_read);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",114
+00000096 05rrrrrr             A  		BSR _R_ADC_Read
+0000009A                         L32:	; bb10.split
+                                 ;     115 		u16thc_sum += u16thc_read;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",115
+0000009A B809                    		MOVU.W 02H[R0], R1
+0000009C 06C801                  		ADD [R0].UW, R1
+0000009F 9009                    		MOV.W R1, 02H[R0]
+000000A1 B189                    		MOVU.B 07H[R0], R1
+000000A3 6211                    		ADD #01H, R1
+000000A5 8189                    		MOV.B R1, 07H[R0]
+000000A7                         L33:	; bb20
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",107
+000000A7 B189                    		MOVU.B 07H[R0], R1
+000000A9 6181                    		CMP #08H, R1
+000000AB 29rr                    		BLT L28
+000000AD                         L34:	; bb26
+                                 ;     116 	}
+                                 ;     117 	u16thc_value = u16thc_sum/8;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",117
+000000AD B809                    		MOVU.W 02H[R0], R1
+000000AF 6831                    		SHLR #03H, R1
+000000B1 9081                    		MOV.W R1, 04H[R0]
+000000B3                         L35:	; bb26.split
+                                 ;     118 	THC_real = (float)(((float)300/4095)*u16thc_value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",118
+000000B3 06E1110E02              		ITOF 04H[R0].UW, R14
+000000B8 FD723E6109963D          		FMUL #3D960961H, R14
+000000BF FBF2rrrrrrrr            		MOV.L #_THC_real, R15
+000000C5 E3FE                    		MOV.L R14, [R15]
+000000C7 6702                    		RTSD #08H
+000000C9                         _pl_thc_pid:
+                                 		.STACK	_pl_thc_pid=24
+                                 ;     119 }
+                                 ;     120 
+                                 ;     121 float pl_thc_pid(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",121
+000000C9 7100EC                  		ADD #0FFFFFFECH, R0
+                                 ;     122 {
+                                 ;     123 	float result = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",123
+000000CC 3E0100                  		MOV.L #00000000H, 04H[R0]
+000000CF                         L37:	; entry.split
+                                 ;     124 	float THCVel = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",124
+000000CF 3E0200                  		MOV.L #00000000H, 08H[R0]
+000000D2                         L38:	; entry.split1
+                                 ;     125 	int16_t delay_thc;
+                                 ;     126 	/* velocidade do THC proporcinal a velocidade de feddrate */
+                                 ;     127 	if (configVarPl[PL_CONFIG_VELOC_CORTE] < 3500)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",127
+000000D2 FB12rrrrrrrr            		MOV.L #_configVarPl, R1
+000000D8 A891                    		MOV.L 08H[R1], R1
+000000DA FD721100C05A45          		FCMP #455AC000H, R1
+000000E1 26rr                    		BPZ L40
+000000E3                         L39:	; bb4
+                                 ;     128 		THCVel = configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MULT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",128
+000000E3 FD72319069DC35          		FMUL #35DC6990H, R1
+000000EA A081                    		MOV.L R1, 08H[R0]
+000000EC 08                   S  		BRA L41
+000000ED                         L40:	; bb7
+                                 ;     129 	else
+                                 ;     130 		THCVel = configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MULT_RAP;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",130
+000000ED FD7231FAC10936          		FMUL #3609C1FAH, R1
+000000F4 A081                    		MOV.L R1, 08H[R0]
+000000F6                         L41:	; bb13
+                                 ;     131 
+                                 ;     132 	/* reta do delay inversamente proporcinal a velocidade de feddrate */
+                                 ;     133 	delay_thc = (uint16_t)(17500 - configVarPl[PL_CONFIG_VELOC_CORTE]*5);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",133
+000000F6 FB12rrrrrrrr            		MOV.L #_configVarPl, R1
+000000FC A891                    		MOV.L 08H[R1], R1
+000000FE FD72310000A0C0          		FMUL #0C0A00000H, R1
+00000105 FD722100B88846          		FADD #4688B800H, R1
+0000010C FD72110000004F          		FCMP #4F000000H, R1
+00000113 29rr                    		BLT L43
+00000115                         L42:	; bb13
+00000115 FD7221000080CF          		FADD #0CF800000H, R1
+0000011C                         L43:	; bb13
+0000011C FC9711                  		FTOI R1, R1
+0000011F 9189                    		MOV.W R1, 0EH[R0]
+00000121                         L44:	; bb13.split
+00000121 FBE20AD7233C            		MOV.L #3C23D70AH, R14
+                                 ;     134 	/* limite maximo da velocidade do THC */
+                                 ;     135 	if(THCVel > THC_MAX)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",135
+00000127 FC850E02                		FCMP 08H[R0].L, R14
+0000012B 26rr                    		BPZ L46
+0000012D                         L45:	; bb19
+                                 ;     136 	{
+                                 ;     137 		THCVel = THC_MAX;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",137
+0000012D F902020AD7233C          		MOV.L #3C23D70AH, 08H[R0]
+00000134                         L46:	; bb25
+                                 ;     138 	}
+                                 ;     139 	/* limite minimo do delay do THC */
+                                 ;     140 	if(delay_thc < 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",140
+00000134 9989                    		MOV.W 0EH[R0], R1
+00000136 69F1                    		SHLR #1FH, R1
+00000138 6101                    		CMP #00H, R1
+0000013A 10                   S  		BEQ L48
+0000013B                         L47:	; bb26
+                                 ;     141 	{
+                                 ;     142 		delay_thc = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",142
+0000013B 3D0700                  		MOV.W #0000H, 0EH[R0]
+0000013E                         L48:	; bb32
+                                 ;     143 	}
+                                 ;     144 	pl_thc_read();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",144
+0000013E 39rrrr               W  		BSR _pl_thc_read
+00000141                         L49:	; bb32.split
+                                 ;     145 	if(delay_thcGet() > delay_thc){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",145
+00000141 39rrrr               W  		BSR _delay_thcGet
+00000144 06450107                		CMP 0EH[R0].W, R1
+00000148 2Arr                  * 		BLE L68
+         38rrrr                  
+0000014D                         L50:	; bb35
+                                 ;     146 		if(THC_real > THC_VMIN)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",146
+0000014D FBE2rrrrrrrr            		MOV.L #_THC_real, R14
+00000153 FBF20000A041            		MOV.L #41A00000H, R15
+00000159 FC84EF                  		FCMP [R14].L, R15
+0000015C 27rr                  * 		BPZ L68
+         38rrrr                  
+00000161                         L51:	; bb36
+                                 ;     147 		{
+                                 ;     148 			THC_err = configVarPl[PL_CONFIG_TENSAO_THC] - THC_real;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",148
+00000161 FB12rrrrrrrr            		MOV.L #_configVarPl, R1
+00000167 A911                    		MOV.L 10H[R1], R1
+00000169 FBE2rrrrrrrr            		MOV.L #_THC_real, R14
+0000016F FC80E1                  		FSUB [R14].L, R1
+00000172 FBE2rrrrrrrr            		MOV.L #_THC_err, R14
+00000178 E3E1                    		MOV.L R1, [R14]
+0000017A                         L52:	; bb36.split
+                                 ;     149 			if(THC_err > THC_HISTERESE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",149
+0000017A FBE2rrrrrrrr            		MOV.L #_THC_err, R14
+00000180 FBF20000C03F            		MOV.L #3FC00000H, R15
+00000186 FC84EF                  		FCMP [R14].L, R15
+00000189 26rr                    		BPZ L54
+0000018B                         L53:	; bb41
+                                 ;     150 			{
+                                 ;     151 				result = THCVel;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",151
+0000018B E5000201                		MOV.L 08H[R0], 04H[R0]
+0000018F                         L54:	; bb48
+                                 ;     152 			}
+                                 ;     153 			if(THC_err < -THC_HISTERESE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",153
+0000018F FBE2rrrrrrrr            		MOV.L #_THC_err, R14
+00000195 ECEE                    		MOV.L [R14], R14
+00000197 FD721E0000C0BF          		FCMP #0BFC00000H, R14
+0000019E 26rr                    		BPZ L56
+000001A0                         L55:	; bb49
+                                 ;     154 			{
+                                 ;     155 				result = -THCVel;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",155
+000001A0 A881                    		MOV.L 08H[R0], R1
+000001A2 FDFFF1                  		BNOT #1FH, R1
+000001A5 A009                    		MOV.L R1, 04H[R0]
+000001A7                         L56:	; bb57
+                                 ;     156 			}
+                                 ;     157 			if(THC_err >= -THC_HISTERESE && THC_err <= THC_HISTERESE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",157
+000001A7 FBE2rrrrrrrr            		MOV.L #_THC_err, R14
+000001AD ECEE                    		MOV.L [R14], R14
+000001AF FD721E0000C0BF          		FCMP #0BFC00000H, R14
+000001B6 28rr                    		BGE L58
+000001B8 2Err                 B  		BRA L60
+000001BA                         L57:	; bb58
+                                 ;     158 			{
+                                 ;     159 				result = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",159
+000001BA 3E0100                  		MOV.L #00000000H, 04H[R0]
+000001BD 2Err                 B  		BRA L62
+000001BF                         L58:	; bb62
+000001BF FBE2rrrrrrrr            		MOV.L #_THC_err, R14
+000001C5 FBF20000C03F            		MOV.L #3FC00000H, R15
+000001CB FC84EF                  		FCMP [R14].L, R15
+000001CE 29rr                    		BLT L60
+000001D0                         L59:	; bb66
+000001D0 F80601                  		MOV.L #00000001H, [R0]
+000001D3 08                   S  		BRA L61
+000001D4                         L60:	; bb67
+000001D4 F80600                  		MOV.L #00000000H, [R0]
+000001D7                         L61:	; bb68
+000001D7 EC01                    		MOV.L [R0], R1
+000001D9 6101                    		CMP #00H, R1
+000001DB 21rr                    		BNE L57
+000001DD                         L62:	; bb74
+                                 ;     160 			}
+                                 ;     161 			if (configFlags[KERF] == HABILITADO)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",161
+000001DD FB12rrrrrrrr            		MOV.L #_configFlags, R1
+000001E3 A891                    		MOV.L 08H[R1], R1
+000001E5 6111                    		CMP #01H, R1
+000001E7 21rr                    		BNE L65
+000001E9                         L63:	; bb76
+                                 ;     162 			{
+                                 ;     163 				if(fabs(THC_err) > configVarPl[PL_CONFIG_TENSAO_THC]*THC_KERF_PORCENTAGE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",163
+000001E9 FB12rrrrrrrr            		MOV.L #_configVarPl, R1
+000001EF A911                    		MOV.L 10H[R1], R1
+000001F1 FD7231EC51383E          		FMUL #3E3851ECH, R1
+000001F8 FBE2rrrrrrrr            		MOV.L #_THC_err, R14
+000001FE ECEE                    		MOV.L [R14], R14
+00000200 7BFE                    		BCLR #1FH, R14
+00000202 FC87E1                  		FCMP R14, R1
+00000205 26rr                    		BPZ L65
+00000207                         L64:	; bb77
+                                 ;     164 				{
+                                 ;     165 					result = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",165
+00000207 3E0100                  		MOV.L #00000000H, 04H[R0]
+0000020A                         L65:	; bb91
+                                 ;     166 				}
+                                 ;     167 			}
+                                 ;     168 			if (configFlags[MERGULHO] == HABILITADO)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",168
+0000020A FB12rrrrrrrr            		MOV.L #_configFlags, R1
+00000210 A899                    		MOV.L 0CH[R1], R1
+00000212 6111                    		CMP #01H, R1
+00000214 21rr                    		BNE L68
+00000216                         L66:	; bb93
+                                 ;     169 			{
+                                 ;     170 				if(mp_get_runtime_velocity() < configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MERGULHO_PORCENTAGE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",170
+00000216 05rrrrrr             A  		BSR _mp_get_runtime_velocity
+0000021A FB22rrrrrrrr            		MOV.L #_configVarPl, R2
+00000220 A8A2                    		MOV.L 08H[R2], R2
+00000222 FD7232CDCC4C3F          		FMUL #3F4CCCCDH, R2
+00000229 FC8721                  		FCMP R2, R1
+0000022C 26rr                    		BPZ L68
+0000022E                         L67:	; bb94
+                                 ;     171 				{
+                                 ;     172 					result = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",172
+0000022E 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000231                         L68:	; bb119
+                                 ;     173 				}
+                                 ;     174 			}
+                                 ;     175 		}
+                                 ;     176 	}
+                                 ;     177 	return result;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",177
+00000231 A809                    		MOV.L 04H[R0], R1
+00000233 A101                    		MOV.L R1, 10H[R0]
+00000235                         L69:	; bb119.split
+                                 ;     178 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",178
+00000235 6705                    		RTSD #14H
+00000237                         _pl_emergencia_init:
+                                 		.STACK	_pl_emergencia_init=20
+                                 ;     179 
+                                 ;     180 void pl_emergencia_init(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",180
+00000237 FBEE087508              		MOV.L #00087508H, R14
+                                 ;     181 {
+                                 ;     182     ICU.IRQCR[8].BIT.IRQMD = 2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",182
+0000023C 58EF                    		MOVU.B [R14], R15
+0000023E 783F                    		BSET #03H, R15
+00000240 762FFB00                		AND #0FBH, R15
+00000244 C3EF                    		MOV.B R15, [R14]
+00000246                         L71:	; entry.split
+00000246 FBEE487008              		MOV.L #00087048H, R14
+                                 ;     183     IR(ICU, IRQ8)  = 0;            //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",183
+0000024B F0E8                    		BCLR #00H, [R14].B
+0000024D                         L72:	; entry.split1
+0000024D FBEE487308              		MOV.L #00087348H, R14
+                                 ;     184     IPR(ICU, IRQ8) = 3;            //Set interrupt priority
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",184
+00000252 58EF                    		MOVU.B [R14], R15
+00000254 653F                    		OR #03H, R15
+00000256 762FF300                		AND #0F3H, R15
+0000025A C3EF                    		MOV.B R15, [R14]
+0000025C                         L73:	; entry.split2
+0000025C FBEE097208              		MOV.L #00087209H, R14
+                                 ;     185     IEN(ICU, IRQ8) = 0;            // Enable interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",185
+00000261 F0E8                    		BCLR #00H, [R14].B
+00000263                         L74:	; entry.split3
+00000263 FBEE487008              		MOV.L #00087048H, R14
+                                 ;     186     IR(ICU, IRQ8)  = 0;            //Clear any previously pending interrupts
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",186
+00000268 F0E8                    		BCLR #00H, [R14].B
+0000026A                         L75:	; entry.split4
+0000026A FBEE097208              		MOV.L #00087209H, R14
+                                 ;     187     IEN(ICU, IRQ8) = 1;            // Enable interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",187
+0000026F F0E0                    		BSET #00H, [R14].B
+00000271                         L76:	; entry.split5
+00000271 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     188     xTaskCreate((pdTASK_CODE)emergencia_task, "Emergencia task", 256, NULL, 3, &xEmergenciaTaskHandle );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",188
+00000274 FB12rrrrrrrr            		MOV.L #_xEmergenciaTaskHandle, R1
+0000027A A009                    		MOV.L R1, 04H[R0]
+0000027C 3E0300                  		MOV.L #00000000H, 0CH[R0]
+0000027F 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000282 F80603                  		MOV.L #00000003H, [R0]
+00000285 6604                    		MOV.L #00000000H, R4
+00000287 FB3A0001                		MOV.L #00000100H, R3
+0000028B FB22rrrrrrrr            		MOV.L #_L11, R2
+00000291 FB12rrrrrrrr            		MOV.L #_emergencia_task, R1
+00000297 05rrrrrr             A  		BSR _xTaskGenericCreate
+0000029B 710010                  		ADD #10H, R0
+0000029E                         L77:	; entry.split6
+                                 ;     189     R_CMT_CreatePeriodic(10000,timer_motorPower_callback,&timerMotorPower);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",189
+0000029E FB32rrrrrrrr            		MOV.L #_timerMotorPower, R3
+000002A4 FB22rrrrrrrr            		MOV.L #_timer_motorPower_callback, R2
+000002AA FB1A1027                		MOV.L #00002710H, R1
+000002AE 05rrrrrr             A  		BSR _R_CMT_CreatePeriodic
+000002B2 02                      		RTS
+000002B3                         _pl_arcook_start:
+                                 		.STACK	_pl_arcook_start=4
+                                 ;     190 }
+                                 ;     191 
+                                 ;     192 void pl_arcook_start(void)
+                                 ;     193 {
+                                 ;     194     xTaskNotifyGive( xPlasmaTaskHandle);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",194
+000002B3 FBE2rrrrrrrr            		MOV.L #_xPlasmaTaskHandle, R14
+000002B9 ECE1                    		MOV.L [R14], R1
+000002BB 6623                    		MOV.L #00000002H, R3
+000002BD 6602                    		MOV.L #00000000H, R2
+000002BF EF24                    		MOV.L R2, R4
+000002C1 05rrrrrr             A  		BSR _xTaskGenericNotify
+000002C5                         L79:	; entry.split
+000002C5 6601                    		MOV.L #00000000H, R1
+                                 ;     195 	arcoOkSet(false);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",195
+000002C7 39rrrr               W  		BSR _arcoOkSet
+000002CA 02                      		RTS
+000002CB                         _pl_arcook_stop:
+                                 		.STACK	_pl_arcook_stop=4
+                                 ;     196 }
+                                 ;     197 
+                                 ;     198 void pl_arcook_stop(void)
+                                 ;     199 {
+                                 ;     200     ArcoOktaskIdle = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",200
+000002CB FBE2rrrrrrrr            		MOV.L #_ArcoOktaskIdle, R14
+000002D1 F8E400                  		MOV.B #00H, [R14]
+000002D4                         L81:	; entry.split
+000002D4 6601                    		MOV.L #00000000H, R1
+                                 ;     201 	arcoOkSet(false);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",201
+000002D6 39rrrr               W  		BSR _arcoOkSet
+000002D9 02                      		RTS
+000002DA                         __$IRQ9_isr:
+                                 		.STACK	__$IRQ9_isr=8
+                                 		.RVECTOR	73,__$IRQ9_isr
+                                 ;     202 }
+                                 ;     203 
+                                 ;     204 #pragma interrupt IRQ9_isr(vect=VECT(ICU, IRQ9))
+                                 ;     205 static void IRQ9_isr (void) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",205
+000002DA 7F95                    		RTE
+000002DC                         __$IRQ8_isr:
+                                 		.STACK	__$IRQ8_isr=40
+                                 		.RVECTOR	72,__$IRQ8_isr
+                                 ;     206 //	    BaseType_t xHigherPriorityTaskWoken;
+                                 ;     207 //
+                                 ;     208 //	    xHigherPriorityTaskWoken = pdFALSE;
+                                 ;     209 //
+                                 ;     210 //	    vTaskNotifyGiveFromISR( xPlasmaTaskHandle, &xHigherPriorityTaskWoken );
+                                 ;     211 //
+                                 ;     212 //	    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+                                 ;     213 //
+                                 ;     214 //        IR(ICU, IRQ9)  = 0;            //Clear any previously pending interrupts
+                                 ;     215 //        IEN(ICU, IRQ9) = 0;            // Enable interrupt
+                                 ;     216 
+                                 ;     217 }
+                                 ;     218 
+                                 ;     219 #pragma interrupt IRQ8_isr(vect=VECT(ICU, IRQ8))
+                                 ;     220 static void IRQ8_isr (void) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",220
+000002DC 6EEF                    		PUSHM R14-R15
+000002DE 6E15                    		PUSHM R1-R5
+000002E0 6040                    		SUB #04H, R0
+                                 ;     221     BaseType_t xHigherPriorityTaskWoken;
+                                 ;     222 
+                                 ;     223     xHigherPriorityTaskWoken = pdFALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",223
+000002E2 F80600                  		MOV.L #00000000H, [R0]
+000002E5                         L84:	; entry.split
+                                 ;     224 
+                                 ;     225     vTaskNotifyGiveFromISR( xEmergenciaTaskHandle, &xHigherPriorityTaskWoken );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",225
+000002E5 FB12rrrrrrrr            		MOV.L #_xEmergenciaTaskHandle, R1
+000002EB EC11                    		MOV.L [R1], R1
+000002ED EF02                    		MOV.L R0, R2
+000002EF 05rrrrrr             A  		BSR _vTaskNotifyGiveFromISR
+000002F3                         L85:	; entry.split1
+                                 ;     226 
+                                 ;     227     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",227
+000002F3 EC01                    		MOV.L [R0], R1
+000002F5 6101                    		CMP #00H, R1
+000002F7 20rr                    		BEQ L87
+000002F9                         L86:	; bb2
+                                 		._LINE_TOP  inline_asm
+                                  
+000002F9 7EA5                    	PUSH.L R5
+                                 	 
+000002FB FB5EE07208              	MOV.L #553696, R5
+00000300 F85401                  	MOV.B #1, [R5]
+                                 	 
+00000303 EC55                    	MOV.L [R5], R5
+                                 	 
+00000305 7EB5                    	POP R5
+                                 		._LINE_END  inline_asm
+00000307 6240                    		ADD #04H, R0
+00000309 6F15                    		POPM R1-R5
+0000030B 6FEF                    		POPM R14-R15
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",228
+0000030D 7F95                    		RTE
+0000030F                         L87:	; return
+                                 ;     228 }
+0000030F 6240                    		ADD #04H, R0
+00000311 6F15                    		POPM R1-R5
+00000313 6FEF                    		POPM R14-R15
+00000315 7F95                    		RTE
+00000317                         _plasma_task:
+                                 		.STACK	_plasma_task=24
+                                 ;     229 
+                                 ;     230 void plasma_task(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",230
+00000317 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     231 {
+                                 ;     232 	uint8_t debounce;
+                                 ;     233 	uint32_t qSend = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",233
+0000031A 3E0200                  		MOV.L #00000000H, 08H[R0]
+0000031D 38rrrr               W  		BRA L140
+00000320                         L89:	; bb4
+                                 ;     234     bool pinState;
+                                 ;     235 
+                                 ;     236 	while(1)
+                                 ;     237 	{
+                                 ;     238         ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+                                 ;     239         ArcoOktaskIdle = true;
+                                 ;     240         debounce = 0;
+                                 ;     241         while(ArcoOktaskIdle)
+                                 ;     242         {
+                                 ;     243 			pinState = ARCO_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",243
+00000320 FBEE22C008              		MOV.L #0008C022H, R14
+00000325 59EE20                  		MOVU.B 20H[R14], R14
+00000328 681E                    		SHLR #01H, R14
+0000032A 7C0E                    		BTST #00H, R14
+0000032C FCD1010F                		SCNE.B 0FH[R0]
+00000330                         L90:	; bb4.split
+00000330 66A1                    		MOV.L #0000000AH, R1
+                                 ;     244 			vTaskDelay(pdMS_TO_TICKS(10));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",244
+00000332 05rrrrrr             A  		BSR _vTaskDelay
+00000336                         L91:	; bb4.split1
+                                 ;     245 			if(pinState == ARCO_OK)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",245
+00000336 B389                    		MOVU.B 0FH[R0], R1
+00000338 FBEE22C008              		MOV.L #0008C022H, R14
+0000033D 59EE20                  		MOVU.B 20H[R14], R14
+00000340 681E                    		SHLR #01H, R14
+00000342 641E                    		AND #01H, R14
+00000344 47E1                    		CMP R14, R1
+00000346 18                   S  		BNE L93
+00000347                         L92:	; bb13
+                                 ;     246 			{
+                                 ;     247 				debounce++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",247
+00000347 B189                    		MOVU.B 07H[R0], R1
+00000349 6211                    		ADD #01H, R1
+0000034B 8189                    		MOV.B R1, 07H[R0]
+0000034D                         L93:	; bb25
+                                 ;     248 			}
+                                 ;     249 			if(debounce == DEBOUNCE_COUNT)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",249
+0000034D B189                    		MOVU.B 07H[R0], R1
+0000034F 61F1                    		CMP #0FH, R1
+00000351 3Brrrr               W  		BNE L139
+00000354                         L94:	; bb27
+                                 ;     250 			{
+                                 ;     251 				if (!ARCO_OK)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",251
+00000354 FBEE22C008              		MOV.L #0008C022H, R14
+00000359 59EE20                  		MOVU.B 20H[R14], R14
+0000035C 681E                    		SHLR #01H, R14
+0000035E 7C0E                    		BTST #00H, R14
+00000360 21rr                    		BNE L100
+00000362 2Err                 B  		BRA L101
+00000364                         L95:	; bb29
+                                 ;     252 				{
+                                 ;     253 					if (!simTorch)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",253
+00000364 FBE2rrrrrrrr            		MOV.L #_simTorch, R14
+0000036A 58EE                    		MOVU.B [R14], R14
+0000036C 610E                    		CMP #00H, R14
+0000036E 21rr                    		BNE L97
+00000370 2Err                 B  		BRA L98
+00000372                         L96:	; bb30
+                                 ;     254 					{
+                                 ;     255 						//xTaskNotifyGive(xCncTaskHandle);
+                                 ;     256 						xSemaphoreGive( xArcoOkSync );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",256
+00000372 FBE2rrrrrrrr            		MOV.L #_xArcoOkSync, R14
+00000378 ECE1                    		MOV.L [R14], R1
+0000037A 6602                    		MOV.L #00000000H, R2
+0000037C EF23                    		MOV.L R2, R3
+0000037E EF24                    		MOV.L R2, R4
+00000380 05rrrrrr             A  		BSR _xQueueGenericSend
+00000384 2Err                 B  		BRA L103
+00000386                         L97:	; bb37
+00000386 F80600                  		MOV.L #00000000H, [R0]
+00000389 08                   S  		BRA L99
+0000038A                         L98:	; bb38
+0000038A F80601                  		MOV.L #00000001H, [R0]
+0000038D                         L99:	; bb39
+0000038D EC01                    		MOV.L [R0], R1
+0000038F 6101                    		CMP #00H, R1
+00000391 21rr                    		BNE L96
+00000393 2Err                 B  		BRA L103
+00000395                         L100:	; bb50
+00000395 F80600                  		MOV.L #00000000H, [R0]
+00000398 08                   S  		BRA L102
+00000399                         L101:	; bb51
+00000399 F80601                  		MOV.L #00000001H, [R0]
+0000039C                         L102:	; bb52
+0000039C EC01                    		MOV.L [R0], R1
+0000039E 6101                    		CMP #00H, R1
+000003A0 21rr                    		BNE L95
+000003A2                         L103:	; bb56
+                                 ;     257 					}
+                                 ;     258 				}
+                                 ;     259 				debounce = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",259
+000003A2 3C0700                  		MOV.B #00H, 07H[R0]
+000003A5                         L104:	; bb58
+                                 ;     260 				do
+                                 ;     261 				{
+                                 ;     262 					if(ARCO_OK)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",262
+000003A5 FBEE22C008              		MOV.L #0008C022H, R14
+000003AA 59EE20                  		MOVU.B 20H[R14], R14
+000003AD 681E                    		SHLR #01H, R14
+000003AF 7C0E                    		BTST #00H, R14
+000003B1 20rr                    		BEQ L107
+000003B3                         L105:	; bb59
+                                 ;     263 					{
+                                 ;     264 						debounce++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",264
+000003B3 B189                    		MOVU.B 07H[R0], R1
+000003B5 6211                    		ADD #01H, R1
+000003B7 8189                    		MOV.B R1, 07H[R0]
+000003B9                         L106:	; bb59.split
+000003B9 6601                    		MOV.L #00000000H, R1
+                                 ;     265 						arcoOkSet(false);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",265
+000003BB 39rrrr               W  		BSR _arcoOkSet
+000003BE 08                   S  		BRA L109
+000003BF                         L107:	; bb62
+                                 ;     266 					}
+                                 ;     267 					else
+                                 ;     268 					{
+                                 ;     269 						debounce = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",269
+000003BF 3C0700                  		MOV.B #00H, 07H[R0]
+000003C2                         L108:	; bb62.split
+000003C2 6611                    		MOV.L #00000001H, R1
+                                 ;     270 						arcoOkSet(true);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",270
+000003C4 39rrrr               W  		BSR _arcoOkSet
+000003C7                         L109:	; bb70
+000003C7 66A1                    		MOV.L #0000000AH, R1
+                                 ;     271 					}
+                                 ;     272 					vTaskDelay(pdMS_TO_TICKS(10));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",272
+000003C9 05rrrrrr             A  		BSR _vTaskDelay
+000003CD                         L110:	; bb70.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",260
+000003CD B189                    		MOVU.B 07H[R0], R1
+000003CF 755121                  		CMP #21H, R1
+000003D2 20rr                    		BEQ L113
+000003D4                         L111:	; bb75
+000003D4 FBE2rrrrrrrr            		MOV.L #__$isCutting, R14
+000003DA 58EE                    		MOVU.B [R14], R14
+000003DC 610E                    		CMP #00H, R14
+000003DE 10                   S  		BEQ L113
+000003DF                         L112:	; bb81
+000003DF F80601                  		MOV.L #00000001H, [R0]
+000003E2 08                   S  		BRA L114
+000003E3                         L113:	; bb82
+000003E3 F80600                  		MOV.L #00000000H, [R0]
+000003E6                         L114:	; bb83
+000003E6 EC01                    		MOV.L [R0], R1
+000003E8 6101                    		CMP #00H, R1
+000003EA 20rr                    		BEQ L117
+000003EC                         L115:	; bb87
+000003EC FBE2rrrrrrrr            		MOV.L #_ArcoOktaskIdle, R14
+000003F2 58EE                    		MOVU.B [R14], R14
+000003F4 610E                    		CMP #00H, R14
+000003F6 10                   S  		BEQ L117
+000003F7                         L116:	; bb92
+000003F7 F80601                  		MOV.L #00000001H, [R0]
+000003FA 08                   S  		BRA L118
+000003FB                         L117:	; bb93
+000003FB F80600                  		MOV.L #00000000H, [R0]
+000003FE                         L118:	; bb94
+000003FE EC01                    		MOV.L [R0], R1
+00000400 6101                    		CMP #00H, R1
+00000402 21rr                    		BNE L104
+00000404                         L119:	; bb100
+                                 ;     273 				}while(debounce != ARCOOK_DELAY_COUNT && isCutting && ArcoOktaskIdle);
+                                 ;     274 				if (isCutting && ArcoOktaskIdle)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",274
+00000404 FBE2rrrrrrrr            		MOV.L #__$isCutting, R14
+0000040A 58EE                    		MOVU.B [R14], R14
+0000040C 610E                    		CMP #00H, R14
+0000040E 3Brrrr               W  		BNE L135
+00000411 38rrrr               W  		BRA L137
+00000414                         L120:	; bb101
+                                 ;     275 				{
+                                 ;     276 					xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",276
+00000414 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+0000041A AA11                    		MOV.L 20H[R1], R1
+0000041C 6040                    		SUB #04H, R0
+0000041E F80600                  		MOV.L #00000000H, [R0]
+00000421 6603                    		MOV.L #00000000H, R3
+00000423 6632                    		MOV.L #00000003H, R2
+00000425 EF34                    		MOV.L R3, R4
+00000427 05rrrrrr             A  		BSR _xTimerGenericCommand
+0000042B 6240                    		ADD #04H, R0
+0000042D                         L121:	; bb101.split
+0000042D 6611                    		MOV.L #00000001H, R1
+                                 ;     277 					stopDuringCut_Set(true);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",277
+0000042F 39rrrr               W  		BSR _stopDuringCut_Set
+00000432                         L122:	; bb101.split2
+                                 ;     278 				    vTaskPrioritySet( xCncTaskHandle, 3 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",278
+00000432 FBE2rrrrrrrr            		MOV.L #_xCncTaskHandle, R14
+00000438 ECE1                    		MOV.L [R14], R1
+0000043A 6632                    		MOV.L #00000003H, R2
+0000043C 05rrrrrr             A  		BSR _vTaskPrioritySet
+00000440                         L123:	; bb101.split3
+00000440 6621                    		MOV.L #00000002H, R1
+                                 ;     279 					warm_stop(2);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",279
+00000442 05rrrrrr             A  		BSR _warm_stop
+00000446                         L124:	; bb101.split4
+                                 ;     280 				    vTaskPrioritySet( xCncTaskHandle, 1 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",280
+00000446 FBE2rrrrrrrr            		MOV.L #_xCncTaskHandle, R14
+0000044C ECE1                    		MOV.L [R14], R1
+0000044E 6612                    		MOV.L #00000001H, R2
+00000450 05rrrrrr             A  		BSR _vTaskPrioritySet
+00000454                         L125:	; bb101.split5
+                                 ;     281 					TORCH = FALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",281
+00000454 FBEE22C008              		MOV.L #0008C022H, R14
+00000459 F0E3                    		BSET #03H, [R14].B
+0000045B                         L126:	; bb101.split6
+                                 ;     282 					if( uxTaskPriorityGet( xCncTaskHandle ) != 1 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",282
+0000045B FBE2rrrrrrrr            		MOV.L #_xCncTaskHandle, R14
+00000461 ECE1                    		MOV.L [R14], R1
+00000463 05rrrrrr             A  		BSR _uxTaskPriorityGet
+00000467                         L127:	; bb101.split7
+                                 ;     283 					{
+                                 ;     284 
+                                 ;     285 					}
+                                 ;     286 					lstop = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",286
+00000467 FBE2rrrrrrrr            		MOV.L #_lstop, R14
+0000046D F8E401                  		MOV.B #01H, [R14]
+00000470                         L128:	; bb101.split8
+                                 ;     287 					ut_lcd_output_warning("PLASMA NÃO\nTRANSFERIDO\n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",287
+00000470 FB12rrrrrrrr            		MOV.L #_L12, R1
+00000476 05rrrrrr             A  		BSR _ut_lcd_output_warning
+0000047A 2Err                 B  		BRA L132
+0000047C                         L129:	; bb117
+0000047C FBEE308008              		MOV.L #00088030H, R14
+                                 ;     288 					while(qSend != KEY_ESC){
+                                 ;     289 						WDT_FEED
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",289
+00000481 F8E400                  		MOV.B #00H, [R14]
+00000484                         L130:	; bb117.split
+00000484 FBEE308008              		MOV.L #00088030H, R14
+00000489 F8E4FF                  		MOV.B #0FFH, [R14]
+0000048C                         L131:	; bb117.split9
+                                 ;     290 						xQueueReceive( qKeyboard, &qSend, portMAX_DELAY );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",290
+0000048C FBE2rrrrrrrr            		MOV.L #_qKeyboard, R14
+00000492 ECE1                    		MOV.L [R14], R1
+00000494 6604                    		MOV.L #00000000H, R4
+00000496 FB36FF                  		MOV.L #0FFFFFFFFH, R3
+00000499 710208                  		ADD #08H, R0, R2
+0000049C 05rrrrrr             A  		BSR _xQueueGenericReceive
+000004A0                         L132:	; bb121
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",288
+000004A0 A881                    		MOV.L 08H[R0], R1
+000004A2 6111                    		CMP #01H, R1
+000004A4 21rr                    		BNE L129
+000004A6                         L133:	; bb126
+                                 ;     291 					}
+                                 ;     292 					qSend = ARCO_OK_FAILED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",292
+000004A6 F90E020000FF            		MOV.L #0FFFF0000H, 08H[R0]
+000004AC                         L134:	; bb126.split
+                                 ;     293 					xQueueSend( qKeyboard, &qSend, 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",293
+000004AC FBE2rrrrrrrr            		MOV.L #_qKeyboard, R14
+000004B2 ECE1                    		MOV.L [R14], R1
+000004B4 6603                    		MOV.L #00000000H, R3
+000004B6 710208                  		ADD #08H, R0, R2
+000004B9 EF34                    		MOV.L R3, R4
+000004BB 05rrrrrr             A  		BSR _xQueueGenericSend
+000004BF 2Err                 B  		BRA L139
+000004C1                         L135:	; bb134
+000004C1 FBE2rrrrrrrr            		MOV.L #_ArcoOktaskIdle, R14
+000004C7 58EE                    		MOVU.B [R14], R14
+000004C9 610E                    		CMP #00H, R14
+000004CB 10                   S  		BEQ L137
+000004CC                         L136:	; bb139
+000004CC F80601                  		MOV.L #00000001H, [R0]
+000004CF 08                   S  		BRA L138
+000004D0                         L137:	; bb140
+000004D0 F80600                  		MOV.L #00000000H, [R0]
+000004D3                         L138:	; bb141
+000004D3 EC01                    		MOV.L [R0], R1
+000004D5 6101                    		CMP #00H, R1
+000004D7 3Brrrr               W  		BNE L120
+000004DA                         L139:	; bb153
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",241
+000004DA FBE2rrrrrrrr            		MOV.L #_ArcoOktaskIdle, R14
+000004E0 58EE                    		MOVU.B [R14], R14
+000004E2 610E                    		CMP #00H, R14
+000004E4 3Brrrr               W  		BNE L89
+000004E7                         L140:	; bb160.split
+000004E7 FB26FF                  		MOV.L #0FFFFFFFFH, R2
+000004EA 6611                    		MOV.L #00000001H, R1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",238
+000004EC 05rrrrrr             A  		BSR _ulTaskNotifyTake
+000004F0                         L141:	; bb160.split10
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",239
+000004F0 FBE2rrrrrrrr            		MOV.L #_ArcoOktaskIdle, R14
+000004F6 F8E401                  		MOV.B #01H, [R14]
+000004F9                         L142:	; bb160.split11
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",240
+000004F9 3C0700                  		MOV.B #00H, 07H[R0]
+000004FC 2Err                 B  		BRA L139
+000004FE                         _emergencia_task:
+                                 		.STACK	_emergencia_task=24
+                                 ;     294 				}
+                                 ;     295 			}
+                                 ;     296 		}
+                                 ;     297 	}
+                                 ;     298 }
+                                 ;     299 
+                                 ;     300 void emergencia_task(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",300
+000004FE 60C0                    		SUB #0CH, R0
+                                 ;     301 {
+                                 ;     302 	uint32_t keyEntry = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",302
+00000500 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000503                         L144:	; entry.split
+                                 ;     303 	uint8_t emergencyCount = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",303
+00000503 3C0A00                  		MOV.B #00H, 0AH[R0]
+00000506                         L145:	; entry.split1
+                                 ;     304 	bool realease = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",304
+00000506 3C0B00                  		MOV.B #00H, 0BH[R0]
+00000509 38rrrr               W  		BRA L179
+0000050C                         L146:	; bb16
+0000050C 6611                    		MOV.L #00000001H, R1
+                                 ;     305 	while(1)
+                                 ;     306 	{
+                                 ;     307 		emergenciaFlag = false;
+                                 ;     308 		realease = false;
+                                 ;     309 	    IR(ICU, IRQ8)  = 0;            //Clear any previously pending interrupts
+                                 ;     310 	    IEN(ICU, IRQ8) = 1;            // Enable interrupt
+                                 ;     311 		ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+                                 ;     312 	    IR(ICU, IRQ8)  = 0;            //Clear any previously pending interrupts
+                                 ;     313 	    IEN(ICU, IRQ8) = 0;            // Enable interrupt
+                                 ;     314 		while(EMERGENCIA && !realease)
+                                 ;     315 		{
+                                 ;     316 			vTaskDelay(1 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",316
+0000050E 05rrrrrr             A  		BSR _vTaskDelay
+00000512                         L147:	; bb16.split
+                                 ;     317 			emergencyCount++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",317
+00000512 B281                    		MOVU.B 0AH[R0], R1
+00000514 6211                    		ADD #01H, R1
+00000516 8281                    		MOV.B R1, 0AH[R0]
+00000518                         L148:	; bb16.split2
+                                 ;     318 			if(emergencyCount == 100)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",318
+00000518 B281                    		MOVU.B 0AH[R0], R1
+0000051A 755164                  		CMP #64H, R1
+0000051D 3Brrrr               W  		BNE L171
+00000520                         L149:	; bb20
+                                 ;     319 			{
+                                 ;     320 				emergenciaFlag = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",320
+00000520 FBE2rrrrrrrr            		MOV.L #_emergenciaFlag, R14
+00000526 F8E401                  		MOV.B #01H, [R14]
+00000529                         L150:	; bb20.split
+                                 ;     321 				xTimerStop( swTimers[AUTO_MENU_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",321
+00000529 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+0000052F AA11                    		MOV.L 20H[R1], R1
+00000531 6040                    		SUB #04H, R0
+00000533 F80600                  		MOV.L #00000000H, [R0]
+00000536 6603                    		MOV.L #00000000H, R3
+00000538 6632                    		MOV.L #00000003H, R2
+0000053A EF34                    		MOV.L R3, R4
+0000053C 05rrrrrr             A  		BSR _xTimerGenericCommand
+00000540 6240                    		ADD #04H, R0
+00000542                         L151:	; bb20.split3
+                                 ;     322 	    		if (isCuttingGet() == true)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",322
+00000542 39rrrr               W  		BSR _isCuttingGet
+00000545 6111                    		CMP #01H, R1
+00000547 18                   S  		BNE L153
+00000548                         L152:	; bb24
+00000548 6611                    		MOV.L #00000001H, R1
+                                 ;     323 	    		{
+                                 ;     324 	    			stopDuringCut_Set(true);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",324
+0000054A 39rrrr               W  		BSR _stopDuringCut_Set
+0000054D                         L153:	; bb29
+                                 ;     325 	    		}
+                                 ;     326 
+                                 ;     327 			    vTaskPrioritySet( xCncTaskHandle, 3 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",327
+0000054D FBE2rrrrrrrr            		MOV.L #_xCncTaskHandle, R14
+00000553 ECE1                    		MOV.L [R14], R1
+00000555 6632                    		MOV.L #00000003H, R2
+00000557 05rrrrrr             A  		BSR _vTaskPrioritySet
+0000055B                         L154:	; bb29.split
+0000055B 6621                    		MOV.L #00000002H, R1
+                                 ;     328 				warm_stop(2);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",328
+0000055D 05rrrrrr             A  		BSR _warm_stop
+00000561                         L155:	; bb29.split4
+                                 ;     329 			    vTaskPrioritySet( xCncTaskHandle, 1 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",329
+00000561 FBE2rrrrrrrr            		MOV.L #_xCncTaskHandle, R14
+00000567 ECE1                    		MOV.L [R14], R1
+00000569 6612                    		MOV.L #00000001H, R2
+0000056B 05rrrrrr             A  		BSR _vTaskPrioritySet
+0000056F                         L156:	; bb29.split5
+                                 ;     330 				TORCH = FALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",330
+0000056F FBEE22C008              		MOV.L #0008C022H, R14
+00000574 F0E3                    		BSET #03H, [R14].B
+00000576                         L157:	; bb29.split6
+                                 ;     331 			    if( uxTaskPriorityGet( xCncTaskHandle ) != 1 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",331
+00000576 FBE2rrrrrrrr            		MOV.L #_xCncTaskHandle, R14
+0000057C ECE1                    		MOV.L [R14], R1
+0000057E 05rrrrrr             A  		BSR _uxTaskPriorityGet
+00000582                         L158:	; bb29.split7
+                                 ;     332 				{
+                                 ;     333 
+                                 ;     334 				}
+                                 ;     335 	    		lstop = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",335
+00000582 FBE2rrrrrrrr            		MOV.L #_lstop, R14
+00000588 F8E401                  		MOV.B #01H, [R14]
+0000058B                         L159:	; bb29.split8
+                                 ;     336 
+                                 ;     337 		    	if (currentLine == 0){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",337
+0000058B FBE2rrrrrrrr            		MOV.L #_currentLine, R14
+00000591 ECEE                    		MOV.L [R14], R14
+00000593 610E                    		CMP #00H, R14
+00000595 21rr                    		BNE L161
+00000597                         L160:	; bb44
+00000597 754314                  		MOV.L #00000014H, R3
+                                 ;     338 		    		strcpy(Str,"MODO DE EMERGÊNCIA\n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",338
+0000059A FB22rrrrrrrr            		MOV.L #_L13, R2
+000005A0 FB12rrrrrrrr            		MOV.L #__$Str, R1
+000005A6 7F87                    		SMOVU
+000005A8 2Err                 B  		BRA L162
+000005AA                         L161:	; bb45
+                                 ;     339 		    	}
+                                 ;     340 		    	else
+                                 ;     341 		    	{
+                                 ;     342 		    		sprintf(Str,"MODO DE EMERGÊNCIA\nPARADO LINHA\n%d\n",currentLine);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",342
+000005AA FBE2rrrrrrrr            		MOV.L #_currentLine, R14
+000005B0 6080                    		SUB #08H, R0
+000005B2 E4E001                  		MOV.L [R14], 04H[R0]
+000005B5 FBE2rrrrrrrr            		MOV.L #_L14, R14
+000005BB E30E                    		MOV.L R14, [R0]
+000005BD FB12rrrrrrrr            		MOV.L #__$Str, R1
+000005C3 05rrrrrr             A  		BSR _sprintf
+000005C7 6280                    		ADD #08H, R0
+000005C9                         L162:	; bb52
+                                 ;     343 		    	}
+                                 ;     344 		    	ut_lcd_output_warning(Str);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",344
+000005C9 FB12rrrrrrrr            		MOV.L #__$Str, R1
+000005CF 05rrrrrr             A  		BSR _ut_lcd_output_warning
+000005D3 2Err                 B  		BRA L166
+000005D5                         L163:	; bb53
+000005D5 FBEE308008              		MOV.L #00088030H, R14
+                                 ;     345 				while(keyEntry != KEY_ESC){
+                                 ;     346 					WDT_FEED
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",346
+000005DA F8E400                  		MOV.B #00H, [R14]
+000005DD                         L164:	; bb53.split
+000005DD FBEE308008              		MOV.L #00088030H, R14
+000005E2 F8E4FF                  		MOV.B #0FFH, [R14]
+000005E5                         L165:	; bb53.split9
+                                 ;     347 					xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",347
+000005E5 FBE2rrrrrrrr            		MOV.L #_qKeyboard, R14
+000005EB ECE1                    		MOV.L [R14], R1
+000005ED 6604                    		MOV.L #00000000H, R4
+000005EF FB36FF                  		MOV.L #0FFFFFFFFH, R3
+000005F2 710204                  		ADD #04H, R0, R2
+000005F5 05rrrrrr             A  		BSR _xQueueGenericReceive
+000005F9                         L166:	; bb57
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",345
+000005F9 A809                    		MOV.L 04H[R0], R1
+000005FB 6111                    		CMP #01H, R1
+000005FD 21rr                    		BNE L163
+000005FF                         L167:	; bb62
+                                 ;     348 				}
+                                 ;     349 				keyEntry = EMERGENCIA_SIGNAL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",349
+000005FF F902010000AAAA          		MOV.L #0AAAA0000H, 04H[R0]
+00000606                         L168:	; bb62.split
+                                 ;     350 				xQueueSend( qKeyboard, &keyEntry, 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",350
+00000606 FBE2rrrrrrrr            		MOV.L #_qKeyboard, R14
+0000060C ECE1                    		MOV.L [R14], R1
+0000060E 6603                    		MOV.L #00000000H, R3
+00000610 710204                  		ADD #04H, R0, R2
+00000613 EF34                    		MOV.L R3, R4
+00000615 05rrrrrr             A  		BSR _xQueueGenericSend
+00000619                         L169:	; bb62.split10
+                                 ;     351 			//	macro_func_ptr = command_idle;
+                                 ;     352 				realease = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",352
+00000619 3C0B01                  		MOV.B #01H, 0BH[R0]
+0000061C                         L170:	; bb62.split11
+                                 ;     353 				emergencyCount = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",353
+0000061C 3C0A00                  		MOV.B #00H, 0AH[R0]
+0000061F                         L171:	; bb72
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",314
+0000061F FBEE22C008              		MOV.L #0008C022H, R14
+00000624 F5E020                  		BTST #00H, 20H[R14].B
+00000627 20rr                    		BEQ L177
+00000629                         L172:	; bb79
+00000629 B289                    		MOVU.B 0BH[R0], R1
+0000062B 6101                    		CMP #00H, R1
+0000062D 10                   S  		BEQ L174
+0000062E                         L173:	; bb84
+0000062E F80600                  		MOV.L #00000000H, [R0]
+00000631 08                   S  		BRA L175
+00000632                         L174:	; bb85
+00000632 F80601                  		MOV.L #00000001H, [R0]
+00000635                         L175:	; bb86
+00000635 EC01                    		MOV.L [R0], R1
+00000637 6101                    		CMP #00H, R1
+00000639 10                   S  		BEQ L177
+0000063A                         L176:	; bb89
+0000063A F80601                  		MOV.L #00000001H, [R0]
+0000063D 08                   S  		BRA L178
+0000063E                         L177:	; bb90
+0000063E F80600                  		MOV.L #00000000H, [R0]
+00000641                         L178:	; bb91
+00000641 EC01                    		MOV.L [R0], R1
+00000643 6101                    		CMP #00H, R1
+00000645 3Brrrr               W  		BNE L146
+00000648                         L179:	; bb97.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",307
+00000648 FBE2rrrrrrrr            		MOV.L #_emergenciaFlag, R14
+0000064E F8E400                  		MOV.B #00H, [R14]
+00000651                         L180:	; bb97.split12
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",308
+00000651 3C0B00                  		MOV.B #00H, 0BH[R0]
+00000654                         L181:	; bb97.split13
+00000654 FBEE487008              		MOV.L #00087048H, R14
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",309
+00000659 F0E8                    		BCLR #00H, [R14].B
+0000065B                         L182:	; bb97.split14
+0000065B FBEE097208              		MOV.L #00087209H, R14
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",310
+00000660 F0E0                    		BSET #00H, [R14].B
+00000662                         L183:	; bb97.split15
+00000662 FB26FF                  		MOV.L #0FFFFFFFFH, R2
+00000665 6611                    		MOV.L #00000001H, R1
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",311
+00000667 05rrrrrr             A  		BSR _ulTaskNotifyTake
+0000066B                         L184:	; bb97.split16
+0000066B FBEE487008              		MOV.L #00087048H, R14
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",312
+00000670 F0E8                    		BCLR #00H, [R14].B
+00000672                         L185:	; bb97.split17
+00000672 FBEE097208              		MOV.L #00087209H, R14
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",313
+00000677 F0E8                    		BCLR #00H, [R14].B
+00000679 2Err                 B  		BRA L171
+0000067B                         _timer_motorPower_callback:
+                                 		.STACK	_timer_motorPower_callback=8
+                                 ;     354 			}
+                                 ;     355 		}
+                                 ;     356 	}
+                                 ;     357 }
+                                 ;     358 
+                                 ;     359 void timer_motorPower_callback(void *pdata)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",359
+0000067B 6040                    		SUB #04H, R0
+0000067D E301                    		MOV.L R1, [R0]
+0000067F FBEE22C008              		MOV.L #0008C022H, R14
+                                 ;     360 {
+                                 ;     361 	PWMCH ^= 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",361
+00000684 58EF                    		MOVU.B [R14], R15
+00000686 EFF5                    		MOV.L R15, R5
+00000688 7A25                    		BCLR #02H, R5
+0000068A 682F                    		SHLR #02H, R15
+0000068C 641F                    		AND #01H, R15
+0000068E FDE0FF                  		BNOT #00H, R15
+00000691 6C2F                    		SHLL #02H, R15
+00000693 57F5                    		OR R15, R5
+00000695 C3E5                    		MOV.B R5, [R14]
+00000697                         L187:	; entry.split
+00000697 FBEE22C008              		MOV.L #0008C022H, R14
+                                 ;     362 	if (TORCH == TRUE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",362
+0000069C 58EE                    		MOVU.B [R14], R14
+0000069E 683E                    		SHLR #03H, R14
+000006A0 7C0E                    		BTST #00H, R14
+000006A2 21rr                    		BNE L190
+000006A4                         L188:	; bb12
+                                 ;     363 	{
+                                 ;     364 		if (arcoOkGet() == true)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",364
+000006A4 39rrrr               W  		BSR _arcoOkGet
+000006A7 6111                    		CMP #01H, R1
+000006A9 21rr                    		BNE L191
+000006AB                         L189:	; bb13
+000006AB 6611                    		MOV.L #00000001H, R1
+                                 ;     365 		{
+                                 ;     366 			isCuttingSet(true);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",366
+000006AD 39rrrr               W  		BSR _isCuttingSet
+000006B0 08                   S  		BRA L191
+000006B1                         L190:	; bb19
+000006B1 6601                    		MOV.L #00000000H, R1
+                                 ;     367 		}
+                                 ;     368 	}
+                                 ;     369 	else
+                                 ;     370 	{
+                                 ;     371 		isCuttingSet(false);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",371
+000006B3 39rrrr               W  		BSR _isCuttingSet
+000006B6                         L191:	; bb28
+                                 ;     372 	}
+                                 ;     373 	if(delay_thcStart){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",373
+000006B6 FBE2rrrrrrrr            		MOV.L #__$delay_thcStart, R14
+000006BC 5CEE                    		MOVU.W [R14], R14
+000006BE 610E                    		CMP #00H, R14
+000006C0 20rr                    		BEQ L195
+000006C2                         L192:	; bb30
+                                 ;     374 		if (delay_thc == 0xFFFF)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",374
+000006C2 FBE2rrrrrrrr            		MOV.L #__$delay_thc, R14
+000006C8 5CEE                    		MOVU.W [R14], R14
+000006CA 770EFFFF00              		CMP #0FFFFH, R14
+000006CF 21rr                    		BNE L194
+000006D1                         L193:	; bb31
+                                 ;     375 		{
+                                 ;     376 			delay_thc = 0xFFFF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",376
+000006D1 FBE2rrrrrrrr            		MOV.L #__$delay_thc, R14
+000006D7 F8E9FFFF                		MOV.W #0FFFFH, [R14]
+000006DB 6701                    		RTSD #04H
+000006DD                         L194:	; bb32
+                                 ;     377 		}
+                                 ;     378 		else
+                                 ;     379 		{
+                                 ;     380 			delay_thc++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",380
+000006DD FBE2rrrrrrrr            		MOV.L #__$delay_thc, R14
+000006E3 DCEF                    		MOV.W [R14], R15
+000006E5 621F                    		ADD #01H, R15
+000006E7 D3EF                    		MOV.W R15, [R14]
+000006E9 6701                    		RTSD #04H
+000006EB                         L195:	; return
+                                 ;     381 		}
+                                 ;     382 	}
+                                 ;     383 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",383
+000006EB 6701                    		RTSD #04H
+000006ED                         _delay_thcStartStop:
+                                 		.STACK	_delay_thcStartStop=8
+                                 ;     384 
+                                 ;     385 void delay_thcStartStop(bool state)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",385
+000006ED 6040                    		SUB #04H, R0
+000006EF 8089                    		MOV.B R1, 03H[R0]
+                                 ;     386 {
+                                 ;     387 	delay_thcStart = state;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",387
+000006F1 FBE2rrrrrrrr            		MOV.L #__$delay_thcStart, R14
+000006F7 B089                    		MOVU.B 03H[R0], R1
+000006F9 D3E1                    		MOV.W R1, [R14]
+000006FB                         L197:	; entry.split
+                                 ;     388 	delay_thc = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",388
+000006FB FBE2rrrrrrrr            		MOV.L #__$delay_thc, R14
+00000701 F8E500                  		MOV.W #0000H, [R14]
+00000704 6701                    		RTSD #04H
+00000706                         _isCuttingSet:
+                                 		.STACK	_isCuttingSet=8
+                                 ;     389 }
+                                 ;     390 
+                                 ;     391 void isCuttingSet(bool state)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",391
+00000706 6040                    		SUB #04H, R0
+00000708 8089                    		MOV.B R1, 03H[R0]
+                                 ;     392 {
+                                 ;     393 	isCutting = state;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",393
+0000070A FBE2rrrrrrrr            		MOV.L #__$isCutting, R14
+00000710 C3E1                    		MOV.B R1, [R14]
+00000712                         L199:	; entry.split
+                                 ;     394 	if(state == false)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",394
+00000712 B089                    		MOVU.B 03H[R0], R1
+00000714 6101                    		CMP #00H, R1
+00000716 18                   S  		BNE L201
+00000717                         L200:	; bb2
+00000717 6601                    		MOV.L #00000000H, R1
+                                 ;     395 	{
+                                 ;     396 		delay_thcStartStop(false);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",396
+00000719 39rrrr               W  		BSR _delay_thcStartStop
+0000071C 6701                    		RTSD #04H
+0000071E                         L201:	; return
+                                 ;     397 	}
+                                 ;     398 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",398
+0000071E 6701                    		RTSD #04H
+00000720                         _isCuttingGet:
+                                 		.STACK	_isCuttingGet=8
+                                 ;     399 
+                                 ;     400 bool isCuttingGet(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",400
+00000720 6040                    		SUB #04H, R0
+                                 ;     401 {
+                                 ;     402 	return isCutting;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",402
+00000722 FBE2rrrrrrrr            		MOV.L #__$isCutting, R14
+00000728 C4E003                  		MOV.B [R14], 03H[R0]
+0000072B B089                    		MOVU.B 03H[R0], R1
+0000072D                         L203:	; entry.split
+                                 ;     403 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",403
+0000072D 5B11                    		MOVU.B R1, R1
+0000072F 6701                    		RTSD #04H
+00000731                         _arcoOkSet:
+                                 		.STACK	_arcoOkSet=8
+                                 ;     404 
+                                 ;     405 void arcoOkSet(bool state)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",405
+00000731 6040                    		SUB #04H, R0
+00000733 8089                    		MOV.B R1, 03H[R0]
+                                 ;     406 {
+                                 ;     407 	arcoOk = state;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",407
+00000735 FBE2rrrrrrrr            		MOV.L #__$arcoOk, R14
+0000073B C3E1                    		MOV.B R1, [R14]
+0000073D 6701                    		RTSD #04H
+0000073F                         _arcoOkGet:
+                                 		.STACK	_arcoOkGet=8
+                                 ;     408 }
+                                 ;     409 
+                                 ;     410 bool arcoOkGet(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",410
+0000073F 6040                    		SUB #04H, R0
+                                 ;     411 {
+                                 ;     412 	return arcoOk;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",412
+00000741 FBE2rrrrrrrr            		MOV.L #__$arcoOk, R14
+00000747 C4E003                  		MOV.B [R14], 03H[R0]
+0000074A B089                    		MOVU.B 03H[R0], R1
+0000074C                         L206:	; entry.split
+                                 ;     413 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",413
+0000074C 5B11                    		MOVU.B R1, R1
+0000074E 6701                    		RTSD #04H
+00000750                         _THC_realGet:
+                                 		.STACK	_THC_realGet=8
+                                 ;     414 
+                                 ;     415 float THC_realGet(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",415
+00000750 6040                    		SUB #04H, R0
+                                 ;     416 {
+                                 ;     417 	return THC_real;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",417
+00000752 FBE2rrrrrrrr            		MOV.L #_THC_real, R14
+00000758 ECE1                    		MOV.L [R14], R1
+0000075A E301                    		MOV.L R1, [R0]
+0000075C                         L208:	; entry.split
+                                 ;     418 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",418
+0000075C 6701                    		RTSD #04H
+0000075E                         _delay_thcSet:
+                                 		.STACK	_delay_thcSet=8
+                                 ;     419 
+                                 ;     420 void delay_thcSet(uint16_t state)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",420
+0000075E 6040                    		SUB #04H, R0
+00000760 9009                    		MOV.W R1, 02H[R0]
+                                 ;     421 {
+                                 ;     422 	delay_thc = state;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",422
+00000762 FBE2rrrrrrrr            		MOV.L #__$delay_thc, R14
+00000768 D3E1                    		MOV.W R1, [R14]
+0000076A 6701                    		RTSD #04H
+0000076C                         _delay_thcGet:
+                                 		.STACK	_delay_thcGet=8
+                                 ;     423 }
+                                 ;     424 
+                                 ;     425 uint16_t delay_thcGet(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",425
+0000076C 6040                    		SUB #04H, R0
+                                 ;     426 {
+                                 ;     427 	return delay_thc;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",427
+0000076E FBE2rrrrrrrr            		MOV.L #__$delay_thc, R14
+00000774 D4E001                  		MOV.W [R14], 02H[R0]
+00000777 9809                    		MOV.W 02H[R0], R1
+00000779                         L211:	; entry.split
+                                 ;     428 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",428
+00000779 5F11                    		MOVU.W R1, R1
+0000077B 6701                    		RTSD #04H
+0000077D                         _stopDuringCut_Set:
+                                 		.STACK	_stopDuringCut_Set=8
+                                 ;     429 
+                                 ;     430 void stopDuringCut_Set(bool state)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",430
+0000077D 6040                    		SUB #04H, R0
+0000077F 8089                    		MOV.B R1, 03H[R0]
+                                 ;     431 {
+                                 ;     432 	stopDuringCut = state;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",432
+00000781 FBE2rrrrrrrr            		MOV.L #__$stopDuringCut, R14
+00000787 C3E1                    		MOV.B R1, [R14]
+00000789 6701                    		RTSD #04H
+0000078B                         _stopDuringCut_Get:
+                                 		.STACK	_stopDuringCut_Get=8
+                                 ;     433 }
+                                 ;     434 
+                                 ;     435 bool stopDuringCut_Get(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",435
+0000078B 6040                    		SUB #04H, R0
+                                 ;     436 {
+                                 ;     437 	return stopDuringCut;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",437
+0000078D FBE2rrrrrrrr            		MOV.L #__$stopDuringCut, R14
+00000793 C4E003                  		MOV.B [R14], 03H[R0]
+00000796 B089                    		MOVU.B 03H[R0], R1
+00000798                         L214:	; entry.split
+                                 ;     438 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plasma.c",438
+00000798 5B11                    		MOVU.B R1, R1
+0000079A 6701                    		RTSD #04H
+                                 ;     439 
+                                 ;     440 
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 506C6173                		.byte	"Plasma task"
+         6D612074                
+         61736B                  
+0000000B 00                      		.byte	00H
+0000000C                         _L11:
+0000000C 456D6572                		.byte	"Emergencia task"
+         67656E63                
+         69612074                
+         61736B                  
+0000001B 00                      		.byte	00H
+0000001C                         _L12:
+0000001C 504C4153                		.byte	"PLASMA N"
+         4D41204E                
+00000024 C3                      		.byte	0C3H
+00000025 4F                      		.byte	"O"
+00000026 0A                      		.byte	0AH
+00000027 5452414E                		.byte	"TRANSFERIDO"
+         53464552                
+         49444F                  
+00000032 0A00                    		.byte	0AH,00H
+00000034                         _L13:
+00000034 4D4F444F                		.byte	"MODO DE EMERG"
+         20444520                
+         454D4552                
+         47                      
+00000041 CA                      		.byte	0CAH
+00000042 4E434941                		.byte	"NCIA"
+00000046 0A00                    		.byte	0AH,00H
+00000048                         _L14:
+00000048 4D4F444F                		.byte	"MODO DE EMERG"
+         20444520                
+         454D4552                
+         47                      
+00000055 CA                      		.byte	0CAH
+00000056 4E434941                		.byte	"NCIA"
+0000005A 0A                      		.byte	0AH
+0000005B 50415241                		.byte	"PARADO LINHA"
+         444F204C                
+         494E4841                
+00000067 0A                      		.byte	0AH
+00000068 2564                    		.byte	"%d"
+0000006A 0A00                    		.byte	0AH,00H
+                                 		.SECTION	D_2,ROMDATA,ALIGN=2
+00000000                         __$delay_thc:
+00000000 0000                    		.word	0000H
+00000002                         __$delay_thcStart:
+00000002 0000                    		.word	0000H
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$stopDuringCut:
+00000000 00                      		.byte	00H
+00000001                         __$isCutting:
+00000001 00                      		.byte	00H
+00000002                         __$arcoOk:
+00000002 00                      		.byte	00H
+00000003                         _emergenciaFlag:
+00000003 00                      		.byte	00H
+00000004                         _ArcoOktaskIdle:
+00000004 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _xPlasmaTaskHandle:
+00000000(00000004H)              		.blkl	1
+00000004                         _xEmergenciaTaskHandle:
+00000004(00000004H)              		.blkl	1
+00000008                         _xArcoOkSync:
+00000008(00000004H)              		.blkl	1
+0000000C                         _THC_real:
+0000000C(00000004H)              		.blkl	1
+00000010                         _THC_err:
+00000010(00000004H)              		.blkl	1
+00000014                         _THC_integral:
+00000014(00000004H)              		.blkl	1
+                                 		.SECTION	B_2,DATA,ALIGN=2
+00000000                         _data:
+00000000(00000002H)              		.blkw	1
+                                 		.SECTION	B_1,DATA
+00000000                         __$Str:
+00000000(00000032H)              		.blkb	50
+                                 		.SECTION	NOINIT,DATA,ALIGN=4
+00000000                         _currentLine:
+00000000(00000004H)              		.blkl	1
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01646   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001948(0000079CH)  P
+ROMDATA  0000000108(0000006CH)  L
+ROMDATA  0000000004(00000004H)  D_2
+ROMDATA  0000000005(00000005H)  D_1
+DATA     0000000024(00000018H)  B
+DATA     0000000002(00000002H)  B_2
+DATA     0000000050(00000032H)  B_1
+DATA     0000000004(00000004H)  NOINIT
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\plasma.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\plasma.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\src\cnc\plasma.obj

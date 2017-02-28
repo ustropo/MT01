@@ -1,0 +1,313 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:41 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:41
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=locking.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=locking.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;locking.c
+                                 
+                                 		.glb	_g_bsp_Locks
+                                 		.glb	_R_BSP_SoftwareLock
+                                 		.glb	_R_BSP_SoftwareUnlock
+                                 		.glb	_R_BSP_HardwareLock
+                                 		.glb	_R_BSP_HardwareUnlock
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _R_BSP_SoftwareLock:
+                                 		.STACK	_R_BSP_SoftwareLock=20
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : locking.c
+                                 ;      21 * Description  : This implements a locking mechanism that can be used by all code. The locking is done atomically so
+                                 ;      22 *                common resources can be accessed safely.
+                                 ;      23 ***********************************************************************************************************************/
+                                 ;      24 /**********************************************************************************************************************
+                                 ;      25 * History : DD.MM.YYYY Version  Description
+                                 ;      26 *         : 07.03.2012 1.00     First Release
+                                 ;      27 *         : 20.09.2012 1.10     Added ability for user to implement their own locking if  
+                                 ;      28 *                               BSP_CFG_USER_LOCKING_ENABLED != 0.
+                                 ;      29 *         : 19.11.2012 1.20     Updated code to use 'BSP_' and 'BSP_CFG_' prefix for macros.
+                                 ;      30 *         : 16.01.2013 1.30     Added const qualifiers to lock functions.
+                                 ;      31 ***********************************************************************************************************************/
+                                 ;      32 
+                                 ;      33 /***********************************************************************************************************************
+                                 ;      34 Includes   <System Includes> , "Project Includes"
+                                 ;      35 ***********************************************************************************************************************/
+                                 ;      36 /* Platform configuration. */
+                                 ;      37 #include "platform.h"
+                                 ;      38 
+                                 ;      39 /***********************************************************************************************************************
+                                 ;      40 Macro definitions
+                                 ;      41 ***********************************************************************************************************************/
+                                 ;      42 
+                                 ;      43 /***********************************************************************************************************************
+                                 ;      44 Typedef definitions
+                                 ;      45 ***********************************************************************************************************************/
+                                 ;      46 
+                                 ;      47 /***********************************************************************************************************************
+                                 ;      48 Exported global variables (to be accessed by other files)
+                                 ;      49 ***********************************************************************************************************************/
+                                 ;      50  
+                                 ;      51 /***********************************************************************************************************************
+                                 ;      52 Private global variables and functions
+                                 ;      53 ***********************************************************************************************************************/
+                                 ;      54 
+                                 ;      55 /***********************************************************************************************************************
+                                 ;      56 * Function Name: R_BSP_SoftwareLock
+                                 ;      57 * Description  : Attempt to acquire the lock that has been sent in.
+                                 ;      58 * Arguments    : plock -
+                                 ;      59 *                    Pointer to lock structure with lock to try and acquire.
+                                 ;      60 * Return Value : true -
+                                 ;      61 *                    Lock was acquired.
+                                 ;      62 *                false -
+                                 ;      63 *                    Lock was not acquired.
+                                 ;      64 ***********************************************************************************************************************/
+                                 ;      65 bool R_BSP_SoftwareLock (BSP_CFG_USER_LOCKING_TYPE * const plock)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",65
+00000000 7100F0                  		ADD #0FFFFFFF0H, R0
+00000003 A089                    		MOV.L R1, 0CH[R0]
+                                 ;      66 {
+                                 ;      67 #if BSP_CFG_USER_LOCKING_ENABLED == 0
+                                 ;      68     bool ret = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",68
+00000005 3C0300                  		MOV.B #00H, 03H[R0]
+00000008                         L11:	; entry.split
+                                 ;      69 
+                                 ;      70     /* Variable used in trying to acquire lock. Using the xchg instruction makes this atomic */
+                                 ;      71     int32_t is_locked = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",71
+00000008 3E0101                  		MOV.L #00000001H, 04H[R0]
+0000000B                         L12:	; entry.split1
+                                 ;      72     
+                                 ;      73     /* This example uses the RX MCU's atomic xchg() instruction. plock->lock is the lock we are trying to reserve. 
+                                 ;      74        The way this works is that 'is_locked' gets the value of the plock->lock and plock->lock gets the value of 
+                                 ;      75        'is_locked' which we just set to 'true'. Basically this is an atomic 'swap' command. If the lock had not yet been
+                                 ;      76        reserved then its value would be 'false' and after the xchg() instruction finished 'is_locked' would have 
+                                 ;      77        'false'. If it had already been reserved then 'is_locked' would have 'true' after the xchg() instruction. Since 
+                                 ;      78        plock->lock was already 'true' and we just set it back to 'true' everything is ok. To see if we reserved the lock
+                                 ;      79        we just need to check the value of 'is_locked' after this instruction finishes. */
+                                 ;      80 
+                                 ;      81     /* Try to acquire semaphore to obtain lock */
+                                 ;      82     xchg(&is_locked, &plock->lock);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",82
+0000000B A889                    		MOV.L 0CH[R0], R1
+0000000D A80A                    		MOV.L 04H[R0], R2
+0000000F 06A01012                		XCHG [R1].L, R2
+00000013 A00A                    		MOV.L R2, 04H[R0]
+00000015                         L13:	; entry.split2
+                                 ;      83     
+                                 ;      84     /* Check to see if semaphore was successfully taken */
+                                 ;      85     if (is_locked == false)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",85
+00000015 A809                    		MOV.L 04H[R0], R1
+00000017 6101                    		CMP #00H, R1
+00000019 18                   S  		BNE L15
+0000001A                         L14:	; bb8
+                                 ;      86     {        
+                                 ;      87         /* Lock obtained, return success. */
+                                 ;      88         ret = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",88
+0000001A 3C0301                  		MOV.B #01H, 03H[R0]
+0000001D                         L15:	; bb13
+                                 ;      89     }
+                                 ;      90     else
+                                 ;      91     {
+                                 ;      92         /* Lock was not obtained, another task already has it. */
+                                 ;      93     }
+                                 ;      94 
+                                 ;      95     return ret;   
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",95
+0000001D C500030B                		MOV.B 03H[R0], 0BH[R0]
+00000021 B289                    		MOVU.B 0BH[R0], R1
+00000023                         L16:	; bb13.split
+                                 ;      96 #else
+                                 ;      97     /* User is going to handle the locking themselves. */
+                                 ;      98     return BSP_CFG_USER_LOCKING_SW_LOCK_FUNCTION(plock);
+                                 ;      99 #endif
+                                 ;     100 } /* End of function R_BSP_SoftwareLock() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",100
+00000023 5B11                    		MOVU.B R1, R1
+00000025 6704                    		RTSD #10H
+00000027                         _R_BSP_SoftwareUnlock:
+                                 		.STACK	_R_BSP_SoftwareUnlock=12
+                                 ;     101 
+                                 ;     102 /***********************************************************************************************************************
+                                 ;     103 * Function Name: R_BSP_SoftwareUnlock
+                                 ;     104 * Description  : Release hold on lock.
+                                 ;     105 * Arguments    : plock -
+                                 ;     106 *                    Pointer to lock structure with lock to release.
+                                 ;     107 * Return Value : true -
+                                 ;     108 *                    Lock was released.
+                                 ;     109 *                false -
+                                 ;     110 *                    Lock was not released.
+                                 ;     111 ***********************************************************************************************************************/
+                                 ;     112 bool R_BSP_SoftwareUnlock (BSP_CFG_USER_LOCKING_TYPE * const plock)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",112
+00000027 6080                    		SUB #08H, R0
+00000029 A009                    		MOV.L R1, 04H[R0]
+                                 ;     113 {
+                                 ;     114 #if BSP_CFG_USER_LOCKING_ENABLED == 0
+                                 ;     115     /* Set lock back to unlocked. */
+                                 ;     116     plock->lock = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",116
+0000002B F81600                  		MOV.L #00000000H, [R1]
+0000002E                         L18:	; entry.split
+                                 ;     117 
+                                 ;     118     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",118
+0000002E 3C0301                  		MOV.B #01H, 03H[R0]
+00000031 B089                    		MOVU.B 03H[R0], R1
+00000033                         L19:	; entry.split1
+                                 ;     119 #else
+                                 ;     120     /* User is going to handle the locking themselves. */
+                                 ;     121     return BSP_CFG_USER_LOCKING_SW_UNLOCK_FUNCTION(plock);
+                                 ;     122 #endif
+                                 ;     123 } /* End of function R_BSP_SoftwareUnlock() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",123
+00000033 5B11                    		MOVU.B R1, R1
+00000035 6702                    		RTSD #08H
+00000037                         _R_BSP_HardwareLock:
+                                 		.STACK	_R_BSP_HardwareLock=12
+                                 ;     124 
+                                 ;     125 
+                                 ;     126 /***********************************************************************************************************************
+                                 ;     127 * Function Name: R_BSP_HardwareLock
+                                 ;     128 * Description  : Attempt to acquire the lock that has been sent in. This function takes in a peripheral index into the
+                                 ;     129 *                array that holds hardware locks.
+                                 ;     130 * Arguments    : hw_index -
+                                 ;     131 *                    Index in locks array to the hardware resource to lock.
+                                 ;     132 * Return Value : true -
+                                 ;     133 *                    Lock was acquired.
+                                 ;     134 *                false -
+                                 ;     135 *                    Lock was not acquired.
+                                 ;     136 ***********************************************************************************************************************/
+                                 ;     137 bool R_BSP_HardwareLock (mcu_lock_t const hw_index)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",137
+00000037 6080                    		SUB #08H, R0
+00000039 A009                    		MOV.L R1, 04H[R0]
+                                 ;     138 {
+                                 ;     139 #if BSP_CFG_USER_LOCKING_ENABLED == 0
+                                 ;     140     /* Pass actual lock to software lock function. */
+                                 ;     141     return R_BSP_SoftwareLock(&g_bsp_Locks[hw_index]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",141
+0000003B EF1E                    		MOV.L R1, R14
+0000003D 6C2E                    		SHLL #02H, R14
+0000003F FB12rrrrrrrr            		MOV.L #_g_bsp_Locks, R1
+00000045 4BE1                    		ADD R14, R1
+00000047 39rrrr               W  		BSR _R_BSP_SoftwareLock
+0000004A 8089                    		MOV.B R1, 03H[R0]
+0000004C B089                    		MOVU.B 03H[R0], R1
+0000004E                         L21:	; entry.split
+                                 ;     142 #else
+                                 ;     143     /* User is going to handle the locking themselves. */
+                                 ;     144     return BSP_CFG_USER_LOCKING_HW_LOCK_FUNCTION(hw_index);
+                                 ;     145 #endif
+                                 ;     146 } /* End of function R_BSP_HardwareLock() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",146
+0000004E 5B11                    		MOVU.B R1, R1
+00000050 6702                    		RTSD #08H
+00000052                         _R_BSP_HardwareUnlock:
+                                 		.STACK	_R_BSP_HardwareUnlock=12
+                                 ;     147 
+                                 ;     148 /***********************************************************************************************************************
+                                 ;     149 * Function Name: R_BSP_HardwareUnlock
+                                 ;     150 * Description  : Release hold on lock.
+                                 ;     151 * Arguments    : hw_index -
+                                 ;     152 *                    Index in locks array to the hardware resource to unlock.
+                                 ;     153 * Return Value : true -
+                                 ;     154 *                    Lock was released.
+                                 ;     155 *                false -
+                                 ;     156 *                    Lock was not released.
+                                 ;     157 ***********************************************************************************************************************/
+                                 ;     158 bool R_BSP_HardwareUnlock (mcu_lock_t const hw_index)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",158
+00000052 6080                    		SUB #08H, R0
+00000054 A009                    		MOV.L R1, 04H[R0]
+                                 ;     159 {
+                                 ;     160 #if BSP_CFG_USER_LOCKING_ENABLED == 0
+                                 ;     161     /* Pass actual lock to software unlock function. */
+                                 ;     162     return R_BSP_SoftwareUnlock(&g_bsp_Locks[hw_index]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",162
+00000056 EF1E                    		MOV.L R1, R14
+00000058 6C2E                    		SHLL #02H, R14
+0000005A FB12rrrrrrrr            		MOV.L #_g_bsp_Locks, R1
+00000060 4BE1                    		ADD R14, R1
+00000062 39rrrr               W  		BSR _R_BSP_SoftwareUnlock
+00000065 8089                    		MOV.B R1, 03H[R0]
+00000067 B089                    		MOVU.B 03H[R0], R1
+00000069                         L23:	; entry.split
+                                 ;     163 #else
+                                 ;     164     /* User is going to handle the locking themselves. */
+                                 ;     165     return BSP_CFG_USER_LOCKING_HW_UNLOCK_FUNCTION(hw_index);
+                                 ;     166 #endif
+                                 ;     167 } /* End of function R_BSP_HardwareUnlock() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",167
+00000069 5B11                    		MOVU.B R1, R1
+0000006B 6702                    		RTSD #08H
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00280   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000109(0000006DH)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\locking.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\locking.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_bsp\mcu\rx63n\locking.obj

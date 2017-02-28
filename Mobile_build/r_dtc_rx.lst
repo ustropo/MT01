@@ -1,0 +1,1680 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:54:37 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:54:36
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_dtc_rx.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_dtc_rx.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;r_dtc_rx.c
+                                 
+                                 		.glb	_source_array
+                                 		.glb	_g_dtc_table_work
+                                 		.glb	_R_DTC_Open
+                                 		.glb	_malloc
+                                 		.glb	_r_dtc_module_enable
+                                 		.glb	_R_DTC_Create
+                                 		.glb	_R_DTC_Close
+                                 		.glb	_free
+                                 		.glb	_r_dtc_module_disable
+                                 		.glb	_R_DTC_Control
+                                 		.glb	_R_DTC_GetVersion
+                                 		.glb	_R_BSP_HardwareLock
+                                 		.glb	_R_BSP_HardwareUnlock
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _R_DTC_Open:
+                                 		.STACK	_R_DTC_Open=16
+                                 ;       1 /*******************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only
+                                 ;       4 * intended for use with Renesas products. No other uses are authorized. This
+                                 ;       5 * software is owned by Renesas Electronics Corporation and is protected under
+                                 ;       6 * all applicable laws, including copyright laws.
+                                 ;       7 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       8 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+                                 ;       9 * LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+                                 ;      10 * AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+                                 ;      11 * TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+                                 ;      12 * ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+                                 ;      13 * FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+                                 ;      14 * ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+                                 ;      15 * BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      16 * Renesas reserves the right, without notice, to make changes to this software
+                                 ;      17 * and to discontinue the availability of this software. By using this software,
+                                 ;      18 * you agree to the additional terms and conditions found by accessing the
+                                 ;      19 * following link:
+                                 ;      20 * http://www.renesas.com/disclaimer
+                                 ;      21 *
+                                 ;      22 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      23 *******************************************************************************/
+                                 ;      24 
+                                 ;      25 /*******************************************************************************
+                                 ;      26 * File Name    : r_dtc_rx.c
+                                 ;      27 * Device(s)    : RX
+                                 ;      28 * Tool-Chain   : Renesas RXC Toolchain v2.01.00
+                                 ;      29 * OS           : not use
+                                 ;      30 * H/W Platform : not use
+                                 ;      31 * Description  : Functions for using DTC on RX devices.
+                                 ;      32 *******************************************************************************/
+                                 ;      33 /*******************************************************************************
+                                 ;      34 * History : DD.MM.YYYY Version Description
+                                 ;      35 *         : 17.03.2014 1.00    Initial revision
+                                 ;      36 *         : 17.07.2014 2.00    Second  revision
+                                 ;      37 *         : 12.11.2014 2.01    Added RX113.
+                                 ;      38 *         : 30.01.2015 2.02    Added RX71M.
+                                 ;      39 *******************************************************************************/
+                                 ;      40 
+                                 ;      41 /*******************************************************************************
+                                 ;      42 Includes   <System Includes> , "Project Includes"
+                                 ;      43 *******************************************************************************/
+                                 ;      44 /* Defines for DTC support */
+                                 ;      45 #include <stdlib.h>
+                                 ;      46 #include "r_dtc_rx_if.h"
+                                 ;      47 #include ".\src\r_dtc_rx_private.h"
+                                 ;      48 
+                                 ;      49 
+                                 ;      50 /*******************************************************************************
+                                 ;      51 Macro definitions
+                                 ;      52 *******************************************************************************/
+                                 ;      53 #define    DTC_ACT_BIT_MASK            (0x8000) /* DTC Active flag (DTCSTS.ACT) bit mask */
+                                 ;      54 #define    DTC_VECT_NR_MASK            (0x00FF) /* DTC-Activating Vector Number bits mask */
+                                 ;      55 #define    DTC_MAX_16BITS_COUNT_VAL    (65536)  /* The maximum value of 16bit count value */
+                                 ;      56 #define    DTC_MAX_8BITS_COUNT_VAL     (256)    /* The maximum value of 8bit count value */
+                                 ;      57 #define    DTC_MIN_COUNT_VAL           (1)      /* The minimum of count value  and block size */
+                                 ;      58 
+                                 ;      59 
+                                 ;      60 /*******************************************************************************
+                                 ;      61 Typedef definitions
+                                 ;      62 *******************************************************************************/
+                                 ;      63 
+                                 ;      64 
+                                 ;      65 /*******************************************************************************
+                                 ;      66 Exported global variables (to be accessed by other files)
+                                 ;      67 *******************************************************************************/
+                                 ;      68 extern const dtc_activation_source_t source_array[];
+                                 ;      69 
+                                 ;      70 
+                                 ;      71 /*******************************************************************************
+                                 ;      72 Private variables and functions
+                                 ;      73 *******************************************************************************/
+                                 ;      74 static bool g_is_opened = false; /* Indicate whether DTC is opened. */
+                                 ;      75 uint32_t    * g_dtc_table_work[2];
+                                 ;      76 
+                                 ;      77 static dtc_err_t r_dtc_set_transfer_data(dtc_transfer_data_t *p_transfer_data,
+                                 ;      78                                    dtc_transfer_data_cfg_t *p_cfg);
+                                 ;      79 static void r_dtc_clear_all_dtce_bits(void);
+                                 ;      80 static bool r_dtc_abort_chain_transfer(uint32_t chain_transfer_nr);
+                                 ;      81 static bool r_dtc_acquire_hw_lock(void);
+                                 ;      82 static void r_dtc_release_hw_lock(void);
+                                 ;      83 static bool r_dtc_check_DMAC_locking_sw(void);
+                                 ;      84 
+                                 ;      85 /*******************************************************************************
+                                 ;      86 * Function Name: R_DTC_Open
+                                 ;      87 * Description  : Initializes the DTC module. It's only called once.
+                                 ;      88 * Arguments    : None
+                                 ;      89 * Return Value : DTC_SUCCESS -
+                                 ;      90 *                    Successful operation
+                                 ;      91 *                DTC_ERR_INVALID_ARG -
+                                 ;      92 *                    Parameters are invalid.
+                                 ;      93 *                DTC_ERR_OPENED -
+                                 ;      94 *                    The DTC has been already initialized.
+                                 ;      95 *                DTC_ERR_BUSY -
+                                 ;      96 *                    DTC is opened already.
+                                 ;      97 *******************************************************************************/
+                                 ;      98 dtc_err_t R_DTC_Open(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",98
+00000000 60C0                    		SUB #0CH, R0
+                                 ;      99 {
+                                 ;     100 	uint8_t * dtc_table_work2 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",100
+00000002 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000005                         L11:	; entry.split
+                                 ;     101 
+                                 ;     102     if (false == r_dtc_acquire_hw_lock())
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",102
+00000005 39rrrr               W  		BSR __$r_dtc_acquire_hw_lock
+00000008 6101                    		CMP #00H, R1
+0000000A 18                   S  		BNE L13
+0000000B                         L12:	; bb2
+                                 ;     103     {
+                                 ;     104         /* Lock has already been acquired by another task. Need to try again later. */
+                                 ;     105         return DTC_ERR_BUSY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",105
+0000000B F80607                  		MOV.L #00000007H, [R0]
+0000000E 38rrrr               W  		BRA L31
+00000011                         L13:	; bb9
+                                 ;     106     }
+                                 ;     107 
+                                 ;     108     if (true == g_is_opened) /* DTC is opened. */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",108
+00000011 FBE2rrrrrrrr            		MOV.L #__$g_is_opened, R14
+00000017 58EE                    		MOVU.B [R14], R14
+00000019 611E                    		CMP #01H, R14
+0000001B 18                   S  		BNE L16
+0000001C                         L14:	; bb10
+                                 ;     109     {
+                                 ;     110         r_dtc_release_hw_lock();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",110
+0000001C 39rrrr               W  		BSR __$r_dtc_release_hw_lock
+0000001F                         L15:	; bb10.split
+                                 ;     111         return DTC_ERR_OPENED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",111
+0000001F F80602                  		MOV.L #00000002H, [R0]
+00000022 2Err                 B  		BRA L31
+00000024                         L16:	; bb17
+00000024 FB1A0008                		MOV.L #00000800H, R1
+                                 ;     112     }
+                                 ;     113 
+                                 ;     114     g_dtc_table_work[0] = (uint32_t *)malloc(DTC_VECTOR_TABLE_SIZE_BYTES);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",114
+00000028 05rrrrrr             A  		BSR _malloc
+0000002C FBE2rrrrrrrr            		MOV.L #_g_dtc_table_work, R14
+00000032 E3E1                    		MOV.L R1, [R14]
+00000034                         L17:	; bb17.split
+                                 ;     115 
+                                 ;     116     if (0 == g_dtc_table_work[0])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",116
+00000034 FBE2rrrrrrrr            		MOV.L #_g_dtc_table_work, R14
+0000003A ECEE                    		MOV.L [R14], R14
+0000003C 610E                    		CMP #00H, R14
+0000003E 18                   S  		BNE L20
+0000003F                         L18:	; bb21
+                                 ;     117     {
+                                 ;     118         r_dtc_release_hw_lock();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",118
+0000003F 39rrrr               W  		BSR __$r_dtc_release_hw_lock
+00000042                         L19:	; bb21.split
+                                 ;     119         return DTC_ERR_OPENED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",119
+00000042 F80602                  		MOV.L #00000002H, [R0]
+00000045 2Err                 B  		BRA L31
+00000047                         L20:	; bb27
+                                 ;     120     }
+                                 ;     121 
+                                 ;     122     g_dtc_table_work[1] = g_dtc_table_work[0];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",122
+00000047 FBE2rrrrrrrr            		MOV.L #_g_dtc_table_work, R14
+0000004D E4EE01                  		MOV.L [R14], 04H[R14]
+00000050                         L21:	; bb27.split
+                                 ;     123     dtc_table_work2 = (uint8_t *)g_dtc_table_work[1];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",123
+00000050 FBE2rrrrrrrr            		MOV.L #_g_dtc_table_work, R14
+00000056 E5E00101                		MOV.L 04H[R14], 04H[R0]
+0000005A                         L22:	; bb27.split1
+                                 ;     124     dtc_table_work2 = (dtc_table_work2 + 0x400);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",124
+0000005A A809                    		MOV.L 04H[R0], R1
+0000005C 72110004                		ADD #0400H, R1
+00000060 A009                    		MOV.L R1, 04H[R0]
+00000062                         L23:	; bb27.split2
+                                 ;     125     dtc_table_work2 = (uint8_t *)((uint32_t)dtc_table_work2 & 0xfffffc00);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",125
+00000062 A809                    		MOV.L 04H[R0], R1
+00000064 762100FC                		AND #0FFFFFC00H, R1
+00000068 A009                    		MOV.L R1, 04H[R0]
+0000006A                         L24:	; bb27.split3
+                                 ;     126 
+                                 ;     127 #if (DTC_ENABLE == DTC_CFG_DISABLE_ALL_ACT_SOURCE) /* Clear all DTCER registers. */
+                                 ;     128 
+                                 ;     129     r_dtc_clear_all_dtce_bits();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",129
+0000006A 39rrrr               W  		BSR __$r_dtc_clear_all_dtce_bits
+0000006D                         L25:	; bb27.split4
+                                 ;     130 
+                                 ;     131 #endif /* DTC_ENABLE == DTC_CFG_DISABLE_ALL_ACT_SOURCE */
+                                 ;     132 
+                                 ;     133     /* Cancel module stop for DMAC and DTC. */
+                                 ;     134     r_dtc_module_enable();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",134
+0000006D 05rrrrrr             A  		BSR _r_dtc_module_enable
+00000071                         L26:	; bb27.split5
+                                 ;     135     /* Set DTC Vector Table Base Register. */
+                                 ;     136     DTC.DTCVBR = dtc_table_work2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",136
+00000071 FBEE002408              		MOV.L #00082400H, R14
+00000076 E50E0101                		MOV.L 04H[R0], 04H[R14]
+0000007A                         L27:	; bb27.split6
+                                 ;     137 
+                                 ;     138     /* Set DTC address mode. */
+                                 ;     139 #if (DTC_ENABLE == DTC_CFG_SHORT_ADDRRESS_MODE)
+                                 ;     140     DTC.DTCADMOD.BIT.SHORT = 1;
+                                 ;     141 #else /* Full-address mode */
+                                 ;     142     DTC.DTCADMOD.BIT.SHORT = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",142
+0000007A FBEE002408              		MOV.L #00082400H, R14
+0000007F F1E808                  		BCLR #00H, 08H[R14].B
+00000082                         L28:	; bb27.split7
+                                 ;     143 #endif /* DTC_CFG_SHORT_ADDRRESS_MODE */
+                                 ;     144 
+                                 ;     145     /* Set the Transfer Data Read Skip bit. */
+                                 ;     146 #if (DTC_ENABLE == DTC_CFG_TRANSFER_DATA_READ_SKIP_EN) /* Enable Data Read Skip. */
+                                 ;     147     DTC.DTCCR.BIT.RRS = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",147
+00000082 FBEE002408              		MOV.L #00082400H, R14
+00000087 F0E4                    		BSET #04H, [R14].B
+00000089                         L29:	; bb27.split8
+                                 ;     148 #else /* Disable Data Read Skip. */
+                                 ;     149     DTC.DTCCR.BIT.RRS = 0;
+                                 ;     150 #endif /* DTC_TRANSFER_DATA_READ_SKIP_EN */
+                                 ;     151     g_is_opened = true; /* DTC module is initialized successfully. */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",151
+00000089 FBE2rrrrrrrr            		MOV.L #__$g_is_opened, R14
+0000008F F8E401                  		MOV.B #01H, [R14]
+00000092                         L30:	; bb27.split9
+                                 ;     152 
+                                 ;     153     return DTC_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",153
+00000092 F80601                  		MOV.L #00000001H, [R0]
+00000095                         L31:	; bb45
+00000095 EC01                    		MOV.L [R0], R1
+00000097 A081                    		MOV.L R1, 08H[R0]
+                                 ;     154 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",154
+00000099 6703                    		RTSD #0CH
+0000009B                         _R_DTC_Create:
+                                 		.STACK	_R_DTC_Create=44
+                                 ;     155 
+                                 ;     156 /*******************************************************************************
+                                 ;     157 * Function Name: R_DTC_Create
+                                 ;     158 * Description  : Creates the Transfer data for a specified interrupt source.
+                                 ;     159 * Arguments    : act_source -
+                                 ;     160 *                    Activation source
+                                 ;     161 *                p_transfer_data -
+                                 ;     162 *                    Pointer to start address of Transfer data area on RAM
+                                 ;     163 *                p_data_cfg -
+                                 ;     164 *                    Pointer to contains the settings for Transfer data
+                                 ;     165 *                chain_transfer_nr -
+                                 ;     166 *                    Number of chain transfer
+                                 ;     167 * Return Value : DTC_SUCCESS -
+                                 ;     168 *                    Successful operation
+                                 ;     169 *                DTC_ERR_NOT_OPEN -
+                                 ;     170 *                    The DTC is not initialized yet.
+                                 ;     171 *                DTC_ERR_INVALID_ARG -
+                                 ;     172 *                    Parameters are invalid.
+                                 ;     173 *                DTC_ERR_NULL_PTR -
+                                 ;     174 *                    The pointers are NULL.
+                                 ;     175 *                DTC_ERR_BUSY -
+                                 ;     176 *                    The resource are locked by another process.
+                                 ;     177 *******************************************************************************/
+                                 ;     178 dtc_err_t R_DTC_Create(dtc_activation_source_t act_source, dtc_transfer_data_t *p_transfer_data,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",178
+0000009B 7100D8                  		ADD #0FFFFFFD8H, R0
+0000009E A209                    		MOV.L R1, 24H[R0]
+000000A0 A202                    		MOV.L R2, 20H[R0]
+000000A2 A18B                    		MOV.L R3, 1CH[R0]
+000000A4 A184                    		MOV.L R4, 18H[R0]
+                                 ;     179                        dtc_transfer_data_cfg_t *p_data_cfg, uint32_t chain_transfer_nr)
+                                 ;     180 {
+                                 ;     181     uint32_t  count       = chain_transfer_nr + 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",181
+000000A6 6214                    		ADD #01H, R4
+000000A8 A084                    		MOV.L R4, 08H[R0]
+000000AA                         L33:	; entry.split
+                                 ;     182     uint32_t *ptr         = NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",182
+000000AA 3E0300                  		MOV.L #00000000H, 0CH[R0]
+000000AD                         L34:	; entry.split1
+                                 ;     183     uint8_t   dtce_backup = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",183
+000000AD 3C8200                  		MOV.B #00H, 12H[R0]
+000000B0                         L35:	; entry.split2
+                                 ;     184     uint8_t   rrs_backup  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",184
+000000B0 3C8300                  		MOV.B #00H, 13H[R0]
+000000B3                         L36:	; entry.split3
+                                 ;     185 
+                                 ;     186 #if (1 == DTC_CFG_PARAM_CHECKING_ENABLE)
+                                 ;     187 
+                                 ;     188     if ((NULL == p_data_cfg) || (NULL == p_transfer_data))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",188
+000000B3 A989                    		MOV.L 1CH[R0], R1
+000000B5 6101                    		CMP #00H, R1
+000000B7 20rr                    		BEQ L39
+000000B9 08                   S  		BRA L38
+000000BA                         L37:	; bb11
+                                 ;     189     {
+                                 ;     190         return DTC_ERR_NULL_PTR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",190
+000000BA 3E0106                  		MOV.L #00000006H, 04H[R0]
+000000BD 38rrrr               W  		BRA L68
+000000C0                         L38:	; bb16
+000000C0 AA01                    		MOV.L 20H[R0], R1
+000000C2 6101                    		CMP #00H, R1
+000000C4 18                   S  		BNE L40
+000000C5                         L39:	; bb20
+000000C5 F80601                  		MOV.L #00000001H, [R0]
+000000C8 08                   S  		BRA L41
+000000C9                         L40:	; bb21
+000000C9 F80600                  		MOV.L #00000000H, [R0]
+000000CC                         L41:	; bb22
+000000CC EC01                    		MOV.L [R0], R1
+000000CE 6101                    		CMP #00H, R1
+000000D0 21rr                    		BNE L37
+000000D2                         L42:	; bb27
+                                 ;     191     }
+                                 ;     192 
+                                 ;     193     if ((p_data_cfg->transfer_count < DTC_MIN_COUNT_VAL) || (p_data_cfg->transfer_count > DTC_MAX_16BITS_COUNT_VAL))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",193
+000000D2 A989                    		MOV.L 1CH[R0], R1
+000000D4 AA91                    		MOV.L 28H[R1], R1
+000000D6 6101                    		CMP #00H, R1
+000000D8 20rr                    		BEQ L45
+000000DA 08                   S  		BRA L44
+000000DB                         L43:	; bb28
+                                 ;     194     {
+                                 ;     195         return DTC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",195
+000000DB 3E0104                  		MOV.L #00000004H, 04H[R0]
+000000DE 38rrrr               W  		BRA L68
+000000E1                         L44:	; bb35
+000000E1 A989                    		MOV.L 1CH[R0], R1
+000000E3 AA91                    		MOV.L 28H[R1], R1
+000000E5 7701010001              		CMP #00010001H, R1
+000000EA 23rr                    		BLTU L46
+000000EC                         L45:	; bb41
+000000EC F80601                  		MOV.L #00000001H, [R0]
+000000EF 08                   S  		BRA L47
+000000F0                         L46:	; bb42
+000000F0 F80600                  		MOV.L #00000000H, [R0]
+000000F3                         L47:	; bb43
+000000F3 EC01                    		MOV.L [R0], R1
+000000F5 6101                    		CMP #00H, R1
+000000F7 21rr                    		BNE L43
+000000F9                         L48:	; bb49
+                                 ;     196     }
+                                 ;     197 
+                                 ;     198 #endif /* DTC_CFG_PARAM_CHECKING_ENABLE */
+                                 ;     199 
+                                 ;     200     if (false == g_is_opened) /* DTC is not initialized yet. */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",200
+000000F9 FBE2rrrrrrrr            		MOV.L #__$g_is_opened, R14
+000000FF 58EE                    		MOVU.B [R14], R14
+00000101 610E                    		CMP #00H, R14
+00000103 18                   S  		BNE L51
+00000104                         L49:	; bb50
+                                 ;     201     {
+                                 ;     202         r_dtc_release_hw_lock();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",202
+00000104 39rrrr               W  		BSR __$r_dtc_release_hw_lock
+00000107                         L50:	; bb50.split
+                                 ;     203         return DTC_ERR_NOT_OPEN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",203
+00000107 3E0103                  		MOV.L #00000003H, 04H[R0]
+0000010A 38rrrr               W  		BRA L68
+0000010D                         L51:	; bb57
+                                 ;     204     }
+                                 ;     205 
+                                 ;     206 #if (1 == DTC_CFG_PARAM_CHECKING_ENABLE)
+                                 ;     207 #if (DTC_ENABLE == DTC_CFG_SHORT_ADDRRESS_MODE) /* Short-address mode */
+                                 ;     208 /* Address must be in: 0x00000000h to 0x007FFFFF and 0xFF800000 to 0xFFFFFFFF */
+                                 ;     209     if ((p_data_cfg->source_addr > 0x007FFFFF) && (p_data_cfg->source_addr < 0xFF800000))
+                                 ;     210     {
+                                 ;     211         return DTC_ERR_INVALID_ARG;
+                                 ;     212     }
+                                 ;     213 
+                                 ;     214     if ((p_data_cfg->dest_addr > 0x007FFFFF) && (p_data_cfg->dest_addr < 0xFF800000))
+                                 ;     215     {
+                                 ;     216         return DTC_ERR_INVALID_ARG;
+                                 ;     217     }
+                                 ;     218 
+                                 ;     219     if (((uint32_t)p_transfer_data > 0x007FFFFF) && ((uint32_t)p_transfer_data < 0xFF800000))
+                                 ;     220     {
+                                 ;     221         return DTC_ERR_INVALID_ARG;
+                                 ;     222     }
+                                 ;     223 #endif
+                                 ;     224 #endif /* DTC_CFG_PARAM_CHECKING_ENABLE */
+                                 ;     225 
+                                 ;     226     /* Store old value of DTCERn.DTCE bit. */
+                                 ;     227     dtce_backup = ICU.DTCER[act_source].BIT.DTCE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",227
+0000010D AA09                    		MOV.L 24H[R0], R1
+0000010F FBEE007108              		MOV.L #00087100H, R14
+00000114 FEC1E1                  		MOVU.B [R1,R14], R1
+00000117 6411                    		AND #01H, R1
+00000119 8481                    		MOV.B R1, 12H[R0]
+0000011B                         L52:	; bb57.split
+                                 ;     228     /* Disable the interrupt source. Clear the DTCER */
+                                 ;     229     ICU.DTCER[act_source].BIT.DTCE = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",229
+0000011B AA09                    		MOV.L 24H[R0], R1
+0000011D 7311007108              		ADD #00087100H, R1
+00000122 F018                    		BCLR #00H, [R1].B
+00000124                         L53:	; bb57.split4
+                                 ;     230 
+                                 ;     231     /* Store old value of DTCCR.RRS bit. */
+                                 ;     232     rrs_backup = DTC.DTCCR.BIT.RRS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",232
+00000124 FBEE002408              		MOV.L #00082400H, R14
+00000129 58E1                    		MOVU.B [R14], R1
+0000012B 6841                    		SHLR #04H, R1
+0000012D 6411                    		AND #01H, R1
+0000012F 8489                    		MOV.B R1, 13H[R0]
+00000131                         L54:	; bb57.split5
+                                 ;     233     /* Clear RRS bit. */
+                                 ;     234     DTC.DTCCR.BIT.RRS = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",234
+00000131 FBEE002408              		MOV.L #00082400H, R14
+00000136 F0EC                    		BCLR #04H, [R14].B
+00000138                         L55:	; bb57.split6
+                                 ;     235 
+                                 ;     236     /* The row in Vector table corresponding to act_source */
+                                 ;     237     ptr = (uint32_t *)((uint32_t)DTC.DTCVBR + (4 * act_source));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",237
+00000138 FB1E002408              		MOV.L #00082400H, R1
+0000013D A819                    		MOV.L 04H[R1], R1
+0000013F AA0A                    		MOV.L 24H[R0], R2
+00000141 6C22                    		SHLL #02H, R2
+00000143 4B21                    		ADD R2, R1
+00000145 A089                    		MOV.L R1, 0CH[R0]
+00000147                         L56:	; bb57.split7
+                                 ;     238     /* Write start address of Transfer data to Vector table. */
+                                 ;     239     *ptr = (uint32_t)p_transfer_data;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",239
+00000147 AA01                    		MOV.L 20H[R0], R1
+00000149 A88A                    		MOV.L 0CH[R0], R2
+0000014B E321                    		MOV.L R1, [R2]
+0000014D 2Err                 B  		BRA L64
+0000014F                         L57:	; bb92
+                                 ;     240 
+                                 ;     241     while (count > 0)
+                                 ;     242     {
+                                 ;     243         if (DTC_SUCCESS != r_dtc_set_transfer_data(p_transfer_data, p_data_cfg))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",243
+0000014F A98A                    		MOV.L 1CH[R0], R2
+00000151 AA01                    		MOV.L 20H[R0], R1
+00000153 39rrrr               W  		BSR __$r_dtc_set_transfer_data
+00000156 6111                    		CMP #01H, R1
+00000158 20rr                    		BEQ L61
+0000015A                         L58:	; bb93
+                                 ;     244         { /* Fail to apply configurations for Transfer data. */
+                                 ;     245             /* Restore RRS bit */
+                                 ;     246             DTC.DTCCR.BIT.RRS = rrs_backup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",246
+0000015A FBEE002408              		MOV.L #00082400H, R14
+0000015F B489                    		MOVU.B 13H[R0], R1
+00000161 754FEF                  		MOV.L #000000EFH, R15
+00000164 50EF                    		AND [R14].UB, R15
+00000166 6C41                    		SHLL #04H, R1
+00000168 752110                  		AND #10H, R1
+0000016B 571F                    		OR R1, R15
+0000016D C3EF                    		MOV.B R15, [R14]
+0000016F                         L59:	; bb93.split
+                                 ;     247             /* Restore the DTCE bit. */
+                                 ;     248             ICU.DTCER[act_source].BIT.DTCE = dtce_backup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",248
+0000016F AA09                    		MOV.L 24H[R0], R1
+00000171 731E007108              		ADD #00087100H, R1, R14
+00000176 754FFE                  		MOV.L #000000FEH, R15
+00000179 B482                    		MOVU.B 12H[R0], R2
+0000017B 50EF                    		AND [R14].UB, R15
+0000017D 6412                    		AND #01H, R2
+0000017F 572F                    		OR R2, R15
+00000181 FBEE007108              		MOV.L #00087100H, R14
+00000186 FE01EF                  		MOV.B R15, [R1,R14]
+00000189                         L60:	; bb93.split8
+                                 ;     249             return DTC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",249
+00000189 3E0104                  		MOV.L #00000004H, 04H[R0]
+0000018C 2Err                 B  		BRA L68
+0000018E                         L61:	; bb112
+                                 ;     250         }
+                                 ;     251         else
+                                 ;     252         {
+                                 ;     253             p_data_cfg++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",253
+0000018E A989                    		MOV.L 1CH[R0], R1
+00000190 711130                  		ADD #30H, R1
+00000193 A189                    		MOV.L R1, 1CH[R0]
+00000195                         L62:	; bb112.split
+                                 ;     254             p_transfer_data++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",254
+00000195 AA01                    		MOV.L 20H[R0], R1
+00000197 711110                  		ADD #10H, R1
+0000019A A201                    		MOV.L R1, 20H[R0]
+0000019C                         L63:	; bb112.split9
+                                 ;     255         }
+                                 ;     256         count--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",256
+0000019C A881                    		MOV.L 08H[R0], R1
+0000019E 6011                    		SUB #01H, R1
+000001A0 A081                    		MOV.L R1, 08H[R0]
+000001A2                         L64:	; bb126
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",241
+000001A2 A881                    		MOV.L 08H[R0], R1
+000001A4 6101                    		CMP #00H, R1
+000001A6 21rr                    		BNE L57
+000001A8                         L65:	; bb131
+                                 ;     257     }
+                                 ;     258 
+                                 ;     259     /* Restore RRS bit. */
+                                 ;     260     DTC.DTCCR.BIT.RRS = rrs_backup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",260
+000001A8 FBEE002408              		MOV.L #00082400H, R14
+000001AD B489                    		MOVU.B 13H[R0], R1
+000001AF 754FEF                  		MOV.L #000000EFH, R15
+000001B2 50EF                    		AND [R14].UB, R15
+000001B4 6C41                    		SHLL #04H, R1
+000001B6 752110                  		AND #10H, R1
+000001B9 571F                    		OR R1, R15
+000001BB C3EF                    		MOV.B R15, [R14]
+000001BD                         L66:	; bb131.split
+                                 ;     261     /* Restore the DTCE bit. */
+                                 ;     262     ICU.DTCER[act_source].BIT.DTCE = dtce_backup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",262
+000001BD AA09                    		MOV.L 24H[R0], R1
+000001BF 731E007108              		ADD #00087100H, R1, R14
+000001C4 754FFE                  		MOV.L #000000FEH, R15
+000001C7 B482                    		MOVU.B 12H[R0], R2
+000001C9 50EF                    		AND [R14].UB, R15
+000001CB 6412                    		AND #01H, R2
+000001CD 572F                    		OR R2, R15
+000001CF FBEE007108              		MOV.L #00087100H, R14
+000001D4 FE01EF                  		MOV.B R15, [R1,R14]
+000001D7                         L67:	; bb131.split10
+                                 ;     263 
+                                 ;     264     return DTC_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",264
+000001D7 3E0101                  		MOV.L #00000001H, 04H[R0]
+000001DA                         L68:	; bb150
+000001DA A809                    		MOV.L 04H[R0], R1
+000001DC A109                    		MOV.L R1, 14H[R0]
+                                 ;     265 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",265
+000001DE 670A                    		RTSD #28H
+000001E0                         _R_DTC_Close:
+                                 		.STACK	_R_DTC_Close=12
+                                 ;     266 
+                                 ;     267 
+                                 ;     268 /*******************************************************************************
+                                 ;     269 * Function Name: R_DTC_Close
+                                 ;     270 * Description  : Disables power of DTC module.
+                                 ;     271 * Arguments    : None
+                                 ;     272 * Return Value : DTC_SUCCESS -
+                                 ;     273 *                    Successful operation
+                                 ;     274 *                DTC_ERR_BUSY -
+                                 ;     275 *                    The resource are locked by another process.
+                                 ;     276 *                DTC_SUCCESS_DMAC_BUSY -
+                                 ;     277 *                    One or some DMAC resources are locked by another process.
+                                 ;     278 *******************************************************************************/
+                                 ;     279 dtc_err_t R_DTC_Close(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",279
+000001E0 6080                    		SUB #08H, R0
+                                 ;     280 {
+                                 ;     281     /* Clear DTCE bits. */
+                                 ;     282     r_dtc_clear_all_dtce_bits();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",282
+000001E2 39rrrr               W  		BSR __$r_dtc_clear_all_dtce_bits
+000001E5                         L70:	; entry.split
+000001E5 FBEE0C2408              		MOV.L #0008240CH, R14
+                                 ;     283 
+                                 ;     284     /* Stop DTC module. */
+                                 ;     285     DTC.DTCST.BIT.DTCST = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",285
+000001EA F0E8                    		BCLR #00H, [R14].B
+000001EC                         L71:	; entry.split1
+                                 ;     286 
+                                 ;     287     /* DTC is closed. */
+                                 ;     288     g_is_opened = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",288
+000001EC FBE2rrrrrrrr            		MOV.L #__$g_is_opened, R14
+000001F2 F8E400                  		MOV.B #00H, [R14]
+000001F5                         L72:	; entry.split2
+                                 ;     289 
+                                 ;     290     free((void *)g_dtc_table_work[1]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",290
+000001F5 FB12rrrrrrrr            		MOV.L #_g_dtc_table_work, R1
+000001FB A819                    		MOV.L 04H[R1], R1
+000001FD 05rrrrrr             A  		BSR _free
+00000201                         L73:	; entry.split3
+                                 ;     291     g_dtc_table_work[1] = NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",291
+00000201 FB12rrrrrrrr            		MOV.L #_g_dtc_table_work, R1
+00000207 3E1100                  		MOV.L #00000000H, 04H[R1]
+0000020A                         L74:	; entry.split4
+                                 ;     292 
+                                 ;     293     /* Check DMAC locking. */
+                                 ;     294     if (true == r_dtc_check_DMAC_locking_sw())
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",294
+0000020A 39rrrr               W  		BSR __$r_dtc_check_DMAC_locking_sw
+0000020D 6111                    		CMP #01H, R1
+0000020F 21rr                    		BNE L78
+00000211                         L75:	; bb6
+                                 ;     295     {
+                                 ;     296         /* Disable the power for DTC and DMAC module. */
+                                 ;     297         r_dtc_module_disable();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",297
+00000211 05rrrrrr             A  		BSR _r_dtc_module_disable
+00000215                         L76:	; bb6.split
+                                 ;     298         /* Release hardware lock. */
+                                 ;     299         r_dtc_release_hw_lock();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",299
+00000215 39rrrr               W  		BSR __$r_dtc_release_hw_lock
+00000218                         L77:	; bb6.split5
+                                 ;     300     }
+                                 ;     301     else
+                                 ;     302     {
+                                 ;     303         /* Release hardware lock. */
+                                 ;     304         r_dtc_release_hw_lock();
+                                 ;     305         return DTC_SUCCESS_DMAC_BUSY;
+                                 ;     306     }
+                                 ;     307 
+                                 ;     308     return DTC_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",308
+00000218 F80601                  		MOV.L #00000001H, [R0]
+0000021B 08                   S  		BRA L80
+0000021C                         L78:	; bb7
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",304
+0000021C 39rrrr               W  		BSR __$r_dtc_release_hw_lock
+0000021F                         L79:	; bb7.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",305
+0000021F F80600                  		MOV.L #00000000H, [R0]
+00000222                         L80:	; bb15
+00000222 EC01                    		MOV.L [R0], R1
+00000224 A009                    		MOV.L R1, 04H[R0]
+                                 ;     309 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",309
+00000226 6702                    		RTSD #08H
+00000228                         _R_DTC_Control:
+                                 		.STACK	_R_DTC_Control=28
+                                 ;     310 
+                                 ;     311 /*******************************************************************************
+                                 ;     312 * Function Name: R_DTC_Control
+                                 ;     313 * Description  : Starts / Stops DTC, enables or disables Data transfer read skip,
+                                 ;     314 *                selects an interrupt source as DTC activation.
+                                 ;     315 * Arguments    : command -
+                                 ;     316 *                    Action will be done
+                                 ;     317 *                p_stat -
+                                 ;     318 *                    Pointer to the status of DTC module when command is 
+                                 ;     319 *                     DTC_CMD_GET_STATUS, casted to void *.
+                                 ;     320 *                p_args -
+                                 ;     321 *                    Pointer to argument of command, casted to void *.
+                                 ;     322 * Return Value : DTC_SUCCESS -
+                                 ;     323 *                    Successful operation
+                                 ;     324 *                DTC_ERR_NOT_OPEN -
+                                 ;     325 *                    The DTC is not initialized yet.
+                                 ;     326 *                DTC_ERR_INVALID_COMMAND -
+                                 ;     327 *                    Command parameters are invalid.
+                                 ;     328 *                DTC_ERR_NULL_PTR -
+                                 ;     329 *                    The argument is NULL when commnad is valid.
+                                 ;     330 *                DTC_ERR_BUSY
+                                 ;     331 *                    The resource are locked by another process.
+                                 ;     332 *
+                                 ;     333 *******************************************************************************/
+                                 ;     334 dtc_err_t R_DTC_Control(dtc_command_t command, dtc_stat_t *p_stat, dtc_cmd_arg_t *p_args)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",334
+00000228 7100E8                  		ADD #0FFFFFFE8H, R0
+0000022B A109                    		MOV.L R1, 14H[R0]
+0000022D A102                    		MOV.L R2, 10H[R0]
+0000022F A08B                    		MOV.L R3, 0CH[R0]
+                                 ;     335 {
+                                 ;     336 #if (1 == DTC_CFG_PARAM_CHECKING_ENABLE)
+                                 ;     337 
+                                 ;     338     if ((DTC_CMD_STATUS_GET == command) && (NULL == p_stat))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",338
+00000231 A909                    		MOV.L 14H[R0], R1
+00000233 6161                    		CMP #06H, R1
+00000235 20rr                    		BEQ L94
+00000237 2Err                 B  		BRA L96
+00000239                         L82:	; bb4
+                                 ;     339     {
+                                 ;     340         return DTC_ERR_NULL_PTR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",340
+00000239 3E0106                  		MOV.L #00000006H, 04H[R0]
+0000023C 38rrrr               W  		BRA L116
+0000023F                         L83:	; bb7
+                                 ;     341     }
+                                 ;     342     else if ((DTC_CMD_ACT_SRC_ENABLE == command) || (DTC_CMD_ACT_SRC_DISABLE == command) || 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",342
+0000023F A909                    		MOV.L 14H[R0], R1
+00000241 6121                    		CMP #02H, R1
+00000243 20rr                    		BEQ L87
+00000245 2Err                 B  		BRA L86
+00000247                         L84:	; bb9
+                                 ;     343              (DTC_CMD_CHAIN_TRANSFER_ABORT == command))
+                                 ;     344     {
+                                 ;     345         if (NULL == p_args) /* Require argument */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",345
+00000247 A889                    		MOV.L 0CH[R0], R1
+00000249 6101                    		CMP #00H, R1
+0000024B 21rr                    		BNE L98
+0000024D                         L85:	; bb10
+                                 ;     346         {
+                                 ;     347             return DTC_ERR_NULL_PTR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",347
+0000024D 3E0106                  		MOV.L #00000006H, 04H[R0]
+00000250 38rrrr               W  		BRA L116
+00000253                         L86:	; bb20
+00000253 A909                    		MOV.L 14H[R0], R1
+00000255 6131                    		CMP #03H, R1
+00000257 18                   S  		BNE L88
+00000258                         L87:	; bb24
+00000258 F80601                  		MOV.L #00000001H, [R0]
+0000025B 08                   S  		BRA L89
+0000025C                         L88:	; bb25
+0000025C F80600                  		MOV.L #00000000H, [R0]
+0000025F                         L89:	; bb26
+0000025F EC01                    		MOV.L [R0], R1
+00000261 6101                    		CMP #00H, R1
+00000263 18                   S  		BNE L91
+00000264                         L90:	; bb30
+00000264 A909                    		MOV.L 14H[R0], R1
+00000266 6171                    		CMP #07H, R1
+00000268 18                   S  		BNE L92
+00000269                         L91:	; bb34
+00000269 F80601                  		MOV.L #00000001H, [R0]
+0000026C 08                   S  		BRA L93
+0000026D                         L92:	; bb35
+0000026D F80600                  		MOV.L #00000000H, [R0]
+00000270                         L93:	; bb36
+00000270 EC01                    		MOV.L [R0], R1
+00000272 6101                    		CMP #00H, R1
+00000274 21rr                    		BNE L84
+00000276 2Err                 B  		BRA L98
+00000278                         L94:	; bb45
+00000278 A901                    		MOV.L 10H[R0], R1
+0000027A 6101                    		CMP #00H, R1
+0000027C 18                   S  		BNE L96
+0000027D                         L95:	; bb49
+0000027D F80601                  		MOV.L #00000001H, [R0]
+00000280 08                   S  		BRA L97
+00000281                         L96:	; bb50
+00000281 F80600                  		MOV.L #00000000H, [R0]
+00000284                         L97:	; bb51
+00000284 EC01                    		MOV.L [R0], R1
+00000286 6101                    		CMP #00H, R1
+00000288 21rr                    		BNE L82
+0000028A 2Err                 B  		BRA L83
+0000028C                         L98:	; bb57
+                                 ;     348         }
+                                 ;     349     }
+                                 ;     350     else
+                                 ;     351     {
+                                 ;     352         /* do nothing */
+                                 ;     353     }
+                                 ;     354 
+                                 ;     355 #endif /* DTC_CFG_PARAM_CHECKING_ENABLE */
+                                 ;     356 
+                                 ;     357     if (false == g_is_opened)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",357
+0000028C FBE2rrrrrrrr            		MOV.L #__$g_is_opened, R14
+00000292 58EE                    		MOVU.B [R14], R14
+00000294 610E                    		CMP #00H, R14
+00000296 18                   S  		BNE L101
+00000297                         L99:	; bb58
+                                 ;     358     {
+                                 ;     359         r_dtc_release_hw_lock();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",359
+00000297 39rrrr               W  		BSR __$r_dtc_release_hw_lock
+0000029A                         L100:	; bb58.split
+                                 ;     360         return DTC_ERR_NOT_OPEN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",360
+0000029A 3E0103                  		MOV.L #00000003H, 04H[R0]
+0000029D 38rrrr               W  		BRA L116
+000002A0                         L101:	; bb65
+                                 ;     361     }
+                                 ;     362 
+                                 ;     363     switch (command)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",363
+000002A0 A909                    		MOV.L 14H[R0], R1
+000002A2 6171                    		CMP #07H, R1
+000002A4 24rr                    		BGTU L114
+000002A6                         L102:	; bb65
+000002A6 FBE2rrrrrrrr            		MOV.L #L117, R14
+000002AC FE41EE                  		.swmov L117, R1, R14, R14
+000002AF                         L118:
+000002AF 7F4E                    		BRA.L R14
+000002B1                         L103:	; bb67
+                                 ;     364     {
+                                 ;     365         case DTC_CMD_DTC_START: /* Start DTC module. */
+                                 ;     366             DTC.DTCST.BIT.DTCST = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",366
+000002B1 FBEE002408              		MOV.L #00082400H, R14
+000002B6 F1E00C                  		BSET #00H, 0CH[R14].B
+000002B9 2Err                 B  		BRA L115
+000002BB                         L104:	; bb71
+                                 ;     367         break;
+                                 ;     368 
+                                 ;     369         case DTC_CMD_DTC_STOP: /* Stop DTC module. */
+                                 ;     370             DTC.DTCST.BIT.DTCST = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",370
+000002BB FBEE002408              		MOV.L #00082400H, R14
+000002C0 F1E80C                  		BCLR #00H, 0CH[R14].B
+000002C3 2Err                 B  		BRA L115
+000002C5                         L105:	; bb75
+                                 ;     371         break;
+                                 ;     372 
+                                 ;     373         case DTC_CMD_DATA_READ_SKIP_ENABLE: /* Enable Transfer Data Read Skip. */
+                                 ;     374             DTC.DTCCR.BIT.RRS = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",374
+000002C5 FBEE002408              		MOV.L #00082400H, R14
+000002CA F0E4                    		BSET #04H, [R14].B
+000002CC 2Err                 B  		BRA L115
+000002CE                         L106:	; bb79
+                                 ;     375         break;
+                                 ;     376 
+                                 ;     377         case DTC_CMD_DATA_READ_SKIP_DISABLE: /* Disable Transfer Data Read Skip. */
+                                 ;     378             DTC.DTCCR.BIT.RRS = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",378
+000002CE FBEE002408              		MOV.L #00082400H, R14
+000002D3 F0EC                    		BCLR #04H, [R14].B
+000002D5 2Err                 B  		BRA L115
+000002D7                         L107:	; bb83
+                                 ;     379         break;
+                                 ;     380 
+                                 ;     381         case DTC_CMD_ACT_SRC_ENABLE: /* Select one interrupt as a DTC activation source. */
+                                 ;     382             ICU.DTCER[p_args->act_src].BIT.DTCE = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",382
+000002D7 A889                    		MOV.L 0CH[R0], R1
+000002D9 EC1E                    		MOV.L [R1], R14
+000002DB 73EE007108              		ADD #00087100H, R14
+000002E0 F0E0                    		BSET #00H, [R14].B
+000002E2 2Err                 B  		BRA L115
+000002E4                         L108:	; bb95
+                                 ;     383         break;
+                                 ;     384 
+                                 ;     385         case DTC_CMD_ACT_SRC_DISABLE: /* Remove one interrupt as a DTC activation source. */
+                                 ;     386             ICU.DTCER[p_args->act_src].BIT.DTCE = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",386
+000002E4 A889                    		MOV.L 0CH[R0], R1
+000002E6 EC1E                    		MOV.L [R1], R14
+000002E8 73EE007108              		ADD #00087100H, R14
+000002ED F0E8                    		BCLR #00H, [R14].B
+000002EF 2Err                 B  		BRA L115
+000002F1                         L109:	; bb108
+                                 ;     387         break;
+                                 ;     388 
+                                 ;     389         case DTC_CMD_STATUS_GET:
+                                 ;     390             if (0 == (DTC.DTCSTS.WORD & DTC_ACT_BIT_MASK)) /* DTC transfer operation is not in progress. */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",390
+000002F1 FB1E002408              		MOV.L #00082400H, R1
+000002F6 B999                    		MOVU.W 0EH[R1], R1
+000002F8 7CF1                    		BTST #0FH, R1
+000002FA A901                    		MOV.L 10H[R0], R1
+000002FC 18                   S  		BNE L111
+000002FD                         L110:	; bb109
+                                 ;     391             {
+                                 ;     392                 p_stat->in_progress = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",392
+000002FD 3C1100                  		MOV.B #00H, 01H[R1]
+00000300 2Err                 B  		BRA L115
+00000302                         L111:	; bb112
+                                 ;     393                 /* DTC is not in progress. -> vector number is invalid. */
+                                 ;     394             }
+                                 ;     395             else /* DTC transfer operation is in progress. */
+                                 ;     396             {
+                                 ;     397                 p_stat->in_progress = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",397
+00000302 3C1101                  		MOV.B #01H, 01H[R1]
+00000305                         L112:	; bb112.split
+                                 ;     398                 /* Get the current vector number. */
+                                 ;     399                 p_stat->vect_nr = (uint8_t)(DTC.DTCSTS.WORD & DTC_VECT_NR_MASK); /* get lower 8 bits: 0-7*/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",399
+00000305 A901                    		MOV.L 10H[R0], R1
+00000307 FB2E002408              		MOV.L #00082400H, R2
+0000030C B9AA                    		MOVU.W 0EH[R2], R2
+0000030E C312                    		MOV.B R2, [R1]
+00000310 2Err                 B  		BRA L115
+00000312                         L113:	; bb128
+                                 ;     400             }
+                                 ;     401         break;
+                                 ;     402 
+                                 ;     403         case DTC_CMD_CHAIN_TRANSFER_ABORT:
+                                 ;     404             r_dtc_abort_chain_transfer(p_args->chain_transfer_nr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",404
+00000312 A889                    		MOV.L 0CH[R0], R1
+00000314 A819                    		MOV.L 04H[R1], R1
+00000316 39rrrr               W  		BSR __$r_dtc_abort_chain_transfer
+00000319 08                   S  		BRA L115
+0000031A                         L114:	; bb133
+                                 ;     405         break;
+                                 ;     406 
+                                 ;     407         default:
+                                 ;     408             return DTC_ERR_INVALID_COMMAND;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",408
+0000031A 3E0105                  		MOV.L #00000005H, 04H[R0]
+0000031D 08                   S  		BRA L116
+0000031E                         L115:	; bb135
+                                 ;     409         break;
+                                 ;     410     }
+                                 ;     411 
+                                 ;     412     return DTC_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",412
+0000031E 3E0101                  		MOV.L #00000001H, 04H[R0]
+00000321                         L116:	; bb137
+00000321 A809                    		MOV.L 04H[R0], R1
+00000323 A081                    		MOV.L R1, 08H[R0]
+                                 ;     413 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",413
+00000325 6706                    		RTSD #18H
+00000327                         _R_DTC_GetVersion:
+                                 		.STACK	_R_DTC_GetVersion=12
+                                 ;     414 
+                                 ;     415 /*******************************************************************************
+                                 ;     416 * Function Name: R_DTC_GetVersion
+                                 ;     417 * Description  : Returns the version of this module. The version number is 
+                                 ;     418 *                encoded such that the top two bytes are the major version
+                                 ;     419 *                number and the bottom two bytes are the minor version number.
+                                 ;     420 * Arguments    : none
+                                 ;     421 * Return Value : version number
+                                 ;     422 *******************************************************************************/
+                                 ;     423 uint32_t R_DTC_GetVersion(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",423
+00000327 6080                    		SUB #08H, R0
+                                 ;     424 {
+                                 ;     425     uint32_t version = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",425
+00000329 F80600                  		MOV.L #00000000H, [R0]
+0000032C                         L120:	; entry.split
+                                 ;     426 
+                                 ;     427     version = (DTC_VERSION_MAJOR << 16) | DTC_VERSION_MINOR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",427
+0000032C F80E020002              		MOV.L #00020002H, [R0]
+00000331                         L121:	; entry.split1
+                                 ;     428 
+                                 ;     429     return version;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",429
+00000331 EC01                    		MOV.L [R0], R1
+00000333 A009                    		MOV.L R1, 04H[R0]
+00000335                         L122:	; entry.split2
+                                 ;     430 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",430
+00000335 6702                    		RTSD #08H
+00000337                         __$r_dtc_set_transfer_data:
+                                 		.STACK	__$r_dtc_set_transfer_data=32
+                                 ;     431 
+                                 ;     432 /*******************************************************************************
+                                 ;     433 * Function Name: r_dtc_set_transfer_data
+                                 ;     434 * Description  : Applies configurations to a Transfer data area, it is an internal
+                                 ;     435 *                function called by R_DTC_Create(); and all arguments are validated
+                                 ;     436 *                in R_DTC_Create()
+                                 ;     437 * Arguments    : transfer_data -
+                                 ;     438 *                    Start address of Transfer data
+                                 ;     439 *                data_cfg -
+                                 ;     440 *                    Contains configurations for the Transfer data
+                                 ;     441 * Return Value : DTC_SUCCESS -
+                                 ;     442 *                    Apply configurations for Transfer data successfully.
+                                 ;     443 *                DTC_ERR_INVALID_ARG
+                                 ;     444 *                    Fail to apply configurations for Transfer data.
+                                 ;     445 *******************************************************************************/
+                                 ;     446 static dtc_err_t r_dtc_set_transfer_data(dtc_transfer_data_t *p_transfer_data,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",446
+00000337 7100E4                  		ADD #0FFFFFFE4H, R0
+0000033A A181                    		MOV.L R1, 18H[R0]
+0000033C A10A                    		MOV.L R2, 14H[R0]
+                                 ;     447                                    dtc_transfer_data_cfg_t *p_cfg)
+                                 ;     448 {
+                                 ;     449     dtc_mra_t                          t_mra;
+                                 ;     450     dtc_mrb_t                          t_mrb;
+                                 ;     451     dtc_cra_t                          t_cra;
+                                 ;     452     dtc_crb_t                          t_crb;
+                                 ;     453     volatile dtc_internal_registers_t *td_ptr = (volatile dtc_internal_registers_t *)p_transfer_data;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",453
+0000033E E5000603                		MOV.L 18H[R0], 0CH[R0]
+00000342                         L124:	; entry.split
+                                 ;     454 
+                                 ;     455     /* Set for MRA - . */
+                                 ;     456     t_mra.BYTE = (uint8_t)(p_cfg->src_addr_mode | p_cfg->data_size | p_cfg->transfer_mode);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",456
+00000342 A909                    		MOV.L 14H[R0], R1
+00000344 A892                    		MOV.L 08H[R1], R2
+00000346 06951201                		OR 04H[R1].L, R2
+0000034A 069412                  		OR [R1].L, R2
+0000034D 8182                    		MOV.B R2, 06H[R0]
+0000034F                         L125:	; entry.split1
+                                 ;     457     t_mrb.BYTE = (uint8_t)(p_cfg->dest_addr_mode | p_cfg->repeat_block_side | p_cfg->response_interrupt |
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",457
+0000034F A909                    		MOV.L 14H[R0], R1
+00000351 A99A                    		MOV.L 1CH[R1], R2
+00000353 06951206                		OR 18H[R1].L, R2
+00000357 06951205                		OR 14H[R1].L, R2
+0000035B 06951203                		OR 0CH[R1].L, R2
+0000035F 06951204                		OR 10H[R1].L, R2
+00000363 818A                    		MOV.B R2, 07H[R0]
+00000365                         L126:	; entry.split2
+00000365 754EC0                  		MOV.L #000000C0H, R14
+                                 ;     458                             p_cfg->chain_transfer_enable | p_cfg->chain_transfer_mode);
+                                 ;     459 
+                                 ;     460     switch (t_mra.BIT.MD) /* DTC transfer mode */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",460
+00000368 510E06                  		AND 06H[R0].UB, R14
+0000036B 686E                    		SHLR #06H, R14
+0000036D 612E                    		CMP #02H, R14
+0000036F 20rr                    		BEQ L139
+00000371                         L127:	; entry.split2
+00000371 611E                    		CMP #01H, R14
+00000373 20rr                    		BEQ L132
+00000375                         L128:	; entry.split2
+00000375 610E                    		CMP #00H, R14
+00000377 3Brrrr               W  		BNE L149
+0000037A                         L129:	; bb51
+                                 ;     461     {
+                                 ;     462         case 0x0: /* Normal mode */
+                                 ;     463             if (DTC_MAX_16BITS_COUNT_VAL == p_cfg->transfer_count)/* Transfer count = 65536 */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",463
+0000037A A909                    		MOV.L 14H[R0], R1
+0000037C AA91                    		MOV.L 28H[R1], R1
+0000037E 7701000001              		CMP #00010000H, R1
+00000383 18                   S  		BNE L131
+00000384                         L130:	; bb52
+                                 ;     464             {
+                                 ;     465                 t_cra.WORD = 0x0000;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",465
+00000384 3D0400                  		MOV.W #0000H, 08H[R0]
+00000387 38rrrr               W  		BRA L150
+0000038A                         L131:	; bb54
+                                 ;     466             }
+                                 ;     467             else /* 1 - 65535 */
+                                 ;     468             {
+                                 ;     469                 t_cra.WORD = (uint16_t)p_cfg->transfer_count;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",469
+0000038A A909                    		MOV.L 14H[R0], R1
+0000038C AA91                    		MOV.L 28H[R1], R1
+0000038E 9101                    		MOV.W R1, 08H[R0]
+00000390 2Err                 B  		BRA L150
+00000392                         L132:	; bb67
+                                 ;     470             }
+                                 ;     471         break;
+                                 ;     472 
+                                 ;     473         case 0x1: /* Repeat mode */
+                                 ;     474             /* Set counter. */
+                                 ;     475             if (p_cfg->transfer_count < DTC_MAX_8BITS_COUNT_VAL) /* count 1-255 */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",475
+00000392 A909                    		MOV.L 14H[R0], R1
+00000394 AA91                    		MOV.L 28H[R1], R1
+00000396 7551FF                  		CMP #0FFH, R1
+00000399 24rr                    		BGTU L135
+0000039B                         L133:	; bb68
+                                 ;     476             {
+                                 ;     477                 t_cra.BYTE.CRA_H = (uint8_t)p_cfg->transfer_count;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",477
+0000039B A909                    		MOV.L 14H[R0], R1
+0000039D AA91                    		MOV.L 28H[R1], R1
+0000039F 8209                    		MOV.B R1, 09H[R0]
+000003A1                         L134:	; bb68.split
+                                 ;     478                 t_cra.BYTE.CRA_L = (uint8_t)p_cfg->transfer_count;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",478
+000003A1 A909                    		MOV.L 14H[R0], R1
+000003A3 AA91                    		MOV.L 28H[R1], R1
+000003A5 8201                    		MOV.B R1, 08H[R0]
+000003A7 2Err                 B  		BRA L150
+000003A9                         L135:	; bb84
+                                 ;     479             }
+                                 ;     480             else if (DTC_MAX_8BITS_COUNT_VAL == p_cfg->transfer_count)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",480
+000003A9 A909                    		MOV.L 14H[R0], R1
+000003AB AA91                    		MOV.L 28H[R1], R1
+000003AD 76010001                		CMP #0100H, R1
+000003B1 18                   S  		BNE L138
+000003B2                         L136:	; bb85
+                                 ;     481             {
+                                 ;     482                 t_cra.BYTE.CRA_H = 0x00;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",482
+000003B2 3C0900                  		MOV.B #00H, 09H[R0]
+000003B5                         L137:	; bb85.split
+                                 ;     483                 t_cra.BYTE.CRA_L = 0x00;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",483
+000003B5 3C0800                  		MOV.B #00H, 08H[R0]
+000003B8 2Err                 B  		BRA L150
+000003BA                         L138:	; bb93
+                                 ;     484             }
+                                 ;     485             else /* Transfer count > 256 */
+                                 ;     486             {
+                                 ;     487                 return DTC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",487
+000003BA F80604                  		MOV.L #00000004H, [R0]
+000003BD 2Err                 B  		BRA L157
+000003BF                         L139:	; bb110
+                                 ;     488             }
+                                 ;     489         break;
+                                 ;     490 
+                                 ;     491         case 0x2: /* DTC_TRANSFER_MODE_BLOCK - Block transfer mode */
+                                 ;     492             /* Set counter. */
+                                 ;     493             if (DTC_MAX_16BITS_COUNT_VAL == p_cfg->transfer_count)/* Transfer count = 65536 */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",493
+000003BF A909                    		MOV.L 14H[R0], R1
+000003C1 AA91                    		MOV.L 28H[R1], R1
+000003C3 7701000001              		CMP #00010000H, R1
+000003C8 18                   S  		BNE L141
+000003C9                         L140:	; bb111
+                                 ;     494             {
+                                 ;     495                 t_crb.WORD = 0x0000;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",495
+000003C9 3D0500                  		MOV.W #0000H, 0AH[R0]
+000003CC 08                   S  		BRA L142
+000003CD                         L141:	; bb113
+                                 ;     496             }
+                                 ;     497             else /* 1 - 65535 */
+                                 ;     498             {
+                                 ;     499                 t_crb.WORD = (uint16_t)p_cfg->transfer_count;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",499
+000003CD A909                    		MOV.L 14H[R0], R1
+000003CF AA91                    		MOV.L 28H[R1], R1
+000003D1 9109                    		MOV.W R1, 0AH[R0]
+000003D3                         L142:	; bb126
+                                 ;     500             }
+                                 ;     501 
+                                 ;     502             if (p_cfg->block_size < DTC_MAX_8BITS_COUNT_VAL) /* Block size 1-255 */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",502
+000003D3 A909                    		MOV.L 14H[R0], R1
+000003D5 BD91                    		MOVU.W 2CH[R1], R1
+000003D7 7551FF                  		CMP #0FFH, R1
+000003DA 2Arr                    		BGT L145
+000003DC                         L143:	; bb127
+                                 ;     503             {
+                                 ;     504                 t_cra.BYTE.CRA_H = (uint8_t)p_cfg->block_size;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",504
+000003DC A909                    		MOV.L 14H[R0], R1
+000003DE C5102C09                		MOV.B 2CH[R1], 09H[R0]
+000003E2                         L144:	; bb127.split
+                                 ;     505                 t_cra.BYTE.CRA_L = (uint8_t)p_cfg->block_size;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",505
+000003E2 A909                    		MOV.L 14H[R0], R1
+000003E4 C5102C08                		MOV.B 2CH[R1], 08H[R0]
+000003E8 2Err                 B  		BRA L150
+000003EA                         L145:	; bb143
+                                 ;     506             }
+                                 ;     507             else if (DTC_MAX_8BITS_COUNT_VAL == p_cfg->block_size) /* Block size = 256 */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",507
+000003EA A909                    		MOV.L 14H[R0], R1
+000003EC BD91                    		MOVU.W 2CH[R1], R1
+000003EE 76010001                		CMP #0100H, R1
+000003F2 18                   S  		BNE L148
+000003F3                         L146:	; bb144
+                                 ;     508             {
+                                 ;     509                 t_cra.BYTE.CRA_H = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",509
+000003F3 3C0900                  		MOV.B #00H, 09H[R0]
+000003F6                         L147:	; bb144.split
+                                 ;     510                 t_cra.BYTE.CRA_L = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",510
+000003F6 3C0800                  		MOV.B #00H, 08H[R0]
+000003F9 2Err                 B  		BRA L150
+000003FB                         L148:	; bb151
+                                 ;     511             }
+                                 ;     512             else /* Invalid block size */
+                                 ;     513             {
+                                 ;     514                 return DTC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",514
+000003FB F80604                  		MOV.L #00000004H, [R0]
+000003FE 2Err                 B  		BRA L157
+00000400                         L149:	; bb169
+                                 ;     515             }
+                                 ;     516         break;
+                                 ;     517 
+                                 ;     518         default:
+                                 ;     519             return DTC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",519
+00000400 F80604                  		MOV.L #00000004H, [R0]
+00000403 2Err                 B  		BRA L157
+00000405                         L150:	; bb171
+                                 ;     520         break;
+                                 ;     521     }
+                                 ;     522 
+                                 ;     523 #if (DTC_ENABLE == DTC_CFG_SHORT_ADDRRESS_MODE) /* Short-address mode */
+                                 ;     524     /* settings for fist long word: MRA & SAR */
+                                 ;     525     td_ptr->FIRST_LWORD.LWORD   =  0; /* clear */
+                                 ;     526     td_ptr->FIRST_LWORD.REG.MRA =  t_mra; /* 1 byte MRA */
+                                 ;     527     td_ptr->FIRST_LWORD.LWORD   |= (p_cfg->source_addr & 0x00FFFFFF); /* 3 byte SAR */
+                                 ;     528 
+                                 ;     529     /* settings for second long word: MRB & DAR */
+                                 ;     530     td_ptr->SECOND_LWORD.LWORD   =  0; /* clear */
+                                 ;     531     td_ptr->SECOND_LWORD.REG.MRB =  t_mrb; /* 1 byte MRB */
+                                 ;     532     td_ptr->SECOND_LWORD.LWORD   |= (p_cfg->dest_addr & 0x00FFFFFF); /* 3 byte DAR */
+                                 ;     533 
+                                 ;     534     /* settings for third long word: CRA & CRB */
+                                 ;     535     td_ptr->THIRD_LWORD.REG.CRA.WORD = t_cra.WORD;
+                                 ;     536     td_ptr->THIRD_LWORD.REG.CRB.WORD = t_crb.WORD;
+                                 ;     537 #else /* Full-address mode */
+                                 ;     538     /* settings for fist long word: MRA & MRB */
+                                 ;     539     td_ptr->FIRST_LWORD.REG.MRA.BYTE = t_mra.BYTE; /* 1 byte MRA */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",539
+00000405 B181                    		MOVU.B 06H[R0], R1
+00000407 A88A                    		MOV.L 0CH[R0], R2
+00000409 80A9                    		MOV.B R1, 03H[R2]
+0000040B                         L151:	; bb171.split
+                                 ;     540     td_ptr->FIRST_LWORD.REG.MRB.BYTE = t_mrb.BYTE; /* 1 byte MRB */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",540
+0000040B B189                    		MOVU.B 07H[R0], R1
+0000040D A88A                    		MOV.L 0CH[R0], R2
+0000040F 80A1                    		MOV.B R1, 02H[R2]
+00000411                         L152:	; bb171.split3
+                                 ;     541 
+                                 ;     542     /* settings for second long word: SAR */
+                                 ;     543     td_ptr->SECOND_LWORD.SAR = p_cfg->source_addr; /* 4 byte SAR */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",543
+00000411 A909                    		MOV.L 14H[R0], R1
+00000413 A88A                    		MOV.L 0CH[R0], R2
+00000415 E5120801                		MOV.L 20H[R1], 04H[R2]
+00000419                         L153:	; bb171.split4
+                                 ;     544 
+                                 ;     545     /* settings for third long word: DAR */
+                                 ;     546     td_ptr->THIRD_LWORD.DAR = p_cfg->dest_addr; /* 4 byte DAR */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",546
+00000419 A909                    		MOV.L 14H[R0], R1
+0000041B A88A                    		MOV.L 0CH[R0], R2
+0000041D E5120902                		MOV.L 24H[R1], 08H[R2]
+00000421                         L154:	; bb171.split5
+                                 ;     547 
+                                 ;     548     /* settings for fourth long word: CRA & CRB */
+                                 ;     549     td_ptr->FOURTH_LWORD.REG.CRA.WORD = t_cra.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",549
+00000421 9901                    		MOV.W 08H[R0], R1
+00000423 A88A                    		MOV.L 0CH[R0], R2
+00000425 91A9                    		MOV.W R1, 0EH[R2]
+00000427                         L155:	; bb171.split6
+                                 ;     550     td_ptr->FOURTH_LWORD.REG.CRB.WORD = t_crb.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",550
+00000427 9909                    		MOV.W 0AH[R0], R1
+00000429 A88A                    		MOV.L 0CH[R0], R2
+0000042B 91A1                    		MOV.W R1, 0CH[R2]
+0000042D                         L156:	; bb171.split7
+                                 ;     551 #endif
+                                 ;     552     return DTC_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",552
+0000042D F80601                  		MOV.L #00000001H, [R0]
+00000430                         L157:	; bb217
+00000430 EC01                    		MOV.L [R0], R1
+00000432 A101                    		MOV.L R1, 10H[R0]
+                                 ;     553 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",553
+00000434 6707                    		RTSD #1CH
+00000436                         __$r_dtc_clear_all_dtce_bits:
+                                 		.STACK	__$r_dtc_clear_all_dtce_bits=8
+                                 ;     554 
+                                 ;     555 /*******************************************************************************
+                                 ;     556 * Function Name: r_dtc_clear_all_dtce_bits
+                                 ;     557 * Description  : Clears all DTCERn.DTCE bit corresponding to the interrupt that
+                                 ;     558 *                can be selected as DTC activation sources.
+                                 ;     559 * Arguments    : addr -
+                                 ;     560 *                  Address need to be validated
+                                 ;     561 * Return Value : true -
+                                 ;     562 *                  The address is valid.
+                                 ;     563 *                false -
+                                 ;     564 *                  The address is invalid.
+                                 ;     565 *******************************************************************************/
+                                 ;     566 static void r_dtc_clear_all_dtce_bits(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",566
+00000436 6040                    		SUB #04H, R0
+                                 ;     567 {
+                                 ;     568     volatile uint32_t dtce_cnt = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",568
+00000438 F80600                  		MOV.L #00000000H, [R0]
+0000043B 2Err                 B  		BRA L161
+0000043D                         L159:	; bb
+                                 ;     569 
+                                 ;     570     /* Clear all DTCER registers.
+                                 ;     571      * Scan through all available DTCER registers in Array.
+                                 ;     572      */
+                                 ;     573     while (dtce_cnt < DTC_NUM_INTERRUPT_SRC)
+                                 ;     574     {
+                                 ;     575         ICU.DTCER[source_array[dtce_cnt]].BIT.DTCE = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",575
+0000043D EC01                    		MOV.L [R0], R1
+0000043F FBE2rrrrrrrr            		MOV.L #_source_array, R14
+00000445 FE61EE                  		MOV.L [R1,R14], R14
+00000448 73EE007108              		ADD #00087100H, R14
+0000044D F0E8                    		BCLR #00H, [R14].B
+0000044F                         L160:	; bb.split
+                                 ;     576         dtce_cnt++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",576
+0000044F EC01                    		MOV.L [R0], R1
+00000451 6211                    		ADD #01H, R1
+00000453 E301                    		MOV.L R1, [R0]
+00000455                         L161:	; bb14
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",573
+00000455 EC01                    		MOV.L [R0], R1
+00000457 7551CA                  		CMP #0CAH, R1
+0000045A 23rr                    		BLTU L159
+0000045C                         L162:	; return.split
+                                 ;     577     }
+                                 ;     578 
+                                 ;     579     return;
+                                 ;     580 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",580
+0000045C 6701                    		RTSD #04H
+0000045E                         __$r_dtc_abort_chain_transfer:
+                                 		.STACK	__$r_dtc_abort_chain_transfer=28
+                                 ;     581 
+                                 ;     582 /*******************************************************************************
+                                 ;     583 * Function Name: r_dtc_abort_chain_transfer
+                                 ;     584 * Description  : Aborts the current active chain transfer.
+                                 ;     585 * Arguments    : chain_transfer_nr -
+                                 ;     586 *                   Number of chain transfer
+                                 ;     587 * Return Value : true -
+                                 ;     588 *                   Abort successfully.
+                                 ;     589 *                false
+                                 ;     590 *                   Can not abort.
+                                 ;     591 *******************************************************************************/
+                                 ;     592 static bool r_dtc_abort_chain_transfer(uint32_t chain_transfer_nr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",592
+0000045E 7100E8                  		ADD #0FFFFFFE8H, R0
+00000461 A109                    		MOV.L R1, 14H[R0]
+                                 ;     593 {
+                                 ;     594     volatile uint32_t cnt = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",594
+00000463 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000466                         L164:	; entry.split
+                                 ;     595     uint16_t          status_reg = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",595
+00000466 3D0500                  		MOV.W #0000H, 0AH[R0]
+00000469                         L165:	; entry.split1
+                                 ;     596 
+                                 ;     597     status_reg = DTC.DTCSTS.WORD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",597
+00000469 FBEE042408              		MOV.L #00082404H, R14
+0000046E D5E00505                		MOV.W 0AH[R14], 0AH[R0]
+00000472                         L166:	; entry.split2
+                                 ;     598 
+                                 ;     599     volatile dtc_internal_registers_t *td_ptr = NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",599
+00000472 3E0300                  		MOV.L #00000000H, 0CH[R0]
+00000475                         L167:	; entry.split3
+                                 ;     600 
+                                 ;     601     if (0 == (status_reg & 0x8000)) /* DTC is not active. */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",601
+00000475 B909                    		MOVU.W 0AH[R0], R1
+00000477 7CF1                    		BTST #0FH, R1
+00000479 18                   S  		BNE L169
+0000047A                         L168:	; bb6
+                                 ;     602     {
+                                 ;     603         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",603
+0000047A 3C0300                  		MOV.B #00H, 03H[R0]
+0000047D 2Err                 B  		BRA L176
+0000047F                         L169:	; bb13
+                                 ;     604     }
+                                 ;     605 
+                                 ;     606     status_reg &= 0xFF; /* Get the vector number. */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",606
+0000047F B281                    		MOVU.B 0AH[R0], R1
+00000481 9109                    		MOV.W R1, 0AH[R0]
+00000483                         L170:	; bb13.split
+                                 ;     607     td_ptr = (volatile dtc_internal_registers_t *)*((uint32_t *)DTC.DTCVBR + status_reg) + chain_transfer_nr - 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",607
+00000483 FBEE042408              		MOV.L #00082404H, R14
+00000488 ECEE                    		MOV.L [R14], R14
+0000048A B909                    		MOVU.W 0AH[R0], R1
+0000048C 6C21                    		SHLL #02H, R1
+0000048E 4B1E                    		ADD R1, R14
+00000490 A909                    		MOV.L 14H[R0], R1
+00000492 6C41                    		SHLL #04H, R1
+00000494 0688E1                  		ADD [R14].L, R1
+00000497 7111F0                  		ADD #0FFFFFFF0H, R1
+0000049A A089                    		MOV.L R1, 0CH[R0]
+0000049C 2Err                 B  		BRA L174
+0000049E                         L171:	; bb28
+                                 ;     608 
+                                 ;     609     while (cnt < chain_transfer_nr)
+                                 ;     610     {
+                                 ;     611 #if (DTC_DISABLE == DTC_CFG_SHORT_ADDRRESS_MODE) /* Full address mode */
+                                 ;     612         td_ptr->FIRST_LWORD.REG.MRB.BIT.CHNE = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",612
+0000049E A889                    		MOV.L 0CH[R0], R1
+000004A0 F11F02                  		BCLR #07H, 02H[R1].B
+000004A3                         L172:	; bb28.split
+                                 ;     613 #else /* Short address mode */
+                                 ;     614         td_ptr->SECOND_LWORD.REG.MRB.BIT.CHNE = 0;
+                                 ;     615 #endif
+                                 ;     616         td_ptr--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",616
+000004A3 A889                    		MOV.L 0CH[R0], R1
+000004A5 7111F0                  		ADD #0FFFFFFF0H, R1
+000004A8 A089                    		MOV.L R1, 0CH[R0]
+000004AA                         L173:	; bb28.split4
+                                 ;     617         cnt++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",617
+000004AA A809                    		MOV.L 04H[R0], R1
+000004AC 6211                    		ADD #01H, R1
+000004AE A009                    		MOV.L R1, 04H[R0]
+000004B0                         L174:	; bb45
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",609
+000004B0 A809                    		MOV.L 04H[R0], R1
+000004B2 06850105                		CMP 14H[R0].L, R1
+000004B6 23rr                    		BLTU L171
+000004B8                         L175:	; bb51
+                                 ;     618     }
+                                 ;     619 
+                                 ;     620     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",620
+000004B8 3C0301                  		MOV.B #01H, 03H[R0]
+000004BB                         L176:	; bb53
+000004BB C5000313                		MOV.B 03H[R0], 13H[R0]
+                                 ;     621 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",621
+000004BF B489                    		MOVU.B 13H[R0], R1
+000004C1 6706                    		RTSD #18H
+000004C3                         __$r_dtc_acquire_hw_lock:
+                                 		.STACK	__$r_dtc_acquire_hw_lock=8
+                                 ;     622 
+                                 ;     623 /*******************************************************************************
+                                 ;     624 * Function Name: r_dtc_acquire_hw_lock
+                                 ;     625 * Description  : Gets the hardware lock BSP_LOCK_DTC.
+                                 ;     626 * Arguments    : None.
+                                 ;     627 * Return Value : true -
+                                 ;     628 *                  The lock is acquired successfully
+                                 ;     629 *                false -
+                                 ;     630 *                  Fails to get the lock
+                                 ;     631 *******************************************************************************/
+                                 ;     632 static bool r_dtc_acquire_hw_lock(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",632
+000004C3 6040                    		SUB #04H, R0
+000004C5 754111                  		MOV.L #00000011H, R1
+                                 ;     633 {
+                                 ;     634     return R_BSP_HardwareLock(BSP_LOCK_DTC);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",634
+000004C8 05rrrrrr             A  		BSR _R_BSP_HardwareLock
+000004CC 8089                    		MOV.B R1, 03H[R0]
+000004CE B089                    		MOVU.B 03H[R0], R1
+000004D0                         L178:	; entry.split
+                                 ;     635 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",635
+000004D0 5B11                    		MOVU.B R1, R1
+000004D2 6701                    		RTSD #04H
+000004D4                         __$r_dtc_release_hw_lock:
+                                 		.STACK	__$r_dtc_release_hw_lock=4
+                                 ;     636 
+                                 ;     637 /*******************************************************************************
+                                 ;     638 * Function Name: r_dtc_release_hw_lock
+                                 ;     639 * Description  : release hardware lock BSP_LOCK_DTC.
+                                 ;     640 * Arguments    : None.
+                                 ;     641 * Return Value : None.
+                                 ;     642 *******************************************************************************/
+                                 ;     643 static void r_dtc_release_hw_lock(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",643
+000004D4 754111                  		MOV.L #00000011H, R1
+                                 ;     644 {
+                                 ;     645     R_BSP_HardwareUnlock(BSP_LOCK_DTC);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",645
+000004D7 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+000004DB                         L180:	; entry.split
+                                 ;     646     return;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",646
+000004DB 02                      		RTS
+000004DC                         __$r_dtc_check_DMAC_locking_sw:
+                                 		.STACK	__$r_dtc_check_DMAC_locking_sw=20
+                                 ;     647 }
+                                 ;     648 
+                                 ;     649 
+                                 ;     650 /*******************************************************************************
+                                 ;     651 * Function Name: r_dtc_check_DMAC_locking_sw
+                                 ;     652 * Description  : Checks all DMAC channel locking.
+                                 ;     653 * Arguments    : none -
+                                 ;     654 * Return Value : true -
+                                 ;     655 *                    All DMAC channels are unlocked. 
+                                 ;     656 *                false -
+                                 ;     657 *                    One or some DMAC channels are locked.
+                                 ;     658 *******************************************************************************/
+                                 ;     659 static bool r_dtc_check_DMAC_locking_sw(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",659
+000004DC 7100F0                  		ADD #0FFFFFFF0H, R0
+                                 ;     660 {
+                                 ;     661     bool ret = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",661
+000004DF 3C0301                  		MOV.B #01H, 03H[R0]
+000004E2                         L182:	; entry.split
+                                 ;     662 
+                                 ;     663 #if ((0 != BSP_CFG_USER_LOCKING_ENABLED) || (bsp_lock_t != BSP_CFG_USER_LOCKING_TYPE) \
+                                 ;     664       || (DTC_ENABLE != DTC_CFG_USE_DMAC_FIT_MODULE))
+                                 ;     665         /* defined(0 != BSP_CFG_USER_LOCKING_ENABLED) */
+                                 ;     666         /*  or defined(DTC_ENABLE !=DTC_CFG_USE_DMAC_FIT_MODULE) */
+                                 ;     667         /*  or defined(bsp_lock_t != BSP_CFG_USER_LOCKING_TYPE) */
+                                 ;     668         /* User has to do the locking check of DMAC by themselves. */
+                                 ;     669         ret = r_dtc_check_DMAC_locking_byUSER();
+                                 ;     670 #else
+                                 ;     671     uint32_t channel;
+                                 ;     672     uint32_t dmac_lock_num = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",672
+000004E2 3E0200                  		MOV.L #00000000H, 08H[R0]
+000004E5                         L183:	; entry.split1
+                                 ;     673 
+                                 ;     674     for (channel = 0; channel < DMAC_NUM_CHANNELS; channel++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",674
+000004E5 3E0100                  		MOV.L #00000000H, 04H[R0]
+000004E8 2Err                 B  		BRA L188
+000004EA                         L184:	; bb4
+                                 ;     675     {
+                                 ;     676         if (false == R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_DMAC0 + channel)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",676
+000004EA A809                    		MOV.L 04H[R0], R1
+000004EC 62D1                    		ADD #0DH, R1
+000004EE 05rrrrrr             A  		BSR _R_BSP_HardwareLock
+000004F2 6101                    		CMP #00H, R1
+000004F4 18                   S  		BNE L186
+000004F5                         L185:	; bb5
+                                 ;     677         {
+                                 ;     678             dmac_lock_num++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",678
+000004F5 A881                    		MOV.L 08H[R0], R1
+000004F7 6211                    		ADD #01H, R1
+000004F9 A081                    		MOV.L R1, 08H[R0]
+000004FB 08                   S  		BRA L187
+000004FC                         L186:	; bb8
+                                 ;     679         }
+                                 ;     680         else
+                                 ;     681         {
+                                 ;     682             R_BSP_HardwareUnlock((mcu_lock_t)(BSP_LOCK_DMAC0 + channel));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",682
+000004FC A809                    		MOV.L 04H[R0], R1
+000004FE 62D1                    		ADD #0DH, R1
+00000500 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+00000504                         L187:	; bb18
+00000504 A809                    		MOV.L 04H[R0], R1
+00000506 6211                    		ADD #01H, R1
+00000508 A009                    		MOV.L R1, 04H[R0]
+0000050A                         L188:	; bb21
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",674
+0000050A A809                    		MOV.L 04H[R0], R1
+0000050C 6181                    		CMP #08H, R1
+0000050E 23rr                    		BLTU L184
+00000510                         L189:	; bb27
+                                 ;     683         }
+                                 ;     684     }
+                                 ;     685 
+                                 ;     686     if (0 == dmac_lock_num)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",686
+00000510 A881                    		MOV.L 08H[R0], R1
+00000512 6101                    		CMP #00H, R1
+00000514 18                   S  		BNE L191
+00000515                         L190:	; bb28
+                                 ;     687     {
+                                 ;     688         ret = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",688
+00000515 3C0301                  		MOV.B #01H, 03H[R0]
+00000518 08                   S  		BRA L192
+00000519                         L191:	; bb29
+                                 ;     689     }
+                                 ;     690     else
+                                 ;     691     {
+                                 ;     692         ret = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",692
+00000519 3C0300                  		MOV.B #00H, 03H[R0]
+0000051C                         L192:	; bb34
+                                 ;     693     }
+                                 ;     694 #endif
+                                 ;     695 
+                                 ;     696     return ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",696
+0000051C C500030F                		MOV.B 03H[R0], 0FH[R0]
+00000520 B389                    		MOVU.B 0FH[R0], R1
+00000522                         L193:	; bb34.split
+                                 ;     697 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_dtc_rx\src\r_dtc_rx.c",697
+00000522 5B11                    		MOVU.B R1, R1
+00000524 6704                    		RTSD #10H
+                                 ;     698 
+                                 ;     699 
+                                 ;     700 /* End of File */
+                                 ;     701 
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$g_is_opened:
+00000000 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _g_dtc_table_work:
+00000000(00000008H)              		.blkl	2
+                                 		.swsection	W,stuff
+00000000                         L117:
+00000000 rr                      		.switch		L103-L118
+00000001 rr                      		.switch		L104-L118
+00000002 rr                      		.switch		L107-L118
+00000003 rr                      		.switch		L108-L118
+00000004 rr                      		.switch		L105-L118
+00000005 rr                      		.switch		L106-L118
+00000006 rr                      		.switch		L109-L118
+00000007 rr                      		.switch		L113-L118
+                                 		.SECTION	W,ROMDATA,ALIGN=4
+                                 		.SECTION	W_1,ROMDATA
+                                 		.SECTION	W_2,ROMDATA,ALIGN=2
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01642   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001318(00000526H)  P
+ROMDATA  0000000001(00000001H)  D_1
+DATA     0000000008(00000008H)  B
+ROMDATA  0000000000(00000000H)  W
+ROMDATA  0000000008(00000008H)  W_1
+ROMDATA  0000000000(00000000H)  W_2
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx7E87\$ccrx\r_dtc_rx.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\r_dtc_rx.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\r_dtc_rx\src\r_dtc_rx.obj

@@ -1,0 +1,1856 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:49:14 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:49:14
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=rx_mcu.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=rx_mcu.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;rx_mcu.c
+                                 
+                                 		.glb	_usb_gcstd_D0fifo
+                                 		.glb	_usb_gcstd_D1fifo
+                                 		.glb	_usb_cpu_module_start
+                                 		.glb	_R_BSP_HardwareLock
+                                 		.glb	_R_BSP_HardwareUnlock
+                                 		.glb	_R_BSP_RegisterProtectDisable
+                                 		.glb	_R_BSP_RegisterProtectEnable
+                                 		.glb	_usb_cpu_module_stop
+                                 		.glb	_usb_cpu_target_init
+                                 		.glb	_usb_cpu_usbint_init
+                                 		.glb	_usb_cpu_usb_int_hand
+                                 		.glb	_usb_cstd_UsbHandler
+                                 		.glb	_usb_cpu_d0fifo_int_hand
+                                 		.glb	_usb_cstd_DmaHandler
+                                 		.glb	_usb_cpu_d1fifo_int_hand
+                                 		.glb	_usb2_cpu_usb_int_hand
+                                 		.glb	_usb2_cpu_d0fifo_int_hand
+                                 		.glb	_usb2_cpu_d1fifo_int_hand
+                                 		.glb	_usb_cpu_int_enable
+                                 		.glb	_usb_cpu_int_disable
+                                 		.glb	_usb_cpu_Delay1us
+                                 		.glb	_usb_cpu_DelayXms
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _usb_cpu_module_start:
+                                 		.STACK	_usb_cpu_module_start=16
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : rx_rsk.c
+                                 ;      21 * Description  : RX MCU processing
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Added RX71M.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 
+                                 ;      30 /******************************************************************************
+                                 ;      31 Includes   <System Includes> , "Project Includes"
+                                 ;      32 ******************************************************************************/
+                                 ;      33 #include <machine.h>
+                                 ;      34 #include "r_usb_basic_if.h"
+                                 ;      35 
+                                 ;      36 #ifdef USB_DTC_ENABLE
+                                 ;      37 #include "r_dtc_rx_if.h"
+                                 ;      38 #endif /* USB_DTC_ENABLE */
+                                 ;      39 
+                                 ;      40 
+                                 ;      41 /******************************************************************************
+                                 ;      42 Constant macro definitions
+                                 ;      43 ******************************************************************************/
+                                 ;      44 /* Select Use IP */
+                                 ;      45 #define USB_PswIntDisable               (uint32_t)(7 << 24) /* Processer Status Word - IPL(Level7) */
+                                 ;      46 #define USB_PswIntSleep                 (uint32_t)(1 << 24) /* Processer Status Word - IPL(Level1) */
+                                 ;      47 
+                                 ;      48 /******************************************************************************
+                                 ;      49 External variables and functions
+                                 ;      50 ******************************************************************************/
+                                 ;      51 extern void     R_usb_pstd_DeviceInformation(USB_UTR_t *ptr, uint16_t *tbl);
+                                 ;      52 
+                                 ;      53 /******************************************************************************
+                                 ;      54 Typedef definitions
+                                 ;      55 ******************************************************************************/
+                                 ;      56 
+                                 ;      57 
+                                 ;      58 /******************************************************************************
+                                 ;      59 Private global variables and functions
+                                 ;      60 ******************************************************************************/
+                                 ;      61 #ifdef USB_DTC_ENABLE
+                                 ;      62 dtc_transfer_data_cfg_t    usb_td_cfg[2];
+                                 ;      63 dtc_transfer_data_t        usb_dtc_transfer_data[2];
+                                 ;      64 #endif  /* USB_DTC_ENABLE */
+                                 ;      65 
+                                 ;      66 
+                                 ;      67 /******************************************************************************
+                                 ;      68 Private global variables and functions
+                                 ;      69 ******************************************************************************/
+                                 ;      70 uint16_t usb_gcstd_D0fifo[2u] = {0,0};      /* D0fifo0 Interrupt Request enable */
+                                 ;      71 uint16_t usb_gcstd_D1fifo[2u] = {0,0};      /* D1fifo0 Interrupt Request enable */
+                                 ;      72 
+                                 ;      73 static bool usb_gstd_is_opened[2] = { false, false };
+                                 ;      74 
+                                 ;      75 /*=== SYSTEM ================================================================*/
+                                 ;      76 usb_err_t   usb_cpu_module_start( usb_ip_t ip_type );
+                                 ;      77 usb_err_t   usb_cpu_module_stop( usb_ip_t ip_type );
+                                 ;      78 void        usb_cpu_target_init(void);
+                                 ;      79 /*=== Interrupt =============================================================*/
+                                 ;      80 void        usb_cpu_usbint_init(void);
+                                 ;      81 void        usb_cpu_usb_int_hand(void);
+                                 ;      82 void        usb2_cpu_usb_int_hand(void);
+                                 ;      83 void        usb_cpu_d0fifo_int_hand(void);
+                                 ;      84 void        usb2_cpu_d0fifo_int_hand(void);
+                                 ;      85 void        usb_cpu_int_enable(USB_UTR_t *ptr);
+                                 ;      86 void        usb_cpu_int_disable(USB_UTR_t *ptr);
+                                 ;      87 /*=== TIMER =================================================================*/
+                                 ;      88 void        usb_cpu_Delay1us(uint16_t time);
+                                 ;      89 void        usb_cpu_DelayXms(uint16_t time);
+                                 ;      90 
+                                 ;      91 #ifdef USB_DTC_ENABLE
+                                 ;      92 /*=== DMA ===================================================================*/
+                                 ;      93 void        usb_cpu_d0fifo2buf_start_dma(USB_UTR_t *ptr, uint32_t SourceAddr);
+                                 ;      94 void        usb_cpu_buf2d0fifo_start_dma(USB_UTR_t *ptr, uint32_t DistAdr);
+                                 ;      95 void        usb_cpu_d0fifo_restart_dma(USB_UTR_t *ptr);
+                                 ;      96 void        usb_cpu_d0fifo_stop_dma(USB_UTR_t *ptr);
+                                 ;      97 uint16_t    usb_cpu_get_dtc_block_count(USB_UTR_t *ptr);
+                                 ;      98 void        usb_cpu_d0fifo_enable_dma(USB_UTR_t *ptr );
+                                 ;      99 void        usb_cpu_d0fifo_disable_dma(USB_UTR_t *ptr );
+                                 ;     100 #endif  /* USB_DTC_ENABLE */
+                                 ;     101 
+                                 ;     102 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+                                 ;     103 #pragma interrupt usb_cpu_usb_int_hand(vect = VECT(USB0, USBI0))
+                                 ;     104 #pragma interrupt usb2_cpu_usb_int_hand(vect = VECT(USBA, USBAR))
+                                 ;     105 #pragma interrupt usb_cpu_d0fifo_int_hand(vect = VECT(USB0, D0FIFO0))
+                                 ;     106 #pragma interrupt usb2_cpu_d0fifo_int_hand(vect = VECT(USBA, D0FIFO2))
+                                 ;     107 #else
+                                 ;     108 #pragma interrupt usb_cpu_usb_int_hand(vect = VECT(USB0, USBI0))
+                                 ;     109 #pragma interrupt usb_cpu_d0fifo_int_hand(vect = VECT(USB0, D0FIFO0))
+                                 ;     110 #endif /* #if defined(BSP_MCU_RX64M) || (BSP_MCU_RX71M) */
+                                 ;     111 /******************************************************************************
+                                 ;     112 Renesas Abstracted RSK functions
+                                 ;     113 ******************************************************************************/
+                                 ;     114 
+                                 ;     115 
+                                 ;     116 /******************************************************************************
+                                 ;     117 Function Name   : usb_cpu_module_start
+                                 ;     118 Description     : USB module start
+                                 ;     119 Arguments       : usb_ip_t ip_type  : USB_IP0/USB_IP1
+                                 ;     120 Return value    : none
+                                 ;     121 ******************************************************************************/
+                                 ;     122 usb_err_t usb_cpu_module_start( usb_ip_t ip_type )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",122
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
+                                 ;     123 {
+                                 ;     124     if( USB_IP0 == ip_type )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",124
+00000004 6101                    		CMP #00H, R1
+00000006 21rr                    		BNE L20
+00000008                         L11:	; bb3
+00000008 754163                  		MOV.L #00000063H, R1
+                                 ;     125     {
+                                 ;     126         if(R_BSP_HardwareLock(BSP_LOCK_USB0) == false)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",126
+0000000B 05rrrrrr             A  		BSR _R_BSP_HardwareLock
+0000000F 6101                    		CMP #00H, R1
+00000011 18                   S  		BNE L13
+00000012                         L12:	; bb4
+                                 ;     127         {
+                                 ;     128             /* Lock has already been acquired by another task. Need to try again later */
+                                 ;     129             return USB_ERR_BUSY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",129
+00000012 F80605                  		MOV.L #00000005H, [R0]
+00000015 2Err                 B  		BRA L22
+00000017                         L13:	; bb11
+                                 ;     130         }
+                                 ;     131         if(usb_gstd_is_opened[ip_type] == true)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",131
+00000017 A881                    		MOV.L 08H[R0], R1
+00000019 FBE2rrrrrrrr            		MOV.L #__$usb_gstd_is_opened, R14
+0000001F FECE1E                  		MOVU.B [R14,R1], R14
+00000022 611E                    		CMP #01H, R14
+00000024 21rr                    		BNE L16
+00000026                         L14:	; bb12
+00000026 754163                  		MOV.L #00000063H, R1
+                                 ;     132         {
+                                 ;     133             R_BSP_HardwareUnlock(BSP_LOCK_USB0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",133
+00000029 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+0000002D                         L15:	; bb12.split
+                                 ;     134             return USB_ERR_OPENED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",134
+0000002D F80601                  		MOV.L #00000001H, [R0]
+00000030 2Err                 B  		BRA L22
+00000032                         L16:	; bb22
+00000032 6611                    		MOV.L #00000001H, R1
+                                 ;     135         }
+                                 ;     136 
+                                 ;     137         /* Enable writing to MSTP registers */
+                                 ;     138         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",138
+00000034 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+00000038                         L17:	; bb22.split
+00000038 FBEE140008              		MOV.L #00080014H, R14
+                                 ;     139         /* Enable power for USB0 */
+                                 ;     140         SYSTEM.MSTPCRB.BIT.MSTPB19 = 0u;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",140
+0000003D ECEF                    		MOV.L [R14], R15
+0000003F 7B3F                    		BCLR #13H, R15
+00000041 E3EF                    		MOV.L R15, [R14]
+00000043                         L18:	; bb22.split1
+00000043 6611                    		MOV.L #00000001H, R1
+                                 ;     141         /* Disable writing to MSTP registers */
+                                 ;     142         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",142
+00000045 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+00000049                         L19:	; bb22.split2
+00000049 754163                  		MOV.L #00000063H, R1
+                                 ;     143 
+                                 ;     144         R_BSP_HardwareUnlock(BSP_LOCK_USB0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",144
+0000004C 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+00000050                         L20:	; bb31
+                                 ;     145     }
+                                 ;     146 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+                                 ;     147     else if( USB_IP1 == ip_type )
+                                 ;     148     {
+                                 ;     149         if(R_BSP_HardwareLock(BSP_LOCK_USBA) == false)
+                                 ;     150         {
+                                 ;     151             /* Lock has already been acquired by another task. Need to try again later */
+                                 ;     152             return USB_ERR_BUSY;
+                                 ;     153         }
+                                 ;     154         if(usb_gstd_is_opened[ip_type] == true)
+                                 ;     155         {
+                                 ;     156             R_BSP_HardwareUnlock(BSP_LOCK_USBA);
+                                 ;     157             return USB_ERR_OPENED;
+                                 ;     158         }
+                                 ;     159 
+                                 ;     160         /* Enable writing to MSTP registers */
+                                 ;     161         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 ;     162         /* Enable power for USBA */
+                                 ;     163         SYSTEM.MSTPCRB.BIT.MSTPB12 = 0u;
+                                 ;     164         /* Disable writing to MSTP registers */
+                                 ;     165         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 ;     166 
+                                 ;     167         R_BSP_HardwareUnlock(BSP_LOCK_USBA);
+                                 ;     168     }
+                                 ;     169     else
+                                 ;     170     {
+                                 ;     171     }
+                                 ;     172 #endif /* #if defined(BSP_MCU_RX64M) || (BSP_MCU_RX71M) */
+                                 ;     173     usb_gstd_is_opened[ip_type] = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",173
+00000050 A881                    		MOV.L 08H[R0], R1
+00000052 FBE2rrrrrrrr            		MOV.L #__$usb_gstd_is_opened, R14
+00000058 661F                    		MOV.L #00000001H, R15
+0000005A FE0E1F                  		MOV.B R15, [R14,R1]
+0000005D                         L21:	; bb31.split
+                                 ;     174 
+                                 ;     175     return USB_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",175
+0000005D F80600                  		MOV.L #00000000H, [R0]
+00000060                         L22:	; bb35
+00000060 EC01                    		MOV.L [R0], R1
+00000062 A009                    		MOV.L R1, 04H[R0]
+                                 ;     176 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",176
+00000064 6703                    		RTSD #0CH
+00000066                         _usb_cpu_module_stop:
+                                 		.STACK	_usb_cpu_module_stop=16
+                                 ;     177 /******************************************************************************
+                                 ;     178 End of function usb_cpu_McuInitialize
+                                 ;     179 ******************************************************************************/
+                                 ;     180 
+                                 ;     181 /******************************************************************************
+                                 ;     182 Function Name   : usb_cpu_module_stop
+                                 ;     183 Description     : USB module stop
+                                 ;     184 Arguments       : usb_ip_t ip_type  : USB_IP0/USB_IP1
+                                 ;     185 Return value    : none
+                                 ;     186 ******************************************************************************/
+                                 ;     187 usb_err_t usb_cpu_module_stop( usb_ip_t ip_type )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",187
+00000066 60C0                    		SUB #0CH, R0
+00000068 A081                    		MOV.L R1, 08H[R0]
+                                 ;     188 {
+                                 ;     189     if( USB_IP0 == ip_type )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",189
+0000006A 6101                    		CMP #00H, R1
+0000006C 21rr                    		BNE L33
+0000006E                         L24:	; bb3
+0000006E 754163                  		MOV.L #00000063H, R1
+                                 ;     190     {
+                                 ;     191         if(R_BSP_HardwareLock(BSP_LOCK_USB0) == false)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",191
+00000071 05rrrrrr             A  		BSR _R_BSP_HardwareLock
+00000075 6101                    		CMP #00H, R1
+00000077 18                   S  		BNE L26
+00000078                         L25:	; bb4
+                                 ;     192         {
+                                 ;     193             /* Lock has already been acquired by another task. Need to try again later */
+                                 ;     194             return USB_ERR_BUSY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",194
+00000078 F80605                  		MOV.L #00000005H, [R0]
+0000007B 2Err                 B  		BRA L35
+0000007D                         L26:	; bb11
+                                 ;     195         }
+                                 ;     196         if(usb_gstd_is_opened[ip_type] == false)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",196
+0000007D A881                    		MOV.L 08H[R0], R1
+0000007F FBE2rrrrrrrr            		MOV.L #__$usb_gstd_is_opened, R14
+00000085 FECE1E                  		MOVU.B [R14,R1], R14
+00000088 610E                    		CMP #00H, R14
+0000008A 21rr                    		BNE L29
+0000008C                         L27:	; bb12
+0000008C 754163                  		MOV.L #00000063H, R1
+                                 ;     197         {
+                                 ;     198             R_BSP_HardwareUnlock(BSP_LOCK_USB0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",198
+0000008F 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+00000093                         L28:	; bb12.split
+                                 ;     199             return USB_ERR_NOT_OPEN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",199
+00000093 F80602                  		MOV.L #00000002H, [R0]
+00000096 2Err                 B  		BRA L35
+00000098                         L29:	; bb22
+00000098 6611                    		MOV.L #00000001H, R1
+                                 ;     200         }
+                                 ;     201 
+                                 ;     202         /* Enable writing to MSTP registers */
+                                 ;     203         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",203
+0000009A 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+0000009E                         L30:	; bb22.split
+0000009E FBEE140008              		MOV.L #00080014H, R14
+                                 ;     204         /* Disable power for USB0 */
+                                 ;     205         SYSTEM.MSTPCRB.BIT.MSTPB19 = 1u;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",205
+000000A3 ECEF                    		MOV.L [R14], R15
+000000A5 793F                    		BSET #13H, R15
+000000A7 E3EF                    		MOV.L R15, [R14]
+000000A9                         L31:	; bb22.split1
+000000A9 6611                    		MOV.L #00000001H, R1
+                                 ;     206         /* Disable writing to MSTP registers */
+                                 ;     207         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",207
+000000AB 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+000000AF                         L32:	; bb22.split2
+000000AF 754163                  		MOV.L #00000063H, R1
+                                 ;     208 
+                                 ;     209         R_BSP_HardwareUnlock(BSP_LOCK_USB0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",209
+000000B2 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+000000B6                         L33:	; bb31
+                                 ;     210     }
+                                 ;     211 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+                                 ;     212     else if( USB_IP1 == ip_type )
+                                 ;     213     {
+                                 ;     214         if(R_BSP_HardwareLock(BSP_LOCK_USBA) == false)
+                                 ;     215         {
+                                 ;     216             /* Lock has already been acquired by another task. Need to try again later */
+                                 ;     217             return USB_ERR_BUSY;
+                                 ;     218         }
+                                 ;     219         if(usb_gstd_is_opened[ip_type] == false)
+                                 ;     220         {
+                                 ;     221             R_BSP_HardwareUnlock(BSP_LOCK_USBA);
+                                 ;     222             return USB_ERR_NOT_OPEN;
+                                 ;     223         }
+                                 ;     224 
+                                 ;     225         /* Enable writing to MSTP registers */
+                                 ;     226         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 ;     227         /* Disable power for USBA */
+                                 ;     228         SYSTEM.MSTPCRB.BIT.MSTPB12 = 1u;
+                                 ;     229         /* Disable writing to MSTP registers */
+                                 ;     230         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 ;     231 
+                                 ;     232         R_BSP_HardwareUnlock(BSP_LOCK_USBA);
+                                 ;     233     }
+                                 ;     234     else
+                                 ;     235     {
+                                 ;     236     }
+                                 ;     237 #endif /* #if defined(BSP_MCU_RX64M) || (BSP_MCU_RX71M) */
+                                 ;     238     usb_gstd_is_opened[ip_type] = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",238
+000000B6 A881                    		MOV.L 08H[R0], R1
+000000B8 FBE2rrrrrrrr            		MOV.L #__$usb_gstd_is_opened, R14
+000000BE 660F                    		MOV.L #00000000H, R15
+000000C0 FE0E1F                  		MOV.B R15, [R14,R1]
+000000C3                         L34:	; bb31.split
+                                 ;     239 
+                                 ;     240     return USB_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",240
+000000C3 F80600                  		MOV.L #00000000H, [R0]
+000000C6                         L35:	; bb35
+000000C6 EC01                    		MOV.L [R0], R1
+000000C8 A009                    		MOV.L R1, 04H[R0]
+                                 ;     241 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",241
+000000CA 6703                    		RTSD #0CH
+000000CC                         _usb_cpu_target_init:
+                                 		.STACK	_usb_cpu_target_init=4
+                                 ;     242 /******************************************************************************
+                                 ;     243 End of function usb_cpu_McuInitialize
+                                 ;     244 ******************************************************************************/
+                                 ;     245 
+                                 ;     246 /******************************************************************************
+                                 ;     247 Function Name   : usb_cpu_target_init
+                                 ;     248 Description     : Target System Initialize
+                                 ;     249 Arguments       : none
+                                 ;     250 Return value    : none
+                                 ;     251 ******************************************************************************/
+                                 ;     252 void usb_cpu_target_init( void )
+                                 ;     253 {
+                                 ;     254     /* Enable Interrupt */
+                                 ;     255     usb_cpu_usbint_init();      /* Initialized USB interrupt  */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",255
+000000CC 39rrrr               W  		BSR _usb_cpu_usbint_init
+000000CF 02                      		RTS
+000000D0                         _usb_cpu_usbint_init:
+                                 		.STACK	_usb_cpu_usbint_init=4
+                                 ;     256 }
+                                 ;     257 /******************************************************************************
+                                 ;     258 End of function usb_cpu_target_init
+                                 ;     259 ******************************************************************************/
+                                 ;     260 
+                                 ;     261 /******************************************************************************
+                                 ;     262 Interrupt function
+                                 ;     263 ******************************************************************************/
+                                 ;     264 /******************************************************************************
+                                 ;     265 Function Name   : usb_cpu_usbint_init
+                                 ;     266 Description     : USB interrupt Initialize
+                                 ;     267 Arguments       : void
+                                 ;     268 Return value    : void
+                                 ;     269 ******************************************************************************/
+                                 ;     270 void usb_cpu_usbint_init( void )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",270
+000000D0 FBEE00040A              		MOV.L #000A0400H, R14
+                                 ;     271 {
+                                 ;     272 /* Condition compilation by the difference of USB function */
+                                 ;     273 #if USB_FUNCSEL_USBIP0_PP != USB_NOUSE_PP
+                                 ;     274     /* Deep standby USB monitor register
+                                 ;     275     b0      SRPC0    USB0 single end control
+                                 ;     276     b3-b1   Reserved 0
+                                 ;     277     b4      FIXPHY0  USB0 transceiver output fix
+                                 ;     278     b7-b5   Reserved 0
+                                 ;     279     b8      SRPC1    USB1 single end control
+                                 ;     280     b11-b9  Reserved 0
+                                 ;     281     b12     FIXPHY1  USB1 transceiver output fix
+                                 ;     282     b15-b13 Reserved 0
+                                 ;     283     b16     DP0      USB0 DP input
+                                 ;     284     b17     DM0      USB0 DM input
+                                 ;     285     b19-b18 Reserved 0
+                                 ;     286     b20     DOVCA0   USB0 OVRCURA input
+                                 ;     287     b21     DOVCB0   USB0 OVRCURB input
+                                 ;     288     b22     Reserved 0
+                                 ;     289     b23     DVBSTS0  USB1 VBUS input
+                                 ;     290     b24     DP1      USB1 DP input
+                                 ;     291     b25     DM1      USB1 DM input
+                                 ;     292     b27-b26 Reserved 0
+                                 ;     293     b28     DOVCA1   USB1 OVRCURA input
+                                 ;     294     b29     DOVCB1   USB1 OVRCURB input
+                                 ;     295     b30     Reserved 0
+                                 ;     296     b31     DVBSTS1  USB1 VBUS input
+                                 ;     297     */
+                                 ;     298     USB.DPUSR0R.BIT.FIXPHY0 = 0u;   /* USB0 Transceiver Output fixed */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",298
+000000D5 ECEF                    		MOV.L [R14], R15
+000000D7 7A4F                    		BCLR #04H, R15
+000000D9 E3EF                    		MOV.L R15, [R14]
+000000DB                         L38:	; entry.split
+                                 ;     299 
+                                 ;     300     /* Interrupt enable register
+                                 ;     301     b0 IEN0 Interrupt enable bit
+                                 ;     302     b1 IEN1 Interrupt enable bit
+                                 ;     303     b2 IEN2 Interrupt enable bit
+                                 ;     304     b3 IEN3 Interrupt enable bit
+                                 ;     305     b4 IEN4 Interrupt enable bit
+                                 ;     306     b5 IEN5 Interrupt enable bit
+                                 ;     307     b6 IEN6 Interrupt enable bit
+                                 ;     308     b7 IEN7 Interrupt enable bit
+                                 ;     309     */
+                                 ;     310 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+                                 ;     311     IEN( USB0, D0FIFO0 ) = 0u;    /* D0FIFO0 disable */
+                                 ;     312     IEN( USB0, D1FIFO0 ) = 0u;    /* D1FIFO0 disable */
+                                 ;     313     IEN( USB0, USBR0 )   = 1u;    /* USBR0 enable */
+                                 ;     314 
+                                 ;     315     /* Interrupt priority register
+                                 ;     316     b3-b0 IPR      Interrupt priority
+                                 ;     317     b7-b4 Reserved 0
+                                 ;     318     */
+                                 ;     319     IPR( USB0, D0FIFO0 ) = 0x00;  /* D0FIFO0 */
+                                 ;     320     IPR( USB0, D1FIFO0 ) = 0x00;  /* D1FIFO0 */
+                                 ;     321     IPR( USB0, USBR0 )   = 0x00;  /* USBR0 */
+                                 ;     322 #else
+                                 ;     323     IEN( USB0, D0FIFO0 ) = 0u;    /* D0FIFO0 disable */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",323
+000000DB FBEE047208              		MOV.L #00087204H, R14
+000000E0 F0E9                    		BCLR #01H, [R14].B
+000000E2                         L39:	; entry.split1
+                                 ;     324     IEN( USB0, D1FIFO0 ) = 0u;    /* D1FIFO0 disable */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",324
+000000E2 FBEE047208              		MOV.L #00087204H, R14
+000000E7 F0EA                    		BCLR #02H, [R14].B
+000000E9                         L40:	; entry.split2
+                                 ;     325 
+                                 ;     326     /* Interrupt priority register
+                                 ;     327     b3-b0 IPR      Interrupt priority
+                                 ;     328     b7-b4 Reserved 0
+                                 ;     329     */
+                                 ;     330     IPR( USB0, D0FIFO0 ) = 0x00;  /* D0FIFO0 */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",330
+000000E9 FBEE047208              		MOV.L #00087204H, R14
+000000EE 754FF0                  		MOV.L #000000F0H, R15
+000000F1 52EF1D01                		AND 011DH[R14].UB, R15
+000000F5 CBEF1D01                		MOV.B R15, 011DH[R14]
+000000F9                         L41:	; entry.split3
+                                 ;     331     IPR( USB0, D1FIFO0 ) = 0x00;  /* D1FIFO0 */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",331
+000000F9 FBEE047208              		MOV.L #00087204H, R14
+000000FE 754FF0                  		MOV.L #000000F0H, R15
+00000101 52EF1E01                		AND 011EH[R14].UB, R15
+00000105 CBEF1E01                		MOV.B R15, 011EH[R14]
+00000109                         L42:	; entry.split4
+                                 ;     332 #endif /* #if defined(BSP_MCU_RX64M) || (BSP_MCU_RX71M) */
+                                 ;     333 
+                                 ;     334     IPR( USB0, USBI0 )   = 0x03;  /* USBI0 in vector 128 */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",334
+00000109 FBEE047208              		MOV.L #00087204H, R14
+0000010E 5AEF1F01                		MOVU.B 011FH[R14], R15
+00000112 653F                    		OR #03H, R15
+00000114 762FF300                		AND #0F3H, R15
+00000118 CBEF1F01                		MOV.B R15, 011FH[R14]
+0000011C                         L43:	; entry.split5
+                                 ;     335     IEN( USB0, USBI0 )   = 1u;    /* USBI0 enable in vector 128 */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",335
+0000011C FBEE047208              		MOV.L #00087204H, R14
+00000121 F0E3                    		BSET #03H, [R14].B
+00000123 02                      		RTS
+00000124                         _usb_cpu_usb_int_hand:
+                                 		.STACK	_usb_cpu_usb_int_hand=36
+                                 		.RVECTOR	35,_usb_cpu_usb_int_hand
+                                 ;     336 
+                                 ;     337 #endif  /* USB_FUNCSEL_USBIP0_PP != USB_NOUSE_PP */
+                                 ;     338 
+                                 ;     339 #if USB_FUNCSEL_USBIP1_PP != USB_NOUSE_PP
+                                 ;     340 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+                                 ;     341     /* Interrupt enable register
+                                 ;     342     b0 IEN0 Interrupt enable bit
+                                 ;     343     b1 IEN1 Interrupt enable bit
+                                 ;     344     b2 IEN2 Interrupt enable bit
+                                 ;     345     b3 IEN3 Interrupt enable bit
+                                 ;     346     b4 IEN4 Interrupt enable bit
+                                 ;     347     b5 IEN5 Interrupt enable bit
+                                 ;     348     b6 IEN6 Interrupt enable bit
+                                 ;     349     b7 IEN7 Interrupt enable bit
+                                 ;     350     */
+                                 ;     351     IEN( USBA, D0FIFO2 ) = 0u;   /* Disable D0FIF2 interrupt */
+                                 ;     352     IEN( USBA, D1FIFO2 ) = 0u;   /* Disable D1FIF2 interrupt */
+                                 ;     353     IEN( USBA, USBAR )   = 1u;   /* Enable  USBA  interrupt */
+                                 ;     354 
+                                 ;     355     /* Priority D0FIFO0=0(Disable)
+                                 ;     356     b3-b0 IPR      Interrupt priority
+                                 ;     357     b7-b4 Reserved 0
+                                 ;     358     */
+                                 ;     359     IPR( USBA, D0FIFO2 ) = 0x00; /* D0FIFO2 */
+                                 ;     360     IPR( USBA, D1FIFO2 ) = 0x00; /* D0FIFO2 */
+                                 ;     361     IPR( USBA, USBAR )   = 0x03; /* USBA */
+                                 ;     362 #endif /* #if defined(BSP_MCU_RX64M) || (BSP_MCU_RX71M) */
+                                 ;     363 #endif  /* USB_FUNCSEL_USBIP1_PP != USB_NOUSE_PP */
+                                 ;     364 }
+                                 ;     365 /******************************************************************************
+                                 ;     366 End of function usb_cpu_usbint_init
+                                 ;     367 ******************************************************************************/
+                                 ;     368 
+                                 ;     369 
+                                 ;     370 /******************************************************************************
+                                 ;     371 Function Name   : usb_cpu_usb_int_hand
+                                 ;     372 Description     : USB interrupt Handler
+                                 ;     373 Arguments       : void
+                                 ;     374 Return value    : void
+                                 ;     375 ******************************************************************************/
+                                 ;     376 void usb_cpu_usb_int_hand(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",376
+00000124 6EEF                    		PUSHM R14-R15
+00000126 6E15                    		PUSHM R1-R5
+                                 ;     377 {
+                                 ;     378 /* Condition compilation by the difference of USB function */
+                                 ;     379 #if USB_FUNCSEL_USBIP0_PP != USB_NOUSE_PP
+                                 ;     380     /* Call USB interrupt routine */
+                                 ;     381     usb_cstd_UsbHandler();      /* Call interrupt routine */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",381
+00000128 05rrrrrr             A  		BSR _usb_cstd_UsbHandler
+0000012C 6F15                    		POPM R1-R5
+0000012E 6FEF                    		POPM R14-R15
+00000130 7F95                    		RTE
+00000132                         _usb_cpu_d0fifo_int_hand:
+                                 		.STACK	_usb_cpu_d0fifo_int_hand=36
+                                 		.RVECTOR	33,_usb_cpu_d0fifo_int_hand
+                                 ;     382 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+                                 ;     383     ICU.PIBR7.BYTE |= 0x40;   /* Flag clear */
+                                 ;     384 #endif /* #if defined(BSP_MCU_RX64M) || (BSP_MCU_RX71M) */
+                                 ;     385 #endif /* USB_FUNCSEL_USBIP0_PP */
+                                 ;     386 }
+                                 ;     387 /******************************************************************************
+                                 ;     388 End of function usb_cpu_usb_int_hand
+                                 ;     389 ******************************************************************************/
+                                 ;     390 
+                                 ;     391 
+                                 ;     392 /******************************************************************************
+                                 ;     393 Function Name   : usb_cpu_d0fifo_int_hand
+                                 ;     394 Description     : D0FIFO interrupt Handler
+                                 ;     395 Arguments       : none
+                                 ;     396 Return value    : none
+                                 ;     397 ******************************************************************************/
+                                 ;     398 void usb_cpu_d0fifo_int_hand(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",398
+00000132 6EEF                    		PUSHM R14-R15
+00000134 6E15                    		PUSHM R1-R5
+                                 ;     399 {
+                                 ;     400 /* Condition compilation by the difference of USB function */
+                                 ;     401 #if USB_FUNCSEL_USBIP0_PP != USB_NOUSE_PP
+                                 ;     402     usb_cstd_DmaHandler();      /* Call interrupt routine */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",402
+00000136 05rrrrrr             A  		BSR _usb_cstd_DmaHandler
+0000013A 6F15                    		POPM R1-R5
+0000013C 6FEF                    		POPM R14-R15
+0000013E 7F95                    		RTE
+00000140                         _usb_cpu_d1fifo_int_hand:
+                                 		.STACK	_usb_cpu_d1fifo_int_hand=4
+                                 ;     403 #endif /* USB_FUNCSEL_USBIP0_PP */
+                                 ;     404 }
+                                 ;     405 /******************************************************************************
+                                 ;     406 End of function usb_cpu_d0fifo_int_hand
+                                 ;     407 ******************************************************************************/
+                                 ;     408 
+                                 ;     409 
+                                 ;     410 /******************************************************************************
+                                 ;     411 Function Name   : usb_cpu_d1fifo_int_hand
+                                 ;     412 Description     : D1FIFO interrupt Handler
+                                 ;     413 Arguments       : none
+                                 ;     414 Return value    : none
+                                 ;     415 ******************************************************************************/
+                                 ;     416 void usb_cpu_d1fifo_int_hand(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",416
+00000140 02                      		RTS
+00000141                         _usb2_cpu_usb_int_hand:
+                                 		.STACK	_usb2_cpu_usb_int_hand=4
+                                 ;     417 {
+                                 ;     418     /* Please add the processing for the system. */
+                                 ;     419 }
+                                 ;     420 /******************************************************************************
+                                 ;     421 End of function usb_cpu_d1fifo_int_hand
+                                 ;     422 ******************************************************************************/
+                                 ;     423 
+                                 ;     424 
+                                 ;     425 /******************************************************************************
+                                 ;     426 Function Name   : usb2_cpu_usb_int_hand
+                                 ;     427 Description     : USB interrupt Handler
+                                 ;     428 Arguments       : void
+                                 ;     429 Return value    : void
+                                 ;     430 ******************************************************************************/
+                                 ;     431 void usb2_cpu_usb_int_hand(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",431
+00000141 02                      		RTS
+00000142                         _usb2_cpu_d0fifo_int_hand:
+                                 		.STACK	_usb2_cpu_d0fifo_int_hand=4
+                                 ;     432 {
+                                 ;     433 /* Condition compilation by the difference of USB function */
+                                 ;     434 #if USB_FUNCSEL_USBIP1_PP != USB_NOUSE_PP
+                                 ;     435     usb2_cstd_UsbHandler();     /* Call interrupt routine */
+                                 ;     436 #endif /* USB_FUNCSEL_USBIP1_PP */
+                                 ;     437 }
+                                 ;     438 /******************************************************************************
+                                 ;     439 End of function usb2_cpu_usb_int_hand
+                                 ;     440 ******************************************************************************/
+                                 ;     441 
+                                 ;     442 
+                                 ;     443 /******************************************************************************
+                                 ;     444 Function Name   : usb2_cpu_d0fifo_int_hand
+                                 ;     445 Description     : D0FIFO interrupt Handler
+                                 ;     446 Arguments       : none
+                                 ;     447 Return value    : none
+                                 ;     448 ******************************************************************************/
+                                 ;     449 void usb2_cpu_d0fifo_int_hand(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",449
+00000142 02                      		RTS
+00000143                         _usb2_cpu_d1fifo_int_hand:
+                                 		.STACK	_usb2_cpu_d1fifo_int_hand=4
+                                 ;     450 {
+                                 ;     451 /* Condition compilation by the difference of USB function */
+                                 ;     452 #if USB_FUNCSEL_USBIP1_PP != USB_NOUSE_PP
+                                 ;     453     usb2_cstd_DmaHandler();     /* Call interrupt routine */
+                                 ;     454 #endif /* USB_FUNCSEL_USBIP1_PP */
+                                 ;     455 }
+                                 ;     456 /******************************************************************************
+                                 ;     457 End of function usb2_cpu_d0fifo_int_hand
+                                 ;     458 ******************************************************************************/
+                                 ;     459 
+                                 ;     460 
+                                 ;     461 /******************************************************************************
+                                 ;     462 Function Name   : usb2_cpu_d1fifo_int_hand
+                                 ;     463 Description     : D1FIFO interrupt Handler
+                                 ;     464 Arguments       : none
+                                 ;     465 Return value    : none
+                                 ;     466 ******************************************************************************/
+                                 ;     467 void usb2_cpu_d1fifo_int_hand(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",467
+00000143 02                      		RTS
+00000144                         _usb_cpu_int_enable:
+                                 		.STACK	_usb_cpu_int_enable=8
+                                 ;     468 {
+                                 ;     469     /* Please add the processing for the system. */
+                                 ;     470 }
+                                 ;     471 /******************************************************************************
+                                 ;     472 End of function usb2_cpu_d1fifo_int_hand
+                                 ;     473 ******************************************************************************/
+                                 ;     474 
+                                 ;     475 
+                                 ;     476 /******************************************************************************
+                                 ;     477 Renesas Abstracted RSK functions
+                                 ;     478 ******************************************************************************/
+                                 ;     479 /******************************************************************************
+                                 ;     480 Function Name   : usb_cpu_int_enable
+                                 ;     481 Description     : USB Interrupt Enable
+                                 ;     482 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel. 
+                                 ;     483 Return value    : void
+                                 ;     484 ******************************************************************************/
+                                 ;     485 void usb_cpu_int_enable(USB_UTR_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",485
+00000144 6040                    		SUB #04H, R0
+00000146 E301                    		MOV.L R1, [R0]
+                                 ;     486 {
+                                 ;     487     if( ptr->ip == USB_USBIP_0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",487
+00000148 B991                    		MOVU.W 0CH[R1], R1
+0000014A 6101                    		CMP #00H, R1
+0000014C 21rr                    		BNE L54
+0000014E                         L51:	; bb2
+0000014E FBEE047208              		MOV.L #00087204H, R14
+                                 ;     488     {
+                                 ;     489         /* Interrupt enable register (USB0 USBIO enable)
+                                 ;     490         b0 IEN0 Interrupt enable bit
+                                 ;     491         b1 IEN1 Interrupt enable bit
+                                 ;     492         b2 IEN2 Interrupt enable bit
+                                 ;     493         b3 IEN3 Interrupt enable bit
+                                 ;     494         b4 IEN4 Interrupt enable bit
+                                 ;     495         b5 IEN5 Interrupt enable bit
+                                 ;     496         b6 IEN6 Interrupt enable bit
+                                 ;     497         b7 IEN7 Interrupt enable bit
+                                 ;     498         */
+                                 ;     499         IEN( USB0, USBI0 )   = 1;                              /* Enable USB0 interrupt */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",499
+00000153 F0E3                    		BSET #03H, [R14].B
+00000155                         L52:	; bb2.split
+                                 ;     500         IEN( USB0, D0FIFO0 ) = usb_gcstd_D0fifo[ptr->ip];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",500
+00000155 EC01                    		MOV.L [R0], R1
+00000157 B991                    		MOVU.W 0CH[R1], R1
+00000159 6C11                    		SHLL #01H, R1
+0000015B FBE2rrrrrrrr            		MOV.L #_usb_gcstd_D0fifo, R14
+00000161 FECE1E                  		MOVU.B [R14,R1], R14
+00000164 FBFE047208              		MOV.L #00087204H, R15
+00000169 7545FD                  		MOV.L #000000FDH, R5
+0000016C 50F5                    		AND [R15].UB, R5
+0000016E 6C1E                    		SHLL #01H, R14
+00000170 642E                    		AND #02H, R14
+00000172 57E5                    		OR R14, R5
+00000174 C3F5                    		MOV.B R5, [R15]
+00000176                         L53:	; bb2.split1
+                                 ;     501         IEN( USB0, D1FIFO0 ) = usb_gcstd_D1fifo[ptr->ip];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",501
+00000176 EC01                    		MOV.L [R0], R1
+00000178 B991                    		MOVU.W 0CH[R1], R1
+0000017A 6C11                    		SHLL #01H, R1
+0000017C FBE2rrrrrrrr            		MOV.L #_usb_gcstd_D1fifo, R14
+00000182 FECE1E                  		MOVU.B [R14,R1], R14
+00000185 FBFE047208              		MOV.L #00087204H, R15
+0000018A 7545FB                  		MOV.L #000000FBH, R5
+0000018D 50F5                    		AND [R15].UB, R5
+0000018F 6C2E                    		SHLL #02H, R14
+00000191 644E                    		AND #04H, R14
+00000193 57E5                    		OR R14, R5
+00000195 C3F5                    		MOV.B R5, [R15]
+00000197 6701                    		RTSD #04H
+00000199                         L54:	; return
+                                 ;     502     }
+                                 ;     503 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+                                 ;     504     if( ptr->ip == USB_USBIP_1 )
+                                 ;     505     {
+                                 ;     506         /* Interrupt enable register (USB1 USBIO enable)
+                                 ;     507         b0 IEN0 Interrupt enable bit
+                                 ;     508         b1 IEN1 Interrupt enable bit
+                                 ;     509         b2 IEN2 Interrupt enable bit
+                                 ;     510         b3 IEN3 Interrupt enable bit
+                                 ;     511         b4 IEN4 Interrupt enable bit
+                                 ;     512         b5 IEN5 Interrupt enable bit
+                                 ;     513         b6 IEN6 Interrupt enable bit
+                                 ;     514         b7 IEN7 Interrupt enable bit
+                                 ;     515         */
+                                 ;     516         IEN( USBA, USBAR )   = 1u;                            /* Enable USBA interrupt */
+                                 ;     517         IEN( USBA, D0FIFO2 ) = usb_gcstd_D0fifo[ptr->ip];
+                                 ;     518         IEN( USBA, D1FIFO2 ) = usb_gcstd_D1fifo[ptr->ip];
+                                 ;     519     }
+                                 ;     520 #endif /* #if defined(BSP_MCU_RX64M) || (BSP_MCU_RX71M) */
+                                 ;     521 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",521
+00000199 6701                    		RTSD #04H
+0000019B                         _usb_cpu_int_disable:
+                                 		.STACK	_usb_cpu_int_disable=8
+                                 ;     522 /******************************************************************************
+                                 ;     523 End of function usb_cpu_int_enable
+                                 ;     524 ******************************************************************************/
+                                 ;     525 
+                                 ;     526 
+                                 ;     527 /******************************************************************************
+                                 ;     528 Function Name   : usb_cpu_int_disable
+                                 ;     529 Description     : USB Interrupt disable
+                                 ;     530 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel. 
+                                 ;     531 Return value    : void
+                                 ;     532 ******************************************************************************/
+                                 ;     533 void usb_cpu_int_disable(USB_UTR_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",533
+0000019B 6040                    		SUB #04H, R0
+0000019D E301                    		MOV.L R1, [R0]
+                                 ;     534 {
+                                 ;     535     if( ptr->ip == USB_USBIP_0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",535
+0000019F B991                    		MOVU.W 0CH[R1], R1
+000001A1 6101                    		CMP #00H, R1
+000001A3 21rr                    		BNE L61
+000001A5                         L56:	; bb2
+000001A5 FBEE047208              		MOV.L #00087204H, R14
+                                 ;     536     {
+                                 ;     537         /* Interrupt enable register (USB0 USBIO disable)
+                                 ;     538         b0 IEN0 Interrupt enable bit
+                                 ;     539         b1 IEN1 Interrupt enable bit
+                                 ;     540         b2 IEN2 Interrupt enable bit
+                                 ;     541         b3 IEN3 Interrupt enable bit
+                                 ;     542         b4 IEN4 Interrupt enable bit
+                                 ;     543         b5 IEN5 Interrupt enable bit
+                                 ;     544         b6 IEN6 Interrupt enable bit
+                                 ;     545         b7 IEN7 Interrupt enable bit
+                                 ;     546         */
+                                 ;     547         IEN( USB0, USBI0 ) = 0;    /* Disnable USB0 interrupt */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",547
+000001AA F0EB                    		BCLR #03H, [R14].B
+000001AC                         L57:	; bb2.split
+                                 ;     548         usb_gcstd_D0fifo[ptr->ip] = IEN( USB0, D0FIFO0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",548
+000001AC EC01                    		MOV.L [R0], R1
+000001AE B991                    		MOVU.W 0CH[R1], R1
+000001B0 FBEE047208              		MOV.L #00087204H, R14
+000001B5 58EE                    		MOVU.B [R14], R14
+000001B7 681E                    		SHLR #01H, R14
+000001B9 641E                    		AND #01H, R14
+000001BB FBF2rrrrrrrr            		MOV.L #_usb_gcstd_D0fifo, R15
+000001C1 FE11FE                  		MOV.W R14, [R1,R15]
+000001C4                         L58:	; bb2.split1
+000001C4 FBEE047208              		MOV.L #00087204H, R14
+                                 ;     549         IEN( USB0, D0FIFO0 ) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",549
+000001C9 F0E9                    		BCLR #01H, [R14].B
+000001CB                         L59:	; bb2.split2
+                                 ;     550         usb_gcstd_D1fifo[ptr->ip] = IEN( USB0, D1FIFO0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",550
+000001CB EC01                    		MOV.L [R0], R1
+000001CD B991                    		MOVU.W 0CH[R1], R1
+000001CF FBEE047208              		MOV.L #00087204H, R14
+000001D4 58EE                    		MOVU.B [R14], R14
+000001D6 682E                    		SHLR #02H, R14
+000001D8 641E                    		AND #01H, R14
+000001DA FBF2rrrrrrrr            		MOV.L #_usb_gcstd_D1fifo, R15
+000001E0 FE11FE                  		MOV.W R14, [R1,R15]
+000001E3                         L60:	; bb2.split3
+000001E3 FBEE047208              		MOV.L #00087204H, R14
+                                 ;     551         IEN( USB0, D1FIFO0 ) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",551
+000001E8 F0EA                    		BCLR #02H, [R14].B
+000001EA 6701                    		RTSD #04H
+000001EC                         L61:	; return
+                                 ;     552     }
+                                 ;     553 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+                                 ;     554     if ( ptr->ip == USB_USBIP_1 )
+                                 ;     555     {
+                                 ;     556         /* Interrupt enable register (USB1 USBIO disable)
+                                 ;     557         b0 IEN0 Interrupt enable bit
+                                 ;     558         b1 IEN1 Interrupt enable bit
+                                 ;     559         b2 IEN2 Interrupt enable bit
+                                 ;     560         b3 IEN3 Interrupt enable bit
+                                 ;     561         b4 IEN4 Interrupt enable bit
+                                 ;     562         b5 IEN5 Interrupt enable bit
+                                 ;     563         b6 IEN6 Interrupt enable bit
+                                 ;     564         b7 IEN7 Interrupt enable bit
+                                 ;     565         */
+                                 ;     566         IEN( USBA, USBAR ) = 0u;   /* Disnable USBA interrupt */
+                                 ;     567         usb_gcstd_D0fifo[ptr->ip] = IEN( USBA, D0FIFO2 );
+                                 ;     568         IEN( USBA, D0FIFO2 ) = 0;
+                                 ;     569         usb_gcstd_D1fifo[ptr->ip] = IEN( USBA, D1FIFO2 );
+                                 ;     570         IEN( USBA, D1FIFO2 ) = 0;
+                                 ;     571     }
+                                 ;     572 #endif /* #if defined(BSP_MCU_RX64M) || (BSP_MCU_RX71M) */
+                                 ;     573 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",573
+000001EC 6701                    		RTSD #04H
+000001EE                         _usb_cpu_Delay1us:
+                                 		.STACK	_usb_cpu_Delay1us=8
+                                 ;     574 /******************************************************************************
+                                 ;     575 End of function usb_cpu_int_disable
+                                 ;     576 ******************************************************************************/
+                                 ;     577 
+                                 ;     578 
+                                 ;     579 /******************************************************************************
+                                 ;     580 TIMER function
+                                 ;     581 ******************************************************************************/
+                                 ;     582 /******************************************************************************
+                                 ;     583 Function Name   : usb_cpu_Delay1us
+                                 ;     584 Description     : 1us Delay timer
+                                 ;     585 Arguments       : uint16_t  time        ; Delay time(*1us)
+                                 ;     586 Return value    : none
+                                 ;     587 Note            : Please change for your MCU
+                                 ;     588 ******************************************************************************/
+                                 ;     589 void usb_cpu_Delay1us(uint16_t time)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",589
+000001EE 6040                    		SUB #04H, R0
+000001F0 9009                    		MOV.W R1, 02H[R0]
+                                 ;     590 {
+                                 ;     591     volatile register uint16_t  i;
+                                 ;     592 
+                                 ;     593     /* Wait 1us (Please change for your MCU) */
+                                 ;     594 #if defined(BSP_MCU_RX63N)
+                                 ;     595     for( i = 0; i < (7 * time); ++i )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",595
+000001F2 F80500                  		MOV.W #0000H, [R0]
+000001F5 08                   S  		BRA L64
+000001F6                         L63:	; bb
+000001F6 DC01                    		MOV.W [R0], R1
+000001F8 6211                    		ADD #01H, R1
+000001FA D301                    		MOV.W R1, [R0]
+000001FC                         L64:	; bb4
+000001FC 5C01                    		MOVU.W [R0], R1
+000001FE B80A                    		MOVU.W 02H[R0], R2
+00000200 6372                    		MUL #07H, R2
+00000202 4721                    		CMP R2, R1
+00000204 29rr                    		BLT L63
+00000206                         L65:	; return
+                                 ;     596 #endif /* defined(BSP_MCU_RX63N) */
+                                 ;     597 
+                                 ;     598 #if defined(BSP_MCU_RX64M)
+                                 ;     599     for( i = 0; i < (9 * time); ++i )
+                                 ;     600 #endif /* defined(BSP_MCU_RX64M) */
+                                 ;     601 
+                                 ;     602 #if defined(BSP_MCU_RX71M)
+                                 ;     603     for( i = 0; i < (20 * time); ++i )
+                                 ;     604 #endif /* defined(BSP_MCU_RX71M) */
+                                 ;     605 
+                                 ;     606     {
+                                 ;     607     };
+                                 ;     608 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",608
+00000206 6701                    		RTSD #04H
+00000208                         _usb_cpu_DelayXms:
+                                 		.STACK	_usb_cpu_DelayXms=12
+                                 ;     609 /******************************************************************************
+                                 ;     610 End of function usb_cpu_Delay1us
+                                 ;     611 ******************************************************************************/
+                                 ;     612 
+                                 ;     613 
+                                 ;     614 /******************************************************************************
+                                 ;     615 Function Name   : usb_cpu_DelayXms
+                                 ;     616 Description     : xms Delay timer
+                                 ;     617 Arguments       : uint16_t  time        ; Delay time(*1ms)
+                                 ;     618 Return value    : void
+                                 ;     619 Note            : Please change for your MCU
+                                 ;     620 ******************************************************************************/
+                                 ;     621 void usb_cpu_DelayXms(uint16_t time)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",621
+00000208 6080                    		SUB #08H, R0
+0000020A 9089                    		MOV.W R1, 06H[R0]
+                                 ;     622 {
+                                 ;     623     /* Wait xms (Please change for your MCU) */
+                                 ;     624     volatile register uint32_t  i;
+                                 ;     625 
+                                 ;     626     /* Wait 1ms */
+                                 ;     627 #if defined(BSP_MCU_RX63N)
+                                 ;     628     for( i = 0; i < (7600 * time); ++i )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",628
+0000020C F80600                  		MOV.L #00000000H, [R0]
+0000020F 08                   S  		BRA L68
+00000210                         L67:	; bb
+00000210 EC01                    		MOV.L [R0], R1
+00000212 6211                    		ADD #01H, R1
+00000214 E301                    		MOV.L R1, [R0]
+00000216                         L68:	; bb4
+00000216 B889                    		MOVU.W 06H[R0], R1
+00000218 7611B01D                		MUL #1DB0H, R1
+0000021C 068401                  		CMP [R0].L, R1
+0000021F 24rr                    		BGTU L67
+00000221                         L69:	; return
+                                 ;     629 #endif /* defined(BSP_MCU_RX63N) */
+                                 ;     630 
+                                 ;     631 #if defined(BSP_MCU_RX64M)
+                                 ;     632     for( i = 0; i < (9500 * time); ++i )
+                                 ;     633 #endif /* defined(BSP_MCU_RX64M) */
+                                 ;     634 
+                                 ;     635 #if defined(BSP_MCU_RX71M)
+                                 ;     636     for( i = 0; i < (20000 * time); ++i )
+                                 ;     637 #endif /* defined(BSP_MCU_RX71M) */
+                                 ;     638     {
+                                 ;     639     };
+                                 ;     640         /* When "ICLK=120MHz" is set, this code is waiting for 1ms.
+                                 ;     641           Please change this code with CPU Clock mode. */
+                                 ;     642 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\rx_mcu.c",642
+00000221 6702                    		RTSD #08H
+                                 ;     643 /******************************************************************************
+                                 ;     644 End of function usb_cpu_DelayXms
+                                 ;     645 ******************************************************************************/
+                                 ;     646 
+                                 ;     647 
+                                 ;     648 #ifdef USB_DTC_ENABLE
+                                 ;     649 /******************************************************************************
+                                 ;     650 Function Name   : usb_cpu_d0fifo2buf_start_dma
+                                 ;     651 Description     : FIFO to Buffer data read DMA start
+                                 ;     652 Arguments       : USB_UTR_t *ptr        : USB internal structure. Selects USB channel. 
+                                 ;     653                 : uint32_t SourceAddr   : Source address
+                                 ;     654 Return value    : void
+                                 ;     655 ******************************************************************************/
+                                 ;     656 void usb_cpu_d0fifo2buf_start_dma(USB_UTR_t *ptr, uint32_t SourceAddr)
+                                 ;     657 {
+                                 ;     658     uint16_t    size;
+                                 ;     659     uint32_t    tmp;
+                                 ;     660     dtc_activation_source_t    act_src;    /* activation source is Software Interrupt */
+                                 ;     661 
+                                 ;     662 
+                                 ;     663     /* DTC Transfer enable
+                                 ;     664     b0    DTCST    DTC module start bit
+                                 ;     665     b7-b1 Reserved 0
+                                 ;     666     */
+                                 ;     667     R_DTC_Control(DTC_CMD_DTC_START, NULL, 0);
+                                 ;     668 
+                                 ;     669     /* DTC control register (Transfer Information Read No Skip)
+                                 ;     670     b2-b0 Reserved 0
+                                 ;     671     b3    Reserved 0
+                                 ;     672     b4    RRS      DTC Transfer Information Read Skip enable bit
+                                 ;     673     b7-b5 Reserved 0
+                                 ;     674     */
+                                 ;     675     R_DTC_Control(DTC_CMD_DATA_READ_SKIP_DISABLE, NULL, 0);
+                                 ;     676 
+                                 ;     677     /* DTC mode register A (Block Transfer Set)
+                                 ;     678     b1-b0 Reserved 0
+                                 ;     679     b3-b2 SM       source address mode bit
+                                 ;     680     b5-b4 SZ       DTC data transfer size bit
+                                 ;     681     b7-b6 MD       DTC mode bit
+                                 ;     682     */
+                                 ;     683     usb_td_cfg[ptr->ip].transfer_mode = DTC_TRANSFER_MODE_BLOCK;
+                                 ;     684 
+                                 ;     685     if(ptr->ip == USB_USBIP_0)
+                                 ;     686     {
+                                 ;     687         act_src = DTCE_USB0_D0FIFO0;
+                                 ;     688         tmp = ((usb_gcstd_Dma0Fifo[ptr->ip] - 1) / 2) + 1;
+                                 ;     689 
+                                 ;     690         /* DTC mode register A (Word Size)
+                                 ;     691         b1-b0 Reserved 0
+                                 ;     692         b3-b2 SM       source address mode bit
+                                 ;     693         b5-b4 SZ       DTC data transfer size bit
+                                 ;     694         b7-b6 MD       DTC mode bit
+                                 ;     695         */
+                                 ;     696         usb_td_cfg[ptr->ip].data_size = DTC_DATA_SIZE_WORD;
+                                 ;     697     }
+                                 ;     698     else if(ptr->ip == USB_USBIP_1)
+                                 ;     699     {
+                                 ;     700         act_src = DTCE_USBA_D0FIFO2;
+                                 ;     701         tmp = ((usb_gcstd_Dma0Fifo[ptr->ip] - 1) / 4) + 1;
+                                 ;     702 
+                                 ;     703         /* DTC mode register A (Long Size)
+                                 ;     704         b1-b0 Reserved 0
+                                 ;     705         b3-b2 SM       source address mode bit
+                                 ;     706         b5-b4 SZ       DTC data transfer size bit
+                                 ;     707         b7-b6 MD       DTC mode bit
+                                 ;     708         */
+                                 ;     709         usb_td_cfg[ptr->ip].data_size = DTC_DATA_SIZE_LWORD;
+                                 ;     710     }
+                                 ;     711 
+                                 ;     712     /* DTC mode register A (Source Address fixed)
+                                 ;     713     b1-b0 Reserved 0
+                                 ;     714     b3-b2 SM       source address mode bit
+                                 ;     715     b5-b4 SZ       DTC data transfer size bit
+                                 ;     716     b7-b6 MD       DTC mode bit
+                                 ;     717     */
+                                 ;     718     usb_td_cfg[ptr->ip].src_addr_mode = DTC_SRC_ADDR_FIXED;
+                                 ;     719 
+                                 ;     720     /* DTC mode register B (Chain Transfer disable)
+                                 ;     721     b1-b0 Reserved 0
+                                 ;     722     b3-b2 DM       Destination address mode bit
+                                 ;     723     b4    DTS      DTC transfer mode select bit
+                                 ;     724     b5    DISEL    DTC interrupt select bit
+                                 ;     725     b6    CHNS     DTC chain transfer select bit
+                                 ;     726     b7    CHNE     DTC chain transfer enable bit
+                                 ;     727     */
+                                 ;     728     usb_td_cfg[ptr->ip].chain_transfer_enable = DTC_CHAIN_TRANSFER_DISABLE;
+                                 ;     729 
+                                 ;     730     /* DTC mode register B (Select Data Transfer End Interrupt)
+                                 ;     731     b1-b0 Reserved 0
+                                 ;     732     b3-b2 DM       Destination address mode bit
+                                 ;     733     b4    DTS      DTC transfer mode select bit
+                                 ;     734     b5    DISEL    DTC interrupt select bit
+                                 ;     735     b6    CHNS     DTC chain transfer select bit
+                                 ;     736     b7    CHNE     DTC chain transfer enable bit
+                                 ;     737     */
+                                 ;     738     usb_td_cfg[ptr->ip].response_interrupt = DTC_INTERRUPT_AFTER_ALL_COMPLETE;
+                                 ;     739 
+                                 ;     740     /* DTC mode register B (Source Side Block Area)
+                                 ;     741     b1-b0 Reserved 0
+                                 ;     742     b3-b2 DM       Destination address mode bit
+                                 ;     743     b4    DTS      DTC transfer mode select bit
+                                 ;     744     b5    DISEL    DTC interrupt select bit
+                                 ;     745     b6    CHNS     DTC chain transfer select bit
+                                 ;     746     b7    CHNE     DTC chain transfer enable bit
+                                 ;     747     */
+                                 ;     748     usb_td_cfg[ptr->ip].repeat_block_side = DTC_REPEAT_BLOCK_SOURCE;
+                                 ;     749 
+                                 ;     750     /* DTC mode register B (Destination Address Increment)
+                                 ;     751     b1-b0 Reserved 0
+                                 ;     752     b3-b2 DM       Destination address mode bit
+                                 ;     753     b4    DTS      DTC transfer mode select bit
+                                 ;     754     b5    DISEL    DTC interrupt select bit
+                                 ;     755     b6    CHNS     DTC chain transfer select bit
+                                 ;     756     b7    CHNE     DTC chain transfer enable bit
+                                 ;     757     */
+                                 ;     758     usb_td_cfg[ptr->ip].dest_addr_mode = DTC_DES_ADDR_INCR;
+                                 ;     759 
+                                 ;     760     /* DTC source address register (FIFO port address)
+                                 ;     761     b31-b0 SAR Destination address
+                                 ;     762     */
+                                 ;     763     usb_td_cfg[ptr->ip].source_addr = SourceAddr;
+                                 ;     764 
+                                 ;     765     /* DTC source address register (Table address)
+                                 ;     766     b31-b0 SAR Source address
+                                 ;     767     */
+                                 ;     768     usb_td_cfg[ptr->ip].dest_addr = (uint32_t)(usb_gcstd_DataPtr[ptr->ip][usb_gcstd_Dma0Pipe[ptr->ip]]);
+                                 ;     769 
+                                 ;     770     size = (uint8_t)(tmp);
+                                 ;     771 
+                                 ;     772     /* DTC transfer count registerA
+                                 ;     773     b15-b0 CRA Transfer count
+                                 ;     774     */
+                                 ;     775     usb_td_cfg[ptr->ip].block_size = (uint16_t)(size);
+                                 ;     776 
+                                 ;     777     /* DTC transfer count registerB (Block count)
+                                 ;     778     b15-b0 CRB Transfer count
+                                 ;     779     */
+                                 ;     780     usb_td_cfg[ptr->ip].transfer_count =
+                                 ;     781         (uint16_t)((usb_gcstd_DataCnt[ptr->ip][usb_gcstd_Dma0Pipe[ptr->ip]] -1) / usb_gcstd_Dma0Fifo[ptr->ip]) +1;
+                                 ;     782 
+                                 ;     783     /* DTC address mode register (Full Address Mode)
+                                 ;     784     b0    SHORT    Short address mode bit
+                                 ;     785     b7-b1 Reserved 0
+                                 ;     786     */
+                                 ;     787 
+                                 ;     788     /* DTC control register (Transfer Information Read No Skip)
+                                 ;     789     b2-b0 Reserved 0
+                                 ;     790     b3    Reserved 0
+                                 ;     791     b4    RRS      DTC Transfer Information Read Skip enable bit
+                                 ;     792     b7-b5 Reserved 0
+                                 ;     793     */
+                                 ;     794     R_DTC_Control(DTC_CMD_DATA_READ_SKIP_ENABLE, NULL, 0);
+                                 ;     795 
+                                 ;     796     if( ptr->ip == USB_USBIP_0 )
+                                 ;     797     {
+                                 ;     798         /* Priority D0FIFO0=0
+                                 ;     799         b3-b0 IPR      Interrupt priority
+                                 ;     800         b7-b4 Reserved 0
+                                 ;     801         */
+                                 ;     802         IPR( USB0, D0FIFO0 ) = 0x00;
+                                 ;     803 
+                                 ;     804         /* Interrupt enable register (USB0 D0FIFO enable(IEN4))
+                                 ;     805         b0 IEN0 Interrupt enable bit
+                                 ;     806         b1 IEN1 Interrupt enable bit
+                                 ;     807         b2 IEN2 Interrupt enable bit
+                                 ;     808         b3 IEN3 Interrupt enable bit
+                                 ;     809         b4 IEN4 Interrupt enable bit
+                                 ;     810         b5 IEN5 Interrupt enable bit
+                                 ;     811         b6 IEN6 Interrupt enable bit
+                                 ;     812         b7 IEN7 Interrupt enable bit
+                                 ;     813         */
+                                 ;     814         IEN( USB0, D0FIFO0 ) = 0;
+                                 ;     815         R_DTC_Create( act_src, &usb_dtc_transfer_data[ptr->ip], &usb_td_cfg[ptr->ip], 0 );
+                                 ;     816         IEN( USB0, D0FIFO0 ) = 1;
+                                 ;     817 
+                                 ;     818         /* DTC start enable register (USB0 D0FIFO transfer)
+                                 ;     819         b0    DTCE     DTC start enable bit
+                                 ;     820         b7-b1 Reserved 0
+                                 ;     821         */
+                                 ;     822         DTCE( USB0, D0FIFO0 ) = 1;
+                                 ;     823     }
+                                 ;     824     else
+                                 ;     825     {
+                                 ;     826         /* Priority D0FIFO2=0
+                                 ;     827         b3-b0 IPR      Interrupt priority
+                                 ;     828         b7-b4 Reserved 0
+                                 ;     829         */
+                                 ;     830         IPR( USBA, D0FIFO2 ) = 0x00;
+                                 ;     831 
+                                 ;     832         /* Interrupt enable register (USBA D0FIFO enable(IEN4))
+                                 ;     833         b0 IEN0 Interrupt enable bit
+                                 ;     834         b1 IEN1 Interrupt enable bit
+                                 ;     835         b2 IEN2 Interrupt enable bit
+                                 ;     836         b3 IEN3 Interrupt enable bit
+                                 ;     837         b4 IEN4 Interrupt enable bit
+                                 ;     838         b5 IEN5 Interrupt enable bit
+                                 ;     839         b6 IEN6 Interrupt enable bit
+                                 ;     840         b7 IEN7 Interrupt enable bit
+                                 ;     841         */
+                                 ;     842         IEN( USBA, D0FIFO2 ) = 0;
+                                 ;     843         R_DTC_Create( act_src, &usb_dtc_transfer_data[ptr->ip], &usb_td_cfg[ptr->ip], 0 );
+                                 ;     844         IEN( USBA, D0FIFO2 ) = 1;
+                                 ;     845 
+                                 ;     846 
+                                 ;     847         /* DTC start enable register (USBA D0FIFO transfer)
+                                 ;     848         b0    DTCE     DTC start enable bit
+                                 ;     849         b7-b1 Reserved 0
+                                 ;     850         */
+                                 ;     851         DTCE( USBA, D0FIFO2 ) = 1;
+                                 ;     852     }
+                                 ;     853 }
+                                 ;     854 /******************************************************************************
+                                 ;     855 End of function
+                                 ;     856 ******************************************************************************/
+                                 ;     857 
+                                 ;     858 
+                                 ;     859 /******************************************************************************
+                                 ;     860 Function Name   : usb_cpu_buf2d0fifo_start_dma
+                                 ;     861 Description     : Buffer to FIFO data write DMA start
+                                 ;     862 Arguments       : USB_UTR_t *ptr        : USB internal structure. Selects USB channel. 
+                                 ;     863                 : uint32_t DistAdr      : Destination address
+                                 ;     864 Return value    : void
+                                 ;     865 ******************************************************************************/
+                                 ;     866 void usb_cpu_buf2d0fifo_start_dma(USB_UTR_t *ptr, uint32_t DistAdr)
+                                 ;     867 {
+                                 ;     868     uint16_t    size;
+                                 ;     869     uint32_t    tmp;
+                                 ;     870     dtc_activation_source_t    act_src;    /* activation source is Software Interrupt */
+                                 ;     871 
+                                 ;     872 
+                                 ;     873     /* DTC Transfer enable
+                                 ;     874     b0    DTCST    DTC module start bit
+                                 ;     875     b7-b1 Reserved 0
+                                 ;     876     */
+                                 ;     877     R_DTC_Control( DTC_CMD_DTC_START, NULL, 0 );
+                                 ;     878 
+                                 ;     879     /* DTC control register (Transfer Information Read No Skip)
+                                 ;     880     b2-b0 Reserved 0
+                                 ;     881     b3    Reserved 0
+                                 ;     882     b4    RRS      DTC Transfer Information Read Skip enable bit
+                                 ;     883     b7-b5 Reserved 0
+                                 ;     884     */
+                                 ;     885     R_DTC_Control( DTC_CMD_DATA_READ_SKIP_DISABLE, NULL, 0 );
+                                 ;     886 
+                                 ;     887     /* DTC mode register A (Block Transfer Set)
+                                 ;     888     b1-b0 Reserved 0
+                                 ;     889     b3-b2 SM       source address mode bit
+                                 ;     890     b5-b4 SZ       DTC data transfer size bit
+                                 ;     891     b7-b6 MD       DTC mode bit
+                                 ;     892     */
+                                 ;     893     usb_td_cfg[ptr->ip].transfer_mode = DTC_TRANSFER_MODE_BLOCK;
+                                 ;     894 
+                                 ;     895     if(ptr->ip == USB_USBIP_0)
+                                 ;     896     {
+                                 ;     897         act_src = DTCE_USB0_D0FIFO0;
+                                 ;     898 
+                                 ;     899         if( (usb_gcstd_Dma0Size[ptr->ip] & 0x0001) != 0 )
+                                 ;     900         {
+                                 ;     901             /* if count == odd */
+                                 ;     902             tmp = usb_gcstd_Dma0Size[ptr->ip];
+                                 ;     903 
+                                 ;     904             /* DTC mode register A (Byte Size)
+                                 ;     905             b1-b0 Reserved 0
+                                 ;     906             b3-b2 SM       source address mode bit
+                                 ;     907             b5-b4 SZ       DTC data transfer size bit
+                                 ;     908             b7-b6 MD       DTC mode bit
+                                 ;     909             */
+                                 ;     910             usb_td_cfg[ptr->ip].data_size = DTC_DATA_SIZE_BYTE;
+                                 ;     911         }
+                                 ;     912         else
+                                 ;     913         {
+                                 ;     914             tmp = usb_gcstd_Dma0Size[ptr->ip] / 2;
+                                 ;     915 
+                                 ;     916             /* DTC mode register A (Word Size)
+                                 ;     917             b1-b0 Reserved 0
+                                 ;     918             b3-b2 SM       source address mode bit
+                                 ;     919             b5-b4 SZ       DTC data transfer size bit
+                                 ;     920             b7-b6 MD       DTC mode bit
+                                 ;     921             */
+                                 ;     922             usb_td_cfg[ptr->ip].data_size = DTC_DATA_SIZE_WORD;
+                                 ;     923         }
+                                 ;     924     }
+                                 ;     925     else if(ptr->ip == USB_USBIP_1)
+                                 ;     926     {
+                                 ;     927         act_src = DTCE_USBA_D0FIFO2;
+                                 ;     928 
+                                 ;     929         if( (usb_gcstd_Dma0Size[ptr->ip] & 0x0003) != 0 )
+                                 ;     930         {
+                                 ;     931             /* if count == odd */
+                                 ;     932             tmp = usb_gcstd_Dma0Size[ptr->ip];
+                                 ;     933 
+                                 ;     934             /* DTC mode register A (Byte Size)
+                                 ;     935             b1-b0 Reserved 0
+                                 ;     936             b3-b2 SM       source address mode bit
+                                 ;     937             b5-b4 SZ       DTC data transfer size bit
+                                 ;     938             b7-b6 MD       DTC mode bit
+                                 ;     939             */
+                                 ;     940             usb_td_cfg[ptr->ip].data_size = DTC_DATA_SIZE_BYTE;
+                                 ;     941         }
+                                 ;     942         else
+                                 ;     943         {
+                                 ;     944             tmp = usb_gcstd_Dma0Size[ptr->ip] / 4;
+                                 ;     945 
+                                 ;     946             /* DTC mode register A (Word Size)
+                                 ;     947             b1-b0 Reserved 0
+                                 ;     948             b3-b2 SM       source address mode bit
+                                 ;     949             b5-b4 SZ       DTC data transfer size bit
+                                 ;     950             b7-b6 MD       DTC mode bit
+                                 ;     951             */
+                                 ;     952             usb_td_cfg[ptr->ip].data_size = DTC_DATA_SIZE_LWORD;
+                                 ;     953         }
+                                 ;     954     }
+                                 ;     955 
+                                 ;     956     /* DTC mode register A (Source Address Increment)
+                                 ;     957     b1-b0 Reserved 0
+                                 ;     958     b3-b2 SM       source address mode bit
+                                 ;     959     b5-b4 SZ       DTC data transfer size bit
+                                 ;     960     b7-b6 MD       DTC mode bit
+                                 ;     961     */
+                                 ;     962     usb_td_cfg[ptr->ip].src_addr_mode = DTC_SRC_ADDR_INCR;
+                                 ;     963 
+                                 ;     964     /* DTC mode register B (Chain Transfer disable)
+                                 ;     965     b1-b0 Reserved 0
+                                 ;     966     b3-b2 DM       Destination address mode bit
+                                 ;     967     b4    DTS      DTC transfer mode select bit
+                                 ;     968     b5    DISEL    DTC interrupt select bit
+                                 ;     969     b6    CHNS     DTC chain transfer select bit
+                                 ;     970     b7    CHNE     DTC chain transfer enable bit
+                                 ;     971     */
+                                 ;     972     usb_td_cfg[ptr->ip].chain_transfer_enable = DTC_CHAIN_TRANSFER_DISABLE;
+                                 ;     973 
+                                 ;     974     /* DTC mode register B (Select Data Transfer End Interrupt)
+                                 ;     975     b1-b0 Reserved 0
+                                 ;     976     b3-b2 DM       Destination address mode bit
+                                 ;     977     b4    DTS      DTC transfer mode select bit
+                                 ;     978     b5    DISEL    DTC interrupt select bit
+                                 ;     979     b6    CHNS     DTC chain transfer select bit
+                                 ;     980     b7    CHNE     DTC chain transfer enable bit
+                                 ;     981     */
+                                 ;     982     usb_td_cfg[ptr->ip].response_interrupt = DTC_INTERRUPT_AFTER_ALL_COMPLETE;
+                                 ;     983 
+                                 ;     984     /* DTC mode register B (Destination Side Block Area)
+                                 ;     985     b1-b0 Reserved 0
+                                 ;     986     b3-b2 DM       Destination address mode bit
+                                 ;     987     b4    DTS      DTC transfer mode select bit
+                                 ;     988     b5    DISEL    DTC interrupt select bit
+                                 ;     989     b6    CHNS     DTC chain transfer select bit
+                                 ;     990     b7    CHNE     DTC chain transfer enable bit
+                                 ;     991     */
+                                 ;     992     usb_td_cfg[ptr->ip].repeat_block_side = DTC_REPEAT_BLOCK_DESTINATION;
+                                 ;     993 
+                                 ;     994     /* DTC mode register B (Destination Address fixed)
+                                 ;     995     b1-b0 Reserved 0
+                                 ;     996     b3-b2 DM       Destination address mode bit
+                                 ;     997     b4    DTS      DTC transfer mode select bit
+                                 ;     998     b5    DISEL    DTC interrupt select bit
+                                 ;     999     b6    CHNS     DTC chain transfer select bit
+                                 ;    1000     b7    CHNE     DTC chain transfer enable bit
+                                 ;    1001     */
+                                 ;    1002     usb_td_cfg[ptr->ip].dest_addr_mode = DTC_DES_ADDR_FIXED;
+                                 ;    1003 
+                                 ;    1004     /* DTC source address register (Table address)
+                                 ;    1005     b31-b0 SAR Destination address
+                                 ;    1006     */
+                                 ;    1007     usb_td_cfg[ptr->ip].source_addr = (uint32_t)(usb_gcstd_DataPtr[ptr->ip][usb_gcstd_Dma0Pipe[ptr->ip]]);
+                                 ;    1008 
+                                 ;    1009     /* DTC source address register (FIFO port address)
+                                 ;    1010     b31-b0 SAR Source address
+                                 ;    1011     */
+                                 ;    1012     usb_td_cfg[ptr->ip].dest_addr = (uint32_t)(DistAdr);
+                                 ;    1013 
+                                 ;    1014     size = (uint8_t )(tmp);
+                                 ;    1015 
+                                 ;    1016     /* DTC transfer count registerA
+                                 ;    1017     b15-b0 CRA Transfer count
+                                 ;    1018     */
+                                 ;    1019     usb_td_cfg[ptr->ip].block_size = (uint16_t)(size);
+                                 ;    1020 
+                                 ;    1021     /* DTC transfer count registerB (Block count)
+                                 ;    1022     b15-b0 CRB Transfer count
+                                 ;    1023     */
+                                 ;    1024     usb_td_cfg[ptr->ip].transfer_count =
+                                 ;    1025         (uint16_t)(usb_gcstd_DataCnt[ptr->ip][usb_gcstd_Dma0Pipe[ptr->ip]] / usb_gcstd_Dma0Size[ptr->ip]);
+                                 ;    1026 
+                                 ;    1027     /* DTC address mode register (Full Address Mode)
+                                 ;    1028     b0    SHORT    Short address mode bit
+                                 ;    1029     b7-b1 Reserved 0
+                                 ;    1030     */
+                                 ;    1031 
+                                 ;    1032     /* DTC control register (Transfer Information Read No Skip)
+                                 ;    1033     b2-b0 Reserved 0
+                                 ;    1034     b3    Reserved 0
+                                 ;    1035     b4    RRS      DTC Transfer Information Read Skip enable bit
+                                 ;    1036     b7-b5 Reserved 0
+                                 ;    1037     */
+                                 ;    1038     R_DTC_Control(DTC_CMD_DATA_READ_SKIP_ENABLE, NULL, 0);
+                                 ;    1039 
+                                 ;    1040     if( ptr->ip == USB_USBIP_0 )
+                                 ;    1041     {
+                                 ;    1042         /* Priority D0FIFO0=0
+                                 ;    1043         b3-b0 IPR      Interrupt priority
+                                 ;    1044         b7-b4 Reserved 0
+                                 ;    1045         */
+                                 ;    1046         IPR( USB0, D0FIFO0 ) = 0x00;
+                                 ;    1047 
+                                 ;    1048         /* Interrupt enable register (USB0 D0FIFO enable(IEN4))
+                                 ;    1049         b0 IEN0 Interrupt enable bit
+                                 ;    1050         b1 IEN1 Interrupt enable bit
+                                 ;    1051         b2 IEN2 Interrupt enable bit
+                                 ;    1052         b3 IEN3 Interrupt enable bit
+                                 ;    1053         b4 IEN4 Interrupt enable bit
+                                 ;    1054         b5 IEN5 Interrupt enable bit
+                                 ;    1055         b6 IEN6 Interrupt enable bit
+                                 ;    1056         b7 IEN7 Interrupt enable bit
+                                 ;    1057         */
+                                 ;    1058         IEN( USB0, D0FIFO0 ) = 0;
+                                 ;    1059         R_DTC_Create( act_src, &usb_dtc_transfer_data[ptr->ip], &usb_td_cfg[ptr->ip], 0 );
+                                 ;    1060         IEN( USB0, D0FIFO0 ) = 1;
+                                 ;    1061 
+                                 ;    1062         /* DTC start enable register (USB0 D0FIFO transfer)
+                                 ;    1063         b0    DTCE     DTC start enable bit
+                                 ;    1064         b7-b1 Reserved 0
+                                 ;    1065         */
+                                 ;    1066         DTCE( USB0, D0FIFO0 ) = 1;
+                                 ;    1067     }
+                                 ;    1068     else
+                                 ;    1069     {
+                                 ;    1070         /* Priority D0FIFO0=0
+                                 ;    1071         b3-b0 IPR      Interrupt priority
+                                 ;    1072         b7-b4 Reserved 0
+                                 ;    1073         */
+                                 ;    1074         IPR( USBA, D0FIFO2 ) = 0x00;
+                                 ;    1075 
+                                 ;    1076         /* Interrupt enable register (USBA D0FIFO enable(IEN4))
+                                 ;    1077         b0 IEN0 Interrupt enable bit
+                                 ;    1078         b1 IEN1 Interrupt enable bit
+                                 ;    1079         b2 IEN2 Interrupt enable bit
+                                 ;    1080         b3 IEN3 Interrupt enable bit
+                                 ;    1081         b4 IEN4 Interrupt enable bit
+                                 ;    1082         b5 IEN5 Interrupt enable bit
+                                 ;    1083         b6 IEN6 Interrupt enable bit
+                                 ;    1084         b7 IEN7 Interrupt enable bit
+                                 ;    1085         */
+                                 ;    1086         IEN( USBA, D0FIFO2 ) = 0;
+                                 ;    1087         R_DTC_Create( act_src, &usb_dtc_transfer_data[ptr->ip], &usb_td_cfg[ptr->ip], 0 );
+                                 ;    1088         IEN( USBA, D0FIFO2 ) = 1;
+                                 ;    1089 
+                                 ;    1090         /* DTC start enable register (USBA D0FIFO transfer)
+                                 ;    1091         b0    DTCE     DTC start enable bit
+                                 ;    1092         b7-b1 Reserved 0
+                                 ;    1093         */
+                                 ;    1094         DTCE( USBA, D0FIFO2 ) = 1;
+                                 ;    1095     }
+                                 ;    1096 }
+                                 ;    1097 /******************************************************************************
+                                 ;    1098 End of function
+                                 ;    1099 ******************************************************************************/
+                                 ;    1100 
+                                 ;    1101 
+                                 ;    1102 /******************************************************************************
+                                 ;    1103 Function Name   : usb_cpu_d0fifo_stop_dma
+                                 ;    1104 Description     : DMA stop
+                                 ;    1105 Arguments       : USB_UTR_t *ptr        : USB internal structure. Selects USB channel. 
+                                 ;    1106 Return value    : void
+                                 ;    1107 ******************************************************************************/
+                                 ;    1108 void usb_cpu_d0fifo_stop_dma(USB_UTR_t *ptr)
+                                 ;    1109 {
+                                 ;    1110     if( ptr->ip == USB_USBIP_0 )
+                                 ;    1111     {
+                                 ;    1112         /* Interrupt request register
+                                 ;    1113         b0    IR       Interrupt status flag
+                                 ;    1114         b7-b1 Reserved 0
+                                 ;    1115         */
+                                 ;    1116         IR( USB0, D0FIFO0 ) = 0;
+                                 ;    1117 
+                                 ;    1118         /* Priority D0FIFO0=0
+                                 ;    1119         b3-b0 IPR      Interrupt priority
+                                 ;    1120         b7-b4 Reserved 0
+                                 ;    1121         */
+                                 ;    1122         IPR( USB0, D0FIFO0 ) = 0x00;
+                                 ;    1123 
+                                 ;    1124         /* Interrupt enable register (USB0 D0FIFO disable(IEN4))
+                                 ;    1125         b0 IEN0 Interrupt enable bit
+                                 ;    1126         b1 IEN1 Interrupt enable bit
+                                 ;    1127         b2 IEN2 Interrupt enable bit
+                                 ;    1128         b3 IEN3 Interrupt enable bit
+                                 ;    1129         b4 IEN4 Interrupt enable bit
+                                 ;    1130         b5 IEN5 Interrupt enable bit
+                                 ;    1131         b6 IEN6 Interrupt enable bit
+                                 ;    1132         b7 IEN7 Interrupt enable bit
+                                 ;    1133         */
+                                 ;    1134         IEN( USB0, D0FIFO0 ) = 0;
+                                 ;    1135 
+                                 ;    1136         /* DTC start enable register (USB0 D0FIFO transfer disable)
+                                 ;    1137         b0    DTCE     DTC start enable bit
+                                 ;    1138         b7-b1 Reserved 0
+                                 ;    1139         */
+                                 ;    1140         DTCE( USB0, D0FIFO0 ) = 0;
+                                 ;    1141     }
+                                 ;    1142     else
+                                 ;    1143     {
+                                 ;    1144         /* Interrupt request register
+                                 ;    1145         b0    IR       Interrupt status flag
+                                 ;    1146         b7-b1 Reserved 0
+                                 ;    1147         */
+                                 ;    1148         IR( USBA, D0FIFO2 ) = 0;
+                                 ;    1149 
+                                 ;    1150         /* Priority D0FIFO0=0
+                                 ;    1151         b3-b0 IPR      Interrupt priority
+                                 ;    1152         b7-b4 Reserved 0
+                                 ;    1153         */
+                                 ;    1154         IPR( USBA, D0FIFO2 ) = 0x00;
+                                 ;    1155 
+                                 ;    1156         /* Interrupt enable register (USBA D0FIFO disable(IEN4))
+                                 ;    1157         b0 IEN0 Interrupt enable bit
+                                 ;    1158         b1 IEN1 Interrupt enable bit
+                                 ;    1159         b2 IEN2 Interrupt enable bit
+                                 ;    1160         b3 IEN3 Interrupt enable bit
+                                 ;    1161         b4 IEN4 Interrupt enable bit
+                                 ;    1162         b5 IEN5 Interrupt enable bit
+                                 ;    1163         b6 IEN6 Interrupt enable bit
+                                 ;    1164         b7 IEN7 Interrupt enable bit
+                                 ;    1165         */
+                                 ;    1166         IEN( USBA, D0FIFO2 ) = 0;
+                                 ;    1167 
+                                 ;    1168         /* DTC start enable register (USBA D0FIFO transfer disable)
+                                 ;    1169         b0    DTCE     DTC start enable bit
+                                 ;    1170         b7-b1 Reserved 0
+                                 ;    1171         */
+                                 ;    1172         DTCE( USBA, D0FIFO2 ) = 0;
+                                 ;    1173     }
+                                 ;    1174 }
+                                 ;    1175 /******************************************************************************
+                                 ;    1176 End of function
+                                 ;    1177 ******************************************************************************/
+                                 ;    1178 
+                                 ;    1179 
+                                 ;    1180 /******************************************************************************
+                                 ;    1181 Function Name   : usb_cpu_d0fifo_restart_dma
+                                 ;    1182 Description     : DMA Restart
+                                 ;    1183 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel. 
+                                 ;    1184 Return value    : none
+                                 ;    1185 ******************************************************************************/
+                                 ;    1186 void usb_cpu_d0fifo_restart_dma( USB_UTR_t *ptr )
+                                 ;    1187 {
+                                 ;    1188     uint16_t    size;
+                                 ;    1189     uint32_t    tmp;
+                                 ;    1190     dtc_activation_source_t    act_src;    /* activation source is Software Interrupt */
+                                 ;    1191 
+                                 ;    1192 
+                                 ;    1193     if(ptr->ip == USB_USBIP_0)
+                                 ;    1194     {
+                                 ;    1195         act_src = DTCE_USB0_D0FIFO0;
+                                 ;    1196 
+                                 ;    1197         if( (usb_gcstd_Dma0Size[ptr->ip] & 0x0001u) != 0u )
+                                 ;    1198         {
+                                 ;    1199             /* if count == odd */
+                                 ;    1200             tmp = usb_gcstd_Dma0Size[ptr->ip];
+                                 ;    1201 
+                                 ;    1202             /* DTC mode register A (Byte Size)
+                                 ;    1203             b1-b0 Reserved 0
+                                 ;    1204             b3-b2 SM       source address mode bit
+                                 ;    1205             b5-b4 SZ       DTC data transfer size bit
+                                 ;    1206             b7-b6 MD       DTC mode bit
+                                 ;    1207             */
+                                 ;    1208             usb_td_cfg[ptr->ip].data_size = DTC_DATA_SIZE_BYTE;
+                                 ;    1209 
+                                 ;    1210             /* DTC source address register (Table address)
+                                 ;    1211             b31-b0 SAR Source address
+                                 ;    1212             */
+                                 ;    1213             usb_td_cfg[ptr->ip].dest_addr = usb_cstd_GetD0fifo8Adr(ptr);
+                                 ;    1214         }
+                                 ;    1215         else
+                                 ;    1216         {
+                                 ;    1217             tmp = usb_gcstd_Dma0Size[ptr->ip] / 2;
+                                 ;    1218 
+                                 ;    1219             /* DTC mode register A (Word Size)
+                                 ;    1220             b1-b0 Reserved 0
+                                 ;    1221             b3-b2 SM       source address mode bit
+                                 ;    1222             b5-b4 SZ       DTC data transfer size bit
+                                 ;    1223             b7-b6 MD       DTC mode bit
+                                 ;    1224             */
+                                 ;    1225             usb_td_cfg[ptr->ip].data_size = DTC_DATA_SIZE_WORD;
+                                 ;    1226         }
+                                 ;    1227     }
+                                 ;    1228     else if(ptr->ip == USB_USBIP_1)
+                                 ;    1229     {
+                                 ;    1230         act_src = DTCE_USBA_D0FIFO2;
+                                 ;    1231 
+                                 ;    1232         if( (usb_gcstd_Dma0Size[ptr->ip] & 0x0003u) != 0u )
+                                 ;    1233         {
+                                 ;    1234             /* if count == odd */
+                                 ;    1235             tmp = usb_gcstd_Dma0Size[ptr->ip];
+                                 ;    1236 
+                                 ;    1237             /* DTC mode register A (Byte Size)
+                                 ;    1238             b1-b0 Reserved 0
+                                 ;    1239             b3-b2 SM       source address mode bit
+                                 ;    1240             b5-b4 SZ       DTC data transfer size bit
+                                 ;    1241             b7-b6 MD       DTC mode bit
+                                 ;    1242             */
+                                 ;    1243             usb_td_cfg[ptr->ip].data_size = DTC_DATA_SIZE_BYTE;
+                                 ;    1244 
+                                 ;    1245             /* DTC source address register (Table address)
+                                 ;    1246             b31-b0 SAR Source address
+                                 ;    1247             */
+                                 ;    1248             usb_td_cfg[ptr->ip].dest_addr = usb_cstd_GetD0fifo8Adr(ptr);
+                                 ;    1249         }
+                                 ;    1250         else
+                                 ;    1251         {
+                                 ;    1252             tmp = usb_gcstd_Dma0Size[ptr->ip] / 4;
+                                 ;    1253 
+                                 ;    1254             /* DTC mode register A (Word Size)
+                                 ;    1255             b1-b0 Reserved 0
+                                 ;    1256             b3-b2 SM       source address mode bit
+                                 ;    1257             b5-b4 SZ       DTC data transfer size bit
+                                 ;    1258             b7-b6 MD       DTC mode bit
+                                 ;    1259             */
+                                 ;    1260             usb_td_cfg[ptr->ip].data_size = DTC_DATA_SIZE_LWORD;
+                                 ;    1261         }
+                                 ;    1262     }
+                                 ;    1263 
+                                 ;    1264     /* DTC source address register (Table address)
+                                 ;    1265     b31-b0 SAR Destination address
+                                 ;    1266     */
+                                 ;    1267     usb_td_cfg[ptr->ip].source_addr = usb_dtc_transfer_data[ptr->ip].lw2;
+                                 ;    1268 
+                                 ;    1269     size = (uint8_t)(tmp);
+                                 ;    1270 
+                                 ;    1271     /* DTC transfer count registerA
+                                 ;    1272     b15-b0 CRA Transfer count
+                                 ;    1273     */
+                                 ;    1274     usb_td_cfg[ptr->ip].block_size = (uint16_t)(size);
+                                 ;    1275 
+                                 ;    1276     /* DTC transfer count registerB (Block count)
+                                 ;    1277     b15-b0 CRB Transfer count
+                                 ;    1278     */
+                                 ;    1279     usb_td_cfg[ptr->ip].transfer_count = (uint16_t)(1);
+                                 ;    1280     
+                                 ;    1281     if( ptr->ip == USB_USBIP_0 )
+                                 ;    1282     {
+                                 ;    1283         IEN( USB0, D0FIFO0 ) = 0;
+                                 ;    1284         R_DTC_Create( act_src, &usb_dtc_transfer_data[ptr->ip], &usb_td_cfg[ptr->ip], 0 );
+                                 ;    1285         IEN( USB0, D0FIFO0 ) = 1;
+                                 ;    1286     }
+                                 ;    1287     else
+                                 ;    1288     {
+                                 ;    1289         IEN( USBA, D0FIFO2 ) = 0;
+                                 ;    1290         R_DTC_Create( act_src, &usb_dtc_transfer_data[ptr->ip], &usb_td_cfg[ptr->ip], 0 );
+                                 ;    1291         IEN( USBA, D0FIFO2 ) = 1;
+                                 ;    1292     }
+                                 ;    1293 
+                                 ;    1294     /* DTC Transfer enable
+                                 ;    1295     b0    DTCST    DTC module start bit
+                                 ;    1296     b7-b1 Reserved 0
+                                 ;    1297     */
+                                 ;    1298     R_DTC_Control( DTC_CMD_DTC_START, NULL, 0 );
+                                 ;    1299 
+                                 ;    1300     if( ptr->ip == USB_USBIP_0 )
+                                 ;    1301     {
+                                 ;    1302         /* DTC start enable register (USB0 D0FIFO transfer)
+                                 ;    1303         b0    DTCE     DTC start enable bit
+                                 ;    1304         b7-b1 Reserved 0
+                                 ;    1305         */
+                                 ;    1306         DTCE( USB0, D0FIFO0 ) = 1;
+                                 ;    1307     }
+                                 ;    1308     else
+                                 ;    1309     {
+                                 ;    1310         /* DTC start enable register (USBA D0FIFO transfer)
+                                 ;    1311         b0    DTCE     DTC start enable bit
+                                 ;    1312         b7-b1 Reserved 0
+                                 ;    1313         */
+                                 ;    1314         DTCE( USBA, D0FIFO2 ) = 1;
+                                 ;    1315     }
+                                 ;    1316 }
+                                 ;    1317 /******************************************************************************
+                                 ;    1318 End of function
+                                 ;    1319 ******************************************************************************/
+                                 ;    1320 
+                                 ;    1321 
+                                 ;    1322 /******************************************************************************
+                                 ;    1323 Function Name   : usb_cpu_d0fifo_enable_dma
+                                 ;    1324 Description     : DTC(D0FIFO) interrupt enable (Interrupt priority 5 set)
+                                 ;    1325 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel. 
+                                 ;    1326 Return value    : none
+                                 ;    1327 ******************************************************************************/
+                                 ;    1328 void usb_cpu_d0fifo_enable_dma(USB_UTR_t *ptr)
+                                 ;    1329 {
+                                 ;    1330     if( ptr->ip == USB_USBIP_0 )
+                                 ;    1331     {
+                                 ;    1332         /* Priority D0FIFO0 = 0(Disable)
+                                 ;    1333         b3-b0 IPR      Interrupt priority
+                                 ;    1334         b7-b4 Reserved 0
+                                 ;    1335         */
+                                 ;    1336         IPR( USB0, D0FIFO0 ) = 0x05;
+                                 ;    1337     }
+                                 ;    1338     else
+                                 ;    1339     {
+                                 ;    1340         /* Priority D0FIFO2 = 0(Disable)
+                                 ;    1341         b3-b0 IPR      Interrupt priority
+                                 ;    1342         b7-b4 Reserved 0
+                                 ;    1343         */
+                                 ;    1344         IPR( USBA, D0FIFO2 ) = 0x05;
+                                 ;    1345     }
+                                 ;    1346 }
+                                 ;    1347 /******************************************************************************
+                                 ;    1348 End of function
+                                 ;    1349 ******************************************************************************/
+                                 ;    1350 
+                                 ;    1351 
+                                 ;    1352 /******************************************************************************
+                                 ;    1353 Function Name   : usb_cpu_d0fifo_disable_dma
+                                 ;    1354 Description     : D0FIFO interrupt disable (Interrupt priority 0 set)
+                                 ;    1355 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel. 
+                                 ;    1356 Return value    : none
+                                 ;    1357 ******************************************************************************/
+                                 ;    1358 void usb_cpu_d0fifo_disable_dma(USB_UTR_t *ptr)
+                                 ;    1359 {
+                                 ;    1360     if( ptr->ip == USB_USBIP_0 )
+                                 ;    1361     {
+                                 ;    1362         /* Priority D0FIFO0 = 0(Disable)
+                                 ;    1363         b3-b0 IPR      Interrupt priority
+                                 ;    1364         b7-b4 Reserved 0
+                                 ;    1365         */
+                                 ;    1366         IPR( USB0, D0FIFO0 ) = 0x00;
+                                 ;    1367     }
+                                 ;    1368     else
+                                 ;    1369     {
+                                 ;    1370         /* Priority D0FIFO2 = 0(Disable)
+                                 ;    1371         b3-b0 IPR      Interrupt priority
+                                 ;    1372         b7-b4 Reserved 0
+                                 ;    1373         */
+                                 ;    1374         IPR( USBA, D0FIFO2 ) = 0x00;
+                                 ;    1375     }
+                                 ;    1376 }
+                                 ;    1377 /******************************************************************************
+                                 ;    1378 End of function
+                                 ;    1379 ******************************************************************************/
+                                 ;    1380 
+                                 ;    1381 
+                                 ;    1382 /******************************************************************************
+                                 ;    1383 Function Name   : usb_cpu_get_dtc_block_count
+                                 ;    1384 Description     : Get DTC Transfer count reg B(CRB).
+                                 ;    1385 Arguments       : USB_UTR_t *ptr        : USB internal structure. Selects USB channel. 
+                                 ;    1386 Return value    : DTC Transfer count reg B(CRB)
+                                 ;    1387 ******************************************************************************/
+                                 ;    1388 uint16_t usb_cpu_get_dtc_block_count(USB_UTR_t *ptr)
+                                 ;    1389 {
+                                 ;    1390     uint16_t value;
+                                 ;    1391     uint16_t status_reg = 0;
+                                 ;    1392     
+                                 ;    1393     /* Wait Complete DTC Transfer */
+                                 ;    1394     do
+                                 ;    1395     {
+                                 ;    1396         status_reg = DTC.DTCSTS.WORD;
+                                 ;    1397     }
+                                 ;    1398     while( 0 != ( status_reg & 0x8000 ) );  /* DTC is not active */
+                                 ;    1399  
+                                 ;    1400     /* Read DTC transfer count (CRB) */
+                                 ;    1401     value = (uint16_t)(usb_dtc_transfer_data[ptr->ip].lw4 & 0xffff);
+                                 ;    1402     
+                                 ;    1403     return value;
+                                 ;    1404 }
+                                 ;    1405 /******************************************************************************
+                                 ;    1406 End of function
+                                 ;    1407 ******************************************************************************/
+                                 ;    1408 #endif /* USB_DTC_ENABLE */
+                                 ;    1409 
+                                 ;    1410 
+                                 ;    1411 /******************************************************************************
+                                 ;    1412 End  Of File
+                                 ;    1413 ******************************************************************************/
+                                 		.SECTION	D_2,ROMDATA,ALIGN=2
+00000000                         _usb_gcstd_D0fifo:
+00000000 00                      		.byte	0
+00000001 00                      		.byte	0
+00000002 00                      		.byte	0
+00000003 00                      		.byte	0
+00000004                         _usb_gcstd_D1fifo:
+00000004 00                      		.byte	0
+00000005 00                      		.byte	0
+00000006 00                      		.byte	0
+00000007 00                      		.byte	0
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$usb_gstd_is_opened:
+00000000 00                      		.byte	0
+00000001 00                      		.byte	0
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01821   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000547(00000223H)  P
+ROMDATA  0000000008(00000008H)  D_2
+ROMDATA  0000000002(00000002H)  D_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\rx_mcu.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\rx_mcu.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\r_usb_basic\src\HW\comm\rx_mcu.obj

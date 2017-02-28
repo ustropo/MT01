@@ -1,0 +1,964 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:49:23 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:49:23
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=lowsrc.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=lowsrc.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;lowsrc.c
+                                 
+                                 		.glb	__Stdin
+                                 		.glb	__Stdout
+                                 		.glb	__Stderr
+                                 		.glb	__nfiles
+                                 		.glb	_flmod
+                                 		.glb	_sml_buf
+                                 		.glb	__Files
+                                 		.glb	_env_list
+                                 		.glb	_environ
+                                 		.glb	__INIT_IOLIB
+                                 		.glb	_freopen
+                                 		.glb	__CLOSEALL
+                                 		.glb	_fclose
+                                 		.glb	_open
+                                 		.glb	_close
+                                 		.glb	_write
+                                 		.glb	_charput
+                                 		.glb	_read
+                                 		.glb	_charget
+                                 		.glb	_lseek
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         __INIT_IOLIB:
+                                 		.STACK	__INIT_IOLIB=4
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : lowsrc.c
+                                 ;      21 * Description  : Functions to support stream I/O
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /***********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version  Description
+                                 ;      25 *         : 26.10.2011 1.00     First Release
+                                 ;      26 *         : 15.01.2013 1.10     Added braces to if() statements. 
+                                 ;      27 *         : 25.06.2013 1.20     Made minor changes to code to remove 'loss of precision' and 'unused parameter'
+                                 ;      28 *                               compiler messages.
+                                 ;      29 ***********************************************************************************************************************/
+                                 ;      30 
+                                 ;      31 /***********************************************************************************************************************
+                                 ;      32 Includes   <System Includes> , "Project Includes"
+                                 ;      33 ***********************************************************************************************************************/
+                                 ;      34 #include "r_bsp_config.h"
+                                 ;      35 
+                                 ;      36 /* Do not include this file if stdio is disabled in r_bsp_config. */
+                                 ;      37 #if (BSP_CFG_IO_LIB_ENABLE == 1)
+                                 ;      38 
+                                 ;      39 #include <string.h>
+                                 ;      40 #include <stdio.h>
+                                 ;      41 #include <stddef.h>
+                                 ;      42 
+                                 ;      43 /* BCH - 01/15/2013 */
+                                 ;      44 /* 1335: Function parameters identifiers are missing below. This is not going to be changed to keep this as close to 
+                                 ;      45          default lowsrc.c as possible.
+                                 ;      46    0602: Defect for macro names with '_[A-Z]' is also being suppressed since these are defaut names from toolchain.  
+                                 ;      47    3447: External linkage is not needed for these toolchain supplied library functions.
+                                 ;      48    2217: Line length could be changed but will not to keep file as close to original as possible. 
+                                 ;      49    3227: Not going to add const since this is toolchain library function. 
+                                 ;      50    3206: Not going to change parameters since this is toolchain library function.
+                                 ;      51    4130: Not going to change since this is provided toolchain library code.
+                                 ;      52    3397: Not going to change since this is provided toolchain library code.
+                                 ;      53    3400: Not going to change since this is provided toolchain library code. 
+                                 ;      54    0861: Not going to change since this is provided toolchain library code. 
+                                 ;      55    4107: Not going to change since this is provided toolchain library code. 
+                                 ;      56    3003: Not going to change since this is provided toolchain library code. 
+                                 ;      57    3777: Not going to change since this is provided toolchain library code. */
+                                 ;      58 /* PRQA S 1335, 0602, 2217, 3447, 3227, 3206, 4130, 3397, 3400, 0861, 4107, 3003, 3777 ++ */
+                                 ;      59 
+                                 ;      60 /***********************************************************************************************************************
+                                 ;      61 Macro definitions
+                                 ;      62 ***********************************************************************************************************************/
+                                 ;      63 /*Number of I/O Stream*/
+                                 ;      64 #define IOSTREAM 20
+                                 ;      65 
+                                 ;      66 /* file number */
+                                 ;      67 #define STDIN  0                    /* Standard input (console)        */
+                                 ;      68 #define STDOUT 1                    /* Standard output (console)       */
+                                 ;      69 #define STDERR 2                    /* Standard error output (console) */
+                                 ;      70 
+                                 ;      71 #define FLMIN  0                    /* Minimum file number     */
+                                 ;      72 #define _MOPENR 0x1
+                                 ;      73 #define _MOPENW 0x2
+                                 ;      74 #define _MOPENA 0x4
+                                 ;      75 #define _MTRUNC 0x8
+                                 ;      76 #define _MCREAT 0x10
+                                 ;      77 #define _MBIN   0x20
+                                 ;      78 #define _MEXCL  0x40
+                                 ;      79 #define _MALBUF 0x40
+                                 ;      80 #define _MALFIL 0x80
+                                 ;      81 #define _MEOF   0x100
+                                 ;      82 #define _MERR   0x200
+                                 ;      83 #define _MLBF   0x400
+                                 ;      84 #define _MNBF   0x800
+                                 ;      85 #define _MREAD  0x1000
+                                 ;      86 #define _MWRITE 0x2000
+                                 ;      87 #define _MBYTE  0x4000
+                                 ;      88 #define _MWIDE  0x8000
+                                 ;      89 /* File Flags */
+                                 ;      90 #define O_RDONLY 0x0001 /* Read only                                       */
+                                 ;      91 #define O_WRONLY 0x0002 /* Write only                                      */
+                                 ;      92 #define O_RDWR   0x0004 /* Both read and Write                             */
+                                 ;      93 #define O_CREAT  0x0008 /* A file is created if it is not existed          */
+                                 ;      94 #define O_TRUNC  0x0010 /* The file size is changed to 0 if it is existed. */
+                                 ;      95 #define O_APPEND 0x0020 /* The position is set for next reading/writing    */
+                                 ;      96                         /* 0: Top of the file 1: End of file               */
+                                 ;      97 
+                                 ;      98 /* Special character code */
+                                 ;      99 #define CR 0x0d                     /* Carriage return */
+                                 ;     100 #define LF 0x0a                     /* Line feed       */
+                                 ;     101 
+                                 ;     102 #if defined( __RX )
+                                 ;     103 const long _nfiles = IOSTREAM; /* The number of files for input/output files */
+                                 ;     104 #else
+                                 ;     105 const int _nfiles = IOSTREAM;  /* The number of files for input/output files */
+                                 ;     106 #endif
+                                 ;     107 char flmod[IOSTREAM];          /* The location for the mode of opened file.  */
+                                 ;     108 
+                                 ;     109 unsigned char sml_buf[IOSTREAM];
+                                 ;     110 
+                                 ;     111 #define FPATH_STDIN     "C:\\stdin"
+                                 ;     112 #define FPATH_STDOUT    "C:\\stdout"
+                                 ;     113 #define FPATH_STDERR    "C:\\stderr"
+                                 ;     114 
+                                 ;     115 /* H8 Normal mode ,SH and RX */
+                                 ;     116 #if defined( __2000N__ ) || defined( __2600N__ ) || defined( __300HN__ ) || defined( _SH )
+                                 ;     117 /* Output one character to standard output */
+                                 ;     118 extern void charput(char);
+                                 ;     119 /* Input one character from standard input */
+                                 ;     120 extern char charget(void);
+                                 ;     121 /* Output one character to the file        */
+                                 ;     122 extern char fcharput(char, unsigned char);
+                                 ;     123 /* Input one character from the file       */
+                                 ;     124 extern char fcharget(char*, unsigned char);
+                                 ;     125 /* Open the file */
+                                 ;     126 extern char fileopen(char*, unsigned char, unsigned char*);
+                                 ;     127 /* Close the file */
+                                 ;     128 extern char fileclose(unsigned char);
+                                 ;     129 /* Move the file offset */
+                                 ;     130 extern char fpseek(unsigned char, long, unsigned char);
+                                 ;     131 /* Get the file offset */
+                                 ;     132 extern char fptell(unsigned char, long*);
+                                 ;     133 
+                                 ;     134 /* RX */
+                                 ;     135 #elif defined( __RX )
+                                 ;     136 /* Output one character to standard output */
+                                 ;     137 extern void charput(unsigned char);
+                                 ;     138 /* Input one character from standard input */
+                                 ;     139 extern unsigned char charget(void);
+                                 ;     140 
+                                 ;     141 /* H8 Advanced mode */
+                                 ;     142 #elif defined( __2000A__ ) || defined( __2600A__ ) || defined( __300HA__ ) || defined( __H8SXN__ ) || defined( __H8SXA__ ) || defined( __H8SXM__ ) || defined
+                                 ;     143 /* Output one character to standard output */
+                                 ;     144 extern void charput(char);
+                                 ;     145 /* Input one character from standard input */
+                                 ;     146 extern char charget(void);
+                                 ;     147 /* Output one character to the file        */
+                                 ;     148 extern char fcharput(char, unsigned char);
+                                 ;     149 /* Input one character from the file       */
+                                 ;     150 extern char fcharget(char*, unsigned char);
+                                 ;     151 /* Open the file */
+                                 ;     152 /* Specified as the number of register which stored paramter is 3 */
+                                 ;     153 extern char __regparam3 fileopen(char*, unsigned char, unsigned char*);
+                                 ;     154 /* Close the file */
+                                 ;     155 extern char fileclose(unsigned char);
+                                 ;     156 /* Move the file offset */
+                                 ;     157 extern char fpseek(unsigned char, long, unsigned char);
+                                 ;     158 /* Get the file offset */
+                                 ;     159 extern char fptell(unsigned char, long*);
+                                 ;     160 
+                                 ;     161 /* H8300 and H8300L */
+                                 ;     162 #elif defined( __300__ ) || defined( __300L__ )
+                                 ;     163 /* Output one character to standard output */
+                                 ;     164 extern void charput(char);
+                                 ;     165 /* Input one character from standard input */
+                                 ;     166 extern char charget(void);
+                                 ;     167 /* Output one character to the file        */
+                                 ;     168 extern char fcharput(char, unsigned char);
+                                 ;     169 /* Input one character from the file       */
+                                 ;     170 extern char fcharget(char*, unsigned char);
+                                 ;     171 /* Open the file */
+                                 ;     172 /* Specified as the number of register which stored paramter is 3 */
+                                 ;     173 extern char __regparam3 fileopen(char*, unsigned char, unsigned char*);
+                                 ;     174 /* Close the file */
+                                 ;     175 extern char fileclose(unsigned char);
+                                 ;     176 /* Move the file offset */
+                                 ;     177 /* Move the file offset */
+                                 ;     178 extern char __regparam3 fpseek(unsigned char, long, unsigned char);
+                                 ;     179 /* Get the file offset */
+                                 ;     180 extern char fptell(unsigned char, long*);
+                                 ;     181 #endif
+                                 ;     182 
+                                 ;     183 #include <stdio.h>
+                                 ;     184 FILE *_Files[IOSTREAM]; // structure for FILE
+                                 ;     185 char *env_list[] = {            // Array for environment variables(**environ)
+                                 ;     186     "ENV1=temp01",
+                                 ;     187     "ENV2=temp02",
+                                 ;     188     "ENV9=end",
+                                 ;     189     '\0'                        // Terminal for environment variables
+                                 ;     190 };
+                                 ;     191 
+                                 ;     192 char **environ = env_list;
+                                 ;     193 
+                                 ;     194 /* This macro is used to suppress compiler messages about a parameter not being used in a function. The nice thing
+                                 ;     195  * about using this implementation is that it does not take any extra RAM or ROM.
+                                 ;     196  */
+                                 ;     197 #define     INTERNAL_NOT_USED(p)    ((void)(p))
+                                 ;     198 
+                                 ;     199 /****************************************************************************/
+                                 ;     200 /* _INIT_IOLIB                                                              */
+                                 ;     201 /*  Initialize C library Functions, if necessary.                           */
+                                 ;     202 /*  Define USES_SIMIO on Assembler Option.                                  */
+                                 ;     203 /****************************************************************************/
+                                 ;     204 void _INIT_IOLIB( void )
+                                 ;     205 {
+                                 ;     206     /* A file for standard input/output is opened or created. Each FILE     */
+                                 ;     207     /* structure members are initialized by the library. Each _Buf member   */
+                                 ;     208     /* in it is re-set the end of buffer pointer.                           */
+                                 ;     209 
+                                 ;     210     /* Standard Input File                                                  */
+                                 ;     211     if( freopen( FPATH_STDIN, "r", stdin ) == NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",211
+00000000 FB32rrrrrrrr            		MOV.L #__Stdin, R3
+00000006 FB22rrrrrrrr            		MOV.L #_L14, R2
+0000000C FB12rrrrrrrr            		MOV.L #_L13, R1
+00000012 05rrrrrr             A  		BSR _freopen
+00000016 6101                    		CMP #00H, R1
+00000018 21rr                    		BNE L20
+0000001A                         L19:	; bb1
+                                 ;     212     {
+                                 ;     213         stdin->_Mode = 0xffff;  /* Not allow the access if it fails to open */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",213
+0000001A FBE2rrrrrrrr            		MOV.L #__Stdin, R14
+00000020 F8E9FFFF                		MOV.W #0FFFFH, [R14]
+00000024                         L20:	; bb4
+                                 ;     214     }
+                                 ;     215     stdin->_Mode  = _MOPENR;            /* Read only attribute              */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",215
+00000024 FBE2rrrrrrrr            		MOV.L #__Stdin, R14
+0000002A F8E501                  		MOV.W #0001H, [R14]
+0000002D                         L21:	; bb4.split
+                                 ;     216     stdin->_Mode |= _MNBF;              /* Non-buffering for data           */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",216
+0000002D FBE2rrrrrrrr            		MOV.L #__Stdin, R14
+00000033 DCEF                    		MOV.W [R14], R15
+00000035 78BF                    		BSET #0BH, R15
+00000037 D3EF                    		MOV.W R15, [R14]
+00000039                         L22:	; bb4.split1
+                                 ;     217     stdin->_Bend = stdin->_Buf + 1;  /* Re-set pointer to the end of buffer */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",217
+00000039 FB12rrrrrrrr            		MOV.L #__Stdin, R1
+0000003F A81A                    		MOV.L 04H[R1], R2
+00000041 6212                    		ADD #01H, R2
+00000043 A092                    		MOV.L R2, 08H[R1]
+00000045                         L23:	; bb4.split2
+                                 ;     218 
+                                 ;     219     /* Standard Output File                                                 */
+                                 ;     220     if( freopen( FPATH_STDOUT, "w", stdout ) == NULL ) 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",220
+00000045 FB32rrrrrrrr            		MOV.L #__Stdout, R3
+0000004B FB22rrrrrrrr            		MOV.L #_L16, R2
+00000051 FB12rrrrrrrr            		MOV.L #_L15, R1
+00000057 05rrrrrr             A  		BSR _freopen
+0000005B 6101                    		CMP #00H, R1
+0000005D 21rr                    		BNE L25
+0000005F                         L24:	; bb12
+                                 ;     221     {
+                                 ;     222         stdout->_Mode = 0xffff; /* Not allow the access if it fails to open */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",222
+0000005F FBE2rrrrrrrr            		MOV.L #__Stdout, R14
+00000065 F8E9FFFF                		MOV.W #0FFFFH, [R14]
+00000069                         L25:	; bb17
+                                 ;     223     }
+                                 ;     224     stdout->_Mode |= _MNBF;             /* Non-buffering for data           */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",224
+00000069 FBE2rrrrrrrr            		MOV.L #__Stdout, R14
+0000006F DCEF                    		MOV.W [R14], R15
+00000071 78BF                    		BSET #0BH, R15
+00000073 D3EF                    		MOV.W R15, [R14]
+00000075                         L26:	; bb17.split
+                                 ;     225     stdout->_Bend = stdout->_Buf + 1;/* Re-set pointer to the end of buffer */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",225
+00000075 FB12rrrrrrrr            		MOV.L #__Stdout, R1
+0000007B A81A                    		MOV.L 04H[R1], R2
+0000007D 6212                    		ADD #01H, R2
+0000007F A092                    		MOV.L R2, 08H[R1]
+00000081                         L27:	; bb17.split3
+                                 ;     226     
+                                 ;     227     /* Standard Error File                                                  */
+                                 ;     228     if( freopen( FPATH_STDERR, "w", stderr ) == NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",228
+00000081 FB32rrrrrrrr            		MOV.L #__Stderr, R3
+00000087 FB22rrrrrrrr            		MOV.L #_L16, R2
+0000008D FB12rrrrrrrr            		MOV.L #_L17, R1
+00000093 05rrrrrr             A  		BSR _freopen
+00000097 6101                    		CMP #00H, R1
+00000099 21rr                    		BNE L29
+0000009B                         L28:	; bb25
+                                 ;     229     {
+                                 ;     230         stderr->_Mode = 0xffff; /* Not allow the access if it fails to open */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",230
+0000009B FBE2rrrrrrrr            		MOV.L #__Stderr, R14
+000000A1 F8E9FFFF                		MOV.W #0FFFFH, [R14]
+000000A5                         L29:	; bb30
+                                 ;     231     }
+                                 ;     232     stderr->_Mode |= _MNBF;             /* Non-buffering for data           */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",232
+000000A5 FBE2rrrrrrrr            		MOV.L #__Stderr, R14
+000000AB DCEF                    		MOV.W [R14], R15
+000000AD 78BF                    		BSET #0BH, R15
+000000AF D3EF                    		MOV.W R15, [R14]
+000000B1                         L30:	; bb30.split
+                                 ;     233     stderr->_Bend = stderr->_Buf + 1;/* Re-set pointer to the end of buffer */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",233
+000000B1 FB12rrrrrrrr            		MOV.L #__Stderr, R1
+000000B7 A81A                    		MOV.L 04H[R1], R2
+000000B9 6212                    		ADD #01H, R2
+000000BB A092                    		MOV.L R2, 08H[R1]
+000000BD 02                      		RTS
+000000BE                         __CLOSEALL:
+                                 		.STACK	__CLOSEALL=8
+                                 ;     234 }
+                                 ;     235 
+                                 ;     236 /****************************************************************************/
+                                 ;     237 /* _CLOSEALL                                                                */
+                                 ;     238 /****************************************************************************/
+                                 ;     239 void _CLOSEALL( void )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",239
+000000BE 6040                    		SUB #04H, R0
+                                 ;     240 {
+                                 ;     241     long i;
+                                 ;     242 
+                                 ;     243     for( i=0; i < _nfiles; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",243
+000000C0 F80600                  		MOV.L #00000000H, [R0]
+000000C3 2Err                 B  		BRA L35
+000000C5                         L32:	; bb2
+                                 ;     244     {
+                                 ;     245         /* Checks if the file is opened or not                               */
+                                 ;     246         if( _Files[i]->_Mode & (_MOPENR | _MOPENW | _MOPENA ) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",246
+000000C5 FBE2rrrrrrrr            		MOV.L #__Files, R14
+000000CB EC01                    		MOV.L [R0], R1
+000000CD FE61EE                  		MOV.L [R1,R14], R14
+000000D0 667F                    		MOV.L #00000007H, R15
+000000D2 06E00CEF                		TST [R14].UW, R15
+000000D6 20rr                    		BEQ L34
+000000D8                         L33:	; bb3
+                                 ;     247         {
+                                 ;     248             fclose( _Files[i] );    /* Closes the file                       */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",248
+000000D8 FBE2rrrrrrrr            		MOV.L #__Files, R14
+000000DE EC01                    		MOV.L [R0], R1
+000000E0 FE61E1                  		MOV.L [R1,R14], R1
+000000E3 05rrrrrr             A  		BSR _fclose
+000000E7                         L34:	; bb16
+000000E7 EC01                    		MOV.L [R0], R1
+000000E9 6211                    		ADD #01H, R1
+000000EB E301                    		MOV.L R1, [R0]
+000000ED                         L35:	; bb19
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",243
+000000ED FBE2rrrrrrrr            		MOV.L #__nfiles, R14
+000000F3 EC01                    		MOV.L [R0], R1
+000000F5 0684E1                  		CMP [R14].L, R1
+000000F8 29rr                    		BLT L32
+000000FA                         L36:	; return
+                                 ;     249         }
+                                 ;     250     }
+                                 ;     251 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",251
+000000FA 6701                    		RTSD #04H
+000000FC                         _open:
+                                 		.STACK	_open=24
+                                 ;     252 
+                                 ;     253 /**************************************************************************/
+                                 ;     254 /*       open:file open                                                   */
+                                 ;     255 /*          Return value:File number (Pass)                               */
+                                 ;     256 /*                       -1          (Failure)                            */
+                                 ;     257 /**************************************************************************/
+                                 ;     258 #if defined( __RX )
+                                 ;     259 long open(const char *name,                  /* File name                 */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",259
+000000FC 7100EC                  		ADD #0FFFFFFECH, R0
+000000FF A101                    		MOV.L R1, 10H[R0]
+00000101 A08A                    		MOV.L R2, 0CH[R0]
+00000103 A083                    		MOV.L R3, 08H[R0]
+00000105                         L38:	; entry.split
+00000105 FB36FF                  		MOV.L #0FFFFFFFFH, R3
+                                 ;     260      long  mode,                             /* Open mode                 */
+                                 ;     261      long  flg)                              /* Open flag                 */
+                                 ;     262 #else
+                                 ;     263 int open(char *name,                         /* File name                 */
+                                 ;     264      int  mode,                              /* Open mode                 */
+                                 ;     265      int  flg)                               /* Open flag                 */
+                                 ;     266 #endif
+                                 ;     267 {
+                                 ;     268     /* This code is only used to remove compiler info messages about these parameters not being used. */
+                                 ;     269     INTERNAL_NOT_USED(flg);
+                                 ;     270 
+                                 ;     271     if( strcmp( name, FPATH_STDIN ) == 0 )      /* Standard Input file?   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",271
+00000108 FB22rrrrrrrr            		MOV.L #_L13, R2
+0000010E A901                    		MOV.L 10H[R0], R1
+00000110 7F83                    		SCMPU
+00000112 FCDBE2                  		SCGEU.L R14
+00000115 FCDBF5                  		SCLEU.L R15
+00000118 43FE                    		SUB R15, R14
+0000011A 610E                    		CMP #00H, R14
+0000011C 21rr                    		BNE L43
+0000011E                         L39:	; bb6
+                                 ;     272     {
+                                 ;     273         if( ( mode & O_RDONLY ) == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",273
+0000011E A889                    		MOV.L 0CH[R0], R1
+00000120 7C01                    		BTST #00H, R1
+00000122 18                   S  		BNE L41
+00000123                         L40:	; bb7
+                                 ;     274         { 
+                                 ;     275             return -1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",275
+00000123 F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+00000126 2Err                 B  		BRA L54
+00000128                         L41:	; bb13
+                                 ;     276         }
+                                 ;     277         flmod[STDIN] = (char)mode;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",277
+00000128 A889                    		MOV.L 0CH[R0], R1
+0000012A FBE2rrrrrrrr            		MOV.L #_flmod, R14
+00000130 C3E1                    		MOV.B R1, [R14]
+00000132                         L42:	; bb13.split
+                                 ;     278         return STDIN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",278
+00000132 F80600                  		MOV.L #00000000H, [R0]
+00000135 2Err                 B  		BRA L54
+00000137                         L43:	; bb18
+00000137 FB36FF                  		MOV.L #0FFFFFFFFH, R3
+                                 ;     279     }
+                                 ;     280     else if( strcmp( name, FPATH_STDOUT ) == 0 )/* Standard Output file?  */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",280
+0000013A FB22rrrrrrrr            		MOV.L #_L15, R2
+00000140 A901                    		MOV.L 10H[R0], R1
+00000142 7F83                    		SCMPU
+00000144 FCDBE2                  		SCGEU.L R14
+00000147 FCDBF5                  		SCLEU.L R15
+0000014A 43FE                    		SUB R15, R14
+0000014C 610E                    		CMP #00H, R14
+0000014E 21rr                    		BNE L48
+00000150                         L44:	; bb20
+                                 ;     281     {
+                                 ;     282         if( ( mode & O_WRONLY ) == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",282
+00000150 A889                    		MOV.L 0CH[R0], R1
+00000152 7C11                    		BTST #01H, R1
+00000154 18                   S  		BNE L46
+00000155                         L45:	; bb21
+                                 ;     283         { 
+                                 ;     284             return -1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",284
+00000155 F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+00000158 2Err                 B  		BRA L54
+0000015A                         L46:	; bb28
+                                 ;     285         }
+                                 ;     286         flmod[STDOUT] = (char)mode;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",286
+0000015A A889                    		MOV.L 0CH[R0], R1
+0000015C FB22rrrrrrrr            		MOV.L #_flmod, R2
+00000162 8029                    		MOV.B R1, 01H[R2]
+00000164                         L47:	; bb28.split
+                                 ;     287         return STDOUT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",287
+00000164 F80601                  		MOV.L #00000001H, [R0]
+00000167 2Err                 B  		BRA L54
+00000169                         L48:	; bb33
+00000169 FB36FF                  		MOV.L #0FFFFFFFFH, R3
+                                 ;     288     }
+                                 ;     289     else if(strcmp(name, FPATH_STDERR ) == 0 )  /* Standard Error file?   */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",289
+0000016C FB22rrrrrrrr            		MOV.L #_L17, R2
+00000172 A901                    		MOV.L 10H[R0], R1
+00000174 7F83                    		SCMPU
+00000176 FCDBE2                  		SCGEU.L R14
+00000179 FCDBF5                  		SCLEU.L R15
+0000017C 43FE                    		SUB R15, R14
+0000017E 610E                    		CMP #00H, R14
+00000180 21rr                    		BNE L53
+00000182                         L49:	; bb35
+                                 ;     290     {
+                                 ;     291         if( ( mode & O_WRONLY ) == 0 ) 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",291
+00000182 A889                    		MOV.L 0CH[R0], R1
+00000184 7C11                    		BTST #01H, R1
+00000186 18                   S  		BNE L51
+00000187                         L50:	; bb36
+                                 ;     292         {
+                                 ;     293             return -1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",293
+00000187 F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+0000018A 2Err                 B  		BRA L54
+0000018C                         L51:	; bb43
+                                 ;     294         }
+                                 ;     295         flmod[STDERR] = (char)mode;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",295
+0000018C A889                    		MOV.L 0CH[R0], R1
+0000018E FB22rrrrrrrr            		MOV.L #_flmod, R2
+00000194 80A1                    		MOV.B R1, 02H[R2]
+00000196                         L52:	; bb43.split
+                                 ;     296         return STDERR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",296
+00000196 F80602                  		MOV.L #00000002H, [R0]
+00000199 08                   S  		BRA L54
+0000019A                         L53:	; bb47
+                                 ;     297     }
+                                 ;     298     else 
+                                 ;     299     {
+                                 ;     300         return -1;                             /*Others                  */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",300
+0000019A F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+0000019D                         L54:	; bb67
+0000019D EC01                    		MOV.L [R0], R1
+0000019F A009                    		MOV.L R1, 04H[R0]
+                                 ;     301     }
+                                 ;     302 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",302
+000001A1 6705                    		RTSD #14H
+000001A3                         _close:
+                                 		.STACK	_close=12
+                                 ;     303 
+                                 ;     304 #if defined( __RX )
+                                 ;     305 long close( long fileno )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",305
+000001A3 6080                    		SUB #08H, R0
+000001A5 A009                    		MOV.L R1, 04H[R0]
+000001A7                         L56:	; entry.split
+                                 ;     306 #else
+                                 ;     307 int close( int fileno )
+                                 ;     308 #endif
+                                 ;     309 {
+                                 ;     310     /* This code is only used to remove compiler info messages about these parameters not being used. */
+                                 ;     311     INTERNAL_NOT_USED(fileno);
+                                 ;     312 
+                                 ;     313     return 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",313
+000001A7 F80601                  		MOV.L #00000001H, [R0]
+000001AA 6611                    		MOV.L #00000001H, R1
+000001AC                         L57:	; entry.split1
+                                 ;     314 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",314
+000001AC 6702                    		RTSD #08H
+000001AE                         _write:
+                                 		.STACK	_write=36
+                                 ;     315 
+                                 ;     316 /**************************************************************************/
+                                 ;     317 /* write:Data write                                                       */
+                                 ;     318 /*  Return value:Number of write characters (Pass)                        */
+                                 ;     319 /*               -1                         (Failure)                     */
+                                 ;     320 /**************************************************************************/
+                                 ;     321 #if defined( __RX )
+                                 ;     322 long write(long  fileno,             /* File number                       */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",322
+000001AE 7100E0                  		ADD #0FFFFFFE0H, R0
+000001B1 A189                    		MOV.L R1, 1CH[R0]
+000001B3 A182                    		MOV.L R2, 18H[R0]
+000001B5 A10B                    		MOV.L R3, 14H[R0]
+                                 ;     323       const unsigned char *buf,       /* The address of destination buffer */
+                                 ;     324       long  count)                   /* The number of chacter to write    */
+                                 ;     325 #else
+                                 ;     326 int write(int  fileno,               /* File number                       */
+                                 ;     327       char *buf,                     /* The address of destination buffer */
+                                 ;     328       int  count)                    /* The number of chacter to write    */
+                                 ;     329 #endif
+                                 ;     330 {
+                                 ;     331     long    i;                          /* A variable for counter         */
+                                 ;     332     unsigned char    c;                 /* An output character            */
+                                 ;     333 
+                                 ;     334     /* Checking the mode of file , output each character                  */
+                                 ;     335     /* Checking the attribute for Write-Only, Read-Only or Read-Write     */
+                                 ;     336     if((flmod[fileno]&O_WRONLY) || (flmod[fileno]&O_RDWR))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",336
+000001B7 FBE2rrrrrrrr            		MOV.L #_flmod, R14
+000001BD A989                    		MOV.L 1CH[R0], R1
+000001BF FECE1E                  		MOVU.B [R14,R1], R14
+000001C2 7C1E                    		BTST #01H, R14
+000001C4 21rr                    		BNE L74
+000001C6 2Err                 B  		BRA L73
+000001C8                         L59:	; bb7
+                                 ;     337     {
+                                 ;     338         if( fileno == STDIN ) 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",338
+000001C8 A989                    		MOV.L 1CH[R0], R1
+000001CA 6101                    		CMP #00H, R1
+000001CC 18                   S  		BNE L61
+000001CD                         L60:	; bb8
+                                 ;     339         {
+                                 ;     340             return -1;            /* Standard Input     */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",340
+000001CD F90601FF                		MOV.L #0FFFFFFFFH, 04H[R0]
+000001D1 2Err                 B  		BRA L77
+000001D3                         L61:	; bb11
+                                 ;     341         }
+                                 ;     342         else if( (fileno == STDOUT) || (fileno == STDERR) ) 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",342
+000001D3 A989                    		MOV.L 1CH[R0], R1
+000001D5 6111                    		CMP #01H, R1
+000001D7 20rr                    		BEQ L69
+000001D9 2Err                 B  		BRA L68
+000001DB                         L62:	; bb12
+                                 ;     343                                                 /* Standard Error/output   */
+                                 ;     344         {
+                                 ;     345             for( i = count; i > 0; --i )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",345
+000001DB E5000502                		MOV.L 14H[R0], 08H[R0]
+000001DF 2Err                 B  		BRA L65
+000001E1                         L63:	; bb14
+                                 ;     346             {
+                                 ;     347                 c = *buf++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",347
+000001E1 A981                    		MOV.L 18H[R0], R1
+000001E3 C4100F                  		MOV.B [R1], 0FH[R0]
+000001E6 A981                    		MOV.L 18H[R0], R1
+000001E8 6211                    		ADD #01H, R1
+000001EA A181                    		MOV.L R1, 18H[R0]
+000001EC                         L64:	; bb14.split
+                                 ;     348                 charput(c);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",348
+000001EC B389                    		MOVU.B 0FH[R0], R1
+000001EE 05rrrrrr             A  		BSR _charput
+000001F2 A881                    		MOV.L 08H[R0], R1
+000001F4 6011                    		SUB #01H, R1
+000001F6 A081                    		MOV.L R1, 08H[R0]
+000001F8                         L65:	; bb22
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",345
+000001F8 A881                    		MOV.L 08H[R0], R1
+000001FA 6101                    		CMP #00H, R1
+000001FC 2Arr                    		BGT L63
+000001FE                         L66:	; bb26
+                                 ;     349             }
+                                 ;     350             return count;        /*Return the number of written characters */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",350
+000001FE E5000501                		MOV.L 14H[R0], 04H[R0]
+00000202 2Err                 B  		BRA L77
+00000204                         L67:	; bb29
+                                 ;     351         }
+                                 ;     352         else 
+                                 ;     353         {
+                                 ;     354             return -1;                  /* Incorrect file number          */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",354
+00000204 F90601FF                		MOV.L #0FFFFFFFFH, 04H[R0]
+00000208 2Err                 B  		BRA L77
+0000020A                         L68:	; bb34
+0000020A A989                    		MOV.L 1CH[R0], R1
+0000020C 6121                    		CMP #02H, R1
+0000020E 18                   S  		BNE L70
+0000020F                         L69:	; bb38
+0000020F F80601                  		MOV.L #00000001H, [R0]
+00000212 08                   S  		BRA L71
+00000213                         L70:	; bb39
+00000213 F80600                  		MOV.L #00000000H, [R0]
+00000216                         L71:	; bb40
+00000216 EC01                    		MOV.L [R0], R1
+00000218 6101                    		CMP #00H, R1
+0000021A 21rr                    		BNE L62
+0000021C 2Err                 B  		BRA L67
+0000021E                         L72:	; bb51
+                                 ;     355         }
+                                 ;     356     }
+                                 ;     357     else 
+                                 ;     358     {
+                                 ;     359         return -1;                      /* An error                       */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",359
+0000021E F90601FF                		MOV.L #0FFFFFFFFH, 04H[R0]
+00000222 2Err                 B  		BRA L77
+00000224                         L73:	; bb60
+00000224 A989                    		MOV.L 1CH[R0], R1
+00000226 FBE2rrrrrrrr            		MOV.L #_flmod, R14
+0000022C FECE1E                  		MOVU.B [R14,R1], R14
+0000022F 7C2E                    		BTST #02H, R14
+00000231 10                   S  		BEQ L75
+00000232                         L74:	; bb68
+00000232 F80601                  		MOV.L #00000001H, [R0]
+00000235 08                   S  		BRA L76
+00000236                         L75:	; bb69
+00000236 F80600                  		MOV.L #00000000H, [R0]
+00000239                         L76:	; bb70
+00000239 EC01                    		MOV.L [R0], R1
+0000023B 6101                    		CMP #00H, R1
+0000023D 21rr                    		BNE L59
+0000023F 2Err                 B  		BRA L72
+00000241                         L77:	; bb76
+00000241 A809                    		MOV.L 04H[R0], R1
+00000243 A101                    		MOV.L R1, 10H[R0]
+                                 ;     360     }
+                                 ;     361 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",361
+00000245 6708                    		RTSD #20H
+00000247                         _read:
+                                 		.STACK	_read=36
+                                 ;     362 
+                                 ;     363 #if defined( __RX )
+                                 ;     364 long read( long fileno, unsigned char *buf, long count )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",364
+00000247 7EA6                    		PUSH.L R6
+00000249 7100E4                  		ADD #0FFFFFFE4H, R0
+0000024C A181                    		MOV.L R1, 18H[R0]
+0000024E A10A                    		MOV.L R2, 14H[R0]
+00000250 A103                    		MOV.L R3, 10H[R0]
+                                 ;     365 #else
+                                 ;     366 int read( int fileno, char *buf, unsigned int count )
+                                 ;     367 #endif
+                                 ;     368 {
+                                 ;     369        long i;
+                                 ;     370 
+                                 ;     371        /* Checking the file mode with the file number, each character is input and stored the buffer */
+                                 ;     372 
+                                 ;     373        if((flmod[fileno]&_MOPENR) || (flmod[fileno]&O_RDWR))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",373
+00000252 FBE2rrrrrrrr            		MOV.L #_flmod, R14
+00000258 A981                    		MOV.L 18H[R0], R1
+0000025A FECE1E                  		MOVU.B [R14,R1], R14
+0000025D 7C0E                    		BTST #00H, R14
+0000025F 21rr                    		BNE L88
+00000261 2Err                 B  		BRA L87
+00000263                         L79:	; bb5
+                                 ;     374        {
+                                 ;     375              for(i = count; i > 0; i--)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",375
+00000263 E5000402                		MOV.L 10H[R0], 08H[R0]
+00000267 2Err                 B  		BRA L84
+00000269                         L80:	; bb7
+                                 ;     376              {
+                                 ;     377                    *buf = charget();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",377
+00000269 A90E                    		MOV.L 14H[R0], R6
+0000026B 05rrrrrr             A  		BSR _charget
+0000026F C361                    		MOV.B R1, [R6]
+00000271                         L81:	; bb7.split
+                                 ;     378                    if(*buf==CR)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",378
+00000271 A909                    		MOV.L 14H[R0], R1
+00000273 581E                    		MOVU.B [R1], R14
+00000275 61DE                    		CMP #0DH, R14
+00000277 18                   S  		BNE L83
+00000278                         L82:	; bb11
+                                 ;     379                    {              /* Replace the new line character */
+                                 ;     380                          *buf = LF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",380
+00000278 A909                    		MOV.L 14H[R0], R1
+0000027A F8140A                  		MOV.B #0AH, [R1]
+0000027D                         L83:	; bb18
+                                 ;     381                    }
+                                 ;     382                    buf++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",382
+0000027D A909                    		MOV.L 14H[R0], R1
+0000027F 6211                    		ADD #01H, R1
+00000281 A109                    		MOV.L R1, 14H[R0]
+00000283 A881                    		MOV.L 08H[R0], R1
+00000285 6011                    		SUB #01H, R1
+00000287 A081                    		MOV.L R1, 08H[R0]
+00000289                         L84:	; bb23
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",375
+00000289 A881                    		MOV.L 08H[R0], R1
+0000028B 6101                    		CMP #00H, R1
+0000028D 2Arr                    		BGT L80
+0000028F                         L85:	; bb28
+                                 ;     383              }
+                                 ;     384              return count;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",384
+0000028F E5000401                		MOV.L 10H[R0], 04H[R0]
+00000293 2Err                 B  		BRA L91
+00000295                         L86:	; bb31
+                                 ;     385        }
+                                 ;     386        else 
+                                 ;     387        {
+                                 ;     388              return -1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",388
+00000295 F90601FF                		MOV.L #0FFFFFFFFH, 04H[R0]
+00000299 2Err                 B  		BRA L91
+0000029B                         L87:	; bb40
+0000029B A981                    		MOV.L 18H[R0], R1
+0000029D FBE2rrrrrrrr            		MOV.L #_flmod, R14
+000002A3 FECE1E                  		MOVU.B [R14,R1], R14
+000002A6 7C2E                    		BTST #02H, R14
+000002A8 10                   S  		BEQ L89
+000002A9                         L88:	; bb48
+000002A9 F80601                  		MOV.L #00000001H, [R0]
+000002AC 08                   S  		BRA L90
+000002AD                         L89:	; bb49
+000002AD F80600                  		MOV.L #00000000H, [R0]
+000002B0                         L90:	; bb50
+000002B0 EC01                    		MOV.L [R0], R1
+000002B2 6101                    		CMP #00H, R1
+000002B4 21rr                    		BNE L79
+000002B6 2Err                 B  		BRA L86
+000002B8                         L91:	; bb56
+000002B8 A809                    		MOV.L 04H[R0], R1
+000002BA A089                    		MOV.L R1, 0CH[R0]
+                                 ;     389        }
+                                 ;     390 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",390
+000002BC 3F6608                  		RTSD #20H, R6-R6
+000002BF                         _lseek:
+                                 		.STACK	_lseek=20
+                                 ;     391 
+                                 ;     392 #if defined( __RX )
+                                 ;     393 long lseek( long fileno, long offset, long base )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",393
+000002BF 7100F0                  		ADD #0FFFFFFF0H, R0
+000002C2 A089                    		MOV.L R1, 0CH[R0]
+000002C4 A082                    		MOV.L R2, 08H[R0]
+000002C6 A00B                    		MOV.L R3, 04H[R0]
+000002C8                         L93:	; entry.split2
+                                 ;     394 #else
+                                 ;     395 long lseek( int fileno, long offset, int base )
+                                 ;     396 #endif
+                                 ;     397 {
+                                 ;     398     /* This code is only used to remove compiler info messages about these parameters not being used. */
+                                 ;     399     INTERNAL_NOT_USED(fileno);
+                                 ;     400     INTERNAL_NOT_USED(offset);
+                                 ;     401     INTERNAL_NOT_USED(base);
+                                 ;     402 
+                                 ;     403     return -1L;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",403
+000002C8 F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+000002CB FB16FF                  		MOV.L #0FFFFFFFFH, R1
+000002CE                         L94:	; entry.split3
+                                 ;     404 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\lowsrc.c",404
+000002CE 6704                    		RTSD #10H
+                                 ;     405 
+                                 ;     406 #endif /* BSP_CFG_IO_LIB_ENABLE */
+                                 		.SECTION	C,ROMDATA,ALIGN=4
+00000000                         __nfiles:
+00000000 14000000                		.lword	00000014H
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 454E5631                		.byte	"ENV1=temp01"
+         3D74656D                
+         703031                  
+0000000B 00                      		.byte	00H
+0000000C                         _L11:
+0000000C 454E5632                		.byte	"ENV2=temp02"
+         3D74656D                
+         703032                  
+00000017 00                      		.byte	00H
+00000018                         _L12:
+00000018 454E5639                		.byte	"ENV9=end"
+         3D656E64                
+00000020 00                      		.byte	00H
+00000021                         _L13:
+00000021 433A                    		.byte	"C:"
+00000023 5C                      		.byte	5CH
+00000024 73746469                		.byte	"stdin"
+         6E                      
+00000029 00                      		.byte	00H
+0000002A                         _L14:
+0000002A 72                      		.byte	"r"
+0000002B 00                      		.byte	00H
+0000002C                         _L15:
+0000002C 433A                    		.byte	"C:"
+0000002E 5C                      		.byte	5CH
+0000002F 7374646F                		.byte	"stdout"
+         7574                    
+00000035 00                      		.byte	00H
+00000036                         _L16:
+00000036 77                      		.byte	"w"
+00000037 00                      		.byte	00H
+00000038                         _L17:
+00000038 433A                    		.byte	"C:"
+0000003A 5C                      		.byte	5CH
+0000003B 73746465                		.byte	"stderr"
+         7272                    
+00000041 00                      		.byte	00H
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         _env_list:
+00000000 rrrrrrrr                		.lword	_L10
+00000004 rrrrrrrr                		.lword	_L11
+00000008 rrrrrrrr                		.lword	_L12
+0000000C 00000000                		.lword	00000000H
+00000010                         _environ:
+00000010 rrrrrrrr                		.lword	_env_list
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         __Files:
+00000000(00000050H)              		.blkl	20
+                                 		.SECTION	B_1,DATA
+00000000                         _flmod:
+00000000(00000014H)              		.blkb	20
+00000014                         _sml_buf:
+00000014(00000014H)              		.blkb	20
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00918   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000720(000002D0H)  P
+ROMDATA  0000000004(00000004H)  C
+ROMDATA  0000000066(00000042H)  L
+ROMDATA  0000000020(00000014H)  D
+DATA     0000000080(00000050H)  B
+DATA     0000000040(00000028H)  B_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\lowsrc.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\lowsrc.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\r_bsp\board\MT01\lowsrc.obj

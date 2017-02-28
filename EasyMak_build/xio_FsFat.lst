@@ -1,0 +1,484 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:48:49 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:48:49
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=xio_FsFat.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=xio_FsFat.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;xio_FsFat.c
+                                 
+                                 		.glb	_gszCurFile
+                                 		.glb	_macro_func_ptr
+                                 		.glb	_ds
+                                 		.glb	_actualLine
+                                 		.glb	_previousLine
+                                 		.glb	_choosedLine
+                                 		.glb	_choosedLinePosition
+                                 		.glb	_ufsfat
+                                 		.glb	_xio_ctrl_generic
+                                 		.glb	_xio_fc_null
+                                 		.glb	_xio_init_fsfat
+                                 		.glb	_xio_open_file
+                                 		.glb	_xio_gets_fsfat
+                                 		.glb	_xio_close_fsfat
+                                 		.glb	_xio_getc_fsfat
+                                 		.glb	_xio_putc_fsfat
+                                 		.glb	_xio_open_generic
+                                 		.glb	_f_mount
+                                 		.glb	_f_close
+                                 		.glb	_f_open
+                                 		.glb	_f_lseek
+                                 		.glb	_RunningInicial_Macro
+                                 		.glb	_clearerr
+                                 		.glb	_f_gets
+                                 		.glb	_printf
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _xio_init_fsfat:
+                                 		.STACK	_xio_init_fsfat=28
+                                 ;       1 /*
+                                 ;       2  *  xio_file.c	- device driver for program memory "files"
+                                 ;       3  * 				- works with avr-gcc stdio library
+                                 ;       4  *
+                                 ;       5  * Part of TinyG project
+                                 ;       6  *
+                                 ;       7  * Copyright (c) 2011 - 2015 Alden S. Hart Jr.
+                                 ;       8  *
+                                 ;       9  * This file ("the software") is free software: you can redistribute it and/or modify
+                                 ;      10  * it under the terms of the GNU General Public License, version 2 as published by the
+                                 ;      11  * Free Software Foundation. You should have received a copy of the GNU General Public
+                                 ;      12  * License, version 2 along with the software.  If not, see <http://www.gnu.org/licenses/>.
+                                 ;      13  *
+                                 ;      14  * THE SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY
+                                 ;      15  * WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                 ;      16  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+                                 ;      17  * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                 ;      18  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+                                 ;      19  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                                 ;      20  */
+                                 ;      21 #include "tinyg.h"			// #1
+                                 ;      22 #include "config.h"			// #2
+                                 ;      23 #include "macros.h"
+                                 ;      24 
+                                 ;      25 #include <stdio.h>				// precursor for xio.h
+                                 ;      26 #include <stdbool.h>			// true and false
+                                 ;      27 #include <string.h>				// for memset
+                                 ;      28 #include <stdint.h>				//
+                                 ;      29 //#include "platform.h"
+                                 ;      30 #include "xio.h"
+                                 ;      31 #include "ut_state.h"
+                                 ;      32 
+                                 ;      33 /******************************************************************************
+                                 ;      34  * FILE CONFIGURATION RECORDS
+                                 ;      35  ******************************************************************************/
+                                 ;      36 
+                                 ;      37 static bool fileRunning = false;
+                                 ;      38 extern uint32_t actualLine;
+                                 ;      39 extern uint32_t previousLine;
+                                 ;      40 extern uint32_t choosedLine;
+                                 ;      41 extern uint32_t choosedLinePosition;
+                                 ;      42 
+                                 ;      43 xioFsfat_t	    ufsfat[XIO_DEV_USBFILE_COUNT];
+                                 ;      44 
+                                 ;      45 struct cfgFILE {
+                                 ;      46 	x_open_t x_open;			// see xio.h for typedefs
+                                 ;      47 	x_ctrl_t x_ctrl;
+                                 ;      48 	x_close_t x_close;
+                                 ;      49 	x_gets_t x_gets;
+                                 ;      50 	x_getc_t x_getc;
+                                 ;      51 	x_putc_t x_putc;
+                                 ;      52 	x_flow_t x_flow;
+                                 ;      53 };
+                                 ;      54 
+                                 ;      55 static struct cfgFILE const cfgFile[] = {
+                                 ;      56 {	// PGM config
+                                 ;      57 	xio_open_file,				// open function
+                                 ;      58 	xio_ctrl_generic, 			// ctrl function
+                                 ;      59 	xio_close_fsfat, 			// close function
+                                 ;      60 	xio_gets_fsfat,				// get string function
+                                 ;      61 	xio_getc_fsfat,				// stdio getc function
+                                 ;      62 	xio_putc_fsfat,				// stdio putc function
+                                 ;      63 	xio_fc_null,				// flow control callback
+                                 ;      64 }
+                                 ;      65 };
+                                 ;      66 /******************************************************************************
+                                 ;      67  * FUNCTIONS
+                                 ;      68  ******************************************************************************/
+                                 ;      69 
+                                 ;      70 /*
+                                 ;      71  *	xio_init_file() - initialize and set controls for file IO
+                                 ;      72  *
+                                 ;      73  *	Need to bind the open function or a subsequent opens will fail
+                                 ;      74  */
+                                 ;      75 
+                                 ;      76 void xio_init_fsfat()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",76
+00000000 7EA6                    		PUSH.L R6
+00000002 6040                    		SUB #04H, R0
+                                 ;      77 {
+                                 ;      78 	for (uint8_t i=0; i<XIO_DEV_USBFILE_COUNT; i++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",78
+00000004 3C0300                  		MOV.B #00H, 03H[R0]
+00000007 2Err                 B  		BRA L13
+00000009                         L12:	; bb
+                                 ;      79 		xio_open_generic(XIO_DEV_USBFILE_OFFSET + i,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",79
+00000009 B089                    		MOVU.B 03H[R0], R1
+0000000B EF1E                    		MOV.L R1, R14
+0000000D 751E1C                  		MUL #1CH, R14
+00000010 FB52rrrrrrrr            		MOV.L #__$cfgFile, R5
+00000016 4BE5                    		ADD R14, R5
+00000018 ED5F05                  		MOV.L 14H[R5], R15
+0000001B ED5E04                  		MOV.L 10H[R5], R14
+0000001E A8DE                    		MOV.L 0CH[R5], R6
+00000020 A8D4                    		MOV.L 08H[R5], R4
+00000022 A85B                    		MOV.L 04H[R5], R3
+00000024 EC52                    		MOV.L [R5], R2
+00000026 7100F0                  		ADD #0FFFFFFF0H, R0
+00000029 E5500603                		MOV.L 18H[R5], 0CH[R0]
+0000002D E70F02                  		MOV.L R15, 08H[R0]
+00000030 E70E01                  		MOV.L R14, 04H[R0]
+00000033 E306                    		MOV.L R6, [R0]
+00000035 05rrrrrr             A  		BSR _xio_open_generic
+00000039 710010                  		ADD #10H, R0
+0000003C B089                    		MOVU.B 03H[R0], R1
+0000003E 6211                    		ADD #01H, R1
+00000040 8089                    		MOV.B R1, 03H[R0]
+00000042                         L13:	; bb43
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",78
+00000042 B089                    		MOVU.B 03H[R0], R1
+00000044 6101                    		CMP #00H, R1
+00000046 2Brr                    		BLE L12
+00000048                         L14:	; return
+                                 ;      80 						(x_open_t)(cfgFile[i].x_open),
+                                 ;      81 						(x_ctrl_t)(cfgFile[i].x_ctrl),
+                                 ;      82 						(x_close_t)(cfgFile[i].x_close),
+                                 ;      83 						(x_gets_t)(cfgFile[i].x_gets),
+                                 ;      84 						(x_getc_t)(cfgFile[i].x_getc),
+                                 ;      85 						(x_putc_t)(cfgFile[i].x_putc),
+                                 ;      86 						(x_flow_t)(cfgFile[i].x_flow));
+                                 ;      87 	}
+                                 ;      88 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",88
+00000048 3F6602                  		RTSD #08H, R6-R6
+0000004B                         _xio_open_file:
+                                 		.STACK	_xio_open_file=28
+                                 ;      89 
+                                 ;      90 /*
+                                 ;      91  *	xio_open_file() - open the program memory device to a specific string address
+                                 ;      92  *
+                                 ;      93  *	OK, so this is not really a UNIX open() except for its moral equivalent
+                                 ;      94  *  Returns a pointer to the stdio FILE struct or -1 on error
+                                 ;      95  */
+                                 ;      96 FILE * xio_open_file(const uint8_t dev, const char *addr, const flags_t flags)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",96
+0000004B 7100E8                  		ADD #0FFFFFFE8H, R0
+0000004E 8589                    		MOV.B R1, 17H[R0]
+00000050 A102                    		MOV.L R2, 10H[R0]
+00000052 918B                    		MOV.W R3, 0EH[R0]
+00000054 754E88                  		MOV.L #00000088H, R14
+                                 ;      97 {
+                                 ;      98 	xioDev_t *d = (xioDev_t *)&ds[dev];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",98
+00000057 4D0E17                  		MUL 17H[R0].UB, R14
+0000005A FB12rrrrrrrr            		MOV.L #_ds, R1
+00000060 4BE1                    		ADD R14, R1
+00000062 E301                    		MOV.L R1, [R0]
+00000064                         L16:	; entry.split
+                                 ;      99 	d->x = &ufsfat[dev - XIO_DEV_USBFILE_OFFSET];			// bind extended struct to device
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",99
+00000064 B589                    		MOVU.B 17H[R0], R1
+00000066 76115804                		MUL #0458H, R1
+0000006A FB22rrrrrrrr            		MOV.L #_ufsfat, R2
+00000070 4B12                    		ADD R1, R2
+00000072 EC01                    		MOV.L [R0], R1
+00000074 A49A                    		MOV.L R2, 4CH[R1]
+00000076                         L17:	; entry.split1
+                                 ;     100 	xioFsfat_t *dx = (xioFsfat_t *)d->x;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",100
+00000076 EC01                    		MOV.L [R0], R1
+00000078 E5101301                		MOV.L 4CH[R1], 04H[R0]
+0000007C                         L18:	; entry.split2
+                                 ;     101 
+                                 ;     102 	f_mount(&dx->gFatfs,"",0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",102
+0000007C A809                    		MOV.L 04H[R0], R1
+0000007E 6603                    		MOV.L #00000000H, R3
+00000080 FB22rrrrrrrr            		MOV.L #_L10, R2
+00000086 05rrrrrr             A  		BSR _f_mount
+0000008A                         L19:	; entry.split3
+                                 ;     103 	f_close(&dx->f);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",103
+0000008A A809                    		MOV.L 04H[R0], R1
+0000008C 72113402                		ADD #0234H, R1
+00000090 05rrrrrr             A  		BSR _f_close
+00000094                         L20:	; entry.split4
+                                 ;     104     /* Open a text file */
+                                 ;     105     f_open(&dx->f, gszCurFile, FA_READ);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",105
+00000094 A809                    		MOV.L 04H[R0], R1
+00000096 72113402                		ADD #0234H, R1
+0000009A 6613                    		MOV.L #00000001H, R3
+0000009C FB22rrrrrrrr            		MOV.L #_gszCurFile, R2
+000000A2 05rrrrrr             A  		BSR _f_open
+000000A6                         L21:	; entry.split5
+                                 ;     106     if (choosedLinePosition > 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",106
+000000A6 FBE2rrrrrrrr            		MOV.L #_choosedLinePosition, R14
+000000AC ECEE                    		MOV.L [R14], R14
+000000AE 610E                    		CMP #00H, R14
+000000B0 20rr                    		BEQ L26
+000000B2                         L22:	; bb29
+                                 ;     107     {
+                                 ;     108         f_lseek(&dx->f,choosedLinePosition);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",108
+000000B2 FBE2rrrrrrrr            		MOV.L #_choosedLinePosition, R14
+000000B8 ECE2                    		MOV.L [R14], R2
+000000BA A809                    		MOV.L 04H[R0], R1
+000000BC 72113402                		ADD #0234H, R1
+000000C0 05rrrrrr             A  		BSR _f_lseek
+000000C4                         L23:	; bb29.split
+                                 ;     109         macro_func_ptr = RunningInicial_Macro;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",109
+000000C4 FBE2rrrrrrrr            		MOV.L #_macro_func_ptr, R14
+000000CA FBF2rrrrrrrr            		MOV.L #_RunningInicial_Macro, R15
+000000D0 E3EF                    		MOV.L R15, [R14]
+000000D2                         L24:	; bb29.split6
+                                 ;     110         choosedLinePosition = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",110
+000000D2 FBE2rrrrrrrr            		MOV.L #_choosedLinePosition, R14
+000000D8 F8E600                  		MOV.L #00000000H, [R14]
+000000DB                         L25:	; bb29.split7
+                                 ;     111         choosedLine = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",111
+000000DB FBE2rrrrrrrr            		MOV.L #_choosedLine, R14
+000000E1 F8E600                  		MOV.L #00000000H, [R14]
+000000E4                         L26:	; bb37
+                                 ;     112     }
+                                 ;     113     fileRunning = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",113
+000000E4 FBE2rrrrrrrr            		MOV.L #__$fileRunning, R14
+000000EA F8E401                  		MOV.B #01H, [R14]
+000000ED                         L27:	; bb37.split
+                                 ;     114 	return(&d->file);								// return pointer to the FILE stream
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",114
+000000ED EC01                    		MOV.L [R0], R1
+000000EF 6241                    		ADD #04H, R1
+000000F1 A081                    		MOV.L R1, 08H[R0]
+000000F3                         L28:	; bb37.split8
+                                 ;     115 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",115
+000000F3 6706                    		RTSD #18H
+000000F5                         _xio_gets_fsfat:
+                                 		.STACK	_xio_gets_fsfat=32
+                                 ;     116 
+                                 ;     117 int xio_gets_fsfat(xioDev_t *d, char *buf, const int size)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",117
+000000F5 7100E8                  		ADD #0FFFFFFE8H, R0
+000000F8 A109                    		MOV.L R1, 14H[R0]
+000000FA A102                    		MOV.L R2, 10H[R0]
+000000FC A08B                    		MOV.L R3, 0CH[R0]
+                                 ;     118 {
+                                 ;     119 	xioFsfat_t *dx = (xioFsfat_t *)d->x;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",119
+000000FE A909                    		MOV.L 14H[R0], R1
+00000100 E5101301                		MOV.L 4CH[R1], 04H[R0]
+00000104                         L30:	; entry.split
+                                 ;     120 	if (fileRunning)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",120
+00000104 FBE2rrrrrrrr            		MOV.L #__$fileRunning, R14
+0000010A 58EE                    		MOVU.B [R14], R14
+0000010C 610E                    		CMP #00H, R14
+0000010E 20rr                    		BEQ L40
+00000110                         L31:	; bb9
+                                 ;     121 	{
+                                 ;     122 		d->signal = XIO_SIG_OK;			// initialize signal
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",122
+00000110 A909                    		MOV.L 14H[R0], R1
+00000112 F9147900                		MOV.B #00H, 79H[R1]
+00000116                         L32:	; bb9.split
+                                 ;     123 		if (f_gets(buf, size, &dx->f) == NULL) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",123
+00000116 A80B                    		MOV.L 04H[R0], R3
+00000118 A88A                    		MOV.L 0CH[R0], R2
+0000011A A901                    		MOV.L 10H[R0], R1
+0000011C 72333402                		ADD #0234H, R3
+00000120 05rrrrrr             A  		BSR _f_gets
+00000124 6101                    		CMP #00H, R1
+00000126 21rr                    		BNE L36
+00000128                         L33:	; bb13
+                                 ;     124 			clearerr(&d->file);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",124
+00000128 A909                    		MOV.L 14H[R0], R1
+0000012A 6241                    		ADD #04H, R1
+0000012C 05rrrrrr             A  		BSR _clearerr
+00000130                         L34:	; bb13.split
+                                 ;     125 			fileRunning = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",125
+00000130 FBE2rrrrrrrr            		MOV.L #__$fileRunning, R14
+00000136 F8E400                  		MOV.B #00H, [R14]
+00000139                         L35:	; bb13.split1
+                                 ;     126 			return (XIO_EOF);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",126
+00000139 F80608                  		MOV.L #00000008H, [R0]
+0000013C 2Err                 B  		BRA L41
+0000013E                         L36:	; bb24
+                                 ;     127 		}
+                                 ;     128 		previousLine = actualLine;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",128
+0000013E FBE2rrrrrrrr            		MOV.L #_previousLine, R14
+00000144 FBF2rrrrrrrr            		MOV.L #_actualLine, R15
+0000014A E0FE                    		MOV.L [R15], [R14]
+0000014C                         L37:	; bb24.split
+                                 ;     129 		actualLine = dx->f.fptr;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",129
+0000014C A809                    		MOV.L 04H[R0], R1
+0000014E FBE2rrrrrrrr            		MOV.L #_actualLine, R14
+00000154 E11E8F                  		MOV.L 023CH[R1], [R14]
+00000157                         L38:	; bb24.split2
+                                 ;     130 		printf(buf);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",130
+00000157 A901                    		MOV.L 10H[R0], R1
+00000159 6040                    		SUB #04H, R0
+0000015B E301                    		MOV.L R1, [R0]
+0000015D 05rrrrrr             A  		BSR _printf
+00000161 6240                    		ADD #04H, R0
+00000163                         L39:	; bb24.split3
+                                 ;     131 		return(XIO_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",131
+00000163 F80600                  		MOV.L #00000000H, [R0]
+00000166 08                   S  		BRA L41
+00000167                         L40:	; bb38
+                                 ;     132 	}
+                                 ;     133 	return(XIO_EAGAIN);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",133
+00000167 F80602                  		MOV.L #00000002H, [R0]
+0000016A                         L41:	; bb40
+0000016A EC01                    		MOV.L [R0], R1
+0000016C A081                    		MOV.L R1, 08H[R0]
+                                 ;     134 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",134
+0000016E 6706                    		RTSD #18H
+00000170                         _xio_close_fsfat:
+                                 		.STACK	_xio_close_fsfat=12
+                                 ;     135 
+                                 ;     136 void xio_close_fsfat (xioDev_t *d)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",136
+00000170 6080                    		SUB #08H, R0
+00000172 A009                    		MOV.L R1, 04H[R0]
+                                 ;     137 {
+                                 ;     138 	xioFsfat_t *dx = (xioFsfat_t *)d->x;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",138
+00000174 E11013                  		MOV.L 4CH[R1], [R0]
+00000177                         L43:	; entry.split
+                                 ;     139 	f_close(&dx->f);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",139
+00000177 EC01                    		MOV.L [R0], R1
+00000179 72113402                		ADD #0234H, R1
+0000017D 05rrrrrr             A  		BSR _f_close
+00000181 6702                    		RTSD #08H
+00000183                         _xio_getc_fsfat:
+                                 		.STACK	_xio_getc_fsfat=12
+                                 ;     140 }
+                                 ;     141 
+                                 ;     142 int xio_getc_fsfat(FILE *stream)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",142
+00000183 6080                    		SUB #08H, R0
+00000185 A009                    		MOV.L R1, 04H[R0]
+                                 ;     143 {
+                                 ;     144 	return(0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",144
+00000187 F80600                  		MOV.L #00000000H, [R0]
+0000018A 6601                    		MOV.L #00000000H, R1
+0000018C                         L45:	; entry.split
+                                 ;     145 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",145
+0000018C 6702                    		RTSD #08H
+0000018E                         _xio_putc_fsfat:
+                                 		.STACK	_xio_putc_fsfat=16
+                                 ;     146 
+                                 ;     147 int xio_putc_fsfat(const char c, FILE *stream)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",147
+0000018E 60C0                    		SUB #0CH, R0
+00000190 8289                    		MOV.B R1, 0BH[R0]
+00000192 A00A                    		MOV.L R2, 04H[R0]
+                                 ;     148 {
+                                 ;     149 	return(-1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",149
+00000194 F806FF                  		MOV.L #0FFFFFFFFH, [R0]
+00000197 FB16FF                  		MOV.L #0FFFFFFFFH, R1
+0000019A                         L47:	; entry.split
+                                 ;     150 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio\xio_FsFat.c",150
+0000019A 6703                    		RTSD #0CH
+                                 		.SECTION	C,ROMDATA,ALIGN=4
+00000000                         __$cfgFile:
+00000000 rrrrrrrr                		.lword	_xio_open_file
+00000004 rrrrrrrr                		.lword	_xio_ctrl_generic
+00000008 rrrrrrrr                		.lword	_xio_close_fsfat
+0000000C rrrrrrrr                		.lword	_xio_gets_fsfat
+00000010 rrrrrrrr                		.lword	_xio_getc_fsfat
+00000014 rrrrrrrr                		.lword	_xio_putc_fsfat
+00000018 rrrrrrrr                		.lword	_xio_fc_null
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 00                      		.byte	0
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$fileRunning:
+00000000 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _ufsfat:
+00000000(00000458H)              		.blkl	278
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00447   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000412(0000019CH)  P
+ROMDATA  0000000028(0000001CH)  C
+ROMDATA  0000000001(00000001H)  L
+ROMDATA  0000000001(00000001H)  D_1
+DATA     0000001112(00000458H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\xio_FsFat.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\xio_FsFat.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\src\cnc\xio\xio_FsFat.obj

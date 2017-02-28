@@ -1,0 +1,909 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:54:37 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:54:37
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_byteq.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_byteq.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;r_byteq.c
+                                 
+                                 		.glb	_R_BYTEQ_Open
+                                 		.glb	_R_BYTEQ_Put
+                                 		.glb	_R_BYTEQ_Get
+                                 		.glb	_R_BYTEQ_Flush
+                                 		.glb	_R_BYTEQ_Used
+                                 		.glb	_R_BYTEQ_Unused
+                                 		.glb	_R_BYTEQ_Close
+                                 		.glb	_R_BYTEQ_GetVersion
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _R_BYTEQ_Open:
+                                 		.STACK	_R_BYTEQ_Open=32
+                                 ;       1 /*****************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      18 ******************************************************************************/
+                                 ;      19 /*****************************************************************************
+                                 ;      20 * File Name    : r_byteq.c
+                                 ;      21 * Device(s)    : all
+                                 ;      22 * Tool-Chain   : Renesas RX Standard Toolchain 1.02
+                                 ;      23 * OS           : None
+                                 ;      24 * H/W Platform : all
+                                 ;      25 * Description  : Functions for using byte queues/circular buffers. 
+                                 ;      26 ******************************************************************************
+                                 ;      27 * History : DD.MM.YYYY Version Description  
+                                 ;      28 *           24.07.2013 1.00     Initial Release
+                                 ;      29 *           11.21.2014 1.20     Removed dependency to BSP
+                                 ;      30 ******************************************************************************/
+                                 ;      31 /* PRQA S 3116, 0769, 2962, 2814, 2889, 3218 ++ */
+                                 ;      32 /* GRI 1/25/2013
+                                 ;      33  * 3116 "inline" pragma not recognized
+                                 ;      34  * 0769 break statement used to end iteration; guideline: avoid multiple breaks
+                                 ;      35  * 2962 uninitialized variable: variable initialized within if statements
+                                 ;      36  * 2814 possible dereferencing of NULL ptr: ptr initialized within if statements
+                                 ;      37  * 2889 more than one return statement: ok
+                                 ;      38  * 3218 static g_qcb[] only used in Open() and should move there: logically,
+                                 ;      39  *      this is module static
+                                 ;      40  */
+                                 ;      41 
+                                 ;      42 /*****************************************************************************
+                                 ;      43 Includes   <System Includes> , "Project Includes"
+                                 ;      44 ******************************************************************************/
+                                 ;      45 /* for BSP_CFG_PARAM_CHECKING_ENABLE */
+                                 ;      46 #include "platform.h"
+                                 ;      47 
+                                 ;      48 /* Defines for BYTEQ support */
+                                 ;      49 #include "r_byteq_private.h"
+                                 ;      50 #include "r_byteq_if.h"
+                                 ;      51 #include "r_byteq_config.h"
+                                 ;      52 
+                                 ;      53 /*****************************************************************************
+                                 ;      54 Typedef definitions
+                                 ;      55 ******************************************************************************/
+                                 ;      56 
+                                 ;      57 /*****************************************************************************
+                                 ;      58 Macro definitions
+                                 ;      59 ******************************************************************************/
+                                 ;      60 
+                                 ;      61 /*****************************************************************************
+                                 ;      62 Private global variables and functions
+                                 ;      63 ******************************************************************************/
+                                 ;      64 
+                                 ;      65 /* QUEUE CONTROL BLOCK ALLOCATIONS */
+                                 ;      66 
+                                 ;      67 #if BYTEQ_CFG_USE_HEAP_FOR_CTRL_BLKS == 0
+                                 ;      68 static byteq_ctrl_t     g_qcb[BYTEQ_CFG_MAX_CTRL_BLKS];
+                                 ;      69 #endif
+                                 ;      70 
+                                 ;      71 
+                                 ;      72 /*****************************************************************************
+                                 ;      73 * Function Name: R_BYTEQ_Open
+                                 ;      74 * Description  : Allocates or assigns a queue control block for the buffer 
+                                 ;      75 *                pointed to by p_buf (see BYTEQ_CFG_USE_HEAP_FOR_CTRL_BLKS in
+                                 ;      76 *                config.h). Initializes the queue to an empty state and 
+                                 ;      77 *                provides a Handle to its control structure in p_hdl which is
+                                 ;      78 *                then used as a queue ID for the other API functions.
+                                 ;      79 * Arguments    : p_buf -
+                                 ;      80 *                    Pointer to byte buffer.
+                                 ;      81 *                size -
+                                 ;      82 *                    Buffer size in bytes.
+                                 ;      83 *                p_hdl -
+                                 ;      84 *                    Pointer to a handle for queue (value set here)
+                                 ;      85 * Return Value : SCI_SUCCESS -
+                                 ;      86 *                    queue initialized successfully
+                                 ;      87 *                BYTEQ_ERR_NULL_PTR
+                                 ;      88 *                    received null ptr; missing required argument
+                                 ;      89 *                BYTEQ_ERR_INVALID_ARG
+                                 ;      90 *                    argument is not valid for parameter
+                                 ;      91 *                BYTEQ_ERR_MALLOC_FAIL
+                                 ;      92 *                    can't allocate memory for ctrl block; increase heap
+                                 ;      93 *                BYTEQ_ERR_NO_MORE_CTRL_BLKS
+                                 ;      94 *                    no more control blocks, increase BYTEQ_CFG_MAX_CTRL_BLKS
+                                 ;      95 ******************************************************************************/
+                                 ;      96 byteq_err_t R_BYTEQ_Open(uint8_t * const        p_buf,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",96
+00000000 7100E4                  		ADD #0FFFFFFE4H, R0
+00000003 A181                    		MOV.L R1, 18H[R0]
+00000005 928A                    		MOV.W R2, 16H[R0]
+00000007 A103                    		MOV.L R3, 10H[R0]
+                                 ;      97                          uint16_t const         size,
+                                 ;      98                          byteq_hdl_t * const    p_hdl)
+                                 ;      99 {
+                                 ;     100 byteq_ctrl_t    *p_qcb=0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",100
+00000009 3E0100                  		MOV.L #00000000H, 04H[R0]
+0000000C                         L11:	; entry.split
+                                 ;     101 uint32_t        i;
+                                 ;     102 static bool     qcb_init=false;
+                                 ;     103     
+                                 ;     104 
+                                 ;     105     /* CHECK ARGUMENTS */
+                                 ;     106 
+                                 ;     107 #if (BYTEQ_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     108     if (p_hdl == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",108
+0000000C A901                    		MOV.L 10H[R0], R1
+0000000E 6101                    		CMP #00H, R1
+00000010 18                   S  		BNE L13
+00000011                         L12:	; bb6
+                                 ;     109     {
+                                 ;     110         return BYTEQ_ERR_INVALID_ARG;   // return if invalid location (PRQA)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",110
+00000011 F80602                  		MOV.L #00000002H, [R0]
+00000014 38rrrr               W  		BRA L37
+00000017                         L13:	; bb11
+                                 ;     111     }
+                                 ;     112     *p_hdl = NULL;                      // set handle to invalid value
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",112
+00000017 A901                    		MOV.L 10H[R0], R1
+00000019 F81600                  		MOV.L #00000000H, [R1]
+0000001C                         L14:	; bb11.split
+                                 ;     113     if (p_buf == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",113
+0000001C A981                    		MOV.L 18H[R0], R1
+0000001E 6101                    		CMP #00H, R1
+00000020 18                   S  		BNE L16
+00000021                         L15:	; bb14
+                                 ;     114     {
+                                 ;     115         return BYTEQ_ERR_NULL_PTR;      // return if no buffer pointer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",115
+00000021 F80601                  		MOV.L #00000001H, [R0]
+00000024 38rrrr               W  		BRA L37
+00000027                         L16:	; bb21
+                                 ;     116     }
+                                 ;     117     if (size < 2)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",117
+00000027 BA89                    		MOVU.W 16H[R0], R1
+00000029 6111                    		CMP #01H, R1
+0000002B 2Arr                    		BGT L18
+0000002D                         L17:	; bb22
+                                 ;     118     {
+                                 ;     119         return BYTEQ_ERR_INVALID_ARG;   // return insufficient buffer size
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",119
+0000002D F80602                  		MOV.L #00000002H, [R0]
+00000030 38rrrr               W  		BRA L37
+00000033                         L18:	; bb30
+                                 ;     120     }
+                                 ;     121 #endif
+                                 ;     122     
+                                 ;     123     
+                                 ;     124     /* GET QUEUE CONTROL BLOCK */
+                                 ;     125     
+                                 ;     126 #if BYTEQ_CFG_USE_HEAP_FOR_CTRL_BLKS
+                                 ;     127 
+                                 ;     128     /* allocate memory for a QCB */
+                                 ;     129     p_qcb = (byteq_ctrl_t *)malloc(sizeof(byteq_ctrl_t));
+                                 ;     130     if (p_qcb == NULL)
+                                 ;     131     {
+                                 ;     132         return BYTEQ_ERR_MALLOC_FAIL;
+                                 ;     133     }
+                                 ;     134 #else
+                                 ;     135     /* if first Open call, mark all QCBs as being available */
+                                 ;     136     if (qcb_init == false)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",136
+00000033 FBE2rrrrrrrr            		MOV.L #__$qcb_init$1, R14
+00000039 58EE                    		MOVU.B [R14], R14
+0000003B 610E                    		CMP #00H, R14
+0000003D 21rr                    		BNE L23
+0000003F                         L19:	; bb31
+                                 ;     137     {
+                                 ;     138         for (i=0; i < BYTEQ_CFG_MAX_CTRL_BLKS; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",138
+0000003F 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000042 2Err                 B  		BRA L21
+00000044                         L20:	; bb32
+                                 ;     139         {
+                                 ;     140             g_qcb[i].buffer = NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",140
+00000044 A881                    		MOV.L 08H[R0], R1
+00000046 63C1                    		MUL #0CH, R1
+00000048 FBE2rrrrrrrr            		MOV.L #__$g_qcb, R14
+0000004E 4B1E                    		ADD R1, R14
+00000050 F8E600                  		MOV.L #00000000H, [R14]
+00000053 A881                    		MOV.L 08H[R0], R1
+00000055 6211                    		ADD #01H, R1
+00000057 A081                    		MOV.L R1, 08H[R0]
+00000059                         L21:	; bb38
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",138
+00000059 A881                    		MOV.L 08H[R0], R1
+0000005B 6141                    		CMP #04H, R1
+0000005D 23rr                    		BLTU L20
+0000005F                         L22:	; bb43
+                                 ;     141         }
+                                 ;     142         qcb_init = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",142
+0000005F FBE2rrrrrrrr            		MOV.L #__$qcb_init$1, R14
+00000065 F8E401                  		MOV.B #01H, [R14]
+00000068                         L23:	; bb49
+                                 ;     143     }
+                                 ;     144 
+                                 ;     145     /* locate first available QCB */
+                                 ;     146     for (i=0; i < BYTEQ_CFG_MAX_CTRL_BLKS; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",146
+00000068 3E0200                  		MOV.L #00000000H, 08H[R0]
+0000006B 2Err                 B  		BRA L27
+0000006D                         L24:	; bb51
+                                 ;     147     {
+                                 ;     148         if (g_qcb[i].buffer == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",148
+0000006D A881                    		MOV.L 08H[R0], R1
+0000006F EF1E                    		MOV.L R1, R14
+00000071 63CE                    		MUL #0CH, R14
+00000073 FBF2rrrrrrrr            		MOV.L #__$g_qcb, R15
+00000079 4BEF                    		ADD R14, R15
+0000007B ECFE                    		MOV.L [R15], R14
+0000007D 610E                    		CMP #00H, R14
+0000007F 21rr                    		BNE L26
+00000081                         L25:	; bb52
+                                 ;     149         {
+                                 ;     150             p_qcb = &g_qcb[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",150
+00000081 63C1                    		MUL #0CH, R1
+00000083 FB22rrrrrrrr            		MOV.L #__$g_qcb, R2
+00000089 4B12                    		ADD R1, R2
+0000008B A00A                    		MOV.L R2, 04H[R0]
+0000008D 2Err                 B  		BRA L28
+0000008F                         L26:	; bb63
+0000008F 6211                    		ADD #01H, R1
+00000091 A081                    		MOV.L R1, 08H[R0]
+00000093                         L27:	; bb66
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",146
+00000093 A881                    		MOV.L 08H[R0], R1
+00000095 6141                    		CMP #04H, R1
+00000097 23rr                    		BLTU L24
+00000099                         L28:	; bb73
+                                 ;     151             break;
+                                 ;     152         }
+                                 ;     153     }
+                                 ;     154     
+                                 ;     155     /* return error if none available */
+                                 ;     156     if (i == BYTEQ_CFG_MAX_CTRL_BLKS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",156
+00000099 A881                    		MOV.L 08H[R0], R1
+0000009B 6141                    		CMP #04H, R1
+0000009D 18                   S  		BNE L30
+0000009E                         L29:	; bb74
+                                 ;     157     {
+                                 ;     158         return BYTEQ_ERR_NO_MORE_CTRL_BLKS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",158
+0000009E F80604                  		MOV.L #00000004H, [R0]
+000000A1 2Err                 B  		BRA L37
+000000A3                         L30:	; bb80
+                                 ;     159     }
+                                 ;     160 #endif
+                                 ;     161 
+                                 ;     162 
+                                 ;     163     /* INITIALIZE QCB FIELDS */
+                                 ;     164     
+                                 ;     165     p_qcb->buffer = p_buf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",165
+000000A3 A981                    		MOV.L 18H[R0], R1
+000000A5 A80A                    		MOV.L 04H[R0], R2
+000000A7 E321                    		MOV.L R1, [R2]
+000000A9                         L31:	; bb80.split
+                                 ;     166     p_qcb->size = size;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",166
+000000A9 9A89                    		MOV.W 16H[R0], R1
+000000AB A80A                    		MOV.L 04H[R0], R2
+000000AD 90A1                    		MOV.W R1, 04H[R2]
+000000AF                         L32:	; bb80.split1
+                                 ;     167     p_qcb->count = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",167
+000000AF A809                    		MOV.L 04H[R0], R1
+000000B1 3D1300                  		MOV.W #0000H, 06H[R1]
+000000B4                         L33:	; bb80.split2
+                                 ;     168     p_qcb->in_index = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",168
+000000B4 A809                    		MOV.L 04H[R0], R1
+000000B6 3D1400                  		MOV.W #0000H, 08H[R1]
+000000B9                         L34:	; bb80.split3
+                                 ;     169     p_qcb->out_index = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",169
+000000B9 A809                    		MOV.L 04H[R0], R1
+000000BB 3D1500                  		MOV.W #0000H, 0AH[R1]
+000000BE                         L35:	; bb80.split4
+                                 ;     170     
+                                 ;     171     
+                                 ;     172     /* SET HANDLE */
+                                 ;     173     
+                                 ;     174     *p_hdl = p_qcb;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",174
+000000BE A809                    		MOV.L 04H[R0], R1
+000000C0 A902                    		MOV.L 10H[R0], R2
+000000C2 E321                    		MOV.L R1, [R2]
+000000C4                         L36:	; bb80.split5
+                                 ;     175     return BYTEQ_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",175
+000000C4 F80600                  		MOV.L #00000000H, [R0]
+000000C7                         L37:	; bb96
+000000C7 EC01                    		MOV.L [R0], R1
+000000C9 A089                    		MOV.L R1, 0CH[R0]
+                                 ;     176 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",176
+000000CB 6707                    		RTSD #1CH
+000000CD                         _R_BYTEQ_Put:
+                                 		.STACK	_R_BYTEQ_Put=20
+                                 ;     177 
+                                 ;     178 
+                                 ;     179 /*****************************************************************************
+                                 ;     180 * Function Name: R_BYTEQ_Put
+                                 ;     181 * Description  : This function adds a byte of data to the queue.
+                                 ;     182 *
+                                 ;     183 * NOTE: This function does not disable/enable interrupts. If the queue is
+                                 ;     184 *       accessed from both the interrupt and application level, the app must
+                                 ;     185 *       disable/enable interrupts before/after calling this routine.
+                                 ;     186 *
+                                 ;     187 * Arguments    : hdl - 
+                                 ;     188 *                    Handle for queue.
+                                 ;     189 *                byte -
+                                 ;     190 *                    Byte to add to queue.
+                                 ;     191 * Return Value : BYTEQ_SUCCESS -
+                                 ;     192 *                    Successful; byte sent or queued for transmit
+                                 ;     193 *                BYTEQ_ERR_NULL_PTR -
+                                 ;     194 *                    hdl is NULL
+                                 ;     195 *                BYTEQ_ERR_QUEUE_FULL -
+                                 ;     196 *                    Queue full; cannot add byte to queue.
+                                 ;     197 ******************************************************************************/
+                                 ;     198 byteq_err_t R_BYTEQ_Put(byteq_hdl_t const   hdl,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",198
+000000CD 7100F0                  		ADD #0FFFFFFF0H, R0
+000000D0 A089                    		MOV.L R1, 0CH[R0]
+000000D2 828A                    		MOV.B R2, 0BH[R0]
+                                 ;     199                         uint8_t const       byte)
+                                 ;     200 {
+                                 ;     201 #if (BYTEQ_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     202     if (hdl == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",202
+000000D4 A889                    		MOV.L 0CH[R0], R1
+000000D6 6101                    		CMP #00H, R1
+000000D8 18                   S  		BNE L40
+000000D9                         L39:	; bb3
+                                 ;     203     {
+                                 ;     204         return BYTEQ_ERR_NULL_PTR;          // return if no handle
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",204
+000000D9 F80601                  		MOV.L #00000001H, [R0]
+000000DC 2Err                 B  		BRA L47
+000000DE                         L40:	; bb9
+                                 ;     205     }
+                                 ;     206 #endif
+                                 ;     207 
+                                 ;     208     if (hdl->count >= hdl->size)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",208
+000000DE A889                    		MOV.L 0CH[R0], R1
+000000E0 B89A                    		MOVU.W 06H[R1], R2
+000000E2 06C51202                		CMP 04H[R1].UW, R2
+000000E6 29rr                    		BLT L42
+000000E8                         L41:	; bb10
+                                 ;     209     {
+                                 ;     210         return BYTEQ_ERR_QUEUE_FULL;        // return if queue is full
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",210
+000000E8 F80605                  		MOV.L #00000005H, [R0]
+000000EB 2Err                 B  		BRA L47
+000000ED                         L42:	; bb23
+                                 ;     211     }
+                                 ;     212 
+                                 ;     213     /* load byte into queue */
+                                 ;     214     hdl->buffer[hdl->in_index++] = byte;    // add byte
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",214
+000000ED A889                    		MOV.L 0CH[R0], R1
+000000EF B912                    		MOVU.W 08H[R1], R2
+000000F1 EC1E                    		MOV.L [R1], R14
+000000F3 B28B                    		MOVU.B 0BH[R0], R3
+000000F5 FE0E23                  		MOV.B R3, [R14,R2]
+000000F8 9912                    		MOV.W 08H[R1], R2
+000000FA 6212                    		ADD #01H, R2
+000000FC 9112                    		MOV.W R2, 08H[R1]
+000000FE                         L43:	; bb23.split
+                                 ;     215     if (hdl->in_index >= hdl->size)         // adjust index
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",215
+000000FE A889                    		MOV.L 0CH[R0], R1
+00000100 B912                    		MOVU.W 08H[R1], R2
+00000102 06C51202                		CMP 04H[R1].UW, R2
+00000106 29rr                    		BLT L45
+00000108                         L44:	; bb36
+                                 ;     216     {
+                                 ;     217         hdl->in_index = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",217
+00000108 A889                    		MOV.L 0CH[R0], R1
+0000010A 3D1400                  		MOV.W #0000H, 08H[R1]
+0000010D                         L45:	; bb50
+                                 ;     218     }
+                                 ;     219     hdl->count++;                           // adjust count
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",219
+0000010D A889                    		MOV.L 0CH[R0], R1
+0000010F 989A                    		MOV.W 06H[R1], R2
+00000111 6212                    		ADD #01H, R2
+00000113 909A                    		MOV.W R2, 06H[R1]
+00000115                         L46:	; bb50.split
+                                 ;     220         
+                                 ;     221     return BYTEQ_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",221
+00000115 F80600                  		MOV.L #00000000H, [R0]
+00000118                         L47:	; bb56
+00000118 EC01                    		MOV.L [R0], R1
+0000011A A009                    		MOV.L R1, 04H[R0]
+                                 ;     222 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",222
+0000011C 6704                    		RTSD #10H
+0000011E                         _R_BYTEQ_Get:
+                                 		.STACK	_R_BYTEQ_Get=20
+                                 ;     223 
+                                 ;     224 
+                                 ;     225 /*****************************************************************************
+                                 ;     226 * Function Name: R_BYTEQ_Get
+                                 ;     227 * Description  : This function removes a byte of data from the queue.
+                                 ;     228 *
+                                 ;     229 * NOTE: This function does not disable/enable interrupts. If the queue is
+                                 ;     230 *       accessed from both the interrupt and application level, the app must
+                                 ;     231 *       disable/enable interrupts before/after calling this routine.
+                                 ;     232 *
+                                 ;     233 * Arguments    : hdl - 
+                                 ;     234 *                    Handle for queue.
+                                 ;     235 *                p_byte -
+                                 ;     236 *                    Pointer to load byte to.
+                                 ;     237 * Return Value : BYTEQ_SUCCESS -
+                                 ;     238 *                    Successful; byte sent or queued for transmit
+                                 ;     239 *                BYTEQ_ERR_NULL_PTR - 
+                                 ;     240 *                    hdl is NULL
+                                 ;     241 *                BYTEQ_ERR_QUEUE_EMPTY -
+                                 ;     242 *                    Queue empty; no data available to fetch
+                                 ;     243 ******************************************************************************/
+                                 ;     244 byteq_err_t R_BYTEQ_Get(byteq_hdl_t const   hdl,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",244
+0000011E 7100F0                  		ADD #0FFFFFFF0H, R0
+00000121 A089                    		MOV.L R1, 0CH[R0]
+00000123 A082                    		MOV.L R2, 08H[R0]
+                                 ;     245                         uint8_t * const     p_byte)
+                                 ;     246 {
+                                 ;     247 #if (BYTEQ_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     248     if (hdl == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",248
+00000125 A889                    		MOV.L 0CH[R0], R1
+00000127 6101                    		CMP #00H, R1
+00000129 18                   S  		BNE L50
+0000012A                         L49:	; bb3
+                                 ;     249     {
+                                 ;     250         return BYTEQ_ERR_NULL_PTR;          // return if no handle
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",250
+0000012A F80601                  		MOV.L #00000001H, [R0]
+0000012D 2Err                 B  		BRA L59
+0000012F                         L50:	; bb9
+                                 ;     251     }
+                                 ;     252     if (p_byte == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",252
+0000012F A881                    		MOV.L 08H[R0], R1
+00000131 6101                    		CMP #00H, R1
+00000133 18                   S  		BNE L52
+00000134                         L51:	; bb10
+                                 ;     253     {
+                                 ;     254         return BYTEQ_ERR_INVALID_ARG;       // return if invalid location (PRQA)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",254
+00000134 F80602                  		MOV.L #00000002H, [R0]
+00000137 2Err                 B  		BRA L59
+00000139                         L52:	; bb17
+                                 ;     255     }
+                                 ;     256 #endif
+                                 ;     257 
+                                 ;     258     if (hdl->count == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",258
+00000139 A889                    		MOV.L 0CH[R0], R1
+0000013B B899                    		MOVU.W 06H[R1], R1
+0000013D 6101                    		CMP #00H, R1
+0000013F 18                   S  		BNE L54
+00000140                         L53:	; bb18
+                                 ;     259     {
+                                 ;     260         return BYTEQ_ERR_QUEUE_EMPTY;       // return if queue empty        
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",260
+00000140 F80606                  		MOV.L #00000006H, [R0]
+00000143 2Err                 B  		BRA L59
+00000145                         L54:	; bb27
+                                 ;     261     }
+                                 ;     262 
+                                 ;     263     *p_byte = hdl->buffer[hdl->out_index++]; // get byte
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",263
+00000145 A889                    		MOV.L 0CH[R0], R1
+00000147 B91A                    		MOVU.W 0AH[R1], R2
+00000149 EC1E                    		MOV.L [R1], R14
+0000014B FECE2E                  		MOVU.B [R14,R2], R14
+0000014E A882                    		MOV.L 08H[R0], R2
+00000150 C32E                    		MOV.B R14, [R2]
+00000152 991A                    		MOV.W 0AH[R1], R2
+00000154 6212                    		ADD #01H, R2
+00000156 911A                    		MOV.W R2, 0AH[R1]
+00000158                         L55:	; bb27.split
+                                 ;     264     if (hdl->out_index >= hdl->size)        // adjust index
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",264
+00000158 A889                    		MOV.L 0CH[R0], R1
+0000015A B91A                    		MOVU.W 0AH[R1], R2
+0000015C 06C51202                		CMP 04H[R1].UW, R2
+00000160 29rr                    		BLT L57
+00000162                         L56:	; bb41
+                                 ;     265     {
+                                 ;     266         hdl->out_index = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",266
+00000162 A889                    		MOV.L 0CH[R0], R1
+00000164 3D1500                  		MOV.W #0000H, 0AH[R1]
+00000167                         L57:	; bb55
+                                 ;     267     }
+                                 ;     268     hdl->count--;                           // adjust count
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",268
+00000167 A889                    		MOV.L 0CH[R0], R1
+00000169 989A                    		MOV.W 06H[R1], R2
+0000016B 6012                    		SUB #01H, R2
+0000016D 909A                    		MOV.W R2, 06H[R1]
+0000016F                         L58:	; bb55.split
+                                 ;     269 
+                                 ;     270     return BYTEQ_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",270
+0000016F F80600                  		MOV.L #00000000H, [R0]
+00000172                         L59:	; bb61
+00000172 EC01                    		MOV.L [R0], R1
+00000174 A009                    		MOV.L R1, 04H[R0]
+                                 ;     271 }        
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",271
+00000176 6704                    		RTSD #10H
+00000178                         _R_BYTEQ_Flush:
+                                 		.STACK	_R_BYTEQ_Flush=16
+                                 ;     272 
+                                 ;     273 
+                                 ;     274 /*****************************************************************************
+                                 ;     275 * Function Name: R_BYTEQ_Flush
+                                 ;     276 * Description  : This function resets a queue to an empty state.
+                                 ;     277 *
+                                 ;     278 * NOTE: This function does not disable/enable interrupts. If the queue is
+                                 ;     279 *       accessed from both the interrupt and application level, the app must
+                                 ;     280 *       disable/enable interrupts before/after calling this routine.
+                                 ;     281 *
+                                 ;     282 * Arguments    : hdl - 
+                                 ;     283 *                    Handle for queue.
+                                 ;     284 * Return Value : BYTEQ_SUCCESS -
+                                 ;     285 *                    Successful; queue is reset to en ampty state
+                                 ;     286 *                BYTEQ_ERR_NULL_PTR - 
+                                 ;     287 *                    hdl is NULL
+                                 ;     288 ******************************************************************************/
+                                 ;     289 byteq_err_t R_BYTEQ_Flush(byteq_hdl_t const hdl)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",289
+00000178 60C0                    		SUB #0CH, R0
+0000017A A081                    		MOV.L R1, 08H[R0]
+                                 ;     290 {
+                                 ;     291 #if (BYTEQ_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     292     if (hdl == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",292
+0000017C 6101                    		CMP #00H, R1
+0000017E 18                   S  		BNE L62
+0000017F                         L61:	; bb2
+                                 ;     293     {
+                                 ;     294         return BYTEQ_ERR_NULL_PTR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",294
+0000017F F80601                  		MOV.L #00000001H, [R0]
+00000182 2Err                 B  		BRA L66
+00000184                         L62:	; bb7
+                                 ;     295     }
+                                 ;     296 #endif
+                                 ;     297 
+                                 ;     298     /* RESET QUEUE */
+                                 ;     299     
+                                 ;     300     hdl->in_index = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",300
+00000184 A881                    		MOV.L 08H[R0], R1
+00000186 3D1400                  		MOV.W #0000H, 08H[R1]
+00000189                         L63:	; bb7.split
+                                 ;     301     hdl->out_index = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",301
+00000189 A881                    		MOV.L 08H[R0], R1
+0000018B 3D1500                  		MOV.W #0000H, 0AH[R1]
+0000018E                         L64:	; bb7.split1
+                                 ;     302     hdl->count = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",302
+0000018E A881                    		MOV.L 08H[R0], R1
+00000190 3D1300                  		MOV.W #0000H, 06H[R1]
+00000193                         L65:	; bb7.split2
+                                 ;     303 
+                                 ;     304     return BYTEQ_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",304
+00000193 F80600                  		MOV.L #00000000H, [R0]
+00000196                         L66:	; bb15
+00000196 EC01                    		MOV.L [R0], R1
+00000198 A009                    		MOV.L R1, 04H[R0]
+                                 ;     305 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",305
+0000019A 6703                    		RTSD #0CH
+0000019C                         _R_BYTEQ_Used:
+                                 		.STACK	_R_BYTEQ_Used=20
+                                 ;     306 
+                                 ;     307 
+                                 ;     308 /*****************************************************************************
+                                 ;     309 * Function Name: R_BYTEQ_Used
+                                 ;     310 * Description  : This function provides the number of data bytes in the queue.
+                                 ;     311 * Arguments    : hdl - 
+                                 ;     312 *                    Handle for queue.
+                                 ;     313 *                p_cnt -
+                                 ;     314 *                    Pointer to load queue data count to.
+                                 ;     315 * Return Value : BYTEQ_SUCCESS -
+                                 ;     316 *                    Successful; *p_cnt loaded with number of bytes in queue
+                                 ;     317 *                BYTEQ_ERR_NULL_PTR - 
+                                 ;     318 *                    hdl is NULL
+                                 ;     319 ******************************************************************************/
+                                 ;     320 byteq_err_t R_BYTEQ_Used(byteq_hdl_t const  hdl,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",320
+0000019C 7100F0                  		ADD #0FFFFFFF0H, R0
+0000019F A089                    		MOV.L R1, 0CH[R0]
+000001A1 A082                    		MOV.L R2, 08H[R0]
+                                 ;     321                          uint16_t * const   p_cnt)
+                                 ;     322 {
+                                 ;     323 #if (BYTEQ_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     324     if (hdl == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",324
+000001A3 A889                    		MOV.L 0CH[R0], R1
+000001A5 6101                    		CMP #00H, R1
+000001A7 18                   S  		BNE L69
+000001A8                         L68:	; bb3
+                                 ;     325     {
+                                 ;     326         return BYTEQ_ERR_NULL_PTR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",326
+000001A8 F80601                  		MOV.L #00000001H, [R0]
+000001AB 2Err                 B  		BRA L73
+000001AD                         L69:	; bb9
+                                 ;     327     }
+                                 ;     328     if (p_cnt == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",328
+000001AD A881                    		MOV.L 08H[R0], R1
+000001AF 6101                    		CMP #00H, R1
+000001B1 18                   S  		BNE L71
+000001B2                         L70:	; bb10
+                                 ;     329     {
+                                 ;     330         return BYTEQ_ERR_INVALID_ARG;       // return if invalid location (PRQA)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",330
+000001B2 F80602                  		MOV.L #00000002H, [R0]
+000001B5 2Err                 B  		BRA L73
+000001B7                         L71:	; bb16
+                                 ;     331     }
+                                 ;     332 #endif
+                                 ;     333 
+                                 ;     334     *p_cnt = hdl->count;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",334
+000001B7 A889                    		MOV.L 0CH[R0], R1
+000001B9 A882                    		MOV.L 08H[R0], R2
+000001BB D11203                  		MOV.W 06H[R1], [R2]
+000001BE                         L72:	; bb16.split
+                                 ;     335     return BYTEQ_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",335
+000001BE F80600                  		MOV.L #00000000H, [R0]
+000001C1                         L73:	; bb22
+000001C1 EC01                    		MOV.L [R0], R1
+000001C3 A009                    		MOV.L R1, 04H[R0]
+                                 ;     336 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",336
+000001C5 6704                    		RTSD #10H
+000001C7                         _R_BYTEQ_Unused:
+                                 		.STACK	_R_BYTEQ_Unused=20
+                                 ;     337 
+                                 ;     338 
+                                 ;     339 /*****************************************************************************
+                                 ;     340 * Function Name: R_BYTEQ_Unused
+                                 ;     341 * Description  : This function provides the number of data bytes available 
+                                 ;     342 *                for storage in the queue.
+                                 ;     343 * Arguments    : hdl - 
+                                 ;     344 *                    Handle for queue.
+                                 ;     345 *                p_cnt -
+                                 ;     346 *                    Pointer to load queue unused byte count to.
+                                 ;     347 * Return Value : BYTEQ_SUCCESS -
+                                 ;     348 *                    Successful; *p_cnt loaded with number of bytes available in
+                                 ;     349 *                    queue
+                                 ;     350 *                BYTEQ_ERR_NULL_PTR - 
+                                 ;     351 *                    hdl is NULL
+                                 ;     352 ******************************************************************************/
+                                 ;     353 byteq_err_t R_BYTEQ_Unused(byteq_hdl_t const  hdl,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",353
+000001C7 7100F0                  		ADD #0FFFFFFF0H, R0
+000001CA A089                    		MOV.L R1, 0CH[R0]
+000001CC A082                    		MOV.L R2, 08H[R0]
+                                 ;     354                            uint16_t * const   p_cnt)
+                                 ;     355 {
+                                 ;     356 #if (BYTEQ_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     357     if (hdl == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",357
+000001CE A889                    		MOV.L 0CH[R0], R1
+000001D0 6101                    		CMP #00H, R1
+000001D2 18                   S  		BNE L76
+000001D3                         L75:	; bb3
+                                 ;     358     {
+                                 ;     359         return BYTEQ_ERR_NULL_PTR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",359
+000001D3 F80601                  		MOV.L #00000001H, [R0]
+000001D6 2Err                 B  		BRA L80
+000001D8                         L76:	; bb9
+                                 ;     360     }
+                                 ;     361     if (p_cnt == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",361
+000001D8 A881                    		MOV.L 08H[R0], R1
+000001DA 6101                    		CMP #00H, R1
+000001DC 18                   S  		BNE L78
+000001DD                         L77:	; bb10
+                                 ;     362     {
+                                 ;     363         return BYTEQ_ERR_INVALID_ARG;       // return if invalid location (PRQA)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",363
+000001DD F80602                  		MOV.L #00000002H, [R0]
+000001E0 2Err                 B  		BRA L80
+000001E2                         L78:	; bb16
+                                 ;     364     }
+                                 ;     365 #endif
+                                 ;     366 
+                                 ;     367     *p_cnt = (uint16_t) (hdl->size - hdl->count);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",367
+000001E2 A889                    		MOV.L 0CH[R0], R1
+000001E4 B892                    		MOVU.W 04H[R1], R2
+000001E6 06C11203                		SUB 06H[R1].UW, R2
+000001EA A881                    		MOV.L 08H[R0], R1
+000001EC D312                    		MOV.W R2, [R1]
+000001EE                         L79:	; bb16.split
+                                 ;     368     return BYTEQ_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",368
+000001EE F80600                  		MOV.L #00000000H, [R0]
+000001F1                         L80:	; bb29
+000001F1 EC01                    		MOV.L [R0], R1
+000001F3 A009                    		MOV.L R1, 04H[R0]
+                                 ;     369 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",369
+000001F5 6704                    		RTSD #10H
+000001F7                         _R_BYTEQ_Close:
+                                 		.STACK	_R_BYTEQ_Close=16
+                                 ;     370 
+                                 ;     371 
+                                 ;     372 /*****************************************************************************
+                                 ;     373 * Function Name: R_BYTEQ_Close
+                                 ;     374 * Description  : If the control block associated with this Handle was allocated 
+                                 ;     375 *                dynamically at run time (BYTEQ_CFG_USE_HEAP_FOR_CTRL_BLKS set to 1
+                                 ;     376 *                in config.h), then that memory is free()d by this function. If 
+                                 ;     377 *                the control block was statically allocated at compile time 
+                                 ;     378 *                (BYTEQ_CFG_USE_HEAP_FOR_CTRL_BLKS set to 0 in config.h), then this
+                                 ;     379 *                function marks the control block as available for use by another 
+                                 ;     380 *                buffer. Nothing is done to the contents of the buffer referenced 
+                                 ;     381 *                by this Handle.
+                                 ;     382 * Arguments    : hdl - 
+                                 ;     383 *                    handle for queue
+                                 ;     384 * Return Value : BYTEQ_SUCCESS -
+                                 ;     385 *                    Successful; control block freed
+                                 ;     386 *                BYTEQ_ERR_NULL_PTR -
+                                 ;     387 *                    hdl is NULL.
+                                 ;     388 ******************************************************************************/
+                                 ;     389 byteq_err_t R_BYTEQ_Close(byteq_hdl_t const hdl)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",389
+000001F7 60C0                    		SUB #0CH, R0
+000001F9 A081                    		MOV.L R1, 08H[R0]
+                                 ;     390 {
+                                 ;     391 #if (BYTEQ_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     392     if (hdl == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",392
+000001FB 6101                    		CMP #00H, R1
+000001FD 18                   S  		BNE L83
+000001FE                         L82:	; bb2
+                                 ;     393     {
+                                 ;     394         return BYTEQ_ERR_NULL_PTR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",394
+000001FE F80601                  		MOV.L #00000001H, [R0]
+00000201 08                   S  		BRA L85
+00000202                         L83:	; bb7
+                                 ;     395     }
+                                 ;     396 #endif
+                                 ;     397 
+                                 ;     398 #if BYTEQ_CFG_USE_HEAP_FOR_CTRL_BLKS
+                                 ;     399     free(hdl);                          // free QCB memory
+                                 ;     400 #else
+                                 ;     401     hdl->buffer = NULL;                 // mark QCB as free
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",401
+00000202 A881                    		MOV.L 08H[R0], R1
+00000204 F81600                  		MOV.L #00000000H, [R1]
+00000207                         L84:	; bb7.split
+                                 ;     402 #endif
+                                 ;     403     
+                                 ;     404     return BYTEQ_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",404
+00000207 F80600                  		MOV.L #00000000H, [R0]
+0000020A                         L85:	; bb11
+0000020A EC01                    		MOV.L [R0], R1
+0000020C A009                    		MOV.L R1, 04H[R0]
+                                 ;     405 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",405
+0000020E 6703                    		RTSD #0CH
+00000210                         _R_BYTEQ_GetVersion:
+                                 		.STACK	_R_BYTEQ_GetVersion=12
+                                 ;     406 
+                                 ;     407 
+                                 ;     408 /*****************************************************************************
+                                 ;     409 * Function Name: R_BYTEQ_GetVersion
+                                 ;     410 * Description  : Returns the version of this module. The version number is 
+                                 ;     411 *                encoded such that the top two bytes are the major version
+                                 ;     412 *                number and the bottom two bytes are the minor version number.
+                                 ;     413 * Arguments    : none
+                                 ;     414 * Return Value : version number
+                                 ;     415 ******************************************************************************/
+                                 ;     416 #pragma inline(R_BYTEQ_GetVersion)
+                                 ;     417 uint32_t  R_BYTEQ_GetVersion(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",417
+00000210 6080                    		SUB #08H, R0
+                                 ;     418 {
+                                 ;     419 
+                                 ;     420     uint32_t const version = (BYTEQ_VERSION_MAJOR << 16) | BYTEQ_VERSION_MINOR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",420
+00000212 F80E280001              		MOV.L #00010028H, [R0]
+00000217                         L87:	; entry.split
+                                 ;     421     return version;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",421
+00000217 EC01                    		MOV.L [R0], R1
+00000219 A009                    		MOV.L R1, 04H[R0]
+0000021B                         L88:	; entry.split1
+                                 ;     422 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_byteq\src\r_byteq.c",422
+0000021B 6702                    		RTSD #08H
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$qcb_init$1:
+00000000 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         __$g_qcb:
+00000000(00000030H)              		.blkl	12
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00874   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000541(0000021DH)  P
+ROMDATA  0000000001(00000001H)  D_1
+DATA     0000000048(00000030H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\r_byteq.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\r_byteq.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\r_byteq\src\r_byteq.obj

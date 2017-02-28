@@ -1,0 +1,900 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:54:30 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:54:30
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_usb_creg_dmadtc.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_usb_creg_dmadtc.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;r_usb_creg_dmadtc.c
+                                 
+                                 		.glb	_usb_gcstd_Pipe
+                                 		.glb	_usb_cstd_brdy_pipe
+                                 		.glb	_usb_creg_clr_sts_bemp
+                                 		.glb	_usb_cstd_Pipe2Fport
+                                 		.glb	_usb_cstd_Buf2Fifo
+                                 		.glb	_usb_cstd_Fifo2Buf
+                                 		.glb	_usb_cstd_GetPipeDir
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _usb_cstd_brdy_pipe:
+                                 		.STACK	_usb_cstd_brdy_pipe=16
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_usb_creg_dmadtc.c
+                                 ;      21 * Description  : Setting code of DMA/DTC
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Added RX71M.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 
+                                 ;      30 /******************************************************************************
+                                 ;      31 Includes   <System Includes> , "Project Includes"
+                                 ;      32 ******************************************************************************/
+                                 ;      33 #include "r_usb_basic_if.h"
+                                 ;      34 #include "r_usb_reg_access.h"
+                                 ;      35 
+                                 ;      36 #ifdef USB_DTC_ENABLE
+                                 ;      37 
+                                 ;      38 #include "r_dtc_rx_if.h"            /* Defines for DTC support */
+                                 ;      39 /******************************************************************************
+                                 ;      40 Constant macro definitions
+                                 ;      41 ******************************************************************************/
+                                 ;      42 #define USB_BYTE_SIZE_0             0           /* 0Byte size */
+                                 ;      43 #define USB_BYTE_SIZE_1             1           /* 1Byte size */
+                                 ;      44 #define USB_BYTE_SIZE_2             2           /* 2Byte size */
+                                 ;      45 #define USB_BYTE_SIZE_3             3           /* 3Byte size */
+                                 ;      46 #define USB_BYTE_SIZE_4             4           /* 4Byte size */
+                                 ;      47 
+                                 ;      48 #define USB_DTC_CRA_VAL_MAX         0xff        /* MAX Value for DTC Transfer count reg A */
+                                 ;      49 #define USB_DTC_4ALIGNMENT_MASK     0xfffffffc;
+                                 ;      50 
+                                 ;      51 /******************************************************************************
+                                 ;      52 External variables and functions
+                                 ;      53 ******************************************************************************/
+                                 ;      54 extern void         usb_cpu_d0fifo_enable_dma(USB_UTR_t *ptr );
+                                 ;      55 extern void         usb_cpu_d0fifo_disable_dma(USB_UTR_t *ptr );
+                                 ;      56 extern uint32_t     usb_cpu_get_dtc_Source_address(USB_UTR_t *ptr);
+                                 ;      57 extern uint16_t     usb_cpu_get_dtc_block_count(USB_UTR_t *ptr);
+                                 ;      58 
+                                 ;      59 extern USB_UTR_t    usb_gcstd_IntMsgD0fifo;
+                                 ;      60 extern USB_UTR_t    usb2_gcstd_IntMsgD0fifo;
+                                 ;      61 
+                                 ;      62 /******************************************************************************
+                                 ;      63 Private global variables and functions
+                                 ;      64 ******************************************************************************/
+                                 ;      65 void        usb_cstd_dtc_write_not_4alignment(USB_UTR_t *ptr);
+                                 ;      66 void        usb_cstd_dtc_not_4alignment(USB_UTR_t *ptr);
+                                 ;      67 
+                                 ;      68 uint8_t     usb_dtc_alignment_size;         /* Rounded 4Byte Alignent size for USB DTC Transfer data size */
+                                 ;      69 uint8_t     usb_dtc_alignment_data[4];      /* Store rounded 4Byte Alignent data for USB DTC Transfer data */
+                                 ;      70 
+                                 ;      71 /******************************************************************************
+                                 ;      72 Function Name   : usb_cstd_Buf2D0fifoStartUsb
+                                 ;      73 Description     : Setup to start DMA/DTC transfer from data buffer to D0FIFO.
+                                 ;      74 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel.
+                                 ;      75 Return value    : none
+                                 ;      76 ******************************************************************************/
+                                 ;      77 void usb_cstd_Buf2D0fifoStartUsb(USB_UTR_t *ptr)
+                                 ;      78 {
+                                 ;      79     uint16_t    mbw;
+                                 ;      80 
+                                 ;      81     /* Write (MEMORY -> FIFO) : USB register set */
+                                 ;      82     if(ptr->ip == USB_USBIP_0)  /* USB0 */
+                                 ;      83     {
+                                 ;      84         if((usb_gcstd_Dma0Size[ptr->ip] & 0x0001u) == 0u)
+                                 ;      85         {
+                                 ;      86             mbw = USB_MBW_16;
+                                 ;      87         }
+                                 ;      88         else
+                                 ;      89         {
+                                 ;      90             mbw = USB_MBW_8;
+                                 ;      91         }
+                                 ;      92     }
+                                 ;      93     else if(ptr->ip == USB_USBIP_1) /* USBHS */
+                                 ;      94     {
+                                 ;      95         if((usb_gcstd_Dma0Size[ptr->ip] & 0x0003u) == 0u)
+                                 ;      96         {
+                                 ;      97             mbw = USB_MBW_32;
+                                 ;      98         }
+                                 ;      99         else
+                                 ;     100         {
+                                 ;     101             mbw = USB_MBW_8;
+                                 ;     102         }
+                                 ;     103     }
+                                 ;     104 
+                                 ;     105     /* Change MBW setting */
+                                 ;     106     usb_creg_set_mbw( ptr, USB_D0DMA, mbw );
+                                 ;     107 
+                                 ;     108     /* DTC(D0FIFO) interrupt enable */
+                                 ;     109     usb_cpu_d0fifo_enable_dma(ptr);
+                                 ;     110 
+                                 ;     111     /* Set DREQ enable */
+                                 ;     112     usb_creg_set_dreqe( ptr, USB_D0DMA );
+                                 ;     113 }/* eof usb_cstd_Buf2D0fifoStartUsb() */
+                                 ;     114 
+                                 ;     115 /******************************************************************************
+                                 ;     116 Function Name   : usb_cstd_D0fifo2BufStartUsb
+                                 ;     117 Description     : Setup to start DMA/DTC transfer D0FIFO to buffer.
+                                 ;     118 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel.
+                                 ;     119 Return value    : none
+                                 ;     120 ******************************************************************************/
+                                 ;     121 void usb_cstd_D0fifo2BufStartUsb(USB_UTR_t *ptr)
+                                 ;     122 {
+                                 ;     123     /* Read (FIFO -> MEMORY) : USB register set */
+                                 ;     124     /* DMA buffer clear mode & MBW set */
+                                 ;     125     if(ptr->ip == USB_USBIP_0)  /* USB0 */
+                                 ;     126     {
+                                 ;     127         usb_creg_set_mbw( ptr, USB_D0DMA, (uint16_t)(USB_MBW_16) );
+                                 ;     128     }
+                                 ;     129     else if(ptr->ip == USB_USBIP_1) /* USBHS */
+                                 ;     130     {
+                                 ;     131         usb_creg_set_mbw( ptr, USB_D0DMA, (uint16_t)(USB_MBW_32) );
+                                 ;     132     }
+                                 ;     133     usb_creg_clr_dclrm( ptr, USB_D0DMA );
+                                 ;     134 
+                                 ;     135     /* Set DREQ enable */
+                                 ;     136     usb_creg_set_dreqe( ptr, USB_D0DMA );
+                                 ;     137 }/* eof usb_cstd_D0fifo2BufStartUsb */
+                                 ;     138 
+                                 ;     139 /******************************************************************************
+                                 ;     140 Function Name   : usb_cstd_D0fifoStopUsb
+                                 ;     141 Description     : Setup external variables used for USB data transfer; to reg-
+                                 ;     142                 : ister if you want to stop the transfer of DMA/DTC.
+                                 ;     143 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel.
+                                 ;     144 Return value    : none
+                                 ;     145 ******************************************************************************/
+                                 ;     146 void usb_cstd_D0fifoStopUsb(USB_UTR_t *ptr)
+                                 ;     147 {
+                                 ;     148     uint16_t    ip = ptr->ip;
+                                 ;     149     uint16_t    pipe = usb_gcstd_Dma0Pipe[ip];
+                                 ;     150     uint32_t    transfer_size = usb_gcstd_Dma0Size[ip];
+                                 ;     151     uint32_t    *request_size = &usb_gcstd_DataCnt[ip][pipe];
+                                 ;     152     uint8_t     *tran_data_ptr = (uint8_t *)&usb_gcstd_DataPtr[ip][pipe];
+                                 ;     153 
+                                 ;     154     usb_creg_clr_dreqe( ptr, USB_D0DMA );
+                                 ;     155 
+                                 ;     156     /* Direction check */
+                                 ;     157     if( usb_gcstd_Dma0Dir[ip] == USB_BUF2FIFO )
+                                 ;     158     {
+                                 ;     159         /* Buffer to FIFO */
+                                 ;     160         if( *request_size < transfer_size )
+                                 ;     161         {
+                                 ;     162             /* >yes then set BVAL */
+                                 ;     163             *tran_data_ptr += *request_size;
+                                 ;     164             *request_size = (uint32_t)0u;
+                                 ;     165             /* Disable Ready Interrupt */
+                                 ;     166             usb_creg_clr_brdyenb(ptr, pipe);
+                                 ;     167             /* Set BVAL */
+                                 ;     168             usb_creg_set_bval( ptr, USB_D0DMA );
+                                 ;     169         }
+                                 ;     170         else
+                                 ;     171         {
+                                 ;     172             *tran_data_ptr += transfer_size;
+                                 ;     173             /* Set data count to remain */
+                                 ;     174             *request_size -= transfer_size;
+                                 ;     175         }
+                                 ;     176     }
+                                 ;     177     else
+                                 ;     178     {
+                                 ;     179         /* FIFO to Buffer */
+                                 ;     180         *tran_data_ptr += transfer_size;
+                                 ;     181         /* Set data count to remain */
+                                 ;     182         if( *request_size < transfer_size )
+                                 ;     183         {
+                                 ;     184             *request_size = transfer_size - *request_size;
+                                 ;     185         }
+                                 ;     186         else
+                                 ;     187         {
+                                 ;     188             *request_size -= transfer_size;
+                                 ;     189         }
+                                 ;     190     }
+                                 ;     191 }/* eof usb_cstd_D0fifoStopUsb() */
+                                 ;     192 
+                                 ;     193 /******************************************************************************
+                                 ;     194 Function Name   : usb_cstd_D0fifoInt
+                                 ;     195 Description     : Set end of DMA/DTC transfer. Set to restart DMA/DTC trans-
+                                 ;     196                 : fer according to data size of remaining functions to be pro-
+                                 ;     197                 : cessed.
+                                 ;     198 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel.
+                                 ;     199 Return value    : none
+                                 ;     200 ******************************************************************************/
+                                 ;     201 void usb_cstd_D0fifoInt(USB_UTR_t *ptr)
+                                 ;     202 {
+                                 ;     203     uint16_t pipe;
+                                 ;     204     uint16_t ip;
+                                 ;     205     uint16_t maxps;
+                                 ;     206     uint32_t *transfer_count;
+                                 ;     207 
+                                 ;     208     ip = ptr->ip;
+                                 ;     209     pipe = usb_gcstd_Dma0Pipe[ip];
+                                 ;     210     maxps = usb_gcstd_Dma0Fifo[ip];
+                                 ;     211     transfer_count = &usb_gcstd_DataCnt[ip][pipe];
+                                 ;     212 
+                                 ;     213     /* Transfer count >= MAXPS */
+                                 ;     214     if ( *transfer_count >= maxps )
+                                 ;     215     {
+                                 ;     216         /* DMA Transfer count update */
+                                 ;     217         *transfer_count %= maxps;
+                                 ;     218         /* Transfer continue check */
+                                 ;     219         if( *transfer_count != 0 )
+                                 ;     220         {
+                                 ;     221             /* Transfer count != MAXPS * N */
+                                 ;     222             /* Odd size data check  */
+                                 ;     223             if(ptr->ip == USB_USBIP_0)
+                                 ;     224             {
+                                 ;     225                 if( (*transfer_count & 0x0001u) != 0u )
+                                 ;     226                 {
+                                 ;     227                     /* if count == odd */
+                                 ;     228                     usb_creg_set_mbw( ptr, USB_D0DMA, USB_MBW_8 );
+                                 ;     229                 }
+                                 ;     230             }
+                                 ;     231             else if(ptr->ip == USB_USBIP_1)
+                                 ;     232             {
+                                 ;     233                 if( (*transfer_count & 0x0003u) != 0u )
+                                 ;     234                 {
+                                 ;     235                     /* if count == odd */
+                                 ;     236                     usb_creg_set_mbw( ptr, USB_D0DMA, USB_MBW_8 );
+                                 ;     237                 }
+                                 ;     238             }
+                                 ;     239 
+                                 ;     240             /* DMA Transfer size update */
+                                 ;     241             usb_gcstd_Dma0Size[ip] = *transfer_count;
+                                 ;     242             /* DMA Restart */
+                                 ;     243             usb_cpu_d0fifo_restart_dma(ptr);
+                                 ;     244 
+                                 ;     245             /* DTC(D0FIFO) interrupt enable */
+                                 ;     246             usb_cpu_d0fifo_enable_dma(ptr);
+                                 ;     247 
+                                 ;     248             /* DMA Transfer Request Set */
+                                 ;     249             usb_creg_set_dreqe( ptr, USB_D0DMA );
+                                 ;     250         }
+                                 ;     251         else
+                                 ;     252         {
+                                 ;     253             /* Check Rounded data for 4Byte Alignment */
+                                 ;     254             if( usb_dtc_alignment_size )
+                                 ;     255             {
+                                 ;     256                 /* count == odd ( 1 to 3 ) */
+                                 ;     257                 *transfer_count = usb_dtc_alignment_size;
+                                 ;     258                 usb_creg_set_mbw( ptr, USB_D0DMA, USB_MBW_8 );
+                                 ;     259 
+                                 ;     260                 /* DMA Transfer size update */
+                                 ;     261                 usb_gcstd_Dma0Size[ip] = *transfer_count;
+                                 ;     262                 /* DMA Restart */
+                                 ;     263                 usb_cpu_d0fifo_restart_dma(ptr);
+                                 ;     264 
+                                 ;     265                 /* DTC(D0FIFO) interrupt enable */
+                                 ;     266                 usb_cpu_d0fifo_enable_dma(ptr);
+                                 ;     267 
+                                 ;     268                 /* DMA Transfer Request Set */
+                                 ;     269                 usb_creg_set_dreqe( ptr, USB_D0DMA );
+                                 ;     270                 usb_dtc_alignment_size = 0;
+                                 ;     271             }
+                                 ;     272         }
+                                 ;     273     }
+                                 ;     274     else if( *transfer_count == 0 )
+                                 ;     275     {
+                                 ;     276         /* More than enough Interrupt */
+                                 ;     277         return;
+                                 ;     278     }
+                                 ;     279     else
+                                 ;     280     {
+                                 ;     281         /* Write Rounded data for D0FIFO */
+                                 ;     282         usb_cstd_dtc_write_not_4alignment(ptr);
+                                 ;     283 
+                                 ;     284         /* Transfer count < MAXPS */
+                                 ;     285         usb_creg_set_bval( ptr, USB_D0DMA );
+                                 ;     286         /* Transfer complete */
+                                 ;     287         *transfer_count = 0;
+                                 ;     288     }
+                                 ;     289 
+                                 ;     290     /* Transfer complete check */
+                                 ;     291     if( *transfer_count == 0 )
+                                 ;     292     {
+                                 ;     293         /* Enable Empty Interrupt */
+                                 ;     294         usb_creg_set_bempenb(ptr, pipe);
+                                 ;     295     }
+                                 ;     296 }/* eof usb_cstd_D0fifoInt() */
+                                 ;     297 
+                                 ;     298 
+                                 ;     299 
+                                 ;     300 /******************************************************************************
+                                 ;     301 Function Name   : usb_cstd_Buf2fifoStartDma
+                                 ;     302 Description     : Start transfer using DMA/DTC. If transfer size is 0, write 
+                                 ;     303                 : more data to buffer.
+                                 ;     304 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel.
+                                 ;     305                 : uint16_t pipe   : Pipe nr.
+                                 ;     306                 : uint16_t useport: FIFO select
+                                 ;     307 Return value    : none
+                                 ;     308 ******************************************************************************/
+                                 ;     309 void    usb_cstd_Buf2fifoStartDma( USB_UTR_t *ptr, uint16_t pipe, uint16_t useport )
+                                 ;     310 {
+                                 ;     311     /* Transfer size check */
+                                 ;     312     if(usb_gcstd_Dma0Size[ptr->ip] != 0)
+                                 ;     313     {
+                                 ;     314         if(ptr->ip == USB_USBIP_0)
+                                 ;     315         {
+                                 ;     316             if((usb_gcstd_Dma0Size[ptr->ip] & 0x0001u) == 0u)
+                                 ;     317             {
+                                 ;     318                 /* 16bit access */
+                                 ;     319                 /* DMA access Buffer to FIFO start */
+                                 ;     320                 usb_cpu_buf2d0fifo_start_dma(ptr, usb_cstd_GetD0fifo16Adr(ptr));
+                                 ;     321             }
+                                 ;     322             else
+                                 ;     323             {
+                                 ;     324                 /* 8bit access */
+                                 ;     325                 /* DMA access Buffer to FIFO start */
+                                 ;     326                 usb_cpu_buf2d0fifo_start_dma(ptr, usb_cstd_GetD0fifo8Adr(ptr));
+                                 ;     327             }
+                                 ;     328         }
+                                 ;     329         else if(ptr->ip == USB_USBIP_1)
+                                 ;     330         {
+                                 ;     331             /* USB Transfer data size 4Byte Alignment. */
+                                 ;     332             usb_cstd_dtc_not_4alignment(ptr);
+                                 ;     333 
+                                 ;     334             if((usb_gcstd_Dma0Size[ptr->ip] & 0x0003u) == 0u)
+                                 ;     335             {
+                                 ;     336                 /* 32bit access */
+                                 ;     337                 /* DMA access Buffer to FIFO start */
+                                 ;     338                 usb_cpu_buf2d0fifo_start_dma(ptr, usb_cstd_GetD0fifo32Adr(ptr));
+                                 ;     339             }
+                                 ;     340             else
+                                 ;     341             {
+                                 ;     342                 /* 8bit access */
+                                 ;     343                 /* DMA access Buffer to FIFO start */
+                                 ;     344                 usb_cpu_buf2d0fifo_start_dma(ptr, usb_cstd_GetD0fifo8Adr(ptr));
+                                 ;     345             }
+                                 ;     346         }
+                                 ;     347 
+                                 ;     348         /* Changes the FIFO port by the pipe. */
+                                 ;     349         usb_cstd_chg_curpipe(ptr, pipe, useport, USB_NO);
+                                 ;     350         /* Enable Not Ready Interrupt */
+                                 ;     351         usb_cstd_NrdyEnable(ptr, pipe);
+                                 ;     352         /* CPU access Buffer to FIFO start */
+                                 ;     353         usb_cstd_Buf2D0fifoStartUsb(ptr);
+                                 ;     354     }
+                                 ;     355     else
+                                 ;     356     {
+                                 ;     357         /* Buffer to FIFO data write */
+                                 ;     358         usb_cstd_Buf2Fifo(ptr, pipe, useport);
+                                 ;     359     }
+                                 ;     360 }/* eof usb_cstd_Buf2fifoStartDma() */
+                                 ;     361 
+                                 ;     362 
+                                 ;     363 /******************************************************************************
+                                 ;     364 Function Name   : usb_cstd_Fifo2BufStartDma
+                                 ;     365 Description     : Start transfer using DMA/DTC. If transfer size is 0, clear DMA. 
+                                 ;     366 Arguments       : USB_UTR_t *ptr  : USB internal structure. Selects USB channel.
+                                 ;     367                 : uint16_t pipe   : Pipe nr.
+                                 ;     368                 : uint16_t useport: FIFO select
+                                 ;     369                 : uint32_t length
+                                 ;     370 Return value    : none
+                                 ;     371 ******************************************************************************/
+                                 ;     372 void    usb_cstd_Fifo2BufStartDma( USB_UTR_t *ptr, uint16_t pipe, uint16_t useport, uint32_t length )
+                                 ;     373 {
+                                 ;     374     uint16_t        mxps;
+                                 ;     375 
+                                 ;     376     /* Data size check */
+                                 ;     377     if( usb_gcstd_Dma0Size[ptr->ip] != 0u )
+                                 ;     378     {
+                                 ;     379         if(ptr->ip == USB_USBIP_0)
+                                 ;     380         {
+                                 ;     381             if((usb_gcstd_Dma0Size[ptr->ip] & 0x0001u) == 0u)
+                                 ;     382             {
+                                 ;     383                 /* 16bit access */
+                                 ;     384                 /* DMA access Buffer to FIFO start */
+                                 ;     385                 usb_cpu_d0fifo2buf_start_dma(ptr, usb_cstd_GetD0fifo16Adr(ptr));
+                                 ;     386             }
+                                 ;     387             else
+                                 ;     388             {
+                                 ;     389                 /* 8bit access */
+                                 ;     390                 /* DMA access Buffer to FIFO start */
+                                 ;     391                 usb_cpu_d0fifo2buf_start_dma(ptr, usb_cstd_GetD0fifo8Adr(ptr));
+                                 ;     392             }
+                                 ;     393         }
+                                 ;     394         else if(ptr->ip == USB_USBIP_1)
+                                 ;     395         {
+                                 ;     396             if((usb_gcstd_Dma0Size[ptr->ip] & 0x0003u) == 0u)
+                                 ;     397             {
+                                 ;     398                 /* 32bit access */
+                                 ;     399                 /* DMA access Buffer to FIFO start */
+                                 ;     400                 usb_cpu_d0fifo2buf_start_dma(ptr, usb_cstd_GetD0fifo32Adr(ptr));
+                                 ;     401             }
+                                 ;     402             else
+                                 ;     403             {
+                                 ;     404                 /* 8bit access */
+                                 ;     405                 /* DMA access Buffer to FIFO start */
+                                 ;     406                 usb_cpu_d0fifo2buf_start_dma(ptr, usb_cstd_GetD0fifo8Adr(ptr));
+                                 ;     407             }
+                                 ;     408         }
+                                 ;     409 
+                                 ;     410         /* Changes the FIFO port by the pipe. */
+                                 ;     411         usb_cstd_chg_curpipe(ptr, pipe, useport, USB_NO);
+                                 ;     412         /* Max Packet Size */
+                                 ;     413         mxps = usb_cstd_GetMaxPacketSize(ptr, pipe);
+                                 ;     414         if( length != (uint32_t)0u )
+                                 ;     415         {
+                                 ;     416             /* Data length check */
+                                 ;     417             if( (length % mxps) == (uint32_t)0u )
+                                 ;     418             {
+                                 ;     419                 /* Set Transaction counter */
+                                 ;     420                 usb_cstd_SetTransactionCounter(ptr, pipe, (uint16_t)(length / mxps));
+                                 ;     421             }
+                                 ;     422             else
+                                 ;     423             {
+                                 ;     424                 /* Set Transaction counter */
+                                 ;     425                 usb_cstd_SetTransactionCounter(ptr, pipe, (uint16_t)((length / mxps) + (uint32_t)1u));
+                                 ;     426             }
+                                 ;     427         }
+                                 ;     428         /* Set BUF */
+                                 ;     429         usb_cstd_SetBuf(ptr, pipe);
+                                 ;     430         /* Enable Ready Interrupt */
+                                 ;     431         usb_creg_set_brdyenb(ptr, pipe);
+                                 ;     432         /* Enable Not Ready Interrupt */
+                                 ;     433         usb_cstd_NrdyEnable(ptr, pipe);
+                                 ;     434         usb_cstd_D0fifo2BufStartUsb(ptr);
+                                 ;     435     }
+                                 ;     436     else
+                                 ;     437     {
+                                 ;     438         /* Changes the FIFO port by the pipe. */
+                                 ;     439         usb_cstd_chg_curpipe(ptr, pipe, useport, USB_NO);
+                                 ;     440         /* DMA buffer clear mode set */
+                                 ;     441         usb_creg_set_dclrm( ptr, USB_D0DMA );
+                                 ;     442         /* Set BUF */
+                                 ;     443         usb_cstd_SetBuf(ptr, pipe);
+                                 ;     444         /* Enable Ready Interrupt */
+                                 ;     445         usb_creg_set_brdyenb(ptr, pipe);
+                                 ;     446         /* Enable Not Ready Interrupt */
+                                 ;     447         usb_cstd_NrdyEnable(ptr, pipe);
+                                 ;     448     }
+                                 ;     449 } /* eof usb_cstd_Fifo2BufStartDma() */
+                                 ;     450 
+                                 ;     451 
+                                 ;     452 #if USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP0_PP == USB_PERI_PP
+                                 ;     453 /******************************************************************************
+                                 ;     454 Function Name   : usb_cstd_d0fifo_handler
+                                 ;     455 Description     : DMA interrupt routine. Send message to PCD/HCD task.
+                                 ;     456 Arguments       : none
+                                 ;     457 Return value    : none
+                                 ;     458 ******************************************************************************/
+                                 ;     459 void usb_cstd_d0fifo_handler(void)
+                                 ;     460 {
+                                 ;     461     USB_UTR_t       *ptr;
+                                 ;     462 
+                                 ;     463     ptr = &usb_gcstd_IntMsgD0fifo;
+                                 ;     464     ptr->msghead = (USB_MH_t)USB_NULL;
+                                 ;     465     ptr->keyword = 0;
+                                 ;     466     ptr->status  = 0;
+                                 ;     467     ptr->ip  = USB_USBIP_0;
+                                 ;     468     ptr->ipp = usb_cstd_GetUsbIpAdr( ptr->ip );
+                                 ;     469 
+                                 ;     470     usb_creg_clr_dreqe( ptr, USB_D0DMA );       /* DMA Transfer request disable */
+                                 ;     471     usb_cpu_d0fifo_stop_dma(ptr);               /* Stop DMA,FIFO access */
+                                 ;     472 
+                                 ;     473     if( usb_cstd_is_host_mode(ptr) == USB_NO )
+                                 ;     474     {
+                                 ;     475 #if USB_FUNCSEL_USBIP0_PP == USB_PERI_PP
+                                 ;     476         USB_ER_t        err;
+                                 ;     477 
+                                 ;     478         /* Peripheral Function */
+                                 ;     479         ptr->msginfo = USB_MSG_PCD_D0FIFO_INT;
+                                 ;     480         /* Send message */
+                                 ;     481         err = USB_ISND_MSG(USB_PCD_MBX, (USB_MSG_t*)ptr);
+                                 ;     482         if( err != USB_E_OK )
+                                 ;     483         {
+                                 ;     484                 USB_PRINTF1("### DmaHandler DEF1 isnd_msg error (%ld)\n", err);
+                                 ;     485         }
+                                 ;     486 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_PERI_PP */
+                                 ;     487     }
+                                 ;     488     else
+                                 ;     489     {
+                                 ;     490 #if USB_FUNCSEL_USBIP0_PP == USB_HOST_PP
+                                 ;     491         USB_ER_t        err;
+                                 ;     492 
+                                 ;     493         ptr->msginfo = USB_MSG_HCD_D0FIFO_INT;
+                                 ;     494         /* Send message */
+                                 ;     495         err = USB_ISND_MSG(USB_HCD_MBX, (USB_MSG_t*)ptr);
+                                 ;     496         if( err != USB_E_OK )
+                                 ;     497         {
+                                 ;     498             USB_PRINTF1("### DmaHandler DEF2 isnd_msg error (%ld)\n", err);
+                                 ;     499         }
+                                 ;     500 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP */
+                                 ;     501     }
+                                 ;     502 } /* eof usb_cstd_d0fifo_handler() */
+                                 ;     503 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP0_PP == USB_PERI_PP */
+                                 ;     504 
+                                 ;     505 #if USB_FUNCSEL_USBIP1_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_PERI_PP
+                                 ;     506 /******************************************************************************
+                                 ;     507 Function Name   : usb2_cstd_d0fifo_handler
+                                 ;     508 Description     : DMA interrupt routine. Send message to PCD/HCD task.
+                                 ;     509 Arguments       : none
+                                 ;     510 Return value    : none
+                                 ;     511 ******************************************************************************/
+                                 ;     512 void usb2_cstd_d0fifo_handler(void)
+                                 ;     513 {
+                                 ;     514 /* Conditional compile dep. on difference of USB function */
+                                 ;     515 #if USB_FUNCSEL_USBIP1_PP != USB_NOUSE_PP
+                                 ;     516     USB_UTR_t       *ptr;
+                                 ;     517 
+                                 ;     518     ptr = &usb2_gcstd_IntMsgD0fifo;
+                                 ;     519     ptr->msghead = (USB_MH_t)USB_NULL;
+                                 ;     520     ptr->keyword = 0;
+                                 ;     521     ptr->status  = 0;
+                                 ;     522     ptr->ip  = USB_USBIP_1;
+                                 ;     523     ptr->ipp = usb_cstd_GetUsbIpAdr( ptr->ip );
+                                 ;     524 
+                                 ;     525     usb_creg_clr_dreqe( ptr, USB_D0DMA );       /* DMA Transfer request disable */
+                                 ;     526     usb_cpu_d0fifo_stop_dma(ptr);               /* Stop DMA,FIFO access */
+                                 ;     527 
+                                 ;     528     if( usb_cstd_is_host_mode(ptr) == USB_NO )
+                                 ;     529     {
+                                 ;     530 #if USB_FUNCSEL_USBIP1_PP == USB_PERI_PP
+                                 ;     531         USB_ER_t        err;
+                                 ;     532 
+                                 ;     533         /* Peripheral Function */
+                                 ;     534         ptr->msginfo = USB_MSG_PCD_D0FIFO_INT;
+                                 ;     535         /* Send message */
+                                 ;     536         err = USB_ISND_MSG(USB_PCD_MBX, (USB_MSG_t*)ptr);
+                                 ;     537         if( err != USB_E_OK )
+                                 ;     538         {
+                                 ;     539             USB_PRINTF1("### DmaHandler DEF1 isnd_msg error (%ld)\n", err);
+                                 ;     540         }
+                                 ;     541 #endif /* USB_FUNCSEL_USBIP1_PP != USB_NOUSE_PP */
+                                 ;     542     }
+                                 ;     543     else
+                                 ;     544     {
+                                 ;     545 #if USB_FUNCSEL_USBIP1_PP == USB_HOST_PP
+                                 ;     546         USB_ER_t        err;
+                                 ;     547 
+                                 ;     548         /* Host Function */
+                                 ;     549         ptr->msginfo = USB_MSG_HCD_D0FIFO_INT;
+                                 ;     550         /* Send message */
+                                 ;     551         err = USB_ISND_MSG(USB_HCD_MBX, (USB_MSG_t*)ptr);
+                                 ;     552         if( err != USB_E_OK )
+                                 ;     553         {
+                                 ;     554             USB_PRINTF1("### DmaHandler DEF2 isnd_msg error (%ld)\n", err);
+                                 ;     555         }
+                                 ;     556 #endif /* USB_FUNCSEL_USBIP1_PP == USB_HOST_PP */
+                                 ;     557     }
+                                 ;     558 #endif  /* USB_FUNCSEL_USBIP1_PP != USB_NOUSE_PP */
+                                 ;     559 } /* eof usb2_cstd_d0fifo_handler() */
+                                 ;     560 #endif  /* USB_FUNCSEL_USBIP1_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_PERI_PP */
+                                 ;     561 
+                                 ;     562 /******************************************************************************
+                                 ;     563 Function Name   : usb_cstd_dtc_not_4alignment
+                                 ;     564 Description     : USB Transfer data size 4Byte Alignment.
+                                 ;     565 Arguments       : USB_UTR_t *ptr        : USB internal structure. Selects USB channel. 
+                                 ;     566 Return value    : none
+                                 ;     567 ******************************************************************************/
+                                 ;     568 void usb_cstd_dtc_not_4alignment(USB_UTR_t *ptr)
+                                 ;     569 {
+                                 ;     570     uint32_t    offset;
+                                 ;     571     uint8_t     *data_ptr;
+                                 ;     572     uint16_t pipe;
+                                 ;     573 
+                                 ;     574     usb_dtc_alignment_size = USB_BYTE_SIZE_0;
+                                 ;     575 
+                                 ;     576     /* Get DTC Transfer pipe no. */
+                                 ;     577     pipe = usb_gcstd_Dma0Pipe[ptr->ip];
+                                 ;     578 
+                                 ;     579     /* Check transfer size.(Over 8bit size?) */
+                                 ;     580     if( usb_gcstd_DataCnt[ptr->ip][pipe] > USB_DTC_CRA_VAL_MAX )
+                                 ;     581     {
+                                 ;     582         /* Check 4Byte alignment */
+                                 ;     583         if( ( usb_gcstd_DataCnt[ptr->ip][pipe] % USB_BYTE_SIZE_4 ) != USB_BYTE_SIZE_0 )
+                                 ;     584         {
+                                 ;     585             /* Get transfer data top address. */
+                                 ;     586             data_ptr = usb_gcstd_DataPtr[ptr->ip][usb_gcstd_Dma0Pipe[ptr->ip]];
+                                 ;     587 
+                                 ;     588             /* Get alignment size */
+                                 ;     589             usb_dtc_alignment_size = usb_gcstd_DataCnt[ptr->ip][pipe] % USB_BYTE_SIZE_4;
+                                 ;     590             /* Round transfer data size */
+                                 ;     591             usb_gcstd_DataCnt[ptr->ip][pipe] &= USB_DTC_4ALIGNMENT_MASK;
+                                 ;     592 
+                                 ;     593             /* Store alignment data */
+                                 ;     594             offset = usb_gcstd_DataCnt[ptr->ip][pipe];
+                                 ;     595             if( usb_dtc_alignment_size == USB_BYTE_SIZE_3 )
+                                 ;     596             {
+                                 ;     597                 usb_dtc_alignment_data[0] = data_ptr[offset];
+                                 ;     598                 usb_dtc_alignment_data[1] = data_ptr[offset+1];
+                                 ;     599                 usb_dtc_alignment_data[2] = data_ptr[offset+2];
+                                 ;     600             }
+                                 ;     601             else if( usb_dtc_alignment_size == USB_BYTE_SIZE_2 )
+                                 ;     602             {
+                                 ;     603                 usb_dtc_alignment_data[0] = data_ptr[offset];
+                                 ;     604                 usb_dtc_alignment_data[1] = data_ptr[offset+1];
+                                 ;     605             }
+                                 ;     606             else
+                                 ;     607             {
+                                 ;     608                 usb_dtc_alignment_data[0] = data_ptr[offset];
+                                 ;     609             }
+                                 ;     610         }
+                                 ;     611     }
+                                 ;     612 }   /* eof usb_cstd_dtc_not_4alignment() */
+                                 ;     613 
+                                 ;     614 /******************************************************************************
+                                 ;     615 Function Name   : usb_cstd_dtc_write_not_4alignment
+                                 ;     616 Description     : Write Rounded data for D0FIFO
+                                 ;     617 Arguments       : USB_UTR_t *ptr        : USB internal structure. Selects USB channel. 
+                                 ;     618 Return value    : none
+                                 ;     619 ******************************************************************************/
+                                 ;     620 void usb_cstd_dtc_write_not_4alignment(USB_UTR_t *ptr)
+                                 ;     621 {
+                                 ;     622     /* Check alignment data */
+                                 ;     623     if( usb_dtc_alignment_size > USB_BYTE_SIZE_0 )
+                                 ;     624     {
+                                 ;     625         /* DMA buffer clear mode & MBW set */
+                                 ;     626         usb_creg_set_mbw( ptr, USB_D0DMA, USB_MBW_8 );
+                                 ;     627 
+                                 ;     628         /* Write alignment data for D0FIFO */
+                                 ;     629         if( usb_dtc_alignment_size == USB_BYTE_SIZE_3 )
+                                 ;     630         {
+                                 ;     631             usb_creg_write_fifo8( ptr, USB_D0DMA, usb_dtc_alignment_data[0] );
+                                 ;     632             usb_creg_write_fifo8( ptr, USB_D0DMA, usb_dtc_alignment_data[1] );
+                                 ;     633             usb_creg_write_fifo8( ptr, USB_D0DMA, usb_dtc_alignment_data[2] );
+                                 ;     634         }
+                                 ;     635         else if( usb_dtc_alignment_size == USB_BYTE_SIZE_2 )
+                                 ;     636         {
+                                 ;     637             usb_creg_write_fifo8( ptr, USB_D0DMA, usb_dtc_alignment_data[0] );
+                                 ;     638             usb_creg_write_fifo8( ptr, USB_D0DMA, usb_dtc_alignment_data[1] );
+                                 ;     639         }
+                                 ;     640         else
+                                 ;     641         {
+                                 ;     642             usb_creg_write_fifo8( ptr, USB_D0DMA, usb_dtc_alignment_data[0] );
+                                 ;     643         }
+                                 ;     644 
+                                 ;     645         usb_dtc_alignment_size = USB_BYTE_SIZE_0;
+                                 ;     646     }
+                                 ;     647 }   /* eof usb_cstd_dtc_write_not_4alignment() */
+                                 ;     648 
+                                 ;     649 #endif /* USB_DTC_ENABLE */
+                                 ;     650 
+                                 ;     651 /******************************************************************************
+                                 ;     652 Function Name   : usb_cstd_brdy_pipe
+                                 ;     653 Description     : Search for the PIPE No. that BRDY interrupt occurred, and 
+                                 ;     654                   request data transmission/reception from the PIPE
+                                 ;     655 Arguments       : USB_UTR_t *ptr
+                                 ;     656                 : uint16_t bitsts       ; BRDYSTS Register & BRDYENB Register
+                                 ;     657 Return value    : none
+                                 ;     658 ******************************************************************************/
+                                 ;     659 void usb_cstd_brdy_pipe(USB_UTR_t *ptr, uint16_t bitsts)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",659
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
+00000004 908A                    		MOV.W R2, 06H[R0]
+                                 ;     660 {
+                                 ;     661     uint16_t        useport;
+                                 ;     662     uint16_t        i;
+                                 ;     663     uint16_t ip;
+                                 ;     664 
+                                 ;     665 #ifdef USB_DTC_ENABLE
+                                 ;     666     uint16_t        buffer;
+                                 ;     667     uint16_t maxps;
+                                 ;     668     uint16_t set_dtc_brock_cnt;
+                                 ;     669     uint16_t trans_dtc_block_cnt;
+                                 ;     670 #endif /* USB_DTC_ENABLE */
+                                 ;     671 
+                                 ;     672     ip = ptr->ip;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",672
+00000006 A881                    		MOV.L 08H[R0], R1
+00000008 D5100602                		MOV.W 0CH[R1], 04H[R0]
+0000000C                         L11:	; entry.split
+                                 ;     673 #ifdef USB_DTC_ENABLE
+                                 ;     674     maxps = usb_gcstd_Dma0Fifo[ip];
+                                 ;     675 #endif /* USB_DTC_ENABLE */
+                                 ;     676     for( i = USB_PIPE1; i <= USB_MAX_PIPE_NO; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",676
+0000000C 3D0101                  		MOV.W #0001H, 02H[R0]
+0000000F 2Err                 B  		BRA L21
+00000011                         L12:	; bb8
+00000011 661E                    		MOV.L #00000001H, R14
+                                 ;     677     {
+                                 ;     678         if( (bitsts & USB_BITSET(i)) != 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",678
+00000013 B809                    		MOVU.W 02H[R0], R1
+00000015 FD621E                  		SHLL R1, R14
+00000018 06510E03                		AND 06H[R0].W, R14
+0000001C 5FEE                    		MOVU.W R14, R14
+0000001E 610E                    		CMP #00H, R14
+00000020 20rr                    		BEQ L20
+00000022                         L13:	; bb9
+                                 ;     679         {
+                                 ;     680             /* Interrupt check */
+                                 ;     681             usb_creg_clr_sts_bemp( ptr, i );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",681
+00000022 B80A                    		MOVU.W 02H[R0], R2
+00000024 A881                    		MOV.L 08H[R0], R1
+00000026 05rrrrrr             A  		BSR _usb_creg_clr_sts_bemp
+0000002A                         L14:	; bb9.split
+                                 ;     682 
+                                 ;     683             if( usb_gcstd_Pipe[ip][i] != USB_NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",683
+0000002A B881                    		MOVU.W 04H[R0], R1
+0000002C 751128                  		MUL #28H, R1
+0000002F FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+00000035 4B1E                    		ADD R1, R14
+00000037 B809                    		MOVU.W 02H[R0], R1
+00000039 FE61EE                  		MOV.L [R1,R14], R14
+0000003C 610E                    		CMP #00H, R14
+0000003E 20rr                    		BEQ L20
+00000040                         L15:	; bb13
+                                 ;     684             {
+                                 ;     685                 /* Pipe number to FIFO port select */
+                                 ;     686                 useport = usb_cstd_Pipe2Fport(ptr, i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",686
+00000040 B80A                    		MOVU.W 02H[R0], R2
+00000042 A881                    		MOV.L 08H[R0], R1
+00000044 05rrrrrr             A  		BSR _usb_cstd_Pipe2Fport
+00000048 D301                    		MOV.W R1, [R0]
+0000004A                         L16:	; bb13.split
+                                 ;     687                 if( useport == USB_D0DMA )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",687
+0000004A 5C01                    		MOVU.W [R0], R1
+0000004C 6121                    		CMP #02H, R1
+0000004E 20rr                    		BEQ L20
+00000050                         L17:	; bb20
+                                 ;     688                 {
+                                 ;     689 #ifdef USB_DTC_ENABLE
+                                 ;     690                     /* DMA Transfer request disable */
+                                 ;     691                     usb_creg_clr_dreqe( ptr, USB_D0DMA );
+                                 ;     692 
+                                 ;     693                     /* DMA stop */
+                                 ;     694                     usb_cpu_d0fifo_stop_dma(ptr);
+                                 ;     695 
+                                 ;     696                     /* Changes FIFO port by the pipe. */
+                                 ;     697                     buffer = usb_cstd_is_set_frdy(ptr, i, useport, USB_NO);
+                                 ;     698 
+                                 ;     699                     set_dtc_brock_cnt = (uint16_t)((usb_gcstd_DataCnt[ip][usb_gcstd_Dma0Pipe[ip]] -1)
+                                 ;     700                         / usb_gcstd_Dma0Fifo[ip]) +1;
+                                 ;     701 
+                                 ;     702                     trans_dtc_block_cnt = usb_cpu_get_dtc_block_count(ptr);
+                                 ;     703                     /* Get D0fifo Receive Data Length */
+                                 ;     704                     usb_gcstd_Dma0Size[ip]
+                                 ;     705                         = (uint32_t)(buffer & USB_DTLN) + (set_dtc_brock_cnt - (trans_dtc_block_cnt + 1)) * maxps;
+                                 ;     706 
+                                 ;     707                     /* Check data count */
+                                 ;     708                     if( usb_gcstd_Dma0Size[ip] == usb_gcstd_DataCnt[ptr->ip][i] )
+                                 ;     709                     {
+                                 ;     710                         usb_gcstd_DataCnt[ip][i] = 0;
+                                 ;     711                         /* End of data transfer */
+                                 ;     712                         usb_cstd_DataEnd(ptr, i, (uint16_t)USB_DATA_OK);
+                                 ;     713                     }
+                                 ;     714                     else if( usb_gcstd_Dma0Size[ip] > usb_gcstd_DataCnt[ip][i] )
+                                 ;     715                     {
+                                 ;     716                         /* D0FIFO access DMA stop */
+                                 ;     717                         usb_cstd_D0fifoStopUsb(ptr);
+                                 ;     718                         /* End of data transfer */
+                                 ;     719                         usb_cstd_DataEnd(ptr, i, (uint16_t)USB_DATA_OVR);
+                                 ;     720                     }
+                                 ;     721                     else
+                                 ;     722                     {
+                                 ;     723                         /* D0FIFO access DMA stop */
+                                 ;     724                         usb_cstd_D0fifoStopUsb(ptr);
+                                 ;     725                         /* End of data transfer */
+                                 ;     726                         usb_cstd_DataEnd(ptr, i, (uint16_t)USB_DATA_SHT);
+                                 ;     727                     }
+                                 ;     728                     /* Set BCLR */
+                                 ;     729                     usb_creg_set_bclr( ptr, USB_D0DMA );
+                                 ;     730 #endif /* USB_DTC_ENABLE */
+                                 ;     731                 }
+                                 ;     732                 else
+                                 ;     733                 {
+                                 ;     734                     if( usb_cstd_GetPipeDir(ptr, i) == USB_BUF2FIFO )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",734
+00000050 B80A                    		MOVU.W 02H[R0], R2
+00000052 A881                    		MOV.L 08H[R0], R1
+00000054 05rrrrrr             A  		BSR _usb_cstd_GetPipeDir
+00000058 755110                  		CMP #10H, R1
+0000005B DC02                    		MOV.W [R0], R2
+0000005D 980C                    		MOV.W 02H[R0], R4
+0000005F A881                    		MOV.L 08H[R0], R1
+00000061 18                   S  		BNE L19
+00000062                         L18:	; bb21
+                                 ;     735                     {
+                                 ;     736                         /* Buffer to FIFO data write */
+                                 ;     737                         usb_cstd_Buf2Fifo(ptr, i, useport);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",737
+00000062 5F23                    		MOVU.W R2, R3
+00000064 5F42                    		MOVU.W R4, R2
+00000066 05rrrrrr             A  		BSR _usb_cstd_Buf2Fifo
+0000006A 08                   S  		BRA L20
+0000006B                         L19:	; bb25
+                                 ;     738                     }
+                                 ;     739                     else
+                                 ;     740                     {
+                                 ;     741                         /* FIFO to Buffer data read */
+                                 ;     742                         usb_cstd_Fifo2Buf(ptr, i, useport);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",742
+0000006B 5F23                    		MOVU.W R2, R3
+0000006D 5F42                    		MOVU.W R4, R2
+0000006F 05rrrrrr             A  		BSR _usb_cstd_Fifo2Buf
+00000073                         L20:	; bb65
+00000073 9809                    		MOV.W 02H[R0], R1
+00000075 6211                    		ADD #01H, R1
+00000077 9009                    		MOV.W R1, 02H[R0]
+00000079                         L21:	; bb68
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",676
+00000079 B809                    		MOVU.W 02H[R0], R1
+0000007B 61A1                    		CMP #0AH, R1
+0000007D 23rr                    		BLTU L12
+0000007F                         L22:	; return
+                                 ;     743                     }
+                                 ;     744                 }
+                                 ;     745             }
+                                 ;     746         }
+                                 ;     747     }
+                                 ;     748 }/* eof usb_cstd_brdy_pipe() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.c",748
+0000007F 6703                    		RTSD #0CH
+                                 ;     749 
+                                 ;     750 /******************************************************************************
+                                 ;     751 End of file
+                                 ;     752 ******************************************************************************/
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00867   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000129(00000081H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\r_usb_creg_dmadtc.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\r_usb_creg_dmadtc.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\r_usb_basic\src\HW\comm\r_usb_creg_dmadtc.obj

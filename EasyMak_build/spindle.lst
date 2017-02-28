@@ -1,0 +1,629 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:48:46 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:48:46
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=spindle.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=spindle.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;spindle.c
+                                 
+                                 		.glb	_cm
+                                 		.glb	_pwm
+                                 		.glb	_configFlags
+                                 		.glb	_sim
+                                 		.glb	_simTorch
+                                 		.glb	_cm_spindle_init
+                                 		.glb	_pwm_set_freq
+                                 		.glb	_pwm_set_duty
+                                 		.glb	_cm_get_spindle_pwm
+                                 		.glb	_cm_spindle_control
+                                 		.glb	_mp_queue_command
+                                 		.glb	_cm_set_spindle_mode
+                                 		.glb	_pl_arcook_stop
+                                 		.glb	_cm_set_spindle_speed
+                                 		.glb	_cm_exec_spindle_speed
+                                 		.glb	_cm_set_spindle_speed_parameter
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _cm_spindle_init:
+                                 		.STACK	_cm_spindle_init=4
+                                 ;       1 /*
+                                 ;       2  * spindle.c - canonical machine spindle driver
+                                 ;       3  * This file is part of the TinyG project
+                                 ;       4  *
+                                 ;       5  * Copyright (c) 2010 - 2015 Alden S. Hart, Jr.
+                                 ;       6  *
+                                 ;       7  * This file ("the software") is free software: you can redistribute it and/or modify
+                                 ;       8  * it under the terms of the GNU General Public License, version 2 as published by the
+                                 ;       9  * Free Software Foundation. You should have received a copy of the GNU General Public
+                                 ;      10  * License, version 2 along with the software.  If not, see <http://www.gnu.org/licenses/>.
+                                 ;      11  *
+                                 ;      12  * As a special exception, you may use this file as part of a software library without
+                                 ;      13  * restriction. Specifically, if other files instantiate templates or use macros or
+                                 ;      14  * inline functions from this file, or you compile this file and link it with  other
+                                 ;      15  * files to produce an executable, this file does not by itself cause the resulting
+                                 ;      16  * executable to be covered by the GNU General Public License. This exception does not
+                                 ;      17  * however invalidate any other reasons why the executable file might be covered by the
+                                 ;      18  * GNU General Public License.
+                                 ;      19  *
+                                 ;      20  * THE SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY
+                                 ;      21  * WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                 ;      22  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+                                 ;      23  * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                 ;      24  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+                                 ;      25  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                                 ;      26  */
+                                 ;      27 
+                                 ;      28 #include "tinyg.h"		// #1
+                                 ;      29 #include "config.h"		// #2
+                                 ;      30 #include "spindle.h"
+                                 ;      31 #include "gpio.h"
+                                 ;      32 #include "planner.h"
+                                 ;      33 #include "hardware.h"
+                                 ;      34 #include "pwm.h"
+                                 ;      35 #include "eeprom.h"
+                                 ;      36 #include "plasma.h"
+                                 ;      37 
+                                 ;      38 #ifdef __cplusplus
+                                 ;      39 extern "C"{
+                                 ;      40 #endif
+                                 ;      41 
+                                 ;      42 extern bool sim;
+                                 ;      43 bool simTorch = false;
+                                 ;      44 
+                                 ;      45 static void _exec_spindle_control(float *value, float *flag);
+                                 ;      46 static void _exec_spindle_speed(float *value, float *flag);
+                                 ;      47 
+                                 ;      48 /*
+                                 ;      49  * cm_spindle_init()
+                                 ;      50  */
+                                 ;      51 void cm_spindle_init()
+                                 ;      52 {
+                                 ;      53 	if( pwm.c[PWM_1].frequency < 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",53
+00000000 FBE2rrrrrrrr            		MOV.L #_pwm, R14
+00000006 ECEE                    		MOV.L [R14], R14
+00000008 FD721E00000000          		FCMP #00000000H, R14
+0000000F 26rr                    		BPZ L14
+00000011                         L13:	; bb1
+                                 ;      54 		pwm.c[PWM_1].frequency = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",54
+00000011 FBE2rrrrrrrr            		MOV.L #_pwm, R14
+00000017 F8E600                  		MOV.L #00000000H, [R14]
+0000001A                         L14:	; bb4
+                                 ;      55 
+                                 ;      56     pwm_set_freq(PWM_1, pwm.c[PWM_1].frequency);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",56
+0000001A FBE2rrrrrrrr            		MOV.L #_pwm, R14
+00000020 ECE2                    		MOV.L [R14], R2
+00000022 6601                    		MOV.L #00000000H, R1
+00000024 05rrrrrr             A  		BSR _pwm_set_freq
+00000028                         L15:	; bb4.split
+                                 ;      57     pwm_set_duty(PWM_1, pwm.c[PWM_1].phase_off);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",57
+00000028 FB12rrrrrrrr            		MOV.L #_pwm, R1
+0000002E AA1A                    		MOV.L 24H[R1], R2
+00000030 6601                    		MOV.L #00000000H, R1
+00000032 05rrrrrr             A  		BSR _pwm_set_duty
+00000036 02                      		RTS
+00000037                         _cm_get_spindle_pwm:
+                                 		.STACK	_cm_get_spindle_pwm=40
+                                 ;      58 }
+                                 ;      59 
+                                 ;      60 /*
+                                 ;      61  * cm_get_spindle_pwm() - return PWM phase (duty cycle) for dir and speed
+                                 ;      62  */
+                                 ;      63 float cm_get_spindle_pwm( uint8_t spindle_mode )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",63
+00000037 7100DC                  		ADD #0FFFFFFDCH, R0
+0000003A C70123                  		MOV.B R1, 23H[R0]
+0000003D 6601                    		MOV.L #00000000H, R1
+                                 ;      64 {
+                                 ;      65 	float speed_lo=0, speed_hi=0, phase_lo=0, phase_hi=0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",65
+0000003F A081                    		MOV.L R1, 08H[R0]
+00000041 A089                    		MOV.L R1, 0CH[R0]
+00000043 A101                    		MOV.L R1, 10H[R0]
+00000045 A109                    		MOV.L R1, 14H[R0]
+00000047                         L17:	; entry.split
+                                 ;      66 	if (spindle_mode == SPINDLE_CW ) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",66
+00000047 590123                  		MOVU.B 23H[R0], R1
+0000004A 6111                    		CMP #01H, R1
+0000004C 21rr                    		BNE L22
+0000004E                         L18:	; bb7
+                                 ;      67 		speed_lo = pwm.c[PWM_1].cw_speed_lo;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",67
+0000004E FBE2rrrrrrrr            		MOV.L #_pwm, R14
+00000054 E5E00102                		MOV.L 04H[R14], 08H[R0]
+00000058                         L19:	; bb7.split
+                                 ;      68 		speed_hi = pwm.c[PWM_1].cw_speed_hi;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",68
+00000058 FBE2rrrrrrrr            		MOV.L #_pwm, R14
+0000005E E5E00203                		MOV.L 08H[R14], 0CH[R0]
+00000062                         L20:	; bb7.split1
+                                 ;      69 		phase_lo = pwm.c[PWM_1].cw_phase_lo;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",69
+00000062 FBE2rrrrrrrr            		MOV.L #_pwm, R14
+00000068 E5E00304                		MOV.L 0CH[R14], 10H[R0]
+0000006C                         L21:	; bb7.split2
+                                 ;      70 		phase_hi = pwm.c[PWM_1].cw_phase_hi;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",70
+0000006C FBE2rrrrrrrr            		MOV.L #_pwm, R14
+00000072 E5E00405                		MOV.L 10H[R14], 14H[R0]
+00000076 2Err                 B  		BRA L27
+00000078                         L22:	; bb13
+                                 ;      71 	} else if (spindle_mode == SPINDLE_CCW ) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",71
+00000078 590123                  		MOVU.B 23H[R0], R1
+0000007B 6121                    		CMP #02H, R1
+0000007D 21rr                    		BNE L27
+0000007F                         L23:	; bb14
+                                 ;      72 		speed_lo = pwm.c[PWM_1].ccw_speed_lo;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",72
+0000007F FBE2rrrrrrrr            		MOV.L #_pwm, R14
+00000085 E5E00502                		MOV.L 14H[R14], 08H[R0]
+00000089                         L24:	; bb14.split
+                                 ;      73 		speed_hi = pwm.c[PWM_1].ccw_speed_hi;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",73
+00000089 FBE2rrrrrrrr            		MOV.L #_pwm, R14
+0000008F E5E00603                		MOV.L 18H[R14], 0CH[R0]
+00000093                         L25:	; bb14.split3
+                                 ;      74 		phase_lo = pwm.c[PWM_1].ccw_phase_lo;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",74
+00000093 FBE2rrrrrrrr            		MOV.L #_pwm, R14
+00000099 E5E00704                		MOV.L 1CH[R14], 10H[R0]
+0000009D                         L26:	; bb14.split4
+                                 ;      75 		phase_hi = pwm.c[PWM_1].ccw_phase_hi;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",75
+0000009D FBE2rrrrrrrr            		MOV.L #_pwm, R14
+000000A3 E5E00805                		MOV.L 20H[R14], 14H[R0]
+000000A7                         L27:	; bb30
+                                 ;      76 	}
+                                 ;      77 
+                                 ;      78 	if (spindle_mode==SPINDLE_CW || spindle_mode==SPINDLE_CCW ) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",78
+000000A7 590123                  		MOVU.B 23H[R0], R1
+000000AA 6111                    		CMP #01H, R1
+000000AC 20rr                    		BEQ L36
+000000AE 2Err                 B  		BRA L35
+000000B0                         L28:	; bb32
+                                 ;      79 		// clamp spindle speed to lo/hi range
+                                 ;      80 		if( cm.gm.spindle_speed < speed_lo ) cm.gm.spindle_speed = speed_lo;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",80
+000000B0 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000000B6 EDEEA6                  		MOV.L 0298H[R14], R14
+000000B9 FC850E02                		FCMP 08H[R0].L, R14
+000000BD 26rr                    		BPZ L30
+000000BF                         L29:	; bb33
+000000BF FBE2rrrrrrrr            		MOV.L #_cm, R14
+000000C5 E50E02A6                		MOV.L 08H[R0], 0298H[R14]
+000000C9                         L30:	; bb41
+                                 ;      81 		if( cm.gm.spindle_speed > speed_hi ) cm.gm.spindle_speed = speed_hi;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",81
+000000C9 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000000CF A889                    		MOV.L 0CH[R0], R1
+000000D1 FC85E1A6                		FCMP 0298H[R14].L, R1
+000000D5 26rr                    		BPZ L32
+000000D7                         L31:	; bb42
+000000D7 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000000DD E50E03A6                		MOV.L 0CH[R0], 0298H[R14]
+000000E1                         L32:	; bb49
+                                 ;      82 
+                                 ;      83 		// normalize speed to [0..1]
+                                 ;      84 		float speed = (cm.gm.spindle_speed - speed_lo) / (speed_hi - speed_lo);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",84
+000000E1 A881                    		MOV.L 08H[R0], R1
+000000E3 A88A                    		MOV.L 0CH[R0], R2
+000000E5 FC8312                  		FSUB R1, R2
+000000E8 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000000EE EDE3A6                  		MOV.L 0298H[R14], R3
+000000F1 FC8313                  		FSUB R1, R3
+000000F4 FC9323                  		FDIV R2, R3
+000000F7 A183                    		MOV.L R3, 18H[R0]
+000000F9                         L33:	; bb49.split
+                                 ;      85 		return (speed * (phase_hi - phase_lo)) + phase_lo;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",85
+000000F9 A901                    		MOV.L 10H[R0], R1
+000000FB A90A                    		MOV.L 14H[R0], R2
+000000FD FC8312                  		FSUB R1, R2
+00000100 FC8D0206                		FMUL 18H[R0].L, R2
+00000104 FC8B12                  		FADD R1, R2
+00000107 A00A                    		MOV.L R2, 04H[R0]
+00000109 2Err                 B  		BRA L39
+0000010B                         L34:	; bb65
+                                 ;      86 	} else {
+                                 ;      87 		return pwm.c[PWM_1].phase_off;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",87
+0000010B FBE2rrrrrrrr            		MOV.L #_pwm, R14
+00000111 E5E00901                		MOV.L 24H[R14], 04H[R0]
+00000115 2Err                 B  		BRA L39
+00000117                         L35:	; bb72
+00000117 590123                  		MOVU.B 23H[R0], R1
+0000011A 6121                    		CMP #02H, R1
+0000011C 18                   S  		BNE L37
+0000011D                         L36:	; bb77
+0000011D F80601                  		MOV.L #00000001H, [R0]
+00000120 08                   S  		BRA L38
+00000121                         L37:	; bb78
+00000121 F80600                  		MOV.L #00000000H, [R0]
+00000124                         L38:	; bb79
+00000124 EC01                    		MOV.L [R0], R1
+00000126 6101                    		CMP #00H, R1
+00000128 21rr                    		BNE L28
+0000012A 2Err                 B  		BRA L34
+0000012C                         L39:	; bb85
+0000012C A809                    		MOV.L 04H[R0], R1
+0000012E A189                    		MOV.L R1, 1CH[R0]
+                                 ;      88 	}
+                                 ;      89 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",89
+00000130 6709                    		RTSD #24H
+00000132                         _cm_spindle_control:
+                                 		.STACK	_cm_spindle_control=32
+                                 ;      90 
+                                 ;      91 /*
+                                 ;      92  * cm_spindle_control() -  queue the spindle command to the planner buffer
+                                 ;      93  * cm_exec_spindle_control() - execute the spindle command (called from planner)
+                                 ;      94  */
+                                 ;      95 
+                                 ;      96 stat_t cm_spindle_control(uint8_t spindle_mode)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",96
+00000132 7100E4                  		ADD #0FFFFFFE4H, R0
+00000135 8689                    		MOV.B R1, 1BH[R0]
+                                 ;      97 {
+                                 ;      98 	float value[AXES] = { (float)spindle_mode, 0,0,0,0,0 };
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",98
+00000137 FBE2rrrrrrrr            		MOV.L #_L10, R14
+0000013D E0E0                    		MOV.L [R14], [R0]
+0000013F E5E00101                		MOV.L 04H[R14], 04H[R0]
+00000143 E5E00202                		MOV.L 08H[R14], 08H[R0]
+00000147 E5E00303                		MOV.L 0CH[R14], 0CH[R0]
+0000014B E5E00404                		MOV.L 10H[R14], 10H[R0]
+0000014F E5E00505                		MOV.L 14H[R14], 14H[R0]
+00000153 FC45011B                		ITOF 1BH[R0].UB, R1
+00000157 E301                    		MOV.L R1, [R0]
+00000159                         L41:	; entry.split
+00000159 EF02                    		MOV.L R0, R2
+                                 ;      99 	mp_queue_command(_exec_spindle_control, value, value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",99
+0000015B FB12rrrrrrrr            		MOV.L #__$_exec_spindle_control, R1
+00000161 EF23                    		MOV.L R2, R3
+00000163 05rrrrrr             A  		BSR _mp_queue_command
+00000167                         L42:	; entry.split1
+                                 ;     100 	return(STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",100
+00000167 3C8A00                  		MOV.B #00H, 1AH[R0]
+0000016A B681                    		MOVU.B 1AH[R0], R1
+0000016C                         L43:	; entry.split2
+                                 ;     101 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",101
+0000016C 5B11                    		MOVU.B R1, R1
+0000016E 6707                    		RTSD #1CH
+00000170                         __$_exec_spindle_control:
+                                 		.STACK	__$_exec_spindle_control=20
+                                 ;     102 
+                                 ;     103 //static void _exec_spindle_control(uint8_t spindle_mode, float f, float *vector, float *flag)
+                                 ;     104 static void _exec_spindle_control(float *value, float *flag)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",104
+00000170 7100F0                  		ADD #0FFFFFFF0H, R0
+00000173 A089                    		MOV.L R1, 0CH[R0]
+00000175 A082                    		MOV.L R2, 08H[R0]
+                                 ;     105 {
+                                 ;     106 	uint8_t spindle_mode = (uint8_t)value[0];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",106
+00000177 A889                    		MOV.L 0CH[R0], R1
+00000179 EC1E                    		MOV.L [R1], R14
+0000017B FD721E0000004F          		FCMP #4F000000H, R14
+00000182 29rr                    		BLT L46
+00000184                         L45:	; entry
+00000184 FD722E000080CF          		FADD #0CF800000H, R14
+0000018B                         L46:	; entry
+0000018B FC97E1                  		FTOI R14, R1
+0000018E 8189                    		MOV.B R1, 07H[R0]
+00000190                         L47:	; entry.split
+                                 ;     107 	cm_set_spindle_mode(MODEL, spindle_mode);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",107
+00000190 B18A                    		MOVU.B 07H[R0], R2
+00000192 FB12rrrrrrrr            		MOV.L #_cm, R1
+00000198 72115402                		ADD #0254H, R1
+0000019C 05rrrrrr             A  		BSR _cm_set_spindle_mode
+000001A0                         L48:	; entry.split1
+                                 ;     108 
+                                 ;     109  #ifdef __AVR
+                                 ;     110 	if (spindle_mode == SPINDLE_CW) {
+                                 ;     111 		gpio_set_bit_on(SPINDLE_BIT);
+                                 ;     112 		gpio_set_bit_off(SPINDLE_DIR);
+                                 ;     113 	} else if (spindle_mode == SPINDLE_CCW) {
+                                 ;     114 		gpio_set_bit_on(SPINDLE_BIT);
+                                 ;     115 		gpio_set_bit_on(SPINDLE_DIR);
+                                 ;     116 	} else {
+                                 ;     117 		gpio_set_bit_off(SPINDLE_BIT);	// failsafe: any error causes stop
+                                 ;     118 	}
+                                 ;     119 #endif // __AVR
+                                 ;     120 #ifdef __ARM
+                                 ;     121 	if (spindle_mode == SPINDLE_CW) {
+                                 ;     122 		spindle_enable_pin.set();
+                                 ;     123 		spindle_dir_pin.clear();
+                                 ;     124 	} else if (spindle_mode == SPINDLE_CCW) {
+                                 ;     125 		spindle_enable_pin.set();
+                                 ;     126 		spindle_dir_pin.set();
+                                 ;     127 	} else {
+                                 ;     128 		spindle_enable_pin.clear();	// failsafe: any error causes stop
+                                 ;     129 	}
+                                 ;     130 #endif // __ARM
+                                 ;     131 #ifdef __RX
+                                 ;     132 	if (spindle_mode == SPINDLE_CW) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",132
+000001A0 B189                    		MOVU.B 07H[R0], R1
+000001A2 6111                    		CMP #01H, R1
+000001A4 21rr                    		BNE L55
+000001A6                         L49:	; bb9
+                                 ;     133 		if(!sim){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",133
+000001A6 FBE2rrrrrrrr            		MOV.L #_sim, R14
+000001AC 58EE                    		MOVU.B [R14], R14
+000001AE 610E                    		CMP #00H, R14
+000001B0 21rr                    		BNE L52
+000001B2 2Err                 B  		BRA L53
+000001B4                         L50:	; bb11.split
+000001B4 FBEE22C008              		MOV.L #0008C022H, R14
+                                 ;     134 			if (configFlags[MODOMAQUINA] == 0){
+                                 ;     135 //				pl_arcook_start();
+                                 ;     136 			}
+                                 ;     137 			TORCH = TRUE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",137
+000001B9 F0EB                    		BCLR #03H, [R14].B
+000001BB 2Err                 B  		BRA L59
+000001BD                         L51:	; bb20
+                                 ;     138 		}
+                                 ;     139 		else
+                                 ;     140 		{
+                                 ;     141 			simTorch = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",141
+000001BD FBE2rrrrrrrr            		MOV.L #_simTorch, R14
+000001C3 F8E401                  		MOV.B #01H, [R14]
+000001C6 2Err                 B  		BRA L59
+000001C8                         L52:	; bb25
+000001C8 F80600                  		MOV.L #00000000H, [R0]
+000001CB 08                   S  		BRA L54
+000001CC                         L53:	; bb26
+000001CC F80601                  		MOV.L #00000001H, [R0]
+000001CF                         L54:	; bb27
+000001CF EC01                    		MOV.L [R0], R1
+000001D1 6101                    		CMP #00H, R1
+000001D3 21rr                    		BNE L50
+000001D5 2Err                 B  		BRA L51
+000001D7                         L55:	; bb33
+                                 ;     142 		}
+                                 ;     143 	} else if (spindle_mode == SPINDLE_CCW) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",143
+000001D7 B189                    		MOVU.B 07H[R0], R1
+000001D9 6121                    		CMP #02H, R1
+000001DB 20rr                    		BEQ L59
+000001DD                         L56:	; bb35
+                                 ;     144 //		pl_arcook_stop();
+                                 ;     145 //		isCuttingSet(false);
+                                 ;     146 //		TORCH = FALSE;
+                                 ;     147 //		simTorch = false;
+                                 ;     148 	} else {
+                                 ;     149 		pl_arcook_stop();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",149
+000001DD 05rrrrrr             A  		BSR _pl_arcook_stop
+000001E1                         L57:	; bb35.split
+000001E1 FBEE22C008              		MOV.L #0008C022H, R14
+                                 ;     150 //		isCuttingSet(false);
+                                 ;     151 		TORCH = FALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",151
+000001E6 F0E3                    		BSET #03H, [R14].B
+000001E8                         L58:	; bb35.split2
+                                 ;     152 		simTorch = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",152
+000001E8 FBE2rrrrrrrr            		MOV.L #_simTorch, R14
+000001EE F8E400                  		MOV.B #00H, [R14]
+000001F1                         L59:	; bb50
+                                 ;     153 	}
+                                 ;     154 #endif // __RX
+                                 ;     155 
+                                 ;     156 	// PWM spindle control
+                                 ;     157 	pwm_set_duty(PWM_1, cm_get_spindle_pwm(spindle_mode) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",157
+000001F1 B189                    		MOVU.B 07H[R0], R1
+000001F3 39rrrr               W  		BSR _cm_get_spindle_pwm
+000001F6 EF12                    		MOV.L R1, R2
+000001F8 6601                    		MOV.L #00000000H, R1
+000001FA 05rrrrrr             A  		BSR _pwm_set_duty
+000001FE 6704                    		RTSD #10H
+00000200                         _cm_set_spindle_speed:
+                                 		.STACK	_cm_set_spindle_speed=36
+                                 ;     158 }
+                                 ;     159 
+                                 ;     160 /*
+                                 ;     161  * cm_set_spindle_speed() 	- queue the S parameter to the planner buffer
+                                 ;     162  * cm_exec_spindle_speed() 	- execute the S command (called from the planner buffer)
+                                 ;     163  * _exec_spindle_speed()	- spindle speed callback from planner queue
+                                 ;     164  */
+                                 ;     165 stat_t cm_set_spindle_speed(float speed)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",165
+00000200 7100E0                  		ADD #0FFFFFFE0H, R0
+00000203 A189                    		MOV.L R1, 1CH[R0]
+                                 ;     166 {
+                                 ;     167 //	if (speed > cfg.max_spindle speed)
+                                 ;     168 //        return (STAT_MAX_SPINDLE_SPEED_EXCEEDED);
+                                 ;     169 
+                                 ;     170 	float value[AXES] = { speed, 0,0,0,0,0 };
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",170
+00000205 FBE2rrrrrrrr            		MOV.L #_L11, R14
+0000020B E0E0                    		MOV.L [R14], [R0]
+0000020D E5E00101                		MOV.L 04H[R14], 04H[R0]
+00000211 E5E00202                		MOV.L 08H[R14], 08H[R0]
+00000215 E5E00303                		MOV.L 0CH[R14], 0CH[R0]
+00000219 E5E00404                		MOV.L 10H[R14], 10H[R0]
+0000021D E5E00505                		MOV.L 14H[R14], 14H[R0]
+00000221 E10007                  		MOV.L 1CH[R0], [R0]
+00000224                         L61:	; entry.split
+00000224 EF02                    		MOV.L R0, R2
+                                 ;     171 	mp_queue_command(_exec_spindle_speed, value, value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",171
+00000226 FB12rrrrrrrr            		MOV.L #__$_exec_spindle_speed, R1
+0000022C EF23                    		MOV.L R2, R3
+0000022E 05rrrrrr             A  		BSR _mp_queue_command
+00000232                         L62:	; entry.split1
+                                 ;     172 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",172
+00000232 3C8B00                  		MOV.B #00H, 1BH[R0]
+00000235 B689                    		MOVU.B 1BH[R0], R1
+00000237                         L63:	; entry.split2
+                                 ;     173 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",173
+00000237 5B11                    		MOVU.B R1, R1
+00000239 6708                    		RTSD #20H
+0000023B                         _cm_exec_spindle_speed:
+                                 		.STACK	_cm_exec_spindle_speed=8
+                                 ;     174 
+                                 ;     175 void cm_exec_spindle_speed(float speed)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",175
+0000023B 6040                    		SUB #04H, R0
+0000023D E301                    		MOV.L R1, [R0]
+                                 ;     176 {
+                                 ;     177 	cm_set_spindle_speed(speed);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",177
+0000023F 39rrrr               W  		BSR _cm_set_spindle_speed
+00000242 6701                    		RTSD #04H
+00000244                         __$_exec_spindle_speed:
+                                 		.STACK	__$_exec_spindle_speed=12
+                                 ;     178 }
+                                 ;     179 
+                                 ;     180 static void _exec_spindle_speed(float *value, float *flag)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",180
+00000244 6080                    		SUB #08H, R0
+00000246 A009                    		MOV.L R1, 04H[R0]
+00000248 E302                    		MOV.L R2, [R0]
+                                 ;     181 {
+                                 ;     182 	cm_set_spindle_speed_parameter(MODEL, value[0]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",182
+0000024A A809                    		MOV.L 04H[R0], R1
+0000024C EC12                    		MOV.L [R1], R2
+0000024E FB12rrrrrrrr            		MOV.L #_cm, R1
+00000254 72115402                		ADD #0254H, R1
+00000258 05rrrrrr             A  		BSR _cm_set_spindle_speed_parameter
+0000025C                         L66:	; entry.split
+                                 ;     183 	pwm_set_duty(PWM_1, cm_get_spindle_pwm(cm.gm.spindle_mode) ); // update spindle speed if we're running
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\spindle.c",183
+0000025C FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000262 5AE1AC02                		MOVU.B 02ACH[R14], R1
+00000266 39rrrr               W  		BSR _cm_get_spindle_pwm
+00000269 EF12                    		MOV.L R1, R2
+0000026B 6601                    		MOV.L #00000000H, R1
+0000026D 05rrrrrr             A  		BSR _pwm_set_duty
+00000271 6702                    		RTSD #08H
+                                 ;     184 }
+                                 ;     185 
+                                 ;     186 #ifdef __cplusplus
+                                 ;     187 }
+                                 ;     188 #endif
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 00                      		.byte	0
+00000001 00                      		.byte	0
+00000002 00                      		.byte	0
+00000003 00                      		.byte	0
+00000004 00                      		.byte	0
+00000005 00                      		.byte	0
+00000006 00                      		.byte	0
+00000007 00                      		.byte	0
+00000008 00                      		.byte	0
+00000009 00                      		.byte	0
+0000000A 00                      		.byte	0
+0000000B 00                      		.byte	0
+0000000C 00                      		.byte	0
+0000000D 00                      		.byte	0
+0000000E 00                      		.byte	0
+0000000F 00                      		.byte	0
+00000010 00                      		.byte	0
+00000011 00                      		.byte	0
+00000012 00                      		.byte	0
+00000013 00                      		.byte	0
+00000014 00                      		.byte	0
+00000015 00                      		.byte	0
+00000016 00                      		.byte	0
+00000017 00                      		.byte	0
+00000018                         _L11:
+00000018 00                      		.byte	0
+00000019 00                      		.byte	0
+0000001A 00                      		.byte	0
+0000001B 00                      		.byte	0
+0000001C 00                      		.byte	0
+0000001D 00                      		.byte	0
+0000001E 00                      		.byte	0
+0000001F 00                      		.byte	0
+00000020 00                      		.byte	0
+00000021 00                      		.byte	0
+00000022 00                      		.byte	0
+00000023 00                      		.byte	0
+00000024 00                      		.byte	0
+00000025 00                      		.byte	0
+00000026 00                      		.byte	0
+00000027 00                      		.byte	0
+00000028 00                      		.byte	0
+00000029 00                      		.byte	0
+0000002A 00                      		.byte	0
+0000002B 00                      		.byte	0
+0000002C 00                      		.byte	0
+0000002D 00                      		.byte	0
+0000002E 00                      		.byte	0
+0000002F 00                      		.byte	0
+                                 		.SECTION	D_1,ROMDATA
+00000000                         _simTorch:
+00000000 00                      		.byte	00H
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00594   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000627(00000273H)  P
+ROMDATA  0000000048(00000030H)  L
+ROMDATA  0000000001(00000001H)  D_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\spindle.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\spindle.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\src\cnc\spindle.obj

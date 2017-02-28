@@ -1,0 +1,2319 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:48:45 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:48:44
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=plan_exec.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=plan_exec.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;plan_exec.c
+                                 
+                                 		.glb	_status_code
+                                 		.glb	_cm
+                                 		.glb	_mr
+                                 		.glb	_zmove
+                                 		.glb	_configsVar
+                                 		.glb	_configVarOx
+                                 		.glb	_configVarMaq
+                                 		.glb	_configFlags
+                                 		.glb	_sim
+                                 		.glb	_zmoved
+                                 		.glb	_mp_exec_move
+                                 		.glb	_st_prep_null
+                                 		.glb	_mp_get_run_buffer
+                                 		.glb	_cm_set_motion_state
+                                 		.glb	_cm_hard_alarm
+                                 		.glb	_mp_exec_aline
+                                 		.glb	_mp_plan_zmove_callback
+                                 		.glb	_cm_cycle_end
+                                 		.glb	_mp_free_run_buffer
+                                 		.glb	_sr_request_status_report
+                                 		.glb	_ceil
+                                 		.glb	_pl_thc_pid
+                                 		.glb	_isCuttingGet
+                                 		.glb	_fmax
+                                 		.glb	_en_read_encoder
+                                 		.glb	_ik_kinematics
+                                 		.glb	_st_prep_line
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _mp_exec_move:
+                                 		.STACK	_mp_exec_move=16
+                                 ;       1 /*
+                                 ;       2  * plan_exec.c - execution function for acceleration managed lines
+                                 ;       3  * This file is part of the TinyG project
+                                 ;       4  *
+                                 ;       5  * Copyright (c) 2010 - 2015 Alden S. Hart, Jr.
+                                 ;       6  * Copyright (c) 2012 - 2015 Rob Giseburt
+                                 ;       7  *
+                                 ;       8  * This file ("the software") is free software: you can redistribute it and/or modify
+                                 ;       9  * it under the terms of the GNU General Public License, version 2 as published by the
+                                 ;      10  * Free Software Foundation. You should have received a copy of the GNU General Public
+                                 ;      11  * License, version 2 along with the software.  If not, see <http://www.gnu.org/licenses/>.
+                                 ;      12  *
+                                 ;      13  * As a special exception, you may use this file as part of a software library without
+                                 ;      14  * restriction. Specifically, if other files instantiate templates or use macros or
+                                 ;      15  * inline functions from this file, or you compile this file and link it with  other
+                                 ;      16  * files to produce an executable, this file does not by itself cause the resulting
+                                 ;      17  * executable to be covered by the GNU General Public License. This exception does not
+                                 ;      18  * however invalidate any other reasons why the executable file might be covered by the
+                                 ;      19  * GNU General Public License.
+                                 ;      20  *
+                                 ;      21  * THE SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY
+                                 ;      22  * WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                 ;      23  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+                                 ;      24  * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                 ;      25  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+                                 ;      26  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                                 ;      27  */
+                                 ;      28 
+                                 ;      29 #include "tinyg.h"
+                                 ;      30 #include "config.h"
+                                 ;      31 #include "planner.h"
+                                 ;      32 #include "kinematics.h"
+                                 ;      33 #include "stepper.h"
+                                 ;      34 #include "encoder.h"
+                                 ;      35 #include "report.h"
+                                 ;      36 #include "util.h"
+                                 ;      37 
+                                 ;      38 #include "interpreter_if.h"
+                                 ;      39 #include "eeprom.h"
+                                 ;      40 #include "plasma.h"
+                                 ;      41 
+                                 ;      42 /*
+                                 ;      43 #ifdef __cplusplus
+                                 ;      44 extern "C"{
+                                 ;      45 #endif
+                                 ;      46 */
+                                 ;      47 // execute routines (NB: These are all called from the LO interrupt)
+                                 ;      48 static stat_t _exec_aline_head(void);
+                                 ;      49 static stat_t _exec_aline_body(void);
+                                 ;      50 static stat_t _exec_aline_tail(void);
+                                 ;      51 static stat_t _exec_aline_segment(void);
+                                 ;      52 
+                                 ;      53 #ifndef __JERK_EXEC
+                                 ;      54 static void _init_forward_diffs(float Vi, float Vt);
+                                 ;      55 #endif
+                                 ;      56 
+                                 ;      57 extern bool sim;
+                                 ;      58 bool zmoved = false;
+                                 ;      59 static float zmovedlenght = 0;
+                                 ;      60 
+                                 ;      61 /*************************************************************************
+                                 ;      62  * mp_exec_move() - execute runtime functions to prep move for steppers
+                                 ;      63  *
+                                 ;      64  *	Dequeues the buffer queue and executes the move continuations.
+                                 ;      65  *	Manages run buffers and other details
+                                 ;      66  */
+                                 ;      67 
+                                 ;      68 stat_t mp_exec_move()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",68
+00000000 60C0                    		SUB #0CH, R0
+                                 ;      69 {
+                                 ;      70 	mpBuf_t *bf;
+                                 ;      71 
+                                 ;      72 	if ((bf = mp_get_run_buffer()) == NULL) {			// NULL means nothing's running
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",72
+00000002 05rrrrrr             A  		BSR _mp_get_run_buffer
+00000006 A009                    		MOV.L R1, 04H[R0]
+00000008 6101                    		CMP #00H, R1
+0000000A 18                   S  		BNE L13
+0000000B                         L11:	; bb2
+                                 ;      73 		st_prep_null();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",73
+0000000B 05rrrrrr             A  		BSR _st_prep_null
+0000000F                         L12:	; bb2.split
+                                 ;      74 		return (STAT_NOOP);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",74
+0000000F 3C0303                  		MOV.B #03H, 03H[R0]
+00000012 2Err                 B  		BRA L19
+00000014                         L13:	; bb9
+                                 ;      75 	}
+                                 ;      76 	// Manage cycle and motion state transitions
+                                 ;      77 	if (bf->move_type == MOVE_TYPE_ALINE) { 			// cycle auto-start for lines only
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",77
+00000014 A809                    		MOV.L 04H[R0], R1
+00000016 B519                    		MOVU.B 15H[R1], R1
+00000018 6111                    		CMP #01H, R1
+0000001A 21rr                    		BNE L16
+0000001C                         L14:	; bb11
+                                 ;      78 		if (cm.motion_state == MOTION_STOP) cm_set_motion_state(MOTION_RUN);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",78
+0000001C FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000022 5AEE1F02                		MOVU.B 021FH[R14], R14
+00000026 610E                    		CMP #00H, R14
+00000028 18                   S  		BNE L16
+00000029                         L15:	; bb12
+00000029 6611                    		MOV.L #00000001H, R1
+0000002B 05rrrrrr             A  		BSR _cm_set_motion_state
+0000002F                         L16:	; bb27
+                                 ;      79 	}
+                                 ;      80 	if (bf->bf_func == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",80
+0000002F A809                    		MOV.L 04H[R0], R1
+00000031 A891                    		MOV.L 08H[R1], R1
+00000033 6101                    		CMP #00H, R1
+00000035 21rr                    		BNE L18
+00000037                         L17:	; bb28
+00000037 754114                  		MOV.L #00000014H, R1
+                                 ;      81         return(cm_hard_alarm(STAT_INTERNAL_ERROR));     // never supposed to get here
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",81
+0000003A 05rrrrrr             A  		BSR _cm_hard_alarm
+0000003E 8089                    		MOV.B R1, 03H[R0]
+00000040 08                   S  		BRA L19
+00000041                         L18:	; bb37
+                                 ;      82 
+                                 ;      83 	return (bf->bf_func(bf)); 							// run the move callback in the planner buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",83
+00000041 A809                    		MOV.L 04H[R0], R1
+00000043 A892                    		MOV.L 08H[R1], R2
+00000045 7F12                    		JSR R2
+00000047 8089                    		MOV.B R1, 03H[R0]
+00000049                         L19:	; bb44
+00000049 C500030B                		MOV.B 03H[R0], 0BH[R0]
+                                 ;      84 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",84
+0000004D B289                    		MOVU.B 0BH[R0], R1
+0000004F 6703                    		RTSD #0CH
+00000051                         _mp_exec_aline:
+                                 		.STACK	_mp_exec_aline=16
+                                 ;      85 
+                                 ;      86 /*************************************************************************/
+                                 ;      87 /**** ALINE EXECUTION ROUTINES *******************************************/
+                                 ;      88 /*************************************************************************
+                                 ;      89  * ---> Everything here fires from interrupts and must be interrupt safe
+                                 ;      90  *
+                                 ;      91  *  _exec_aline()		  - acceleration line main routine
+                                 ;      92  *	_exec_aline_head()	  - helper for acceleration section
+                                 ;      93  *	_exec_aline_body()	  - helper for cruise section
+                                 ;      94  *	_exec_aline_tail()	  - helper for deceleration section
+                                 ;      95  *	_exec_aline_segment() - helper for running a segment
+                                 ;      96  *
+                                 ;      97  *	Returns:
+                                 ;      98  *	 STAT_OK		move is done
+                                 ;      99  *	 STAT_EAGAIN	move is not finished - has more segments to run
+                                 ;     100  *	 STAT_NOOP		cause no operation from the steppers - do not load the move
+                                 ;     101  *	 STAT_xxxxx		fatal error. Ends the move and frees the bf buffer
+                                 ;     102  *
+                                 ;     103  *	This routine is called from the (LO) interrupt level. The interrupt
+                                 ;     104  *	sequencing relies on the behaviors of the routines being exactly correct.
+                                 ;     105  *	Each call to _exec_aline() must execute and prep *one and only one*
+                                 ;     106  *	segment. If the segment is the not the last segment in the bf buffer the
+                                 ;     107  *	_aline() must return STAT_EAGAIN. If it's the last segment it must return
+                                 ;     108  *	STAT_OK. If it encounters a fatal error that would terminate the move it
+                                 ;     109  *	should return a valid error code. Failure to obey this will introduce
+                                 ;     110  *	subtle and very difficult to diagnose bugs (trust me on this).
+                                 ;     111  *
+                                 ;     112  *	Note 1 Returning STAT_OK ends the move and frees the bf buffer.
+                                 ;     113  *		   Returning STAT_OK at this point does NOT advance position meaning any
+                                 ;     114  *		   position error will be compensated by the next move.
+                                 ;     115  *
+                                 ;     116  *	Note 2 Solves a potential race condition where the current move ends but the
+                                 ;     117  * 		   new move has not started because the previous move is still being run
+                                 ;     118  *		   by the steppers. Planning can overwrite the new move.
+                                 ;     119  */
+                                 ;     120 /* OPERATION:
+                                 ;     121  *	Aline generates jerk-controlled S-curves as per Ed Red's course notes:
+                                 ;     122  *	  http://www.et.byu.edu/~ered/ME537/Notes/Ch5.pdf
+                                 ;     123  *	  http://www.scribd.com/doc/63521608/Ed-Red-Ch5-537-Jerk-Equations
+                                 ;     124  *
+                                 ;     125  *	A full trapezoid is divided into 5 periods Periods 1 and 2 are the
+                                 ;     126  *	first and second halves of the acceleration ramp (the concave and convex
+                                 ;     127  *	parts of the S curve in the "head"). Periods 3 and 4 are the first
+                                 ;     128  *	and second parts of the deceleration ramp (the tail). There is also
+                                 ;     129  *	a period for the constant-velocity plateau of the trapezoid (the body).
+                                 ;     130  *	There are various degraded trapezoids possible, including 2 section
+                                 ;     131  *	combinations (head and tail; head and body; body and tail), and single
+                                 ;     132  *	sections - any one of the three.
+                                 ;     133  *
+                                 ;     134  *	The equations that govern the acceleration and deceleration ramps are:
+                                 ;     135  *
+                                 ;     136  *	  Period 1	  V = Vi + Jm*(T^2)/2
+                                 ;     137  *	  Period 2	  V = Vh + As*T - Jm*(T^2)/2
+                                 ;     138  *	  Period 3	  V = Vi - Jm*(T^2)/2
+                                 ;     139  *	  Period 4	  V = Vh + As*T + Jm*(T^2)/2
+                                 ;     140  *
+                                 ;     141  * 	These routines play some games with the acceleration and move timing
+                                 ;     142  *	to make sure this actually all works out. move_time is the actual time of the
+                                 ;     143  *	move, accel_time is the time valaue needed to compute the velocity - which
+                                 ;     144  *	takes the initial velocity into account (move_time does not need to).
+                                 ;     145  */
+                                 ;     146 /* --- State transitions - hierarchical state machine ---
+                                 ;     147  *
+                                 ;     148  *	bf->move_state transitions:
+                                 ;     149  *	 from _NEW to _RUN on first call (sub_state set to _OFF)
+                                 ;     150  *	 from _RUN to _OFF on final call
+                                 ;     151  * 	 or just remains _OFF
+                                 ;     152  *
+                                 ;     153  *	mr.move_state transitions on first call from _OFF to one of _HEAD, _BODY, _TAIL
+                                 ;     154  *	Within each section state may be
+                                 ;     155  *	 _NEW - trigger initialization
+                                 ;     156  *	 _RUN1 - run the first part
+                                 ;     157  *	 _RUN2 - run the second part
+                                 ;     158  *
+                                 ;     159  *	Note: For a direct math implementation see build 357.xx or earlier
+                                 ;     160  *		  Builds 358 onward have only forward difference code
+                                 ;     161  */
+                                 ;     162 
+                                 ;     163 stat_t mp_exec_aline(mpBuf_t *bf)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",163
+00000051 60C0                    		SUB #0CH, R0
+00000053 A081                    		MOV.L R1, 08H[R0]
+                                 ;     164 {
+                                 ;     165 	if (bf->move_state == MOVE_OFF)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",165
+00000055 B599                    		MOVU.B 17H[R1], R1
+00000057 6101                    		CMP #00H, R1
+00000059 18                   S  		BNE L22
+0000005A                         L21:	; bb4
+                                 ;     166         return (STAT_NOOP);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",166
+0000005A 3C0403                  		MOV.B #03H, 04H[R0]
+0000005D 38rrrr               W  		BRA L92
+00000060                         L22:	; bb13
+                                 ;     167 
+                                 ;     168 	// start a new move by setting up local context (singleton)
+                                 ;     169 	if (mr.move_state == MOVE_OFF) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",169
+00000060 FB12rrrrrrrr            		MOV.L #_mr, R1
+00000066 B091                    		MOVU.B 02H[R1], R1
+00000068 6101                    		CMP #00H, R1
+0000006A 3Brrrr               W  		BNE L61
+0000006D                         L23:	; bb15
+                                 ;     170 		if (cm.hold_state == FEEDHOLD_HOLD)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",170
+0000006D FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000073 5AEE2002                		MOVU.B 0220H[R14], R14
+00000077 614E                    		CMP #04H, R14
+00000079 18                   S  		BNE L25
+0000007A                         L24:	; bb16
+                                 ;     171             return (STAT_NOOP);	                        // stops here if holding
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",171
+0000007A 3C0403                  		MOV.B #03H, 04H[R0]
+0000007D 38rrrr               W  		BRA L92
+00000080                         L25:	; bb24
+                                 ;     172 
+                                 ;     173 		if (bf->unit[2] != 0 && zmoved)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",173
+00000080 A881                    		MOV.L 08H[R0], R1
+00000082 AA19                    		MOV.L 24H[R1], R1
+00000084 FD721100000000          		FCMP #00000000H, R1
+0000008B 21rr                    		BNE L29
+0000008D 2Err                 B  		BRA L31
+0000008F                         L26:	; bb25
+                                 ;     174 		{
+                                 ;     175 			mp_plan_zmove_callback(bf,zmovedlenght);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",175
+0000008F FBE2rrrrrrrr            		MOV.L #__$zmovedlenght, R14
+00000095 ECE2                    		MOV.L [R14], R2
+00000097 A881                    		MOV.L 08H[R0], R1
+00000099 05rrrrrr             A  		BSR _mp_plan_zmove_callback
+0000009D                         L27:	; bb25.split
+                                 ;     176 			zmovedlenght = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",176
+0000009D FBE2rrrrrrrr            		MOV.L #__$zmovedlenght, R14
+000000A3 F8E600                  		MOV.L #00000000H, [R14]
+000000A6                         L28:	; bb25.split1
+                                 ;     177 			zmoved = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",177
+000000A6 FBE2rrrrrrrr            		MOV.L #_zmoved, R14
+000000AC F8E400                  		MOV.B #00H, [R14]
+000000AF 2Err                 B  		BRA L33
+000000B1                         L29:	; bb36
+000000B1 FBE2rrrrrrrr            		MOV.L #_zmoved, R14
+000000B7 58EE                    		MOVU.B [R14], R14
+000000B9 610E                    		CMP #00H, R14
+000000BB 10                   S  		BEQ L31
+000000BC                         L30:	; bb41
+000000BC F80601                  		MOV.L #00000001H, [R0]
+000000BF 08                   S  		BRA L32
+000000C0                         L31:	; bb42
+000000C0 F80600                  		MOV.L #00000000H, [R0]
+000000C3                         L32:	; bb43
+000000C3 EC01                    		MOV.L [R0], R1
+000000C5 6101                    		CMP #00H, R1
+000000C7 21rr                    		BNE L26
+000000C9                         L33:	; bb48
+                                 ;     178 		}
+                                 ;     179 		// initialization to process the new incoming bf buffer (Gcode block)
+                                 ;     180 		memcpy(&mr.gm, &(bf->gm), sizeof(GCodeState_t));// copy in the gcode model state
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",180
+000000C9 A882                    		MOV.L 08H[R0], R2
+000000CB 712274                  		ADD #74H, R2
+000000CE FB12rrrrrrrr            		MOV.L #_mr, R1
+000000D4 72114001                		ADD #0140H, R1
+000000D8 75435C                  		MOV.L #0000005CH, R3
+000000DB 7F8F                    		SMOVF
+000000DD                         L34:	; bb48.split
+                                 ;     181 		bf->replannable = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",181
+000000DD A881                    		MOV.L 08H[R0], R1
+000000DF 3C9800                  		MOV.B #00H, 18H[R1]
+000000E2                         L35:	; bb48.split2
+                                 ;     182 														// too short lines have already been removed
+                                 ;     183 		if (fp_ZERO(bf->length)) {						// ...looks for an actual zero here
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",183
+000000E2 A881                    		MOV.L 08H[R0], R1
+000000E4 AB19                    		MOV.L 34H[R1], R1
+000000E6 7BF1                    		BCLR #1FH, R1
+000000E8 FD7211BD378635          		FCMP #358637BDH, R1
+000000EF 26rr                    		BPZ L43
+000000F1                         L36:	; bb55
+                                 ;     184 			mr.move_state = MOVE_OFF;					// reset mr buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",184
+000000F1 FB12rrrrrrrr            		MOV.L #_mr, R1
+000000F7 3C1200                  		MOV.B #00H, 02H[R1]
+000000FA                         L37:	; bb55.split
+                                 ;     185 			mr.section_state = SECTION_OFF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",185
+000000FA FB12rrrrrrrr            		MOV.L #_mr, R1
+00000100 3C1400                  		MOV.B #00H, 04H[R1]
+00000103                         L38:	; bb55.split3
+                                 ;     186 			bf->nx->replannable = false;				// prevent overplanning (Note 2)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",186
+00000103 A881                    		MOV.L 08H[R0], R1
+00000105 A819                    		MOV.L 04H[R1], R1
+00000107 3C9800                  		MOV.B #00H, 18H[R1]
+0000010A                         L39:	; bb55.split4
+                                 ;     187 			st_prep_null();								// call this to keep the loader happy
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",187
+0000010A 05rrrrrr             A  		BSR _st_prep_null
+0000010E                         L40:	; bb55.split5
+                                 ;     188 			if (mp_free_run_buffer()) cm_cycle_end();	// free buffer & end cycle if planner is empty
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",188
+0000010E 05rrrrrr             A  		BSR _mp_free_run_buffer
+00000112 6101                    		CMP #00H, R1
+00000114 10                   S  		BEQ L42
+00000115                         L41:	; bb61
+00000115 05rrrrrr             A  		BSR _cm_cycle_end
+00000119                         L42:	; bb67
+                                 ;     189 			return (STAT_NOOP);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",189
+00000119 3C0403                  		MOV.B #03H, 04H[R0]
+0000011C 38rrrr               W  		BRA L92
+0000011F                         L43:	; bb76
+                                 ;     190 		}
+                                 ;     191 
+                                 ;     192 		bf->move_state = MOVE_RUN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",192
+0000011F A881                    		MOV.L 08H[R0], R1
+00000121 3C9702                  		MOV.B #02H, 17H[R1]
+00000124                         L44:	; bb76.split
+                                 ;     193 		mr.move_state = MOVE_RUN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",193
+00000124 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000012A 3C1202                  		MOV.B #02H, 02H[R1]
+0000012D                         L45:	; bb76.split6
+                                 ;     194 		mr.section = SECTION_HEAD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",194
+0000012D FB12rrrrrrrr            		MOV.L #_mr, R1
+00000133 3C1300                  		MOV.B #00H, 03H[R1]
+00000136                         L46:	; bb76.split7
+                                 ;     195 		mr.section_state = SECTION_NEW;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",195
+00000136 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000013C 3C1401                  		MOV.B #01H, 04H[R1]
+0000013F                         L47:	; bb76.split8
+                                 ;     196 		mr.jerk = bf->jerk;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",196
+0000013F A881                    		MOV.L 08H[R0], R1
+00000141 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000147 E51E1A4A                		MOV.L 68H[R1], 0128H[R14]
+0000014B                         L48:	; bb76.split9
+                                 ;     197 #ifdef __JERK_EXEC
+                                 ;     198 		mr.jerk_div2 = bf->jerk/2;						// only needed by __JERK_EXEC
+                                 ;     199 #endif
+                                 ;     200 
+                                 ;     201 		mr.head_length = bf->head_length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",201
+0000014B A881                    		MOV.L 08H[R0], R1
+0000014D FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000153 E51E0E40                		MOV.L 38H[R1], 0100H[R14]
+00000157                         L49:	; bb76.split10
+                                 ;     202 		mr.body_length = bf->body_length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",202
+00000157 A881                    		MOV.L 08H[R0], R1
+00000159 FBE2rrrrrrrr            		MOV.L #_mr, R14
+0000015F E51E0F41                		MOV.L 3CH[R1], 0104H[R14]
+00000163                         L50:	; bb76.split11
+                                 ;     203 		mr.tail_length = bf->tail_length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",203
+00000163 A881                    		MOV.L 08H[R0], R1
+00000165 FBE2rrrrrrrr            		MOV.L #_mr, R14
+0000016B E51E1042                		MOV.L 40H[R1], 0108H[R14]
+0000016F                         L51:	; bb76.split12
+                                 ;     204 
+                                 ;     205 		mr.entry_velocity = bf->entry_velocity;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",205
+0000016F A881                    		MOV.L 08H[R0], R1
+00000171 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000177 E51E1143                		MOV.L 44H[R1], 010CH[R14]
+0000017B                         L52:	; bb76.split13
+                                 ;     206 		mr.cruise_velocity = bf->cruise_velocity;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",206
+0000017B A881                    		MOV.L 08H[R0], R1
+0000017D FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000183 E51E1244                		MOV.L 48H[R1], 0110H[R14]
+00000187                         L53:	; bb76.split14
+                                 ;     207 		mr.exit_velocity = bf->exit_velocity;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",207
+00000187 A881                    		MOV.L 08H[R0], R1
+00000189 FBE2rrrrrrrr            		MOV.L #_mr, R14
+0000018F E51E1345                		MOV.L 4CH[R1], 0114H[R14]
+00000193                         L54:	; bb76.split15
+                                 ;     208 
+                                 ;     209 		copy_vector(mr.unit, bf->unit);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",209
+00000193 A882                    		MOV.L 08H[R0], R2
+00000195 71221C                  		ADD #1CH, R2
+00000198 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000019E 6281                    		ADD #08H, R1
+000001A0 754318                  		MOV.L #00000018H, R3
+000001A3 7F8F                    		SMOVF
+000001A5                         L55:	; bb76.split16
+                                 ;     210 		copy_vector(mr.target, bf->gm.target);			// save the final target of the move
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",210
+000001A5 A882                    		MOV.L 08H[R0], R2
+000001A7 71227C                  		ADD #7CH, R2
+000001AA FB12rrrrrrrr            		MOV.L #_mr, R1
+000001B0 711120                  		ADD #20H, R1
+000001B3 754318                  		MOV.L #00000018H, R3
+000001B6 7F8F                    		SMOVF
+000001B8                         L56:	; bb76.split17
+                                 ;     211 
+                                 ;     212 		// generate the waypoints for position correction at section ends
+                                 ;     213 		for (uint8_t axis=0; axis<AXES; axis++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",213
+000001B8 3C0600                  		MOV.B #00H, 06H[R0]
+000001BB 2Err                 B  		BRA L60
+000001BD                         L57:	; bb110
+                                 ;     214 			mr.waypoint[SECTION_HEAD][axis] = mr.position[axis] + mr.unit[axis] * mr.head_length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",214
+000001BD B181                    		MOVU.B 06H[R0], R1
+000001BF 6C21                    		SHLL #02H, R1
+000001C1 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000001C7 4BE1                    		ADD R14, R1
+000001C9 A892                    		MOV.L 08H[R1], R2
+000001CB FC8DE240                		FMUL 0100H[R14].L, R2
+000001CF FC89120E                		FADD 38H[R1].L, R2
+000001D3 A692                    		MOV.L R2, 68H[R1]
+000001D5                         L58:	; bb110.split
+                                 ;     215 			mr.waypoint[SECTION_BODY][axis] = mr.position[axis] + mr.unit[axis] * (mr.head_length + mr.body_length);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",215
+000001D5 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000001DB EDEF40                  		MOV.L 0100H[R14], R15
+000001DE FC89EF41                		FADD 0104H[R14].L, R15
+000001E2 B181                    		MOVU.B 06H[R0], R1
+000001E4 6C21                    		SHLL #02H, R1
+000001E6 4B1E                    		ADD R1, R14
+000001E8 FC8DEF02                		FMUL 08H[R14].L, R15
+000001EC FC89EF0E                		FADD 38H[R14].L, R15
+000001F0 E7EF20                  		MOV.L R15, 80H[R14]
+000001F3                         L59:	; bb110.split18
+                                 ;     216 			mr.waypoint[SECTION_TAIL][axis] = mr.position[axis] + mr.unit[axis] * (mr.head_length + mr.body_length + mr.tail_length);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",216
+000001F3 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000001F9 EDEF40                  		MOV.L 0100H[R14], R15
+000001FC FC89EF41                		FADD 0104H[R14].L, R15
+00000200 FC89EF42                		FADD 0108H[R14].L, R15
+00000204 B181                    		MOVU.B 06H[R0], R1
+00000206 6C21                    		SHLL #02H, R1
+00000208 4B1E                    		ADD R1, R14
+0000020A FC8DEF02                		FMUL 08H[R14].L, R15
+0000020E FC89EF0E                		FADD 38H[R14].L, R15
+00000212 E7EF26                  		MOV.L R15, 98H[R14]
+00000215 B181                    		MOVU.B 06H[R0], R1
+00000217 6211                    		ADD #01H, R1
+00000219 8181                    		MOV.B R1, 06H[R0]
+0000021B                         L60:	; bb161
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",213
+0000021B B181                    		MOVU.B 06H[R0], R1
+0000021D 6161                    		CMP #06H, R1
+0000021F 29rr                    		BLT L57
+00000221                         L61:	; bb173
+                                 ;     217 		}
+                                 ;     218 	}
+                                 ;     219 	// NB: from this point on the contents of the bf buffer do not affect execution
+                                 ;     220 
+                                 ;     221 	//**** main dispatcher to process segments ***
+                                 ;     222 	stat_t status = STAT_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",222
+00000221 3C0500                  		MOV.B #00H, 05H[R0]
+00000224                         L62:	; bb173.split
+                                 ;     223 	if (mr.section == SECTION_HEAD) { status = _exec_aline_head();} else
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",223
+00000224 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000022A B099                    		MOVU.B 03H[R1], R1
+0000022C 6101                    		CMP #00H, R1
+0000022E 18                   S  		BNE L64
+0000022F                         L63:	; bb175
+0000022F 39rrrr               W  		BSR __$_exec_aline_head
+00000232 8109                    		MOV.B R1, 05H[R0]
+00000234 2Err                 B  		BRA L71
+00000236                         L64:	; bb178
+                                 ;     224 	if (mr.section == SECTION_BODY) { status = _exec_aline_body();} else
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",224
+00000236 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000023C B099                    		MOVU.B 03H[R1], R1
+0000023E 6111                    		CMP #01H, R1
+00000240 18                   S  		BNE L66
+00000241                         L65:	; bb179
+00000241 39rrrr               W  		BSR __$_exec_aline_body
+00000244 8109                    		MOV.B R1, 05H[R0]
+00000246 2Err                 B  		BRA L71
+00000248                         L66:	; bb182
+                                 ;     225 	if (mr.section == SECTION_TAIL) { status = _exec_aline_tail();} else
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",225
+00000248 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000024E B099                    		MOVU.B 03H[R1], R1
+00000250 6121                    		CMP #02H, R1
+00000252 18                   S  		BNE L68
+00000253                         L67:	; bb183
+00000253 39rrrr               W  		BSR __$_exec_aline_tail
+00000256 8109                    		MOV.B R1, 05H[R0]
+00000258 2Err                 B  		BRA L71
+0000025A                         L68:	; bb186
+                                 ;     226 	if (mr.move_state == MOVE_SKIP_BLOCK) { status = STAT_OK;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",226
+0000025A FB12rrrrrrrr            		MOV.L #_mr, R1
+00000260 B091                    		MOVU.B 02H[R1], R1
+00000262 6131                    		CMP #03H, R1
+00000264 18                   S  		BNE L70
+00000265                         L69:	; bb187
+00000265 3C0500                  		MOV.B #00H, 05H[R0]
+00000268 2Err                 B  		BRA L71
+0000026A                         L70:	; bb188
+0000026A 754114                  		MOV.L #00000014H, R1
+                                 ;     227 	else { return(cm_hard_alarm(STAT_INTERNAL_ERROR));}	// never supposed to get here
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",227
+0000026D 05rrrrrr             A  		BSR _cm_hard_alarm
+00000271 8101                    		MOV.B R1, 04H[R0]
+00000273 38rrrr               W  		BRA L92
+00000276                         L71:	; bb215
+                                 ;     228 
+                                 ;     229 	// Feedhold processing. Refer to canonical_machine.h for state machine
+                                 ;     230 	// Catch the feedhold request and start the planning the hold
+                                 ;     231 	if (cm.hold_state == FEEDHOLD_SYNC) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",231
+00000276 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000027C 5AEE2002                		MOVU.B 0220H[R14], R14
+00000280 611E                    		CMP #01H, R14
+00000282 21rr                    		BNE L75
+00000284                         L72:	; bb217
+                                 ;     232 		if (zmoved)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",232
+00000284 FBE2rrrrrrrr            		MOV.L #_zmoved, R14
+0000028A 58EE                    		MOVU.B [R14], R14
+0000028C 610E                    		CMP #00H, R14
+0000028E 20rr                    		BEQ L74
+00000290                         L73:	; bb218
+                                 ;     233 		{
+                                 ;     234 			mr.target[AXIS_Z] = mr.gm.target[AXIS_Z];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",234
+00000290 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000296 E5EE540A                		MOV.L 0150H[R14], 28H[R14]
+0000029A                         L74:	; bb225
+                                 ;     235 		}
+                                 ;     236 		cm.hold_state = FEEDHOLD_PLAN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",236
+0000029A FBE2rrrrrrrr            		MOV.L #_cm, R14
+000002A0 FAE4200202              		MOV.B #02H, 0220H[R14]
+000002A5                         L75:	; bb232
+                                 ;     237 	}
+                                 ;     238 
+                                 ;     239 	// Look for the end of the decel to go into HOLD state
+                                 ;     240 	if ((cm.hold_state == FEEDHOLD_DECEL) && (status == STAT_OK)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",240
+000002A5 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000002AB 5AEE2002                		MOVU.B 0220H[R14], R14
+000002AF 613E                    		CMP #03H, R14
+000002B1 20rr                    		BEQ L79
+000002B3 2Err                 B  		BRA L81
+000002B5                         L76:	; bb233
+                                 ;     241 		cm.hold_state = FEEDHOLD_HOLD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",241
+000002B5 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000002BB FAE4200204              		MOV.B #04H, 0220H[R14]
+000002C0                         L77:	; bb233.split
+000002C0 6621                    		MOV.L #00000002H, R1
+                                 ;     242 		cm_set_motion_state(MOTION_HOLD);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",242
+000002C2 05rrrrrr             A  		BSR _cm_set_motion_state
+000002C6                         L78:	; bb233.split19
+000002C6 6611                    		MOV.L #00000001H, R1
+                                 ;     243 		sr_request_status_report(SR_IMMEDIATE_REQUEST);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",243
+000002C8 05rrrrrr             A  		BSR _sr_request_status_report
+000002CC 2Err                 B  		BRA L83
+000002CE                         L79:	; bb239
+000002CE B109                    		MOVU.B 05H[R0], R1
+000002D0 6101                    		CMP #00H, R1
+000002D2 18                   S  		BNE L81
+000002D3                         L80:	; bb244
+000002D3 F80601                  		MOV.L #00000001H, [R0]
+000002D6 08                   S  		BRA L82
+000002D7                         L81:	; bb245
+000002D7 F80600                  		MOV.L #00000000H, [R0]
+000002DA                         L82:	; bb246
+000002DA EC01                    		MOV.L [R0], R1
+000002DC 6101                    		CMP #00H, R1
+000002DE 21rr                    		BNE L76
+000002E0                         L83:	; bb252
+                                 ;     244 	}
+                                 ;     245 
+                                 ;     246 	// There are 3 things that can happen here depending on return conditions:
+                                 ;     247 	//	  status		bf->move_state		Description
+                                 ;     248 	//    -----------	--------------		----------------------------------------
+                                 ;     249 	//	  STAT_EAGAIN	<don't care>		mr buffer has more segments to run
+                                 ;     250 	//	  STAT_OK		MOVE_RUN			mr and bf buffers are done
+                                 ;     251 	//	  STAT_OK		MOVE_NEW			mr done; bf must be run again (it's been reused)
+                                 ;     252 
+                                 ;     253 	if (status == STAT_EAGAIN) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",253
+000002E0 B109                    		MOVU.B 05H[R0], R1
+000002E2 6121                    		CMP #02H, R1
+000002E4 18                   S  		BNE L85
+000002E5                         L84:	; bb253
+000002E5 6601                    		MOV.L #00000000H, R1
+                                 ;     254 		sr_request_status_report(SR_TIMED_REQUEST);		// continue reporting mr buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",254
+000002E7 05rrrrrr             A  		BSR _sr_request_status_report
+000002EB 2Err                 B  		BRA L91
+000002ED                         L85:	; bb255
+                                 ;     255 	} else {
+                                 ;     256 		mr.move_state = MOVE_OFF;						// reset mr buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",256
+000002ED FB12rrrrrrrr            		MOV.L #_mr, R1
+000002F3 3C1200                  		MOV.B #00H, 02H[R1]
+000002F6                         L86:	; bb255.split
+                                 ;     257 		mr.section_state = SECTION_OFF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",257
+000002F6 FB12rrrrrrrr            		MOV.L #_mr, R1
+000002FC 3C1400                  		MOV.B #00H, 04H[R1]
+000002FF                         L87:	; bb255.split20
+                                 ;     258 		bf->nx->replannable = false;					// prevent overplanning (Note 2)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",258
+000002FF A881                    		MOV.L 08H[R0], R1
+00000301 A819                    		MOV.L 04H[R1], R1
+00000303 3C9800                  		MOV.B #00H, 18H[R1]
+00000306                         L88:	; bb255.split21
+                                 ;     259 		if (bf->move_state == MOVE_RUN) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",259
+00000306 A881                    		MOV.L 08H[R0], R1
+00000308 B599                    		MOVU.B 17H[R1], R1
+0000030A 6121                    		CMP #02H, R1
+0000030C 21rr                    		BNE L91
+0000030E                         L89:	; bb262
+                                 ;     260 			if (mp_free_run_buffer()) cm_cycle_end();	// free buffer & end cycle if planner is empty
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",260
+0000030E 05rrrrrr             A  		BSR _mp_free_run_buffer
+00000312 6101                    		CMP #00H, R1
+00000314 10                   S  		BEQ L91
+00000315                         L90:	; bb263
+00000315 05rrrrrr             A  		BSR _cm_cycle_end
+00000319                         L91:	; bb283
+                                 ;     261 		}
+                                 ;     262 	}
+                                 ;     263 	return (status);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",263
+00000319 C5000504                		MOV.B 05H[R0], 04H[R0]
+0000031D                         L92:	; bb286
+0000031D C5000407                		MOV.B 04H[R0], 07H[R0]
+                                 ;     264 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",264
+00000321 B189                    		MOVU.B 07H[R0], R1
+00000323 6703                    		RTSD #0CH
+00000325                         __$_init_forward_diffs:
+                                 		.STACK	__$_init_forward_diffs=56
+                                 ;     265 
+                                 ;     266 /* Forward difference math explained:
+                                 ;     267  *
+                                 ;     268  *	We are using a quintic (fifth-degree) Bezier polynomial for the velocity curve.
+                                 ;     269  *	This gives us a "linear pop" velocity curve; with pop being the sixth derivative of position:
+                                 ;     270  *	velocity - 1st, acceleration - 2nd, jerk - 3rd, snap - 4th, crackle - 5th, pop - 6th
+                                 ;     271  *
+                                 ;     272  * The Bezier curve takes the form:
+                                 ;     273  *
+                                 ;     274  *  V(t) = P_0 * B_0(t) + P_1 * B_1(t) + P_2 * B_2(t) + P_3 * B_3(t) + P_4 * B_4(t) + P_5 * B_5(t)
+                                 ;     275  *
+                                 ;     276  * Where 0 <= t <= 1, and V(t) is the velocity. P_0 through P_5 are the control points, and B_0(t)
+                                 ;     277  * through B_5(t) are the Bernstein basis as follows:
+                                 ;     278  *
+                                 ;     279  *		B_0(t) =   (1-t)^5        =   -t^5 +  5t^4 - 10t^3 + 10t^2 -  5t   +   1
+                                 ;     280  *		B_1(t) =  5(1-t)^4 * t    =   5t^5 - 20t^4 + 30t^3 - 20t^2 +  5t
+                                 ;     281  *		B_2(t) = 10(1-t)^3 * t^2  = -10t^5 + 30t^4 - 30t^3 + 10t^2
+                                 ;     282  *		B_3(t) = 10(1-t)^2 * t^3  =  10t^5 - 20t^4 + 10t^3
+                                 ;     283  *		B_4(t) =  5(1-t)   * t^4  =  -5t^5 +  5t^4
+                                 ;     284  *		B_5(t) =             t^5  =    t^5
+                                 ;     285  *		                              ^       ^       ^       ^       ^       ^
+                                 ;     286  *		                              |       |       |       |       |       |
+                                 ;     287  *		                              A       B       C       D       E       F
+                                 ;     288  *
+                                 ;     289  *
+                                 ;     290  *  We use forward-differencing to calculate each position through the curve.
+                                 ;     291  *	This requires a formula of the form:
+                                 ;     292  *
+                                 ;     293  *		V_f(t) = A*t^5 + B*t^4 + C*t^3 + D*t^2 + E*t + F
+                                 ;     294  *
+                                 ;     295  *  Looking at the above B_0(t) through B_5(t) expanded forms, if we take the coefficients of t^5
+                                 ;     296  *  through t of the Bezier form of V(t), we can determine that:
+                                 ;     297  *
+                                 ;     298  *		A =    -P_0 +  5*P_1 - 10*P_2 + 10*P_3 -  5*P_4 +  P_5
+                                 ;     299  *		B =   5*P_0 - 20*P_1 + 30*P_2 - 20*P_3 +  5*P_4
+                                 ;     300  *		C = -10*P_0 + 30*P_1 - 30*P_2 + 10*P_3
+                                 ;     301  *		D =  10*P_0 - 20*P_1 + 10*P_2
+                                 ;     302  *		E = - 5*P_0 +  5*P_1
+                                 ;     303  *		F =     P_0
+                                 ;     304  *
+                                 ;     305  *	Now, since we will (currently) *always* want the initial acceleration and jerk values to be 0,
+                                 ;     306  *	We set P_i = P_0 = P_1 = P_2 (initial velocity), and P_t = P_3 = P_4 = P_5 (target velocity),
+                                 ;     307  *	which, after simplification, resolves to:
+                                 ;     308  *
+                                 ;     309  *		A = - 6*P_i +  6*P_t
+                                 ;     310  *		B =  15*P_i - 15*P_t
+                                 ;     311  *		C = -10*P_i + 10*P_t
+                                 ;     312  *		D = 0
+                                 ;     313  *		E = 0
+                                 ;     314  *		F = P_i
+                                 ;     315  *
+                                 ;     316  *	Given an interval count of I to get from P_i to P_t, we get the parametric "step" size of h = 1/I.
+                                 ;     317  *	We need to calculate the initial value of forward differences (F_0 - F_5) such that the inital
+                                 ;     318  *	velocity V = P_i, then we iterate over the following I times:
+                                 ;     319  *
+                                 ;     320  *		V   += F_5
+                                 ;     321  *		F_5 += F_4
+                                 ;     322  *		F_4 += F_3
+                                 ;     323  *		F_3 += F_2
+                                 ;     324  *		F_2 += F_1
+                                 ;     325  *
+                                 ;     326  *	See http://www.drdobbs.com/forward-difference-calculation-of-bezier/184403417 for an example of
+                                 ;     327  *	how to calculate F_0 - F_5 for a cubic bezier curve. Since this is a quintic bezier curve, we
+                                 ;     328  *	need to extend the formulas somewhat. I'll not go into the long-winded step-by-step here,
+                                 ;     329  *	but it gives the resulting formulas:
+                                 ;     330  *
+                                 ;     331  *		a = A, b = B, c = C, d = D, e = E, f = F
+                                 ;     332  *		F_5(t+h)-F_5(t) = (5ah)t^4 + (10ah^2 + 4bh)t^3 + (10ah^3 + 6bh^2 + 3ch)t^2 +
+                                 ;     333  *			(5ah^4 + 4bh^3 + 3ch^2 + 2dh)t + ah^5 + bh^4 + ch^3 + dh^2 + eh
+                                 ;     334  *
+                                 ;     335  *		a = 5ah
+                                 ;     336  *		b = 10ah^2 + 4bh
+                                 ;     337  *		c = 10ah^3 + 6bh^2 + 3ch
+                                 ;     338  *		d = 5ah^4 + 4bh^3 + 3ch^2 + 2dh
+                                 ;     339  *
+                                 ;     340  *  (After substitution, simplification, and rearranging):
+                                 ;     341  *		F_4(t+h)-F_4(t) = (20ah^2)t^3 + (60ah^3 + 12bh^2)t^2 + (70ah^4 + 24bh^3 + 6ch^2)t +
+                                 ;     342  *			30ah^5 + 14bh^4 + 6ch^3 + 2dh^2
+                                 ;     343  *
+                                 ;     344  *		a = (20ah^2)
+                                 ;     345  *		b = (60ah^3 + 12bh^2)
+                                 ;     346  *		c = (70ah^4 + 24bh^3 + 6ch^2)
+                                 ;     347  *
+                                 ;     348  *  (After substitution, simplification, and rearranging):
+                                 ;     349  *		F_3(t+h)-F_3(t) = (60ah^3)t^2 + (180ah^4 + 24bh^3)t + 150ah^5 + 36bh^4 + 6ch^3
+                                 ;     350  *
+                                 ;     351  *  (You get the picture...)
+                                 ;     352  *		F_2(t+h)-F_2(t) = (120ah^4)t + 240ah^5 + 24bh^4
+                                 ;     353  *		F_1(t+h)-F_1(t) = 120ah^5
+                                 ;     354  *
+                                 ;     355  *  Normally, we could then assign t = 0, use the A-F values from above, and get out initial F_* values.
+                                 ;     356  *  However, for the sake of "averaging" the velocity of each segment, we actually want to have the initial
+                                 ;     357  *  V be be at t = h/2 and iterate I-1 times. So, the resulting F_* values are (steps not shown):
+                                 ;     358  *
+                                 ;     359  *		F_5 = (121Ah^5)/16 + 5Bh^4 + (13Ch^3)/4 + 2Dh^2 + Eh
+                                 ;     360  *		F_4 = (165Ah^5)/2 + 29Bh^4 + 9Ch^3 + 2Dh^2
+                                 ;     361  *		F_3 = 255Ah^5 + 48Bh^4 + 6Ch^3
+                                 ;     362  *		F_2 = 300Ah^5 + 24Bh^4
+                                 ;     363  *		F_1 = 120Ah^5
+                                 ;     364  *
+                                 ;     365  *  Note that with our current control points, D and E are actually 0.
+                                 ;     366  */
+                                 ;     367 #ifndef __JERK_EXEC
+                                 ;     368 
+                                 ;     369 static void _init_forward_diffs(float Vi, float Vt)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",369
+00000325 7100CC                  		ADD #0FFFFFFCCH, R0
+00000328 A301                    		MOV.L R1, 30H[R0]
+0000032A A28A                    		MOV.L R2, 2CH[R0]
+                                 ;     370 {
+                                 ;     371 	float A =  -6.0*Vi +  6.0*Vt;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",371
+0000032C AB01                    		MOV.L 30H[R0], R1
+0000032E FD72310000C0C0          		FMUL #0C0C00000H, R1
+00000335 FD72320000C040          		FMUL #40C00000H, R2
+0000033C FC8B21                  		FADD R2, R1
+0000033F E301                    		MOV.L R1, [R0]
+00000341                         L94:	; entry.split
+                                 ;     372 	float B =  15.0*Vi - 15.0*Vt;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",372
+00000341 AB01                    		MOV.L 30H[R0], R1
+00000343 FD723100007041          		FMUL #41700000H, R1
+0000034A AA8A                    		MOV.L 2CH[R0], R2
+0000034C FD723200007041          		FMUL #41700000H, R2
+00000353 FC8321                  		FSUB R2, R1
+00000356 A009                    		MOV.L R1, 04H[R0]
+00000358                         L95:	; entry.split1
+                                 ;     373 	float C = -10.0*Vi + 10.0*Vt;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",373
+00000358 AB01                    		MOV.L 30H[R0], R1
+0000035A FD7231000020C1          		FMUL #0C1200000H, R1
+00000361 AA8A                    		MOV.L 2CH[R0], R2
+00000363 FD723200002041          		FMUL #41200000H, R2
+0000036A FC8B21                  		FADD R2, R1
+0000036D A081                    		MOV.L R1, 08H[R0]
+0000036F                         L96:	; entry.split2
+0000036F FB120000803F            		MOV.L #3F800000H, R1
+                                 ;     374 	// D = 0
+                                 ;     375 	// E = 0
+                                 ;     376 	// F = Vi
+                                 ;     377 
+                                 ;     378 	float h   = 1/(mr.segments);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",378
+00000375 FBE2rrrrrrrr            		MOV.L #_mr, R14
+0000037B FC91E146                		FDIV 0118H[R14].L, R1
+0000037F A089                    		MOV.L R1, 0CH[R0]
+00000381                         L97:	; entry.split3
+                                 ;     379 //	float h_3 = h * h * h;
+                                 ;     380 //	float h_4 = h_3 * h;
+                                 ;     381 //	float h_5 = h_4 * h;
+                                 ;     382 
+                                 ;     383 	float Ah_5 = A * h * h * h * h * h;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",383
+00000381 A889                    		MOV.L 0CH[R0], R1
+00000383 EF12                    		MOV.L R1, R2
+00000385 FC8C02                  		FMUL [R0].L, R2
+00000388 FC8F12                  		FMUL R1, R2
+0000038B FC8F12                  		FMUL R1, R2
+0000038E FC8F12                  		FMUL R1, R2
+00000391 FC8F12                  		FMUL R1, R2
+00000394 A102                    		MOV.L R2, 10H[R0]
+00000396                         L98:	; entry.split4
+                                 ;     384 	float Bh_4 = B * h * h * h * h;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",384
+00000396 A889                    		MOV.L 0CH[R0], R1
+00000398 EF12                    		MOV.L R1, R2
+0000039A FC8D0201                		FMUL 04H[R0].L, R2
+0000039E FC8F12                  		FMUL R1, R2
+000003A1 FC8F12                  		FMUL R1, R2
+000003A4 FC8F12                  		FMUL R1, R2
+000003A7 A10A                    		MOV.L R2, 14H[R0]
+000003A9                         L99:	; entry.split5
+                                 ;     385 	float Ch_3 = C * h * h * h;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",385
+000003A9 A889                    		MOV.L 0CH[R0], R1
+000003AB EF12                    		MOV.L R1, R2
+000003AD FC8D0202                		FMUL 08H[R0].L, R2
+000003B1 FC8F12                  		FMUL R1, R2
+000003B4 FC8F12                  		FMUL R1, R2
+000003B7 A182                    		MOV.L R2, 18H[R0]
+000003B9                         L100:	; entry.split6
+                                 ;     386 
+                                 ;     387 	mr.forward_diff_5 = (121.0/16.0)*Ah_5 + 5.0*Bh_4 + (13.0/4.0)*Ch_3;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",387
+000003B9 A901                    		MOV.L 10H[R0], R1
+000003BB FD72310000F240          		FMUL #40F20000H, R1
+000003C2 A90A                    		MOV.L 14H[R0], R2
+000003C4 FD72320000A040          		FMUL #40A00000H, R2
+000003CB FC8B21                  		FADD R2, R1
+000003CE A982                    		MOV.L 18H[R0], R2
+000003D0 FD723200005040          		FMUL #40500000H, R2
+000003D7 FC8B21                  		FADD R2, R1
+000003DA FBE2rrrrrrrr            		MOV.L #_mr, R14
+000003E0 E7E14F                  		MOV.L R1, 013CH[R14]
+000003E3                         L101:	; entry.split7
+                                 ;     388 	mr.forward_diff_4 = (165.0/2.0)*Ah_5 + 29.0*Bh_4 + 9.0*Ch_3;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",388
+000003E3 A901                    		MOV.L 10H[R0], R1
+000003E5 FD72310000A542          		FMUL #42A50000H, R1
+000003EC A90A                    		MOV.L 14H[R0], R2
+000003EE FD72320000E841          		FMUL #41E80000H, R2
+000003F5 FC8B21                  		FADD R2, R1
+000003F8 A982                    		MOV.L 18H[R0], R2
+000003FA FD723200001041          		FMUL #41100000H, R2
+00000401 FC8B21                  		FADD R2, R1
+00000404 FBE2rrrrrrrr            		MOV.L #_mr, R14
+0000040A E7E14E                  		MOV.L R1, 0138H[R14]
+0000040D                         L102:	; entry.split8
+                                 ;     389 	mr.forward_diff_3 = 255.0*Ah_5 + 48.0*Bh_4 + 6.0*Ch_3;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",389
+0000040D A901                    		MOV.L 10H[R0], R1
+0000040F FD723100007F43          		FMUL #437F0000H, R1
+00000416 A90A                    		MOV.L 14H[R0], R2
+00000418 FD723200004042          		FMUL #42400000H, R2
+0000041F FC8B21                  		FADD R2, R1
+00000422 A982                    		MOV.L 18H[R0], R2
+00000424 FD72320000C040          		FMUL #40C00000H, R2
+0000042B FC8B21                  		FADD R2, R1
+0000042E FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000434 E7E14D                  		MOV.L R1, 0134H[R14]
+00000437                         L103:	; entry.split9
+                                 ;     390 	mr.forward_diff_2 = 300.0*Ah_5 + 24.0*Bh_4;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",390
+00000437 A901                    		MOV.L 10H[R0], R1
+00000439 FD723100009643          		FMUL #43960000H, R1
+00000440 A90A                    		MOV.L 14H[R0], R2
+00000442 FD72320000C041          		FMUL #41C00000H, R2
+00000449 FC8B21                  		FADD R2, R1
+0000044C FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000452 E7E14C                  		MOV.L R1, 0130H[R14]
+00000455                         L104:	; entry.split10
+                                 ;     391 	mr.forward_diff_1 = 120.0*Ah_5;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",391
+00000455 A901                    		MOV.L 10H[R0], R1
+00000457 FD72310000F042          		FMUL #42F00000H, R1
+0000045E FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000464 E7E14B                  		MOV.L R1, 012CH[R14]
+00000467                         L105:	; entry.split11
+                                 ;     392 
+                                 ;     393 #ifdef __KAHAN
+                                 ;     394 	mr.forward_diff_5_c = 0;
+                                 ;     395 	mr.forward_diff_4_c = 0;
+                                 ;     396 	mr.forward_diff_3_c = 0;
+                                 ;     397 	mr.forward_diff_2_c = 0;
+                                 ;     398 	mr.forward_diff_1_c = 0;
+                                 ;     399 #endif
+                                 ;     400 
+                                 ;     401 	// Calculate the initial velocity by calculating V(h/2)
+                                 ;     402 	float half_h = h/2.0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",402
+00000467 A889                    		MOV.L 0CH[R0], R1
+00000469 FD724100000040          		FDIV #40000000H, R1
+00000470 A189                    		MOV.L R1, 1CH[R0]
+00000472                         L106:	; entry.split12
+                                 ;     403 	float half_Ch_3 = C * half_h * half_h * half_h;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",403
+00000472 A989                    		MOV.L 1CH[R0], R1
+00000474 EF12                    		MOV.L R1, R2
+00000476 FC8D0202                		FMUL 08H[R0].L, R2
+0000047A FC8F12                  		FMUL R1, R2
+0000047D FC8F12                  		FMUL R1, R2
+00000480 A202                    		MOV.L R2, 20H[R0]
+00000482                         L107:	; entry.split13
+                                 ;     404 	float half_Bh_4 = B * half_h * half_h * half_h * half_h;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",404
+00000482 A989                    		MOV.L 1CH[R0], R1
+00000484 EF12                    		MOV.L R1, R2
+00000486 FC8D0201                		FMUL 04H[R0].L, R2
+0000048A FC8F12                  		FMUL R1, R2
+0000048D FC8F12                  		FMUL R1, R2
+00000490 FC8F12                  		FMUL R1, R2
+00000493 A20A                    		MOV.L R2, 24H[R0]
+00000495                         L108:	; entry.split14
+                                 ;     405 	float half_Ah_5 = C * half_h * half_h * half_h * half_h * half_h;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",405
+00000495 A989                    		MOV.L 1CH[R0], R1
+00000497 EF12                    		MOV.L R1, R2
+00000499 FC8D0202                		FMUL 08H[R0].L, R2
+0000049D FC8F12                  		FMUL R1, R2
+000004A0 FC8F12                  		FMUL R1, R2
+000004A3 FC8F12                  		FMUL R1, R2
+000004A6 FC8F12                  		FMUL R1, R2
+000004A9 A282                    		MOV.L R2, 28H[R0]
+000004AB                         L109:	; entry.split15
+                                 ;     406 	mr.segment_velocity = half_Ah_5 + half_Bh_4 + half_Ch_3 + Vi;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",406
+000004AB AA81                    		MOV.L 28H[R0], R1
+000004AD FC890109                		FADD 24H[R0].L, R1
+000004B1 FC890108                		FADD 20H[R0].L, R1
+000004B5 FC89010C                		FADD 30H[R0].L, R1
+000004B9 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000004BF E7E148                  		MOV.L R1, 0120H[R14]
+000004C2 670D                    		RTSD #34H
+000004C4                         __$_exec_aline_head:
+                                 		.STACK	__$_exec_aline_head=16
+                                 ;     407 }
+                                 ;     408 #endif
+                                 ;     409 
+                                 ;     410 /*********************************************************************************************
+                                 ;     411  * _exec_aline_head()
+                                 ;     412  */
+                                 ;     413 #ifdef __JERK_EXEC
+                                 ;     414 
+                                 ;     415 static stat_t _exec_aline_head()
+                                 ;     416 {
+                                 ;     417 	if (mr.section_state == SECTION_NEW) {							// initialize the move singleton (mr)
+                                 ;     418 		if (fp_ZERO(mr.head_length)) {
+                                 ;     419 			mr.section = SECTION_BODY;
+                                 ;     420 			return(_exec_aline_body());								// skip ahead to the body generator
+                                 ;     421 		}
+                                 ;     422 		mr.midpoint_velocity = (mr.entry_velocity + mr.cruise_velocity) / 2;
+                                 ;     423 		mr.gm.move_time = mr.head_length / mr.midpoint_velocity;	// time for entire accel region
+                                 ;     424 		mr.segments = ceil(uSec(mr.gm.move_time) / (2 * NOM_SEGMENT_USEC)); // # of segments in *each half*
+                                 ;     425 		mr.segment_time = mr.gm.move_time / (2 * mr.segments);
+                                 ;     426 		mr.accel_time = 2 * sqrt((mr.cruise_velocity - mr.entry_velocity) / mr.jerk);
+                                 ;     427 		mr.midpoint_acceleration = 2 * (mr.cruise_velocity - mr.entry_velocity) / mr.accel_time;
+                                 ;     428 		mr.segment_accel_time = mr.accel_time / (2 * mr.segments);	// time to advance for each segment
+                                 ;     429 		mr.elapsed_accel_time = mr.segment_accel_time / 2;			// elapsed time starting point (offset)
+                                 ;     430 		mr.segment_count = (uint32_t)mr.segments;
+                                 ;     431 		if (mr.segment_time < MIN_SEGMENT_TIME)
+                                 ;     432             return(STAT_MINIMUM_TIME_MOVE);                         // exit without advancing position
+                                 ;     433 		mr.section = SECTION_HEAD;
+                                 ;     434 		mr.section_state = SECTION_1st_HALF;
+                                 ;     435 	}
+                                 ;     436 	if (mr.section_state == SECTION_1st_HALF) {						// FIRST HALF (concave part of accel curve)
+                                 ;     437 		mr.segment_velocity = mr.entry_velocity + (square(mr.elapsed_accel_time) * mr.jerk_div2);
+                                 ;     438 		if (_exec_aline_segment() == STAT_OK) { 					// set up for second half
+                                 ;     439 			mr.segment_count = (uint32_t)mr.segments;
+                                 ;     440 			mr.section_state = SECTION_2nd_HALF;
+                                 ;     441 			mr.elapsed_accel_time = mr.segment_accel_time / 2;		// start time from midpoint of segment
+                                 ;     442 		}
+                                 ;     443 		return(STAT_EAGAIN);
+                                 ;     444 	}
+                                 ;     445 	if (mr.section_state == SECTION_2nd_HALF) {						// SECOND HAF (convex part of accel curve)
+                                 ;     446 		mr.segment_velocity = mr.midpoint_velocity +
+                                 ;     447 			(mr.elapsed_accel_time * mr.midpoint_acceleration) -
+                                 ;     448 			(square(mr.elapsed_accel_time) * mr.jerk_div2);
+                                 ;     449 		if (_exec_aline_segment() == STAT_OK) {						// OK means this section is done
+                                 ;     450 			if ((fp_ZERO(mr.body_length)) && (fp_ZERO(mr.tail_length)))
+                                 ;     451                 return(STAT_OK);                                    // ends the move
+                                 ;     452 			mr.section = SECTION_BODY;
+                                 ;     453 			mr.section_state = SECTION_NEW;
+                                 ;     454 		}
+                                 ;     455 	}
+                                 ;     456 	return(STAT_EAGAIN);
+                                 ;     457 }
+                                 ;     458 #else // __ JERK_EXEC
+                                 ;     459 
+                                 ;     460 static stat_t _exec_aline_head()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",460
+000004C4 7EA6                    		PUSH.L R6
+000004C6 6080                    		SUB #08H, R0
+                                 ;     461 {
+                                 ;     462 	if (mr.section_state == SECTION_NEW) {							// initialize the move singleton (mr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",462
+000004C8 FB12rrrrrrrr            		MOV.L #_mr, R1
+000004CE B111                    		MOVU.B 04H[R1], R1
+000004D0 6111                    		CMP #01H, R1
+000004D2 3Brrrr               W  		BNE L125
+000004D5                         L111:	; bb2
+                                 ;     463 		if (fp_ZERO(mr.head_length)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",463
+000004D5 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000004DB EDEE40                  		MOV.L 0100H[R14], R14
+000004DE 7BFE                    		BCLR #1FH, R14
+000004E0 FD721EBD378635          		FCMP #358637BDH, R14
+000004E7 26rr                    		BPZ L114
+000004E9                         L112:	; bb3
+                                 ;     464 			mr.section = SECTION_BODY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",464
+000004E9 FB12rrrrrrrr            		MOV.L #_mr, R1
+000004EF 3C1301                  		MOV.B #01H, 03H[R1]
+000004F2                         L113:	; bb3.split
+                                 ;     465 			return(_exec_aline_body());								// skip ahead to the body generator
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",465
+000004F2 39rrrr               W  		BSR __$_exec_aline_body
+000004F5 8181                    		MOV.B R1, 06H[R0]
+000004F7 38rrrr               W  		BRA L147
+000004FA                         L114:	; bb10
+                                 ;     466 		}
+                                 ;     467 		mr.gm.move_time = 2*mr.head_length / (mr.entry_velocity + mr.cruise_velocity);// time for entire accel region
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",467
+000004FA FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000500 EDEF43                  		MOV.L 010CH[R14], R15
+00000503 FC89EF44                		FADD 0110H[R14].L, R15
+00000507 EDE540                  		MOV.L 0100H[R14], R5
+0000050A FC8B55                  		FADD R5, R5
+0000050D FC93F5                  		FDIV R15, R5
+00000510 E7E55E                  		MOV.L R5, 0178H[R14]
+00000513                         L115:	; bb10.split
+                                 ;     468 		mr.segments = ceil(uSec(mr.gm.move_time) / NOM_SEGMENT_USEC);// # of segments for the section
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",468
+00000513 FB62rrrrrrrr            		MOV.L #_mr, R6
+00000519 ED615E                  		MOV.L 0178H[R6], R1
+0000051C FD7231C0E1644C          		FMUL #4C64E1C0H, R1
+00000523 FD72410080BB44          		FDIV #44BB8000H, R1
+0000052A 05rrrrrr             A  		BSR _ceil
+0000052E E76146                  		MOV.L R1, 0118H[R6]
+00000531                         L116:	; bb10.split1
+                                 ;     469 		mr.segment_time = mr.gm.move_time / mr.segments;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",469
+00000531 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000537 EDEF5E                  		MOV.L 0178H[R14], R15
+0000053A FC91EF46                		FDIV 0118H[R14].L, R15
+0000053E E7EF49                  		MOV.L R15, 0124H[R14]
+00000541                         L117:	; bb10.split2
+                                 ;     470 		_init_forward_diffs(mr.entry_velocity, mr.cruise_velocity);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",470
+00000541 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000547 EDE244                  		MOV.L 0110H[R14], R2
+0000054A EDE143                  		MOV.L 010CH[R14], R1
+0000054D 39rrrr               W  		BSR __$_init_forward_diffs
+00000550                         L118:	; bb10.split3
+                                 ;     471 		mr.segment_count = (uint32_t)mr.segments;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",471
+00000550 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000556 EDEF46                  		MOV.L 0118H[R14], R15
+00000559 FD721F0000004F          		FCMP #4F000000H, R15
+00000560 29rr                    		BLT L120
+00000562                         L119:	; bb10.split3
+00000562 FD722F000080CF          		FADD #0CF800000H, R15
+00000569                         L120:	; bb10.split3
+00000569 FC97FF                  		FTOI R15, R15
+0000056C E7EF47                  		MOV.L R15, 011CH[R14]
+0000056F                         L121:	; bb10.split4
+                                 ;     472 		if (mr.segment_time < MIN_SEGMENT_TIME)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",472
+0000056F FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000575 EDEE49                  		MOV.L 0124H[R14], R14
+00000578 FD721E17B75137          		FCMP #3751B717H, R14
+0000057F 26rr                    		BPZ L123
+00000581                         L122:	; bb29
+                                 ;     473             return(STAT_MINIMUM_TIME_MOVE);                         // exit without advancing position
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",473
+00000581 3C06CA                  		MOV.B #0CAH, 06H[R0]
+00000584 38rrrr               W  		BRA L147
+00000587                         L123:	; bb35
+                                 ;     474 		mr.section = SECTION_HEAD;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",474
+00000587 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000058D 3C1300                  		MOV.B #00H, 03H[R1]
+00000590                         L124:	; bb35.split
+                                 ;     475 		mr.section_state = SECTION_1st_HALF;						// Note: Set to SECTION_1st_HALF for one segment
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",475
+00000590 FB12rrrrrrrr            		MOV.L #_mr, R1
+00000596 3C1402                  		MOV.B #02H, 04H[R1]
+00000599                         L125:	; bb42
+                                 ;     476 	}
+                                 ;     477 	// For forward differencing we should have one segment in SECTION_1st_HALF
+                                 ;     478 	// However, if it returns from that as STAT_OK, then there was only one segment in this section.
+                                 ;     479 	if (mr.section_state == SECTION_1st_HALF) {						// FIRST HALF (concave part of accel curve)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",479
+00000599 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000059F B111                    		MOVU.B 04H[R1], R1
+000005A1 6121                    		CMP #02H, R1
+000005A3 21rr                    		BNE L131
+000005A5                         L126:	; bb44
+                                 ;     480 		if (_exec_aline_segment() == STAT_OK) { 					// set up for second half
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",480
+000005A5 39rrrr               W  		BSR __$_exec_aline_segment
+000005A8 6101                    		CMP #00H, R1
+000005AA 21rr                    		BNE L129
+000005AC                         L127:	; bb45
+                                 ;     481 			mr.section = SECTION_BODY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",481
+000005AC FB12rrrrrrrr            		MOV.L #_mr, R1
+000005B2 3C1301                  		MOV.B #01H, 03H[R1]
+000005B5                         L128:	; bb45.split
+                                 ;     482 			mr.section_state = SECTION_NEW;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",482
+000005B5 FB12rrrrrrrr            		MOV.L #_mr, R1
+000005BB 3C1401                  		MOV.B #01H, 04H[R1]
+000005BE 08                   S  		BRA L130
+000005BF                         L129:	; bb46
+                                 ;     483 		} else {
+                                 ;     484 			mr.section_state = SECTION_2nd_HALF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",484
+000005BF FB12rrrrrrrr            		MOV.L #_mr, R1
+000005C5 3C1403                  		MOV.B #03H, 04H[R1]
+000005C8                         L130:	; bb52
+                                 ;     485 		}
+                                 ;     486 		return(STAT_EAGAIN);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",486
+000005C8 3C0602                  		MOV.B #02H, 06H[R0]
+000005CB 38rrrr               W  		BRA L147
+000005CE                         L131:	; bb60
+                                 ;     487 	}
+                                 ;     488 	if (mr.section_state == SECTION_2nd_HALF) {						// SECOND HALF (convex part of accel curve)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",488
+000005CE FB12rrrrrrrr            		MOV.L #_mr, R1
+000005D4 B111                    		MOVU.B 04H[R1], R1
+000005D6 6131                    		CMP #03H, R1
+000005D8 3Brrrr               W  		BNE L146
+000005DB                         L132:	; bb61
+                                 ;     489 #ifndef __KAHAN
+                                 ;     490 		mr.segment_velocity += mr.forward_diff_5;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",490
+000005DB FBE2rrrrrrrr            		MOV.L #_mr, R14
+000005E1 EDEF48                  		MOV.L 0120H[R14], R15
+000005E4 FC89EF4F                		FADD 013CH[R14].L, R15
+000005E8 E7EF48                  		MOV.L R15, 0120H[R14]
+000005EB                         L133:	; bb61.split
+                                 ;     491 #else	// Use Kahan summation algorithm to mitigate floating-point errors for the above
+                                 ;     492 		float y = mr.forward_diff_5 - mr.forward_diff_5_c;
+                                 ;     493 		float v = mr.segment_velocity + y;
+                                 ;     494 		mr.forward_diff_5_c = (v - mr.segment_velocity) - y;
+                                 ;     495 		mr.segment_velocity = v;
+                                 ;     496 #endif
+                                 ;     497 
+                                 ;     498 		if (_exec_aline_segment() == STAT_OK) { 					// set up for body
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",498
+000005EB 39rrrr               W  		BSR __$_exec_aline_segment
+000005EE 6101                    		CMP #00H, R1
+000005F0 21rr                    		BNE L142
+000005F2                         L134:	; bb67
+                                 ;     499 			if ((fp_ZERO(mr.body_length)) && (fp_ZERO(mr.tail_length)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",499
+000005F2 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000005F8 EDEE41                  		MOV.L 0104H[R14], R14
+000005FB 7BFE                    		BCLR #1FH, R14
+000005FD FD721EBD378635          		FCMP #358637BDH, R14
+00000604 27rr                    		BN L136
+00000606 2Err                 B  		BRA L138
+00000608                         L135:	; bb68
+                                 ;     500                 return(STAT_OK);                                    // ends the move
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",500
+00000608 3C0600                  		MOV.B #00H, 06H[R0]
+0000060B 2Err                 B  		BRA L147
+0000060D                         L136:	; bb74
+0000060D FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000613 EDEE42                  		MOV.L 0108H[R14], R14
+00000616 7BFE                    		BCLR #1FH, R14
+00000618 FD721EBD378635          		FCMP #358637BDH, R14
+0000061F 26rr                    		BPZ L138
+00000621                         L137:	; bb79
+00000621 F80601                  		MOV.L #00000001H, [R0]
+00000624 08                   S  		BRA L139
+00000625                         L138:	; bb80
+00000625 F80600                  		MOV.L #00000000H, [R0]
+00000628                         L139:	; bb81
+00000628 EC01                    		MOV.L [R0], R1
+0000062A 6101                    		CMP #00H, R1
+0000062C 21rr                    		BNE L135
+0000062E                         L140:	; bb86
+                                 ;     501 			mr.section = SECTION_BODY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",501
+0000062E FB12rrrrrrrr            		MOV.L #_mr, R1
+00000634 3C1301                  		MOV.B #01H, 03H[R1]
+00000637                         L141:	; bb86.split
+                                 ;     502 			mr.section_state = SECTION_NEW;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",502
+00000637 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000063D 3C1401                  		MOV.B #01H, 04H[R1]
+00000640 2Err                 B  		BRA L146
+00000642                         L142:	; bb87
+                                 ;     503 		} else {
+                                 ;     504 #ifndef __KAHAN
+                                 ;     505 			mr.forward_diff_5 += mr.forward_diff_4;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",505
+00000642 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000648 EDEF4F                  		MOV.L 013CH[R14], R15
+0000064B FC89EF4E                		FADD 0138H[R14].L, R15
+0000064F E7EF4F                  		MOV.L R15, 013CH[R14]
+00000652                         L143:	; bb87.split
+                                 ;     506 			mr.forward_diff_4 += mr.forward_diff_3;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",506
+00000652 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000658 EDEF4E                  		MOV.L 0138H[R14], R15
+0000065B FC89EF4D                		FADD 0134H[R14].L, R15
+0000065F E7EF4E                  		MOV.L R15, 0138H[R14]
+00000662                         L144:	; bb87.split5
+                                 ;     507 			mr.forward_diff_3 += mr.forward_diff_2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",507
+00000662 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000668 EDEF4D                  		MOV.L 0134H[R14], R15
+0000066B FC89EF4C                		FADD 0130H[R14].L, R15
+0000066F E7EF4D                  		MOV.L R15, 0134H[R14]
+00000672                         L145:	; bb87.split6
+                                 ;     508 			mr.forward_diff_2 += mr.forward_diff_1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",508
+00000672 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000678 EDEF4C                  		MOV.L 0130H[R14], R15
+0000067B FC89EF4B                		FADD 012CH[R14].L, R15
+0000067F E7EF4C                  		MOV.L R15, 0130H[R14]
+00000682                         L146:	; bb111
+                                 ;     509 #else
+                                 ;     510 			//mr.forward_diff_5 += mr.forward_diff_4;
+                                 ;     511 			y = mr.forward_diff_4 - mr.forward_diff_4_c;
+                                 ;     512 			v = mr.forward_diff_5 + y;
+                                 ;     513 			mr.forward_diff_4_c = (v - mr.forward_diff_5) - y;
+                                 ;     514 			mr.forward_diff_5 = v;
+                                 ;     515 
+                                 ;     516 			//mr.forward_diff_4 += mr.forward_diff_3;
+                                 ;     517 			y = mr.forward_diff_3 - mr.forward_diff_3_c;
+                                 ;     518 			v = mr.forward_diff_4 + y;
+                                 ;     519 			mr.forward_diff_3_c = (v - mr.forward_diff_4) - y;
+                                 ;     520 			mr.forward_diff_4 = v;
+                                 ;     521 
+                                 ;     522 			//mr.forward_diff_3 += mr.forward_diff_2;
+                                 ;     523 			y = mr.forward_diff_2 - mr.forward_diff_2_c;
+                                 ;     524 			v = mr.forward_diff_3 + y;
+                                 ;     525 			mr.forward_diff_2_c = (v - mr.forward_diff_3) - y;
+                                 ;     526 			mr.forward_diff_3 = v;
+                                 ;     527 
+                                 ;     528 			//mr.forward_diff_2 += mr.forward_diff_1;
+                                 ;     529 			y = mr.forward_diff_1 - mr.forward_diff_1_c;
+                                 ;     530 			v = mr.forward_diff_2 + y;
+                                 ;     531 			mr.forward_diff_1_c = (v - mr.forward_diff_2) - y;
+                                 ;     532 			mr.forward_diff_2 = v;
+                                 ;     533 #endif
+                                 ;     534 		}
+                                 ;     535 	}
+                                 ;     536 	return(STAT_EAGAIN);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",536
+00000682 3C0602                  		MOV.B #02H, 06H[R0]
+00000685                         L147:	; bb113
+00000685 C5000607                		MOV.B 06H[R0], 07H[R0]
+                                 ;     537 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",537
+00000689 B189                    		MOVU.B 07H[R0], R1
+0000068B 3F6603                  		RTSD #0CH, R6-R6
+0000068E                         __$_exec_aline_body:
+                                 		.STACK	__$_exec_aline_body=12
+                                 ;     538 #endif // __ JERK_EXEC
+                                 ;     539 
+                                 ;     540 /*********************************************************************************************
+                                 ;     541  * _exec_aline_body()
+                                 ;     542  *
+                                 ;     543  *	The body is broken into little segments even though it is a straight line so that
+                                 ;     544  *	feedholds can happen in the middle of a line with a minimum of latency
+                                 ;     545  */
+                                 ;     546 static stat_t _exec_aline_body()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",546
+0000068E 7EA6                    		PUSH.L R6
+00000690 6040                    		SUB #04H, R0
+                                 ;     547 {
+                                 ;     548 	if (mr.section_state == SECTION_NEW) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",548
+00000692 FB12rrrrrrrr            		MOV.L #_mr, R1
+00000698 B111                    		MOVU.B 04H[R1], R1
+0000069A 6111                    		CMP #01H, R1
+0000069C 3Brrrr               W  		BNE L163
+0000069F                         L149:	; bb2
+                                 ;     549 		if (fp_ZERO(mr.body_length)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",549
+0000069F FBE2rrrrrrrr            		MOV.L #_mr, R14
+000006A5 EDEE41                  		MOV.L 0104H[R14], R14
+000006A8 7BFE                    		BCLR #1FH, R14
+000006AA FD721EBD378635          		FCMP #358637BDH, R14
+000006B1 26rr                    		BPZ L152
+000006B3                         L150:	; bb3
+                                 ;     550 			mr.section = SECTION_TAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",550
+000006B3 FB12rrrrrrrr            		MOV.L #_mr, R1
+000006B9 3C1302                  		MOV.B #02H, 03H[R1]
+000006BC                         L151:	; bb3.split
+                                 ;     551 			return(_exec_aline_tail());						// skip ahead to tail periods
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",551
+000006BC 39rrrr               W  		BSR __$_exec_aline_tail
+000006BF 8081                    		MOV.B R1, 02H[R0]
+000006C1 38rrrr               W  		BRA L170
+000006C4                         L152:	; bb10
+                                 ;     552 		}
+                                 ;     553 		mr.gm.move_time = mr.body_length / mr.cruise_velocity;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",553
+000006C4 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000006CA EDEF41                  		MOV.L 0104H[R14], R15
+000006CD FC91EF44                		FDIV 0110H[R14].L, R15
+000006D1 E7EF5E                  		MOV.L R15, 0178H[R14]
+000006D4                         L153:	; bb10.split
+                                 ;     554 		mr.segments = ceil(uSec(mr.gm.move_time) / NOM_SEGMENT_USEC);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",554
+000006D4 FB62rrrrrrrr            		MOV.L #_mr, R6
+000006DA ED615E                  		MOV.L 0178H[R6], R1
+000006DD FD7231C0E1644C          		FMUL #4C64E1C0H, R1
+000006E4 FD72410080BB44          		FDIV #44BB8000H, R1
+000006EB 05rrrrrr             A  		BSR _ceil
+000006EF E76146                  		MOV.L R1, 0118H[R6]
+000006F2                         L154:	; bb10.split1
+                                 ;     555 		mr.segment_time = mr.gm.move_time / mr.segments;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",555
+000006F2 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000006F8 EDEF5E                  		MOV.L 0178H[R14], R15
+000006FB FC91EF46                		FDIV 0118H[R14].L, R15
+000006FF E7EF49                  		MOV.L R15, 0124H[R14]
+00000702                         L155:	; bb10.split2
+                                 ;     556 //		mr.segment_velocity = mr.cruise_velocity * cm.gmx.feed_rate_override_factor;
+                                 ;     557 		mr.segment_velocity = mr.cruise_velocity;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",557
+00000702 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000708 E5EE4448                		MOV.L 0110H[R14], 0120H[R14]
+0000070C                         L156:	; bb10.split3
+                                 ;     558 		mr.segment_count = (uint32_t)mr.segments;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",558
+0000070C FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000712 EDEF46                  		MOV.L 0118H[R14], R15
+00000715 FD721F0000004F          		FCMP #4F000000H, R15
+0000071C 29rr                    		BLT L158
+0000071E                         L157:	; bb10.split3
+0000071E FD722F000080CF          		FADD #0CF800000H, R15
+00000725                         L158:	; bb10.split3
+00000725 FC97FF                  		FTOI R15, R15
+00000728 E7EF47                  		MOV.L R15, 011CH[R14]
+0000072B                         L159:	; bb10.split4
+                                 ;     559 		if (mr.segment_time < MIN_SEGMENT_TIME)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",559
+0000072B FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000731 EDEE49                  		MOV.L 0124H[R14], R14
+00000734 FD721E17B75137          		FCMP #3751B717H, R14
+0000073B 26rr                    		BPZ L161
+0000073D                         L160:	; bb25
+                                 ;     560             return(STAT_MINIMUM_TIME_MOVE);                 // exit without advancing position
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",560
+0000073D 3C02CA                  		MOV.B #0CAH, 02H[R0]
+00000740 2Err                 B  		BRA L170
+00000742                         L161:	; bb31
+                                 ;     561 		mr.section = SECTION_BODY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",561
+00000742 FB12rrrrrrrr            		MOV.L #_mr, R1
+00000748 3C1301                  		MOV.B #01H, 03H[R1]
+0000074B                         L162:	; bb31.split
+                                 ;     562 		mr.section_state = SECTION_2nd_HALF;				// uses PERIOD_2 so last segment detection works
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",562
+0000074B FB12rrrrrrrr            		MOV.L #_mr, R1
+00000751 3C1403                  		MOV.B #03H, 04H[R1]
+00000754                         L163:	; bb38
+                                 ;     563 	}
+                                 ;     564 	if (mr.section_state == SECTION_2nd_HALF) {				// straight part (period 3)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",564
+00000754 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000075A B111                    		MOVU.B 04H[R1], R1
+0000075C 6131                    		CMP #03H, R1
+0000075E 21rr                    		BNE L169
+00000760                         L164:	; bb40
+                                 ;     565 		if (_exec_aline_segment() == STAT_OK) {				// OK means this section is done
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",565
+00000760 39rrrr               W  		BSR __$_exec_aline_segment
+00000763 6101                    		CMP #00H, R1
+00000765 21rr                    		BNE L169
+00000767                         L165:	; bb42
+                                 ;     566 			if (fp_ZERO(mr.tail_length))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",566
+00000767 FBE2rrrrrrrr            		MOV.L #_mr, R14
+0000076D EDEE42                  		MOV.L 0108H[R14], R14
+00000770 7BFE                    		BCLR #1FH, R14
+00000772 FD721EBD378635          		FCMP #358637BDH, R14
+00000779 26rr                    		BPZ L167
+0000077B                         L166:	; bb43
+                                 ;     567                 return(STAT_OK);	                        // ends the move
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",567
+0000077B 3C0200                  		MOV.B #00H, 02H[R0]
+0000077E 2Err                 B  		BRA L170
+00000780                         L167:	; bb50
+                                 ;     568 			mr.section = SECTION_TAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",568
+00000780 FB12rrrrrrrr            		MOV.L #_mr, R1
+00000786 3C1302                  		MOV.B #02H, 03H[R1]
+00000789                         L168:	; bb50.split
+                                 ;     569 			mr.section_state = SECTION_NEW;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",569
+00000789 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000078F 3C1401                  		MOV.B #01H, 04H[R1]
+00000792                         L169:	; bb62
+                                 ;     570 		}
+                                 ;     571 	}
+                                 ;     572 	return(STAT_EAGAIN);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",572
+00000792 3C0202                  		MOV.B #02H, 02H[R0]
+00000795                         L170:	; bb64
+00000795 C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     573 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",573
+00000799 B089                    		MOVU.B 03H[R0], R1
+0000079B 3F6602                  		RTSD #08H, R6-R6
+0000079E                         __$_exec_aline_tail:
+                                 		.STACK	__$_exec_aline_tail=12
+                                 ;     574 
+                                 ;     575 /*********************************************************************************************
+                                 ;     576  * _exec_aline_tail()
+                                 ;     577  */
+                                 ;     578 
+                                 ;     579 #ifdef __JERK_EXEC
+                                 ;     580 
+                                 ;     581 static stat_t _exec_aline_tail()
+                                 ;     582 {
+                                 ;     583 	if (mr.section_state == SECTION_NEW) {							// INITIALIZATION
+                                 ;     584 		if (fp_ZERO(mr.tail_length))
+                                 ;     585             return(STAT_OK);			                            // end the move
+                                 ;     586 		mr.midpoint_velocity = (mr.cruise_velocity + mr.exit_velocity) / 2;
+                                 ;     587 		mr.gm.move_time = mr.tail_length / mr.midpoint_velocity;
+                                 ;     588 		mr.segments = ceil(uSec(mr.gm.move_time) / (2 * NOM_SEGMENT_USEC));// # of segments in *each half*
+                                 ;     589 		mr.segment_time = mr.gm.move_time / (2 * mr.segments);		// time to advance for each segment
+                                 ;     590 		mr.accel_time = 2 * sqrt((mr.cruise_velocity - mr.exit_velocity) / mr.jerk);
+                                 ;     591 		mr.midpoint_acceleration = 2 * (mr.cruise_velocity - mr.exit_velocity) / mr.accel_time;
+                                 ;     592 		mr.segment_accel_time = mr.accel_time / (2 * mr.segments);	// time to advance for each segment
+                                 ;     593 		mr.elapsed_accel_time = mr.segment_accel_time / 2;			//compute time from midpoint of segment
+                                 ;     594 		mr.segment_count = (uint32_t)mr.segments;
+                                 ;     595 		if (mr.segment_time < MIN_SEGMENT_TIME)
+                                 ;     596             return(STAT_MINIMUM_TIME_MOVE);                         // exit without advancing position
+                                 ;     597 		mr.section = SECTION_TAIL;
+                                 ;     598 		mr.section_state = SECTION_1st_HALF;
+                                 ;     599 	}
+                                 ;     600 	if (mr.section_state == SECTION_1st_HALF) {						// FIRST HALF - convex part (period 4)
+                                 ;     601 		mr.segment_velocity = mr.cruise_velocity - (square(mr.elapsed_accel_time) * mr.jerk_div2);
+                                 ;     602 		if (_exec_aline_segment() == STAT_OK) {						// set up for second half
+                                 ;     603 			mr.segment_count = (uint32_t)mr.segments;
+                                 ;     604 			mr.section_state = SECTION_2nd_HALF;
+                                 ;     605 			mr.elapsed_accel_time = mr.segment_accel_time / 2;		// start time from midpoint of segment
+                                 ;     606 		}
+                                 ;     607 		return(STAT_EAGAIN);
+                                 ;     608 	}
+                                 ;     609 	if (mr.section_state == SECTION_2nd_HALF) {						// SECOND HALF - concave part (period 5)
+                                 ;     610 		mr.segment_velocity = mr.midpoint_velocity -
+                                 ;     611 			(mr.elapsed_accel_time * mr.midpoint_acceleration) +
+                                 ;     612 			(square(mr.elapsed_accel_time) * mr.jerk_div2);
+                                 ;     613 		return (_exec_aline_segment()); 							// ends the move or continues EAGAIN
+                                 ;     614 	}
+                                 ;     615 	return(STAT_EAGAIN);											// should never get here
+                                 ;     616 }
+                                 ;     617 
+                                 ;     618 #else // __JERK_EXEC -- run forward differencing math
+                                 ;     619 
+                                 ;     620 static stat_t _exec_aline_tail()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",620
+0000079E 7EA6                    		PUSH.L R6
+000007A0 6040                    		SUB #04H, R0
+                                 ;     621 {
+                                 ;     622 	if (mr.section_state == SECTION_NEW) {							// INITIALIZATION
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",622
+000007A2 FB12rrrrrrrr            		MOV.L #_mr, R1
+000007A8 B111                    		MOVU.B 04H[R1], R1
+000007AA 6111                    		CMP #01H, R1
+000007AC 3Brrrr               W  		BNE L185
+000007AF                         L172:	; bb2
+                                 ;     623 		if (fp_ZERO(mr.tail_length))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",623
+000007AF FBE2rrrrrrrr            		MOV.L #_mr, R14
+000007B5 EDEE42                  		MOV.L 0108H[R14], R14
+000007B8 7BFE                    		BCLR #1FH, R14
+000007BA FD721EBD378635          		FCMP #358637BDH, R14
+000007C1 26rr                    		BPZ L174
+000007C3                         L173:	; bb3
+                                 ;     624             return(STAT_OK);                                        // end the move
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",624
+000007C3 3C0200                  		MOV.B #00H, 02H[R0]
+000007C6 38rrrr               W  		BRA L198
+000007C9                         L174:	; bb9
+                                 ;     625 		mr.gm.move_time = 2*mr.tail_length / (mr.cruise_velocity + mr.exit_velocity); // len/avg. velocity
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",625
+000007C9 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000007CF EDEF44                  		MOV.L 0110H[R14], R15
+000007D2 FC89EF45                		FADD 0114H[R14].L, R15
+000007D6 EDE542                  		MOV.L 0108H[R14], R5
+000007D9 FC8B55                  		FADD R5, R5
+000007DC FC93F5                  		FDIV R15, R5
+000007DF E7E55E                  		MOV.L R5, 0178H[R14]
+000007E2                         L175:	; bb9.split
+                                 ;     626 		mr.segments = ceil(uSec(mr.gm.move_time) / NOM_SEGMENT_USEC);// # of segments for the section
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",626
+000007E2 FB62rrrrrrrr            		MOV.L #_mr, R6
+000007E8 ED615E                  		MOV.L 0178H[R6], R1
+000007EB FD7231C0E1644C          		FMUL #4C64E1C0H, R1
+000007F2 FD72410080BB44          		FDIV #44BB8000H, R1
+000007F9 05rrrrrr             A  		BSR _ceil
+000007FD E76146                  		MOV.L R1, 0118H[R6]
+00000800                         L176:	; bb9.split1
+                                 ;     627 		mr.segment_time = mr.gm.move_time / mr.segments;			// time to advance for each segment
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",627
+00000800 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000806 EDEF5E                  		MOV.L 0178H[R14], R15
+00000809 FC91EF46                		FDIV 0118H[R14].L, R15
+0000080D E7EF49                  		MOV.L R15, 0124H[R14]
+00000810                         L177:	; bb9.split2
+                                 ;     628 		_init_forward_diffs(mr.cruise_velocity, mr.exit_velocity);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",628
+00000810 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000816 EDE245                  		MOV.L 0114H[R14], R2
+00000819 EDE144                  		MOV.L 0110H[R14], R1
+0000081C 39rrrr               W  		BSR __$_init_forward_diffs
+0000081F                         L178:	; bb9.split3
+                                 ;     629 		mr.segment_count = (uint32_t)mr.segments;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",629
+0000081F FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000825 EDEF46                  		MOV.L 0118H[R14], R15
+00000828 FD721F0000004F          		FCMP #4F000000H, R15
+0000082F 29rr                    		BLT L180
+00000831                         L179:	; bb9.split3
+00000831 FD722F000080CF          		FADD #0CF800000H, R15
+00000838                         L180:	; bb9.split3
+00000838 FC97FF                  		FTOI R15, R15
+0000083B E7EF47                  		MOV.L R15, 011CH[R14]
+0000083E                         L181:	; bb9.split4
+                                 ;     630 		if (mr.segment_time < MIN_SEGMENT_TIME)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",630
+0000083E FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000844 EDEE49                  		MOV.L 0124H[R14], R14
+00000847 FD721E17B75137          		FCMP #3751B717H, R14
+0000084E 26rr                    		BPZ L183
+00000850                         L182:	; bb28
+                                 ;     631             return(STAT_MINIMUM_TIME_MOVE);                         // exit without advancing position
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",631
+00000850 3C02CA                  		MOV.B #0CAH, 02H[R0]
+00000853 38rrrr               W  		BRA L198
+00000856                         L183:	; bb34
+                                 ;     632 		mr.section = SECTION_TAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",632
+00000856 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000085C 3C1302                  		MOV.B #02H, 03H[R1]
+0000085F                         L184:	; bb34.split
+                                 ;     633 		mr.section_state = SECTION_1st_HALF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",633
+0000085F FB12rrrrrrrr            		MOV.L #_mr, R1
+00000865 3C1402                  		MOV.B #02H, 04H[R1]
+00000868                         L185:	; bb41
+                                 ;     634 	}
+                                 ;     635 	if (mr.section_state == SECTION_1st_HALF) {						// FIRST HALF - convex part (period 4)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",635
+00000868 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000086E B111                    		MOVU.B 04H[R1], R1
+00000870 6121                    		CMP #02H, R1
+00000872 21rr                    		BNE L189
+00000874                         L186:	; bb43
+                                 ;     636 		if (_exec_aline_segment() == STAT_OK) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",636
+00000874 39rrrr               W  		BSR __$_exec_aline_segment
+00000877 FB22rrrrrrrr            		MOV.L #_mr, R2
+0000087D 3C2403                  		MOV.B #03H, 04H[R2]
+00000880 6101                    		CMP #00H, R1
+00000882 18                   S  		BNE L188
+00000883                         L187:	; bb44.split
+                                 ;     637 			// For forward differencing we should have one segment in SECTION_1st_HALF.
+                                 ;     638 			// However, if it returns from that as STAT_OK, then there was only one segment in this section.
+                                 ;     639 			// Show that we did complete section 2 ... effectively.
+                                 ;     640 			mr.section_state = SECTION_2nd_HALF;
+                                 ;     641 			return STAT_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",641
+00000883 3C0200                  		MOV.B #00H, 02H[R0]
+00000886 2Err                 B  		BRA L198
+00000888                         L188:	; bb52.split
+                                 ;     642 		} else {
+                                 ;     643 			mr.section_state = SECTION_2nd_HALF;
+                                 ;     644 		}
+                                 ;     645 		return(STAT_EAGAIN);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",645
+00000888 3C0202                  		MOV.B #02H, 02H[R0]
+0000088B 2Err                 B  		BRA L198
+0000088D                         L189:	; bb60
+                                 ;     646 	}
+                                 ;     647 	if (mr.section_state == SECTION_2nd_HALF) {						// SECOND HALF - concave part (period 5)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",647
+0000088D FB12rrrrrrrr            		MOV.L #_mr, R1
+00000893 B111                    		MOVU.B 04H[R1], R1
+00000895 6131                    		CMP #03H, R1
+00000897 21rr                    		BNE L197
+00000899                         L190:	; bb61
+                                 ;     648 #ifndef __KAHAN
+                                 ;     649 		mr.segment_velocity += mr.forward_diff_5;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",649
+00000899 FBE2rrrrrrrr            		MOV.L #_mr, R14
+0000089F EDEF48                  		MOV.L 0120H[R14], R15
+000008A2 FC89EF4F                		FADD 013CH[R14].L, R15
+000008A6 E7EF48                  		MOV.L R15, 0120H[R14]
+000008A9                         L191:	; bb61.split
+                                 ;     650 #else	// Use Kahan summation algorithm to mitigate floating-point errors for the above
+                                 ;     651 		float y = mr.forward_diff_5 - mr.forward_diff_5_c;
+                                 ;     652 		float v = mr.segment_velocity + y;
+                                 ;     653 		mr.forward_diff_5_c = (v - mr.segment_velocity) - y;
+                                 ;     654 		mr.segment_velocity = v;
+                                 ;     655 #endif
+                                 ;     656 
+                                 ;     657 		if (_exec_aline_segment() == STAT_OK) { 					// set up for body
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",657
+000008A9 39rrrr               W  		BSR __$_exec_aline_segment
+000008AC 6101                    		CMP #00H, R1
+000008AE 18                   S  		BNE L193
+000008AF                         L192:	; bb66
+                                 ;     658 			return STAT_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",658
+000008AF 3C0200                  		MOV.B #00H, 02H[R0]
+000008B2 2Err                 B  		BRA L198
+000008B4                         L193:	; bb68
+                                 ;     659 		} else {
+                                 ;     660 #ifndef __KAHAN
+                                 ;     661 			mr.forward_diff_5 += mr.forward_diff_4;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",661
+000008B4 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000008BA EDEF4F                  		MOV.L 013CH[R14], R15
+000008BD FC89EF4E                		FADD 0138H[R14].L, R15
+000008C1 E7EF4F                  		MOV.L R15, 013CH[R14]
+000008C4                         L194:	; bb68.split
+                                 ;     662 			mr.forward_diff_4 += mr.forward_diff_3;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",662
+000008C4 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000008CA EDEF4E                  		MOV.L 0138H[R14], R15
+000008CD FC89EF4D                		FADD 0134H[R14].L, R15
+000008D1 E7EF4E                  		MOV.L R15, 0138H[R14]
+000008D4                         L195:	; bb68.split5
+                                 ;     663 			mr.forward_diff_3 += mr.forward_diff_2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",663
+000008D4 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000008DA EDEF4D                  		MOV.L 0134H[R14], R15
+000008DD FC89EF4C                		FADD 0130H[R14].L, R15
+000008E1 E7EF4D                  		MOV.L R15, 0134H[R14]
+000008E4                         L196:	; bb68.split6
+                                 ;     664 			mr.forward_diff_2 += mr.forward_diff_1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",664
+000008E4 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000008EA EDEF4C                  		MOV.L 0130H[R14], R15
+000008ED FC89EF4B                		FADD 012CH[R14].L, R15
+000008F1 E7EF4C                  		MOV.L R15, 0130H[R14]
+000008F4                         L197:	; bb92
+                                 ;     665 #else
+                                 ;     666 			//mr.forward_diff_5 += mr.forward_diff_4;
+                                 ;     667 			y = mr.forward_diff_4 - mr.forward_diff_4_c;
+                                 ;     668 			v = mr.forward_diff_5 + y;
+                                 ;     669 			mr.forward_diff_4_c = (v - mr.forward_diff_5) - y;
+                                 ;     670 			mr.forward_diff_5 = v;
+                                 ;     671 
+                                 ;     672 			//mr.forward_diff_4 += mr.forward_diff_3;
+                                 ;     673 			y = mr.forward_diff_3 - mr.forward_diff_3_c;
+                                 ;     674 			v = mr.forward_diff_4 + y;
+                                 ;     675 			mr.forward_diff_3_c = (v - mr.forward_diff_4) - y;
+                                 ;     676 			mr.forward_diff_4 = v;
+                                 ;     677 
+                                 ;     678 			//mr.forward_diff_3 += mr.forward_diff_2;
+                                 ;     679 			y = mr.forward_diff_2 - mr.forward_diff_2_c;
+                                 ;     680 			v = mr.forward_diff_3 + y;
+                                 ;     681 			mr.forward_diff_2_c = (v - mr.forward_diff_3) - y;
+                                 ;     682 			mr.forward_diff_3 = v;
+                                 ;     683 
+                                 ;     684 			//mr.forward_diff_2 += mr.forward_diff_1;
+                                 ;     685 			y = mr.forward_diff_1 - mr.forward_diff_1_c;
+                                 ;     686 			v = mr.forward_diff_2 + y;
+                                 ;     687 			mr.forward_diff_1_c = (v - mr.forward_diff_2) - y;
+                                 ;     688 			mr.forward_diff_2 = v;
+                                 ;     689 #endif
+                                 ;     690 		}
+                                 ;     691 	}
+                                 ;     692 	return(STAT_EAGAIN);									// should never get here
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",692
+000008F4 3C0202                  		MOV.B #02H, 02H[R0]
+000008F7                         L198:	; bb94
+000008F7 C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     693 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",693
+000008FB B089                    		MOVU.B 03H[R0], R1
+000008FD 3F6602                  		RTSD #08H, R6-R6
+00000900                         __$_exec_aline_segment:
+                                 		.STACK	__$_exec_aline_segment=40
+                                 ;     694 #endif // __JERK_EXEC
+                                 ;     695 
+                                 ;     696 /*********************************************************************************************
+                                 ;     697  * _exec_aline_segment() - segment runner helper
+                                 ;     698  *
+                                 ;     699  * NOTES ON STEP ERROR CORRECTION:
+                                 ;     700  *
+                                 ;     701  *	The commanded_steps are the target_steps delayed by one more segment.
+                                 ;     702  *	This lines them up in time with the encoder readings so a following error can be generated
+                                 ;     703  *
+                                 ;     704  *	The following_error term is positive if the encoder reading is greater than (ahead of)
+                                 ;     705  *	the commanded steps, and negative (behind) if the encoder reading is less than the
+                                 ;     706  *	commanded steps. The following error is not affected by the direction of movement -
+                                 ;     707  *	it's purely a statement of relative position. Examples:
+                                 ;     708  *
+                                 ;     709  *    Encoder Commanded   Following Err
+                                 ;     710  *	  	  100	     90	       +10		encoder is 10 steps ahead of commanded steps
+                                 ;     711  *	      -90	   -100	       +10		encoder is 10 steps ahead of commanded steps
+                                 ;     712  *		   90	    100	       -10		encoder is 10 steps behind commanded steps
+                                 ;     713  *	     -100	    -90	       -10		encoder is 10 steps behind commanded steps
+                                 ;     714  */
+                                 ;     715 
+                                 ;     716 static stat_t _exec_aline_segment()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",716
+00000900 7EA6                    		PUSH.L R6
+00000902 7100E0                  		ADD #0FFFFFFE0H, R0
+                                 ;     717 {
+                                 ;     718 
+                                 ;     719 	uint8_t i;
+                                 ;     720 	float travel_steps[MOTORS];
+                                 ;     721 
+                                 ;     722 	// Set target position for the segment
+                                 ;     723 	// If the segment ends on a section waypoint synchronize to the head, body or tail end
+                                 ;     724 	// Otherwise if not at a section waypoint compute target from segment time and velocity
+                                 ;     725 	// Don't do waypoint correction if you are going into a hold.
+                                 ;     726 
+                                 ;     727 	if ((--mr.segment_count == 0) && (mr.section_state == SECTION_2nd_HALF) &&
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",727
+00000905 FBE2rrrrrrrr            		MOV.L #_mr, R14
+0000090B EDEF47                  		MOV.L 011CH[R14], R15
+0000090E 601F                    		SUB #01H, R15
+00000910 E7EF47                  		MOV.L R15, 011CH[R14]
+00000913 610F                    		CMP #00H, R15
+00000915 3Arrrr               W  		BEQ L238
+00000918 38rrrr               W  		BRA L240
+0000091B                         L200:	; bb4
+                                 ;     728 		(cm.motion_state == MOTION_RUN) && (cm.cycle_state == CYCLE_MACHINING)) {
+                                 ;     729 		copy_vector(mr.gm.target, mr.waypoint[mr.section]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",729
+0000091B FB12rrrrrrrr            		MOV.L #_mr, R1
+00000921 B09A                    		MOVU.B 03H[R1], R2
+00000923 751218                  		MUL #18H, R2
+00000926 4B12                    		ADD R1, R2
+00000928 712268                  		ADD #68H, R2
+0000092B 72114801                		ADD #0148H, R1
+0000092F 754318                  		MOV.L #00000018H, R3
+00000932 7F8F                    		SMOVF
+00000934 38rrrr               W  		BRA L250
+00000937                         L201:	; bb10
+                                 ;     730 	} else {
+                                 ;     731 		float segment_length = mr.segment_velocity * mr.segment_time;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",731
+00000937 FBE2rrrrrrrr            		MOV.L #_mr, R14
+0000093D EDE148                  		MOV.L 0120H[R14], R1
+00000940 FC8DE149                		FMUL 0124H[R14].L, R1
+00000944 A181                    		MOV.L R1, 18H[R0]
+00000946                         L202:	; bb10.split
+                                 ;     732 		for (i=0; i<AXES; i++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",732
+00000946 3C0700                  		MOV.B #00H, 07H[R0]
+00000949 2Err                 B  		BRA L204
+0000094B                         L203:	; bb14
+                                 ;     733 			mr.gm.target[i] = mr.position[i] + (mr.unit[i] * segment_length);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",733
+0000094B B189                    		MOVU.B 07H[R0], R1
+0000094D 6C21                    		SHLL #02H, R1
+0000094F FB22rrrrrrrr            		MOV.L #_mr, R2
+00000955 4B12                    		ADD R1, R2
+00000957 A8A1                    		MOV.L 08H[R2], R1
+00000959 FC8D0106                		FMUL 18H[R0].L, R1
+0000095D FC89210E                		FADD 38H[R2].L, R1
+00000961 E72152                  		MOV.L R1, 0148H[R2]
+00000964 B189                    		MOVU.B 07H[R0], R1
+00000966 6211                    		ADD #01H, R1
+00000968 8189                    		MOV.B R1, 07H[R0]
+0000096A                         L204:	; bb31
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",732
+0000096A B189                    		MOVU.B 07H[R0], R1
+0000096C 6161                    		CMP #06H, R1
+0000096E 29rr                    		BLT L203
+00000970                         L205:	; bb37
+                                 ;     734 		}
+                                 ;     735 		if (configsVar->currentState == STATE_CONFIG_AUTO_MODE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",735
+00000970 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000976 ECE1                    		MOV.L [R14], R1
+00000978 AA11                    		MOV.L 20H[R1], R1
+0000097A 6181                    		CMP #08H, R1
+0000097C 21rr                    		BNE L222
+0000097E                         L206:	; bb39
+                                 ;     736 		{
+                                 ;     737 			if((configFlags[MODOMAQUINA] == MODO_PLASMA) && isCuttingGet() == true){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",737
+0000097E FBE2rrrrrrrr            		MOV.L #_configFlags, R14
+00000984 ECEE                    		MOV.L [R14], R14
+00000986 610E                    		CMP #00H, R14
+00000988 20rr                    		BEQ L208
+0000098A 2Err                 B  		BRA L210
+0000098C                         L207:	; bb40
+                                 ;     738 				zmove = pl_thc_pid();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",738
+0000098C 05rrrrrr             A  		BSR _pl_thc_pid
+00000990 FBE2rrrrrrrr            		MOV.L #_zmove, R14
+00000996 E3E1                    		MOV.L R1, [R14]
+00000998 2Err                 B  		BRA L212
+0000099A                         L208:	; bb45
+0000099A 05rrrrrr             A  		BSR _isCuttingGet
+0000099E 6111                    		CMP #01H, R1
+000009A0 18                   S  		BNE L210
+000009A1                         L209:	; bb50
+000009A1 F80601                  		MOV.L #00000001H, [R0]
+000009A4 08                   S  		BRA L211
+000009A5                         L210:	; bb51
+000009A5 F80600                  		MOV.L #00000000H, [R0]
+000009A8                         L211:	; bb52
+000009A8 EC01                    		MOV.L [R0], R1
+000009AA 6101                    		CMP #00H, R1
+000009AC 21rr                    		BNE L207
+000009AE                         L212:	; bb58
+                                 ;     739 			}
+                                 ;     740 
+                                 ;     741 			if((configFlags[MODOMAQUINA] == MODO_PLASMA) && isCuttingGet() == false && sim == false){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",741
+000009AE FBE2rrrrrrrr            		MOV.L #_configFlags, R14
+000009B4 ECEE                    		MOV.L [R14], R14
+000009B6 610E                    		CMP #00H, R14
+000009B8 20rr                    		BEQ L214
+000009BA 2Err                 B  		BRA L216
+000009BC                         L213:	; bb59
+                                 ;     742 				zmove = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",742
+000009BC FBE2rrrrrrrr            		MOV.L #_zmove, R14
+000009C2 F8E600                  		MOV.L #00000000H, [R14]
+000009C5 2Err                 B  		BRA L222
+000009C7                         L214:	; bb63
+000009C7 05rrrrrr             A  		BSR _isCuttingGet
+000009CB 6101                    		CMP #00H, R1
+000009CD 18                   S  		BNE L216
+000009CE                         L215:	; bb68
+000009CE F80601                  		MOV.L #00000001H, [R0]
+000009D1 08                   S  		BRA L217
+000009D2                         L216:	; bb69
+000009D2 F80600                  		MOV.L #00000000H, [R0]
+000009D5                         L217:	; bb70
+000009D5 EC01                    		MOV.L [R0], R1
+000009D7 6101                    		CMP #00H, R1
+000009D9 20rr                    		BEQ L220
+000009DB                         L218:	; bb74
+000009DB FBE2rrrrrrrr            		MOV.L #_sim, R14
+000009E1 58EE                    		MOVU.B [R14], R14
+000009E3 610E                    		CMP #00H, R14
+000009E5 18                   S  		BNE L220
+000009E6                         L219:	; bb80
+000009E6 F80601                  		MOV.L #00000001H, [R0]
+000009E9 08                   S  		BRA L221
+000009EA                         L220:	; bb81
+000009EA F80600                  		MOV.L #00000000H, [R0]
+000009ED                         L221:	; bb82
+000009ED EC01                    		MOV.L [R0], R1
+000009EF 6101                    		CMP #00H, R1
+000009F1 21rr                    		BNE L213
+000009F3                         L222:	; bb105
+                                 ;     743 			}
+                                 ;     744 		}else if (configsVar->currentState == STATE_CONFIG_MANUAL_MODE)
+                                 ;     745 		{
+                                 ;     746 
+                                 ;     747 		}
+                                 ;     748 		if(zmove != 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",748
+000009F3 FBE2rrrrrrrr            		MOV.L #_zmove, R14
+000009F9 ECEE                    		MOV.L [R14], R14
+000009FB FD721E00000000          		FCMP #00000000H, R14
+00000A02 3Arrrr               W  		BEQ L250
+00000A05                         L223:	; bb107
+                                 ;     749 		{
+                                 ;     750 			if (fp_ZERO(mr.unit[2]))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",750
+00000A05 FB12rrrrrrrr            		MOV.L #_mr, R1
+00000A0B A911                    		MOV.L 10H[R1], R1
+00000A0D 7BF1                    		BCLR #1FH, R1
+00000A0F FD7211BD378635          		FCMP #358637BDH, R1
+00000A16 27rr                  * 		BPZ L250
+         38rrrr                  
+00000A1B                         L224:	; bb108
+                                 ;     751 			{
+                                 ;     752 				mr.gm.target[2] += zmove;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",752
+00000A1B FBE2rrrrrrrr            		MOV.L #_zmove, R14
+00000A21 ECEE                    		MOV.L [R14], R14
+00000A23 FBF2rrrrrrrr            		MOV.L #_mr, R15
+00000A29 FC89FE54                		FADD 0150H[R15].L, R14
+00000A2D E7FE54                  		MOV.L R14, 0150H[R15]
+00000A30                         L225:	; bb108.split
+                                 ;     753 				/* Não corrigir a mais que 50 mm*/
+                                 ;     754 				if (mr.gm.target[2] > 50.0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",754
+00000A30 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000A36 FBF200004842            		MOV.L #42480000H, R15
+00000A3C FC85EF54                		FCMP 0150H[R14].L, R15
+00000A40 26rr                    		BPZ L227
+00000A42                         L226:	; bb113
+                                 ;     755 				{
+                                 ;     756 					mr.gm.target[2] = 50.0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",756
+00000A42 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000A48 F9E25400004842          		MOV.L #42480000H, 0150H[R14]
+00000A4F                         L227:	; bb119
+                                 ;     757 				}
+                                 ;     758 				/* Se a correçao do THC fizer o target do eixo Z maior que a altura de deslocamento
+                                 ;     759 				 * a altura de deslocamento será igual a correção*/
+                                 ;     760 				if(configFlags[MODOMAQUINA] == MODO_PLASMA)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",760
+00000A4F FBE2rrrrrrrr            		MOV.L #_configFlags, R14
+00000A55 ECEE                    		MOV.L [R14], R14
+00000A57 610E                    		CMP #00H, R14
+00000A59 FBE2rrrrrrrr            		MOV.L #_configVarMaq, R14
+00000A5F ECE2                    		MOV.L [R14], R2
+00000A61 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000A67 EDE154                  		MOV.L 0150H[R14], R1
+00000A6A 21rr                    		BNE L229
+00000A6C                         L228:	; bb120
+                                 ;     761 				{
+                                 ;     762 					configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] = fmax(mr.gm.target[2],configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",762
+00000A6C 05rrrrrr             A  		BSR _fmax
+00000A70 FBE2rrrrrrrr            		MOV.L #_configVarMaq, R14
+00000A76 E3E1                    		MOV.L R1, [R14]
+00000A78 2Err                 B  		BRA L233
+00000A7A                         L229:	; bb124
+                                 ;     763 				}
+                                 ;     764 				else
+                                 ;     765 				{
+                                 ;     766 					configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] = fmax(mr.gm.target[2],configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",766
+00000A7A 05rrrrrr             A  		BSR _fmax
+00000A7E FBE2rrrrrrrr            		MOV.L #_configVarMaq, R14
+00000A84 E3E1                    		MOV.L R1, [R14]
+00000A86                         L230:	; bb124.split
+                                 ;     767 					/* Atualizando a altura de corte*/
+                                 ;     768 					configVarOx[OX_CONFIG_ALTURA_CORTE] += zmove;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",768
+00000A86 FBE2rrrrrrrr            		MOV.L #_zmove, R14
+00000A8C ECE1                    		MOV.L [R14], R1
+00000A8E FB22rrrrrrrr            		MOV.L #_configVarOx, R2
+00000A94 FC892101                		FADD 04H[R2].L, R1
+00000A98 A029                    		MOV.L R1, 04H[R2]
+00000A9A                         L231:	; bb124.split1
+                                 ;     769 					configVarOx[OX_CONFIG_ALTURA_PERFURACAO] += zmove;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",769
+00000A9A FBE2rrrrrrrr            		MOV.L #_configVarOx, R14
+00000AA0 ECEF                    		MOV.L [R14], R15
+00000AA2 FB52rrrrrrrr            		MOV.L #_zmove, R5
+00000AA8 FC885F                  		FADD [R5].L, R15
+00000AAB E3EF                    		MOV.L R15, [R14]
+00000AAD                         L232:	; bb124.split2
+                                 ;     770 					configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO] += zmove;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",770
+00000AAD FBE2rrrrrrrr            		MOV.L #_configVarMaq, R14
+00000AB3 ECEF                    		MOV.L [R14], R15
+00000AB5 FB52rrrrrrrr            		MOV.L #_zmove, R5
+00000ABB FC885F                  		FADD [R5].L, R15
+00000ABE E3EF                    		MOV.L R15, [R14]
+00000AC0                         L233:	; bb141
+                                 ;     771 				}
+                                 ;     772 
+                                 ;     773 				zmovedlenght = mr.gm.target[2];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",773
+00000AC0 FBE2rrrrrrrr            		MOV.L #__$zmovedlenght, R14
+00000AC6 FBF2rrrrrrrr            		MOV.L #_mr, R15
+00000ACC E1FE54                  		MOV.L 0150H[R15], [R14]
+00000ACF                         L234:	; bb141.split
+                                 ;     774 				//mp_set_planner_position(2, mr.gm.target[2]);
+                                 ;     775 				mr.waypoint[SECTION_HEAD][2] = mr.gm.target[2];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",775
+00000ACF FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000AD5 E5EE541C                		MOV.L 0150H[R14], 70H[R14]
+00000AD9                         L235:	; bb141.split3
+                                 ;     776 				mr.waypoint[SECTION_BODY][2] = mr.gm.target[2];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",776
+00000AD9 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000ADF E5EE5422                		MOV.L 0150H[R14], 88H[R14]
+00000AE3                         L236:	; bb141.split4
+                                 ;     777 				mr.waypoint[SECTION_TAIL][2] = mr.gm.target[2];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",777
+00000AE3 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000AE9 E5EE5428                		MOV.L 0150H[R14], 0A0H[R14]
+00000AED                         L237:	; bb141.split5
+                                 ;     778 				zmoved = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",778
+00000AED FBE2rrrrrrrr            		MOV.L #_zmoved, R14
+00000AF3 F8E401                  		MOV.B #01H, [R14]
+00000AF6 2Err                 B  		BRA L250
+00000AF8                         L238:	; bb162
+00000AF8 FB12rrrrrrrr            		MOV.L #_mr, R1
+00000AFE B111                    		MOVU.B 04H[R1], R1
+00000B00 6131                    		CMP #03H, R1
+00000B02 18                   S  		BNE L240
+00000B03                         L239:	; bb167
+00000B03 F80601                  		MOV.L #00000001H, [R0]
+00000B06 08                   S  		BRA L241
+00000B07                         L240:	; bb168
+00000B07 F80600                  		MOV.L #00000000H, [R0]
+00000B0A                         L241:	; bb169
+00000B0A EC01                    		MOV.L [R0], R1
+00000B0C 6101                    		CMP #00H, R1
+00000B0E 20rr                    		BEQ L244
+00000B10                         L242:	; bb173
+00000B10 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000B16 5AEE1F02                		MOVU.B 021FH[R14], R14
+00000B1A 611E                    		CMP #01H, R14
+00000B1C 18                   S  		BNE L244
+00000B1D                         L243:	; bb178
+00000B1D F80601                  		MOV.L #00000001H, [R0]
+00000B20 08                   S  		BRA L245
+00000B21                         L244:	; bb179
+00000B21 F80600                  		MOV.L #00000000H, [R0]
+00000B24                         L245:	; bb180
+00000B24 EC01                    		MOV.L [R0], R1
+00000B26 6101                    		CMP #00H, R1
+00000B28 20rr                    		BEQ L248
+00000B2A                         L246:	; bb184
+00000B2A FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000B30 5AEE1E02                		MOVU.B 021EH[R14], R14
+00000B34 611E                    		CMP #01H, R14
+00000B36 18                   S  		BNE L248
+00000B37                         L247:	; bb189
+00000B37 F80601                  		MOV.L #00000001H, [R0]
+00000B3A 08                   S  		BRA L249
+00000B3B                         L248:	; bb190
+00000B3B F80600                  		MOV.L #00000000H, [R0]
+00000B3E                         L249:	; bb191
+00000B3E EC01                    		MOV.L [R0], R1
+00000B40 6101                    		CMP #00H, R1
+00000B42 3Brrrr               W  		BNE L200
+00000B45 38rrrr               W  		BRA L201
+00000B48                         L250:	; bb196
+                                 ;     779 			}
+                                 ;     780 		}
+                                 ;     781 	}
+                                 ;     782 
+                                 ;     783 	// Convert target position to steps
+                                 ;     784 	// Bucket-brigade the old target down the chain before getting the new target from kinematics
+                                 ;     785 	//
+                                 ;     786 	// NB: The direct manipulation of steps to compute travel_steps only works for Cartesian kinematics.
+                                 ;     787 	//	   Other kinematics may require transforming travel distance as opposed to simply subtracting steps.
+                                 ;     788 
+                                 ;     789 	for (i=0; i<MOTORS; i++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",789
+00000B48 3C0700                  		MOV.B #00H, 07H[R0]
+00000B4B 2Err                 B  		BRA L255
+00000B4D                         L251:	; bb197
+                                 ;     790 		mr.commanded_steps[i] = mr.position_steps[i];		// previous segment's position, delayed by 1 segment
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",790
+00000B4D B189                    		MOVU.B 07H[R0], R1
+00000B4F 6C21                    		SHLL #02H, R1
+00000B51 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000B57 4B1E                    		ADD R1, R14
+00000B59 E5EE3034                		MOV.L 0C0H[R14], 0D0H[R14]
+00000B5D                         L252:	; bb197.split
+                                 ;     791 		mr.position_steps[i] = mr.target_steps[i];			// previous segment's target becomes position
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",791
+00000B5D B189                    		MOVU.B 07H[R0], R1
+00000B5F 6C21                    		SHLL #02H, R1
+00000B61 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000B67 4B1E                    		ADD R1, R14
+00000B69 E5EE2C30                		MOV.L 0B0H[R14], 0C0H[R14]
+00000B6D                         L253:	; bb197.split6
+                                 ;     792 		mr.encoder_steps[i] = en_read_encoder(i);			// get current encoder position (time aligns to commanded_steps)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",792
+00000B6D B18E                    		MOVU.B 07H[R0], R6
+00000B6F EF61                    		MOV.L R6, R1
+00000B71 05rrrrrr             A  		BSR _en_read_encoder
+00000B75 6C26                    		SHLL #02H, R6
+00000B77 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000B7D 4B6E                    		ADD R6, R14
+00000B7F E7E138                  		MOV.L R1, 0E0H[R14]
+00000B82                         L254:	; bb197.split7
+                                 ;     793 		mr.following_error[i] = mr.encoder_steps[i] - mr.commanded_steps[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",793
+00000B82 B189                    		MOVU.B 07H[R0], R1
+00000B84 6C21                    		SHLL #02H, R1
+00000B86 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000B8C 4B1E                    		ADD R1, R14
+00000B8E EDEF38                  		MOV.L 0E0H[R14], R15
+00000B91 FC81EF34                		FSUB 0D0H[R14].L, R15
+00000B95 E7EF3C                  		MOV.L R15, 0F0H[R14]
+00000B98 B189                    		MOVU.B 07H[R0], R1
+00000B9A 6211                    		ADD #01H, R1
+00000B9C 8189                    		MOV.B R1, 07H[R0]
+00000B9E                         L255:	; bb231
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",789
+00000B9E B189                    		MOVU.B 07H[R0], R1
+00000BA0 6141                    		CMP #04H, R1
+00000BA2 29rr                    		BLT L251
+00000BA4                         L256:	; bb237
+                                 ;     794 	}
+                                 ;     795 	ik_kinematics(mr.gm.target, mr.target_steps);			// now determine the target steps...
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",795
+00000BA4 FB12rrrrrrrr            		MOV.L #_mr, R1
+00000BAA 7212B000                		ADD #0B0H, R1, R2
+00000BAE 72114801                		ADD #0148H, R1
+00000BB2 05rrrrrr             A  		BSR _ik_kinematics
+00000BB6                         L257:	; bb237.split
+                                 ;     796 	for (i=0; i<MOTORS; i++) {								// and compute the distances to be traveled
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",796
+00000BB6 3C0700                  		MOV.B #00H, 07H[R0]
+00000BB9 2Err                 B  		BRA L259
+00000BBB                         L258:	; bb238
+                                 ;     797 		travel_steps[i] = mr.target_steps[i] - mr.position_steps[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",797
+00000BBB B189                    		MOVU.B 07H[R0], R1
+00000BBD FDC21E                  		SHLL #02H, R1, R14
+00000BC0 FBF2rrrrrrrr            		MOV.L #_mr, R15
+00000BC6 4BEF                    		ADD R14, R15
+00000BC8 EDFE2C                  		MOV.L 0B0H[R15], R14
+00000BCB FC81FE30                		FSUB 0C0H[R15].L, R14
+00000BCF 710F08                  		ADD #08H, R0, R15
+00000BD2 FE21FE                  		MOV.L R14, [R1,R15]
+00000BD5 B189                    		MOVU.B 07H[R0], R1
+00000BD7 6211                    		ADD #01H, R1
+00000BD9 8189                    		MOV.B R1, 07H[R0]
+00000BDB                         L259:	; bb254
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",796
+00000BDB B189                    		MOVU.B 07H[R0], R1
+00000BDD 6141                    		CMP #04H, R1
+00000BDF 29rr                    		BLT L258
+00000BE1                         L260:	; bb261
+                                 ;     798 	}
+                                 ;     799 
+                                 ;     800 	// Call the stepper prep function
+                                 ;     801 
+                                 ;     802 	ritorno(st_prep_line(travel_steps, mr.following_error, mr.segment_time));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",802
+00000BE1 FB22rrrrrrrr            		MOV.L #_mr, R2
+00000BE7 ED2349                  		MOV.L 0124H[R2], R3
+00000BEA 7222F000                		ADD #0F0H, R2
+00000BEE 710108                  		ADD #08H, R0, R1
+00000BF1 05rrrrrr             A  		BSR _st_prep_line
+00000BF5 FBE2rrrrrrrr            		MOV.L #_status_code, R14
+00000BFB C3E1                    		MOV.B R1, [R14]
+00000BFD 6101                    		CMP #00H, R1
+00000BFF 20rr                    		BEQ L262
+00000C01                         L261:	; bb262
+00000C01 FBE2rrrrrrrr            		MOV.L #_status_code, R14
+00000C07 C4E006                  		MOV.B [R14], 06H[R0]
+00000C0A 2Err                 B  		BRA L266
+00000C0C                         L262:	; bb273
+                                 ;     803 	copy_vector(mr.position, mr.gm.target); 				// update position from target
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",803
+00000C0C FB12rrrrrrrr            		MOV.L #_mr, R1
+00000C12 72124801                		ADD #0148H, R1, R2
+00000C16 711138                  		ADD #38H, R1
+00000C19 754318                  		MOV.L #00000018H, R3
+00000C1C 7F8F                    		SMOVF
+00000C1E                         L263:	; bb273.split
+                                 ;     804 #ifdef __JERK_EXEC
+                                 ;     805 	mr.elapsed_accel_time += mr.segment_accel_time;			// this is needed by jerk-based exec (NB: ignored if running the body)
+                                 ;     806 #endif
+                                 ;     807 	if (mr.segment_count == 0) return (STAT_OK);			// this section has run all its segments
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",807
+00000C1E FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000C24 EDEE47                  		MOV.L 011CH[R14], R14
+00000C27 610E                    		CMP #00H, R14
+00000C29 18                   S  		BNE L265
+00000C2A                         L264:	; bb275
+00000C2A 3C0600                  		MOV.B #00H, 06H[R0]
+00000C2D 08                   S  		BRA L266
+00000C2E                         L265:	; bb281
+                                 ;     808 	return (STAT_EAGAIN);									// this section still has more segments to run
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",808
+00000C2E 3C0602                  		MOV.B #02H, 06H[R0]
+00000C31                         L266:	; bb283
+00000C31 C500061F                		MOV.B 06H[R0], 1FH[R0]
+                                 ;     809 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_exec.c",809
+00000C35 B789                    		MOVU.B 1FH[R0], R1
+00000C37 3F6609                  		RTSD #24H, R6-R6
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         __$zmovedlenght:
+00000000 00000000                		.lword	00000000H
+                                 		.SECTION	D_1,ROMDATA
+00000000                         _zmoved:
+00000000 00                      		.byte	00H
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     02283   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000003130(00000C3AH)  P
+ROMDATA  0000000004(00000004H)  D
+ROMDATA  0000000001(00000001H)  D_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\plan_exec.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\plan_exec.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\src\cnc\plan_exec.obj

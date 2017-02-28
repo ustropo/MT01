@@ -1,0 +1,2680 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:25 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:24
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_usb_hmsc_api.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_usb_hmsc_api.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;r_usb_hmsc_api.c
+                                 
+                                 		.glb	_usb_ghmsc_ControlData
+                                 		.glb	_usb_ghmsc_Cbw
+                                 		.glb	_usb_ghmsc_drv_no_tbl
+                                 		.glb	_usb_ghmsc_CbwTagNo
+                                 		.glb	_usb_ghmsc_PipeTable
+                                 		.glb	_usb_ghmsc_DeviceTable
+                                 		.glb	_usb_ghmsc_ConfigTable
+                                 		.glb	_usb_ghmsc_InterfaceTable
+                                 		.glb	_usb_ghhub_TPL
+                                 		.glb	_usb_ghmsc_AttSts
+                                 		.glb	_usb_ghmsc_InPipe
+                                 		.glb	_usb_ghmsc_OutPipe
+                                 		.glb	_usb_ghhub_DefEPTbl
+                                 		.glb	_usb_ghmsc_Devaddr
+                                 		.glb	_usb_ghmsc_Speed
+                                 		.glb	_usb_shmsc_InitSeq
+                                 		.glb	_usb_ghmsc_Data
+                                 		.glb	_usb_ghmsc_drive_no
+                                 		.glb	_gszCurFile
+                                 		.glb	_drivemountFlag
+                                 		.glb	_R_usb_hmsc_Task
+                                 		.glb	_usb_hmsc_Task
+                                 		.glb	_R_usb_hmsc_hub_registration
+                                 		.glb	_R_usb_cstd_SetTaskPri
+                                 		.glb	_R_usb_hhub_Registration
+                                 		.glb	_R_usb_hmsc_driver_start
+                                 		.glb	_R_usb_hmsc_ClearStall
+                                 		.glb	_usb_hmsc_ClearStall
+                                 		.glb	_R_usb_hmsc_get_pipetbl
+                                 		.glb	_R_usb_hmsc_TaskOpen
+                                 		.glb	_R_usb_hmsc_TaskClose
+                                 		.glb	_R_usb_hmsc_Initialized
+                                 		.glb	_R_usb_hmsc_ClassCheck
+                                 		.glb	_R_usb_cstd_SndMsg
+                                 		.glb	_R_usb_cstd_RelBlk
+                                 		.glb	_R_usb_cstd_PgetBlk
+                                 		.glb	_R_usb_hmsc_Read10
+                                 		.glb	_usb_hmsc_SmpDrive2Unit
+                                 		.glb	_usb_hmsc_SetRwCbw
+                                 		.glb	_usb_hmsc_DataIn
+                                 		.glb	_R_usb_hmsc_Write10
+                                 		.glb	_usb_hmsc_DataOut
+                                 		.glb	_R_usb_hmsc_PreventAllow
+                                 		.glb	_usb_hmsc_ClrData
+                                 		.glb	_usb_hmsc_SetElsCbw
+                                 		.glb	_usb_hmsc_NoData
+                                 		.glb	_R_usb_hmsc_TestUnit
+                                 		.glb	_R_usb_hmsc_RequestSense
+                                 		.glb	_R_usb_hmsc_Inquiry
+                                 		.glb	_R_usb_hmsc_ReadCapacity
+                                 		.glb	_R_usb_hmsc_ReadFormatCapacity
+                                 		.glb	_R_usb_hmsc_ModeSense10
+                                 		.glb	_R_usb_hmsc_ModeSelect6
+                                 		.glb	_R_usb_hmsc_DriveSpeed
+                                 		.glb	_R_usb_hstd_DeviceInformation
+                                 		.glb	_R_usb_hmsc_Release
+                                 		.glb	_R_usb_hstd_DriverRelease
+                                 		.glb	_R_usb_hmsc_SetDevSts
+                                 		.glb	_R_usb_hmsc_GetDevSts
+                                 		.glb	_R_usb_hmsc_Information
+                                 		.glb	_R_usb_hmsc_GetMaxUnit
+                                 		.glb	_usb_hmsc_SubmitutrReq
+                                 		.glb	_R_usb_hmsc_MassStorageReset
+                                 		.glb	_usb_hmsc_SmpDrive2Addr
+                                 		.glb	_R_usb_hmsc_DriveClose
+                                 		.glb	_usb_hmsc_SmpFsiDriveClear
+                                 		.glb	_f_mount
+                                 		.glb	_R_usb_hmsc_alloc_drvno
+                                 		.glb	_R_usb_hmsc_free_drvno
+                                 		.glb	_R_usb_hmsc_ref_drvno
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _R_usb_hmsc_Task:
+                                 		.STACK	_R_usb_hmsc_Task=4
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_usb_hmsc_api.c
+                                 ;      21 * Description  : USB Peripheral Sample Code
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Support Multi device.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 /******************************************************************************
+                                 ;      30 Includes   <System Includes> , "Project Includes"
+                                 ;      31 ******************************************************************************/
+                                 ;      32 #include "r_usb_basic_if.h"
+                                 ;      33 #include "r_usb_hatapi_define.h"    /* Peripheral ATAPI Device extern */
+                                 ;      34 #include "r_usb_hmsc_define.h"      /* Host Mass Storage Class Driver */
+                                 ;      35 #include "r_usb_hmsc_extern.h"      /* Host MSC grobal define */
+                                 ;      36 #include "r_usb_api.h"
+                                 ;      37 #include "r_usb_hmsc_config.h"
+                                 ;      38 #include "r_usb_hmsc_if.h"
+                                 ;      39 #include "ff.h"
+                                 ;      40 #include "ut_state.h"
+                                 ;      41 #include "keyboard.h"
+                                 ;      42 
+                                 ;      43 extern bool drivemountFlag;
+                                 ;      44 extern char gszCurFile[MAX_FILE_PATH_SIZE];
+                                 ;      45 
+                                 ;      46 /******************************************************************************
+                                 ;      47 Renesas Host MSC Sample Code functions
+                                 ;      48 ******************************************************************************/
+                                 ;      49 
+                                 ;      50 
+                                 ;      51 /******************************************************************************
+                                 ;      52 Function Name   : R_usb_hmsc_Task
+                                 ;      53 Description     : USB HMSC Task
+                                 ;      54 Arguments       : none
+                                 ;      55 Return value    : none
+                                 ;      56 ******************************************************************************/
+                                 ;      57 void R_usb_hmsc_Task(void)
+                                 ;      58 {
+                                 ;      59     usb_hmsc_Task();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",59
+00000000 05rrrrrr             A  		BSR _usb_hmsc_Task
+00000004 02                      		RTS
+00000005                         _R_usb_hmsc_hub_registration:
+                                 		.STACK	_R_usb_hmsc_hub_registration=48
+                                 ;      60 }   /* eof R_usb_hmsc_Task() */
+                                 ;      61 
+                                 ;      62 
+                                 ;      63 /******************************************************************************
+                                 ;      64 Function Name   : R_usb_hmsc_hub_registration
+                                 ;      65 Description     : Hub Data Registration
+                                 ;      66 Argument        : none
+                                 ;      67 Return          : none
+                                 ;      68 ******************************************************************************/
+                                 ;      69 void R_usb_hmsc_hub_registration(USB_UTR_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",69
+00000005 7100D4                  		ADD #0FFFFFFD4H, R0
+00000008 A281                    		MOV.L R1, 28H[R0]
+0000000A 6631                    		MOV.L #00000003H, R1
+                                 ;      70 {
+                                 ;      71     USB_HCDREG_t    driver;
+                                 ;      72 
+                                 ;      73     R_usb_cstd_SetTaskPri(USB_HUB_TSK,  USB_PRI_3);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",73
+0000000C EF12                    		MOV.L R1, R2
+0000000E 05rrrrrr             A  		BSR _R_usb_cstd_SetTaskPri
+00000012                         L13:	; entry.split
+                                 ;      74 
+                                 ;      75     /* Driver registration */
+                                 ;      76     driver.tpl          = (uint16_t*)&usb_ghhub_TPL;        /* Target peripheral list */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",76
+00000012 FB12rrrrrrrr            		MOV.L #_usb_ghhub_TPL, R1
+00000018 A081                    		MOV.L R1, 08H[R0]
+0000001A                         L14:	; entry.split1
+                                 ;      77     driver.pipetbl      = (uint16_t*)&usb_ghhub_DefEPTbl;   /* Pipe Define Table address */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",77
+0000001A FB12rrrrrrrr            		MOV.L #_usb_ghhub_DefEPTbl, R1
+00000020 A089                    		MOV.L R1, 0CH[R0]
+00000022                         L15:	; entry.split2
+                                 ;      78 
+                                 ;      79     R_usb_hhub_Registration(ptr, &driver);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",79
+00000022 AA81                    		MOV.L 28H[R0], R1
+00000024 EF02                    		MOV.L R0, R2
+00000026 05rrrrrr             A  		BSR _R_usb_hhub_Registration
+0000002A 670B                    		RTSD #2CH
+0000002C                         _R_usb_hmsc_driver_start:
+                                 		.STACK	_R_usb_hmsc_driver_start=12
+                                 ;      80 }   /* eof R_usb_hmsc_hub_registration() */
+                                 ;      81 
+                                 ;      82 /******************************************************************************
+                                 ;      83 Function Name   : R_usb_hmsc_driver_start
+                                 ;      84 Description     : USB Host Initialize process
+                                 ;      85 Argument        : none
+                                 ;      86 Return          : none
+                                 ;      87 ******************************************************************************/
+                                 ;      88 void R_usb_hmsc_driver_start( USB_UTR_t *ptr )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",88
+0000002C 6080                    		SUB #08H, R0
+0000002E A009                    		MOV.L R1, 04H[R0]
+                                 ;      89 {
+                                 ;      90     uint16_t    i,j;
+                                 ;      91 
+                                 ;      92     for( i = 0; i < USB_DEVICENUM ; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",92
+00000030 F80500                  		MOV.W #0000H, [R0]
+00000033 2Err                 B  		BRA L18
+00000035                         L17:	; bb
+                                 ;      93     {
+                                 ;      94         usb_ghmsc_drv_no_tbl[i].use_flag = USB_NOUSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",94
+00000035 5C01                    		MOVU.W [R0], R1
+00000037 6361                    		MUL #06H, R1
+00000039 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_drv_no_tbl, R14
+0000003F 4B1E                    		ADD R1, R14
+00000041 F8E500                  		MOV.W #0000H, [R14]
+00000044 DC01                    		MOV.W [R0], R1
+00000046 6211                    		ADD #01H, R1
+00000048 D301                    		MOV.W R1, [R0]
+0000004A                         L18:	; bb9
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",92
+0000004A 5C01                    		MOVU.W [R0], R1
+0000004C 61A1                    		CMP #0AH, R1
+0000004E 29rr                    		BLT L17
+00000050                         L19:	; bb14
+                                 ;      95     }
+                                 ;      96 
+                                 ;      97     for( i = 0; i < USB_NUM_USBIP ; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",97
+00000050 F80500                  		MOV.W #0000H, [R0]
+00000053 2Err                 B  		BRA L24
+00000055                         L20:	; bb15
+                                 ;      98     {
+                                 ;      99         for( j = 0; j < USB_MAXDEVADDR ; j++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",99
+00000055 3D0100                  		MOV.W #0000H, 02H[R0]
+00000058 2Err                 B  		BRA L22
+0000005A                         L21:	; bb16
+                                 ;     100         {
+                                 ;     101             usb_ghmsc_drive_no[i][j] = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",101
+0000005A 5F1E                    		MOVU.W R1, R14
+0000005C 751E14                  		MUL #14H, R14
+0000005F FBF2rrrrrrrr            		MOV.L #_usb_ghmsc_drive_no, R15
+00000065 4BEF                    		ADD R14, R15
+00000067 B809                    		MOVU.W 02H[R0], R1
+00000069 FBE6FF                  		MOV.L #0FFFFFFFFH, R14
+0000006C FE11FE                  		MOV.W R14, [R1,R15]
+0000006F 9809                    		MOV.W 02H[R0], R1
+00000071 6211                    		ADD #01H, R1
+00000073 9009                    		MOV.W R1, 02H[R0]
+00000075                         L22:	; bb26
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",99
+00000075 B809                    		MOVU.W 02H[R0], R1
+00000077 61A1                    		CMP #0AH, R1
+00000079 DC01                    		MOV.W [R0], R1
+0000007B 23rr                    		BLTU L21
+0000007D                         L23:	; bb32
+0000007D 6211                    		ADD #01H, R1
+0000007F D301                    		MOV.W R1, [R0]
+00000081                         L24:	; bb35
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",97
+00000081 5C01                    		MOVU.W [R0], R1
+00000083 6121                    		CMP #02H, R1
+00000085 29rr                    		BLT L20
+00000087                         L25:	; bb41
+00000087 6632                    		MOV.L #00000003H, R2
+00000089 6641                    		MOV.L #00000004H, R1
+                                 ;     102         }
+                                 ;     103     }
+                                 ;     104 
+                                 ;     105     R_usb_cstd_SetTaskPri(USB_HMSC_TSK, USB_PRI_3);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",105
+0000008B 05rrrrrr             A  		BSR _R_usb_cstd_SetTaskPri
+0000008F                         L26:	; bb41.split
+0000008F 6632                    		MOV.L #00000003H, R2
+00000091 6651                    		MOV.L #00000005H, R1
+                                 ;     106     R_usb_cstd_SetTaskPri(USB_HSTRG_TSK, USB_PRI_3);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",106
+00000093 05rrrrrr             A  		BSR _R_usb_cstd_SetTaskPri
+00000097 6702                    		RTSD #08H
+00000099                         _R_usb_hmsc_ClearStall:
+                                 		.STACK	_R_usb_hmsc_ClearStall=20
+                                 ;     107 }   /* eof R_usb_hmsc_driver_start() */
+                                 ;     108 
+                                 ;     109 /******************************************************************************
+                                 ;     110 Function Name   : R_usb_hmsc_ClearStall
+                                 ;     111 Description     : Clear Stall
+                                 ;     112 Argument        : uint16_t type             : Data transmit/Data Receive
+                                 ;     113                 : uint16_t msgnum           : Message Number
+                                 ;     114                 : USB_CB_t complete         : Callback Function
+                                 ;     115 Return value    : none
+                                 ;     116 ******************************************************************************/
+                                 ;     117 void R_usb_hmsc_ClearStall(USB_UTR_t *ptr, uint16_t type, uint16_t msgnum, USB_CB_t complete)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",117
+00000099 7100F0                  		ADD #0FFFFFFF0H, R0
+0000009C A089                    		MOV.L R1, 0CH[R0]
+0000009E 910A                    		MOV.W R2, 0AH[R0]
+000000A0 9103                    		MOV.W R3, 08H[R0]
+000000A2 A00C                    		MOV.L R4, 04H[R0]
+                                 ;     118 {
+                                 ;     119     uint16_t        pipeno;
+                                 ;     120 
+                                 ;     121     switch( type ) 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",121
+000000A4 B909                    		MOVU.W 0AH[R0], R1
+000000A6 6131                    		CMP #03H, R1
+000000A8 20rr                    		BEQ L32
+000000AA                         L28:	; entry
+000000AA 6111                    		CMP #01H, R1
+000000AC 3Brrrr               W  		BNE L35
+000000AF                         L29:	; bb
+                                 ;     122     {
+                                 ;     123     case USB_DATA_NONE:                         /* Data transmit */
+                                 ;     124         pipeno = R_usb_hmsc_Information(ptr->ip, usb_ghmsc_OutPipe[ptr->ip][msgnum][0]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",124
+000000AF A889                    		MOV.L 0CH[R0], R1
+000000B1 B991                    		MOVU.W 0CH[R1], R1
+000000B3 FDC51E                  		SHLL #05H, R1, R14
+000000B6 FBF2rrrrrrrr            		MOV.L #_usb_ghmsc_OutPipe, R15
+000000BC 4BEF                    		ADD R14, R15
+000000BE B902                    		MOVU.W 08H[R0], R2
+000000C0 6C22                    		SHLL #02H, R2
+000000C2 4B2F                    		ADD R2, R15
+000000C4 5CF2                    		MOVU.W [R15], R2
+000000C6 39rrrr               W  		BSR _R_usb_hmsc_Information
+000000C9 9009                    		MOV.W R1, 02H[R0]
+000000CB                         L30:	; bb.split
+                                 ;     125         usb_ghmsc_OutPipe[ptr->ip][msgnum][1] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",125
+000000CB A889                    		MOV.L 0CH[R0], R1
+000000CD B991                    		MOVU.W 0CH[R1], R1
+000000CF 6C51                    		SHLL #05H, R1
+000000D1 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_OutPipe, R2
+000000D7 4B12                    		ADD R1, R2
+000000D9 B901                    		MOVU.W 08H[R0], R1
+000000DB 6C21                    		SHLL #02H, R1
+000000DD 4B12                    		ADD R1, R2
+000000DF 3D2100                  		MOV.W #0000H, 02H[R2]
+000000E2                         L31:	; bb.split1
+                                 ;     126         usb_hmsc_ClearStall(ptr, pipeno, complete);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",126
+000000E2 A80B                    		MOV.L 04H[R0], R3
+000000E4 B80A                    		MOVU.W 02H[R0], R2
+000000E6 A889                    		MOV.L 0CH[R0], R1
+000000E8 05rrrrrr             A  		BSR _usb_hmsc_ClearStall
+000000EC 6704                    		RTSD #10H
+000000EE                         L32:	; bb38
+                                 ;     127         break;
+                                 ;     128     case USB_DATA_OK:                           /* Data recieve */
+                                 ;     129         pipeno = R_usb_hmsc_Information(ptr->ip, usb_ghmsc_InPipe[ptr->ip][msgnum][0]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",129
+000000EE A889                    		MOV.L 0CH[R0], R1
+000000F0 B991                    		MOVU.W 0CH[R1], R1
+000000F2 FDC51E                  		SHLL #05H, R1, R14
+000000F5 FBF2rrrrrrrr            		MOV.L #_usb_ghmsc_InPipe, R15
+000000FB 4BEF                    		ADD R14, R15
+000000FD B902                    		MOVU.W 08H[R0], R2
+000000FF 6C22                    		SHLL #02H, R2
+00000101 4B2F                    		ADD R2, R15
+00000103 5CF2                    		MOVU.W [R15], R2
+00000105 39rrrr               W  		BSR _R_usb_hmsc_Information
+00000108 9009                    		MOV.W R1, 02H[R0]
+0000010A                         L33:	; bb38.split
+                                 ;     130         usb_ghmsc_InPipe[ptr->ip][msgnum][1] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",130
+0000010A A889                    		MOV.L 0CH[R0], R1
+0000010C B991                    		MOVU.W 0CH[R1], R1
+0000010E 6C51                    		SHLL #05H, R1
+00000110 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_InPipe, R2
+00000116 4B12                    		ADD R1, R2
+00000118 B901                    		MOVU.W 08H[R0], R1
+0000011A 6C21                    		SHLL #02H, R1
+0000011C 4B12                    		ADD R1, R2
+0000011E 3D2100                  		MOV.W #0000H, 02H[R2]
+00000121                         L34:	; bb38.split2
+                                 ;     131         usb_hmsc_ClearStall(ptr, pipeno, complete);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",131
+00000121 A80B                    		MOV.L 04H[R0], R3
+00000123 B80A                    		MOVU.W 02H[R0], R2
+00000125 A889                    		MOV.L 0CH[R0], R1
+00000127 05rrrrrr             A  		BSR _usb_hmsc_ClearStall
+0000012B 6704                    		RTSD #10H
+0000012D                         L35:	; return
+                                 ;     132         break;
+                                 ;     133     default:
+                                 ;     134         USB_PRINTF0("### stall error\n");
+                                 ;     135         break;
+                                 ;     136     }
+                                 ;     137 }   /* eof R_usb_hmsc_ClearStall() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",137
+0000012D 6704                    		RTSD #10H
+0000012F                         _R_usb_hmsc_get_pipetbl:
+                                 		.STACK	_R_usb_hmsc_get_pipetbl=20
+                                 ;     138 
+                                 ;     139 /******************************************************************************
+                                 ;     140 Function Name   : R_usb_hmsc_get_pipetbl
+                                 ;     141 Description     : Get pipe table address.
+                                 ;     142 Arguments       : uint16_t devadr           : Device address
+                                 ;     143 Return value    : Pipe table address.
+                                 ;     144 ******************************************************************************/
+                                 ;     145 uint16_t* R_usb_hmsc_get_pipetbl(USB_UTR_t *ptr, uint16_t devadr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",145
+0000012F 7100F0                  		ADD #0FFFFFFF0H, R0
+00000132 A089                    		MOV.L R1, 0CH[R0]
+00000134 910A                    		MOV.W R2, 0AH[R0]
+                                 ;     146 {
+                                 ;     147     if( devadr == usb_ghmsc_Devaddr[ptr->ip] )                      /* Device Address */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",147
+00000136 A889                    		MOV.L 0CH[R0], R1
+00000138 B991                    		MOVU.W 0CH[R1], R1
+0000013A FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_Devaddr, R14
+00000140 FED1EE                  		MOVU.W [R1,R14], R14
+00000143 B909                    		MOVU.W 0AH[R0], R1
+00000145 47E1                    		CMP R14, R1
+00000147 21rr                    		BNE L38
+00000149                         L37:	; bb3
+                                 ;     148     {
+                                 ;     149         return (uint16_t*)usb_ghmsc_PipeTable[ptr->ip];             /* Pipe Table(DefEP) */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",149
+00000149 A889                    		MOV.L 0CH[R0], R1
+0000014B B991                    		MOVU.W 0CH[R1], R1
+0000014D FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_PipeTable, R14
+00000153 FE61E1                  		MOV.L [R1,R14], R1
+00000156 E301                    		MOV.L R1, [R0]
+00000158 08                   S  		BRA L39
+00000159                         L38:	; bb22
+                                 ;     150     }
+                                 ;     151 
+                                 ;     152     return (uint16_t*)USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",152
+00000159 F80EFFFF00              		MOV.L #0000FFFFH, [R0]
+0000015E                         L39:	; bb24
+0000015E EC01                    		MOV.L [R0], R1
+00000160 A009                    		MOV.L R1, 04H[R0]
+                                 ;     153 }   /* eof R_usb_hhid_get_pipetbl() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",153
+00000162 6704                    		RTSD #10H
+00000164                         _R_usb_hmsc_TaskOpen:
+                                 		.STACK	_R_usb_hmsc_TaskOpen=12
+                                 ;     154 
+                                 ;     155 
+                                 ;     156 /******************************************************************************
+                                 ;     157 Function Name   : R_usb_hmsc_TaskOpen
+                                 ;     158 Description     : Open Mass storage class driver
+                                 ;     159 Arguments       : none
+                                 ;     160 Return value    : none
+                                 ;     161 ******************************************************************************/
+                                 ;     162 void R_usb_hmsc_TaskOpen(USB_UTR_t *ptr, uint16_t data1, uint16_t data2)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",162
+00000164 6080                    		SUB #08H, R0
+00000166 A009                    		MOV.L R1, 04H[R0]
+00000168 900A                    		MOV.W R2, 02H[R0]
+0000016A D303                    		MOV.W R3, [R0]
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",165
+0000016C 6702                    		RTSD #08H
+0000016E                         _R_usb_hmsc_TaskClose:
+                                 		.STACK	_R_usb_hmsc_TaskClose=8
+                                 ;     163 {
+                                 ;     164     USB_PRINTF0("*** Install Host MSCD device driver ***\n");
+                                 ;     165 }   /* eof R_usb_hmsc_TaskOpen() */
+                                 ;     166 
+                                 ;     167 /******************************************************************************
+                                 ;     168 Function Name   : R_usb_hmsc_TaskClose
+                                 ;     169 Description     : Close Mass storage class driver
+                                 ;     170 Arguments       : none
+                                 ;     171 Return value    : none
+                                 ;     172 ******************************************************************************/
+                                 ;     173 void R_usb_hmsc_TaskClose(USB_UTR_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",173
+0000016E 6040                    		SUB #04H, R0
+00000170 E301                    		MOV.L R1, [R0]
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",176
+00000172 6701                    		RTSD #04H
+00000174                         _R_usb_hmsc_Initialized:
+                                 		.STACK	_R_usb_hmsc_Initialized=16
+                                 ;     174 {
+                                 ;     175     USB_PRINTF0("*** Release Host MS device driver ***\n");
+                                 ;     176 }   /* eof R_usb_hmsc_TaskClose() */
+                                 ;     177 
+                                 ;     178 /******************************************************************************
+                                 ;     179 Function Name   : R_usb_hmsc_Initialized
+                                 ;     180 Description     : initialized USB_HMSC_TSK
+                                 ;     181 Arguments       : uint16_t data1 : 
+                                 ;     182                 : uint16_t data2 : 
+                                 ;     183 Return value    : none
+                                 ;     184 ******************************************************************************/
+                                 ;     185 void R_usb_hmsc_Initialized(USB_UTR_t *ptr, uint16_t data1, uint16_t data2)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",185
+00000174 60C0                    		SUB #0CH, R0
+00000176 A081                    		MOV.L R1, 08H[R0]
+00000178 908A                    		MOV.W R2, 06H[R0]
+0000017A 9083                    		MOV.W R3, 04H[R0]
+                                 ;     186 {
+                                 ;     187     uint16_t    i;
+                                 ;     188 
+                                 ;     189     /* 0x00 */
+                                 ;     190 
+                                 ;     191     for( i = 0; i < USB_MAXSTRAGE; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",191
+0000017C 3D0100                  		MOV.W #0000H, 02H[R0]
+0000017F 38rrrr               W  		BRA L73
+00000182                         L43:	; bb
+                                 ;     192     {
+                                 ;     193         usb_ghmsc_AttSts[i] = USB_HMSC_DEV_DET;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",193
+00000182 B809                    		MOVU.W 02H[R0], R1
+00000184 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_AttSts, R14
+0000018A 660F                    		MOV.L #00000000H, R15
+0000018C FE11EF                  		MOV.W R15, [R1,R14]
+0000018F                         L44:	; bb.split
+                                 ;     194         usb_ghmsc_CbwTagNo[ptr->ip][i] = (uint16_t)1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",194
+0000018F A881                    		MOV.L 08H[R0], R1
+00000191 B991                    		MOVU.W 0CH[R1], R1
+00000193 6C51                    		SHLL #05H, R1
+00000195 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_CbwTagNo, R14
+0000019B 4B1E                    		ADD R1, R14
+0000019D 661F                    		MOV.L #00000001H, R15
+0000019F B809                    		MOVU.W 02H[R0], R1
+000001A1 FE21EF                  		MOV.L R15, [R1,R14]
+000001A4                         L45:	; bb.split1
+                                 ;     195 
+                                 ;     196         usb_ghmsc_Cbw[ptr->ip][i].dCBWSignature = USB_MSC_CBW_SIGNATURE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",196
+000001A4 A881                    		MOV.L 08H[R0], R1
+000001A6 B991                    		MOVU.W 0CH[R1], R1
+000001A8 6C91                    		SHLL #09H, R1
+000001AA FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R14
+000001B0 4B1E                    		ADD R1, R14
+000001B2 B809                    		MOVU.W 02H[R0], R1
+000001B4 6C61                    		SHLL #06H, R1
+000001B6 4B1E                    		ADD R1, R14
+000001B8 F8E255534243            		MOV.L #43425355H, [R14]
+000001BE                         L46:	; bb.split2
+                                 ;     197         usb_ghmsc_Cbw[ptr->ip][i].dCBWTag = usb_ghmsc_CbwTagNo[ptr->ip][i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",197
+000001BE A881                    		MOV.L 08H[R0], R1
+000001C0 B991                    		MOVU.W 0CH[R1], R1
+000001C2 FDC91E                  		SHLL #09H, R1, R14
+000001C5 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+000001CB 4BE2                    		ADD R14, R2
+000001CD 6C51                    		SHLL #05H, R1
+000001CF FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_CbwTagNo, R14
+000001D5 4B1E                    		ADD R1, R14
+000001D7 B809                    		MOVU.W 02H[R0], R1
+000001D9 FE61E3                  		MOV.L [R1,R14], R3
+000001DC 6C61                    		SHLL #06H, R1
+000001DE 4B12                    		ADD R1, R2
+000001E0 A02B                    		MOV.L R3, 04H[R2]
+000001E2                         L47:	; bb.split3
+                                 ;     198         usb_ghmsc_Cbw[ptr->ip][i].dCBWDTL_Lo = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",198
+000001E2 A881                    		MOV.L 08H[R0], R1
+000001E4 B991                    		MOVU.W 0CH[R1], R1
+000001E6 6C91                    		SHLL #09H, R1
+000001E8 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+000001EE 4B12                    		ADD R1, R2
+000001F0 B809                    		MOVU.W 02H[R0], R1
+000001F2 6C61                    		SHLL #06H, R1
+000001F4 4B12                    		ADD R1, R2
+000001F6 3C2800                  		MOV.B #00H, 08H[R2]
+000001F9                         L48:	; bb.split4
+                                 ;     199         usb_ghmsc_Cbw[ptr->ip][i].dCBWDTL_ML = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",199
+000001F9 A881                    		MOV.L 08H[R0], R1
+000001FB B991                    		MOVU.W 0CH[R1], R1
+000001FD 6C91                    		SHLL #09H, R1
+000001FF FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+00000205 4B12                    		ADD R1, R2
+00000207 B809                    		MOVU.W 02H[R0], R1
+00000209 6C61                    		SHLL #06H, R1
+0000020B 4B12                    		ADD R1, R2
+0000020D 3C2900                  		MOV.B #00H, 09H[R2]
+00000210                         L49:	; bb.split5
+                                 ;     200         usb_ghmsc_Cbw[ptr->ip][i].dCBWDTL_MH = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",200
+00000210 A881                    		MOV.L 08H[R0], R1
+00000212 B991                    		MOVU.W 0CH[R1], R1
+00000214 6C91                    		SHLL #09H, R1
+00000216 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+0000021C 4B12                    		ADD R1, R2
+0000021E B809                    		MOVU.W 02H[R0], R1
+00000220 6C61                    		SHLL #06H, R1
+00000222 4B12                    		ADD R1, R2
+00000224 3C2A00                  		MOV.B #00H, 0AH[R2]
+00000227                         L50:	; bb.split6
+                                 ;     201         usb_ghmsc_Cbw[ptr->ip][i].dCBWDTL_Hi = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",201
+00000227 A881                    		MOV.L 08H[R0], R1
+00000229 B991                    		MOVU.W 0CH[R1], R1
+0000022B 6C91                    		SHLL #09H, R1
+0000022D FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+00000233 4B12                    		ADD R1, R2
+00000235 B809                    		MOVU.W 02H[R0], R1
+00000237 6C61                    		SHLL #06H, R1
+00000239 4B12                    		ADD R1, R2
+0000023B 3C2B00                  		MOV.B #00H, 0BH[R2]
+0000023E                         L51:	; bb.split7
+                                 ;     202         usb_ghmsc_Cbw[ptr->ip][i].bmCBWFlags.CBWdir = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",202
+0000023E A881                    		MOV.L 08H[R0], R1
+00000240 B991                    		MOVU.W 0CH[R1], R1
+00000242 6C91                    		SHLL #09H, R1
+00000244 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R14
+0000024A 4B1E                    		ADD R1, R14
+0000024C B809                    		MOVU.W 02H[R0], R1
+0000024E 6C61                    		SHLL #06H, R1
+00000250 4B1E                    		ADD R1, R14
+00000252 F1EF0C                  		BCLR #07H, 0CH[R14].B
+00000255                         L52:	; bb.split8
+                                 ;     203         usb_ghmsc_Cbw[ptr->ip][i].bmCBWFlags.reserved7 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",203
+00000255 A881                    		MOV.L 08H[R0], R1
+00000257 B991                    		MOVU.W 0CH[R1], R1
+00000259 6C91                    		SHLL #09H, R1
+0000025B FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+00000261 4B12                    		ADD R1, R2
+00000263 B809                    		MOVU.W 02H[R0], R1
+00000265 6C61                    		SHLL #06H, R1
+00000267 4B12                    		ADD R1, R2
+00000269 754180                  		MOV.L #00000080H, R1
+0000026C 51210C                  		AND 0CH[R2].UB, R1
+0000026F 8321                    		MOV.B R1, 0CH[R2]
+00000271                         L53:	; bb.split9
+                                 ;     204         usb_ghmsc_Cbw[ptr->ip][i].bCBWLUN.bCBWLUN = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",204
+00000271 A881                    		MOV.L 08H[R0], R1
+00000273 B991                    		MOVU.W 0CH[R1], R1
+00000275 6C91                    		SHLL #09H, R1
+00000277 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+0000027D 4B12                    		ADD R1, R2
+0000027F B809                    		MOVU.W 02H[R0], R1
+00000281 6C61                    		SHLL #06H, R1
+00000283 4B12                    		ADD R1, R2
+00000285 7541F0                  		MOV.L #000000F0H, R1
+00000288 51210D                  		AND 0DH[R2].UB, R1
+0000028B 8329                    		MOV.B R1, 0DH[R2]
+0000028D                         L54:	; bb.split10
+                                 ;     205         usb_ghmsc_Cbw[ptr->ip][i].bCBWLUN.reserved4 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",205
+0000028D A881                    		MOV.L 08H[R0], R1
+0000028F B991                    		MOVU.W 0CH[R1], R1
+00000291 6C91                    		SHLL #09H, R1
+00000293 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+00000299 4B12                    		ADD R1, R2
+0000029B B809                    		MOVU.W 02H[R0], R1
+0000029D 6C61                    		SHLL #06H, R1
+0000029F 4B12                    		ADD R1, R2
+000002A1 B329                    		MOVU.B 0DH[R2], R1
+000002A3 64F1                    		AND #0FH, R1
+000002A5 8329                    		MOV.B R1, 0DH[R2]
+000002A7                         L55:	; bb.split11
+                                 ;     206         usb_ghmsc_Cbw[ptr->ip][i].bCBWCBLength.bCBWCBLength = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",206
+000002A7 A881                    		MOV.L 08H[R0], R1
+000002A9 B991                    		MOVU.W 0CH[R1], R1
+000002AB 6C91                    		SHLL #09H, R1
+000002AD FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+000002B3 4B12                    		ADD R1, R2
+000002B5 B809                    		MOVU.W 02H[R0], R1
+000002B7 6C61                    		SHLL #06H, R1
+000002B9 4B12                    		ADD R1, R2
+000002BB 7541E0                  		MOV.L #000000E0H, R1
+000002BE 51210E                  		AND 0EH[R2].UB, R1
+000002C1 83A1                    		MOV.B R1, 0EH[R2]
+000002C3                         L56:	; bb.split12
+                                 ;     207         usb_ghmsc_Cbw[ptr->ip][i].bCBWCBLength.reserved3 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",207
+000002C3 A881                    		MOV.L 08H[R0], R1
+000002C5 B991                    		MOVU.W 0CH[R1], R1
+000002C7 6C91                    		SHLL #09H, R1
+000002C9 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+000002CF 4B12                    		ADD R1, R2
+000002D1 B809                    		MOVU.W 02H[R0], R1
+000002D3 6C61                    		SHLL #06H, R1
+000002D5 4B12                    		ADD R1, R2
+000002D7 B3A1                    		MOVU.B 0EH[R2], R1
+000002D9 75211F                  		AND #1FH, R1
+000002DC 83A1                    		MOV.B R1, 0EH[R2]
+000002DE                         L57:	; bb.split13
+                                 ;     208 
+                                 ;     209         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[0]  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",209
+000002DE A881                    		MOV.L 08H[R0], R1
+000002E0 B991                    		MOVU.W 0CH[R1], R1
+000002E2 6C91                    		SHLL #09H, R1
+000002E4 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+000002EA 4B12                    		ADD R1, R2
+000002EC B809                    		MOVU.W 02H[R0], R1
+000002EE 6C61                    		SHLL #06H, R1
+000002F0 4B12                    		ADD R1, R2
+000002F2 3C2F00                  		MOV.B #00H, 0FH[R2]
+000002F5                         L58:	; bb.split14
+                                 ;     210         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[1]  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",210
+000002F5 A881                    		MOV.L 08H[R0], R1
+000002F7 B991                    		MOVU.W 0CH[R1], R1
+000002F9 6C91                    		SHLL #09H, R1
+000002FB FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+00000301 4B12                    		ADD R1, R2
+00000303 B809                    		MOVU.W 02H[R0], R1
+00000305 6C61                    		SHLL #06H, R1
+00000307 4B12                    		ADD R1, R2
+00000309 3CA000                  		MOV.B #00H, 10H[R2]
+0000030C                         L59:	; bb.split15
+                                 ;     211         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[2]  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",211
+0000030C A881                    		MOV.L 08H[R0], R1
+0000030E B991                    		MOVU.W 0CH[R1], R1
+00000310 6C91                    		SHLL #09H, R1
+00000312 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+00000318 4B12                    		ADD R1, R2
+0000031A B809                    		MOVU.W 02H[R0], R1
+0000031C 6C61                    		SHLL #06H, R1
+0000031E 4B12                    		ADD R1, R2
+00000320 3CA100                  		MOV.B #00H, 11H[R2]
+00000323                         L60:	; bb.split16
+                                 ;     212         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[3]  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",212
+00000323 A881                    		MOV.L 08H[R0], R1
+00000325 B991                    		MOVU.W 0CH[R1], R1
+00000327 6C91                    		SHLL #09H, R1
+00000329 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+0000032F 4B12                    		ADD R1, R2
+00000331 B809                    		MOVU.W 02H[R0], R1
+00000333 6C61                    		SHLL #06H, R1
+00000335 4B12                    		ADD R1, R2
+00000337 3CA200                  		MOV.B #00H, 12H[R2]
+0000033A                         L61:	; bb.split17
+                                 ;     213         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[4]  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",213
+0000033A A881                    		MOV.L 08H[R0], R1
+0000033C B991                    		MOVU.W 0CH[R1], R1
+0000033E 6C91                    		SHLL #09H, R1
+00000340 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+00000346 4B12                    		ADD R1, R2
+00000348 B809                    		MOVU.W 02H[R0], R1
+0000034A 6C61                    		SHLL #06H, R1
+0000034C 4B12                    		ADD R1, R2
+0000034E 3CA300                  		MOV.B #00H, 13H[R2]
+00000351                         L62:	; bb.split18
+                                 ;     214         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[5]  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",214
+00000351 A881                    		MOV.L 08H[R0], R1
+00000353 B991                    		MOVU.W 0CH[R1], R1
+00000355 6C91                    		SHLL #09H, R1
+00000357 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+0000035D 4B12                    		ADD R1, R2
+0000035F B809                    		MOVU.W 02H[R0], R1
+00000361 6C61                    		SHLL #06H, R1
+00000363 4B12                    		ADD R1, R2
+00000365 3CA400                  		MOV.B #00H, 14H[R2]
+00000368                         L63:	; bb.split19
+                                 ;     215         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[6]  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",215
+00000368 A881                    		MOV.L 08H[R0], R1
+0000036A B991                    		MOVU.W 0CH[R1], R1
+0000036C 6C91                    		SHLL #09H, R1
+0000036E FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+00000374 4B12                    		ADD R1, R2
+00000376 B809                    		MOVU.W 02H[R0], R1
+00000378 6C61                    		SHLL #06H, R1
+0000037A 4B12                    		ADD R1, R2
+0000037C 3CA500                  		MOV.B #00H, 15H[R2]
+0000037F                         L64:	; bb.split20
+                                 ;     216         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[7]  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",216
+0000037F A881                    		MOV.L 08H[R0], R1
+00000381 B991                    		MOVU.W 0CH[R1], R1
+00000383 6C91                    		SHLL #09H, R1
+00000385 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+0000038B 4B12                    		ADD R1, R2
+0000038D B809                    		MOVU.W 02H[R0], R1
+0000038F 6C61                    		SHLL #06H, R1
+00000391 4B12                    		ADD R1, R2
+00000393 3CA600                  		MOV.B #00H, 16H[R2]
+00000396                         L65:	; bb.split21
+                                 ;     217         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[8]  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",217
+00000396 A881                    		MOV.L 08H[R0], R1
+00000398 B991                    		MOVU.W 0CH[R1], R1
+0000039A 6C91                    		SHLL #09H, R1
+0000039C FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+000003A2 4B12                    		ADD R1, R2
+000003A4 B809                    		MOVU.W 02H[R0], R1
+000003A6 6C61                    		SHLL #06H, R1
+000003A8 4B12                    		ADD R1, R2
+000003AA 3CA700                  		MOV.B #00H, 17H[R2]
+000003AD                         L66:	; bb.split22
+                                 ;     218         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[9]  = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",218
+000003AD A881                    		MOV.L 08H[R0], R1
+000003AF B991                    		MOVU.W 0CH[R1], R1
+000003B1 6C91                    		SHLL #09H, R1
+000003B3 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+000003B9 4B12                    		ADD R1, R2
+000003BB B809                    		MOVU.W 02H[R0], R1
+000003BD 6C61                    		SHLL #06H, R1
+000003BF 4B12                    		ADD R1, R2
+000003C1 3CA800                  		MOV.B #00H, 18H[R2]
+000003C4                         L67:	; bb.split23
+                                 ;     219         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[10] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",219
+000003C4 A881                    		MOV.L 08H[R0], R1
+000003C6 B991                    		MOVU.W 0CH[R1], R1
+000003C8 6C91                    		SHLL #09H, R1
+000003CA FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+000003D0 4B12                    		ADD R1, R2
+000003D2 B809                    		MOVU.W 02H[R0], R1
+000003D4 6C61                    		SHLL #06H, R1
+000003D6 4B12                    		ADD R1, R2
+000003D8 3CA900                  		MOV.B #00H, 19H[R2]
+000003DB                         L68:	; bb.split24
+                                 ;     220         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[11] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",220
+000003DB A881                    		MOV.L 08H[R0], R1
+000003DD B991                    		MOVU.W 0CH[R1], R1
+000003DF 6C91                    		SHLL #09H, R1
+000003E1 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+000003E7 4B12                    		ADD R1, R2
+000003E9 B809                    		MOVU.W 02H[R0], R1
+000003EB 6C61                    		SHLL #06H, R1
+000003ED 4B12                    		ADD R1, R2
+000003EF 3CAA00                  		MOV.B #00H, 1AH[R2]
+000003F2                         L69:	; bb.split25
+                                 ;     221         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[12] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",221
+000003F2 A881                    		MOV.L 08H[R0], R1
+000003F4 B991                    		MOVU.W 0CH[R1], R1
+000003F6 6C91                    		SHLL #09H, R1
+000003F8 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+000003FE 4B12                    		ADD R1, R2
+00000400 B809                    		MOVU.W 02H[R0], R1
+00000402 6C61                    		SHLL #06H, R1
+00000404 4B12                    		ADD R1, R2
+00000406 3CAB00                  		MOV.B #00H, 1BH[R2]
+00000409                         L70:	; bb.split26
+                                 ;     222         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[13] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",222
+00000409 A881                    		MOV.L 08H[R0], R1
+0000040B B991                    		MOVU.W 0CH[R1], R1
+0000040D 6C91                    		SHLL #09H, R1
+0000040F FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+00000415 4B12                    		ADD R1, R2
+00000417 B809                    		MOVU.W 02H[R0], R1
+00000419 6C61                    		SHLL #06H, R1
+0000041B 4B12                    		ADD R1, R2
+0000041D 3CAC00                  		MOV.B #00H, 1CH[R2]
+00000420                         L71:	; bb.split27
+                                 ;     223         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[14] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",223
+00000420 A881                    		MOV.L 08H[R0], R1
+00000422 B991                    		MOVU.W 0CH[R1], R1
+00000424 6C91                    		SHLL #09H, R1
+00000426 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+0000042C 4B12                    		ADD R1, R2
+0000042E B809                    		MOVU.W 02H[R0], R1
+00000430 6C61                    		SHLL #06H, R1
+00000432 4B12                    		ADD R1, R2
+00000434 3CAD00                  		MOV.B #00H, 1DH[R2]
+00000437                         L72:	; bb.split28
+                                 ;     224         usb_ghmsc_Cbw[ptr->ip][i].CBWCB[15] = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",224
+00000437 A881                    		MOV.L 08H[R0], R1
+00000439 B991                    		MOVU.W 0CH[R1], R1
+0000043B 6C91                    		SHLL #09H, R1
+0000043D FB22rrrrrrrr            		MOV.L #_usb_ghmsc_Cbw, R2
+00000443 4B12                    		ADD R1, R2
+00000445 B809                    		MOVU.W 02H[R0], R1
+00000447 6C61                    		SHLL #06H, R1
+00000449 4B12                    		ADD R1, R2
+0000044B 3CAE00                  		MOV.B #00H, 1EH[R2]
+0000044E 9809                    		MOV.W 02H[R0], R1
+00000450 6211                    		ADD #01H, R1
+00000452 9009                    		MOV.W R1, 02H[R0]
+00000454                         L73:	; bb370
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",191
+00000454 B809                    		MOVU.W 02H[R0], R1
+00000456 6181                    		CMP #08H, R1
+00000458 28rr                  * 		BLT L43
+         38rrrr                  
+0000045D                         L74:	; return
+                                 ;     225     }
+                                 ;     226 }   /* eof R_usb_hmsc_Initialized() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",226
+0000045D 6703                    		RTSD #0CH
+0000045F                         _R_usb_hmsc_ClassCheck:
+                                 		.STACK	_R_usb_hmsc_ClassCheck=24
+                                 ;     227 
+                                 ;     228 /******************************************************************************
+                                 ;     229 Function Name   : R_usb_hmsc_ClassCheck
+                                 ;     230 Description     : check connected device
+                                 ;     231 Arguments       : uint16_t **table : 
+                                 ;     232 Return value    : none
+                                 ;     233 ******************************************************************************/
+                                 ;     234 void R_usb_hmsc_ClassCheck(USB_UTR_t *ptr, uint16_t **table)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",234
+0000045F 7100EC                  		ADD #0FFFFFFECH, R0
+00000462 A101                    		MOV.L R1, 10H[R0]
+00000464 A08A                    		MOV.L R2, 0CH[R0]
+                                 ;     235 {
+                                 ;     236 
+                                 ;     237     USB_MH_t            p_blf;
+                                 ;     238     USB_ER_t            err;
+                                 ;     239     USB_CLSINFO_t       *cp;
+                                 ;     240 
+                                 ;     241     usb_ghmsc_DeviceTable[ptr->ip]       = (uint8_t*)(table[0]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",241
+00000466 A901                    		MOV.L 10H[R0], R1
+00000468 B991                    		MOVU.W 0CH[R1], R1
+0000046A EC2E                    		MOV.L [R2], R14
+0000046C FBF2rrrrrrrr            		MOV.L #_usb_ghmsc_DeviceTable, R15
+00000472 FE21FE                  		MOV.L R14, [R1,R15]
+00000475                         L76:	; entry.split
+                                 ;     242     usb_ghmsc_ConfigTable[ptr->ip]       = (uint8_t*)(table[1]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",242
+00000475 A889                    		MOV.L 0CH[R0], R1
+00000477 A819                    		MOV.L 04H[R1], R1
+00000479 A902                    		MOV.L 10H[R0], R2
+0000047B B9A2                    		MOVU.W 0CH[R2], R2
+0000047D FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_ConfigTable, R14
+00000483 FE22E1                  		MOV.L R1, [R2,R14]
+00000486                         L77:	; entry.split1
+                                 ;     243     usb_ghmsc_InterfaceTable[ptr->ip]    = (uint8_t*)(table[2]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",243
+00000486 A889                    		MOV.L 0CH[R0], R1
+00000488 A891                    		MOV.L 08H[R1], R1
+0000048A A902                    		MOV.L 10H[R0], R2
+0000048C B9A2                    		MOVU.W 0CH[R2], R2
+0000048E FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_InterfaceTable, R14
+00000494 FE22E1                  		MOV.L R1, [R2,R14]
+00000497                         L78:	; entry.split2
+                                 ;     244     usb_ghmsc_Speed[ptr->ip]             = *table[6];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",244
+00000497 A901                    		MOV.L 10H[R0], R1
+00000499 B991                    		MOVU.W 0CH[R1], R1
+0000049B A88A                    		MOV.L 0CH[R0], R2
+0000049D A9A2                    		MOV.L 18H[R2], R2
+0000049F DC2E                    		MOV.W [R2], R14
+000004A1 FBF2rrrrrrrr            		MOV.L #_usb_ghmsc_Speed, R15
+000004A7 FE11FE                  		MOV.W R14, [R1,R15]
+000004AA                         L79:	; entry.split3
+                                 ;     245     usb_ghmsc_Devaddr[ptr->ip]           = *table[7];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",245
+000004AA A901                    		MOV.L 10H[R0], R1
+000004AC B991                    		MOVU.W 0CH[R1], R1
+000004AE A88A                    		MOV.L 0CH[R0], R2
+000004B0 A9AA                    		MOV.L 1CH[R2], R2
+000004B2 DC2E                    		MOV.W [R2], R14
+000004B4 FBF2rrrrrrrr            		MOV.L #_usb_ghmsc_Devaddr, R15
+000004BA FE11FE                  		MOV.W R14, [R1,R15]
+000004BD                         L80:	; entry.split4
+                                 ;     246     usb_ghmsc_PipeTable[ptr->ip]         = (uint16_t*)(table[8]);        /* Pipe Table(DefEP) */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",246
+000004BD A889                    		MOV.L 0CH[R0], R1
+000004BF AA11                    		MOV.L 20H[R1], R1
+000004C1 A902                    		MOV.L 10H[R0], R2
+000004C3 B9A2                    		MOVU.W 0CH[R2], R2
+000004C5 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_PipeTable, R14
+000004CB FE22E1                  		MOV.L R1, [R2,R14]
+000004CE                         L81:	; entry.split5
+                                 ;     247     *table[3]                   = USB_DONE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",247
+000004CE A889                    		MOV.L 0CH[R0], R1
+000004D0 A899                    		MOV.L 0CH[R1], R1
+000004D2 F81500                  		MOV.W #0000H, [R1]
+000004D5                         L82:	; entry.split6
+000004D5 EF02                    		MOV.L R0, R2
+000004D7 6641                    		MOV.L #00000004H, R1
+                                 ;     248 
+                                 ;     249     /* Get mem pool blk */
+                                 ;     250     if( R_USB_PGET_BLK(USB_HMSC_MPL,&p_blf) == USB_E_OK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",250
+000004D9 05rrrrrr             A  		BSR _R_usb_cstd_PgetBlk
+000004DD 6101                    		CMP #00H, R1
+000004DF 21rr                    		BNE L91
+000004E1                         L83:	; bb61
+                                 ;     251     {
+                                 ;     252         cp = (USB_CLSINFO_t*)p_blf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",252
+000004E1 E40002                  		MOV.L [R0], 08H[R0]
+000004E4                         L84:	; bb61.split
+                                 ;     253         cp->msginfo = USB_MSG_CLS_INIT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",253
+000004E4 A881                    		MOV.L 08H[R0], R1
+000004E6 F919020202              		MOV.W #0202H, 04H[R1]
+000004EB                         L85:	; bb61.split7
+                                 ;     254         usb_shmsc_InitSeq[ptr->ip] = USB_SEQ_0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",254
+000004EB A901                    		MOV.L 10H[R0], R1
+000004ED B991                    		MOVU.W 0CH[R1], R1
+000004EF FBE2rrrrrrrr            		MOV.L #_usb_shmsc_InitSeq, R14
+000004F5 660F                    		MOV.L #00000000H, R15
+000004F7 FE11EF                  		MOV.W R15, [R1,R14]
+000004FA                         L86:	; bb61.split8
+                                 ;     255 
+                                 ;     256         cp->ip = ptr->ip;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",256
+000004FA A901                    		MOV.L 10H[R0], R1
+000004FC A882                    		MOV.L 08H[R0], R2
+000004FE D5120606                		MOV.W 0CH[R1], 0CH[R2]
+00000502                         L87:	; bb61.split9
+                                 ;     257         cp->ipp = ptr->ipp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",257
+00000502 A901                    		MOV.L 10H[R0], R1
+00000504 A882                    		MOV.L 08H[R0], R2
+00000506 E5120202                		MOV.L 08H[R1], 08H[R2]
+0000050A                         L88:	; bb61.split10
+                                 ;     258 
+                                 ;     259         /* Send message */
+                                 ;     260         err = R_USB_SND_MSG( USB_HMSC_MBX, (USB_MSG_t*)p_blf );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",260
+0000050A EC02                    		MOV.L [R0], R2
+0000050C 6641                    		MOV.L #00000004H, R1
+0000050E 05rrrrrr             A  		BSR _R_usb_cstd_SndMsg
+00000512 A009                    		MOV.L R1, 04H[R0]
+00000514                         L89:	; bb61.split11
+                                 ;     261         if( err != USB_E_OK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",261
+00000514 A809                    		MOV.L 04H[R0], R1
+00000516 6101                    		CMP #00H, R1
+00000518 20rr                    		BEQ L91
+0000051A                         L90:	; bb88
+                                 ;     262         {
+                                 ;     263             err = R_USB_REL_BLK(USB_HMSC_MPL,(USB_MH_t)p_blf);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",263
+0000051A EC02                    		MOV.L [R0], R2
+0000051C 6641                    		MOV.L #00000004H, R1
+0000051E 05rrrrrr             A  		BSR _R_usb_cstd_RelBlk
+00000522 A009                    		MOV.L R1, 04H[R0]
+00000524 6705                    		RTSD #14H
+00000526                         L91:	; return
+                                 ;     264             USB_PRINTF0("### ClassCheck function snd_msg error\n");
+                                 ;     265         }
+                                 ;     266     }
+                                 ;     267     else
+                                 ;     268     {
+                                 ;     269         USB_PRINTF0("### ClassCheck function pget_blk error\n");
+                                 ;     270     }   
+                                 ;     271 }   /* eof R_usb_hmsc_ClassCheck() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",271
+00000526 6705                    		RTSD #14H
+00000528                         _R_usb_hmsc_Read10:
+                                 		.STACK	_R_usb_hmsc_Read10=44
+                                 ;     272 
+                                 ;     273 
+                                 ;     274 /******************************************************************************
+                                 ;     275 Function Name   : R_usb_hmsc_Read10
+                                 ;     276 Description     : Read10
+                                 ;     277 Arguments       : uint16_t side : 
+                                 ;     278                 : uint8_t *buff : 
+                                 ;     279                 : uint32_t secno : 
+                                 ;     280                 : uint16_t seccnt : 
+                                 ;     281                 : uint32_t trans_byte : 
+                                 ;     282 Return value    : uint16_t : 
+                                 ;     283 ******************************************************************************/
+                                 ;     284 uint16_t R_usb_hmsc_Read10(USB_UTR_t *ptr, uint16_t side, uint8_t *buff, uint32_t secno,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",284
+00000528 7100E0                  		ADD #0FFFFFFE0H, R0
+0000052B A189                    		MOV.L R1, 1CH[R0]
+0000052D 930A                    		MOV.W R2, 1AH[R0]
+0000052F A10B                    		MOV.L R3, 14H[R0]
+00000531 A104                    		MOV.L R4, 10H[R0]
+00000533 D5001207                		MOV.W 24H[R0], 0EH[R0]
+00000537 E5000A02                		MOV.L 28H[R0], 08H[R0]
+                                 ;     285      uint16_t seccnt, uint32_t trans_byte)
+                                 ;     286 {
+                                 ;     287     uint16_t    hmsc_retval, unit;
+                                 ;     288 
+                                 ;     289     unit = usb_hmsc_SmpDrive2Unit(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",289
+0000053B BB0A                    		MOVU.W 1AH[R0], R2
+0000053D A989                    		MOV.L 1CH[R0], R1
+0000053F 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Unit
+00000543 9081                    		MOV.W R1, 04H[R0]
+00000545                         L93:	; entry.split
+                                 ;     290     if( unit == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",290
+00000545 B881                    		MOVU.W 04H[R0], R1
+00000547 7701FFFF00              		CMP #0FFFFH, R1
+0000054C 18                   S  		BNE L95
+0000054D                         L94:	; bb12
+                                 ;     291     {
+                                 ;     292         USB_PRINTF2("### unit error(Read10:side=%d,unit=%d)\n", side, unit);
+                                 ;     293         return (USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",293
+0000054D F809FFFF                		MOV.W #0FFFFH, [R0]
+00000551 2Err                 B  		BRA L98
+00000553                         L95:	; bb18
+                                 ;     294     }
+                                 ;     295 
+                                 ;     296     /* set CBW parameter */
+                                 ;     297     usb_hmsc_SetRwCbw(ptr, (uint16_t)USB_ATAPI_READ10, secno, seccnt, trans_byte, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",297
+00000553 9B0A                    		MOV.W 1AH[R0], R2
+00000555 A885                    		MOV.L 08H[R0], R5
+00000557 B98C                    		MOVU.W 0EH[R0], R4
+00000559 A903                    		MOV.L 10H[R0], R3
+0000055B A989                    		MOV.L 1CH[R0], R1
+0000055D 6080                    		SUB #08H, R0
+0000055F 9082                    		MOV.W R2, 04H[R0]
+00000561 E305                    		MOV.L R5, [R0]
+00000563 754228                  		MOV.L #00000028H, R2
+00000566 05rrrrrr             A  		BSR _usb_hmsc_SetRwCbw
+0000056A 6280                    		ADD #08H, R0
+0000056C                         L96:	; bb18.split
+                                 ;     298 
+                                 ;     299     /* Data IN */
+                                 ;     300     hmsc_retval = usb_hmsc_DataIn(ptr, side, buff, trans_byte);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",300
+0000056C A884                    		MOV.L 08H[R0], R4
+0000056E A90B                    		MOV.L 14H[R0], R3
+00000570 BB0A                    		MOVU.W 1AH[R0], R2
+00000572 A989                    		MOV.L 1CH[R0], R1
+00000574 05rrrrrr             A  		BSR _usb_hmsc_DataIn
+00000578 9009                    		MOV.W R1, 02H[R0]
+0000057A                         L97:	; bb18.split1
+                                 ;     301     return (hmsc_retval);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",301
+0000057A D10001                  		MOV.W 02H[R0], [R0]
+0000057D                         L98:	; bb31
+0000057D D40003                  		MOV.W [R0], 06H[R0]
+                                 ;     302 }   /* eof R_usb_hmsc_Read10() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",302
+00000580 B889                    		MOVU.W 06H[R0], R1
+00000582 6708                    		RTSD #20H
+00000584                         _R_usb_hmsc_Write10:
+                                 		.STACK	_R_usb_hmsc_Write10=44
+                                 ;     303 
+                                 ;     304 /******************************************************************************
+                                 ;     305 Function Name   : R_usb_hmsc_Write10
+                                 ;     306 Description     : Write10
+                                 ;     307 Arguments       : uint16_t side : 
+                                 ;     308                 : uint8_t *buff : 
+                                 ;     309                 : uint32_t secno : 
+                                 ;     310                 : uint16_t seccnt : 
+                                 ;     311                 : uint32_t trans_byte : 
+                                 ;     312 Return value    : uint16_t : 
+                                 ;     313 ******************************************************************************/
+                                 ;     314 uint16_t R_usb_hmsc_Write10(USB_UTR_t *ptr, uint16_t side, uint8_t *buff, uint32_t secno,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",314
+00000584 7100E0                  		ADD #0FFFFFFE0H, R0
+00000587 A189                    		MOV.L R1, 1CH[R0]
+00000589 930A                    		MOV.W R2, 1AH[R0]
+0000058B A10B                    		MOV.L R3, 14H[R0]
+0000058D A104                    		MOV.L R4, 10H[R0]
+0000058F D5001207                		MOV.W 24H[R0], 0EH[R0]
+00000593 E5000A02                		MOV.L 28H[R0], 08H[R0]
+                                 ;     315      uint16_t seccnt, uint32_t trans_byte)
+                                 ;     316 {
+                                 ;     317     uint16_t    hmsc_retval, unit;
+                                 ;     318 
+                                 ;     319     unit = usb_hmsc_SmpDrive2Unit(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",319
+00000597 BB0A                    		MOVU.W 1AH[R0], R2
+00000599 A989                    		MOV.L 1CH[R0], R1
+0000059B 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Unit
+0000059F 9081                    		MOV.W R1, 04H[R0]
+000005A1                         L100:	; entry.split
+                                 ;     320     if( unit == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",320
+000005A1 B881                    		MOVU.W 04H[R0], R1
+000005A3 7701FFFF00              		CMP #0FFFFH, R1
+000005A8 18                   S  		BNE L102
+000005A9                         L101:	; bb12
+                                 ;     321     {
+                                 ;     322         USB_PRINTF2("### unit error(Write10:side=%d,unit=%d)\n", side, unit);
+                                 ;     323         return (USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",323
+000005A9 F809FFFF                		MOV.W #0FFFFH, [R0]
+000005AD 2Err                 B  		BRA L105
+000005AF                         L102:	; bb18
+                                 ;     324     }
+                                 ;     325 
+                                 ;     326     /* set CBW parameter */
+                                 ;     327     usb_hmsc_SetRwCbw(ptr, (uint16_t)USB_ATAPI_WRITE10, secno, seccnt, trans_byte, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",327
+000005AF 9B0A                    		MOV.W 1AH[R0], R2
+000005B1 A885                    		MOV.L 08H[R0], R5
+000005B3 B98C                    		MOVU.W 0EH[R0], R4
+000005B5 A903                    		MOV.L 10H[R0], R3
+000005B7 A989                    		MOV.L 1CH[R0], R1
+000005B9 6080                    		SUB #08H, R0
+000005BB 9082                    		MOV.W R2, 04H[R0]
+000005BD E305                    		MOV.L R5, [R0]
+000005BF 75422A                  		MOV.L #0000002AH, R2
+000005C2 05rrrrrr             A  		BSR _usb_hmsc_SetRwCbw
+000005C6 6280                    		ADD #08H, R0
+000005C8                         L103:	; bb18.split
+                                 ;     328 
+                                 ;     329     /* Data OUT */
+                                 ;     330     hmsc_retval = usb_hmsc_DataOut(ptr, side, buff, trans_byte);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",330
+000005C8 A884                    		MOV.L 08H[R0], R4
+000005CA A90B                    		MOV.L 14H[R0], R3
+000005CC BB0A                    		MOVU.W 1AH[R0], R2
+000005CE A989                    		MOV.L 1CH[R0], R1
+000005D0 05rrrrrr             A  		BSR _usb_hmsc_DataOut
+000005D4 9009                    		MOV.W R1, 02H[R0]
+000005D6                         L104:	; bb18.split1
+                                 ;     331     return (hmsc_retval);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",331
+000005D6 D10001                  		MOV.W 02H[R0], [R0]
+000005D9                         L105:	; bb31
+000005D9 D40003                  		MOV.W [R0], 06H[R0]
+                                 ;     332 }   /* eof R_usb_hmsc_Write10() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",332
+000005DC B889                    		MOVU.W 06H[R0], R1
+000005DE 6708                    		RTSD #20H
+000005E0                         _R_usb_hmsc_PreventAllow:
+                                 		.STACK	_R_usb_hmsc_PreventAllow=36
+                                 ;     333 
+                                 ;     334 /******************************************************************************
+                                 ;     335 Function Name   : R_usb_hmsc_PreventAllow
+                                 ;     336 Description     : PreventAllow
+                                 ;     337 Arguments       : uint16_t side : 
+                                 ;     338                 : uint8_t *buff : 
+                                 ;     339 Return value    : uint16_t : 
+                                 ;     340 ******************************************************************************/
+                                 ;     341 uint16_t R_usb_hmsc_PreventAllow(USB_UTR_t *ptr, uint16_t side, uint8_t *buff)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",341
+000005E0 7100E0                  		ADD #0FFFFFFE0H, R0
+000005E3 A189                    		MOV.L R1, 1CH[R0]
+000005E5 930A                    		MOV.W R2, 1AH[R0]
+000005E7 A10B                    		MOV.L R3, 14H[R0]
+                                 ;     342 {
+                                 ;     343     uint8_t     data[12];
+                                 ;     344     uint16_t    hmsc_retval, unit;
+                                 ;     345 
+                                 ;     346     unit = usb_hmsc_SmpDrive2Unit(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",346
+000005E9 BB0A                    		MOVU.W 1AH[R0], R2
+000005EB A989                    		MOV.L 1CH[R0], R1
+000005ED 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Unit
+000005F1 9201                    		MOV.W R1, 10H[R0]
+000005F3                         L107:	; entry.split
+                                 ;     347     if( unit == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",347
+000005F3 BA01                    		MOVU.W 10H[R0], R1
+000005F5 7701FFFF00              		CMP #0FFFFH, R1
+000005FA 18                   S  		BNE L109
+000005FB                         L108:	; bb10
+                                 ;     348     {
+                                 ;     349         USB_PRINTF2("### unit error(PreventAllow:side=%d,unit=%d)\n", side, unit);
+                                 ;     350         return (USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",350
+000005FB F809FFFF                		MOV.W #0FFFFH, [R0]
+000005FF 2Err                 B  		BRA L115
+00000601                         L109:	; bb16
+00000601 710202                  		ADD #02H, R0, R2
+00000604 66C1                    		MOV.L #0000000CH, R1
+                                 ;     351     }
+                                 ;     352 
+                                 ;     353     /* Data clear */
+                                 ;     354     usb_hmsc_ClrData((uint16_t)12, data);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",354
+00000606 05rrrrrr             A  		BSR _usb_hmsc_ClrData
+0000060A                         L110:	; bb16.split
+                                 ;     355 
+                                 ;     356     /* Data set */
+                                 ;     357     /* Command */
+                                 ;     358     data[0] = USB_ATAPI_PREVENT_ALLOW;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",358
+0000060A 3C021E                  		MOV.B #1EH, 02H[R0]
+0000060D                         L111:	; bb16.split1
+                                 ;     359     /* Reserved */
+                                 ;     360     data[4] = buff[0];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",360
+0000060D A909                    		MOV.L 14H[R0], R1
+0000060F C41006                  		MOV.B [R1], 06H[R0]
+00000612                         L112:	; bb16.split2
+                                 ;     361 
+                                 ;     362     /* Set CBW parameter */
+                                 ;     363     usb_hmsc_SetElsCbw(ptr, (uint8_t*)&data, (uint32_t)0, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",363
+00000612 BB0C                    		MOVU.W 1AH[R0], R4
+00000614 A989                    		MOV.L 1CH[R0], R1
+00000616 6603                    		MOV.L #00000000H, R3
+00000618 710202                  		ADD #02H, R0, R2
+0000061B 05rrrrrr             A  		BSR _usb_hmsc_SetElsCbw
+0000061F                         L113:	; bb16.split3
+                                 ;     364 
+                                 ;     365     /* No Data */
+                                 ;     366     hmsc_retval = usb_hmsc_NoData(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",366
+0000061F BB0A                    		MOVU.W 1AH[R0], R2
+00000621 A989                    		MOV.L 1CH[R0], R1
+00000623 05rrrrrr             A  		BSR _usb_hmsc_NoData
+00000627 9189                    		MOV.W R1, 0EH[R0]
+00000629                         L114:	; bb16.split4
+                                 ;     367     return (hmsc_retval);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",367
+00000629 D10007                  		MOV.W 0EH[R0], [R0]
+0000062C                         L115:	; bb33
+0000062C D40009                  		MOV.W [R0], 12H[R0]
+                                 ;     368 }   /* eof R_usb_hmsc_PreventAllow() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",368
+0000062F BA09                    		MOVU.W 12H[R0], R1
+00000631 6708                    		RTSD #20H
+00000633                         _R_usb_hmsc_TestUnit:
+                                 		.STACK	_R_usb_hmsc_TestUnit=32
+                                 ;     369 
+                                 ;     370 /******************************************************************************
+                                 ;     371 Function Name   : R_usb_hmsc_TestUnit
+                                 ;     372 Description     : TestUnit
+                                 ;     373 Arguments       : uint16_t side : 
+                                 ;     374 Return value    : uint16_t : 
+                                 ;     375 ******************************************************************************/
+                                 ;     376 uint16_t R_usb_hmsc_TestUnit(USB_UTR_t *ptr, uint16_t side)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",376
+00000633 7100E4                  		ADD #0FFFFFFE4H, R0
+00000636 A181                    		MOV.L R1, 18H[R0]
+00000638 928A                    		MOV.W R2, 16H[R0]
+                                 ;     377 {
+                                 ;     378     uint8_t     data[12];
+                                 ;     379     uint16_t    hmsc_retval, unit;
+                                 ;     380 
+                                 ;     381     unit = usb_hmsc_SmpDrive2Unit(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",381
+0000063A BA8A                    		MOVU.W 16H[R0], R2
+0000063C A981                    		MOV.L 18H[R0], R1
+0000063E 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Unit
+00000642 9209                    		MOV.W R1, 12H[R0]
+00000644                         L117:	; entry.split
+                                 ;     382     if( unit == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",382
+00000644 BA09                    		MOVU.W 12H[R0], R1
+00000646 7701FFFF00              		CMP #0FFFFH, R1
+0000064B 18                   S  		BNE L119
+0000064C                         L118:	; bb9
+                                 ;     383     {
+                                 ;     384         USB_PRINTF2("### unit error(TestUnit:side=%d,unit=%d)\n", side, unit);
+                                 ;     385         return (USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",385
+0000064C F90901FFFF              		MOV.W #0FFFFH, 02H[R0]
+00000651 2Err                 B  		BRA L124
+00000653                         L119:	; bb15
+00000653 710204                  		ADD #04H, R0, R2
+00000656 66C1                    		MOV.L #0000000CH, R1
+                                 ;     386     }
+                                 ;     387 
+                                 ;     388     /* Data clear */
+                                 ;     389     usb_hmsc_ClrData((uint16_t)12, data);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",389
+00000658 05rrrrrr             A  		BSR _usb_hmsc_ClrData
+0000065C                         L120:	; bb15.split
+                                 ;     390 
+                                 ;     391     /* Data set */
+                                 ;     392     /* Command */
+                                 ;     393     data[0] = USB_ATAPI_TEST_UNIT_READY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",393
+0000065C 3C0400                  		MOV.B #00H, 04H[R0]
+0000065F                         L121:	; bb15.split1
+                                 ;     394 
+                                 ;     395     /* Set CBW parameter */
+                                 ;     396     usb_hmsc_SetElsCbw(ptr, (uint8_t*)&data, (uint32_t)0, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",396
+0000065F BA8C                    		MOVU.W 16H[R0], R4
+00000661 A981                    		MOV.L 18H[R0], R1
+00000663 6603                    		MOV.L #00000000H, R3
+00000665 710204                  		ADD #04H, R0, R2
+00000668 05rrrrrr             A  		BSR _usb_hmsc_SetElsCbw
+0000066C                         L122:	; bb15.split2
+                                 ;     397 
+                                 ;     398     /* No Data */
+                                 ;     399     hmsc_retval = usb_hmsc_NoData(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",399
+0000066C BA8A                    		MOVU.W 16H[R0], R2
+0000066E A981                    		MOV.L 18H[R0], R1
+00000670 05rrrrrr             A  		BSR _usb_hmsc_NoData
+00000674 9201                    		MOV.W R1, 10H[R0]
+00000676                         L123:	; bb15.split3
+                                 ;     400     return (hmsc_retval);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",400
+00000676 D5000801                		MOV.W 10H[R0], 02H[R0]
+0000067A                         L124:	; bb27
+0000067A D500010A                		MOV.W 02H[R0], 14H[R0]
+                                 ;     401 }   /* eof R_usb_hmsc_TestUnit() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",401
+0000067E BA81                    		MOVU.W 14H[R0], R1
+00000680 6707                    		RTSD #1CH
+00000682                         _R_usb_hmsc_RequestSense:
+                                 		.STACK	_R_usb_hmsc_RequestSense=40
+                                 ;     402 
+                                 ;     403 /******************************************************************************
+                                 ;     404 Function Name   : R_usb_hmsc_RequestSense
+                                 ;     405 Description     : RequestSense
+                                 ;     406 Arguments       : uint16_t side : 
+                                 ;     407                 : uint8_t *buff : 
+                                 ;     408 Return value    : uint16_t : 
+                                 ;     409 ******************************************************************************/
+                                 ;     410 uint16_t R_usb_hmsc_RequestSense(USB_UTR_t *ptr, uint16_t side, uint8_t *buff)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",410
+00000682 7100DC                  		ADD #0FFFFFFDCH, R0
+00000685 A201                    		MOV.L R1, 20H[R0]
+00000687 938A                    		MOV.W R2, 1EH[R0]
+00000689 A183                    		MOV.L R3, 18H[R0]
+                                 ;     411 {
+                                 ;     412     uint8_t     data[12];
+                                 ;     413     uint8_t     length = 18;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",413
+0000068B 3C8112                  		MOV.B #12H, 11H[R0]
+0000068E                         L126:	; entry.split
+                                 ;     414     uint16_t    hmsc_retval, unit;
+                                 ;     415 
+                                 ;     416     unit = usb_hmsc_SmpDrive2Unit(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",416
+0000068E BB8A                    		MOVU.W 1EH[R0], R2
+00000690 AA01                    		MOV.L 20H[R0], R1
+00000692 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Unit
+00000696 9281                    		MOV.W R1, 14H[R0]
+00000698                         L127:	; entry.split1
+                                 ;     417     if( unit == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",417
+00000698 BA81                    		MOVU.W 14H[R0], R1
+0000069A 7701FFFF00              		CMP #0FFFFH, R1
+0000069F 18                   S  		BNE L129
+000006A0                         L128:	; bb11
+                                 ;     418     {
+                                 ;     419         USB_PRINTF2("### unit error(RequestSense:side=%d,unit=%d)\n", side, unit);
+                                 ;     420         return (USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",420
+000006A0 F90901FFFF              		MOV.W #0FFFFH, 02H[R0]
+000006A5 2Err                 B  		BRA L135
+000006A7                         L129:	; bb17
+000006A7 710205                  		ADD #05H, R0, R2
+000006AA 66C1                    		MOV.L #0000000CH, R1
+                                 ;     421     }
+                                 ;     422 
+                                 ;     423     /* Data clear */
+                                 ;     424     usb_hmsc_ClrData((uint16_t)12, data);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",424
+000006AC 05rrrrrr             A  		BSR _usb_hmsc_ClrData
+000006B0                         L130:	; bb17.split
+                                 ;     425 
+                                 ;     426     /* Data set */
+                                 ;     427     /* Command */
+                                 ;     428     data[0] = USB_ATAPI_REQUEST_SENSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",428
+000006B0 3C0503                  		MOV.B #03H, 05H[R0]
+000006B3                         L131:	; bb17.split2
+                                 ;     429     /* Allocation length */
+                                 ;     430     data[4] = length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",430
+000006B3 C5001109                		MOV.B 11H[R0], 09H[R0]
+000006B7                         L132:	; bb17.split3
+                                 ;     431 
+                                 ;     432     /* Set CBW parameter */
+                                 ;     433     usb_hmsc_SetElsCbw(ptr, (uint8_t*)&data, (uint32_t)length, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",433
+000006B7 BB8C                    		MOVU.W 1EH[R0], R4
+000006B9 B40B                    		MOVU.B 11H[R0], R3
+000006BB AA01                    		MOV.L 20H[R0], R1
+000006BD 710205                  		ADD #05H, R0, R2
+000006C0 05rrrrrr             A  		BSR _usb_hmsc_SetElsCbw
+000006C4                         L133:	; bb17.split4
+                                 ;     434 
+                                 ;     435     /* Data IN */
+                                 ;     436     hmsc_retval = usb_hmsc_DataIn(ptr, side, buff, (uint32_t)length);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",436
+000006C4 B40C                    		MOVU.B 11H[R0], R4
+000006C6 A983                    		MOV.L 18H[R0], R3
+000006C8 BB8A                    		MOVU.W 1EH[R0], R2
+000006CA AA01                    		MOV.L 20H[R0], R1
+000006CC 05rrrrrr             A  		BSR _usb_hmsc_DataIn
+000006D0 9209                    		MOV.W R1, 12H[R0]
+000006D2                         L134:	; bb17.split5
+                                 ;     437     return (hmsc_retval);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",437
+000006D2 D5000901                		MOV.W 12H[R0], 02H[R0]
+000006D6                         L135:	; bb37
+000006D6 D500010B                		MOV.W 02H[R0], 16H[R0]
+                                 ;     438 }   /* eof R_usb_hmsc_RequestSense() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",438
+000006DA BA89                    		MOVU.W 16H[R0], R1
+000006DC 6709                    		RTSD #24H
+000006DE                         _R_usb_hmsc_Inquiry:
+                                 		.STACK	_R_usb_hmsc_Inquiry=40
+                                 ;     439 
+                                 ;     440 /******************************************************************************
+                                 ;     441 Function Name   : R_usb_hmsc_Inquiry
+                                 ;     442 Description     : Inquiry
+                                 ;     443 Arguments       : uint16_t side : 
+                                 ;     444                 : uint8_t *buff : 
+                                 ;     445 Return value    : uint16_t : 
+                                 ;     446 ******************************************************************************/
+                                 ;     447 uint16_t R_usb_hmsc_Inquiry(USB_UTR_t *ptr, uint16_t side, uint8_t *buff)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",447
+000006DE 7100DC                  		ADD #0FFFFFFDCH, R0
+000006E1 A201                    		MOV.L R1, 20H[R0]
+000006E3 938A                    		MOV.W R2, 1EH[R0]
+000006E5 A183                    		MOV.L R3, 18H[R0]
+                                 ;     448 {
+                                 ;     449     uint8_t     data[12];
+                                 ;     450     uint8_t     length = 36;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",450
+000006E7 3C8124                  		MOV.B #24H, 11H[R0]
+000006EA                         L137:	; entry.split
+                                 ;     451     uint16_t    hmsc_retval, unit;
+                                 ;     452 
+                                 ;     453     unit = usb_hmsc_SmpDrive2Unit(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",453
+000006EA BB8A                    		MOVU.W 1EH[R0], R2
+000006EC AA01                    		MOV.L 20H[R0], R1
+000006EE 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Unit
+000006F2 9281                    		MOV.W R1, 14H[R0]
+000006F4                         L138:	; entry.split1
+                                 ;     454     if( unit == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",454
+000006F4 BA81                    		MOVU.W 14H[R0], R1
+000006F6 7701FFFF00              		CMP #0FFFFH, R1
+000006FB 18                   S  		BNE L140
+000006FC                         L139:	; bb11
+                                 ;     455     {
+                                 ;     456         USB_PRINTF2("### unit error(Inquiry:side=%d,unit=%d)\n", side, unit);
+                                 ;     457         return (USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",457
+000006FC F90901FFFF              		MOV.W #0FFFFH, 02H[R0]
+00000701 2Err                 B  		BRA L146
+00000703                         L140:	; bb17
+00000703 710205                  		ADD #05H, R0, R2
+00000706 66C1                    		MOV.L #0000000CH, R1
+                                 ;     458     }
+                                 ;     459 
+                                 ;     460     /* Data clear */
+                                 ;     461     usb_hmsc_ClrData((uint16_t)12, data);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",461
+00000708 05rrrrrr             A  		BSR _usb_hmsc_ClrData
+0000070C                         L141:	; bb17.split
+                                 ;     462 
+                                 ;     463     /* Data set */
+                                 ;     464     /* Command */
+                                 ;     465     data[0] = USB_ATAPI_INQUIRY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",465
+0000070C 3C0512                  		MOV.B #12H, 05H[R0]
+0000070F                         L142:	; bb17.split2
+                                 ;     466     /* Allocation length */
+                                 ;     467     data[4] = length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",467
+0000070F C5001109                		MOV.B 11H[R0], 09H[R0]
+00000713                         L143:	; bb17.split3
+                                 ;     468 
+                                 ;     469     /* Set CBW parameter */
+                                 ;     470     usb_hmsc_SetElsCbw(ptr, (uint8_t*)&data, (uint32_t)length, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",470
+00000713 BB8C                    		MOVU.W 1EH[R0], R4
+00000715 B40B                    		MOVU.B 11H[R0], R3
+00000717 AA01                    		MOV.L 20H[R0], R1
+00000719 710205                  		ADD #05H, R0, R2
+0000071C 05rrrrrr             A  		BSR _usb_hmsc_SetElsCbw
+00000720                         L144:	; bb17.split4
+                                 ;     471 
+                                 ;     472     /* Data IN */
+                                 ;     473     hmsc_retval = usb_hmsc_DataIn(ptr, side, buff, (uint32_t)length);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",473
+00000720 B40C                    		MOVU.B 11H[R0], R4
+00000722 A983                    		MOV.L 18H[R0], R3
+00000724 BB8A                    		MOVU.W 1EH[R0], R2
+00000726 AA01                    		MOV.L 20H[R0], R1
+00000728 05rrrrrr             A  		BSR _usb_hmsc_DataIn
+0000072C 9209                    		MOV.W R1, 12H[R0]
+0000072E                         L145:	; bb17.split5
+                                 ;     474     return (hmsc_retval);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",474
+0000072E D5000901                		MOV.W 12H[R0], 02H[R0]
+00000732                         L146:	; bb37
+00000732 D500010B                		MOV.W 02H[R0], 16H[R0]
+                                 ;     475 }   /* eof R_usb_hmsc_Inquiry() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",475
+00000736 BA89                    		MOVU.W 16H[R0], R1
+00000738 6709                    		RTSD #24H
+0000073A                         _R_usb_hmsc_ReadCapacity:
+                                 		.STACK	_R_usb_hmsc_ReadCapacity=40
+                                 ;     476 
+                                 ;     477 /******************************************************************************
+                                 ;     478 Function Name   : R_usb_hmsc_ReadCapacity
+                                 ;     479 Description     : ReadCapacity
+                                 ;     480 Arguments       : uint16_t side : 
+                                 ;     481                 : uint8_t *buff : 
+                                 ;     482 Return value    : uint16_t : 
+                                 ;     483 ******************************************************************************/
+                                 ;     484 uint16_t R_usb_hmsc_ReadCapacity(USB_UTR_t *ptr, uint16_t side, uint8_t *buff)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",484
+0000073A 7100DC                  		ADD #0FFFFFFDCH, R0
+0000073D A201                    		MOV.L R1, 20H[R0]
+0000073F 938A                    		MOV.W R2, 1EH[R0]
+00000741 A183                    		MOV.L R3, 18H[R0]
+                                 ;     485 {
+                                 ;     486     uint8_t     data[12];
+                                 ;     487     uint8_t     length = 8;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",487
+00000743 3C8108                  		MOV.B #08H, 11H[R0]
+00000746                         L148:	; entry.split
+                                 ;     488     uint16_t    hmsc_retval, unit;
+                                 ;     489 
+                                 ;     490     unit = usb_hmsc_SmpDrive2Unit(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",490
+00000746 BB8A                    		MOVU.W 1EH[R0], R2
+00000748 AA01                    		MOV.L 20H[R0], R1
+0000074A 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Unit
+0000074E 9281                    		MOV.W R1, 14H[R0]
+00000750                         L149:	; entry.split1
+                                 ;     491     if( unit == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",491
+00000750 BA81                    		MOVU.W 14H[R0], R1
+00000752 7701FFFF00              		CMP #0FFFFH, R1
+00000757 18                   S  		BNE L151
+00000758                         L150:	; bb11
+                                 ;     492     {
+                                 ;     493         USB_PRINTF2("### unit error(ReadCapacity:side=%d,unit=%d)\n", side, unit);
+                                 ;     494         return (USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",494
+00000758 F90901FFFF              		MOV.W #0FFFFH, 02H[R0]
+0000075D 2Err                 B  		BRA L156
+0000075F                         L151:	; bb17
+0000075F 710205                  		ADD #05H, R0, R2
+00000762 66C1                    		MOV.L #0000000CH, R1
+                                 ;     495     }
+                                 ;     496 
+                                 ;     497     /* Data clear */
+                                 ;     498     usb_hmsc_ClrData((uint16_t)12, data);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",498
+00000764 05rrrrrr             A  		BSR _usb_hmsc_ClrData
+00000768                         L152:	; bb17.split
+                                 ;     499 
+                                 ;     500     /* Data set */
+                                 ;     501     /* Command */
+                                 ;     502     data[0] = USB_ATAPI_READ_CAPACITY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",502
+00000768 3C0525                  		MOV.B #25H, 05H[R0]
+0000076B                         L153:	; bb17.split2
+                                 ;     503 
+                                 ;     504     /* Set CBW parameter */
+                                 ;     505     usb_hmsc_SetElsCbw(ptr, (uint8_t*)&data, (uint32_t)length, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",505
+0000076B BB8C                    		MOVU.W 1EH[R0], R4
+0000076D B40B                    		MOVU.B 11H[R0], R3
+0000076F AA01                    		MOV.L 20H[R0], R1
+00000771 710205                  		ADD #05H, R0, R2
+00000774 05rrrrrr             A  		BSR _usb_hmsc_SetElsCbw
+00000778                         L154:	; bb17.split3
+                                 ;     506 
+                                 ;     507     /* Data IN */
+                                 ;     508     hmsc_retval = usb_hmsc_DataIn(ptr, side, buff, (uint32_t)length);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",508
+00000778 B40C                    		MOVU.B 11H[R0], R4
+0000077A A983                    		MOV.L 18H[R0], R3
+0000077C BB8A                    		MOVU.W 1EH[R0], R2
+0000077E AA01                    		MOV.L 20H[R0], R1
+00000780 05rrrrrr             A  		BSR _usb_hmsc_DataIn
+00000784 9209                    		MOV.W R1, 12H[R0]
+00000786                         L155:	; bb17.split4
+                                 ;     509     return (hmsc_retval);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",509
+00000786 D5000901                		MOV.W 12H[R0], 02H[R0]
+0000078A                         L156:	; bb34
+0000078A D500010B                		MOV.W 02H[R0], 16H[R0]
+                                 ;     510 }   /* eof R_usb_hmsc_ReadCapacity() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",510
+0000078E BA89                    		MOVU.W 16H[R0], R1
+00000790 6709                    		RTSD #24H
+00000792                         _R_usb_hmsc_ReadFormatCapacity:
+                                 		.STACK	_R_usb_hmsc_ReadFormatCapacity=40
+                                 ;     511 
+                                 ;     512 /******************************************************************************
+                                 ;     513 Function Name   : R_usb_hmsc_ReadFormatCapacity
+                                 ;     514 Description     : ReadFormatCapacity
+                                 ;     515 Arguments       : uint16_t side : 
+                                 ;     516                 : uint8_t *buff : 
+                                 ;     517 Return value    : uint16_t : 
+                                 ;     518 ******************************************************************************/
+                                 ;     519 uint16_t R_usb_hmsc_ReadFormatCapacity(USB_UTR_t *ptr, uint16_t side, uint8_t *buff)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",519
+00000792 7100DC                  		ADD #0FFFFFFDCH, R0
+00000795 A201                    		MOV.L R1, 20H[R0]
+00000797 938A                    		MOV.W R2, 1EH[R0]
+00000799 A183                    		MOV.L R3, 18H[R0]
+                                 ;     520 {
+                                 ;     521     uint8_t     data[12];
+                                 ;     522     uint8_t     length = 0x20;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",522
+0000079B 3C8120                  		MOV.B #20H, 11H[R0]
+0000079E                         L158:	; entry.split
+                                 ;     523     uint16_t    hmsc_retval, unit;
+                                 ;     524 
+                                 ;     525     unit = usb_hmsc_SmpDrive2Unit(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",525
+0000079E BB8A                    		MOVU.W 1EH[R0], R2
+000007A0 AA01                    		MOV.L 20H[R0], R1
+000007A2 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Unit
+000007A6 9281                    		MOV.W R1, 14H[R0]
+000007A8                         L159:	; entry.split1
+                                 ;     526     if( unit == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",526
+000007A8 BA81                    		MOVU.W 14H[R0], R1
+000007AA 7701FFFF00              		CMP #0FFFFH, R1
+000007AF 18                   S  		BNE L161
+000007B0                         L160:	; bb11
+                                 ;     527     {
+                                 ;     528         USB_PRINTF2("### unit error(read_format:side=%d,unit=%d)\n", side, unit);
+                                 ;     529         return (USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",529
+000007B0 F90901FFFF              		MOV.W #0FFFFH, 02H[R0]
+000007B5 2Err                 B  		BRA L167
+000007B7                         L161:	; bb17
+000007B7 710205                  		ADD #05H, R0, R2
+000007BA 66C1                    		MOV.L #0000000CH, R1
+                                 ;     530     }
+                                 ;     531 
+                                 ;     532     /* Data clear */
+                                 ;     533     usb_hmsc_ClrData((uint16_t)12, data);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",533
+000007BC 05rrrrrr             A  		BSR _usb_hmsc_ClrData
+000007C0                         L162:	; bb17.split
+                                 ;     534 
+                                 ;     535     /* Data set */
+                                 ;     536     /* Command */
+                                 ;     537     data[0] = USB_ATAPI_READ_FORMAT_CAPACITY;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",537
+000007C0 3C0523                  		MOV.B #23H, 05H[R0]
+000007C3                         L163:	; bb17.split2
+                                 ;     538     /* Allocation length */
+                                 ;     539     data[8] = length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",539
+000007C3 C500110D                		MOV.B 11H[R0], 0DH[R0]
+000007C7                         L164:	; bb17.split3
+                                 ;     540 
+                                 ;     541     /* Set CBW parameter */
+                                 ;     542     usb_hmsc_SetElsCbw(ptr, (uint8_t*)&data, (uint32_t)length, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",542
+000007C7 BB8C                    		MOVU.W 1EH[R0], R4
+000007C9 B40B                    		MOVU.B 11H[R0], R3
+000007CB AA01                    		MOV.L 20H[R0], R1
+000007CD 710205                  		ADD #05H, R0, R2
+000007D0 05rrrrrr             A  		BSR _usb_hmsc_SetElsCbw
+000007D4                         L165:	; bb17.split4
+                                 ;     543 
+                                 ;     544     /* Data IN */
+                                 ;     545     hmsc_retval = usb_hmsc_DataIn(ptr, side, buff, (uint32_t)length);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",545
+000007D4 B40C                    		MOVU.B 11H[R0], R4
+000007D6 A983                    		MOV.L 18H[R0], R3
+000007D8 BB8A                    		MOVU.W 1EH[R0], R2
+000007DA AA01                    		MOV.L 20H[R0], R1
+000007DC 05rrrrrr             A  		BSR _usb_hmsc_DataIn
+000007E0 9209                    		MOV.W R1, 12H[R0]
+000007E2                         L166:	; bb17.split5
+                                 ;     546     return (hmsc_retval);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",546
+000007E2 D5000901                		MOV.W 12H[R0], 02H[R0]
+000007E6                         L167:	; bb37
+000007E6 D500010B                		MOV.W 02H[R0], 16H[R0]
+                                 ;     547 }   /* eof R_usb_hmsc_ReadFormatCapacity() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",547
+000007EA BA89                    		MOVU.W 16H[R0], R1
+000007EC 6709                    		RTSD #24H
+000007EE                         _R_usb_hmsc_ModeSense10:
+                                 		.STACK	_R_usb_hmsc_ModeSense10=40
+                                 ;     548 
+                                 ;     549 /******************************************************************************
+                                 ;     550 Function Name   : R_usb_hmsc_ModeSense10
+                                 ;     551 Description     : ModeSense10
+                                 ;     552 Arguments       : uint16_t side : 
+                                 ;     553                 : uint8_t *buff : 
+                                 ;     554 Return value    : uint16_t : 
+                                 ;     555 ******************************************************************************/
+                                 ;     556 uint16_t R_usb_hmsc_ModeSense10(USB_UTR_t *ptr, uint16_t side, uint8_t *buff)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",556
+000007EE 7100DC                  		ADD #0FFFFFFDCH, R0
+000007F1 A201                    		MOV.L R1, 20H[R0]
+000007F3 938A                    		MOV.W R2, 1EH[R0]
+000007F5 A183                    		MOV.L R3, 18H[R0]
+                                 ;     557 {
+                                 ;     558     uint8_t     data[12];
+                                 ;     559     uint8_t     length = 26;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",559
+000007F7 3C811A                  		MOV.B #1AH, 11H[R0]
+000007FA                         L169:	; entry.split
+                                 ;     560     uint16_t    hmsc_retval, unit;
+                                 ;     561 
+                                 ;     562     unit = usb_hmsc_SmpDrive2Unit(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",562
+000007FA BB8A                    		MOVU.W 1EH[R0], R2
+000007FC AA01                    		MOV.L 20H[R0], R1
+000007FE 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Unit
+00000802 9281                    		MOV.W R1, 14H[R0]
+00000804                         L170:	; entry.split1
+                                 ;     563     if( unit == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",563
+00000804 BA81                    		MOVU.W 14H[R0], R1
+00000806 7701FFFF00              		CMP #0FFFFH, R1
+0000080B 18                   S  		BNE L172
+0000080C                         L171:	; bb11
+                                 ;     564     {
+                                 ;     565         USB_PRINTF2("### unit error(ModeSense10:side=%d,unit=%d)\n", side, unit);
+                                 ;     566         return (USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",566
+0000080C F90901FFFF              		MOV.W #0FFFFH, 02H[R0]
+00000811 2Err                 B  		BRA L180
+00000813                         L172:	; bb17
+00000813 710205                  		ADD #05H, R0, R2
+00000816 66C1                    		MOV.L #0000000CH, R1
+                                 ;     567     }
+                                 ;     568 
+                                 ;     569     /* Data clear */
+                                 ;     570     usb_hmsc_ClrData((uint16_t)12, data);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",570
+00000818 05rrrrrr             A  		BSR _usb_hmsc_ClrData
+0000081C                         L173:	; bb17.split
+                                 ;     571 
+                                 ;     572     /* Data set */
+                                 ;     573     /* Command */
+                                 ;     574     data[0] = USB_ATAPI_MODE_SENSE10;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",574
+0000081C 3C055A                  		MOV.B #5AH, 05H[R0]
+0000081F                         L174:	; bb17.split2
+                                 ;     575     /* Set LUN / DBD=1 */
+                                 ;     576     data[1] = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",576
+0000081F 3C0608                  		MOV.B #08H, 06H[R0]
+00000822                         L175:	; bb17.split3
+                                 ;     577     /* Allocation length */
+                                 ;     578     data[7] = 0x00;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",578
+00000822 3C0C00                  		MOV.B #00H, 0CH[R0]
+00000825                         L176:	; bb17.split4
+                                 ;     579     /* Allocation length */
+                                 ;     580     data[8] = 0x02;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",580
+00000825 3C0D02                  		MOV.B #02H, 0DH[R0]
+00000828                         L177:	; bb17.split5
+                                 ;     581 
+                                 ;     582     /* Set CBW parameter */
+                                 ;     583     usb_hmsc_SetElsCbw(ptr, (uint8_t*)&data, (uint32_t)length, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",583
+00000828 BB8C                    		MOVU.W 1EH[R0], R4
+0000082A B40B                    		MOVU.B 11H[R0], R3
+0000082C AA01                    		MOV.L 20H[R0], R1
+0000082E 710205                  		ADD #05H, R0, R2
+00000831 05rrrrrr             A  		BSR _usb_hmsc_SetElsCbw
+00000835                         L178:	; bb17.split6
+                                 ;     584 
+                                 ;     585     /* Data IN */
+                                 ;     586     hmsc_retval = usb_hmsc_DataIn(ptr, side, buff, (uint32_t)length);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",586
+00000835 B40C                    		MOVU.B 11H[R0], R4
+00000837 A983                    		MOV.L 18H[R0], R3
+00000839 BB8A                    		MOVU.W 1EH[R0], R2
+0000083B AA01                    		MOV.L 20H[R0], R1
+0000083D 05rrrrrr             A  		BSR _usb_hmsc_DataIn
+00000841 9209                    		MOV.W R1, 12H[R0]
+00000843                         L179:	; bb17.split7
+                                 ;     587     return (hmsc_retval);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",587
+00000843 D5000901                		MOV.W 12H[R0], 02H[R0]
+00000847                         L180:	; bb40
+00000847 D500010B                		MOV.W 02H[R0], 16H[R0]
+                                 ;     588 }   /* eof R_usb_hmsc_ModeSense10() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",588
+0000084B BA89                    		MOVU.W 16H[R0], R1
+0000084D 6709                    		RTSD #24H
+0000084F                         _R_usb_hmsc_ModeSelect6:
+                                 		.STACK	_R_usb_hmsc_ModeSelect6=40
+                                 ;     589 
+                                 ;     590 /******************************************************************************
+                                 ;     591 Function Name   : R_usb_hmsc_ModeSelect6
+                                 ;     592 Description     : ModeSelect6
+                                 ;     593 Arguments       : uint16_t side : 
+                                 ;     594                 : uint8_t *buff : 
+                                 ;     595 Return value    : uint16_t : 
+                                 ;     596 ******************************************************************************/
+                                 ;     597 uint16_t R_usb_hmsc_ModeSelect6(USB_UTR_t *ptr, uint16_t side, uint8_t *buff)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",597
+0000084F 7100DC                  		ADD #0FFFFFFDCH, R0
+00000852 A201                    		MOV.L R1, 20H[R0]
+00000854 938A                    		MOV.W R2, 1EH[R0]
+00000856 A183                    		MOV.L R3, 18H[R0]
+                                 ;     598 {
+                                 ;     599     uint8_t     data[12];
+                                 ;     600     uint8_t     length = 18;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",600
+00000858 3C8112                  		MOV.B #12H, 11H[R0]
+0000085B                         L182:	; entry.split
+                                 ;     601     uint16_t    hmsc_retval, unit;
+                                 ;     602 
+                                 ;     603     unit = usb_hmsc_SmpDrive2Unit(ptr, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",603
+0000085B BB8A                    		MOVU.W 1EH[R0], R2
+0000085D AA01                    		MOV.L 20H[R0], R1
+0000085F 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Unit
+00000863 9281                    		MOV.W R1, 14H[R0]
+00000865                         L183:	; entry.split1
+                                 ;     604     if( unit == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",604
+00000865 BA81                    		MOVU.W 14H[R0], R1
+00000867 7701FFFF00              		CMP #0FFFFH, R1
+0000086C 18                   S  		BNE L185
+0000086D                         L184:	; bb11
+                                 ;     605     {
+                                 ;     606         USB_PRINTF2("### unit error(mode_sense6:side=%d,unit=%d)\n", side, unit);
+                                 ;     607         return (USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",607
+0000086D F90901FFFF              		MOV.W #0FFFFH, 02H[R0]
+00000872 2Err                 B  		BRA L197
+00000874                         L185:	; bb17
+00000874 710205                  		ADD #05H, R0, R2
+00000877 66C1                    		MOV.L #0000000CH, R1
+                                 ;     608     }
+                                 ;     609 
+                                 ;     610     /* Data clear */
+                                 ;     611     usb_hmsc_ClrData((uint16_t)12, data);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",611
+00000879 05rrrrrr             A  		BSR _usb_hmsc_ClrData
+0000087D                         L186:	; bb17.split
+                                 ;     612 
+                                 ;     613     /* Data set */
+                                 ;     614     /* Command */
+                                 ;     615     data[0] = USB_ATAPI_MODE_SELECT6;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",615
+0000087D 3C0515                  		MOV.B #15H, 05H[R0]
+00000880                         L187:	; bb17.split2
+                                 ;     616     /* SP=0 */
+                                 ;     617     data[1] = 0x10;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",617
+00000880 3C0610                  		MOV.B #10H, 06H[R0]
+00000883                         L188:	; bb17.split3
+                                 ;     618     /* Parameter list length ??? */
+                                 ;     619     data[4] = 0x18;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",619
+00000883 3C0918                  		MOV.B #18H, 09H[R0]
+00000886                         L189:	; bb17.split4
+                                 ;     620 
+                                 ;     621     /* Set CBW parameter */
+                                 ;     622     usb_hmsc_SetElsCbw(ptr, (uint8_t*)&data, (uint32_t)length, side);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",622
+00000886 BB8C                    		MOVU.W 1EH[R0], R4
+00000888 B40B                    		MOVU.B 11H[R0], R3
+0000088A AA01                    		MOV.L 20H[R0], R1
+0000088C 710205                  		ADD #05H, R0, R2
+0000088F 05rrrrrr             A  		BSR _usb_hmsc_SetElsCbw
+00000893                         L190:	; bb17.split5
+                                 ;     623 
+                                 ;     624     /* Data clear */
+                                 ;     625     usb_hmsc_ClrData((uint16_t)24, buff);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",625
+00000893 A982                    		MOV.L 18H[R0], R2
+00000895 754118                  		MOV.L #00000018H, R1
+00000898 05rrrrrr             A  		BSR _usb_hmsc_ClrData
+0000089C                         L191:	; bb17.split6
+                                 ;     626 
+                                 ;     627     /* Data set */
+                                 ;     628     buff[3] = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",628
+0000089C A981                    		MOV.L 18H[R0], R1
+0000089E 3C1308                  		MOV.B #08H, 03H[R1]
+000008A1                         L192:	; bb17.split7
+                                 ;     629     buff[10] = 0x02;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",629
+000008A1 A981                    		MOV.L 18H[R0], R1
+000008A3 3C1A02                  		MOV.B #02H, 0AH[R1]
+000008A6                         L193:	; bb17.split8
+                                 ;     630     buff[12] = 0x08;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",630
+000008A6 A981                    		MOV.L 18H[R0], R1
+000008A8 3C1C08                  		MOV.B #08H, 0CH[R1]
+000008AB                         L194:	; bb17.split9
+                                 ;     631     buff[13] = 0x0A;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",631
+000008AB A981                    		MOV.L 18H[R0], R1
+000008AD 3C1D0A                  		MOV.B #0AH, 0DH[R1]
+000008B0                         L195:	; bb17.split10
+                                 ;     632 
+                                 ;     633     /* Data OUT */
+                                 ;     634     hmsc_retval = usb_hmsc_DataOut(ptr, side, buff, (uint32_t)length);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",634
+000008B0 B40C                    		MOVU.B 11H[R0], R4
+000008B2 A983                    		MOV.L 18H[R0], R3
+000008B4 BB8A                    		MOVU.W 1EH[R0], R2
+000008B6 AA01                    		MOV.L 20H[R0], R1
+000008B8 05rrrrrr             A  		BSR _usb_hmsc_DataOut
+000008BC 9209                    		MOV.W R1, 12H[R0]
+000008BE                         L196:	; bb17.split11
+                                 ;     635     return (hmsc_retval);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",635
+000008BE D5000901                		MOV.W 12H[R0], 02H[R0]
+000008C2                         L197:	; bb47
+000008C2 D500010B                		MOV.W 02H[R0], 16H[R0]
+                                 ;     636 }   /* eof R_usb_hmsc_ModeSelect6() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",636
+000008C6 BA89                    		MOVU.W 16H[R0], R1
+000008C8 6709                    		RTSD #24H
+000008CA                         _R_usb_hmsc_DriveSpeed:
+                                 		.STACK	_R_usb_hmsc_DriveSpeed=32
+                                 ;     637 
+                                 ;     638 /******************************************************************************
+                                 ;     639 Function Name   : R_usb_hmsc_DriveSpeed
+                                 ;     640 Description     : DriveSpeed
+                                 ;     641 Arguments       : uint16_t side : 
+                                 ;     642 Return value    : uint16_t : 
+                                 ;     643 ******************************************************************************/
+                                 ;     644 uint16_t R_usb_hmsc_DriveSpeed(USB_UTR_t *ptr, uint16_t side)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",644
+000008CA 7100E4                  		ADD #0FFFFFFE4H, R0
+000008CD A181                    		MOV.L R1, 18H[R0]
+000008CF 928A                    		MOV.W R2, 16H[R0]
+                                 ;     645 {
+                                 ;     646     uint16_t    tbl[10];
+                                 ;     647 
+                                 ;     648     R_usb_hstd_DeviceInformation(ptr, side, (uint16_t *)tbl);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",648
+000008D1 BA8A                    		MOVU.W 16H[R0], R2
+000008D3 A981                    		MOV.L 18H[R0], R1
+000008D5 EF03                    		MOV.L R0, R3
+000008D7 05rrrrrr             A  		BSR _R_usb_hstd_DeviceInformation
+000008DB                         L199:	; entry.split
+                                 ;     649     return (tbl[3]);            /* Speed */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",649
+000008DB D500030A                		MOV.W 06H[R0], 14H[R0]
+000008DF 9A81                    		MOV.W 14H[R0], R1
+000008E1                         L200:	; entry.split1
+                                 ;     650 }   /* eof R_usb_hmsc_DriveSpeed() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",650
+000008E1 5F11                    		MOVU.W R1, R1
+000008E3 6707                    		RTSD #1CH
+000008E5                         _R_usb_hmsc_Release:
+                                 		.STACK	_R_usb_hmsc_Release=8
+                                 ;     651 
+                                 ;     652 /******************************************************************************
+                                 ;     653 Function Name   : R_usb_hmsc_Release
+                                 ;     654 Description     : Release Mass Strage Class driver
+                                 ;     655 Arguments       : none
+                                 ;     656 Return value    : none
+                                 ;     657 ******************************************************************************/
+                                 ;     658 void R_usb_hmsc_Release(USB_UTR_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",658
+000008E5 6040                    		SUB #04H, R0
+000008E7 E301                    		MOV.L R1, [R0]
+000008E9 6682                    		MOV.L #00000008H, R2
+                                 ;     659 {
+                                 ;     660     R_usb_hstd_DriverRelease(ptr, (uint8_t)USB_IFCLS_MAS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",660
+000008EB 05rrrrrr             A  		BSR _R_usb_hstd_DriverRelease
+000008EF 6701                    		RTSD #04H
+000008F1                         _R_usb_hmsc_SetDevSts:
+                                 		.STACK	_R_usb_hmsc_SetDevSts=12
+                                 ;     661 }   /* eof R_usb_hmsc_Release() */
+                                 ;     662 
+                                 ;     663 
+                                 ;     664 /******************************************************************************
+                                 ;     665 Function Name   : R_usb_hmsc_SetDevSts
+                                 ;     666 Description     : Sets HMSCD operation state
+                                 ;     667 Arguments       : uint16_t data : 
+                                 ;     668 Return value    : uint16_t : 
+                                 ;     669 ******************************************************************************/
+                                 ;     670 uint16_t R_usb_hmsc_SetDevSts( uint16_t side, uint16_t data )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",670
+000008F1 6080                    		SUB #08H, R0
+000008F3 9089                    		MOV.W R1, 06H[R0]
+000008F5 9082                    		MOV.W R2, 04H[R0]
+                                 ;     671 {
+                                 ;     672     usb_ghmsc_AttSts[side] = data;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",672
+000008F7 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_AttSts, R14
+000008FD B889                    		MOVU.W 06H[R0], R1
+000008FF FE11E2                  		MOV.W R2, [R1,R14]
+00000902                         L203:	; entry.split
+                                 ;     673     return USB_DONE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",673
+00000902 3D0100                  		MOV.W #0000H, 02H[R0]
+00000905 9809                    		MOV.W 02H[R0], R1
+00000907                         L204:	; entry.split1
+                                 ;     674 }   /* eof R_usb_hmsc_SetDevSts() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",674
+00000907 5F11                    		MOVU.W R1, R1
+00000909 6702                    		RTSD #08H
+0000090B                         _R_usb_hmsc_GetDevSts:
+                                 		.STACK	_R_usb_hmsc_GetDevSts=8
+                                 ;     675 
+                                 ;     676 /******************************************************************************
+                                 ;     677 Function Name   : R_usb_hmsc_GetDevSts
+                                 ;     678 Description     : Responds to HMSCD operation state
+                                 ;     679 Arguments       : none
+                                 ;     680 Return value    : uint16_t : 
+                                 ;     681 ******************************************************************************/
+                                 ;     682 uint16_t R_usb_hmsc_GetDevSts( uint16_t side )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",682
+0000090B 6040                    		SUB #04H, R0
+0000090D 9009                    		MOV.W R1, 02H[R0]
+                                 ;     683 {
+                                 ;     684     return( usb_ghmsc_AttSts[side] );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",684
+0000090F FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_AttSts, R14
+00000915 B809                    		MOVU.W 02H[R0], R1
+00000917 FE51E1                  		MOV.W [R1,R14], R1
+0000091A D301                    		MOV.W R1, [R0]
+0000091C DC01                    		MOV.W [R0], R1
+0000091E                         L206:	; entry.split
+                                 ;     685 }   /* eof R_usb_hmsc_GetDevSts() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",685
+0000091E 5F11                    		MOVU.W R1, R1
+00000920 6701                    		RTSD #04H
+00000922                         _R_usb_hmsc_Information:
+                                 		.STACK	_R_usb_hmsc_Information=12
+                                 ;     686 
+                                 ;     687 /******************************************************************************
+                                 ;     688 Function Name   : R_usb_hmsc_Information
+                                 ;     689 Description     : EP Table Information
+                                 ;     690 Arguments       : uint16_t pipe_offset : 
+                                 ;     691 Return value    : uint16_t : 
+                                 ;     692 ******************************************************************************/
+                                 ;     693 uint16_t R_usb_hmsc_Information(uint16_t ipno, uint16_t pipe_offset)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",693
+00000922 6080                    		SUB #08H, R0
+00000924 9089                    		MOV.W R1, 06H[R0]
+00000926 9082                    		MOV.W R2, 04H[R0]
+                                 ;     694 {
+                                 ;     695     return(usb_ghmsc_PipeTable[ipno][pipe_offset]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",695
+00000928 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_PipeTable, R14
+0000092E B889                    		MOVU.W 06H[R0], R1
+00000930 FE61EE                  		MOV.L [R1,R14], R14
+00000933 B881                    		MOVU.W 04H[R0], R1
+00000935 FE51E1                  		MOV.W [R1,R14], R1
+00000938 9009                    		MOV.W R1, 02H[R0]
+0000093A 9809                    		MOV.W 02H[R0], R1
+0000093C                         L208:	; entry.split
+                                 ;     696 }   /* eof R_usb_hmsc_Information() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",696
+0000093C 5F11                    		MOVU.W R1, R1
+0000093E 6702                    		RTSD #08H
+00000940                         _R_usb_hmsc_GetMaxUnit:
+                                 		.STACK	_R_usb_hmsc_GetMaxUnit=24
+                                 ;     697 
+                                 ;     698 /******************************************************************************
+                                 ;     699 Function Name   : R_usb_hmsc_GetMaxUnit
+                                 ;     700 Description     : Get Max LUN request
+                                 ;     701 Argument        : uint16_t addr             : Device Address
+                                 ;     702                 : USB_CB_t complete         : CallBack Function
+                                 ;     703 Return value    : USB_ER_t                  : Error Code
+                                 ;     704 ******************************************************************************/
+                                 ;     705 USB_ER_t R_usb_hmsc_GetMaxUnit(USB_UTR_t *ptr, uint16_t addr, USB_CB_t complete)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",705
+00000940 7100EC                  		ADD #0FFFFFFECH, R0
+00000943 A101                    		MOV.L R1, 10H[R0]
+00000945 918A                    		MOV.W R2, 0EH[R0]
+00000947 A083                    		MOV.L R3, 08H[R0]
+                                 ;     706 {
+                                 ;     707     USB_ER_t err;
+                                 ;     708     static uint16_t get_max_lun_table[5] = {0xFEA1, 0x0000, 0x0000, 0x0001, 0x0000};
+                                 ;     709 
+                                 ;     710     /* Device address set */
+                                 ;     711     get_max_lun_table[4] = addr;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",711
+00000949 FBE2rrrrrrrr            		MOV.L #__$get_max_lun_table$1, R14
+0000094F D50E0704                		MOV.W 0EH[R0], 08H[R14]
+00000953                         L210:	; entry.split
+                                 ;     712 
+                                 ;     713     /* Recieve MaxLUN */
+                                 ;     714     usb_ghmsc_ControlData[ptr->ip].keyword   = USB_PIPE0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",714
+00000953 A901                    		MOV.L 10H[R0], R1
+00000955 B991                    		MOVU.W 0CH[R1], R1
+00000957 75112C                  		MUL #2CH, R1
+0000095A FB22rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R2
+00000960 4B12                    		ADD R1, R2
+00000962 3D2300                  		MOV.W #0000H, 06H[R2]
+00000965                         L211:	; entry.split1
+                                 ;     715     usb_ghmsc_ControlData[ptr->ip].tranadr   = (void*)usb_ghmsc_Data[ptr->ip];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",715
+00000965 A901                    		MOV.L 10H[R0], R1
+00000967 B991                    		MOVU.W 0CH[R1], R1
+00000969 EF1E                    		MOV.L R1, R14
+0000096B 751E2C                  		MUL #2CH, R14
+0000096E FB22rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R2
+00000974 4BE2                    		ADD R14, R2
+00000976 76110014                		MUL #1400H, R1
+0000097A FB32rrrrrrrr            		MOV.L #_usb_ghmsc_Data, R3
+00000980 4B13                    		ADD R1, R3
+00000982 A12B                    		MOV.L R3, 14H[R2]
+00000984                         L212:	; entry.split2
+                                 ;     716     usb_ghmsc_ControlData[ptr->ip].tranlen   = (uint32_t)1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",716
+00000984 A901                    		MOV.L 10H[R0], R1
+00000986 B991                    		MOVU.W 0CH[R1], R1
+00000988 75112C                  		MUL #2CH, R1
+0000098B FB22rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R2
+00000991 4B12                    		ADD R1, R2
+00000993 3E2601                  		MOV.L #00000001H, 18H[R2]
+00000996                         L213:	; entry.split3
+                                 ;     717     usb_ghmsc_ControlData[ptr->ip].setup     = get_max_lun_table;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",717
+00000996 A901                    		MOV.L 10H[R0], R1
+00000998 B991                    		MOVU.W 0CH[R1], R1
+0000099A 75112C                  		MUL #2CH, R1
+0000099D FB22rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R2
+000009A3 4B12                    		ADD R1, R2
+000009A5 FB12rrrrrrrr            		MOV.L #__$get_max_lun_table$1, R1
+000009AB A1A9                    		MOV.L R1, 1CH[R2]
+000009AD                         L214:	; entry.split4
+                                 ;     718     usb_ghmsc_ControlData[ptr->ip].complete  = complete;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",718
+000009AD A901                    		MOV.L 10H[R0], R1
+000009AF B991                    		MOVU.W 0CH[R1], R1
+000009B1 75112C                  		MUL #2CH, R1
+000009B4 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R2
+000009BA 4B12                    		ADD R1, R2
+000009BC E5020204                		MOV.L 08H[R0], 10H[R2]
+000009C0                         L215:	; entry.split5
+                                 ;     719     usb_ghmsc_ControlData[ptr->ip].segment   = USB_TRAN_END;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",719
+000009C0 A901                    		MOV.L 10H[R0], R1
+000009C2 B991                    		MOVU.W 0CH[R1], R1
+000009C4 75112C                  		MUL #2CH, R1
+000009C7 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R14
+000009CD 4B1E                    		ADD R1, R14
+000009CF F9E42580                		MOV.B #80H, 25H[R14]
+000009D3                         L216:	; entry.split6
+                                 ;     720 
+                                 ;     721     err = usb_hmsc_SubmitutrReq(ptr, (uint16_t)USB_CTRL_END, &usb_ghmsc_ControlData[ptr->ip]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",721
+000009D3 A901                    		MOV.L 10H[R0], R1
+000009D5 B992                    		MOVU.W 0CH[R1], R2
+000009D7 75122C                  		MUL #2CH, R2
+000009DA FB32rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R3
+000009E0 4B23                    		ADD R2, R3
+000009E2 6602                    		MOV.L #00000000H, R2
+000009E4 05rrrrrr             A  		BSR _usb_hmsc_SubmitutrReq
+000009E8 E301                    		MOV.L R1, [R0]
+000009EA                         L217:	; entry.split7
+                                 ;     722     return err;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",722
+000009EA EC01                    		MOV.L [R0], R1
+000009EC A009                    		MOV.L R1, 04H[R0]
+000009EE                         L218:	; entry.split8
+                                 ;     723 }   /* eof R_usb_hmsc_GetMaxUnit() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",723
+000009EE 6705                    		RTSD #14H
+000009F0                         _R_usb_hmsc_MassStorageReset:
+                                 		.STACK	_R_usb_hmsc_MassStorageReset=68
+                                 ;     724 
+                                 ;     725 
+                                 ;     726 /******************************************************************************
+                                 ;     727 Function Name   : R_usb_hmsc_MassStorageReset
+                                 ;     728 Description     : Mass Strage Reset request
+                                 ;     729 Argument        : uint16_t drvnum           : Drive Number
+                                 ;     730                 : USB_CB_t complete        : Callback Funtion
+                                 ;     731 Return value    : USB_ER_t                 : Error Code
+                                 ;     732 ******************************************************************************/
+                                 ;     733 USB_ER_t R_usb_hmsc_MassStorageReset(USB_UTR_t *ptr, uint16_t drvnum, USB_CB_t complete)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",733
+000009F0 7100C0                  		ADD #0FFFFFFC0H, R0
+000009F3 A389                    		MOV.L R1, 3CH[R0]
+000009F5 970A                    		MOV.W R2, 3AH[R0]
+000009F7 A30B                    		MOV.L R3, 34H[R0]
+                                 ;     734 {
+                                 ;     735     USB_ER_t err;
+                                 ;     736     USB_UTR_t    dev_adr;
+                                 ;     737 
+                                 ;     738     static uint16_t mass_storage_reset_table[5] = {0xFF21, 0x0000, 0x0000, 0x0000, 0x0000};
+                                 ;     739 
+                                 ;     740     /* Device address set */
+                                 ;     741     usb_hmsc_SmpDrive2Addr(drvnum, &dev_adr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",741
+000009F9 BF09                    		MOVU.W 3AH[R0], R1
+000009FB 710204                  		ADD #04H, R0, R2
+000009FE 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Addr
+00000A02                         L220:	; entry.split
+                                 ;     742     mass_storage_reset_table[4] = dev_adr.keyword;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",742
+00000A02 FBE2rrrrrrrr            		MOV.L #__$mass_storage_reset_table$2, R14
+00000A08 D50E0504                		MOV.W 0AH[R0], 08H[R14]
+00000A0C                         L221:	; entry.split1
+                                 ;     743 
+                                 ;     744     /* Set MassStorageReset */
+                                 ;     745     usb_ghmsc_ControlData[ptr->ip].keyword   = USB_PIPE0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",745
+00000A0C AB89                    		MOV.L 3CH[R0], R1
+00000A0E B991                    		MOVU.W 0CH[R1], R1
+00000A10 75112C                  		MUL #2CH, R1
+00000A13 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R2
+00000A19 4B12                    		ADD R1, R2
+00000A1B 3D2300                  		MOV.W #0000H, 06H[R2]
+00000A1E                         L222:	; entry.split2
+                                 ;     746     usb_ghmsc_ControlData[ptr->ip].tranadr   = (void*)usb_ghmsc_Data[ptr->ip];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",746
+00000A1E AB89                    		MOV.L 3CH[R0], R1
+00000A20 B991                    		MOVU.W 0CH[R1], R1
+00000A22 EF1E                    		MOV.L R1, R14
+00000A24 751E2C                  		MUL #2CH, R14
+00000A27 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R2
+00000A2D 4BE2                    		ADD R14, R2
+00000A2F 76110014                		MUL #1400H, R1
+00000A33 FB32rrrrrrrr            		MOV.L #_usb_ghmsc_Data, R3
+00000A39 4B13                    		ADD R1, R3
+00000A3B A12B                    		MOV.L R3, 14H[R2]
+00000A3D                         L223:	; entry.split3
+                                 ;     747     usb_ghmsc_ControlData[ptr->ip].tranlen   = (uint32_t)0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",747
+00000A3D AB89                    		MOV.L 3CH[R0], R1
+00000A3F B991                    		MOVU.W 0CH[R1], R1
+00000A41 75112C                  		MUL #2CH, R1
+00000A44 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R2
+00000A4A 4B12                    		ADD R1, R2
+00000A4C 3E2600                  		MOV.L #00000000H, 18H[R2]
+00000A4F                         L224:	; entry.split4
+                                 ;     748     usb_ghmsc_ControlData[ptr->ip].setup     = mass_storage_reset_table;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",748
+00000A4F AB89                    		MOV.L 3CH[R0], R1
+00000A51 B991                    		MOVU.W 0CH[R1], R1
+00000A53 75112C                  		MUL #2CH, R1
+00000A56 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R2
+00000A5C 4B12                    		ADD R1, R2
+00000A5E FB12rrrrrrrr            		MOV.L #__$mass_storage_reset_table$2, R1
+00000A64 A1A9                    		MOV.L R1, 1CH[R2]
+00000A66                         L225:	; entry.split5
+                                 ;     749     usb_ghmsc_ControlData[ptr->ip].complete  = complete;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",749
+00000A66 AB89                    		MOV.L 3CH[R0], R1
+00000A68 B991                    		MOVU.W 0CH[R1], R1
+00000A6A 75112C                  		MUL #2CH, R1
+00000A6D FB22rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R2
+00000A73 4B12                    		ADD R1, R2
+00000A75 E5020D04                		MOV.L 34H[R0], 10H[R2]
+00000A79                         L226:	; entry.split6
+                                 ;     750     usb_ghmsc_ControlData[ptr->ip].segment   = USB_TRAN_END;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",750
+00000A79 AB89                    		MOV.L 3CH[R0], R1
+00000A7B B991                    		MOVU.W 0CH[R1], R1
+00000A7D 75112C                  		MUL #2CH, R1
+00000A80 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R14
+00000A86 4B1E                    		ADD R1, R14
+00000A88 F9E42580                		MOV.B #80H, 25H[R14]
+00000A8C                         L227:	; entry.split7
+                                 ;     751 
+                                 ;     752     err = usb_hmsc_SubmitutrReq(ptr, (uint16_t)USB_CTRL_END, &usb_ghmsc_ControlData[ptr->ip]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",752
+00000A8C AB89                    		MOV.L 3CH[R0], R1
+00000A8E B992                    		MOVU.W 0CH[R1], R2
+00000A90 75122C                  		MUL #2CH, R2
+00000A93 FB32rrrrrrrr            		MOV.L #_usb_ghmsc_ControlData, R3
+00000A99 4B23                    		ADD R2, R3
+00000A9B 6602                    		MOV.L #00000000H, R2
+00000A9D 05rrrrrr             A  		BSR _usb_hmsc_SubmitutrReq
+00000AA1 E301                    		MOV.L R1, [R0]
+00000AA3                         L228:	; entry.split8
+                                 ;     753     return err;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",753
+00000AA3 EC01                    		MOV.L [R0], R1
+00000AA5 A301                    		MOV.L R1, 30H[R0]
+00000AA7                         L229:	; entry.split9
+                                 ;     754 }   /* eof R_usb_hmsc_MassStorageReset() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",754
+00000AA7 6710                    		RTSD #40H
+00000AA9                         _R_usb_hmsc_DriveClose:
+                                 		.STACK	_R_usb_hmsc_DriveClose=16
+                                 ;     755 
+                                 ;     756 /******************************************************************************
+                                 ;     757 Function Name   : R_usb_hmsc_DriveClose
+                                 ;     758 Description     : drive close
+                                 ;     759 Arguments       : uint16_t addr : 
+                                 ;     760                 : uint16_t data2 : 
+                                 ;     761 Return value    : none
+                                 ;     762 ******************************************************************************/
+                                 ;     763 void R_usb_hmsc_DriveClose(USB_UTR_t *ptr, uint16_t addr, uint16_t data2)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",763
+00000AA9 60C0                    		SUB #0CH, R0
+00000AAB A081                    		MOV.L R1, 08H[R0]
+00000AAD 908A                    		MOV.W R2, 06H[R0]
+00000AAF 9083                    		MOV.W R3, 04H[R0]
+                                 ;     764 {
+                                 ;     765     uint16_t    strage_drive_no;
+                                 ;     766 
+                                 ;     767     usb_hmsc_SmpFsiDriveClear(ptr, addr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",767
+00000AB1 B88A                    		MOVU.W 06H[R0], R2
+00000AB3 A881                    		MOV.L 08H[R0], R1
+00000AB5 05rrrrrr             A  		BSR _usb_hmsc_SmpFsiDriveClear
+00000AB9                         L231:	; entry.split
+                                 ;     768     strage_drive_no = R_usb_hmsc_ref_drvno(ptr->ip, addr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",768
+00000AB9 A881                    		MOV.L 08H[R0], R1
+00000ABB B991                    		MOVU.W 0CH[R1], R1
+00000ABD B88A                    		MOVU.W 06H[R0], R2
+00000ABF 39rrrr               W  		BSR _R_usb_hmsc_ref_drvno
+00000AC2 9009                    		MOV.W R1, 02H[R0]
+00000AC4                         L232:	; entry.split1
+                                 ;     769     R_usb_hmsc_free_drvno(strage_drive_no);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",769
+00000AC4 B809                    		MOVU.W 02H[R0], R1
+00000AC6 39rrrr               W  		BSR _R_usb_hmsc_free_drvno
+00000AC9                         L233:	; entry.split2
+                                 ;     770     f_mount(0, "", NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",770
+00000AC9 FB22rrrrrrrr            		MOV.L #_L10, R2
+00000ACF 6601                    		MOV.L #00000000H, R1
+00000AD1 EF13                    		MOV.L R1, R3
+00000AD3 05rrrrrr             A  		BSR _f_mount
+00000AD7                         L234:	; entry.split3
+                                 ;     771 	drivemountFlag = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",771
+00000AD7 FBE2rrrrrrrr            		MOV.L #_drivemountFlag, R14
+00000ADD F8E400                  		MOV.B #00H, [R14]
+00000AE0                         L235:	; entry.split4
+                                 ;     772    	gszCurFile[0] = NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",772
+00000AE0 FBE2rrrrrrrr            		MOV.L #_gszCurFile, R14
+00000AE6 F8E400                  		MOV.B #00H, [R14]
+00000AE9 6703                    		RTSD #0CH
+00000AEB                         _R_usb_hmsc_alloc_drvno:
+                                 		.STACK	_R_usb_hmsc_alloc_drvno=16
+                                 ;     773 }   /* eof R_usb_hmsc_DriveClose() */
+                                 ;     774 
+                                 ;     775 /******************************************************************************
+                                 ;     776 Function Name   : R_usb_hmsc_alloc_drvno
+                                 ;     777 Description     : Get Drive no.
+                                 ;     778 Arguments       : uint16_t ipno         : USB IP No. 
+                                 ;     779                 : uint16_t devadr       : Device address
+                                 ;     780 Return value    : Drive no.
+                                 ;     781 ******************************************************************************/
+                                 ;     782 uint16_t    R_usb_hmsc_alloc_drvno(uint16_t ipno, uint16_t devadr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",782
+00000AEB 60C0                    		SUB #0CH, R0
+00000AED 9109                    		MOV.W R1, 0AH[R0]
+00000AEF 9102                    		MOV.W R2, 08H[R0]
+                                 ;     783 {
+                                 ;     784     uint16_t    drv_no;
+                                 ;     785 
+                                 ;     786     /* Initialeze hid device state */
+                                 ;     787     for( drv_no = 0; drv_no < USB_DEVICENUM ; drv_no++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",787
+00000AF1 3D0200                  		MOV.W #0000H, 04H[R0]
+00000AF4 2Err                 B  		BRA L244
+00000AF6                         L237:	; bb4
+                                 ;     788     {
+                                 ;     789         if( USB_NOUSE == usb_ghmsc_drv_no_tbl[drv_no].use_flag )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",789
+00000AF6 B881                    		MOVU.W 04H[R0], R1
+00000AF8 EF1E                    		MOV.L R1, R14
+00000AFA 636E                    		MUL #06H, R14
+00000AFC FBF2rrrrrrrr            		MOV.L #_usb_ghmsc_drv_no_tbl, R15
+00000B02 4BEF                    		ADD R14, R15
+00000B04 5CFE                    		MOVU.W [R15], R14
+00000B06 610E                    		CMP #00H, R14
+00000B08 21rr                    		BNE L243
+00000B0A                         L238:	; bb5
+                                 ;     790         {
+                                 ;     791             usb_ghmsc_drv_no_tbl[drv_no].use_flag = USB_YES;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",791
+00000B0A 5F1E                    		MOVU.W R1, R14
+00000B0C 636E                    		MUL #06H, R14
+00000B0E FBF2rrrrrrrr            		MOV.L #_usb_ghmsc_drv_no_tbl, R15
+00000B14 4BEF                    		ADD R14, R15
+00000B16 F8F501                  		MOV.W #0001H, [R15]
+00000B19                         L239:	; bb5.split
+                                 ;     792             usb_ghmsc_drv_no_tbl[drv_no].dev_adr = devadr;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",792
+00000B19 B881                    		MOVU.W 04H[R0], R1
+00000B1B 6361                    		MUL #06H, R1
+00000B1D FB22rrrrrrrr            		MOV.L #_usb_ghmsc_drv_no_tbl, R2
+00000B23 4B12                    		ADD R1, R2
+00000B25 D5020402                		MOV.W 08H[R0], 04H[R2]
+00000B29                         L240:	; bb5.split1
+                                 ;     793             usb_ghmsc_drv_no_tbl[drv_no].ip = ipno;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",793
+00000B29 B881                    		MOVU.W 04H[R0], R1
+00000B2B 6361                    		MUL #06H, R1
+00000B2D FB22rrrrrrrr            		MOV.L #_usb_ghmsc_drv_no_tbl, R2
+00000B33 4B12                    		ADD R1, R2
+00000B35 D5020501                		MOV.W 0AH[R0], 02H[R2]
+00000B39                         L241:	; bb5.split2
+                                 ;     794             usb_ghmsc_drive_no[ipno][devadr] = drv_no;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",794
+00000B39 B909                    		MOVU.W 0AH[R0], R1
+00000B3B 751114                  		MUL #14H, R1
+00000B3E FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_drive_no, R14
+00000B44 4B1E                    		ADD R1, R14
+00000B46 9881                    		MOV.W 04H[R0], R1
+00000B48 B902                    		MOVU.W 08H[R0], R2
+00000B4A FE12E1                  		MOV.W R1, [R2,R14]
+00000B4D                         L242:	; bb5.split3
+                                 ;     795             return drv_no;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",795
+00000B4D D5000201                		MOV.W 04H[R0], 02H[R0]
+00000B51 2Err                 B  		BRA L246
+00000B53                         L243:	; bb38
+00000B53 6211                    		ADD #01H, R1
+00000B55 9081                    		MOV.W R1, 04H[R0]
+00000B57                         L244:	; bb41
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",787
+00000B57 B881                    		MOVU.W 04H[R0], R1
+00000B59 61A1                    		CMP #0AH, R1
+00000B5B 29rr                    		BLT L237
+00000B5D                         L245:	; bb47
+                                 ;     796         }
+                                 ;     797     }
+                                 ;     798 
+                                 ;     799     return USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",799
+00000B5D F90901FFFF              		MOV.W #0FFFFH, 02H[R0]
+00000B62                         L246:	; bb49
+00000B62 D5000103                		MOV.W 02H[R0], 06H[R0]
+                                 ;     800 } /* eof R_usb_hmsc_alloc_drvno() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",800
+00000B66 B889                    		MOVU.W 06H[R0], R1
+00000B68 6703                    		RTSD #0CH
+00000B6A                         _R_usb_hmsc_free_drvno:
+                                 		.STACK	_R_usb_hmsc_free_drvno=12
+                                 ;     801 
+                                 ;     802 /******************************************************************************
+                                 ;     803 Function Name   : R_usb_hmsc_free_drvno
+                                 ;     804 Description     : Release Drive no.
+                                 ;     805 Arguments       : uint16_t drvno        : Drive no.
+                                 ;     806 Return value    : none
+                                 ;     807 ******************************************************************************/
+                                 ;     808 void R_usb_hmsc_free_drvno( uint16_t drvno )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",808
+00000B6A 6080                    		SUB #08H, R0
+00000B6C 9089                    		MOV.W R1, 06H[R0]
+                                 ;     809 {
+                                 ;     810     uint16_t    ip;
+                                 ;     811     uint16_t    devadr;
+                                 ;     812 
+                                 ;     813     ip = usb_ghmsc_drv_no_tbl[drvno].ip;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",813
+00000B6E B889                    		MOVU.W 06H[R0], R1
+00000B70 6361                    		MUL #06H, R1
+00000B72 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_drv_no_tbl, R2
+00000B78 4B12                    		ADD R1, R2
+00000B7A D5200101                		MOV.W 02H[R2], 02H[R0]
+00000B7E                         L248:	; entry.split
+                                 ;     814     devadr = usb_ghmsc_drv_no_tbl[drvno].dev_adr;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",814
+00000B7E B889                    		MOVU.W 06H[R0], R1
+00000B80 6361                    		MUL #06H, R1
+00000B82 FB22rrrrrrrr            		MOV.L #_usb_ghmsc_drv_no_tbl, R2
+00000B88 4B12                    		ADD R1, R2
+00000B8A D5200202                		MOV.W 04H[R2], 04H[R0]
+00000B8E                         L249:	; entry.split1
+                                 ;     815 
+                                 ;     816     usb_ghmsc_drv_no_tbl[drvno].use_flag = USB_NOUSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",816
+00000B8E B889                    		MOVU.W 06H[R0], R1
+00000B90 6361                    		MUL #06H, R1
+00000B92 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_drv_no_tbl, R14
+00000B98 4B1E                    		ADD R1, R14
+00000B9A F8E500                  		MOV.W #0000H, [R14]
+00000B9D                         L250:	; entry.split2
+                                 ;     817     if( usb_ghmsc_drive_no[ip][devadr] == drvno )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",817
+00000B9D B809                    		MOVU.W 02H[R0], R1
+00000B9F 751114                  		MUL #14H, R1
+00000BA2 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_drive_no, R14
+00000BA8 4B1E                    		ADD R1, R14
+00000BAA B881                    		MOVU.W 04H[R0], R1
+00000BAC FED1EE                  		MOVU.W [R1,R14], R14
+00000BAF 06C50E03                		CMP 06H[R0].UW, R14
+00000BB3 21rr                    		BNE L252
+00000BB5                         L251:	; bb17
+                                 ;     818     {
+                                 ;     819         usb_ghmsc_drive_no[ip][devadr] = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",819
+00000BB5 B809                    		MOVU.W 02H[R0], R1
+00000BB7 751114                  		MUL #14H, R1
+00000BBA FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_drive_no, R14
+00000BC0 4B1E                    		ADD R1, R14
+00000BC2 FBF6FF                  		MOV.L #0FFFFFFFFH, R15
+00000BC5 B881                    		MOVU.W 04H[R0], R1
+00000BC7 FE11EF                  		MOV.W R15, [R1,R14]
+00000BCA 6702                    		RTSD #08H
+00000BCC                         L252:	; return
+                                 ;     820     }
+                                 ;     821 } /* eof R_usb_hmsc_free_drvno() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",821
+00000BCC 6702                    		RTSD #08H
+00000BCE                         _R_usb_hmsc_ref_drvno:
+                                 		.STACK	_R_usb_hmsc_ref_drvno=12
+                                 ;     822 
+                                 ;     823 /******************************************************************************
+                                 ;     824 Function Name   : R_usb_hmsc_ref_drvno
+                                 ;     825 Description     : Get Drive no.
+                                 ;     826 Arguments       : uint16_t ipno         : USB IP No. 
+                                 ;     827                 : uint16_t devadr       : Device address
+                                 ;     828 Return value    : Drive no.
+                                 ;     829 ******************************************************************************/
+                                 ;     830 uint16_t    R_usb_hmsc_ref_drvno(uint16_t ipno, uint16_t devadr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",830
+00000BCE 6080                    		SUB #08H, R0
+00000BD0 9089                    		MOV.W R1, 06H[R0]
+00000BD2 9082                    		MOV.W R2, 04H[R0]
+                                 ;     831 {
+                                 ;     832     return usb_ghmsc_drive_no[ipno][devadr];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",832
+00000BD4 B889                    		MOVU.W 06H[R0], R1
+00000BD6 751114                  		MUL #14H, R1
+00000BD9 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_drive_no, R14
+00000BDF 4B1E                    		ADD R1, R14
+00000BE1 B881                    		MOVU.W 04H[R0], R1
+00000BE3 FE51E1                  		MOV.W [R1,R14], R1
+00000BE6 9009                    		MOV.W R1, 02H[R0]
+00000BE8 9809                    		MOV.W 02H[R0], R1
+00000BEA                         L254:	; entry.split
+                                 ;     833 } /* eof R_usb_hmsc_ref_drvno() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_hmsc\src\r_usb_hmsc_api.c",833
+00000BEA 5F11                    		MOVU.W R1, R1
+00000BEC 6702                    		RTSD #08H
+                                 ;     834 
+                                 ;     835 
+                                 ;     836 /******************************************************************************
+                                 ;     837 End  Of File
+                                 ;     838 ******************************************************************************/
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 00                      		.byte	0
+                                 		.SECTION	D_2,ROMDATA,ALIGN=2
+00000000                         __$get_max_lun_table$1:
+00000000 A1FE                    		.word	0FEA1H
+00000002 0000                    		.word	0000H
+00000004 0000                    		.word	0000H
+00000006 0100                    		.word	0001H
+00000008 0000                    		.word	0000H
+0000000A                         __$mass_storage_reset_table$2:
+0000000A 21FF                    		.word	0FF21H
+0000000C 0000                    		.word	0000H
+0000000E 0000                    		.word	0000H
+00000010 0000                    		.word	0000H
+00000012 0000                    		.word	0000H
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     02644   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000003054(00000BEEH)  P
+ROMDATA  0000000001(00000001H)  L
+ROMDATA  0000000020(00000014H)  D_2
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\r_usb_hmsc_api.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_usb_hmsc_api.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_usb_hmsc\src\r_usb_hmsc_api.obj

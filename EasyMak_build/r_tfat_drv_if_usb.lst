@@ -1,0 +1,781 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:49:15 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:49:15
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_tfat_drv_if_usb.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_tfat_drv_if_usb.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;r_tfat_drv_if_usb.c
+                                 
+                                 		.glb	_tfat_ptr
+                                 		.glb	_R_tfat_usb_disk_initialize
+                                 		.glb	_R_tfat_usb_disk_read
+                                 		.glb	_usb_hmsc_SmpDrive2Addr
+                                 		.glb	_R_usb_hstd_DeviceInformation
+                                 		.glb	_R_usb_hmsc_StrgReadSector
+                                 		.glb	_R_usb_cstd_RecMsg
+                                 		.glb	_R_usb_cstd_RelBlk
+                                 		.glb	_R_tfat_usb_disk_write
+                                 		.glb	_R_usb_hmsc_StrgWriteSector
+                                 		.glb	_R_tfat_usb_disk_ioctl
+                                 		.glb	_R_tfat_usb_disk_status
+                                 		.glb	_R_tfat_disk_read_write_complete
+                                 		.glb	_R_usb_cstd_SndMsg
+                                 		.glb	_R_usb_cstd_PgetBlk
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _R_tfat_usb_disk_initialize:
+                                 		.STACK	_R_tfat_usb_disk_initialize=8
+                                 ;       1 /*******************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only
+                                 ;       4 * intended for use with Renesas products. No other uses are authorized. This
+                                 ;       5 * software is owned by Renesas Electronics Corporation and is protected under
+                                 ;       6 * all applicable laws, including copyright laws.
+                                 ;       7 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       8 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+                                 ;       9 * LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+                                 ;      10 * AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+                                 ;      11 * TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+                                 ;      12 * ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+                                 ;      13 * FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+                                 ;      14 * ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+                                 ;      15 * BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      16 * Renesas reserves the right, without notice, to make changes to this software
+                                 ;      17 * and to discontinue the availability of this software. By using this software,
+                                 ;      18 * you agree to the additional terms and conditions found by accessing the
+                                 ;      19 * following link:
+                                 ;      20 * http://www.renesas.com/disclaimer
+                                 ;      21 *
+                                 ;      22 * Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+                                 ;      23 *******************************************************************************/
+                                 ;      24 /*******************************************************************************
+                                 ;      25 * File Name    : r_tfat_drv_if_usb.c
+                                 ;      26 * Description  : TFAT driver Interface for USB.
+                                 ;      27 *******************************************************************************/
+                                 ;      28 /*******************************************************************************
+                                 ;      29 * History      : DD.MM.YYYY Version  Description
+                                 ;      30 *              : 01.12.2014 1.00     First Release
+                                 ;      31 *******************************************************************************/
+                                 ;      32 
+                                 ;      33 /******************************************************************************
+                                 ;      34 Includes   <System Includes> , "Project Includes"
+                                 ;      35 *******************************************************************************/
+                                 ;      36 #include "r_tfat_drv_if_dev.h"
+                                 ;      37 #include "r_tfat_driver_rx_config.h"
+                                 ;      38 #include "r_tfat_rx_config.h"
+                                 ;      39 
+                                 ;      40 #if (TFAT_USB_DRIVE_NUM > 0)
+                                 ;      41 
+                                 ;      42 #include "r_usb_basic_if.h"
+                                 ;      43 #include "r_usb_hatapi_define.h"    /* Peripheral ATAPI Device extern */
+                                 ;      44 //#include "r_tfat_lib.h"             /* TFAT define */
+                                 ;      45 #include "ff.h"
+                                 ;      46 #include "diskio.h"
+                                 ;      47 
+                                 ;      48 #include "r_usb_hmsc_extern.h"
+                                 ;      49 #include "r_usb_hmsc_api.h"
+                                 ;      50 #include "r_usb_hmsc_config.h"
+                                 ;      51 
+                                 ;      52 /*******************************************************************************
+                                 ;      53 Macro definitions
+                                 ;      54 *******************************************************************************/
+                                 ;      55 
+                                 ;      56 /******************************************************************************
+                                 ;      57 Exported global variables and functions (to be accessed by other files)
+                                 ;      58 ******************************************************************************/
+                                 ;      59 
+                                 ;      60 /******************************************************************************
+                                 ;      61 Private global variables and functions
+                                 ;      62 *******************************************************************************/
+                                 ;      63 //static void R_usb_hmsc_WaitLoop(void);
+                                 ;      64 static uint16_t usb_ghmsc_tfatSecSize = 512;
+                                 ;      65 
+                                 ;      66 USB_UTR_t tfat_ptr;
+                                 ;      67 
+                                 ;      68 /******************************************************************************
+                                 ;      69 * Function Name : R_tfat_usb_disk_initialize
+                                 ;      70 * Description   : This function initializes the memory medium
+                                 ;      71 *               :    for file operations
+                                 ;      72 * Arguments     : uint8_t  drive        : Physical drive number
+                                 ;      73 * Return value  : Status of the memory medium
+                                 ;      74 ******************************************************************************/
+                                 ;      75 DSTATUS R_tfat_usb_disk_initialize(uint8_t pdrv)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",75
+00000000 6040                    		SUB #04H, R0
+00000002 8089                    		MOV.B R1, 03H[R0]
+                                 ;      76 {
+                                 ;      77     return  RES_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",77
+00000004 3C0200                  		MOV.B #00H, 02H[R0]
+00000007 B081                    		MOVU.B 02H[R0], R1
+00000009                         L11:	; entry.split
+                                 ;      78 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",78
+00000009 5B11                    		MOVU.B R1, R1
+0000000B 6701                    		RTSD #04H
+0000000D                         _R_tfat_usb_disk_read:
+                                 		.STACK	_R_tfat_usb_disk_read=68
+                                 ;      79 
+                                 ;      80 /******************************************************************************
+                                 ;      81 * Function Name : R_tfat_usb_disk_read
+                                 ;      82 * Description   : This function reads data from the specified location
+                                 ;      83 *               :    of the memory medium
+                                 ;      84 * Arguments     : uint8_t  drive        : Physical drive number
+                                 ;      85 *               : uint8_t* buffer       : Pointer to the read data buffer
+                                 ;      86 *               : uint32_t sector_number : uint32_t SectorNumber
+                                 ;      87 *               : uint8_t sector_count   : Number of sectors to read
+                                 ;      88 * Return value  : Result of function execution
+                                 ;      89 ******************************************************************************/
+                                 ;      90 DRESULT R_tfat_usb_disk_read (
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",90
+0000000D 7100C8                  		ADD #0FFFFFFC8H, R0
+00000010 C70137                  		MOV.B R1, 37H[R0]
+00000013 A302                    		MOV.L R2, 30H[R0]
+00000015 A28B                    		MOV.L R3, 2CH[R0]
+00000017 C7042B                  		MOV.B R4, 2BH[R0]
+                                 ;      91     uint8_t drive,              /* Physical drive number            */
+                                 ;      92     uint8_t* buffer,            /* Pointer to the read data buffer  */
+                                 ;      93     uint32_t sector_number,     /* Start sector number              */
+                                 ;      94     uint8_t sector_count        /* Number of sectors to read        */
+                                 ;      95 )
+                                 ;      96 {
+                                 ;      97     uint16_t        res[10];
+                                 ;      98     USB_UTR_t       *mess;
+                                 ;      99     uint16_t        err;
+                                 ;     100     uint32_t        tran_byte;
+                                 ;     101 
+                                 ;     102     /* set transfer length */
+                                 ;     103     tran_byte = (uint32_t)sector_count * usb_ghmsc_tfatSecSize;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",103
+0000001A FBE2rrrrrrrr            		MOV.L #__$usb_ghmsc_tfatSecSize, R14
+00000020 5CE1                    		MOVU.W [R14], R1
+00000022 4D012B                  		MUL 2BH[R0].UB, R1
+00000025 A201                    		MOV.L R1, 20H[R0]
+00000027                         L13:	; entry.split
+                                 ;     104 
+                                 ;     105     usb_hmsc_SmpDrive2Addr( drive, &tfat_ptr );                 /* Drive no. -> USB IP no. and IO Reg Base address */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",105
+00000027 590137                  		MOVU.B 37H[R0], R1
+0000002A FB22rrrrrrrr            		MOV.L #_tfat_ptr, R2
+00000030 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Addr
+00000034                         L14:	; entry.split1
+                                 ;     106 
+                                 ;     107     R_usb_hstd_DeviceInformation(&tfat_ptr, tfat_ptr.keyword, (uint16_t *)res);         /* Get device connect state */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",107
+00000034 FB12rrrrrrrr            		MOV.L #_tfat_ptr, R1
+0000003A B89A                    		MOVU.W 06H[R1], R2
+0000003C 710304                  		ADD #04H, R0, R3
+0000003F 05rrrrrr             A  		BSR _R_usb_hstd_DeviceInformation
+00000043                         L15:	; entry.split2
+                                 ;     108     if ( USB_DETACHED == res[1] )    /* Check detach */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",108
+00000043 B889                    		MOVU.W 06H[R0], R1
+00000045 61A1                    		CMP #0AH, R1
+00000047 18                   S  		BNE L17
+00000048                         L16:	; bb18
+                                 ;     109     {
+                                 ;     110         return RES_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",110
+00000048 F80601                  		MOV.L #00000001H, [R0]
+0000004B 38rrrr               W  		BRA L33
+0000004E                         L17:	; bb26
+                                 ;     111     }
+                                 ;     112 
+                                 ;     113     /* read function */
+                                 ;     114     err = R_usb_hmsc_StrgReadSector(&tfat_ptr, (uint16_t)drive, buffer, sector_number
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",114
+0000004E AA01                    		MOV.L 20H[R0], R1
+00000050 59052B                  		MOVU.B 2BH[R0], R5
+00000053 AA8C                    		MOV.L 2CH[R0], R4
+00000055 AB03                    		MOV.L 30H[R0], R3
+00000057 590237                  		MOVU.B 37H[R0], R2
+0000005A 6080                    		SUB #08H, R0
+0000005C A009                    		MOV.L R1, 04H[R0]
+0000005E D305                    		MOV.W R5, [R0]
+00000060 FB12rrrrrrrr            		MOV.L #_tfat_ptr, R1
+00000066 05rrrrrr             A  		BSR _R_usb_hmsc_StrgReadSector
+0000006A 6280                    		ADD #08H, R0
+0000006C 9389                    		MOV.W R1, 1EH[R0]
+0000006E                         L18:	; bb26.split
+                                 ;     115                                     , (uint16_t)sector_count, tran_byte);
+                                 ;     116     if ( USB_E_OK == err )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",116
+0000006E BB89                    		MOVU.W 1EH[R0], R1
+00000070 6101                    		CMP #00H, R1
+00000072 21rr                    		BNE L30
+00000074                         L19:	; bb36
+                                 ;     117     {
+                                 ;     118 #ifndef FREE_RTOS_PP
+                                 ;     119         do  /* Wait for complete R_usb_hmsc_StrgReadSector() */
+                                 ;     120         {
+                                 ;     121             R_usb_hstd_DeviceInformation(&tfat_ptr, tfat_ptr.keyword, (uint16_t *)res); /* Get device connect state */
+                                 ;     122             R_usb_hmsc_WaitLoop();                                                      /* Task Schedule */
+                                 ;     123             err = R_USB_TRCV_MSG(USB_HSTRG_MBX, (USB_MSG_t**)&mess, (uint16_t)0);     /* Receive read complete msg */
+                                 ;     124         }
+                                 ;     125         while ( (err != USB_OK) && (res[1] != USB_DETACHED) );
+                                 ;     126 #else /* FREE_RTOS_PP */
+                                 ;     127             R_usb_hstd_DeviceInformation(&tfat_ptr, tfat_ptr.keyword, (uint16_t *)res); /* Get device connect state */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",127
+00000074 FB12rrrrrrrr            		MOV.L #_tfat_ptr, R1
+0000007A B89A                    		MOVU.W 06H[R1], R2
+0000007C 710304                  		ADD #04H, R0, R3
+0000007F 05rrrrrr             A  		BSR _R_usb_hstd_DeviceInformation
+00000083                         L20:	; bb36.split
+                                 ;     128             if (USB_DETACHED == res[1])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",128
+00000083 B889                    		MOVU.W 06H[R0], R1
+00000085 61A1                    		CMP #0AH, R1
+00000087 18                   S  		BNE L22
+00000088                         L21:	; bb40
+                                 ;     129             {
+                                 ;     130             	return RES_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",130
+00000088 F80601                  		MOV.L #00000001H, [R0]
+0000008B 2Err                 B  		BRA L33
+0000008D                         L22:	; bb49
+0000008D 6603                    		MOV.L #00000000H, R3
+0000008F 710218                  		ADD #18H, R0, R2
+00000092 6671                    		MOV.L #00000007H, R1
+                                 ;     131             }
+                                 ;     132             err = R_USB_TRCV_MSG(USB_TFAT_MBX, (USB_MSG_t**)&mess, (uint16_t)0);     /* Receive read complete msg */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",132
+00000094 05rrrrrr             A  		BSR _R_usb_cstd_RecMsg
+00000098 9389                    		MOV.W R1, 1EH[R0]
+0000009A                         L23:	; bb49.split
+                                 ;     133 #endif /* FREE_RTOS_PP */
+                                 ;     134         if ( err == USB_OK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",134
+0000009A BB89                    		MOVU.W 1EH[R0], R1
+0000009C 6101                    		CMP #00H, R1
+0000009E 21rr                    		BNE L26
+000000A0                         L24:	; bb54
+                                 ;     135         {   /* Complete R_usb_hmsc_StrgReadSector() */
+                                 ;     136             err = mess->result;                                        /* Set result for R_usb_hmsc_StrgReadSector() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",136
+000000A0 A981                    		MOV.L 18H[R0], R1
+000000A2 D510070F                		MOV.W 0EH[R1], 1EH[R0]
+000000A6                         L25:	; bb54.split
+                                 ;     137 #ifdef FREE_RTOS_PP
+                                 ;     138         R_USB_REL_BLK(USB_TFAT_MPL,(USB_MH_t)mess);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",138
+000000A6 A982                    		MOV.L 18H[R0], R2
+000000A8 6671                    		MOV.L #00000007H, R1
+000000AA 05rrrrrr             A  		BSR _R_usb_cstd_RelBlk
+000000AE 2Err                 B  		BRA L30
+000000B0                         L26:	; bb62
+000000B0 6603                    		MOV.L #00000000H, R3
+000000B2 710218                  		ADD #18H, R0, R2
+000000B5 6671                    		MOV.L #00000007H, R1
+                                 ;     139 #else
+                                 ;     140             R_USB_REL_BLK(USB_HSTRG_MPL, (USB_MH_t)mess);
+                                 ;     141 #endif
+                                 ;     142         }
+                                 ;     143         else
+                                 ;     144         {   /* Device detach */
+                                 ;     145 #ifndef FREE_RTOS_PP
+                                 ;     146             R_usb_hmsc_WaitLoop();
+                                 ;     147             err = R_USB_TRCV_MSG(USB_HSTRG_MBX, (USB_MSG_t**)&mess, (uint16_t)0);     /* Receive read complete msg */
+                                 ;     148             if ( USB_OK == err )
+                                 ;     149             {
+                                 ;     150                 R_USB_REL_BLK(USB_HSTRG_MPL, (USB_MH_t)mess);
+                                 ;     151             }
+                                 ;     152             err = USB_ERROR;
+                                 ;     153 #else
+                                 ;     154             err = R_USB_TRCV_MSG(USB_TFAT_MBX, (USB_MSG_t**)&mess, (uint16_t)0);     /* Receive read complete msg */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",154
+000000B7 05rrrrrr             A  		BSR _R_usb_cstd_RecMsg
+000000BB 9389                    		MOV.W R1, 1EH[R0]
+000000BD                         L27:	; bb62.split
+                                 ;     155             if ( USB_OK == err )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",155
+000000BD BB89                    		MOVU.W 1EH[R0], R1
+000000BF 6101                    		CMP #00H, R1
+000000C1 18                   S  		BNE L29
+000000C2                         L28:	; bb67
+                                 ;     156             {
+                                 ;     157                 R_USB_REL_BLK(USB_TFAT_MPL, (USB_MH_t)mess);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",157
+000000C2 A982                    		MOV.L 18H[R0], R2
+000000C4 6671                    		MOV.L #00000007H, R1
+000000C6 05rrrrrr             A  		BSR _R_usb_cstd_RelBlk
+000000CA                         L29:	; bb77
+                                 ;     158             }
+                                 ;     159             err = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",159
+000000CA F9090FFFFF              		MOV.W #0FFFFH, 1EH[R0]
+000000CF                         L30:	; bb90
+                                 ;     160 #endif
+                                 ;     161 
+                                 ;     162         }
+                                 ;     163     }
+                                 ;     164 
+                                 ;     165     if ( err != USB_OK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",165
+000000CF BB89                    		MOVU.W 1EH[R0], R1
+000000D1 6101                    		CMP #00H, R1
+000000D3 10                   S  		BEQ L32
+000000D4                         L31:	; bb91
+                                 ;     166     {
+                                 ;     167         return RES_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",167
+000000D4 F80601                  		MOV.L #00000001H, [R0]
+000000D7 08                   S  		BRA L33
+000000D8                         L32:	; bb98
+                                 ;     168     }
+                                 ;     169     return RES_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",169
+000000D8 F80600                  		MOV.L #00000000H, [R0]
+000000DB                         L33:	; bb100
+000000DB EC01                    		MOV.L [R0], R1
+000000DD A209                    		MOV.L R1, 24H[R0]
+                                 ;     170 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",170
+000000DF 670E                    		RTSD #38H
+000000E1                         _R_tfat_usb_disk_write:
+                                 		.STACK	_R_tfat_usb_disk_write=68
+                                 ;     171 
+                                 ;     172 /******************************************************************************
+                                 ;     173 * Function Name : R_tfat_usb_disk_write
+                                 ;     174 * Description   : This function writes data to a specified location
+                                 ;     175 *               :    of the memory medium
+                                 ;     176 * Arguments     : uint8_t Drive : Physical drive number
+                                 ;     177 *               : const uint8_t* buffer       : Pointer to the write data
+                                 ;     178 *               : uint32_t       sector_number : Sector number to write
+                                 ;     179 *               : uint8_t        sector_count  : Number of sectors to write
+                                 ;     180 * Return value  : Result of function execution
+                                 ;     181 ******************************************************************************/
+                                 ;     182 DRESULT R_tfat_usb_disk_write (
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",182
+000000E1 7100C8                  		ADD #0FFFFFFC8H, R0
+000000E4 C70137                  		MOV.B R1, 37H[R0]
+000000E7 A302                    		MOV.L R2, 30H[R0]
+000000E9 A28B                    		MOV.L R3, 2CH[R0]
+000000EB C7042B                  		MOV.B R4, 2BH[R0]
+                                 ;     183     uint8_t drive,               /* Physical drive number           */
+                                 ;     184     const uint8_t* buffer,       /* Pointer to the write data       */
+                                 ;     185     uint32_t sector_number,      /* Sector number to write          */
+                                 ;     186     uint8_t sector_count         /* Number of sectors to write      */
+                                 ;     187 )
+                                 ;     188 {
+                                 ;     189     uint16_t        res[10];
+                                 ;     190     USB_UTR_t       *mess;
+                                 ;     191     uint16_t        err;
+                                 ;     192     uint32_t        tran_byte;
+                                 ;     193 
+                                 ;     194     /* set transfer length */
+                                 ;     195     tran_byte = (uint32_t)sector_count * usb_ghmsc_tfatSecSize;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",195
+000000EE FBE2rrrrrrrr            		MOV.L #__$usb_ghmsc_tfatSecSize, R14
+000000F4 5CE1                    		MOVU.W [R14], R1
+000000F6 4D012B                  		MUL 2BH[R0].UB, R1
+000000F9 A201                    		MOV.L R1, 20H[R0]
+000000FB                         L35:	; entry.split
+                                 ;     196     usb_hmsc_SmpDrive2Addr(drive, &tfat_ptr);                   /* Drive no. -> USB IP no. and IO Reg Base address */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",196
+000000FB 590137                  		MOVU.B 37H[R0], R1
+000000FE FB22rrrrrrrr            		MOV.L #_tfat_ptr, R2
+00000104 05rrrrrr             A  		BSR _usb_hmsc_SmpDrive2Addr
+00000108                         L36:	; entry.split1
+                                 ;     197 
+                                 ;     198     R_usb_hstd_DeviceInformation(&tfat_ptr, tfat_ptr.keyword, (uint16_t *)res);         /* Get device connect state */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",198
+00000108 FB12rrrrrrrr            		MOV.L #_tfat_ptr, R1
+0000010E B89A                    		MOVU.W 06H[R1], R2
+00000110 710304                  		ADD #04H, R0, R3
+00000113 05rrrrrr             A  		BSR _R_usb_hstd_DeviceInformation
+00000117                         L37:	; entry.split2
+                                 ;     199     if ( USB_DETACHED == res[1] )    /* Check detach */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",199
+00000117 B889                    		MOVU.W 06H[R0], R1
+00000119 61A1                    		CMP #0AH, R1
+0000011B 18                   S  		BNE L39
+0000011C                         L38:	; bb18
+                                 ;     200     {
+                                 ;     201         return RES_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",201
+0000011C F80601                  		MOV.L #00000001H, [R0]
+0000011F 38rrrr               W  		BRA L55
+00000122                         L39:	; bb26
+                                 ;     202     }
+                                 ;     203 
+                                 ;     204     /* write function */
+                                 ;     205     err = R_usb_hmsc_StrgWriteSector(&tfat_ptr, (uint16_t)drive, (uint8_t *)buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",205
+00000122 AA01                    		MOV.L 20H[R0], R1
+00000124 59052B                  		MOVU.B 2BH[R0], R5
+00000127 AA8C                    		MOV.L 2CH[R0], R4
+00000129 AB03                    		MOV.L 30H[R0], R3
+0000012B 590237                  		MOVU.B 37H[R0], R2
+0000012E 6080                    		SUB #08H, R0
+00000130 A009                    		MOV.L R1, 04H[R0]
+00000132 D305                    		MOV.W R5, [R0]
+00000134 FB12rrrrrrrr            		MOV.L #_tfat_ptr, R1
+0000013A 05rrrrrr             A  		BSR _R_usb_hmsc_StrgWriteSector
+0000013E 6280                    		ADD #08H, R0
+00000140 9389                    		MOV.W R1, 1EH[R0]
+00000142                         L40:	; bb26.split
+                                 ;     206                                      , sector_number, (uint16_t)sector_count, tran_byte);
+                                 ;     207     if ( USB_E_OK == err )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",207
+00000142 BB89                    		MOVU.W 1EH[R0], R1
+00000144 6101                    		CMP #00H, R1
+00000146 21rr                    		BNE L52
+00000148                         L41:	; bb36
+                                 ;     208     {
+                                 ;     209  #ifndef FREE_RTOS_PP
+                                 ;     210         do  /* Wait for complete R_usb_hmsc_StrgWriteSector() */
+                                 ;     211         {
+                                 ;     212             R_usb_hstd_DeviceInformation(&tfat_ptr, tfat_ptr.keyword, (uint16_t *)res); /* Get device connect state */
+                                 ;     213             R_usb_hmsc_WaitLoop();                                                      /* Task Schedule */
+                                 ;     214             err = R_USB_TRCV_MSG(USB_HSTRG_MBX, (USB_MSG_t**)&mess, (uint16_t)0 );    /* Receive write complete msg */
+                                 ;     215         }
+                                 ;     216         while ( ( err != USB_OK ) && ( res[1] != USB_DETACHED ) );
+                                 ;     217 #else /* FREE_RTOS_PP */
+                                 ;     218 		R_usb_hstd_DeviceInformation(&tfat_ptr, tfat_ptr.keyword, (uint16_t *)res); /* Get device connect state */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",218
+00000148 FB12rrrrrrrr            		MOV.L #_tfat_ptr, R1
+0000014E B89A                    		MOVU.W 06H[R1], R2
+00000150 710304                  		ADD #04H, R0, R3
+00000153 05rrrrrr             A  		BSR _R_usb_hstd_DeviceInformation
+00000157                         L42:	; bb36.split
+                                 ;     219 		if( USB_DETACHED == res[1] )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",219
+00000157 B889                    		MOVU.W 06H[R0], R1
+00000159 61A1                    		CMP #0AH, R1
+0000015B 18                   S  		BNE L44
+0000015C                         L43:	; bb40
+                                 ;     220 		{
+                                 ;     221 			return RES_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",221
+0000015C F80601                  		MOV.L #00000001H, [R0]
+0000015F 2Err                 B  		BRA L55
+00000161                         L44:	; bb49
+00000161 6603                    		MOV.L #00000000H, R3
+00000163 710218                  		ADD #18H, R0, R2
+00000166 6671                    		MOV.L #00000007H, R1
+                                 ;     222 		}
+                                 ;     223 		err = R_USB_TRCV_MSG(USB_TFAT_MBX, (USB_MSG_t**)&mess, (uint16_t)0 );    /* Receive write complete msg */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",223
+00000168 05rrrrrr             A  		BSR _R_usb_cstd_RecMsg
+0000016C 9389                    		MOV.W R1, 1EH[R0]
+0000016E                         L45:	; bb49.split
+                                 ;     224 #endif
+                                 ;     225         if ( USB_OK == err )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",225
+0000016E BB89                    		MOVU.W 1EH[R0], R1
+00000170 6101                    		CMP #00H, R1
+00000172 21rr                    		BNE L48
+00000174                         L46:	; bb54
+                                 ;     226         {   /* Complete R_usb_hmsc_StrgWriteSector() */
+                                 ;     227             err = mess->result;                                     /* Set result for R_usb_hmsc_StrgWriteSector() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",227
+00000174 A981                    		MOV.L 18H[R0], R1
+00000176 D510070F                		MOV.W 0EH[R1], 1EH[R0]
+0000017A                         L47:	; bb54.split
+                                 ;     228 #ifdef FREE_RTOS_PP
+                                 ;     229             R_USB_REL_BLK(USB_TFAT_MPL,(USB_MH_t)mess);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",229
+0000017A A982                    		MOV.L 18H[R0], R2
+0000017C 6671                    		MOV.L #00000007H, R1
+0000017E 05rrrrrr             A  		BSR _R_usb_cstd_RelBlk
+00000182 2Err                 B  		BRA L52
+00000184                         L48:	; bb62
+00000184 6603                    		MOV.L #00000000H, R3
+00000186 710218                  		ADD #18H, R0, R2
+00000189 6671                    		MOV.L #00000007H, R1
+                                 ;     230 #else
+                                 ;     231             R_USB_REL_BLK(USB_HSTRG_MPL, (USB_MH_t)mess);
+                                 ;     232 #endif
+                                 ;     233         }
+                                 ;     234         else
+                                 ;     235         {   /* Device detach */
+                                 ;     236 #ifndef FREE_RTOS_PP
+                                 ;     237             R_usb_hmsc_WaitLoop();
+                                 ;     238             err = R_USB_TRCV_MSG(USB_HSTRG_MBX, (USB_MSG_t**)&mess, (uint16_t)0);     /* Receive write complete msg */
+                                 ;     239              if ( err == USB_OK )
+                                 ;     240              {
+                                 ;     241                  R_USB_REL_BLK(USB_HSTRG_MPL, (USB_MH_t)mess);
+                                 ;     242              }
+                                 ;     243              err = USB_ERROR;
+                                 ;     244 #endif
+                                 ;     245              err = R_USB_TRCV_MSG(USB_TFAT_MBX, (USB_MSG_t**)&mess, (uint16_t)0);     /* Receive write complete msg */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",245
+0000018B 05rrrrrr             A  		BSR _R_usb_cstd_RecMsg
+0000018F 9389                    		MOV.W R1, 1EH[R0]
+00000191                         L49:	; bb62.split
+                                 ;     246 			  if ( err == USB_OK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",246
+00000191 BB89                    		MOVU.W 1EH[R0], R1
+00000193 6101                    		CMP #00H, R1
+00000195 18                   S  		BNE L51
+00000196                         L50:	; bb67
+                                 ;     247 			  {
+                                 ;     248 				  R_USB_REL_BLK(USB_TFAT_MPL, (USB_MH_t)mess);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",248
+00000196 A982                    		MOV.L 18H[R0], R2
+00000198 6671                    		MOV.L #00000007H, R1
+0000019A 05rrrrrr             A  		BSR _R_usb_cstd_RelBlk
+0000019E                         L51:	; bb77
+                                 ;     249 			  }
+                                 ;     250 			  err = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",250
+0000019E F9090FFFFF              		MOV.W #0FFFFH, 1EH[R0]
+000001A3                         L52:	; bb90
+                                 ;     251         }
+                                 ;     252     }
+                                 ;     253 
+                                 ;     254     if ( err != USB_OK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",254
+000001A3 BB89                    		MOVU.W 1EH[R0], R1
+000001A5 6101                    		CMP #00H, R1
+000001A7 10                   S  		BEQ L54
+000001A8                         L53:	; bb91
+                                 ;     255     {
+                                 ;     256         return RES_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",256
+000001A8 F80601                  		MOV.L #00000001H, [R0]
+000001AB 08                   S  		BRA L55
+000001AC                         L54:	; bb98
+                                 ;     257     }
+                                 ;     258     return RES_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",258
+000001AC F80600                  		MOV.L #00000000H, [R0]
+000001AF                         L55:	; bb100
+000001AF EC01                    		MOV.L [R0], R1
+000001B1 A209                    		MOV.L R1, 24H[R0]
+                                 ;     259 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",259
+000001B3 670E                    		RTSD #38H
+000001B5                         _R_tfat_usb_disk_ioctl:
+                                 		.STACK	_R_tfat_usb_disk_ioctl=16
+                                 ;     260 
+                                 ;     261 /******************************************************************************
+                                 ;     262 * Function Name : R_tfat_usb_disk_ioctl
+                                 ;     263 * Description   : This function is used to execute memory operations
+                                 ;     264 *               :    other than read\write
+                                 ;     265 * Arguments     : uint8_t drive   : Drive number
+                                 ;     266 *               : uint8_t command : Control command code
+                                 ;     267 *               : void*   buffer  : Data transfer buffer
+                                 ;     268 * Return value  : Result of function execution
+                                 ;     269 ******************************************************************************/
+                                 ;     270 DRESULT R_tfat_usb_disk_ioctl (
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",270
+000001B5 60C0                    		SUB #0CH, R0
+000001B7 8289                    		MOV.B R1, 0BH[R0]
+000001B9 8282                    		MOV.B R2, 0AH[R0]
+000001BB A00B                    		MOV.L R3, 04H[R0]
+                                 ;     271     uint8_t drive,               /* Drive number             */
+                                 ;     272     uint8_t command,             /* Control command code     */
+                                 ;     273     void* buffer                 /* Data transfer buffer     */
+                                 ;     274 )
+                                 ;     275 {
+                                 ;     276 
+                                 ;     277     /*  Please put the code for R_tfat_disk_ioctl driver interface
+                                 ;     278          function over here.  */
+                                 ;     279     /*  Please refer the application note for details.  */
+                                 ;     280     return RES_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",280
+000001BD F80600                  		MOV.L #00000000H, [R0]
+000001C0 6601                    		MOV.L #00000000H, R1
+000001C2                         L57:	; entry.split
+                                 ;     281 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",281
+000001C2 6703                    		RTSD #0CH
+000001C4                         _R_tfat_usb_disk_status:
+                                 		.STACK	_R_tfat_usb_disk_status=8
+                                 ;     282 
+                                 ;     283 /******************************************************************************
+                                 ;     284 * Function Name : R_tfat_usb_disk_status
+                                 ;     285 * Description   : This function is used to retrieve the current status
+                                 ;     286 *               :    of the disk
+                                 ;     287 * Arguments     : uint8_t drive : Physical drive number
+                                 ;     288 * Return value  : Status of the disk
+                                 ;     289 ******************************************************************************/
+                                 ;     290 DSTATUS R_tfat_usb_disk_status (
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",290
+000001C4 6040                    		SUB #04H, R0
+000001C6 8089                    		MOV.B R1, 03H[R0]
+                                 ;     291     uint8_t drive                 /* Physical drive number    */
+                                 ;     292 )
+                                 ;     293 {
+                                 ;     294 
+                                 ;     295     /*  Please put the code for R_tfat_disk_status driver interface
+                                 ;     296          function over here.  */
+                                 ;     297     /*  Please refer the application note for details.  */
+                                 ;     298     return RES_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",298
+000001C8 3C0200                  		MOV.B #00H, 02H[R0]
+000001CB B081                    		MOVU.B 02H[R0], R1
+000001CD                         L59:	; entry.split
+                                 ;     299 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",299
+000001CD 5B11                    		MOVU.B R1, R1
+000001CF 6701                    		RTSD #04H
+000001D1                         _R_tfat_disk_read_write_complete:
+                                 		.STACK	_R_tfat_disk_read_write_complete=20
+                                 ;     300 
+                                 ;     301 /******************************************************************************
+                                 ;     302 Function Name   : R_usb_hmsc_WaitLoop
+                                 ;     303 Description     : Hmsc wait loop function
+                                 ;     304 Arguments       : none
+                                 ;     305 Return value    : none
+                                 ;     306 ******************************************************************************/
+                                 ;     307 //void R_usb_hmsc_WaitLoop(void)
+                                 ;     308 //{
+                                 ;     309 //#ifdef FREE_RTOS_PP
+                                 ;     310 //    /* empty */
+                                 ;     311 //    /* This function is not used.
+                                 ;     312 //       Nothing is processed in this function. */
+                                 ;     313 //#else
+                                 ;     314 //    if ( R_usb_cstd_CheckSchedule() == USB_FLGSET )
+                                 ;     315 //    {
+                                 ;     316 //        R_usb_hstd_HcdTask((USB_VP_INT)0);
+                                 ;     317 //        R_usb_hstd_MgrTask((USB_VP_INT)0);
+                                 ;     318 //        R_usb_hhub_Task((USB_VP_INT)0);
+                                 ;     319 //        usb_hmsc_Task();
+                                 ;     320 //    }
+                                 ;     321 //    R_usb_cstd_Scheduler();
+                                 ;     322 //#endif
+                                 ;     323 //}
+                                 ;     324 
+                                 ;     325 #ifdef FREE_RTOS_PP
+                                 ;     326 /******************************************************************************
+                                 ;     327 * Function Name : R_tfat_disk_read_write_complete
+                                 ;     328 * Include       :
+                                 ;     329 * Declaration   : void R_tfat_disk_read_write_complete(USB_CLSINFO_t *mess)
+                                 ;     330 * Description   : tfat disk read/write completion notice
+                                 ;     331 * Arguments     : USB_CLSINFO_t *
+                                 ;     332 * Return value  : none
+                                 ;     333 * NOTE          :
+                                 ;     334 ******************************************************************************/
+                                 ;     335 void R_tfat_disk_read_write_complete(USB_CLSINFO_t *mess)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",335
+000001D1 7100F0                  		ADD #0FFFFFFF0H, R0
+000001D4 A089                    		MOV.L R1, 0CH[R0]
+000001D6 EF02                    		MOV.L R0, R2
+000001D8 6671                    		MOV.L #00000007H, R1
+                                 ;     336 {
+                                 ;     337     USB_MH_t            p_blf;
+                                 ;     338     USB_ER_t            err;
+                                 ;     339     USB_CLSINFO_t       *cp;
+                                 ;     340 
+                                 ;     341     /* Get mem pool blk */
+                                 ;     342     if( R_USB_PGET_BLK(USB_TFAT_MPL, &p_blf) == USB_E_OK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",342
+000001DA 05rrrrrr             A  		BSR _R_usb_cstd_PgetBlk
+000001DE 6101                    		CMP #00H, R1
+000001E0 21rr                    		BNE L67
+000001E2                         L61:	; bb5
+                                 ;     343     {
+                                 ;     344         cp = (USB_CLSINFO_t*)p_blf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",344
+000001E2 E40002                  		MOV.L [R0], 08H[R0]
+000001E5                         L62:	; bb5.split
+                                 ;     345         cp->msginfo = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",345
+000001E5 A881                    		MOV.L 08H[R0], R1
+000001E7 3D1200                  		MOV.W #0000H, 04H[R1]
+000001EA                         L63:	; bb5.split1
+                                 ;     346         cp->result  = mess->result;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",346
+000001EA A889                    		MOV.L 0CH[R0], R1
+000001EC A882                    		MOV.L 08H[R0], R2
+000001EE D5120707                		MOV.W 0EH[R1], 0EH[R2]
+000001F2                         L64:	; bb5.split2
+                                 ;     347 
+                                 ;     348         /* Send message */
+                                 ;     349         err = R_USB_SND_MSG( USB_TFAT_MBX, (USB_MSG_t*)p_blf );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",349
+000001F2 EC02                    		MOV.L [R0], R2
+000001F4 6671                    		MOV.L #00000007H, R1
+000001F6 05rrrrrr             A  		BSR _R_usb_cstd_SndMsg
+000001FA A009                    		MOV.L R1, 04H[R0]
+000001FC                         L65:	; bb5.split3
+                                 ;     350         if( err != USB_E_OK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",350
+000001FC A809                    		MOV.L 04H[R0], R1
+000001FE 6101                    		CMP #00H, R1
+00000200 20rr                    		BEQ L67
+00000202                         L66:	; bb18
+                                 ;     351         {
+                                 ;     352             R_USB_REL_BLK(USB_TFAT_MPL,(USB_MH_t)p_blf);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",352
+00000202 EC02                    		MOV.L [R0], R2
+00000204 6671                    		MOV.L #00000007H, R1
+00000206 05rrrrrr             A  		BSR _R_usb_cstd_RelBlk
+0000020A 6704                    		RTSD #10H
+0000020C                         L67:	; return
+                                 ;     353             USB_PRINTF0("### R_tfat_disk_read_write_complete function snd_msg error\n");
+                                 ;     354         }
+                                 ;     355     }
+                                 ;     356     else
+                                 ;     357     {
+                                 ;     358         USB_PRINTF0("### R_tfat_disk_read_write_complete function pget_blk error\n");
+                                 ;     359     }
+                                 ;     360 }   /* eof R_tfat_disk_read_write_complete() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.c",360
+0000020C 6704                    		RTSD #10H
+                                 ;     361 #endif /* FREE_RTOS_PP */
+                                 ;     362 
+                                 ;     363 #endif // (TFAT_USB_DRIVE_NUM > 0)
+                                 ;     364 /******************************************************************************
+                                 ;     365 End  of file
+                                 ;     366 ******************************************************************************/
+                                 		.SECTION	D_2,ROMDATA,ALIGN=2
+00000000                         __$usb_ghmsc_tfatSecSize:
+00000000 0002                    		.word	0200H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _tfat_ptr:
+00000000(0000002CH)              		.blkl	11
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00746   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000526(0000020EH)  P
+ROMDATA  0000000002(00000002H)  D_2
+DATA     0000000044(0000002CH)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\r_tfat_drv_if_usb.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\r_tfat_drv_if_usb.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\r_tfat_driver_rx\src\device\usb\r_tfat_drv_if_usb.obj

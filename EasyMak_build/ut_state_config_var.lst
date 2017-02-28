@@ -1,0 +1,1788 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:48:34 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:48:34
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=ut_state_config_var.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=ut_state_config_var.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;ut_state_config_var.c
+                                 
+                                 		.glb	_reset_flag
+                                 		.glb	_configVarJog
+                                 		.glb	_velocidadeJog
+                                 		.glb	_swTimers
+                                 		.glb	_qKeyboard
+                                 		.glb	_sim
+                                 		.glb	_func_back
+                                 		.glb	_configsVar
+                                 		.glb	_config_bool
+                                 		.glb	_config_int
+                                 		.glb	_config_null
+                                 		.glb	_ut_menu_init
+                                 		.glb	_selecionarLinhatexto
+                                 		.glb	_ut_menu_browse
+                                 		.glb	_eepromWriteConfig
+                                 		.glb	_get_dec_digits
+                                 		.glb	_get_decimal_digits
+                                 		.glb	_sprintf
+                                 		.glb	_ut_lcd_output_int_var
+                                 		.glb	_xTimerCreate
+                                 		.glb	_xTimerGenericCommand
+                                 		.glb	_xTaskGetTickCount
+                                 		.glb	_ut_lcd_output_warning
+                                 		.glb	_vTaskDelay
+                                 		.glb	_selecionarlinhas
+                                 		.glb	_xQueueGenericReceive
+                                 		.glb	_ut_state_config_var
+                                 		.glb	_linhaSelecionada
+                                 		.glb	_vAssertCalled
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _config_bool:
+                                 		.STACK	_config_bool=440
+                                 ;       1 /*
+                                 ;       2  * ut_state_config.c
+                                 ;       3  *
+                                 ;       4  *  Created on: Jan 5, 2016
+                                 ;       5  *      Author: Fernando
+                                 ;       6  */
+                                 ;       7 
+                                 ;       8 #include "ut_context.h"
+                                 ;       9 #include "ut_state.h"
+                                 ;      10 #include "ut_state_config_var.h"
+                                 ;      11 #include "config_par_maquina.h"
+                                 ;      12 #include "macros.h"
+                                 ;      13 #include "eeprom.h"
+                                 ;      14 
+                                 ;      15 
+                                 ;      16 #include "FreeRTOS.h"
+                                 ;      17 #include "task.h"
+                                 ;      18 #include "timers.h"
+                                 ;      19 #include "config_SwTimers.h"
+                                 ;      20 #include "state_functions.h"
+                                 ;      21 
+                                 ;      22 #include "lcd.h"
+                                 ;      23 #include "lcd_menu.h"
+                                 ;      24 #include "keyboard.h"
+                                 ;      25 #include "util.h"
+                                 ;      26 
+                                 ;      27 #include <stdlib.h>
+                                 ;      28 #include <stdio.h>
+                                 ;      29 #include <string.h>
+                                 ;      30 
+                                 ;      31 
+                                 ;      32 #define DEFAULT_CONFIG_VAR_TOUT	portMAX_DELAY
+                                 ;      33 
+                                 ;      34 extern bool sim;
+                                 ;      35 
+                                 ;      36 
+                                 ;      37 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
+                                 ;      38 static uint8_t count = 0;
+                                 ;      39 static uint16_t mult = 1;
+                                 ;      40 uint8_t func_back = 0;
+                                 ;      41 static bool blink = 0;
+                                 ;      42 
+                                 ;      43 /**
+                                 ;      44  * Function pointer that can change a configuration
+                                 ;      45  * variable.
+                                 ;      46  *
+                                 ;      47  * @param Configuration variable object pointer.
+                                 ;      48  */
+                                 ;      49 typedef void (*ut_config_change_ptr)(ut_config_var*);
+                                 ;      50 ut_config_var* configsVar;
+                                 ;      51 
+                                 ;      52 static char* boolOptions[2] =
+                                 ;      53 {
+                                 ;      54 	"NÃƒO",
+                                 ;      55 	"SIM"
+                                 ;      56 };
+                                 ;      57 
+                                 ;      58 static char* boolJogMaq[2] =
+                                 ;      59 {
+                                 ;      60 	"PLASMA",
+                                 ;      61 	"OXICORTE"
+                                 ;      62 };
+                                 ;      63 
+                                 ;      64 static char* boolSim[2] =
+                                 ;      65 {
+                                 ;      66 	"SIMULAÇÃO",
+                                 ;      67 	"DISPARAR E CORTAR"
+                                 ;      68 };
+                                 ;      69 
+                                 ;      70 static char* boolEn[2] =
+                                 ;      71 {
+                                 ;      72 	"DESABILITADO",
+                                 ;      73 	"HABILITADO"
+                                 ;      74 };
+                                 ;      75 
+                                 ;      76 
+                                 ;      77 /**
+                                 ;      78  * Config boolean variable
+                                 ;      79  *
+                                 ;      80  * @param var Boolean variable
+                                 ;      81  */
+                                 ;      82 void config_bool(ut_config_var* var)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",82
+00000000 72004CFE                		ADD #0FFFFFE4CH, R0
+00000004 E7016C                  		MOV.L R1, 01B0H[R0]
+                                 ;      83 {
+                                 ;      84 	char** boolStr;
+                                 ;      85 	uint32_t *value;
+                                 ;      86 	ut_menu menu;
+                                 ;      87 	uint8_t i;
+                                 ;      88 	bool Recordflag = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",88
+00000007 FA04AF0100              		MOV.B #00H, 01AFH[R0]
+0000000C                         L23:	; entry.split
+                                 ;      89 	func_back = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",89
+0000000C FBE2rrrrrrrr            		MOV.L #_func_back, R14
+00000012 F8E400                  		MOV.B #00H, [R14]
+00000015                         L24:	; entry.split2
+00000015 710108                  		ADD #08H, R0, R1
+                                 ;      90 	/* Initialize */
+                                 ;      91 	ut_menu_init(&menu);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",91
+00000018 05rrrrrr             A  		BSR _ut_menu_init
+0000001C                         L25:	; entry.split3
+                                 ;      92 	boolStr = boolOptions;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",92
+0000001C FB12rrrrrrrr            		MOV.L #__$boolOptions, R1
+00000022 E301                    		MOV.L R1, [R0]
+00000024                         L26:	; entry.split4
+                                 ;      93 	menu.itemMarked = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",93
+00000024 FA04A40100              		MOV.B #00H, 01A4H[R0]
+00000029                         L27:	; entry.split5
+                                 ;      94 	switch(configsVar->currentState)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",94
+00000029 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+0000002F ECE1                    		MOV.L [R14], R1
+00000031 AA11                    		MOV.L 20H[R1], R1
+00000033 6181                    		CMP #08H, R1
+00000035 20rr                    		BEQ L39
+00000037                         L28:	; entry.split5
+00000037 6191                    		CMP #09H, R1
+00000039 20rr                    		BEQ L34
+0000003B                         L29:	; entry.split5
+0000003B 61B1                    		CMP #0BH, R1
+0000003D 3Arrrr               W  		BEQ L44
+00000040                         L30:	; entry.split5
+00000040 61F1                    		CMP #0FH, R1
+00000042 3Brrrr               W  		BNE L48
+00000045                         L31:	; bb
+                                 ;      95 	{
+                                 ;      96 	case STATE_AUTO_MODE:
+                                 ;      97 			switch(configsVar->currentItem)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",97
+00000045 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+0000004B ECEE                    		MOV.L [R14], R14
+0000004D 59EE24                  		MOVU.B 24H[R14], R14
+00000050 616E                    		CMP #06H, R14
+00000052 3Brrrr               W  		BNE L48
+00000055                         L32:	; bb14
+                                 ;      98 			{
+                                 ;      99 				case CONFIG_AUTO_MODO_SIM_RUN:
+                                 ;     100 					value = var->value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",100
+00000055 ED016C                  		MOV.L 01B0H[R0], R1
+00000058 E5100101                		MOV.L 04H[R1], 04H[R0]
+0000005C                         L33:	; bb14.split
+                                 ;     101 					boolStr = boolSim;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",101
+0000005C FB12rrrrrrrr            		MOV.L #__$boolSim, R1
+00000062 E301                    		MOV.L R1, [R0]
+00000064 2Err                 B  		BRA L48
+00000066                         L34:	; bb21
+                                 ;     102 				break;
+                                 ;     103 				default: break;
+                                 ;     104 			}
+                                 ;     105 			break;
+                                 ;     106 #if (COMPACTAXP == 0)
+                                 ;     107 		case STATE_CONFIG_MAQUINA:
+                                 ;     108 			switch(configsVar->currentItem)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",108
+00000066 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+0000006C ECEE                    		MOV.L [R14], R14
+0000006E 59EE24                  		MOVU.B 24H[R14], R14
+00000071 611E                    		CMP #01H, R14
+00000073 21rr                    		BNE L48
+00000075                         L35:	; bb26
+                                 ;     109 			{
+                                 ;     110 				case CFG_MAQUINA_MODOMAQUINA:
+                                 ;     111 					Recordflag =true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",111
+00000075 FA04AF0101              		MOV.B #01H, 01AFH[R0]
+0000007A                         L36:	; bb26.split
+                                 ;     112 					value = var->value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",112
+0000007A ED016C                  		MOV.L 01B0H[R0], R1
+0000007D E5100101                		MOV.L 04H[R1], 04H[R0]
+00000081                         L37:	; bb26.split6
+                                 ;     113 					menu.itemMarked = *value + 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",113
+00000081 A809                    		MOV.L 04H[R0], R1
+00000083 EC1E                    		MOV.L [R1], R14
+00000085 621E                    		ADD #01H, R14
+00000087 CB0EA401                		MOV.B R14, 01A4H[R0]
+0000008B                         L38:	; bb26.split7
+                                 ;     114 					boolStr = boolJogMaq;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",114
+0000008B FB12rrrrrrrr            		MOV.L #__$boolJogMaq, R1
+00000091 E301                    		MOV.L R1, [R0]
+00000093 2Err                 B  		BRA L48
+00000095                         L39:	; bb38
+                                 ;     115 					break;
+                                 ;     116 				default: break;
+                                 ;     117 			}
+                                 ;     118 			break;
+                                 ;     119 #endif
+                                 ;     120 		case STATE_CONFIG_AUTO_MODE:
+                                 ;     121 			switch(configsVar->currentItem)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",121
+00000095 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+0000009B ECEE                    		MOV.L [R14], R14
+0000009D 59EE24                  		MOVU.B 24H[R14], R14
+000000A0 616E                    		CMP #06H, R14
+000000A2 20rr                    		BEQ L42
+000000A4                         L40:	; bb38
+000000A4 613E                    		CMP #03H, R14
+000000A6 21rr                    		BNE L48
+000000A8                         L41:	; bb43
+                                 ;     122 			{
+                                 ;     123 				case CONFIG_AUTO_SELECIONAR_LINHA:
+                                 ;     124 					boolStr = selecionarLinhatexto();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",124
+000000A8 05rrrrrr             A  		BSR _selecionarLinhatexto
+000000AC E301                    		MOV.L R1, [R0]
+000000AE 2Err                 B  		BRA L48
+000000B0                         L42:	; bb45
+                                 ;     125 				break;
+                                 ;     126 				case CONFIG_AUTO_MODO_SIM_RUN:
+                                 ;     127 					value = var->value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",127
+000000B0 ED016C                  		MOV.L 01B0H[R0], R1
+000000B3 E5100101                		MOV.L 04H[R1], 04H[R0]
+000000B7                         L43:	; bb45.split
+                                 ;     128 					boolStr = boolSim;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",128
+000000B7 FB12rrrrrrrr            		MOV.L #__$boolSim, R1
+000000BD E301                    		MOV.L R1, [R0]
+000000BF 2Err                 B  		BRA L48
+000000C1                         L44:	; bb52
+                                 ;     129 				break;
+                                 ;     130 				default: break;
+                                 ;     131 			}
+                                 ;     132 			break;
+                                 ;     133 		case STATE_CONFIG_MAQUINA_THC:
+                                 ;     134 			Recordflag =true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",134
+000000C1 FA04AF0101              		MOV.B #01H, 01AFH[R0]
+000000C6                         L45:	; bb52.split
+                                 ;     135 			value = var->value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",135
+000000C6 ED016C                  		MOV.L 01B0H[R0], R1
+000000C9 E5100101                		MOV.L 04H[R1], 04H[R0]
+000000CD                         L46:	; bb52.split8
+                                 ;     136 			menu.itemMarked = *value + 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",136
+000000CD A809                    		MOV.L 04H[R0], R1
+000000CF EC1E                    		MOV.L [R1], R14
+000000D1 621E                    		ADD #01H, R14
+000000D3 CB0EA401                		MOV.B R14, 01A4H[R0]
+000000D7                         L47:	; bb52.split9
+                                 ;     137 			boolStr = boolEn;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",137
+000000D7 FB12rrrrrrrr            		MOV.L #__$boolEn, R1
+000000DD E301                    		MOV.L R1, [R0]
+000000DF                         L48:	; bb63
+                                 ;     138 			break;
+                                 ;     139 
+                                 ;     140 		default: break;
+                                 ;     141 	}
+                                 ;     142 	 menu.title = var->name;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",142
+000000DF ED016C                  		MOV.L 01B0H[R0], R1
+000000E2 E5100766                		MOV.L 1CH[R1], 0198H[R0]
+000000E6                         L49:	; bb63.split
+                                 ;     143 	 menu.currentState = STATE_CONFIG_VAR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",143
+000000E6 F9066A0C                		MOV.L #0000000CH, 01A8H[R0]
+000000EA                         L50:	; bb63.split10
+                                 ;     144 	for(i = 0; i < 2; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",144
+000000EA FA04AE0100              		MOV.B #00H, 01AEH[R0]
+000000EF 2Err                 B  		BRA L52
+000000F1                         L51:	; bb69
+                                 ;     145 	{
+                                 ;     146 		menu.items[menu.numItems++].text = boolStr[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",146
+000000F1 5D0ECF                  		MOVU.W 019EH[R0], R14
+000000F4 751E14                  		MUL #14H, R14
+000000F7 710108                  		ADD #08H, R0, R1
+000000FA 4BE1                    		ADD R14, R1
+000000FC EC02                    		MOV.L [R0], R2
+000000FE 5A03AE01                		MOVU.B 01AEH[R0], R3
+00000102 FE6322                  		MOV.L [R3,R2], R2
+00000105 A09A                    		MOV.L R2, 0CH[R1]
+00000107 DD0ECF                  		MOV.W 019EH[R0], R14
+0000010A 621E                    		ADD #01H, R14
+0000010C D70ECF                  		MOV.W R14, 019EH[R0]
+0000010F 5A01AE01                		MOVU.B 01AEH[R0], R1
+00000113 6211                    		ADD #01H, R1
+00000115 CB01AE01                		MOV.B R1, 01AEH[R0]
+00000119                         L52:	; bb86
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",144
+00000119 5A01AE01                		MOVU.B 01AEH[R0], R1
+0000011D 6121                    		CMP #02H, R1
+0000011F 29rr                    		BLT L51
+00000121                         L53:	; bb91
+                                 ;     147 	}
+                                 ;     148 	value = var->value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",148
+00000121 ED016C                  		MOV.L 01B0H[R0], R1
+00000124 E5100101                		MOV.L 04H[R1], 04H[R0]
+00000128                         L54:	; bb91.split
+                                 ;     149 	menu.selectedItem = *value % 2; // Just to be sure - it is really not necessary
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",149
+00000128 A809                    		MOV.L 04H[R0], R1
+0000012A EC1E                    		MOV.L [R1], R14
+0000012C 641E                    		AND #01H, R14
+0000012E D70ECE                  		MOV.W R14, 019CH[R0]
+00000131                         L55:	; bb91.split11
+00000131 FB26FF                  		MOV.L #0FFFFFFFFH, R2
+00000134 710108                  		ADD #08H, R0, R1
+                                 ;     150 	/* Check if user selected a valid entry */
+                                 ;     151 	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",151
+00000137 05rrrrrr             A  		BSR _ut_menu_browse
+0000013B 69F1                    		SHLR #1FH, R1
+0000013D 6101                    		CMP #00H, R1
+0000013F 20rr                    		BEQ L58
+00000141                         L56:	; bb102
+                                 ;     152 		func_back = 0xFF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",152
+00000141 FBE2rrrrrrrr            		MOV.L #_func_back, R14
+00000147 F8E4FF                  		MOV.B #0FFH, [R14]
+0000014A                         L57:	; bb102.split
+                                 ;     153 		return;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",153
+0000014A 676D                    		RTSD #01B4H
+0000014C                         L58:	; bb109
+                                 ;     154 	}
+                                 ;     155 	func_back = menu.selectedItem;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",155
+0000014C FBE2rrrrrrrr            		MOV.L #_func_back, R14
+00000152 C20E9C01                		MOV.B 019CH[R0], [R14]
+00000156                         L59:	; bb109.split
+                                 ;     156 	*value = menu.selectedItem;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",156
+00000156 5D0ECE                  		MOVU.W 019CH[R0], R14
+00000159 A809                    		MOV.L 04H[R0], R1
+0000015B E31E                    		MOV.L R14, [R1]
+0000015D                         L60:	; bb109.split12
+                                 ;     157 	/* save it - TODO: ask for confirmation, maybe? */
+                                 ;     158 	if(Recordflag)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",158
+0000015D 5A01AF01                		MOVU.B 01AFH[R0], R1
+00000161 6101                    		CMP #00H, R1
+00000163 10                   S  		BEQ L62
+00000164                         L61:	; bb118
+00000164 6631                    		MOV.L #00000003H, R1
+                                 ;     159 	{
+                                 ;     160 		eepromWriteConfig(CONFIGFLAG);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",160
+00000166 05rrrrrr             A  		BSR _eepromWriteConfig
+0000016A 676D                    		RTSD #01B4H
+0000016C                         L62:	; return
+                                 ;     161 	}
+                                 ;     162 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",162
+0000016C 676D                    		RTSD #01B4H
+0000016E                         _config_int:
+                                 		.STACK	_config_int=76
+                                 ;     163 
+                                 ;     164 /**
+                                 ;     165  * Configure int variables
+                                 ;     166  *
+                                 ;     167  * @param var Int variable
+                                 ;     168  */
+                                 ;     169 void config_int(ut_config_var* var)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",169
+0000016E 7EA6                    		PUSH.L R6
+00000170 7100D0                  		ADD #0FFFFFFD0H, R0
+00000173 A289                    		MOV.L R1, 2CH[R0]
+                                 ;     170 {
+                                 ;     171 	float Buffervalue;
+                                 ;     172 	float *value = configsVar->value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",172
+00000175 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+0000017B ECE1                    		MOV.L [R14], R1
+0000017D E5100101                		MOV.L 04H[R1], 04H[R0]
+00000181                         L64:	; entry.split
+                                 ;     173 	char szText[MAX_COLUMN];
+                                 ;     174 	uint32_t keyEntry;
+                                 ;     175 	uint16_t decNum = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",175
+00000181 3D8101                  		MOV.W #0001H, 22H[R0]
+00000184                         L65:	; entry.split1
+                                 ;     176 	uint16_t decCount = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",176
+00000184 3D8200                  		MOV.W #0000H, 24H[R0]
+00000187                         L66:	; entry.split2
+                                 ;     177 	uint16_t decimalCount = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",177
+00000187 3D8300                  		MOV.W #0000H, 26H[R0]
+0000018A                         L67:	; entry.split3
+                                 ;     178 	uint16_t digits;
+                                 ;     179 	Buffervalue = *value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",179
+0000018A A809                    		MOV.L 04H[R0], R1
+0000018C E010                    		MOV.L [R1], [R0]
+0000018E                         L68:	; entry.split4
+                                 ;     180 
+                                 ;     181 	decCount = get_dec_digits(configsVar->valueMax);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",181
+0000018E FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000194 ECE1                    		MOV.L [R14], R1
+00000196 A899                    		MOV.L 0CH[R1], R1
+00000198 05rrrrrr             A  		BSR _get_dec_digits
+0000019C 9481                    		MOV.W R1, 24H[R0]
+0000019E                         L69:	; entry.split5
+                                 ;     182 	decimalCount = get_decimal_digits(configsVar->step);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",182
+0000019E FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000001A4 ECE1                    		MOV.L [R14], R1
+000001A6 A911                    		MOV.L 10H[R1], R1
+000001A8 05rrrrrr             A  		BSR _get_decimal_digits
+000001AC 9489                    		MOV.W R1, 26H[R0]
+000001AE                         L70:	; entry.split6
+                                 ;     183 
+                                 ;     184 	if(decimalCount > 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",184
+000001AE BC89                    		MOVU.W 26H[R0], R1
+000001B0 6101                    		CMP #00H, R1
+000001B2 9C81                    		MOV.W 24H[R0], R1
+000001B4 2Brr                    		BLE L72
+000001B6                         L71:	; bb26
+                                 ;     185 		digits = decCount + decimalCount + 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",185
+000001B6 5F11                    		MOVU.W R1, R1
+000001B8 06C90113                		ADD 26H[R0].UW, R1
+000001BC 6211                    		ADD #01H, R1
+000001BE 9501                    		MOV.W R1, 28H[R0]
+000001C0 08                   S  		BRA L73
+000001C1                         L72:	; bb34
+                                 ;     186 	else
+                                 ;     187 		digits = decCount;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",187
+000001C1 9501                    		MOV.W R1, 28H[R0]
+000001C3                         L73:	; bb40
+                                 ;     188 
+                                 ;     189 	for (uint8_t i = 1; i<decCount; i++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",189
+000001C3 F9042B01                		MOV.B #01H, 2BH[R0]
+000001C7 2Err                 B  		BRA L75
+000001C9                         L74:	; bb41
+                                 ;     190 	{
+                                 ;     191 		decNum = decNum*10;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",191
+000001C9 BC09                    		MOVU.W 22H[R0], R1
+000001CB 63A1                    		MUL #0AH, R1
+000001CD 9409                    		MOV.W R1, 22H[R0]
+000001CF 59012B                  		MOVU.B 2BH[R0], R1
+000001D2 6211                    		ADD #01H, R1
+000001D4 C7012B                  		MOV.B R1, 2BH[R0]
+000001D7                         L75:	; bb48
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",189
+000001D7 59012B                  		MOVU.B 2BH[R0], R1
+000001DA 06C50112                		CMP 24H[R0].UW, R1
+000001DE 29rr                    		BLT L74
+000001E0                         L76:	; bb56
+                                 ;     192 	}
+                                 ;     193 
+                                 ;     194 	sprintf(szText, "%0*.*f %s", digits , decimalCount,*value,var->unit);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",194
+000001E0 AA89                    		MOV.L 2CH[R0], R1
+000001E2 A80A                    		MOV.L 04H[R0], R2
+000001E4 EC22                    		MOV.L [R2], R2
+000001E6 BC8B                    		MOVU.W 26H[R0], R3
+000001E8 BD04                    		MOVU.W 28H[R0], R4
+000001EA 7100EC                  		ADD #0FFFFFFECH, R0
+000001ED E5100604                		MOV.L 18H[R1], 10H[R0]
+000001F1 A08A                    		MOV.L R2, 0CH[R0]
+000001F3 A083                    		MOV.L R3, 08H[R0]
+000001F5 A00C                    		MOV.L R4, 04H[R0]
+000001F7 FBE2rrrrrrrr            		MOV.L #_L18, R14
+000001FD E30E                    		MOV.L R14, [R0]
+000001FF 71011C                  		ADD #1CH, R0, R1
+00000202 05rrrrrr             A  		BSR _sprintf
+00000206 710014                  		ADD #14H, R0
+00000209                         L77:	; bb56.split
+                                 ;     195 	ut_lcd_output_int_var(var->name,szText,1,false);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",195
+00000209 AA89                    		MOV.L 2CH[R0], R1
+0000020B A999                    		MOV.L 1CH[R1], R1
+0000020D 6604                    		MOV.L #00000000H, R4
+0000020F 6613                    		MOV.L #00000001H, R3
+00000211 710208                  		ADD #08H, R0, R2
+00000214 05rrrrrr             A  		BSR _ut_lcd_output_int_var
+00000218                         L78:	; bb56.split7
+                                 ;     196 
+                                 ;     197 	if (swTimers[DOWN_CONFIGVAR_TIMER] == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",197
+00000218 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+0000021E A991                    		MOV.L 18H[R1], R1
+00000220 6101                    		CMP #00H, R1
+00000222 21rr                    		BNE L80
+00000224                         L79:	; bb73
+00000224 6040                    		SUB #04H, R0
+                                 ;     198 	{
+                                 ;     199 	swTimers[DOWN_CONFIGVAR_TIMER]= xTimerCreate
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",199
+00000226 FBE2rrrrrrrr            		MOV.L #__$vTimerUpdateCallback, R14
+0000022C E30E                    		MOV.L R14, [R0]
+0000022E 6664                    		MOV.L #00000006H, R4
+00000230 6613                    		MOV.L #00000001H, R3
+00000232 7542FA                  		MOV.L #000000FAH, R2
+00000235 FB12rrrrrrrr            		MOV.L #_L19, R1
+0000023B 05rrrrrr             A  		BSR _xTimerCreate
+0000023F 6240                    		ADD #04H, R0
+00000241 FB22rrrrrrrr            		MOV.L #_swTimers, R2
+00000247 A1A1                    		MOV.L R1, 18H[R2]
+00000249                         L80:	; bb79
+                                 ;     200 				   (  /* Just a text name, not used by the RTOS kernel. */
+                                 ;     201 					 "Timer Update",
+                                 ;     202 					 /* The timer period in ticks, must be greater than 0. */
+                                 ;     203 					 ( 250 ),
+                                 ;     204 					 /* The timers will auto-reload themselves when they
+                                 ;     205 					 expire. */
+                                 ;     206 					 pdTRUE,
+                                 ;     207 					 /* Assign each timer a unique id equal to its array
+                                 ;     208 					 index. */
+                                 ;     209 					 ( void * ) DOWN_CONFIGVAR_TIMER,
+                                 ;     210 					 /* Each timer calls the same callback when it expires. */
+                                 ;     211 					 vTimerUpdateCallback
+                                 ;     212 				   );
+                                 ;     213 	}
+                                 ;     214 
+                                 ;     215 	xTimerStart( swTimers[DOWN_CONFIGVAR_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",215
+00000249 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+0000024F A996                    		MOV.L 18H[R1], R6
+00000251 05rrrrrr             A  		BSR _xTaskGetTickCount
+00000255 EF13                    		MOV.L R1, R3
+00000257 6040                    		SUB #04H, R0
+00000259 F80600                  		MOV.L #00000000H, [R0]
+0000025C 6604                    		MOV.L #00000000H, R4
+0000025E 6612                    		MOV.L #00000001H, R2
+00000260 EF61                    		MOV.L R6, R1
+00000262 05rrrrrr             A  		BSR _xTimerGenericCommand
+00000266 6240                    		ADD #04H, R0
+00000268 38rrrr               W  		BRA L144
+0000026B                         L81:	; bb83
+                                 ;     216 	/* Loop to increment / decrement value */
+                                 ;     217 	/* Wait for keyboard */
+                                 ;     218 	while(xQueueReceive( qKeyboard, &keyEntry, DEFAULT_CONFIG_VAR_TOUT ))
+                                 ;     219 	{
+                                 ;     220 		/* Check which key */
+                                 ;     221 		switch (keyEntry)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",221
+0000026B A989                    		MOV.L 1CH[R0], R1
+0000026D 6111                    		CMP #01H, R1
+0000026F 3Arrrr               W  		BEQ L135
+00000272                         L82:	; bb83
+00000272 6141                    		CMP #04H, R1
+00000274 3Arrrr               W  		BEQ L105
+00000277                         L83:	; bb83
+00000277 755120                  		CMP #20H, R1
+0000027A 3Arrrr               W  		BEQ L97
+0000027D                         L84:	; bb83
+0000027D 76010001                		CMP #0100H, R1
+00000281 20rr                    		BEQ L92
+00000283                         L85:	; bb83
+00000283 76010002                		CMP #0200H, R1
+00000287 3Arrrr               W  		BEQ L101
+0000028A                         L86:	; bb83
+0000028A 76010004                		CMP #0400H, R1
+0000028E 3Brrrr               W  		BNE L144
+00000291                         L87:	; bb86
+                                 ;     222 		{
+                                 ;     223 		case KEY_DOWN:
+                                 ;     224 				if(*value > configsVar->valueMin){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",224
+00000291 A809                    		MOV.L 04H[R0], R1
+00000293 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000299 ECE2                    		MOV.L [R14], R2
+0000029B A8A2                    		MOV.L 08H[R2], R2
+0000029D FC8412                  		FCMP [R1].L, R2
+000002A0 26rr                    		BPZ L89
+000002A2                         L88:	; bb87
+                                 ;     225 					*value = *value - configsVar->step*mult;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",225
+000002A2 FBE2rrrrrrrr            		MOV.L #__$mult, R14
+000002A8 06E011EE                		ITOF [R14].UW, R14
+000002AC FBF2rrrrrrrr            		MOV.L #_configsVar, R15
+000002B2 ECFF                    		MOV.L [R15], R15
+000002B4 FC8DFE04                		FMUL 10H[R15].L, R14
+000002B8 A809                    		MOV.L 04H[R0], R1
+000002BA EC1F                    		MOV.L [R1], R15
+000002BC FC83EF                  		FSUB R14, R15
+000002BF E31F                    		MOV.L R15, [R1]
+000002C1                         L89:	; bb107
+                                 ;     226 				}
+                                 ;     227 				if(*value < configsVar->valueMin){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",227
+000002C1 A809                    		MOV.L 04H[R0], R1
+000002C3 EC1E                    		MOV.L [R1], R14
+000002C5 FBF2rrrrrrrr            		MOV.L #_configsVar, R15
+000002CB ECFF                    		MOV.L [R15], R15
+000002CD FC85FE02                		FCMP 08H[R15].L, R14
+000002D1 26rr                    		BPZ L91
+000002D3                         L90:	; bb108
+                                 ;     228 					*value = configsVar->valueMin;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",228
+000002D3 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000002D9 ECEE                    		MOV.L [R14], R14
+000002DB A809                    		MOV.L 04H[R0], R1
+000002DD E1E102                  		MOV.L 08H[R14], [R1]
+000002E0                         L91:	; bb121
+                                 ;     229 				}
+                                 ;     230 				blink = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",230
+000002E0 FBE2rrrrrrrr            		MOV.L #__$blink, R14
+000002E6 F8E400                  		MOV.B #00H, [R14]
+000002E9 38rrrr               W  		BRA L144
+000002EC                         L92:	; bb123
+                                 ;     231 				//ut_lcd_output_int_var(configsVar->name,szText, count + 1,false);
+                                 ;     232 			break;
+                                 ;     233 
+                                 ;     234 		case KEY_UP:
+                                 ;     235 				if(*value < configsVar->valueMax){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",235
+000002EC A809                    		MOV.L 04H[R0], R1
+000002EE EC1E                    		MOV.L [R1], R14
+000002F0 FBF2rrrrrrrr            		MOV.L #_configsVar, R15
+000002F6 ECFF                    		MOV.L [R15], R15
+000002F8 FC85FE03                		FCMP 0CH[R15].L, R14
+000002FC 26rr                    		BPZ L94
+000002FE                         L93:	; bb124
+                                 ;     236 					*value = *value + configsVar->step*mult;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",236
+000002FE FBE2rrrrrrrr            		MOV.L #__$mult, R14
+00000304 06E011EE                		ITOF [R14].UW, R14
+00000308 FBF2rrrrrrrr            		MOV.L #_configsVar, R15
+0000030E ECFF                    		MOV.L [R15], R15
+00000310 FC8DFE04                		FMUL 10H[R15].L, R14
+00000314 A809                    		MOV.L 04H[R0], R1
+00000316 FC881E                  		FADD [R1].L, R14
+00000319 E31E                    		MOV.L R14, [R1]
+0000031B                         L94:	; bb144
+                                 ;     237 				}
+                                 ;     238 				if(*value > configsVar->valueMax){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",238
+0000031B A809                    		MOV.L 04H[R0], R1
+0000031D FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000323 ECE2                    		MOV.L [R14], R2
+00000325 A8AA                    		MOV.L 0CH[R2], R2
+00000327 FC8412                  		FCMP [R1].L, R2
+0000032A 26rr                    		BPZ L96
+0000032C                         L95:	; bb145
+                                 ;     239 					*value = configsVar->valueMax;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",239
+0000032C FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000332 ECEE                    		MOV.L [R14], R14
+00000334 A809                    		MOV.L 04H[R0], R1
+00000336 E1E103                  		MOV.L 0CH[R14], [R1]
+00000339                         L96:	; bb158
+                                 ;     240 				}
+                                 ;     241 				blink = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",241
+00000339 FBE2rrrrrrrr            		MOV.L #__$blink, R14
+0000033F F8E400                  		MOV.B #00H, [R14]
+00000342 38rrrr               W  		BRA L144
+00000345                         L97:	; bb159
+                                 ;     242 				//ut_lcd_output_int_var(configsVar->name,szText, count + 1,false);
+                                 ;     243 			break;
+                                 ;     244 
+                                 ;     245 		case KEY_LEFT:
+                                 ;     246 				mult = mult*10;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",246
+00000345 FBE2rrrrrrrr            		MOV.L #__$mult, R14
+0000034B 5CEF                    		MOVU.W [R14], R15
+0000034D 63AF                    		MUL #0AH, R15
+0000034F D3EF                    		MOV.W R15, [R14]
+00000351                         L98:	; bb159.split
+                                 ;     247 				if (mult*configsVar->step > decNum)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",247
+00000351 FBE2rrrrrrrr            		MOV.L #__$mult, R14
+00000357 06E011EE                		ITOF [R14].UW, R14
+0000035B FBF2rrrrrrrr            		MOV.L #_configsVar, R15
+00000361 ECFF                    		MOV.L [R15], R15
+00000363 FC8DFE04                		FMUL 10H[R15].L, R14
+00000367 06E1110F11              		ITOF 22H[R0].UW, R15
+0000036C FC87EF                  		FCMP R14, R15
+0000036F 26rr                    		BPZ L100
+00000371                         L99:	; bb165
+                                 ;     248 				{
+                                 ;     249 					mult = mult/10;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",249
+00000371 FBE2rrrrrrrr            		MOV.L #__$mult, R14
+00000377 5CEF                    		MOVU.W [R14], R15
+00000379 FD749F0A                		DIVU #0AH, R15
+0000037D D3EF                    		MOV.W R15, [R14]
+0000037F 38rrrr               W  		BRA L144
+00000382                         L100:	; bb170
+                                 ;     250 				}
+                                 ;     251 				else
+                                 ;     252 				{
+                                 ;     253 
+                                 ;     254 					count++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",254
+00000382 FBE2rrrrrrrr            		MOV.L #__$count, R14
+00000388 58EF                    		MOVU.B [R14], R15
+0000038A 621F                    		ADD #01H, R15
+0000038C C3EF                    		MOV.B R15, [R14]
+0000038E 38rrrr               W  		BRA L144
+00000391                         L101:	; bb185
+                                 ;     255 				}
+                                 ;     256 
+                                 ;     257 			break;
+                                 ;     258 
+                                 ;     259 		case KEY_RIGHT:
+                                 ;     260 				mult = mult/10;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",260
+00000391 FBE2rrrrrrrr            		MOV.L #__$mult, R14
+00000397 5CEF                    		MOVU.W [R14], R15
+00000399 FD749F0A                		DIVU #0AH, R15
+0000039D D3EF                    		MOV.W R15, [R14]
+0000039F                         L102:	; bb185.split
+                                 ;     261 				if (mult < 1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",261
+0000039F FBE2rrrrrrrr            		MOV.L #__$mult, R14
+000003A5 5CEE                    		MOVU.W [R14], R14
+000003A7 610E                    		CMP #00H, R14
+000003A9 2Arr                    		BGT L104
+000003AB                         L103:	; bb191
+                                 ;     262 				{
+                                 ;     263 					mult = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",263
+000003AB FBE2rrrrrrrr            		MOV.L #__$mult, R14
+000003B1 F8E501                  		MOV.W #0001H, [R14]
+000003B4 38rrrr               W  		BRA L144
+000003B7                         L104:	; bb192
+                                 ;     264 				}
+                                 ;     265 				else
+                                 ;     266 				{
+                                 ;     267 					count--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",267
+000003B7 FBE2rrrrrrrr            		MOV.L #__$count, R14
+000003BD 58EF                    		MOVU.B [R14], R15
+000003BF 601F                    		SUB #01H, R15
+000003C1 C3EF                    		MOV.B R15, [R14]
+000003C3 38rrrr               W  		BRA L144
+000003C6                         L105:	; bb201
+                                 ;     268 				}
+                                 ;     269 			break;
+                                 ;     270 
+                                 ;     271 		case KEY_ENTER:
+                                 ;     272 			xTimerStop( swTimers[DOWN_CONFIGVAR_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",272
+000003C6 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+000003CC A991                    		MOV.L 18H[R1], R1
+000003CE 6040                    		SUB #04H, R0
+000003D0 F80600                  		MOV.L #00000000H, [R0]
+000003D3 6603                    		MOV.L #00000000H, R3
+000003D5 6632                    		MOV.L #00000003H, R2
+000003D7 EF34                    		MOV.L R3, R4
+000003D9 05rrrrrr             A  		BSR _xTimerGenericCommand
+000003DD 6240                    		ADD #04H, R0
+000003DF                         L106:	; bb201.split
+                                 ;     273 			switch(configsVar->currentState)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",273
+000003DF FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000003E5 ECE1                    		MOV.L [R14], R1
+000003E7 AA11                    		MOV.L 20H[R1], R1
+000003E9 6141                    		CMP #04H, R1
+000003EB 20rr                    		BEQ L118
+000003ED                         L107:	; bb201.split
+000003ED 6151                    		CMP #05H, R1
+000003EF 20rr                    		BEQ L121
+000003F1                         L108:	; bb201.split
+000003F1 61A1                    		CMP #0AH, R1
+000003F3 3Arrrr               W  		BEQ L127
+000003F6                         L109:	; bb201.split
+000003F6 6181                    		CMP #08H, R1
+000003F8 3Arrrr               W  		BEQ L131
+000003FB                         L110:	; bb201.split
+000003FB 6191                    		CMP #09H, R1
+000003FD 3Arrrr               W  		BEQ L124
+00000400                         L111:	; bb201.split
+00000400 6171                    		CMP #07H, R1
+00000402 3Brrrr               W  		BNE L132
+00000405                         L112:	; bb207
+00000405 6621                    		MOV.L #00000002H, R1
+                                 ;     274 			{
+                                 ;     275 				case STATE_CONFIG_JOG:
+                                 ;     276 					eepromWriteConfig(CONFIGVAR_JOG);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",276
+00000407 05rrrrrr             A  		BSR _eepromWriteConfig
+0000040B                         L113:	; bb207.split
+                                 ;     277 					if (configsVar->currentItem == CONFIG_JOG_RAPIDO)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",277
+0000040B FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000411 ECEE                    		MOV.L [R14], R14
+00000413 59EE24                  		MOVU.B 24H[R14], R14
+00000416 610E                    		CMP #00H, R14
+00000418 21rr                    		BNE L115
+0000041A                         L114:	; bb209
+                                 ;     278 					{
+                                 ;     279 						velocidadeJog = &configVarJog[JOG_RAPIDO];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",279
+0000041A FBE2rrrrrrrr            		MOV.L #_velocidadeJog, R14
+00000420 FBF2rrrrrrrr            		MOV.L #_configVarJog, R15
+00000426 E3EF                    		MOV.L R15, [R14]
+00000428 2Err                 B  		BRA L116
+0000042A                         L115:	; bb210
+                                 ;     280 					}
+                                 ;     281 					else
+                                 ;     282 					{
+                                 ;     283 						velocidadeJog = &configVarJog[JOG_LENTO];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",283
+0000042A FBE2rrrrrrrr            		MOV.L #_configVarJog, R14
+00000430 624E                    		ADD #04H, R14
+00000432 FBF2rrrrrrrr            		MOV.L #_velocidadeJog, R15
+00000438 E3FE                    		MOV.L R14, [R15]
+0000043A                         L116:	; bb218
+                                 ;     284 					}
+                                 ;     285 					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",285
+0000043A FB12rrrrrrrr            		MOV.L #_L20, R1
+00000440 05rrrrrr             A  		BSR _ut_lcd_output_warning
+00000444                         L117:	; bb218.split
+00000444 FB1AD007                		MOV.L #000007D0H, R1
+                                 ;     286 							/* Delay */
+                                 ;     287 					vTaskDelay(2000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",287
+00000448 05rrrrrr             A  		BSR _vTaskDelay
+0000044C 2Err                 B  		BRA L132
+0000044E                         L118:	; bb219
+0000044E 6601                    		MOV.L #00000000H, R1
+                                 ;     288 					break;
+                                 ;     289 				case STATE_CONFIG_MENU_OX:
+                                 ;     290 					eepromWriteConfig(CONFIGVAR_OX);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",290
+00000450 05rrrrrr             A  		BSR _eepromWriteConfig
+00000454                         L119:	; bb219.split
+                                 ;     291 					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",291
+00000454 FB12rrrrrrrr            		MOV.L #_L20, R1
+0000045A 05rrrrrr             A  		BSR _ut_lcd_output_warning
+0000045E                         L120:	; bb219.split8
+0000045E FB1AD007                		MOV.L #000007D0H, R1
+                                 ;     292 							/* Delay */
+                                 ;     293 					vTaskDelay(2000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",293
+00000462 05rrrrrr             A  		BSR _vTaskDelay
+00000466 2Err                 B  		BRA L132
+00000468                         L121:	; bb220
+00000468 6611                    		MOV.L #00000001H, R1
+                                 ;     294 					break;
+                                 ;     295 				case STATE_CONFIG_MENU_PL:
+                                 ;     296 					eepromWriteConfig(CONFIGVAR_PL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",296
+0000046A 05rrrrrr             A  		BSR _eepromWriteConfig
+0000046E                         L122:	; bb220.split
+                                 ;     297 					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",297
+0000046E FB12rrrrrrrr            		MOV.L #_L20, R1
+00000474 05rrrrrr             A  		BSR _ut_lcd_output_warning
+00000478                         L123:	; bb220.split9
+00000478 FB1AD007                		MOV.L #000007D0H, R1
+                                 ;     298 							/* Delay */
+                                 ;     299 					vTaskDelay(2000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",299
+0000047C 05rrrrrr             A  		BSR _vTaskDelay
+00000480 2Err                 B  		BRA L132
+00000482                         L124:	; bb221
+00000482 6651                    		MOV.L #00000005H, R1
+                                 ;     300 					break;
+                                 ;     301 				case STATE_CONFIG_MAQUINA:
+                                 ;     302 					eepromWriteConfig(CONFIGVAR_MAQ);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",302
+00000484 05rrrrrr             A  		BSR _eepromWriteConfig
+00000488                         L125:	; bb221.split
+                                 ;     303 					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",303
+00000488 FB12rrrrrrrr            		MOV.L #_L20, R1
+0000048E 05rrrrrr             A  		BSR _ut_lcd_output_warning
+00000492                         L126:	; bb221.split10
+00000492 FB1AD007                		MOV.L #000007D0H, R1
+                                 ;     304 							/* Delay */
+                                 ;     305 					vTaskDelay(2000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",305
+00000496 05rrrrrr             A  		BSR _vTaskDelay
+0000049A 2Err                 B  		BRA L132
+0000049C                         L127:	; bb222
+0000049C 6661                    		MOV.L #00000006H, R1
+                                 ;     306 					break;
+                                 ;     307 				case STATE_CONFIG_PARAMETROS_MAQ:
+                                 ;     308 					eepromWriteConfig(CONFIGVAR_PAR_MAQ);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",308
+0000049E 05rrrrrr             A  		BSR _eepromWriteConfig
+000004A2                         L128:	; bb222.split
+                                 ;     309 					ut_lcd_output_warning("     VALOR     \n     SALVO     \n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",309
+000004A2 FB12rrrrrrrr            		MOV.L #_L20, R1
+000004A8 05rrrrrr             A  		BSR _ut_lcd_output_warning
+000004AC                         L129:	; bb222.split11
+000004AC FB1AD007                		MOV.L #000007D0H, R1
+                                 ;     310 							/* Delay */
+                                 ;     311 					vTaskDelay(2000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",311
+000004B0 05rrrrrr             A  		BSR _vTaskDelay
+000004B4                         L130:	; bb222.split12
+                                 ;     312 					reset_flag = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",312
+000004B4 FBE2rrrrrrrr            		MOV.L #_reset_flag, R14
+000004BA F8E401                  		MOV.B #01H, [R14]
+000004BD 08                   S  		BRA L132
+000004BE                         L131:	; bb223
+                                 ;     313 					break;
+                                 ;     314 				case STATE_CONFIG_AUTO_MODE:
+                                 ;     315 					selecionarlinhas();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",315
+000004BE 05rrrrrr             A  		BSR _selecionarlinhas
+000004C2                         L132:	; bb224
+                                 ;     316 					break;
+                                 ;     317 
+                                 ;     318 			}
+                                 ;     319 
+                                 ;     320 			mult = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",320
+000004C2 FBE2rrrrrrrr            		MOV.L #__$mult, R14
+000004C8 F8E501                  		MOV.W #0001H, [R14]
+000004CB                         L133:	; bb224.split
+                                 ;     321 			count = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",321
+000004CB FBE2rrrrrrrr            		MOV.L #__$count, R14
+000004D1 F8E400                  		MOV.B #00H, [R14]
+000004D4                         L134:	; bb224.split13
+                                 ;     322 			return;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",322
+000004D4 3F660D                  		RTSD #34H, R6-R6
+000004D7                         L135:	; bb226
+                                 ;     323 
+                                 ;     324 		case KEY_ESC:
+                                 ;     325 			*value = Buffervalue;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",325
+000004D7 EC01                    		MOV.L [R0], R1
+000004D9 A80A                    		MOV.L 04H[R0], R2
+000004DB E321                    		MOV.L R1, [R2]
+000004DD                         L136:	; bb226.split
+                                 ;     326 			mult = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",326
+000004DD FBE2rrrrrrrr            		MOV.L #__$mult, R14
+000004E3 F8E501                  		MOV.W #0001H, [R14]
+000004E6                         L137:	; bb226.split14
+                                 ;     327 			count = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",327
+000004E6 FBE2rrrrrrrr            		MOV.L #__$count, R14
+000004EC F8E400                  		MOV.B #00H, [R14]
+000004EF                         L138:	; bb226.split15
+                                 ;     328 			if(configsVar->currentState == STATE_CONFIG_AUTO_MODE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",328
+000004EF FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000004F5 ECE1                    		MOV.L [R14], R1
+000004F7 AA11                    		MOV.L 20H[R1], R1
+000004F9 6181                    		CMP #08H, R1
+000004FB 21rr                    		BNE L141
+000004FD                         L139:	; bb231
+                                 ;     329 			{
+                                 ;     330 				if(configsVar->currentItem == CONFIG_AUTO_SELECIONAR_LINHA)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",330
+000004FD FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000503 ECEE                    		MOV.L [R14], R14
+00000505 59EE24                  		MOVU.B 24H[R14], R14
+00000508 613E                    		CMP #03H, R14
+0000050A 21rr                    		BNE L141
+0000050C                         L140:	; bb232
+                                 ;     331 				{
+                                 ;     332 					configsVar->type = UT_CONFIG_INT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",332
+0000050C FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000512 ECEE                    		MOV.L [R14], R14
+00000514 F8E600                  		MOV.L #00000000H, [R14]
+00000517                         L141:	; bb249
+                                 ;     333 				}
+                                 ;     334 			}
+                                 ;     335 			func_back = 0xFF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",335
+00000517 FBE2rrrrrrrr            		MOV.L #_func_back, R14
+0000051D F8E4FF                  		MOV.B #0FFH, [R14]
+00000520                         L142:	; bb249.split
+                                 ;     336 			xTimerStop( swTimers[DOWN_CONFIGVAR_TIMER], 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",336
+00000520 FB12rrrrrrrr            		MOV.L #_swTimers, R1
+00000526 A991                    		MOV.L 18H[R1], R1
+00000528 6040                    		SUB #04H, R0
+0000052A F80600                  		MOV.L #00000000H, [R0]
+0000052D 6603                    		MOV.L #00000000H, R3
+0000052F 6632                    		MOV.L #00000003H, R2
+00000531 EF34                    		MOV.L R3, R4
+00000533 05rrrrrr             A  		BSR _xTimerGenericCommand
+00000537 6240                    		ADD #04H, R0
+00000539                         L143:	; bb249.split16
+                                 ;     337 			return;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",337
+00000539 3F660D                  		RTSD #34H, R6-R6
+0000053C                         L144:	; bb256
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",218
+0000053C FBE2rrrrrrrr            		MOV.L #_qKeyboard, R14
+00000542 ECE1                    		MOV.L [R14], R1
+00000544 6604                    		MOV.L #00000000H, R4
+00000546 FB36FF                  		MOV.L #0FFFFFFFFH, R3
+00000549 71021C                  		ADD #1CH, R0, R2
+0000054C 05rrrrrr             A  		BSR _xQueueGenericReceive
+00000550 6101                    		CMP #00H, R1
+00000552 3Brrrr               W  		BNE L81
+00000555                         L145:	; return
+                                 ;     338 
+                                 ;     339 		case KEY_RELEASED:
+                                 ;     340 		//	mult = 1;
+                                 ;     341 		//	count = 0;
+                                 ;     342 			break;
+                                 ;     343 
+                                 ;     344 		default:
+                                 ;     345 			break;
+                                 ;     346 		}
+                                 ;     347 
+                                 ;     348 
+                                 ;     349 	}
+                                 ;     350 
+                                 ;     351 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",351
+00000555 3F660D                  		RTSD #34H, R6-R6
+00000558                         _config_null:
+                                 		.STACK	_config_null=8
+                                 ;     352 
+                                 ;     353 /**
+                                 ;     354  * Null handler
+                                 ;     355  * @param var
+                                 ;     356  */
+                                 ;     357 void config_null(ut_config_var* var)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",357
+00000558 6040                    		SUB #04H, R0
+0000055A E301                    		MOV.L R1, [R0]
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",360
+0000055C 6701                    		RTSD #04H
+0000055E                         _ut_state_config_var:
+                                 		.STACK	_ut_state_config_var=32
+                                 ;     358 {
+                                 ;     359 
+                                 ;     360 }
+                                 ;     361 
+                                 ;     362 /* Default handlers for variables */
+                                 ;     363 static ut_config_change_ptr var_handlers[UT_CONFIG_MAX] =
+                                 ;     364 {
+                                 ;     365 	&config_int,
+                                 ;     366 	&config_bool,
+                                 ;     367 	&config_null
+                                 ;     368 };
+                                 ;     369 
+                                 ;     370 /**
+                                 ;     371  * This state configures a single variable that is
+                                 ;     372  * shared among multiple states.
+                                 ;     373  *
+                                 ;     374  * @param pContext Context object
+                                 ;     375  * @return Config menu
+                                 ;     376  */
+                                 ;     377 ut_state ut_state_config_var(ut_context* pContext)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",377
+0000055E 7100E4                  		ADD #0FFFFFFE4H, R0
+00000561 A181                    		MOV.L R1, 18H[R0]
+                                 ;     378 {
+                                 ;     379 	uint32_t *Flag = configsVar->value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",379
+00000563 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000569 ECE1                    		MOV.L [R14], R1
+0000056B E5100101                		MOV.L 04H[R1], 04H[R0]
+0000056F                         L148:	; entry.split
+                                 ;     380 	ut_state stateBack = (ut_state)pContext->value[0];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",380
+0000056F A981                    		MOV.L 18H[R0], R1
+00000571 B091                    		MOVU.B 02H[R1], R1
+00000573 A081                    		MOV.L R1, 08H[R0]
+00000575                         L149:	; entry.split3
+                                 ;     381 
+                                 ;     382 	var_handlers[configsVar->type](configsVar);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",382
+00000575 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+0000057B ECE1                    		MOV.L [R14], R1
+0000057D EC1E                    		MOV.L [R1], R14
+0000057F FBF2rrrrrrrr            		MOV.L #__$var_handlers, R15
+00000585 FE6EFE                  		MOV.L [R14,R15], R14
+00000588 7F1E                    		JSR R14
+0000058A                         L150:	; entry.split4
+                                 ;     383 
+                                 ;     384 	switch(configsVar->currentState)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",384
+0000058A FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000590 ECE1                    		MOV.L [R14], R1
+00000592 AA11                    		MOV.L 20H[R1], R1
+00000594 6161                    		CMP #06H, R1
+00000596 20rr                    		BEQ L157
+00000598                         L151:	; entry.split4
+00000598 6191                    		CMP #09H, R1
+0000059A 3Arrrr               W  		BEQ L191
+0000059D                         L152:	; entry.split4
+0000059D 6181                    		CMP #08H, R1
+0000059F 20rr                    		BEQ L161
+000005A1                         L153:	; entry.split4
+000005A1 6171                    		CMP #07H, R1
+000005A3 3Brrrr               W  		BNE L194
+000005A6                         L154:	; bb26
+                                 ;     385 	{
+                                 ;     386 		case STATE_CONFIG_JOG:
+                                 ;     387 			if(func_back == 0xFF)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",387
+000005A6 FBE2rrrrrrrr            		MOV.L #_func_back, R14
+000005AC 58EE                    		MOVU.B [R14], R14
+000005AE 755EFF                  		CMP #0FFH, R14
+000005B1 3Brrrr               W  		BNE L194
+000005B4                         L155:	; bb27
+                                 ;     388 			{
+                                 ;     389 				stateBack = (ut_state)pContext->value[1];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",389
+000005B4 A981                    		MOV.L 18H[R0], R1
+000005B6 B099                    		MOVU.B 03H[R1], R1
+000005B8 A081                    		MOV.L R1, 08H[R0]
+000005BA                         L156:	; bb27.split
+                                 ;     390 				func_back = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",390
+000005BA FBE2rrrrrrrr            		MOV.L #_func_back, R14
+000005C0 F8E400                  		MOV.B #00H, [R14]
+000005C3 38rrrr               W  		BRA L194
+000005C6                         L157:	; bb40
+                                 ;     391 			}
+                                 ;     392 			break;
+                                 ;     393 		case STATE_CONFIG_MANUAL_MODE:
+                                 ;     394 			if(configsVar->currentItem == CONFIG_MANUAL_DESLOCAR_ZERO )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",394
+000005C6 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000005CC ECEE                    		MOV.L [R14], R14
+000005CE 59EE24                  		MOVU.B 24H[R14], R14
+000005D1 613E                    		CMP #03H, R14
+000005D3 3Brrrr               W  		BNE L194
+000005D6                         L158:	; bb41
+                                 ;     395 			{
+                                 ;     396 				uint32_t *Flag = configsVar->value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",396
+000005D6 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000005DC ECE1                    		MOV.L [R14], R1
+000005DE E5100103                		MOV.L 04H[R1], 0CH[R0]
+000005E2                         L159:	; bb41.split
+                                 ;     397 				if(*Flag == 1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",397
+000005E2 A889                    		MOV.L 0CH[R0], R1
+000005E4 EC1E                    		MOV.L [R1], R14
+000005E6 611E                    		CMP #01H, R14
+000005E8 3Brrrr               W  		BNE L194
+000005EB                         L160:	; bb47
+                                 ;     398 				{
+                                 ;     399 					stateBack = (ut_state)pContext->value[1];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",399
+000005EB A981                    		MOV.L 18H[R0], R1
+000005ED B099                    		MOVU.B 03H[R1], R1
+000005EF A081                    		MOV.L R1, 08H[R0]
+000005F1 38rrrr               W  		BRA L194
+000005F4                         L161:	; bb68
+                                 ;     400 				}
+                                 ;     401 			}
+                                 ;     402 			break;
+                                 ;     403 		case STATE_CONFIG_AUTO_MODE:
+                                 ;     404 			switch(configsVar->currentItem)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",404
+000005F4 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000005FA ECEE                    		MOV.L [R14], R14
+000005FC 59EE24                  		MOVU.B 24H[R14], R14
+000005FF 610E                    		CMP #00H, R14
+00000601 20rr                    		BEQ L166
+00000603                         L162:	; bb68
+00000603 611E                    		CMP #01H, R14
+00000605 20rr                    		BEQ L169
+00000607                         L163:	; bb68
+00000607 612E                    		CMP #02H, R14
+00000609 10                   S  		BEQ L166
+0000060A                         L164:	; bb68
+0000060A 613E                    		CMP #03H, R14
+0000060C 20rr                    		BEQ L173
+0000060E                         L165:	; bb68
+0000060E 614E                    		CMP #04H, R14
+00000610 3Brrrr               W  		BNE L194
+00000613                         L166:	; bb74
+                                 ;     405 			{
+                                 ;     406 				case CONFIG_AUTO_RODAR_PROG:
+                                 ;     407 				case CONFIG_AUTO_DESLOCAR_ZERO:
+                                 ;     408 				case CONFIG_AUTO_TESTAR_TAMANHO_PECA:
+                                 ;     409 					if(*Flag == 1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",409
+00000613 A809                    		MOV.L 04H[R0], R1
+00000615 EC1E                    		MOV.L [R1], R14
+00000617 611E                    		CMP #01H, R14
+00000619 3Brrrr               W  		BNE L194
+0000061C                         L167:	; bb75
+                                 ;     410 					{
+                                 ;     411 						stateBack = (ut_state)pContext->value[1];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",411
+0000061C A981                    		MOV.L 18H[R0], R1
+0000061E B099                    		MOVU.B 03H[R1], R1
+00000620 A081                    		MOV.L R1, 08H[R0]
+00000622                         L168:	; bb75.split
+                                 ;     412 						sim = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",412
+00000622 FBE2rrrrrrrr            		MOV.L #_sim, R14
+00000628 F8E400                  		MOV.B #00H, [R14]
+0000062B 38rrrr               W  		BRA L194
+0000062E                         L169:	; bb89
+                                 ;     413 					}
+                                 ;     414 					break;
+                                 ;     415 				case CONFIG_AUTO_MODO_SIM:
+                                 ;     416 					if(*Flag == 1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",416
+0000062E A809                    		MOV.L 04H[R0], R1
+00000630 EC1E                    		MOV.L [R1], R14
+00000632 611E                    		CMP #01H, R14
+00000634 21rr                    		BNE L172
+00000636                         L170:	; bb90
+                                 ;     417 					{
+                                 ;     418 						sim = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",418
+00000636 FBE2rrrrrrrr            		MOV.L #_sim, R14
+0000063C F8E401                  		MOV.B #01H, [R14]
+0000063F                         L171:	; bb90.split
+                                 ;     419 						stateBack = (ut_state)pContext->value[1];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",419
+0000063F A981                    		MOV.L 18H[R0], R1
+00000641 B099                    		MOVU.B 03H[R1], R1
+00000643 A081                    		MOV.L R1, 08H[R0]
+00000645 38rrrr               W  		BRA L194
+00000648                         L172:	; bb97
+                                 ;     420 					}
+                                 ;     421 					else
+                                 ;     422 					{
+                                 ;     423 						sim = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",423
+00000648 FBE2rrrrrrrr            		MOV.L #_sim, R14
+0000064E F8E400                  		MOV.B #00H, [R14]
+00000651 38rrrr               W  		BRA L194
+00000654                         L173:	; bb106
+                                 ;     424 					}
+                                 ;     425 					break;
+                                 ;     426 				case CONFIG_AUTO_SELECIONAR_LINHA:
+                                 ;     427 					do{
+                                 ;     428 						if(configsVar->type == UT_CONFIG_BOOL){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",428
+00000654 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+0000065A ECEE                    		MOV.L [R14], R14
+0000065C ECEE                    		MOV.L [R14], R14
+0000065E 611E                    		CMP #01H, R14
+00000660 21rr                    		BNE L183
+00000662                         L174:	; bb107
+                                 ;     429 							var_handlers[configsVar->type](configsVar);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",429
+00000662 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000668 ECE1                    		MOV.L [R14], R1
+0000066A EC1E                    		MOV.L [R1], R14
+0000066C FBF2rrrrrrrr            		MOV.L #__$var_handlers, R15
+00000672 FE6EFE                  		MOV.L [R14,R15], R14
+00000675 7F1E                    		JSR R14
+00000677                         L175:	; bb107.split
+                                 ;     430 							if (func_back == 0xFF)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",430
+00000677 FBE2rrrrrrrr            		MOV.L #_func_back, R14
+0000067D 58EE                    		MOVU.B [R14], R14
+0000067F 755EFF                  		CMP #0FFH, R14
+00000682 21rr                    		BNE L182
+00000684                         L176:	; bb115
+                                 ;     431 							{
+                                 ;     432 								configsVar->type = UT_CONFIG_INT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",432
+00000684 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+0000068A ECEE                    		MOV.L [R14], R14
+0000068C F8E600                  		MOV.L #00000000H, [R14]
+0000068F                         L177:	; bb115.split
+                                 ;     433 								var_handlers[configsVar->type](configsVar);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",433
+0000068F FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000695 ECE1                    		MOV.L [R14], R1
+00000697 EC1E                    		MOV.L [R1], R14
+00000699 FBF2rrrrrrrr            		MOV.L #__$var_handlers, R15
+0000069F FE6EFE                  		MOV.L [R14,R15], R14
+000006A2 7F1E                    		JSR R14
+000006A4                         L178:	; bb115.split5
+                                 ;     434 								func_back = 0xFF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",434
+000006A4 FBE2rrrrrrrr            		MOV.L #_func_back, R14
+000006AA F8E4FF                  		MOV.B #0FFH, [R14]
+000006AD                         L179:	; bb115.split6
+                                 ;     435 								if(configsVar->type == UT_CONFIG_INT)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",435
+000006AD FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000006B3 ECEE                    		MOV.L [R14], R14
+000006B5 ECEE                    		MOV.L [R14], R14
+000006B7 610E                    		CMP #00H, R14
+000006B9 21rr                    		BNE L182
+000006BB                         L180:	; bb125
+                                 ;     436 								{
+                                 ;     437 									ut_lcd_output_warning("NENHUM PONTO\nDE ENTRADA\nSELECIONADO\n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",437
+000006BB FB12rrrrrrrr            		MOV.L #_L21, R1
+000006C1 05rrrrrr             A  		BSR _ut_lcd_output_warning
+000006C5                         L181:	; bb125.split
+000006C5 FB1AD007                		MOV.L #000007D0H, R1
+                                 ;     438 									vTaskDelay(2000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",438
+000006C9 05rrrrrr             A  		BSR _vTaskDelay
+000006CD                         L182:	; bb138
+                                 ;     439 								}
+                                 ;     440 							}
+                                 ;     441 						linhaSelecionada(func_back);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",441
+000006CD FBE2rrrrrrrr            		MOV.L #_func_back, R14
+000006D3 58E1                    		MOVU.B [R14], R1
+000006D5 05rrrrrr             A  		BSR _linhaSelecionada
+000006D9 2Err                 B  		BRA L185
+000006DB                         L183:	; bb141
+                                 ;     442 						}
+                                 ;     443 						else
+                                 ;     444 						{
+                                 ;     445 							ut_lcd_output_warning("NENHUM PONTO\nDE ENTRADA\nSELECIONADO\n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",445
+000006DB FB12rrrrrrrr            		MOV.L #_L21, R1
+000006E1 05rrrrrr             A  		BSR _ut_lcd_output_warning
+000006E5                         L184:	; bb141.split
+000006E5 FB1AD007                		MOV.L #000007D0H, R1
+                                 ;     446 							vTaskDelay(2000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",446
+000006E9 05rrrrrr             A  		BSR _vTaskDelay
+000006ED                         L185:	; bb148
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",427
+000006ED FBE2rrrrrrrr            		MOV.L #_func_back, R14
+000006F3 58EE                    		MOVU.B [R14], R14
+000006F5 755EFF                  		CMP #0FFH, R14
+000006F8 21rr                    		BNE L188
+000006FA                         L186:	; bb153
+000006FA FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000700 ECEE                    		MOV.L [R14], R14
+00000702 ECEE                    		MOV.L [R14], R14
+00000704 611E                    		CMP #01H, R14
+00000706 18                   S  		BNE L188
+00000707                         L187:	; bb159
+00000707 F80601                  		MOV.L #00000001H, [R0]
+0000070A 08                   S  		BRA L189
+0000070B                         L188:	; bb160
+0000070B F80600                  		MOV.L #00000000H, [R0]
+0000070E                         L189:	; bb161
+0000070E EC01                    		MOV.L [R0], R1
+00000710 6101                    		CMP #00H, R1
+00000712 3Brrrr               W  		BNE L173
+00000715                         L190:	; bb166
+                                 ;     447 						}
+                                 ;     448 					}while(func_back == 0xFF && configsVar->type == UT_CONFIG_BOOL);
+                                 ;     449 					func_back = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",449
+00000715 FBE2rrrrrrrr            		MOV.L #_func_back, R14
+0000071B F8E400                  		MOV.B #00H, [R14]
+0000071E 2Err                 B  		BRA L194
+00000720                         L191:	; bb168
+                                 ;     450 					break;
+                                 ;     451 				}
+                                 ;     452 			break;
+                                 ;     453 		case STATE_CONFIG_MAQUINA:
+                                 ;     454 			switch(configsVar->currentItem)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",454
+00000720 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000726 ECEE                    		MOV.L [R14], R14
+00000728 59EE24                  		MOVU.B 24H[R14], R14
+0000072B 612E                    		CMP #02H, R14
+0000072D 21rr                    		BNE L194
+0000072F                         L192:	; bb174
+                                 ;     455 			{
+                                 ;     456 			case CFG_MAQUINA_PARAMETROS:
+                                 ;     457 				if(*Flag == 1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",457
+0000072F A809                    		MOV.L 04H[R0], R1
+00000731 EC1E                    		MOV.L [R1], R14
+00000733 611E                    		CMP #01H, R14
+00000735 18                   S  		BNE L194
+00000736                         L193:	; bb175
+                                 ;     458 				{
+                                 ;     459 					stateBack = (ut_state)pContext->value[1];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",459
+00000736 A981                    		MOV.L 18H[R0], R1
+00000738 B099                    		MOVU.B 03H[R1], R1
+0000073A A081                    		MOV.L R1, 08H[R0]
+0000073C                         L194:	; bb190
+                                 ;     460 				}
+                                 ;     461 				break;
+                                 ;     462 			}
+                                 ;     463 		break;
+                                 ;     464 	}
+                                 ;     465 	/* Avoid null handler */
+                                 ;     466 	if(configsVar->func_var) { configsVar->func_var(configsVar); }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",466
+0000073C FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000742 ECE1                    		MOV.L [R14], R1
+00000744 AA91                    		MOV.L 28H[R1], R1
+00000746 6101                    		CMP #00H, R1
+00000748 20rr                    		BEQ L196
+0000074A                         L195:	; bb191
+0000074A FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000750 ECE1                    		MOV.L [R14], R1
+00000752 AA92                    		MOV.L 28H[R1], R2
+00000754 7F12                    		JSR R2
+00000756                         L196:	; bb203
+                                 ;     467 	switch(configsVar->currentState)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",467
+00000756 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+0000075C ECE1                    		MOV.L [R14], R1
+0000075E AA11                    		MOV.L 20H[R1], R1
+00000760 6181                    		CMP #08H, R1
+00000762 21rr                    		BNE L201
+00000764                         L197:	; bb207
+                                 ;     468 	{
+                                 ;     469 		case STATE_CONFIG_AUTO_MODE:
+                                 ;     470 			switch(configsVar->currentItem)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",470
+00000764 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+0000076A ECEE                    		MOV.L [R14], R14
+0000076C 59EE24                  		MOVU.B 24H[R14], R14
+0000076F 614E                    		CMP #04H, R14
+00000771 21rr                    		BNE L201
+00000773                         L198:	; bb212
+                                 ;     471 			{
+                                 ;     472 				case CONFIG_AUTO_TESTAR_TAMANHO_PECA:
+                                 ;     473 					bool *retFile = configsVar->value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",473
+00000773 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+00000779 ECE1                    		MOV.L [R14], R1
+0000077B E5100104                		MOV.L 04H[R1], 10H[R0]
+0000077F                         L199:	; bb212.split
+                                 ;     474 					if (*retFile == false)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",474
+0000077F A901                    		MOV.L 10H[R0], R1
+00000781 581E                    		MOVU.B [R1], R14
+00000783 610E                    		CMP #00H, R14
+00000785 18                   S  		BNE L201
+00000786                         L200:	; bb217
+                                 ;     475 					{
+                                 ;     476 						stateBack = (ut_state)pContext->value[0];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",476
+00000786 A981                    		MOV.L 18H[R0], R1
+00000788 B091                    		MOVU.B 02H[R1], R1
+0000078A A081                    		MOV.L R1, 08H[R0]
+0000078C                         L201:	; bb232
+                                 ;     477 					}
+                                 ;     478 				break;
+                                 ;     479 			}
+                                 ;     480 		break;
+                                 ;     481 	}
+                                 ;     482 
+                                 ;     483 	return stateBack;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",483
+0000078C A881                    		MOV.L 08H[R0], R1
+0000078E A109                    		MOV.L R1, 14H[R0]
+00000790                         L202:	; bb232.split
+                                 ;     484 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",484
+00000790 6707                    		RTSD #1CH
+00000792                         __$vTimerUpdateCallback:
+                                 		.STACK	__$vTimerUpdateCallback=68
+                                 ;     485 
+                                 ;     486 static void vTimerUpdateCallback( TimerHandle_t pxTimer )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",486
+00000792 7100D4                  		ADD #0FFFFFFD4H, R0
+00000795 A281                    		MOV.L R1, 28H[R0]
+                                 ;     487 {
+                                 ;     488 	char szText[MAX_COLUMN];
+                                 ;     489 	long lArrayIndex;
+                                 ;     490 	uint8_t blinkpos = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",490
+00000797 3C8B01                  		MOV.B #01H, 1BH[R0]
+0000079A                         L204:	; entry.split
+                                 ;     491 	float *value = configsVar->value;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",491
+0000079A FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000007A0 ECE1                    		MOV.L [R14], R1
+000007A2 E5100107                		MOV.L 04H[R1], 1CH[R0]
+000007A6                         L205:	; entry.split1
+                                 ;     492 	uint16_t decCount = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",492
+000007A6 3D8100                  		MOV.W #0000H, 22H[R0]
+000007A9                         L206:	; entry.split2
+                                 ;     493 	uint16_t decimalCount = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",493
+000007A9 3D8200                  		MOV.W #0000H, 24H[R0]
+000007AC                         L207:	; entry.split3
+                                 ;     494 	uint16_t digits = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",494
+000007AC 3D8300                  		MOV.W #0000H, 26H[R0]
+000007AF                         L208:	; entry.split4
+                                 ;     495 
+                                 ;     496 	/* Optionally do something if the pxTimer parameter is NULL. */
+                                 ;     497 	configASSERT( pxTimer );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",497
+000007AF AA81                    		MOV.L 28H[R0], R1
+000007B1 6101                    		CMP #00H, R1
+000007B3 18                   S  		BNE L210
+000007B4                         L209:	; bb12
+000007B4 05rrrrrr             A  		BSR _vAssertCalled
+000007B8                         L210:	; bb16
+                                 ;     498 	decCount = get_dec_digits(configsVar->valueMax);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",498
+000007B8 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000007BE ECE1                    		MOV.L [R14], R1
+000007C0 A899                    		MOV.L 0CH[R1], R1
+000007C2 05rrrrrr             A  		BSR _get_dec_digits
+000007C6 9409                    		MOV.W R1, 22H[R0]
+000007C8                         L211:	; bb16.split
+                                 ;     499 	decimalCount = get_decimal_digits(configsVar->step);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",499
+000007C8 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000007CE ECE1                    		MOV.L [R14], R1
+000007D0 A911                    		MOV.L 10H[R1], R1
+000007D2 05rrrrrr             A  		BSR _get_decimal_digits
+000007D6 9481                    		MOV.W R1, 24H[R0]
+000007D8                         L212:	; bb16.split5
+                                 ;     500 	if(decimalCount > 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",500
+000007D8 BC81                    		MOVU.W 24H[R0], R1
+000007DA 6101                    		CMP #00H, R1
+000007DC 9C09                    		MOV.W 22H[R0], R1
+000007DE 2Brr                    		BLE L214
+000007E0                         L213:	; bb28
+                                 ;     501 		digits = decCount + decimalCount + 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",501
+000007E0 5F11                    		MOVU.W R1, R1
+000007E2 06C90112                		ADD 24H[R0].UW, R1
+000007E6 6211                    		ADD #01H, R1
+000007E8 9489                    		MOV.W R1, 26H[R0]
+000007EA 08                   S  		BRA L215
+000007EB                         L214:	; bb36
+                                 ;     502 	else
+                                 ;     503 		digits = decCount;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",503
+000007EB 9489                    		MOV.W R1, 26H[R0]
+000007ED                         L215:	; bb43
+                                 ;     504 
+                                 ;     505 	sprintf(szText, "%0*.*f %s", digits , decimalCount,*value,configsVar->unit);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",505
+000007ED A989                    		MOV.L 1CH[R0], R1
+000007EF EC11                    		MOV.L [R1], R1
+000007F1 FBE2rrrrrrrr            		MOV.L #_configsVar, R14
+000007F7 ECEE                    		MOV.L [R14], R14
+000007F9 BC82                    		MOVU.W 24H[R0], R2
+000007FB BC8B                    		MOVU.W 26H[R0], R3
+000007FD 7100EC                  		ADD #0FFFFFFECH, R0
+00000800 E5E00604                		MOV.L 18H[R14], 10H[R0]
+00000804 A089                    		MOV.L R1, 0CH[R0]
+00000806 A082                    		MOV.L R2, 08H[R0]
+00000808 A00B                    		MOV.L R3, 04H[R0]
+0000080A FBE2rrrrrrrr            		MOV.L #_L18, R14
+00000810 E30E                    		MOV.L R14, [R0]
+00000812 71011B                  		ADD #1BH, R0, R1
+00000815 05rrrrrr             A  		BSR _sprintf
+00000819 710014                  		ADD #14H, R0
+0000081C                         L216:	; bb43.split
+                                 ;     506 	ut_lcd_output_int_var(configsVar->name,szText, count + 1,blink);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",506
+0000081C FBE2rrrrrrrr            		MOV.L #__$blink, R14
+00000822 58E4                    		MOVU.B [R14], R4
+00000824 FBE2rrrrrrrr            		MOV.L #__$count, R14
+0000082A 58EE                    		MOVU.B [R14], R14
+0000082C FBF2rrrrrrrr            		MOV.L #_configsVar, R15
+00000832 ECF1                    		MOV.L [R15], R1
+00000834 A999                    		MOV.L 1CH[R1], R1
+00000836 621E                    		ADD #01H, R14
+00000838 5BE3                    		MOVU.B R14, R3
+0000083A 710207                  		ADD #07H, R0, R2
+0000083D 05rrrrrr             A  		BSR _ut_lcd_output_int_var
+00000841                         L217:	; bb43.split6
+                                 ;     507 	blink = !blink;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",507
+00000841 FBE2rrrrrrrr            		MOV.L #__$blink, R14
+00000847 58EE                    		MOVU.B [R14], R14
+00000849 610E                    		CMP #00H, R14
+0000084B 10                   S  		BEQ L219
+0000084C                         L218:	; bb68
+0000084C F80600                  		MOV.L #00000000H, [R0]
+0000084F 08                   S  		BRA L220
+00000850                         L219:	; bb69
+00000850 F80601                  		MOV.L #00000001H, [R0]
+00000853                         L220:	; bb70
+00000853 EC01                    		MOV.L [R0], R1
+00000855 6101                    		CMP #00H, R1
+00000857 FBE2rrrrrrrr            		MOV.L #__$blink, R14
+0000085D FCD0E1                  		SCNE.B [R14]
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_config_var.c",508
+00000860 670B                    		RTSD #2CH
+                                 ;     508 }
+                                 		.SECTION	L,ROMDATA,ALIGN=4
+00000000                         _L10:
+00000000 4E                      		.byte	"N"
+00000001 C383                    		.byte	0C3H,83H
+00000003 4F                      		.byte	"O"
+00000004 00                      		.byte	00H
+00000005                         _L11:
+00000005 53494D                  		.byte	"SIM"
+00000008 00                      		.byte	00H
+00000009                         _L12:
+00000009 504C4153                		.byte	"PLASMA"
+         4D41                    
+0000000F 00                      		.byte	00H
+00000010                         _L13:
+00000010 4F584943                		.byte	"OXICORTE"
+         4F525445                
+00000018 00                      		.byte	00H
+00000019                         _L14:
+00000019 53494D55                		.byte	"SIMULA"
+         4C41                    
+0000001F C7C3                    		.byte	0C7H,0C3H
+00000021 4F                      		.byte	"O"
+00000022 00                      		.byte	00H
+00000023                         _L15:
+00000023 44495350                		.byte	"DISPARAR E CORTAR"
+         41524152                
+         20452043                
+         4F525441                
+         52                      
+00000034 00                      		.byte	00H
+00000035                         _L16:
+00000035 44455341                		.byte	"DESABILITADO"
+         42494C49                
+         5441444F                
+00000041 00                      		.byte	00H
+00000042                         _L17:
+00000042 48414249                		.byte	"HABILITADO"
+         4C495441                
+         444F                    
+0000004C 00                      		.byte	00H
+0000004D                         _L18:
+0000004D 25302A2E                		.byte	"%0*.*f %s"
+         2A662025                
+         73                      
+00000056 00                      		.byte	00H
+00000057                         _L19:
+00000057 54696D65                		.byte	"Timer Update"
+         72205570                
+         64617465                
+00000063 00                      		.byte	00H
+00000064                         _L20:
+00000064 20202020                		.byte	"     VALOR     "
+         2056414C                
+         4F522020                
+         202020                  
+00000073 0A                      		.byte	0AH
+00000074 20202020                		.byte	"     SALVO     "
+         2053414C                
+         564F2020                
+         202020                  
+00000083 0A00                    		.byte	0AH,00H
+00000085                         _L21:
+00000085 4E454E48                		.byte	"NENHUM PONTO"
+         554D2050                
+         4F4E544F                
+00000091 0A                      		.byte	0AH
+00000092 44452045                		.byte	"DE ENTRADA"
+         4E545241                
+         4441                    
+0000009C 0A                      		.byte	0AH
+0000009D 53454C45                		.byte	"SELECIONADO"
+         43494F4E                
+         41444F                  
+000000A8 0A00                    		.byte	0AH,00H
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         __$boolOptions:
+00000000 rrrrrrrr                		.lword	_L10
+00000004 rrrrrrrr                		.lword	_L11
+00000008                         __$boolJogMaq:
+00000008 rrrrrrrr                		.lword	_L12
+0000000C rrrrrrrr                		.lword	_L13
+00000010                         __$boolSim:
+00000010 rrrrrrrr                		.lword	_L14
+00000014 rrrrrrrr                		.lword	_L15
+00000018                         __$boolEn:
+00000018 rrrrrrrr                		.lword	_L16
+0000001C rrrrrrrr                		.lword	_L17
+00000020                         __$var_handlers:
+00000020 rrrrrrrr                		.lword	_config_int
+00000024 rrrrrrrr                		.lword	_config_bool
+00000028 rrrrrrrr                		.lword	_config_null
+                                 		.SECTION	D_2,ROMDATA,ALIGN=2
+00000000                         __$mult:
+00000000 0100                    		.word	0001H
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$count:
+00000000 00                      		.byte	00H
+00000001                         _func_back:
+00000001 00                      		.byte	00H
+00000002                         __$blink:
+00000002 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _configsVar:
+00000000(00000004H)              		.blkl	1
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01723   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000002146(00000862H)  P
+ROMDATA  0000000170(000000AAH)  L
+ROMDATA  0000000044(0000002CH)  D
+ROMDATA  0000000002(00000002H)  D_2
+ROMDATA  0000000003(00000003H)  D_1
+DATA     0000000004(00000004H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\ut_state_config_var.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\ut_state_config_var.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\src\states\ut_state_config_var.obj

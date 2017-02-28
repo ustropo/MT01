@@ -1,0 +1,1337 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:54:32 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:54:32
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_s12ad_rx63x.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_s12ad_rx63x.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;r_s12ad_rx63x.c
+                                 
+                                 		.glb	_g_dcb
+                                 		.glb	_dreg_ptrs
+                                 		.glb	_adc_open
+                                 		.glb	_R_BSP_HardwareLock
+                                 		.glb	_R_BSP_RegisterProtectDisable
+                                 		.glb	_R_BSP_RegisterProtectEnable
+                                 		.glb	_R_BSP_HardwareUnlock
+                                 		.glb	_adc_control
+                                 		.glb	_adc_enable_chans_63x
+                                 		.glb	_adc_enable_s12adi0
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _adc_open:
+                                 		.STACK	_adc_open=28
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_s12ad_rx63x.c
+                                 ;      21 * Description  : ROM tables and support code for RX63N, RX631 and RX630 devices.
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description           
+                                 ;      25 *           22.02.2014 1.00    Initial Release.
+                                 ;      26 *           05.06.2014 1.30    Fixed channel mask bug in adc_enable_chans_63x()
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 /***********************************************************************************************************************
+                                 ;      30 Includes   <System Includes> , "Project Includes"
+                                 ;      31 ***********************************************************************************************************************/
+                                 ;      32 /* Includes board and MCU related header files. */
+                                 ;      33 #include "platform.h"
+                                 ;      34 #ifdef BSP_MCU_RX63_ALL
+                                 ;      35 #include "r_s12ad_rx_private.h"
+                                 ;      36 #include "r_s12ad_rx_config.h"
+                                 ;      37 /* Public interface header file for this package. */
+                                 ;      38 #include "r_s12ad_rx63x_if.h"
+                                 ;      39 
+                                 ;      40 /***********************************************************************************************************************
+                                 ;      41 Macro definitions
+                                 ;      42 ***********************************************************************************************************************/
+                                 ;      43 
+                                 ;      44 /***********************************************************************************************************************
+                                 ;      45 Typedef definitions
+                                 ;      46 ***********************************************************************************************************************/
+                                 ;      47  
+                                 ;      48 /***********************************************************************************************************************
+                                 ;      49 Private global variables and functions
+                                 ;      50 ***********************************************************************************************************************/
+                                 ;      51 extern adc_ctrl_t g_dcb;
+                                 ;      52 
+                                 ;      53 adc_err_t adc_enable_chans_63x(adc_ch_cfg_t *p_config);
+                                 ;      54 extern void adc_enable_s12adi0(void);
+                                 ;      55 
+                                 ;      56 
+                                 ;      57 /* In ROM. A/D Data Register pointers */
+                                 ;      58 
+                                 ;      59 volatile __evenaccess uint16_t * const  dreg_ptrs[ADC_REG_MAX] =
+                                 ;      60                       { &S12AD.ADDR0,       // channel 0
+                                 ;      61                         &S12AD.ADDR1,       // channel 1
+                                 ;      62                         &S12AD.ADDR2,       // channel 2… 
+                                 ;      63                         &S12AD.ADDR3,
+                                 ;      64                         &S12AD.ADDR4,
+                                 ;      65                         &S12AD.ADDR5,
+                                 ;      66                         &S12AD.ADDR6,
+                                 ;      67                         &S12AD.ADDR7,
+                                 ;      68                         &S12AD.ADDR8,
+                                 ;      69                         &S12AD.ADDR9,
+                                 ;      70                         &S12AD.ADDR10,
+                                 ;      71                         &S12AD.ADDR11,
+                                 ;      72                         &S12AD.ADDR12,
+                                 ;      73                         &S12AD.ADDR13,
+                                 ;      74                         &S12AD.ADDR14,
+                                 ;      75                         &S12AD.ADDR15,
+                                 ;      76                         &S12AD.ADDR16,
+                                 ;      77                         &S12AD.ADDR17,
+                                 ;      78                         &S12AD.ADDR18,
+                                 ;      79                         &S12AD.ADDR19,
+                                 ;      80                         &S12AD.ADDR20,
+                                 ;      81                         &S12AD.ADTSDR,    // temperature sensor
+                                 ;      82                         &S12AD.ADOCDR,    // voltage sensor
+                                 ;      83                       };
+                                 ;      84 
+                                 ;      85 
+                                 ;      86 /******************************************************************************
+                                 ;      87 * Function Name: adc_open
+                                 ;      88 * Description  : This function applies power to the A/D peripheral, sets the
+                                 ;      89 *                operational mode, trigger sources, interrupt priority, and
+                                 ;      90 *                configurations common to all channels and sensors. If interrupt
+                                 ;      91 *                priority is non-zero, the function takes a callback function
+                                 ;      92 *                pointer for notifying the user at interrupt level whenever a
+                                 ;      93 *                scan has completed.
+                                 ;      94 *
+                                 ;      95 * Arguments    : mode-
+                                 ;      96 *                    Operational mode (see enumeration below)
+                                 ;      97 *                p_cfg-
+                                 ;      98 *                    Pointer to configuration structure (see below)
+                                 ;      99 *                p_callback-
+                                 ;     100 *                    Optional pointer to function called from interrupt when
+                                 ;     101 *                    a scan completes
+                                 ;     102 * Return Value : ADC_SUCCESS-
+                                 ;     103 *                    Successful
+                                 ;     104 *                ADC_ERR_AD_LOCKED-
+                                 ;     105 *                    Open() call is in progress elsewhere
+                                 ;     106 *                ADC_ERR_AD_NOT_CLOSED-
+                                 ;     107 *                    Peripheral is still running in another mode; Perform
+                                 ;     108 *                    R_ADC_Close() first
+                                 ;     109 *                ADC_ERR_INVALID_ARG-
+                                 ;     110 *                    mode or element of p_cfg structure has invalid value.
+                                 ;     111 *                ADC_ERR_ILLEGAL_ARG-
+                                 ;     112 *                    an argument is illegal based upon mode
+                                 ;     113 *                ADC_ERR_MISSING_PTR-
+                                 ;     114 *                    p_cfg pointer is FIT_NO_PTR/NULL
+                                 ;     115 *******************************************************************************/
+                                 ;     116 adc_err_t adc_open(adc_mode_t const       mode,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",116
+00000000 7100E8                  		ADD #0FFFFFFE8H, R0
+00000003 A109                    		MOV.L R1, 14H[R0]
+00000005 A102                    		MOV.L R2, 10H[R0]
+00000007 A08B                    		MOV.L R3, 0CH[R0]
+                                 ;     117                    adc_cfg_t * const      p_cfg,
+                                 ;     118                    void         (* const  p_callback)(void *p_args))
+                                 ;     119 {
+                                 ;     120 
+                                 ;     121 #if ADC_CFG_PARAM_CHECKING_ENABLE == 1
+                                 ;     122     if ((p_cfg == NULL) || (p_cfg == FIT_NO_PTR))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",122
+00000009 A901                    		MOV.L 10H[R0], R1
+0000000B 6101                    		CMP #00H, R1
+0000000D 20rr                    		BEQ L13
+0000000F 08                   S  		BRA L12
+00000010                         L11:	; bb4
+                                 ;     123     {
+                                 ;     124         return ADC_ERR_MISSING_PTR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",124
+00000010 3E0103                  		MOV.L #00000003H, 04H[R0]
+00000013 38rrrr               W  		BRA L94
+00000016                         L12:	; bb9
+00000016 A901                    		MOV.L 10H[R0], R1
+00000018 740100000010            		CMP #10000000H, R1
+0000001E 18                   S  		BNE L14
+0000001F                         L13:	; bb14
+0000001F F80601                  		MOV.L #00000001H, [R0]
+00000022 08                   S  		BRA L15
+00000023                         L14:	; bb15
+00000023 F80600                  		MOV.L #00000000H, [R0]
+00000026                         L15:	; bb16
+00000026 EC01                    		MOV.L [R0], R1
+00000028 6101                    		CMP #00H, R1
+0000002A 21rr                    		BNE L11
+0000002C                         L16:	; bb21
+                                 ;     125     }
+                                 ;     126 
+                                 ;     127     /* Check for valid argument values */
+                                 ;     128     if ((mode >= ADC_MODE_MAX)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",128
+0000002C A909                    		MOV.L 14H[R0], R1
+0000002E 6151                    		CMP #05H, R1
+00000030 2Arr                    		BGT L23
+00000032 08                   S  		BRA L18
+00000033                         L17:	; bb22
+                                 ;     129      || ((p_cfg->trigger >= ADC_TRIG_HW_MAX) && (p_cfg->trigger != ADC_TRIG_SOFTWARE))
+                                 ;     130      || (p_cfg->priority > BSP_MCU_IPL_MAX)
+                                 ;     131      || (p_cfg->add_cnt >= ADC_ADD_MAX)
+                                 ;     132      || (p_cfg->conv_speed >= ADC_CONVERT_SPEED_MAX)
+                                 ;     133      || ((p_cfg->clearing != ADC_CLEAR_AFTER_READ_OFF) && (p_cfg->clearing != ADC_CLEAR_AFTER_READ_ON)))
+                                 ;     134 
+                                 ;     135     {
+                                 ;     136         return ADC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",136
+00000033 3E0104                  		MOV.L #00000004H, 04H[R0]
+00000036 38rrrr               W  		BRA L94
+00000039                         L18:	; bb27
+00000039 A901                    		MOV.L 10H[R0], R1
+0000003B A911                    		MOV.L 10H[R1], R1
+0000003D 61B1                    		CMP #0BH, R1
+0000003F 29rr                    		BLT L21
+00000041                         L19:	; bb33
+00000041 A901                    		MOV.L 10H[R0], R1
+00000043 A911                    		MOV.L 10H[R1], R1
+00000045 755110                  		CMP #10H, R1
+00000048 10                   S  		BEQ L21
+00000049                         L20:	; bb39
+00000049 F80601                  		MOV.L #00000001H, [R0]
+0000004C 08                   S  		BRA L22
+0000004D                         L21:	; bb40
+0000004D F80600                  		MOV.L #00000000H, [R0]
+00000050                         L22:	; bb41
+00000050 EC01                    		MOV.L [R0], R1
+00000052 6101                    		CMP #00H, R1
+00000054 10                   S  		BEQ L24
+00000055                         L23:	; bb45
+00000055 F80601                  		MOV.L #00000001H, [R0]
+00000058 08                   S  		BRA L25
+00000059                         L24:	; bb46
+00000059 F80600                  		MOV.L #00000000H, [R0]
+0000005C                         L25:	; bb47
+0000005C EC01                    		MOV.L [R0], R1
+0000005E 6101                    		CMP #00H, R1
+00000060 18                   S  		BNE L27
+00000061                         L26:	; bb51
+00000061 A901                    		MOV.L 10H[R0], R1
+00000063 B511                    		MOVU.B 14H[R1], R1
+00000065 755110                  		CMP #10H, R1
+00000068 29rr                    		BLT L28
+0000006A                         L27:	; bb58
+0000006A F80601                  		MOV.L #00000001H, [R0]
+0000006D 08                   S  		BRA L29
+0000006E                         L28:	; bb59
+0000006E F80600                  		MOV.L #00000000H, [R0]
+00000071                         L29:	; bb60
+00000071 EC01                    		MOV.L [R0], R1
+00000073 6101                    		CMP #00H, R1
+00000075 18                   S  		BNE L31
+00000076                         L30:	; bb64
+00000076 A901                    		MOV.L 10H[R0], R1
+00000078 EC1E                    		MOV.L [R1], R14
+0000007A 614E                    		CMP #04H, R14
+0000007C 29rr                    		BLT L32
+0000007E                         L31:	; bb70
+0000007E F80601                  		MOV.L #00000001H, [R0]
+00000081 08                   S  		BRA L33
+00000082                         L32:	; bb71
+00000082 F80600                  		MOV.L #00000000H, [R0]
+00000085                         L33:	; bb72
+00000085 EC01                    		MOV.L [R0], R1
+00000087 6101                    		CMP #00H, R1
+00000089 18                   S  		BNE L35
+0000008A                         L34:	; bb76
+0000008A A901                    		MOV.L 10H[R0], R1
+0000008C A899                    		MOV.L 0CH[R1], R1
+0000008E 6141                    		CMP #04H, R1
+00000090 29rr                    		BLT L36
+00000092                         L35:	; bb82
+00000092 F80601                  		MOV.L #00000001H, [R0]
+00000095 08                   S  		BRA L37
+00000096                         L36:	; bb83
+00000096 F80600                  		MOV.L #00000000H, [R0]
+00000099                         L37:	; bb84
+00000099 EC01                    		MOV.L [R0], R1
+0000009B 6101                    		CMP #00H, R1
+0000009D 21rr                    		BNE L43
+0000009F                         L38:	; bb88
+0000009F A901                    		MOV.L 10H[R0], R1
+000000A1 A891                    		MOV.L 08H[R1], R1
+000000A3 6101                    		CMP #00H, R1
+000000A5 20rr                    		BEQ L41
+000000A7                         L39:	; bb94
+000000A7 A901                    		MOV.L 10H[R0], R1
+000000A9 A891                    		MOV.L 08H[R1], R1
+000000AB 755120                  		CMP #20H, R1
+000000AE 10                   S  		BEQ L41
+000000AF                         L40:	; bb100
+000000AF F80601                  		MOV.L #00000001H, [R0]
+000000B2 08                   S  		BRA L42
+000000B3                         L41:	; bb101
+000000B3 F80600                  		MOV.L #00000000H, [R0]
+000000B6                         L42:	; bb102
+000000B6 EC01                    		MOV.L [R0], R1
+000000B8 6101                    		CMP #00H, R1
+000000BA 10                   S  		BEQ L44
+000000BB                         L43:	; bb106
+000000BB F80601                  		MOV.L #00000001H, [R0]
+000000BE 08                   S  		BRA L45
+000000BF                         L44:	; bb107
+000000BF F80600                  		MOV.L #00000000H, [R0]
+000000C2                         L45:	; bb108
+000000C2 EC01                    		MOV.L [R0], R1
+000000C4 6101                    		CMP #00H, R1
+000000C6 3Brrrr               W  		BNE L17
+000000C9                         L46:	; bb114
+                                 ;     137     }
+                                 ;     138 
+                                 ;     139     /* If interrupt driven, must have callback function */
+                                 ;     140     if ((p_cfg->priority != 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",140
+000000C9 A901                    		MOV.L 10H[R0], R1
+000000CB B511                    		MOVU.B 14H[R1], R1
+000000CD 6101                    		CMP #00H, R1
+000000CF 18                   S  		BNE L48
+000000D0 2Err                 B  		BRA L54
+000000D2                         L47:	; bb115
+                                 ;     141      && ((p_callback == NULL) || (p_callback == FIT_NO_FUNC)))
+                                 ;     142     {
+                                 ;     143         return ADC_ERR_ILLEGAL_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",143
+000000D2 3E0105                  		MOV.L #00000005H, 04H[R0]
+000000D5 38rrrr               W  		BRA L94
+000000D8                         L48:	; bb123
+000000D8 A889                    		MOV.L 0CH[R0], R1
+000000DA 6101                    		CMP #00H, R1
+000000DC 10                   S  		BEQ L50
+000000DD                         L49:	; bb127
+000000DD A889                    		MOV.L 0CH[R0], R1
+000000DF 740100000010            		CMP #10000000H, R1
+000000E5 18                   S  		BNE L51
+000000E6                         L50:	; bb131
+000000E6 F80601                  		MOV.L #00000001H, [R0]
+000000E9 08                   S  		BRA L52
+000000EA                         L51:	; bb132
+000000EA F80600                  		MOV.L #00000000H, [R0]
+000000ED                         L52:	; bb133
+000000ED EC01                    		MOV.L [R0], R1
+000000EF 6101                    		CMP #00H, R1
+000000F1 10                   S  		BEQ L54
+000000F2                         L53:	; bb137
+000000F2 F80601                  		MOV.L #00000001H, [R0]
+000000F5 08                   S  		BRA L55
+000000F6                         L54:	; bb138
+000000F6 F80600                  		MOV.L #00000000H, [R0]
+000000F9                         L55:	; bb139
+000000F9 EC01                    		MOV.L [R0], R1
+000000FB 6101                    		CMP #00H, R1
+000000FD 21rr                    		BNE L47
+000000FF                         L56:	; bb145
+                                 ;     144     }
+                                 ;     145 
+                                 ;     146     if (p_cfg->add_cnt == ADC_ADD_OFF)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",146
+000000FF A901                    		MOV.L 10H[R0], R1
+00000101 EC1E                    		MOV.L [R1], R14
+00000103 610E                    		CMP #00H, R14
+00000105 21rr                    		BNE L63
+00000107                         L57:	; bb147
+                                 ;     147     {
+                                 ;     148         /* Check alignment values only if addition is off */
+                                 ;     149         if ((p_cfg->alignment != ADC_ALIGN_LEFT) && (p_cfg->alignment != ADC_ALIGN_RIGHT))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",149
+00000107 A901                    		MOV.L 10H[R0], R1
+00000109 A819                    		MOV.L 04H[R1], R1
+0000010B 7701008000              		CMP #8000H, R1
+00000110 18                   S  		BNE L59
+00000111 2Err                 B  		BRA L61
+00000113                         L58:	; bb148
+                                 ;     150         {
+                                 ;     151             return ADC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",151
+00000113 3E0104                  		MOV.L #00000004H, 04H[R0]
+00000116 38rrrr               W  		BRA L94
+00000119                         L59:	; bb155
+00000119 A901                    		MOV.L 10H[R0], R1
+0000011B A819                    		MOV.L 04H[R1], R1
+0000011D 6101                    		CMP #00H, R1
+0000011F 10                   S  		BEQ L61
+00000120                         L60:	; bb161
+00000120 F80601                  		MOV.L #00000001H, [R0]
+00000123 08                   S  		BRA L62
+00000124                         L61:	; bb162
+00000124 F80600                  		MOV.L #00000000H, [R0]
+00000127                         L62:	; bb163
+00000127 EC01                    		MOV.L [R0], R1
+00000129 6101                    		CMP #00H, R1
+0000012B 21rr                    		BNE L58
+0000012D                         L63:	; bb176
+                                 ;     152         }
+                                 ;     153     }
+                                 ;     154 #endif
+                                 ;     155 
+                                 ;     156     if (g_dcb.opened == true)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",156
+0000012D FB12rrrrrrrr            		MOV.L #_g_dcb, R1
+00000133 B111                    		MOVU.B 04H[R1], R1
+00000135 6111                    		CMP #01H, R1
+00000137 18                   S  		BNE L65
+00000138                         L64:	; bb177
+                                 ;     157     {
+                                 ;     158         return ADC_ERR_AD_NOT_CLOSED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",158
+00000138 3E0102                  		MOV.L #00000002H, 04H[R0]
+0000013B 38rrrr               W  		BRA L94
+0000013E                         L65:	; bb185
+0000013E 75413F                  		MOV.L #0000003FH, R1
+                                 ;     159     }
+                                 ;     160     if (R_BSP_HardwareLock(BSP_LOCK_S12AD) == false)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",160
+00000141 05rrrrrr             A  		BSR _R_BSP_HardwareLock
+00000145 6101                    		CMP #00H, R1
+00000147 18                   S  		BNE L67
+00000148                         L66:	; bb186
+                                 ;     161     {
+                                 ;     162         return ADC_ERR_AD_LOCKED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",162
+00000148 3E0101                  		MOV.L #00000001H, 04H[R0]
+0000014B 38rrrr               W  		BRA L94
+0000014E                         L67:	; bb193
+0000014E 6611                    		MOV.L #00000001H, R1
+                                 ;     163     }
+                                 ;     164 
+                                 ;     165 
+                                 ;     166     /* APPLY POWER TO PERIPHERAL */
+                                 ;     167 
+                                 ;     168     R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",168
+00000150 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+00000154                         L68:	; bb193.split
+                                 ;     169     MSTP(S12AD) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",169
+00000154 FBEE100008              		MOV.L #00080010H, R14
+00000159 ECEF                    		MOV.L [R14], R15
+0000015B 7B1F                    		BCLR #11H, R15
+0000015D E3EF                    		MOV.L R15, [R14]
+0000015F                         L69:	; bb193.split1
+                                 ;     170     if (mode == ADC_MODE_SS_TEMPERATURE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",170
+0000015F A909                    		MOV.L 14H[R0], R1
+00000161 6101                    		CMP #00H, R1
+00000163 21rr                    		BNE L71
+00000165                         L70:	; bb198
+                                 ;     171     {
+                                 ;     172         MSTP(TEMPS) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",172
+00000165 FB1E100008              		MOV.L #00080010H, R1
+0000016A A81A                    		MOV.L 04H[R1], R2
+0000016C 7A82                    		BCLR #08H, R2
+0000016E A01A                    		MOV.L R2, 04H[R1]
+00000170                         L71:	; bb206
+00000170 6611                    		MOV.L #00000001H, R1
+                                 ;     173     }
+                                 ;     174     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",174
+00000172 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+00000176                         L72:	; bb206.split
+                                 ;     175 
+                                 ;     176     S12AD.ADCSR.BYTE = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",176
+00000176 FBEE009008              		MOV.L #00089000H, R14
+0000017B F8E400                  		MOV.B #00H, [R14]
+0000017E                         L73:	; bb206.split2
+                                 ;     177     S12AD.ADEXICR.WORD = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",177
+0000017E FB1E009008              		MOV.L #00089000H, R1
+00000183 3D1900                  		MOV.W #0000H, 12H[R1]
+00000186                         L74:	; bb206.split3
+00000186 FBEE00C508              		MOV.L #0008C500H, R14
+                                 ;     178     TEMPS.TSCR.BYTE = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",178
+0000018B F8E400                  		MOV.B #00H, [R14]
+0000018E                         L75:	; bb206.split4
+                                 ;     179 
+                                 ;     180 
+                                 ;     181     /* SET MODE RELATED REGISTER FIELDS */
+                                 ;     182 
+                                 ;     183     g_dcb.mode = mode;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",183
+0000018E FBE2rrrrrrrr            		MOV.L #_g_dcb, R14
+00000194 E10E05                  		MOV.L 14H[R0], [R14]
+00000197                         L76:	; bb206.split5
+                                 ;     184 
+                                 ;     185     if ((mode == ADC_MODE_CONT_ONE_CH) || (mode == ADC_MODE_CONT_MULTI_CH))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",185
+00000197 A909                    		MOV.L 14H[R0], R1
+00000199 6141                    		CMP #04H, R1
+0000019B 20rr                    		BEQ L79
+0000019D 08                   S  		BRA L78
+0000019E                         L77:	; bb209
+                                 ;     186     {
+                                 ;     187         S12AD.ADCSR.BIT.ADCS = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",187
+0000019E FBEE009008              		MOV.L #00089000H, R14
+000001A3 F0E6                    		BSET #06H, [R14].B
+000001A5 2Err                 B  		BRA L82
+000001A7                         L78:	; bb216
+000001A7 A909                    		MOV.L 14H[R0], R1
+000001A9 6151                    		CMP #05H, R1
+000001AB 18                   S  		BNE L80
+000001AC                         L79:	; bb220
+000001AC F80601                  		MOV.L #00000001H, [R0]
+000001AF 08                   S  		BRA L81
+000001B0                         L80:	; bb221
+000001B0 F80600                  		MOV.L #00000000H, [R0]
+000001B3                         L81:	; bb222
+000001B3 EC01                    		MOV.L [R0], R1
+000001B5 6101                    		CMP #00H, R1
+000001B7 21rr                    		BNE L77
+000001B9                         L82:	; bb228
+                                 ;     188     }
+                                 ;     189     // other modes have ADCS=0
+                                 ;     190 
+                                 ;     191 
+                                 ;     192     /* SET TRIGGER AND INTERRUPT PRIORITY REGISTER FIELDS */
+                                 ;     193 
+                                 ;     194     if (p_cfg->trigger != ADC_TRIG_SOFTWARE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",194
+000001B9 A901                    		MOV.L 10H[R0], R1
+000001BB A911                    		MOV.L 10H[R1], R1
+000001BD 755110                  		CMP #10H, R1
+000001C0 20rr                    		BEQ L84
+000001C2                         L83:	; bb229
+                                 ;     195     {
+                                 ;     196         S12AD.ADSTRGR.BIT.ADSTRS = p_cfg->trigger;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",196
+000001C2 A901                    		MOV.L 10H[R0], R1
+000001C4 B411                    		MOVU.B 10H[R1], R1
+000001C6 FB2E009008              		MOV.L #00089000H, R2
+000001CB 7543F0                  		MOV.L #000000F0H, R3
+000001CE 512310                  		AND 10H[R2].UB, R3
+000001D1 64F1                    		AND #0FH, R1
+000001D3 5713                    		OR R1, R3
+000001D5 8423                    		MOV.B R3, 10H[R2]
+000001D7                         L84:	; bb245
+                                 ;     197     }
+                                 ;     198     if (p_cfg->trigger == ADC_TRIG_ASYNC_ADTRG0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",198
+000001D7 A901                    		MOV.L 10H[R0], R1
+000001D9 A911                    		MOV.L 10H[R1], R1
+000001DB 6101                    		CMP #00H, R1
+000001DD 18                   S  		BNE L86
+000001DE                         L85:	; bb246
+                                 ;     199     {
+                                 ;     200         S12AD.ADCSR.BIT.EXTRG = 1;      // set ext trigger for async trigger
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",200
+000001DE FBEE009008              		MOV.L #00089000H, R14
+000001E3 F0E0                    		BSET #00H, [R14].B
+000001E5                         L86:	; bb256
+                                 ;     201     }
+                                 ;     202     IPR(S12AD,S12ADI0) = p_cfg->priority;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",202
+000001E5 A901                    		MOV.L 10H[R0], R1
+000001E7 B511                    		MOVU.B 14H[R1], R1
+000001E9 FBEE667308              		MOV.L #00087366H, R14
+000001EE 754FF0                  		MOV.L #000000F0H, R15
+000001F1 50EF                    		AND [R14].UB, R15
+000001F3 64F1                    		AND #0FH, R1
+000001F5 571F                    		OR R1, R15
+000001F7 C3EF                    		MOV.B R15, [R14]
+000001F9                         L87:	; bb256.split
+                                 ;     203 
+                                 ;     204 
+                                 ;     205     /* SET REGISTER FIELDS FOR REMAINING PARAMETERS */
+                                 ;     206 
+                                 ;     207     S12AD.ADADC.BIT.ADC = p_cfg->add_cnt;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",207
+000001F9 A901                    		MOV.L 10H[R0], R1
+000001FB 581E                    		MOVU.B [R1], R14
+000001FD FB1E009008              		MOV.L #00089000H, R1
+00000202 7542FC                  		MOV.L #000000FCH, R2
+00000205 51120C                  		AND 0CH[R1].UB, R2
+00000208 643E                    		AND #03H, R14
+0000020A 57E2                    		OR R14, R2
+0000020C 8312                    		MOV.B R2, 0CH[R1]
+0000020E                         L88:	; bb256.split6
+                                 ;     208     S12AD.ADCER.WORD = (uint16_t) (p_cfg->alignment | p_cfg->clearing);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",208
+0000020E A901                    		MOV.L 10H[R0], R1
+00000210 A81A                    		MOV.L 04H[R1], R2
+00000212 06951202                		OR 08H[R1].L, R2
+00000216 FB1E009008              		MOV.L #00089000H, R1
+0000021B 919A                    		MOV.W R2, 0EH[R1]
+0000021D                         L89:	; bb256.split7
+                                 ;     209     S12AD.ADCSR.BIT.CKS = p_cfg->conv_speed;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",209
+0000021D A901                    		MOV.L 10H[R0], R1
+0000021F B311                    		MOVU.B 0CH[R1], R1
+00000221 FBEE009008              		MOV.L #00089000H, R14
+00000226 754FF3                  		MOV.L #000000F3H, R15
+00000229 50EF                    		AND [R14].UB, R15
+0000022B 6C21                    		SHLL #02H, R1
+0000022D 64C1                    		AND #0CH, R1
+0000022F 571F                    		OR R1, R15
+00000231 C3EF                    		MOV.B R15, [R14]
+00000233                         L90:	; bb256.split8
+                                 ;     210 
+                                 ;     211 
+                                 ;     212     /* SAVE CALLBACK FUNCTION POINTER */
+                                 ;     213     g_dcb.callback = p_callback;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",213
+00000233 FBE2rrrrrrrr            		MOV.L #_g_dcb, R14
+00000239 E50E0302                		MOV.L 0CH[R0], 08H[R14]
+0000023D                         L91:	; bb256.split9
+                                 ;     214 
+                                 ;     215 
+                                 ;     216     /* MARK DRIVER AS OPENED */
+                                 ;     217     g_dcb.opened = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",217
+0000023D FB12rrrrrrrr            		MOV.L #_g_dcb, R1
+00000243 3C1401                  		MOV.B #01H, 04H[R1]
+00000246                         L92:	; bb256.split10
+00000246 75413F                  		MOV.L #0000003FH, R1
+                                 ;     218     R_BSP_HardwareUnlock(BSP_LOCK_S12AD);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",218
+00000249 05rrrrrr             A  		BSR _R_BSP_HardwareUnlock
+0000024D                         L93:	; bb256.split11
+                                 ;     219 
+                                 ;     220     return ADC_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",220
+0000024D 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000250                         L94:	; bb292
+00000250 A809                    		MOV.L 04H[R0], R1
+00000252 A081                    		MOV.L R1, 08H[R0]
+                                 ;     221 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",221
+00000254 6706                    		RTSD #18H
+00000256                         _adc_control:
+                                 		.STACK	_adc_control=32
+                                 ;     222 
+                                 ;     223 
+                                 ;     224 /******************************************************************************
+                                 ;     225 * Function Name: adc_control
+                                 ;     226 * Description  : This function provides commands for enabling channels and
+                                 ;     227 *                sensors and for runtime operations. These include enabling/
+                                 ;     228 *                disabling trigger sources and interrupts, initiating a
+                                 ;     229 *                software trigger, and checking for scan completion.
+                                 ;     230 *
+                                 ;     231 * NOTE: Enabling a channel or a sensor, or setting the sample state count reg
+                                 ;     232 *       cannot be done while the ADSCR.ADST bit is set (conversion in progress).
+                                 ;     233 *       Because these commands should only be called once during initialization
+                                 ;     234 *       before triggers are enabled, this should not be an issue. Registers
+                                 ;     235 *       with this restriction include ADANSA, ADANSB, ADADS, ADADC, ADSSTR,
+                                 ;     236 *       ADEXICR, and some bits in ADSCR and TSCR.
+                                 ;     237 *       No runtime operational sequence checking of any kind is performed.
+                                 ;     238 *
+                                 ;     239 * Arguments    : cmd-
+                                 ;     240 *                    Command to run
+                                 ;     241 *                p_args-
+                                 ;     242 *                    Pointer to optional configuration structure
+                                 ;     243 * Return Value : ADC_SUCCESS-
+                                 ;     244 *                    Successful
+                                 ;     245 *                ADC_ERR_MISSING_PTR-
+                                 ;     246 *                    p_args pointer is FIT_NO_PTR/NULL when required as an argument
+                                 ;     247 *                ADC_ERR_INVALID_ARG-
+                                 ;     248 *                    cmd or element of p_args structure has invalid value.
+                                 ;     249 *                ADC_ERR_ILLEGAL_CMD-
+                                 ;     250 *                    cmd is illegal based upon mode
+                                 ;     251 *                ADC_ERR_SCAN_NOT_DONE-
+                                 ;     252 *                    The requested scan has not completed
+                                 ;     253 *                ADC_ERR_UNKNOWN
+                                 ;     254 *                    Did not receive expected hardware response
+                                 ;     255 *******************************************************************************/
+                                 ;     256 adc_err_t adc_control(adc_cmd_t const     cmd,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",256
+00000256 7100E4                  		ADD #0FFFFFFE4H, R0
+00000259 A181                    		MOV.L R1, 18H[R0]
+0000025B A10A                    		MOV.L R2, 14H[R0]
+                                 ;     257                       void * const        p_args)
+                                 ;     258 {
+                                 ;     259 adc_err_t       err=ADC_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",259
+0000025D 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000260                         L96:	; entry.split
+                                 ;     260 adc_time_t      *p_sample;
+                                 ;     261 
+                                 ;     262 
+                                 ;     263     switch (cmd)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",263
+00000260 A981                    		MOV.L 18H[R0], R1
+00000262 6191                    		CMP #09H, R1
+00000264 25rr                  * 		BGTU L135
+         38rrrr                  
+00000269                         L97:	; entry.split
+00000269 FBE2rrrrrrrr            		MOV.L #L138, R14
+0000026F FE51EE                  		.swmov L138, R1, R14, R14
+00000272                         L139:
+00000272 7F4E                    		BRA.L R14
+00000274                         L98:	; bb
+                                 ;     264     {
+                                 ;     265     case ADC_CMD_SET_SAMPLE_STATE_CNT:
+                                 ;     266         p_sample = (adc_time_t *) p_args;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",266
+00000274 E5000503                		MOV.L 14H[R0], 0CH[R0]
+00000278                         L99:	; bb.split
+                                 ;     267 
+                                 ;     268 #if ADC_CFG_PARAM_CHECKING_ENABLE == 1
+                                 ;     269         if ((p_sample->reg_id >= ADC_SST_REG_MAX)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",269
+00000278 A889                    		MOV.L 0CH[R0], R1
+0000027A EC1E                    		MOV.L [R1], R14
+0000027C 611E                    		CMP #01H, R14
+0000027E 2Arr                    		BGT L102
+00000280 08                   S  		BRA L101
+00000281                         L100:	; bb9
+                                 ;     270          || (p_sample->num_states < ADC_SST_CNT_MIN))
+                                 ;     271         {
+                                 ;     272             return ADC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",272
+00000281 3E0104                  		MOV.L #00000004H, 04H[R0]
+00000284 38rrrr               W  		BRA L137
+00000287                         L101:	; bb16
+00000287 A889                    		MOV.L 0CH[R0], R1
+00000289 B111                    		MOVU.B 04H[R1], R1
+0000028B 6191                    		CMP #09H, R1
+0000028D 2Arr                    		BGT L103
+0000028F                         L102:	; bb23
+0000028F F80601                  		MOV.L #00000001H, [R0]
+00000292 08                   S  		BRA L104
+00000293                         L103:	; bb24
+00000293 F80600                  		MOV.L #00000000H, [R0]
+00000296                         L104:	; bb25
+00000296 EC01                    		MOV.L [R0], R1
+00000298 6101                    		CMP #00H, R1
+0000029A 21rr                    		BNE L100
+0000029C                         L105:	; bb30
+                                 ;     273         }
+                                 ;     274 #endif
+                                 ;     275         if (p_sample->reg_id == ADC_SST_CH0_TO_20)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",275
+0000029C A889                    		MOV.L 0CH[R0], R1
+0000029E EC1E                    		MOV.L [R1], R14
+000002A0 610E                    		CMP #00H, R14
+000002A2 21rr                    		BNE L107
+000002A4                         L106:	; bb31
+                                 ;     276         {
+                                 ;     277             S12AD.ADSSTR01.BIT.SST1 = p_sample->num_states;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",277
+000002A4 A889                    		MOV.L 0CH[R0], R1
+000002A6 FBEE009008              		MOV.L #00089000H, R14
+000002AB 5DEF30                  		MOVU.W 60H[R14], R15
+000002AE 772F00FF00              		AND #0FF00H, R15
+000002B3 551F04                  		OR 04H[R1].UB, R15
+000002B6 D7EF30                  		MOV.W R15, 60H[R14]
+000002B9 38rrrr               W  		BRA L136
+000002BC                         L107:	; bb40
+                                 ;     278         }
+                                 ;     279         else // temperature sensor
+                                 ;     280         {
+                                 ;     281             S12AD.ADSSTR23.BIT.SST2 = p_sample->num_states;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",281
+000002BC A889                    		MOV.L 0CH[R0], R1
+000002BE B111                    		MOVU.B 04H[R1], R1
+000002C0 6C81                    		SHLL #08H, R1
+000002C2 FBEE009008              		MOV.L #00089000H, R14
+000002C7 5DEF38                  		MOVU.W 70H[R14], R15
+000002CA 5BFF                    		MOVU.B R15, R15
+000002CC 571F                    		OR R1, R15
+000002CE D7EF38                  		MOV.W R15, 70H[R14]
+000002D1 38rrrr               W  		BRA L136
+000002D4                         L108:	; bb57
+                                 ;     282         }
+                                 ;     283     break;
+                                 ;     284 
+                                 ;     285 
+                                 ;     286     case ADC_CMD_ENABLE_CHANS:
+                                 ;     287         err = adc_enable_chans_63x((adc_ch_cfg_t *) p_args);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",287
+000002D4 A909                    		MOV.L 14H[R0], R1
+000002D6 39rrrr               W  		BSR _adc_enable_chans_63x
+000002D9 A081                    		MOV.L R1, 08H[R0]
+000002DB 38rrrr               W  		BRA L136
+000002DE                         L109:	; bb62
+                                 ;     288     break;
+                                 ;     289 
+                                 ;     290 
+                                 ;     291     case ADC_CMD_ENABLE_TEMP_SENSOR:
+                                 ;     292 #if ADC_CFG_PARAM_CHECKING_ENABLE == 1
+                                 ;     293         if (g_dcb.mode != ADC_MODE_SS_TEMPERATURE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",293
+000002DE FBE2rrrrrrrr            		MOV.L #_g_dcb, R14
+000002E4 ECEE                    		MOV.L [R14], R14
+000002E6 610E                    		CMP #00H, R14
+000002E8 10                   S  		BEQ L111
+000002E9                         L110:	; bb63
+                                 ;     294         {
+                                 ;     295             return ADC_ERR_ILLEGAL_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",295
+000002E9 3E0105                  		MOV.L #00000005H, 04H[R0]
+000002EC 38rrrr               W  		BRA L137
+000002EF                         L111:	; bb70
+                                 ;     296         }
+                                 ;     297 #endif
+                                 ;     298         S12AD.ADEXICR.BIT.TSS = 1;                  // select temperature sensor
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",298
+000002EF FB1E009008              		MOV.L #00089000H, R1
+000002F4 9A1A                    		MOV.W 12H[R1], R2
+000002F6 7882                    		BSET #08H, R2
+000002F8 921A                    		MOV.W R2, 12H[R1]
+000002FA                         L112:	; bb70.split
+                                 ;     299         if (S12AD.ADADC.BIT.ADC != ADC_ADD_OFF)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",299
+000002FA FBEE009008              		MOV.L #00089000H, R14
+000002FF 663F                    		MOV.L #00000003H, R15
+00000301 FC31EF0C                		TST 0CH[R14].UB, R15
+00000305 20rr                    		BEQ L114
+00000307                         L113:	; bb75
+                                 ;     300         {
+                                 ;     301             S12AD.ADEXICR.BIT.TSSAD = 1;            // enable addition
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",301
+00000307 FB1E009008              		MOV.L #00089000H, R1
+0000030C 9A1A                    		MOV.W 12H[R1], R2
+0000030E 7802                    		BSET #00H, R2
+00000310 921A                    		MOV.W R2, 12H[R1]
+00000312                         L114:	; bb86
+00000312 FBEE00C508              		MOV.L #0008C500H, R14
+                                 ;     302         }
+                                 ;     303         TEMPS.TSCR.BIT.TSEN = 1;                    // enable sensor
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",303
+00000317 F0E7                    		BSET #07H, [R14].B
+00000319                         L115:	; bb86.split
+                                 ;     304         // NOTE: User application must wait 30us before doing a scan
+                                 ;     305         // TEMPS.TSCR.BIT.TSOE is set to 1 in ADC_CMD_ENABLE_TRIG and ADC_CMD_SCAN_NOW
+                                 ;     306         adc_enable_s12adi0();                       // setup interrupt handling
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",306
+00000319 05rrrrrr             A  		BSR _adc_enable_s12adi0
+0000031D 38rrrr               W  		BRA L136
+00000320                         L116:	; bb91
+                                 ;     307     break;
+                                 ;     308 
+                                 ;     309 
+                                 ;     310     case ADC_CMD_ENABLE_VOLT_SENSOR:
+                                 ;     311 #if ADC_CFG_PARAM_CHECKING_ENABLE == 1
+                                 ;     312         if (g_dcb.mode != ADC_MODE_SS_INT_REF_VOLT)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",312
+00000320 FBE2rrrrrrrr            		MOV.L #_g_dcb, R14
+00000326 ECEE                    		MOV.L [R14], R14
+00000328 611E                    		CMP #01H, R14
+0000032A 10                   S  		BEQ L118
+0000032B                         L117:	; bb92
+                                 ;     313         {
+                                 ;     314             return ADC_ERR_ILLEGAL_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",314
+0000032B 3E0105                  		MOV.L #00000005H, 04H[R0]
+0000032E 38rrrr               W  		BRA L137
+00000331                         L118:	; bb98
+                                 ;     315         }
+                                 ;     316 #endif
+                                 ;     317         S12AD.ADEXICR.BIT.OCS = 1;                  // select ref voltage sensor
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",317
+00000331 FB1E009008              		MOV.L #00089000H, R1
+00000336 9A1A                    		MOV.W 12H[R1], R2
+00000338 7892                    		BSET #09H, R2
+0000033A 921A                    		MOV.W R2, 12H[R1]
+0000033C                         L119:	; bb98.split
+                                 ;     318         if (S12AD.ADADC.BIT.ADC != ADC_ADD_OFF)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",318
+0000033C FBEE009008              		MOV.L #00089000H, R14
+00000341 663F                    		MOV.L #00000003H, R15
+00000343 FC31EF0C                		TST 0CH[R14].UB, R15
+00000347 20rr                    		BEQ L121
+00000349                         L120:	; bb103
+                                 ;     319         {
+                                 ;     320             S12AD.ADEXICR.BIT.OCSAD = 1;            // enable addition
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",320
+00000349 FB1E009008              		MOV.L #00089000H, R1
+0000034E 9A1A                    		MOV.W 12H[R1], R2
+00000350 7812                    		BSET #01H, R2
+00000352 921A                    		MOV.W R2, 12H[R1]
+00000354                         L121:	; bb114
+                                 ;     321         }
+                                 ;     322         adc_enable_s12adi0();                       // setup interrupt handling
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",322
+00000354 05rrrrrr             A  		BSR _adc_enable_s12adi0
+00000358 38rrrr               W  		BRA L136
+0000035B                         L122:	; bb116
+                                 ;     323     break;
+                                 ;     324 
+                                 ;     325 
+                                 ;     326     case ADC_CMD_ENABLE_TRIG:
+                                 ;     327         if (g_dcb.mode == ADC_MODE_SS_TEMPERATURE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",327
+0000035B FBE2rrrrrrrr            		MOV.L #_g_dcb, R14
+00000361 ECEE                    		MOV.L [R14], R14
+00000363 610E                    		CMP #00H, R14
+00000365 18                   S  		BNE L124
+00000366                         L123:	; bb117
+00000366 FBEE00C508              		MOV.L #0008C500H, R14
+                                 ;     328         {   // must be 30us after sensor enabled
+                                 ;     329             TEMPS.TSCR.BIT.TSOE = 1;        // enable output to ADC
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",329
+0000036B F0E4                    		BSET #04H, [R14].B
+0000036D                         L124:	; bb125
+                                 ;     330         }
+                                 ;     331         S12AD.ADCSR.BIT.TRGE = 1;           // enable sync/async triggers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",331
+0000036D FBEE009008              		MOV.L #00089000H, R14
+00000372 F0E1                    		BSET #01H, [R14].B
+00000374 2Err                 B  		BRA L136
+00000376                         L125:	; bb129
+                                 ;     332     break;
+                                 ;     333 
+                                 ;     334 
+                                 ;     335     case ADC_CMD_DISABLE_TRIG:
+                                 ;     336         S12AD.ADCSR.BIT.TRGE = 0;           // disable sync/async triggers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",336
+00000376 FBEE009008              		MOV.L #00089000H, R14
+0000037B F0E9                    		BCLR #01H, [R14].B
+0000037D 2Err                 B  		BRA L136
+0000037F                         L126:	; bb134
+0000037F 754E80                  		MOV.L #00000080H, R14
+                                 ;     337     break;
+                                 ;     338 
+                                 ;     339 
+                                 ;     340     case ADC_CMD_SCAN_NOW:
+                                 ;     341         if (S12AD.ADCSR.BIT.ADST == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",341
+00000382 FBFE009008              		MOV.L #00089000H, R15
+00000387 50FE                    		AND [R15].UB, R14
+00000389 687E                    		SHLR #07H, R14
+0000038B 610E                    		CMP #00H, R14
+0000038D 21rr                    		BNE L130
+0000038F                         L127:	; bb136
+                                 ;     342         {
+                                 ;     343            if (g_dcb.mode == ADC_MODE_SS_TEMPERATURE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",343
+0000038F FBE2rrrrrrrr            		MOV.L #_g_dcb, R14
+00000395 ECEE                    		MOV.L [R14], R14
+00000397 610E                    		CMP #00H, R14
+00000399 18                   S  		BNE L129
+0000039A                         L128:	; bb137
+0000039A FBEE00C508              		MOV.L #0008C500H, R14
+                                 ;     344            {   // (technically only need to do once after 30us wait)
+                                 ;     345                TEMPS.TSCR.BIT.TSOE = 1;     // enable output to ADC
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",345
+0000039F F0E4                    		BSET #04H, [R14].B
+000003A1                         L129:	; bb145
+                                 ;     346            }
+                                 ;     347            S12AD.ADCSR.BIT.ADST = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",347
+000003A1 FBEE009008              		MOV.L #00089000H, R14
+000003A6 F0E7                    		BSET #07H, [R14].B
+000003A8 2Err                 B  		BRA L136
+000003AA                         L130:	; bb149
+                                 ;     348         }
+                                 ;     349         else
+                                 ;     350         {
+                                 ;     351            err = ADC_ERR_SCAN_NOT_DONE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",351
+000003AA 3E0206                  		MOV.L #00000006H, 08H[R0]
+000003AD 2Err                 B  		BRA L136
+000003AF                         L131:	; bb158
+000003AF 754E80                  		MOV.L #00000080H, R14
+                                 ;     352         }
+                                 ;     353     break;
+                                 ;     354 
+                                 ;     355 
+                                 ;     356     case ADC_CMD_CHECK_SCAN_DONE:           // default/Group A or Group B
+                                 ;     357         if (S12AD.ADCSR.BIT.ADST == 1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",357
+000003B2 FBFE009008              		MOV.L #00089000H, R15
+000003B7 50FE                    		AND [R15].UB, R14
+000003B9 687E                    		SHLR #07H, R14
+000003BB 611E                    		CMP #01H, R14
+000003BD 21rr                    		BNE L136
+000003BF                         L132:	; bb159
+                                 ;     358         {
+                                 ;     359             err = ADC_ERR_SCAN_NOT_DONE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",359
+000003BF 3E0206                  		MOV.L #00000006H, 08H[R0]
+000003C2 2Err                 B  		BRA L136
+000003C4                         L133:	; bb167
+                                 ;     360         }
+                                 ;     361     break;
+                                 ;     362 
+                                 ;     363 
+                                 ;     364     case ADC_CMD_ENABLE_INT:
+                                 ;     365         S12AD.ADCSR.BIT.ADIE = 1;           // enable S12ADI0 interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",365
+000003C4 FBEE009008              		MOV.L #00089000H, R14
+000003C9 F0E4                    		BSET #04H, [R14].B
+000003CB 2Err                 B  		BRA L136
+000003CD                         L134:	; bb171
+                                 ;     366     break;
+                                 ;     367 
+                                 ;     368 
+                                 ;     369     case ADC_CMD_DISABLE_INT:
+                                 ;     370         S12AD.ADCSR.BIT.ADIE = 0;           // disable S12ADI0 interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",370
+000003CD FBEE009008              		MOV.L #00089000H, R14
+000003D2 F0EC                    		BCLR #04H, [R14].B
+000003D4 08                   S  		BRA L136
+000003D5                         L135:	; bb175
+                                 ;     371     break;
+                                 ;     372 
+                                 ;     373 
+                                 ;     374     default:
+                                 ;     375         err = ADC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",375
+000003D5 3E0204                  		MOV.L #00000004H, 08H[R0]
+000003D8                         L136:	; bb176
+                                 ;     376     break;
+                                 ;     377     }
+                                 ;     378 
+                                 ;     379     return err;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",379
+000003D8 E5000201                		MOV.L 08H[R0], 04H[R0]
+000003DC                         L137:	; bb179
+000003DC A809                    		MOV.L 04H[R0], R1
+000003DE A101                    		MOV.L R1, 10H[R0]
+                                 ;     380 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",380
+000003E0 6707                    		RTSD #1CH
+000003E2                         _adc_enable_chans_63x:
+                                 		.STACK	_adc_enable_chans_63x=24
+                                 ;     381 
+                                 ;     382 
+                                 ;     383 /******************************************************************************
+                                 ;     384 * Function Name: adc_enable_chans_63x
+                                 ;     385 * Description  : This function does extensive checking on channel mask
+                                 ;     386 *                settings based upon operational mode. Mask registers are
+                                 ;     387 *                initialized and interrupts enabled in peripheral. Interrupts
+                                 ;     388 *                are also enabled in ICU if corresponding priority is not 0.
+                                 ;     389 *
+                                 ;     390 * NOTE: A negative number is stored in two's complement form.
+                                 ;     391 *       A quick way to change a binary number into two's complement is to
+                                 ;     392 *       start at the right (LSB) and moving left, don't change any bits
+                                 ;     393 *       until after the first "1" is reached.
+                                 ;     394 *       Number          2's complement
+                                 ;     395 *       0010 0110       1101 1010
+                                 ;     396 *       0000 0001       1111 1111
+                                 ;     397 *       Another way is to do a 1's complement on the number, then add 1 to that.
+                                 ;     398 *       Number          1's complement  + 1
+                                 ;     399 *       0010 0110       1101 1001       1101 1010
+                                 ;     400 *       0000 0001       1111 1110       1111 1111
+                                 ;     401 *
+                                 ;     402 * Arguments    : p_config
+                                 ;     403 *                    Pointer to channel config structure containing masks
+                                 ;     404 * Return Value : ADC_SUCCESS-
+                                 ;     405 *                    Successful
+                                 ;     406 *                ADC_ERR_INVALID_ARG-
+                                 ;     407 *                    reg_id contains an invalid value.
+                                 ;     408 *                ADC_ERR_ILLEGAL_ARG-
+                                 ;     409 *                    an argument is illegal based upon mode
+                                 ;     410 *******************************************************************************/
+                                 ;     411 adc_err_t adc_enable_chans_63x(adc_ch_cfg_t *p_config)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",411
+000003E2 7100EC                  		ADD #0FFFFFFECH, R0
+000003E5 A101                    		MOV.L R1, 10H[R0]
+                                 ;     412 {
+                                 ;     413 uint32_t    tmp_mask=0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",413
+000003E7 3E0200                  		MOV.L #00000000H, 08H[R0]
+000003EA                         L141:	; entry.split
+                                 ;     414 
+                                 ;     415 #if ADC_CFG_PARAM_CHECKING_ENABLE == 1
+                                 ;     416     /* This command is illegal for sensor modes */
+                                 ;     417     if ((g_dcb.mode == ADC_MODE_SS_TEMPERATURE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",417
+000003EA FBE2rrrrrrrr            		MOV.L #_g_dcb, R14
+000003F0 ECEE                    		MOV.L [R14], R14
+000003F2 610E                    		CMP #00H, R14
+000003F4 20rr                    		BEQ L144
+000003F6 08                   S  		BRA L143
+000003F7                         L142:	; bb3
+                                 ;     418      || (g_dcb.mode == ADC_MODE_SS_INT_REF_VOLT))
+                                 ;     419     {
+                                 ;     420         return ADC_ERR_ILLEGAL_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",420
+000003F7 3E0105                  		MOV.L #00000005H, 04H[R0]
+000003FA 38rrrr               W  		BRA L171
+000003FD                         L143:	; bb8
+000003FD FBE2rrrrrrrr            		MOV.L #_g_dcb, R14
+00000403 ECEE                    		MOV.L [R14], R14
+00000405 611E                    		CMP #01H, R14
+00000407 18                   S  		BNE L145
+00000408                         L144:	; bb12
+00000408 F80601                  		MOV.L #00000001H, [R0]
+0000040B 08                   S  		BRA L146
+0000040C                         L145:	; bb13
+0000040C F80600                  		MOV.L #00000000H, [R0]
+0000040F                         L146:	; bb14
+0000040F EC01                    		MOV.L [R0], R1
+00000411 6101                    		CMP #00H, R1
+00000413 21rr                    		BNE L142
+00000415                         L147:	; bb19
+                                 ;     421     }
+                                 ;     422 
+                                 ;     423     /* Verify at least one bonded channel is selected */
+                                 ;     424     if ((p_config->chan_mask == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",424
+00000415 A901                    		MOV.L 10H[R0], R1
+00000417 EC1E                    		MOV.L [R1], R14
+00000419 610E                    		CMP #00H, R14
+0000041B 20rr                    		BEQ L150
+0000041D 08                   S  		BRA L149
+0000041E                         L148:	; bb20
+                                 ;     425      || ((p_config->chan_mask & ADC_INVALID_CH_MASK) != 0))
+                                 ;     426     {
+                                 ;     427         return ADC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",427
+0000041E 3E0104                  		MOV.L #00000004H, 04H[R0]
+00000421 38rrrr               W  		BRA L171
+00000424                         L149:	; bb27
+00000424 A901                    		MOV.L 10H[R0], R1
+00000426 FBEA00C0                		MOV.L #0FFFFC000H, R14
+0000042A 06A00C1E                		TST [R1].L, R14
+0000042E 10                   S  		BEQ L151
+0000042F                         L150:	; bb34
+0000042F F80601                  		MOV.L #00000001H, [R0]
+00000432 08                   S  		BRA L152
+00000433                         L151:	; bb35
+00000433 F80600                  		MOV.L #00000000H, [R0]
+00000436                         L152:	; bb36
+00000436 EC01                    		MOV.L [R0], R1
+00000438 6101                    		CMP #00H, R1
+0000043A 21rr                    		BNE L148
+0000043C                         L153:	; bb42
+                                 ;     428     }
+                                 ;     429 
+                                 ;     430     /* Addition mask should not include bits from inactive channels */
+                                 ;     431     if (S12AD.ADADC.BIT.ADC != ADC_ADD_OFF)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",431
+0000043C FBEE049008              		MOV.L #00089004H, R14
+00000441 663F                    		MOV.L #00000003H, R15
+00000443 FC31EF08                		TST 08H[R14].UB, R15
+00000447 A901                    		MOV.L 10H[R0], R1
+00000449 20rr                    		BEQ L156
+0000044B                         L154:	; bb44
+                                 ;     432     {
+                                 ;     433         // Bit-AND with 1s-complement
+                                 ;     434         if ((p_config->add_mask & ~p_config->chan_mask) != 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",434
+0000044B A902                    		MOV.L 10H[R0], R2
+0000044D EC2E                    		MOV.L [R2], R14
+0000044F 7E0E                    		NOT R14
+00000451 06A10C1E01              		TST 04H[R1].L, R14
+00000456 10                   S  		BEQ L157
+00000457                         L155:	; bb45
+                                 ;     435         {
+                                 ;     436             return ADC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",436
+00000457 3E0104                  		MOV.L #00000004H, 04H[R0]
+0000045A 2Err                 B  		BRA L171
+0000045C                         L156:	; bb58
+                                 ;     437         }
+                                 ;     438     }
+                                 ;     439     else
+                                 ;     440     {
+                                 ;     441         // WARNING! Other features messed up if add_mask is non-zero when addition is turned off!
+                                 ;     442         p_config->add_mask = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",442
+0000045C 3E1100                  		MOV.L #00000000H, 04H[R1]
+0000045F                         L157:	; bb69
+                                 ;     443     }
+                                 ;     444 
+                                 ;     445     /* Verify only 1 bit is set in mask */
+                                 ;     446     if ((g_dcb.mode == ADC_MODE_SS_ONE_CH)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",446
+0000045F FBE2rrrrrrrr            		MOV.L #_g_dcb, R14
+00000465 ECEE                    		MOV.L [R14], R14
+00000467 612E                    		CMP #02H, R14
+00000469 20rr                    		BEQ L162
+0000046B 2Err                 B  		BRA L161
+0000046D                         L158:	; bb70
+                                 ;     447      || (g_dcb.mode == ADC_MODE_CONT_ONE_CH))
+                                 ;     448     {
+                                 ;     449         tmp_mask = p_config->chan_mask;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",449
+0000046D A901                    		MOV.L 10H[R0], R1
+0000046F E41002                  		MOV.L [R1], 08H[R0]
+00000472                         L159:	; bb70.split
+                                 ;     450         // Bit-AND with 2s-complement (see note in function header)
+                                 ;     451         if ((tmp_mask & (~tmp_mask + 1)) != tmp_mask)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",451
+00000472 A881                    		MOV.L 08H[R0], R1
+00000474 FC3B1E                  		NOT R1, R14
+00000477 621E                    		ADD #01H, R14
+00000479 531E                    		AND R1, R14
+0000047B 471E                    		CMP R1, R14
+0000047D 20rr                    		BEQ L165
+0000047F                         L160:	; bb75
+                                 ;     452         {
+                                 ;     453             return ADC_ERR_INVALID_ARG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",453
+0000047F 3E0104                  		MOV.L #00000004H, 04H[R0]
+00000482 2Err                 B  		BRA L171
+00000484                         L161:	; bb89
+00000484 FBE2rrrrrrrr            		MOV.L #_g_dcb, R14
+0000048A ECEE                    		MOV.L [R14], R14
+0000048C 614E                    		CMP #04H, R14
+0000048E 18                   S  		BNE L163
+0000048F                         L162:	; bb93
+0000048F F80601                  		MOV.L #00000001H, [R0]
+00000492 08                   S  		BRA L164
+00000493                         L163:	; bb94
+00000493 F80600                  		MOV.L #00000000H, [R0]
+00000496                         L164:	; bb95
+00000496 EC01                    		MOV.L [R0], R1
+00000498 6101                    		CMP #00H, R1
+0000049A 21rr                    		BNE L158
+0000049C                         L165:	; bb100
+                                 ;     454         }
+                                 ;     455     }
+                                 ;     456 #endif
+                                 ;     457 
+                                 ;     458     /* SET MASKS FOR ALL CHANNELS */
+                                 ;     459     S12AD.ADANS0.WORD = (uint16_t) (p_config->chan_mask & 0xFFFF);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",459
+0000049C A901                    		MOV.L 10H[R0], R1
+0000049E FBEE049008              		MOV.L #00089004H, R14
+000004A3 D01E                    		MOV.W [R1], [R14]
+000004A5                         L166:	; bb100.split
+                                 ;     460     S12AD.ADANS1.WORD = (uint16_t) ((p_config->chan_mask >> 16) & 0x001F);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",460
+000004A5 A901                    		MOV.L 10H[R0], R1
+000004A7 EC11                    		MOV.L [R1], R1
+000004A9 6901                    		SHLR #10H, R1
+000004AB 75211F                  		AND #1FH, R1
+000004AE FB2E049008              		MOV.L #00089004H, R2
+000004B3 9029                    		MOV.W R1, 02H[R2]
+000004B5                         L167:	; bb100.split1
+                                 ;     461     S12AD.ADADS0.WORD = (uint16_t) (p_config->add_mask & 0xFFFF);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",461
+000004B5 A901                    		MOV.L 10H[R0], R1
+000004B7 FBEE049008              		MOV.L #00089004H, R14
+000004BC D51E0202                		MOV.W 04H[R1], 04H[R14]
+000004C0                         L168:	; bb100.split2
+                                 ;     462     S12AD.ADADS1.WORD = (uint16_t) ((p_config->add_mask >> 16) & 0x001F);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",462
+000004C0 A901                    		MOV.L 10H[R0], R1
+000004C2 A819                    		MOV.L 04H[R1], R1
+000004C4 6901                    		SHLR #10H, R1
+000004C6 75211F                  		AND #1FH, R1
+000004C9 FB2E049008              		MOV.L #00089004H, R2
+000004CE 90A9                    		MOV.W R1, 06H[R2]
+000004D0                         L169:	; bb100.split3
+                                 ;     463 
+                                 ;     464     /* ENABLE INTERRUPTS */
+                                 ;     465     adc_enable_s12adi0();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",465
+000004D0 05rrrrrr             A  		BSR _adc_enable_s12adi0
+000004D4                         L170:	; bb100.split4
+                                 ;     466 
+                                 ;     467     return ADC_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",467
+000004D4 3E0100                  		MOV.L #00000000H, 04H[R0]
+000004D7                         L171:	; bb124
+000004D7 A809                    		MOV.L 04H[R0], R1
+000004D9 A089                    		MOV.L R1, 0CH[R0]
+                                 ;     468 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.c",468
+000004DB 6705                    		RTSD #14H
+                                 ;     469 
+                                 ;     470 #endif
+                                 		.SECTION	C,ROMDATA,ALIGN=4
+00000000                         _dreg_ptrs:
+00000000 20900800                		.lword	00089020H
+00000004 22900800                		.lword	00089022H
+00000008 24900800                		.lword	00089024H
+0000000C 26900800                		.lword	00089026H
+00000010 28900800                		.lword	00089028H
+00000014 2A900800                		.lword	0008902AH
+00000018 2C900800                		.lword	0008902CH
+0000001C 2E900800                		.lword	0008902EH
+00000020 30900800                		.lword	00089030H
+00000024 32900800                		.lword	00089032H
+00000028 34900800                		.lword	00089034H
+0000002C 36900800                		.lword	00089036H
+00000030 38900800                		.lword	00089038H
+00000034 3A900800                		.lword	0008903AH
+00000038 3C900800                		.lword	0008903CH
+0000003C 3E900800                		.lword	0008903EH
+00000040 40900800                		.lword	00089040H
+00000044 42900800                		.lword	00089042H
+00000048 44900800                		.lword	00089044H
+0000004C 46900800                		.lword	00089046H
+00000050 48900800                		.lword	00089048H
+00000054 1A900800                		.lword	0008901AH
+00000058 1C900800                		.lword	0008901CH
+                                 		.swsection	W,stuff
+00000000                         L138:
+00000000 rrrr                    		.switch		L98-L139
+00000002 rrrr                    		.switch		L108-L139
+00000004 rrrr                    		.switch		L109-L139
+00000006 rrrr                    		.switch		L116-L139
+00000008 rrrr                    		.switch		L122-L139
+0000000A rrrr                    		.switch		L126-L139
+0000000C rrrr                    		.switch		L131-L139
+0000000E rrrr                    		.switch		L125-L139
+00000010 rrrr                    		.switch		L134-L139
+00000012 rrrr                    		.switch		L133-L139
+                                 		.SECTION	W,ROMDATA,ALIGN=4
+                                 		.SECTION	W_1,ROMDATA
+                                 		.SECTION	W_2,ROMDATA,ALIGN=2
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01299   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001245(000004DDH)  P
+ROMDATA  0000000092(0000005CH)  C
+ROMDATA  0000000000(00000000H)  W
+ROMDATA  0000000000(00000000H)  W_1
+ROMDATA  0000000020(00000014H)  W_2
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\r_s12ad_rx63x.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\r_s12ad_rx63x.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\r_s12ad_rx\src\targets\rx63x\r_s12ad_rx63x.obj

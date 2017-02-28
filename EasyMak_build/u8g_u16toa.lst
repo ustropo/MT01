@@ -1,0 +1,215 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:48:59 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:48:59
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=u8g_u16toa.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=u8g_u16toa.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;u8g_u16toa.c
+                                 
+                                 		.glb	_u8g_u16toap
+                                 		.glb	_u8g_u16toa
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _u8g_u16toap:
+                                 		.STACK	_u8g_u16toap=20
+                                 ;       1 /*
+                                 ;       2 
+                                 ;       3   u8g_u16toa.c
+                                 ;       4 
+                                 ;       5 
+                                 ;       6   Universal 8bit Graphics Library
+                                 ;       7   
+                                 ;       8   Copyright (c) 2012, olikraus@gmail.com
+                                 ;       9   All rights reserved.
+                                 ;      10 
+                                 ;      11   Redistribution and use in source and binary forms, with or without modification, 
+                                 ;      12   are permitted provided that the following conditions are met:
+                                 ;      13 
+                                 ;      14   * Redistributions of source code must retain the above copyright notice, this list 
+                                 ;      15     of conditions and the following disclaimer.
+                                 ;      16     
+                                 ;      17   * Redistributions in binary form must reproduce the above copyright notice, this 
+                                 ;      18     list of conditions and the following disclaimer in the documentation and/or other 
+                                 ;      19     materials provided with the distribution.
+                                 ;      20 
+                                 ;      21   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+                                 ;      22   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+                                 ;      23   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+                                 ;      24   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+                                 ;      25   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+                                 ;      26   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+                                 ;      27   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+                                 ;      28   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+                                 ;      29   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+                                 ;      30   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+                                 ;      31   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+                                 ;      32   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+                                 ;      33   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+                                 ;      34   
+                                 ;      35 */
+                                 ;      36 
+                                 ;      37 
+                                 ;      38 #include "u8g.h"
+                                 ;      39 
+                                 ;      40 const char *u8g_u16toap(char * dest, uint16_t v)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",40
+00000000 7100F0                  		ADD #0FFFFFFF0H, R0
+00000003 A089                    		MOV.L R1, 0CH[R0]
+00000005 910A                    		MOV.W R2, 0AH[R0]
+                                 ;      41 {
+                                 ;      42   uint8_t pos;
+                                 ;      43   uint8_t d;
+                                 ;      44   uint16_t c;
+                                 ;      45   c = 10000;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",45
+00000007 F909011027              		MOV.W #2710H, 02H[R0]
+0000000C                         L11:	; entry.split
+                                 ;      46   for( pos = 0; pos < 5; pos++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",46
+0000000C F80400                  		MOV.B #00H, [R0]
+0000000F 2Err                 B  		BRA L18
+00000011                         L12:	; bb
+                                 ;      47   {
+                                 ;      48       d = '0';
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",48
+00000011 3C0130                  		MOV.B #30H, 01H[R0]
+00000014 2Err                 B  		BRA L15
+00000016                         L13:	; bb6
+                                 ;      49       while( v >= c )
+                                 ;      50       {
+                                 ;      51 	v -= c;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",51
+00000016 B909                    		MOVU.W 0AH[R0], R1
+00000018 06C10101                		SUB 02H[R0].UW, R1
+0000001C 9109                    		MOV.W R1, 0AH[R0]
+0000001E                         L14:	; bb6.split
+                                 ;      52 	d++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",52
+0000001E B009                    		MOVU.B 01H[R0], R1
+00000020 6211                    		ADD #01H, R1
+00000022 8009                    		MOV.B R1, 01H[R0]
+00000024                         L15:	; bb15
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",49
+00000024 B909                    		MOVU.W 0AH[R0], R1
+00000026 06C50101                		CMP 02H[R0].UW, R1
+0000002A 28rr                    		BGE L13
+0000002C                         L16:	; bb22
+                                 ;      53       }
+                                 ;      54       dest[pos] = d;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",54
+0000002C B009                    		MOVU.B 01H[R0], R1
+0000002E 5802                    		MOVU.B [R0], R2
+00000030 A88B                    		MOV.L 0CH[R0], R3
+00000032 FE0321                  		MOV.B R1, [R3,R2]
+00000035                         L17:	; bb22.split
+                                 ;      55       c /= 10;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",55
+00000035 B809                    		MOVU.W 02H[R0], R1
+00000037 FD74910A                		DIVU #0AH, R1
+0000003B 9009                    		MOV.W R1, 02H[R0]
+0000003D 5801                    		MOVU.B [R0], R1
+0000003F 6211                    		ADD #01H, R1
+00000041 C301                    		MOV.B R1, [R0]
+00000043                         L18:	; bb34
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",46
+00000043 5801                    		MOVU.B [R0], R1
+00000045 6151                    		CMP #05H, R1
+00000047 29rr                    		BLT L12
+00000049                         L19:	; bb40
+                                 ;      56   }  
+                                 ;      57   dest[5] = '\0';
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",57
+00000049 A889                    		MOV.L 0CH[R0], R1
+0000004B 3C1500                  		MOV.B #00H, 05H[R1]
+0000004E                         L20:	; bb40.split
+                                 ;      58   return dest;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",58
+0000004E A889                    		MOV.L 0CH[R0], R1
+00000050 A009                    		MOV.L R1, 04H[R0]
+00000052                         L21:	; bb40.split1
+                                 ;      59 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",59
+00000052 6704                    		RTSD #10H
+00000054                         _u8g_u16toa:
+                                 		.STACK	_u8g_u16toa=12
+                                 ;      60 
+                                 ;      61 /* v = value, d = number of digits */
+                                 ;      62 const char *u8g_u16toa(uint16_t v, uint8_t d)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",62
+00000054 6080                    		SUB #08H, R0
+00000056 9089                    		MOV.W R1, 06H[R0]
+00000058 810A                    		MOV.B R2, 05H[R0]
+0000005A 6651                    		MOV.L #00000005H, R1
+                                 ;      63 {
+                                 ;      64   static char buf[6];
+                                 ;      65   d = 5-d;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",65
+0000005C 4321                    		SUB R2, R1
+0000005E 8109                    		MOV.B R1, 05H[R0]
+00000060                         L23:	; entry.split
+                                 ;      66   return u8g_u16toap(buf, v) + d;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",66
+00000060 B88A                    		MOVU.W 06H[R0], R2
+00000062 FB12rrrrrrrr            		MOV.L #__$buf$1, R1
+00000068 39rrrr               W  		BSR _u8g_u16toap
+0000006B 490105                  		ADD 05H[R0].UB, R1
+0000006E E301                    		MOV.L R1, [R0]
+00000070                         L24:	; entry.split1
+                                 ;      67 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_u16toa.c",67
+00000070 6702                    		RTSD #08H
+                                 ;      68 
+                                 		.SECTION	B_1,DATA
+00000000                         __$buf$1:
+00000000(00000006H)              		.blkb	6
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00181   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000114(00000072H)  P
+DATA     0000000006(00000006H)  B_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\u8g_u16toa.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\u8g_u16toa.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\src\Display\u8g_u16toa.obj

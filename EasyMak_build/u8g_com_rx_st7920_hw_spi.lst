@@ -1,0 +1,642 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:48:52 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:48:52
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=u8g_com_rx_st7920_hw_spi.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=u8g_com_rx_st7920_hw_spi.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;u8g_com_rx_st7920_hw_spi.c
+                                 
+                                 		.glb	_g_rspi_callbackend
+                                 		.glb	_R_RSPI_Write
+                                 		.glb	_u8g_10MicroDelay
+                                 		.glb	_u8g_com_rx_hw_spi_fn
+                                 		.glb	_R_RSPI_Open
+                                 		.glb	_R_RSPI_Control
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         __$u8g_rx_st7920_hw_spi_shift_out:
+                                 		.STACK	__$u8g_rx_st7920_hw_spi_shift_out=20
+                                 ;       1 /*
+                                 ;       2   
+                                 ;       3   u8g_com_rx_st7920_hw_spi.c
+                                 ;       4   
+                                 ;       5   Additional COM device, initially introduced for 3D Printer community
+                                 ;       6   Implements a fast SW SPI com subsystem
+                                 ;       7 
+                                 ;       8   Universal 8bit Graphics Library
+                                 ;       9   
+                                 ;      10   Copyright (c) 2011, olikraus@gmail.com
+                                 ;      11   All rights reserved.
+                                 ;      12 
+                                 ;      13   Redistribution and use in source and binary forms, with or without modification, 
+                                 ;      14   are permitted provided that the following conditions are met:
+                                 ;      15 
+                                 ;      16   * Redistributions of source code must retain the above copyright notice, this list 
+                                 ;      17     of conditions and the following disclaimer.
+                                 ;      18     
+                                 ;      19   * Redistributions in binary form must reproduce the above copyright notice, this 
+                                 ;      20     list of conditions and the following disclaimer in the documentation and/or other 
+                                 ;      21     materials provided with the distribution.
+                                 ;      22 
+                                 ;      23   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+                                 ;      24   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+                                 ;      25   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+                                 ;      26   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+                                 ;      27   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+                                 ;      28   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+                                 ;      29   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+                                 ;      30   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+                                 ;      31   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+                                 ;      32   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+                                 ;      33   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+                                 ;      34   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+                                 ;      35   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+                                 ;      36 
+                                 ;      37   A special SPI interface for ST7920 controller
+                                 ;      38 
+                                 ;      39   Update for ATOMIC operation done (01 Jun 2013)
+                                 ;      40     U8G_ATOMIC_OR(ptr, val)
+                                 ;      41     U8G_ATOMIC_AND(ptr, val)
+                                 ;      42     U8G_ATOMIC_START();
+                                 ;      43     U8G_ATOMIC_END();
+                                 ;      44 
+                                 ;      45 
+                                 ;      46 */
+                                 ;      47 
+                                 ;      48 #include "platform.h"
+                                 ;      49 #include "u8g.h"
+                                 ;      50 #include "r_rspi_rx_if.h"
+                                 ;      51 #include "FreeRTOS.h"
+                                 ;      52 #include "task.h"
+                                 ;      53 
+                                 ;      54 static rspi_handle_t handle;
+                                 ;      55 volatile uint8_t g_rspi_callbackend = 0;
+                                 ;      56 extern xTaskHandle task_main_handle;
+                                 ;      57 
+                                 ;      58 static void rspi_callback(void *p_arg);
+                                 ;      59 
+                                 ;      60 static uint8_t u8g_rx_st7920_hw_spi_shift_out(u8g_t *u8g, uint8_t val)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",60
+00000000 7100F0                  		ADD #0FFFFFFF0H, R0
+00000003 A089                    		MOV.L R1, 0CH[R0]
+00000005 828A                    		MOV.B R2, 0BH[R0]
+                                 ;      61 {
+                                 ;      62 	rspi_command_word_t command;
+                                 ;      63 	command.cpha = RSPI_SPCMD_CPHA_SAMPLE_EVEN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",63
+00000007 F10004                  		BSET #00H, 04H[R0].B
+0000000A                         L11:	; entry.split
+                                 ;      64 	command.cpol = RSPI_SPCMD_CPOL_IDLE_HI;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",64
+0000000A F10104                  		BSET #01H, 04H[R0].B
+0000000D                         L12:	; entry.split1
+                                 ;      65 	command.bit_order = RSPI_SPCMD_ORDER_MSB_FIRST;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",65
+0000000D F10C05                  		BCLR #04H, 05H[R0].B
+00000010                         L13:	; entry.split2
+                                 ;      66 	command.bit_length = RSPI_SPCMD_BIT_LENGTH_8;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",66
+00000010 B109                    		MOVU.B 05H[R0], R1
+00000012 6571                    		OR #07H, R1
+00000014 7621F700                		AND #0F7H, R1
+00000018 8109                    		MOV.B R1, 05H[R0]
+0000001A                         L14:	; entry.split3
+0000001A 7541F3                  		MOV.L #000000F3H, R1
+                                 ;      67 	command.br_div = RSPI_SPCMD_BR_DIV_1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",67
+0000001D 510104                  		AND 04H[R0].UB, R1
+00000020 8101                    		MOV.B R1, 04H[R0]
+00000022                         L15:	; entry.split4
+                                 ;      68 	R_RSPI_Write(handle,command,&val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",68
+00000022 FBE2rrrrrrrr            		MOV.L #__$handle, R14
+00000028 ECE1                    		MOV.L [R14], R1
+0000002A A80A                    		MOV.L 04H[R0], R2
+0000002C 6614                    		MOV.L #00000001H, R4
+0000002E 71030B                  		ADD #0BH, R0, R3
+00000031 05rrrrrr             A  		BSR _R_RSPI_Write
+00000035                         L16:	; bb41
+                                 ;      69 	while(!g_rspi_callbackend);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",69
+00000035 FBE2rrrrrrrr            		MOV.L #_g_rspi_callbackend, R14
+0000003B 58EE                    		MOVU.B [R14], R14
+0000003D 610E                    		CMP #00H, R14
+0000003F 10                   S  		BEQ L18
+00000040                         L17:	; bb46
+00000040 F80600                  		MOV.L #00000000H, [R0]
+00000043 08                   S  		BRA L19
+00000044                         L18:	; bb47
+00000044 F80601                  		MOV.L #00000001H, [R0]
+00000047                         L19:	; bb48
+00000047 EC01                    		MOV.L [R0], R1
+00000049 6101                    		CMP #00H, R1
+0000004B 21rr                    		BNE L16
+0000004D                         L20:	; bb51
+                                 ;      70 	g_rspi_callbackend = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",70
+0000004D FBE2rrrrrrrr            		MOV.L #_g_rspi_callbackend, R14
+00000053 F8E400                  		MOV.B #00H, [R14]
+00000056                         L21:	; bb51.split
+                                 ;      71 //	ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+                                 ;      72 
+                                 ;      73   return  0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",73
+00000056 3C0A00                  		MOV.B #00H, 0AH[R0]
+00000059 B281                    		MOVU.B 0AH[R0], R1
+0000005B                         L22:	; bb51.split5
+                                 ;      74 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",74
+0000005B 5B11                    		MOVU.B R1, R1
+0000005D 6704                    		RTSD #10H
+0000005F                         __$u8g_com_rx_st7920_write_byte_hw_spi_seq:
+                                 		.STACK	__$u8g_com_rx_st7920_write_byte_hw_spi_seq=20
+                                 ;      75 
+                                 ;      76 
+                                 ;      77 static void u8g_com_rx_st7920_write_byte_hw_spi_seq(u8g_t *u8g, uint8_t rs, uint8_t *ptr, uint8_t len)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",77
+0000005F 7100F0                  		ADD #0FFFFFFF0H, R0
+00000062 A089                    		MOV.L R1, 0CH[R0]
+00000064 828A                    		MOV.B R2, 0BH[R0]
+00000066 A00B                    		MOV.L R3, 04H[R0]
+00000068 808C                    		MOV.B R4, 03H[R0]
+                                 ;      78 {
+                                 ;      79   uint8_t i;
+                                 ;      80 
+                                 ;      81   if ( rs == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",81
+0000006A B289                    		MOVU.B 0BH[R0], R1
+0000006C 6101                    		CMP #00H, R1
+0000006E 21rr                    		BNE L25
+00000070                         L24:	; bb6
+                                 ;      82   {
+                                 ;      83     /* command */
+                                 ;      84     u8g_rx_st7920_hw_spi_shift_out(u8g, 0x0f8);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",84
+00000070 A889                    		MOV.L 0CH[R0], R1
+00000072 7542F8                  		MOV.L #000000F8H, R2
+00000075 39rrrr               W  		BSR __$u8g_rx_st7920_hw_spi_shift_out
+00000078 2Err                 B  		BRA L32
+0000007A                         L25:	; bb9
+                                 ;      85   }
+                                 ;      86   else if ( rs == 1 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",86
+0000007A B289                    		MOVU.B 0BH[R0], R1
+0000007C 6111                    		CMP #01H, R1
+0000007E 21rr                    		BNE L32
+00000080                         L26:	; bb10
+                                 ;      87   {
+                                 ;      88     /* data */
+                                 ;      89     u8g_rx_st7920_hw_spi_shift_out(u8g, 0x0fa);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",89
+00000080 A889                    		MOV.L 0CH[R0], R1
+00000082 7542FA                  		MOV.L #000000FAH, R2
+00000085 39rrrr               W  		BSR __$u8g_rx_st7920_hw_spi_shift_out
+00000088 2Err                 B  		BRA L32
+0000008A                         L27:	; bb24
+0000008A 7542F0                  		MOV.L #000000F0H, R2
+                                 ;      90   }
+                                 ;      91 
+                                 ;      92   while( len > 0 )
+                                 ;      93   {
+                                 ;      94     u8g_rx_st7920_hw_spi_shift_out(u8g, *ptr & 0x0f0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",94
+0000008D A809                    		MOV.L 04H[R0], R1
+0000008F 5012                    		AND [R1].UB, R2
+00000091 A889                    		MOV.L 0CH[R0], R1
+00000093 39rrrr               W  		BSR __$u8g_rx_st7920_hw_spi_shift_out
+00000096                         L28:	; bb24.split
+                                 ;      95     u8g_rx_st7920_hw_spi_shift_out(u8g, *ptr << 4);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",95
+00000096 A809                    		MOV.L 04H[R0], R1
+00000098 581E                    		MOVU.B [R1], R14
+0000009A A889                    		MOV.L 0CH[R0], R1
+0000009C 6C4E                    		SHLL #04H, R14
+0000009E 5BE2                    		MOVU.B R14, R2
+000000A0 39rrrr               W  		BSR __$u8g_rx_st7920_hw_spi_shift_out
+000000A3                         L29:	; bb24.split1
+                                 ;      96     ptr++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",96
+000000A3 A809                    		MOV.L 04H[R0], R1
+000000A5 6211                    		ADD #01H, R1
+000000A7 A009                    		MOV.L R1, 04H[R0]
+000000A9                         L30:	; bb24.split2
+                                 ;      97     len--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",97
+000000A9 B089                    		MOVU.B 03H[R0], R1
+000000AB 6011                    		SUB #01H, R1
+000000AD 8089                    		MOV.B R1, 03H[R0]
+000000AF                         L31:	; bb24.split3
+                                 ;      98     u8g_10MicroDelay();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",98
+000000AF 05rrrrrr             A  		BSR _u8g_10MicroDelay
+000000B3                         L32:	; bb43
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",92
+000000B3 B089                    		MOVU.B 03H[R0], R1
+000000B5 6101                    		CMP #00H, R1
+000000B7 2Arr                    		BGT L27
+000000B9                         L33:	; bb49
+                                 ;      99   }
+                                 ;     100 
+                                 ;     101   for( i = 0; i < 1; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",101
+000000B9 3C0200                  		MOV.B #00H, 02H[R0]
+000000BC 2Err                 B  		BRA L35
+000000BE                         L34:	; bb50
+                                 ;     102     u8g_10MicroDelay();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",102
+000000BE 05rrrrrr             A  		BSR _u8g_10MicroDelay
+000000C2 B081                    		MOVU.B 02H[R0], R1
+000000C4 6211                    		ADD #01H, R1
+000000C6 8081                    		MOV.B R1, 02H[R0]
+000000C8                         L35:	; bb53
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",101
+000000C8 B081                    		MOVU.B 02H[R0], R1
+000000CA 6101                    		CMP #00H, R1
+000000CC 2Brr                    		BLE L34
+000000CE                         L36:	; return
+                                 ;     103 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",103
+000000CE 6704                    		RTSD #10H
+000000D0                         __$u8g_com_rx_st7920_write_byte_hw_spi:
+                                 		.STACK	__$u8g_com_rx_st7920_write_byte_hw_spi=12
+                                 ;     104 
+                                 ;     105 static void u8g_com_rx_st7920_write_byte_hw_spi(u8g_t *u8g, uint8_t rs, uint8_t val)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",105
+000000D0 6080                    		SUB #08H, R0
+000000D2 A009                    		MOV.L R1, 04H[R0]
+000000D4 808A                    		MOV.B R2, 03H[R0]
+000000D6 8083                    		MOV.B R3, 02H[R0]
+                                 ;     106 {
+                                 ;     107   uint8_t i;
+                                 ;     108 
+                                 ;     109   if ( rs == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",109
+000000D8 B089                    		MOVU.B 03H[R0], R1
+000000DA 6101                    		CMP #00H, R1
+000000DC 21rr                    		BNE L39
+000000DE                         L38:	; bb5
+                                 ;     110   {
+                                 ;     111     /* command */
+                                 ;     112     u8g_rx_st7920_hw_spi_shift_out(u8g, 0x0f8);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",112
+000000DE A809                    		MOV.L 04H[R0], R1
+000000E0 7542F8                  		MOV.L #000000F8H, R2
+000000E3 39rrrr               W  		BSR __$u8g_rx_st7920_hw_spi_shift_out
+000000E6 2Err                 B  		BRA L41
+000000E8                         L39:	; bb8
+                                 ;     113   }
+                                 ;     114   else if ( rs == 1 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",114
+000000E8 B089                    		MOVU.B 03H[R0], R1
+000000EA 6111                    		CMP #01H, R1
+000000EC 18                   S  		BNE L41
+000000ED                         L40:	; bb9
+                                 ;     115   {
+                                 ;     116     /* data */
+                                 ;     117     u8g_rx_st7920_hw_spi_shift_out(u8g, 0x0fa);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",117
+000000ED A809                    		MOV.L 04H[R0], R1
+000000EF 7542FA                  		MOV.L #000000FAH, R2
+000000F2 39rrrr               W  		BSR __$u8g_rx_st7920_hw_spi_shift_out
+000000F5                         L41:	; bb23
+000000F5 7542F0                  		MOV.L #000000F0H, R2
+                                 ;     118   }
+                                 ;     119   else
+                                 ;     120   {
+                                 ;     121     /* do nothing, keep same state */
+                                 ;     122   }
+                                 ;     123 
+                                 ;     124   u8g_rx_st7920_hw_spi_shift_out(u8g, val & 0x0f0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",124
+000000F8 510202                  		AND 02H[R0].UB, R2
+000000FB A809                    		MOV.L 04H[R0], R1
+000000FD 39rrrr               W  		BSR __$u8g_rx_st7920_hw_spi_shift_out
+00000100                         L42:	; bb23.split
+                                 ;     125   u8g_rx_st7920_hw_spi_shift_out(u8g, val << 4);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",125
+00000100 B082                    		MOVU.B 02H[R0], R2
+00000102 A809                    		MOV.L 04H[R0], R1
+00000104 6C42                    		SHLL #04H, R2
+00000106 5B22                    		MOVU.B R2, R2
+00000108 39rrrr               W  		BSR __$u8g_rx_st7920_hw_spi_shift_out
+0000010B                         L43:	; bb23.split1
+                                 ;     126 
+                                 ;     127   for( i = 0; i < 1; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",127
+0000010B 3C0100                  		MOV.B #00H, 01H[R0]
+0000010E 2Err                 B  		BRA L45
+00000110                         L44:	; bb36
+                                 ;     128     u8g_10MicroDelay();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",128
+00000110 05rrrrrr             A  		BSR _u8g_10MicroDelay
+00000114 B009                    		MOVU.B 01H[R0], R1
+00000116 6211                    		ADD #01H, R1
+00000118 8009                    		MOV.B R1, 01H[R0]
+0000011A                         L45:	; bb39
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",127
+0000011A B009                    		MOVU.B 01H[R0], R1
+0000011C 6101                    		CMP #00H, R1
+0000011E 2Brr                    		BLE L44
+00000120                         L46:	; return
+                                 ;     129 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",129
+00000120 6702                    		RTSD #08H
+00000122                         _u8g_com_rx_hw_spi_fn:
+                                 		.STACK	_u8g_com_rx_hw_spi_fn=48
+                                 ;     130 
+                                 ;     131 uint8_t u8g_com_rx_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",131
+00000122 7100D4                  		ADD #0FFFFFFD4H, R0
+00000125 A281                    		MOV.L R1, 28H[R0]
+00000127 C70227                  		MOV.B R2, 27H[R0]
+0000012A C70326                  		MOV.B R3, 26H[R0]
+0000012D A204                    		MOV.L R4, 20H[R0]
+                                 ;     132 {
+                                 ;     133 	/* Conditions: Channel not yet open. */
+                                 ;     134 	uint8_t chan = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",134
+0000012F 3C0300                  		MOV.B #00H, 03H[R0]
+00000132                         L48:	; entry.split
+                                 ;     135 	rspi_chnl_settings_t my_config;
+                                 ;     136 	rspi_cmd_baud_t my_setbaud_struct;
+                                 ;     137 	rspi_err_t rspi_result;
+                                 ;     138 
+                                 ;     139 
+                                 ;     140 	  switch(msg)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",140
+00000132 590127                  		MOVU.B 27H[R0], R1
+00000135 6171                    		CMP #07H, R1
+00000137 3Arrrr               W  		BEQ L69
+0000013A                         L49:	; entry.split
+0000013A 6121                    		CMP #02H, R1
+0000013C 3Arrrr               W  		BEQ L74
+0000013F                         L50:	; entry.split
+0000013F 6131                    		CMP #03H, R1
+00000141 20rr                    		BEQ L64
+00000143                         L51:	; entry.split
+00000143 6151                    		CMP #05H, R1
+00000145 20rr                    		BEQ L67
+00000147                         L52:	; entry.split
+00000147 6161                    		CMP #06H, R1
+00000149 20rr                    		BEQ L68
+0000014B                         L53:	; entry.split
+0000014B 6111                    		CMP #01H, R1
+0000014D 3Brrrr               W  		BNE L75
+00000150                         L54:	; bb
+                                 ;     141 	  {
+                                 ;     142 	    case U8G_COM_MSG_INIT:
+                                 ;     143 	    	my_config.gpio_ssl = RSPI_IF_MODE_3WIRE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",143
+00000150 3E0101                  		MOV.L #00000001H, 04H[R0]
+00000153                         L55:	; bb.split
+                                 ;     144 	    	my_config.master_slave_mode = RSPI_MS_MODE_MASTER;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",144
+00000153 3E0208                  		MOV.L #00000008H, 08H[R0]
+00000156                         L56:	; bb.split1
+                                 ;     145 	    	my_config.bps_target = 1000000; // Bit rate in bits-per-second.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",145
+00000156 F90E0340420F            		MOV.L #000F4240H, 0CH[R0]
+0000015C                         L57:	; bb.split2
+                                 ;     146 	    	rspi_result = R_RSPI_Open(chan, &my_config, rspi_callback, &handle );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",146
+0000015C B089                    		MOVU.B 03H[R0], R1
+0000015E FB42rrrrrrrr            		MOV.L #__$handle, R4
+00000164 FB32rrrrrrrr            		MOV.L #__$rspi_callback, R3
+0000016A 710204                  		ADD #04H, R0, R2
+0000016D 05rrrrrr             A  		BSR _R_RSPI_Open
+00000171 A109                    		MOV.L R1, 14H[R0]
+00000173                         L58:	; bb.split3
+                                 ;     147 	    	if (RSPI_SUCCESS != rspi_result)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",147
+00000173 A909                    		MOV.L 14H[R0], R1
+00000175 6101                    		CMP #00H, R1
+00000177 10                   S  		BEQ L60
+00000178                         L59:	; bb20
+                                 ;     148 	    	{
+                                 ;     149 	    		while(1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",149
+00000178 2Err                 B  		BRA L59
+0000017A                         L60:	; bb25
+                                 ;     150 	    	}
+                                 ;     151 	    	my_setbaud_struct.bps_target = 1000000;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",151
+0000017A F90E0440420F            		MOV.L #000F4240H, 10H[R0]
+00000180                         L61:	; bb25.split
+                                 ;     152 	    	rspi_result = R_RSPI_Control(handle, RSPI_CMD_SET_BAUD, &my_setbaud_struct);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",152
+00000180 FBE2rrrrrrrr            		MOV.L #__$handle, R14
+00000186 ECE1                    		MOV.L [R14], R1
+00000188 710310                  		ADD #10H, R0, R3
+0000018B 6612                    		MOV.L #00000001H, R2
+0000018D 05rrrrrr             A  		BSR _R_RSPI_Control
+00000191 A109                    		MOV.L R1, 14H[R0]
+00000193                         L62:	; bb25.split4
+                                 ;     153 	    	if (RSPI_SUCCESS != rspi_result)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",153
+00000193 A909                    		MOV.L 14H[R0], R1
+00000195 6101                    		CMP #00H, R1
+00000197 20rr                    		BEQ L75
+00000199                         L63:	; bb33
+                                 ;     154 	    	{
+                                 ;     155 	    		while(1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",155
+00000199 2Err                 B  		BRA L63
+0000019B                         L64:	; bb42
+                                 ;     156 	    	}
+                                 ;     157 
+                                 ;     158 	      break;
+                                 ;     159 	    case U8G_COM_MSG_STOP:
+                                 ;     160 	      break;
+                                 ;     161 
+                                 ;     162 	    case U8G_COM_MSG_CHIP_SELECT:
+                                 ;     163 	        if ( arg_val == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",163
+0000019B 590126                  		MOVU.B 26H[R0], R1
+0000019E 6101                    		CMP #00H, R1
+000001A0 18                   S  		BNE L66
+000001A1                         L65:	; bb43
+000001A1 FBEE2CC008              		MOV.L #0008C02CH, R14
+                                 ;     164 	        {
+                                 ;     165 	          /* disable, note: the st7920 has an active high chip select */
+                                 ;     166 	        	LCD_CS = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",166
+000001A6 F0EA                    		BCLR #02H, [R14].B
+000001A8 2Err                 B  		BRA L75
+000001AA                         L66:	; bb47
+000001AA FBEE2CC008              		MOV.L #0008C02CH, R14
+                                 ;     167 	        }
+                                 ;     168 	        else
+                                 ;     169 	        {
+                                 ;     170 	          /* enable */
+                                 ;     171 	        	LCD_CS = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",171
+000001AF F0E2                    		BSET #02H, [R14].B
+000001B1 2Err                 B  		BRA L75
+000001B3                         L67:	; bb57
+                                 ;     172 	        }
+                                 ;     173 	      break;
+                                 ;     174 
+                                 ;     175 
+                                 ;     176 	    case U8G_COM_MSG_WRITE_BYTE:
+                                 ;     177 	    	 u8g_com_rx_st7920_write_byte_hw_spi(u8g,  u8g->pin_list[U8G_PI_A0_STATE], arg_val);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",177
+000001B3 AA81                    		MOV.L 28H[R0], R1
+000001B5 591237                  		MOVU.B 37H[R1], R2
+000001B8 590326                  		MOVU.B 26H[R0], R3
+000001BB 39rrrr               W  		BSR __$u8g_com_rx_st7920_write_byte_hw_spi
+000001BE 2Err                 B  		BRA L75
+000001C0                         L68:	; bb65
+                                 ;     178 	      break;
+                                 ;     179 	    case U8G_COM_MSG_WRITE_SEQ:
+                                 ;     180 	        u8g_com_rx_st7920_write_byte_hw_spi_seq(u8g, u8g->pin_list[U8G_PI_A0_STATE], (uint8_t *)arg_ptr, arg_val);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",180
+000001C0 AA81                    		MOV.L 28H[R0], R1
+000001C2 591237                  		MOVU.B 37H[R1], R2
+000001C5 590426                  		MOVU.B 26H[R0], R4
+000001C8 AA03                    		MOV.L 20H[R0], R3
+000001CA 39rrrr               W  		BSR __$u8g_com_rx_st7920_write_byte_hw_spi_seq
+000001CD 2Err                 B  		BRA L75
+000001CF                         L69:	; bb74
+                                 ;     181 	      break;
+                                 ;     182 	      case U8G_COM_MSG_WRITE_SEQ_P:
+                                 ;     183 	      {
+                                 ;     184 	        register uint8_t *ptr = arg_ptr;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",184
+000001CF E5000806                		MOV.L 20H[R0], 18H[R0]
+000001D3 2Err                 B  		BRA L73
+000001D5                         L70:	; bb76
+                                 ;     185 	        while( arg_val > 0 )
+                                 ;     186 	        {
+                                 ;     187 	          u8g_com_rx_st7920_write_byte_hw_spi(u8g, u8g->pin_list[U8G_PI_A0_STATE], u8g_pgm_read(ptr) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",187
+000001D5 A981                    		MOV.L 18H[R0], R1
+000001D7 5813                    		MOVU.B [R1], R3
+000001D9 AA81                    		MOV.L 28H[R0], R1
+000001DB 591237                  		MOVU.B 37H[R1], R2
+000001DE 39rrrr               W  		BSR __$u8g_com_rx_st7920_write_byte_hw_spi
+000001E1                         L71:	; bb76.split
+                                 ;     188 	          // u8g->pin_list[U8G_PI_A0_STATE] = 2;
+                                 ;     189 	          ptr++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",189
+000001E1 A981                    		MOV.L 18H[R0], R1
+000001E3 6211                    		ADD #01H, R1
+000001E5 A181                    		MOV.L R1, 18H[R0]
+000001E7                         L72:	; bb76.split5
+                                 ;     190 	          arg_val--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",190
+000001E7 590126                  		MOVU.B 26H[R0], R1
+000001EA 6011                    		SUB #01H, R1
+000001EC C70126                  		MOV.B R1, 26H[R0]
+000001EF                         L73:	; bb89
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",185
+000001EF 590126                  		MOVU.B 26H[R0], R1
+000001F2 6101                    		CMP #00H, R1
+000001F4 2Arr                    		BGT L70
+000001F6 08                   S  		BRA L75
+000001F7                         L74:	; bb96
+                                 ;     191 	        }
+                                 ;     192 	      }
+                                 ;     193 	      break;
+                                 ;     194 
+                                 ;     195 	    case U8G_COM_MSG_ADDRESS:                     /* define cmd (arg_val = 0) or data mode (arg_val = 1) */
+                                 ;     196 	      u8g->pin_list[U8G_PI_A0_STATE] = arg_val;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",196
+000001F7 590126                  		MOVU.B 26H[R0], R1
+000001FA AA82                    		MOV.L 28H[R0], R2
+000001FC C72137                  		MOV.B R1, 37H[R2]
+000001FF                         L75:	; bb102
+                                 ;     197 	      break;
+                                 ;     198 	  }
+                                 ;     199 	  return 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",199
+000001FF 3C8F01                  		MOV.B #01H, 1FH[R0]
+00000202 B789                    		MOVU.B 1FH[R0], R1
+00000204                         L76:	; bb102.split
+                                 ;     200 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",200
+00000204 5B11                    		MOVU.B R1, R1
+00000206 670B                    		RTSD #2CH
+00000208                         __$rspi_callback:
+                                 		.STACK	__$rspi_callback=8
+                                 ;     201 
+                                 ;     202 void rspi_callback(void *p_arg)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",202
+00000208 6040                    		SUB #04H, R0
+0000020A E301                    		MOV.L R1, [R0]
+                                 ;     203 {
+                                 ;     204 	g_rspi_callbackend = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\Display\u8g_com_rx_st7920_hw_spi.c",204
+0000020C FBE2rrrrrrrr            		MOV.L #_g_rspi_callbackend, R14
+00000212 F8E401                  		MOV.B #01H, [R14]
+00000215 6701                    		RTSD #04H
+                                 ;     205 //    BaseType_t xHigherPriorityTaskWoken;
+                                 ;     206 //
+                                 ;     207 //    xHigherPriorityTaskWoken = pdFALSE;
+                                 ;     208 //
+                                 ;     209 //    vTaskNotifyGiveFromISR( task_main_handle, &xHigherPriorityTaskWoken );
+                                 ;     210 //
+                                 ;     211 //    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+                                 ;     212 }
+                                 ;     213 
+                                 ;     214 
+                                 ;     215 
+                                 ;     216 
+                                 ;     217 
+                                 		.SECTION	D_1,ROMDATA
+00000000                         _g_rspi_callbackend:
+00000000 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         __$handle:
+00000000(00000004H)              		.blkl	1
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00607   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000535(00000217H)  P
+ROMDATA  0000000001(00000001H)  D_1
+DATA     0000000004(00000004H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\u8g_com_rx_st7920_hw_spi.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\EasyMak_build\u8g_com_rx_st7920_hw_spi.lst
+-output=C:\Workspace\e2studio\git\MT01\EasyMak_build\src\Display\u8g_com_rx_st7920_hw_spi.obj

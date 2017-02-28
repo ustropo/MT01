@@ -1,0 +1,1151 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Sun Feb 19 10:54:31 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  19-Feb-2017 10:54:31
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_tfat_drv_if.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_tfat_drv_if.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=0,MOBILE=1,FREE_RTOS_PP
+                                 ;r_tfat_drv_if.c
+                                 
+                                 		.glb	_disk_initialize
+                                 		.glb	_R_tfat_usb_disk_initialize
+                                 		.glb	_disk_read
+                                 		.glb	_R_tfat_usb_disk_read
+                                 		.glb	_disk_write
+                                 		.glb	_R_tfat_usb_disk_write
+                                 		.glb	_disk_ioctl
+                                 		.glb	_R_tfat_usb_disk_ioctl
+                                 		.glb	_disk_status
+                                 		.glb	_R_tfat_usb_disk_status
+                                 		.glb	_get_fattime
+                                 		.glb	_R_BSP_InterruptsDisable
+                                 		.glb	_R_BSP_InterruptsEnable
+                                 		.glb	_R_tfat_drv_change_alloc
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         __$check_use_usb:
+                                 		.STACK	__$check_use_usb=12
+                                 ;       1 /*******************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only
+                                 ;       4 * intended for use with Renesas products. No other uses are authorized. This
+                                 ;       5 * software is owned by Renesas Electronics Corporation and is protected under
+                                 ;       6 * all applicable laws, including copyright laws.
+                                 ;       7 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       8 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+                                 ;       9 * LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+                                 ;      10 * AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+                                 ;      11 * TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+                                 ;      12 * ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+                                 ;      13 * FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+                                 ;      14 * ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+                                 ;      15 * BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      16 * Renesas reserves the right, without notice, to make changes to this software
+                                 ;      17 * and to discontinue the availability of this software. By using this software,
+                                 ;      18 * you agree to the additional terms and conditions found by accessing the
+                                 ;      19 * following link:
+                                 ;      20 * http://www.renesas.com/disclaimer
+                                 ;      21 *
+                                 ;      22 * Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+                                 ;      23 *******************************************************************************/
+                                 ;      24 /*******************************************************************************
+                                 ;      25 * File Name    : r_tfat_drv_if.c
+                                 ;      26 * Description  : TFAT driver Interface.
+                                 ;      27 *******************************************************************************/
+                                 ;      28 /*******************************************************************************
+                                 ;      29 * History      : DD.MM.YYYY Version  Description
+                                 ;      30 *              : 01.12.2014 1.00     First Release
+                                 ;      31 *              : 21.01.2015 1.01     Added Support USB Mini Firmware.
+                                 ;      32 *******************************************************************************/
+                                 ;      33 
+                                 ;      34 /******************************************************************************
+                                 ;      35 Includes   <System Includes> , "Project Includes"
+                                 ;      36 *******************************************************************************/
+                                 ;      37 #include "platform.h"
+                                 ;      38 #include "r_tfat_driver_rx_if.h"
+                                 ;      39 #include "r_tfat_driver_rx_config.h"
+                                 ;      40 #include "r_tfat_drv_if_dev.h"
+                                 ;      41 
+                                 ;      42 /*******************************************************************************
+                                 ;      43 Macro definitions
+                                 ;      44 *******************************************************************************/
+                                 ;      45 /* for USB */
+                                 ;      46 #if (TFAT_USB_DRIVE_NUM > 0)
+                                 ;      47 #if (TFAT_DRIVE_ALLOC_NUM_0 == TFAT_CTRL_USB)
+                                 ;      48 #define USB_NUM_0    (1)
+                                 ;      49 #define DRV0_DEV_CH  (0)
+                                 ;      50 #else
+                                 ;      51 #define USB_NUM_0    (0)
+                                 ;      52 #endif // (TFAT_DRIVE_ALLOC_NUM_0 == TFAT_CTRL_USB)
+                                 ;      53 #if (TFAT_DRIVE_ALLOC_NUM_1 == TFAT_CTRL_USB)
+                                 ;      54 #define USB_NUM_1    (1<<1)
+                                 ;      55 #define DRV1_DEV_CH  (0 + USB_NUM_0)
+                                 ;      56 #else
+                                 ;      57 #define USB_NUM_1    (0)
+                                 ;      58 #endif // (TFAT_DRIVE_ALLOC_NUM_1 == TFAT_CTRL_USB)
+                                 ;      59 #if (TFAT_DRIVE_ALLOC_NUM_2 == TFAT_CTRL_USB)
+                                 ;      60 #define USB_NUM_2    (1<<2)
+                                 ;      61 #define DRV2_DEV_CH  (0 + USB_NUM_0 + (USB_NUM_1>>1))
+                                 ;      62 #else
+                                 ;      63 #define USB_NUM_2    (0)
+                                 ;      64 #endif // (TFAT_DRIVE_ALLOC_NUM_2 == TFAT_CTRL_USB)
+                                 ;      65 #if (TFAT_DRIVE_ALLOC_NUM_3 == TFAT_CTRL_USB)
+                                 ;      66 #define USB_NUM_3    (1<<3)
+                                 ;      67 #define DRV3_DEV_CH  (0 + USB_NUM_0 + (USB_NUM_1>>1) + (USB_NUM_2>>2))
+                                 ;      68 #else
+                                 ;      69 #define USB_NUM_3    (0)
+                                 ;      70 #endif // (TFAT_DRIVE_ALLOC_NUM_3 == TFAT_CTRL_USB)
+                                 ;      71 #if (TFAT_DRIVE_ALLOC_NUM_4 == TFAT_CTRL_USB)
+                                 ;      72 #define USB_NUM_4    (1<<4)
+                                 ;      73 #define DRV4_DEV_CH  (0 + USB_NUM_0 + (USB_NUM_1>>1) + (USB_NUM_2>>2) + (USB_NUM_3>>3))
+                                 ;      74 #else
+                                 ;      75 #define USB_NUM_4    (0)
+                                 ;      76 #endif // (TFAT_DRIVE_ALLOC_NUM_4 == TFAT_CTRL_USB)
+                                 ;      77 #if (TFAT_DRIVE_ALLOC_NUM_5 == TFAT_CTRL_USB)
+                                 ;      78 #define USB_NUM_5    (1<<5)
+                                 ;      79 #define DRV5_DEV_CH  (0 + USB_NUM_0 + (USB_NUM_1>>1) + (USB_NUM_2>>2) + (USB_NUM_3>>3) + (USB_NUM_4>>4))
+                                 ;      80 #else
+                                 ;      81 #define USB_NUM_5    (0)
+                                 ;      82 #endif // (TFAT_DRIVE_ALLOC_NUM_5 == TFAT_CTRL_USB)
+                                 ;      83 #if (TFAT_DRIVE_ALLOC_NUM_6 == TFAT_CTRL_USB)
+                                 ;      84 #define USB_NUM_6    (1<<6)
+                                 ;      85 #define DRV6_DEV_CH  (0 + USB_NUM_0 + (USB_NUM_1>>1) + (USB_NUM_2>>2) + (USB_NUM_3>>3) + (USB_NUM_4>>4) + (USB_NUM_5>>5))
+                                 ;      86 #else
+                                 ;      87 #define USB_NUM_6    (0)
+                                 ;      88 #endif // (TFAT_DRIVE_ALLOC_NUM_6 == TFAT_CTRL_USB)
+                                 ;      89 #if (TFAT_DRIVE_ALLOC_NUM_7 == TFAT_CTRL_USB)
+                                 ;      90 #define USB_NUM_7    (1<<7)
+                                 ;      91 #define DRV7_DEV_CH  (0 + USB_NUM_0 + (USB_NUM_1>>1) + (USB_NUM_2>>2) + (USB_NUM_3>>3) + (USB_NUM_4>>4) + (USB_NUM_5>>5) + (USB_NUM_6>>6))
+                                 ;      92 #else
+                                 ;      93 #define USB_NUM_7    (0)
+                                 ;      94 #endif // (TFAT_DRIVE_ALLOC_NUM_7 == TFAT_CTRL_USB)
+                                 ;      95 #if ( TFAT_DRIVE_ALLOC_NUM_8 == TFAT_CTRL_USB)
+                                 ;      96 #define USB_NUM_8    (1<<8)
+                                 ;      97 #define DRV8_DEV_CH  (0 + USB_NUM_0 + (USB_NUM_1>>1) + (USB_NUM_2>>2) + (USB_NUM_3>>3) + (USB_NUM_4>>4) + (USB_NUM_5>>5) + (USB_NUM_6>>6) + (USB_NUM_7>>7))
+                                 ;      98 #else
+                                 ;      99 #define USB_NUM_8    (0)
+                                 ;     100 #endif // ( TFAT_DRIVE_ALLOC_NUM_8 == TFAT_CTRL_USB)
+                                 ;     101 #if (TFAT_DRIVE_ALLOC_NUM_9 == TFAT_CTRL_USB)
+                                 ;     102 #define USB_NUM_9    (1<<9)
+                                 ;     103 #define DRV9_DEV_CH  (0 + USB_NUM_0 + (USB_NUM_1>>1) + (USB_NUM_2>>2) + (USB_NUM_3>>3) + (USB_NUM_4>>4) + (USB_NUM_5>>5) + (USB_NUM_6>>6) + (USB_NUM_7>>7) + 
+                                 ;     104 #else
+                                 ;     105 #define USB_NUM_9    (0)
+                                 ;     106 #endif // (TFAT_DRIVE_ALLOC_NUM_9 == TFAT_CTRL_USB)
+                                 ;     107 
+                                 ;     108 static uint32_t TFAT_DRIVE_USB_ALLOC = (USB_NUM_9 | USB_NUM_8 | USB_NUM_7 | USB_NUM_6 | USB_NUM_5 | USB_NUM_4 | USB_NUM_3 | USB_NUM_2 | USB_NUM_1 | USB_NUM_0
+                                 ;     109 
+                                 ;     110 #if TFAT_USB_DRIVE_NUM != ( (USB_NUM_9>>9)+(USB_NUM_8>>8)+(USB_NUM_7>>7)+(USB_NUM_6>>6)+(USB_NUM_5>>5)+(USB_NUM_4>>4)+(USB_NUM_3>>3)+(USB_NUM_2>>2)+(USB_NUM_
+                                 ;     111 #error "Error! Invalid setting for TFAT_USB_DRIVE_NUM or TFAT_DRIVE_ALLOC_NUM_x in r_tfat_driver_rx_config.h"
+                                 ;     112 #endif
+                                 ;     113 
+                                 ;     114 #endif // (TFAT_USB_DRIVE_NUM > 0)
+                                 ;     115 
+                                 ;     116 
+                                 ;     117 /* for SDHI */
+                                 ;     118 #if (TFAT_SDHI_DRIVE_NUM > 0)
+                                 ;     119 #if (TFAT_DRIVE_ALLOC_NUM_0 == TFAT_CTRL_SDHI)
+                                 ;     120 #define SDHI_NUM_0    (1)
+                                 ;     121 #define DRV0_DEV_CH   (0)
+                                 ;     122 #else
+                                 ;     123 #define SDHI_NUM_0    (0)
+                                 ;     124 #endif // (TFAT_DRIVE_ALLOC_NUM_0 == TFAT_CTRL_SDHI)
+                                 ;     125 #if (TFAT_DRIVE_ALLOC_NUM_1 == TFAT_CTRL_SDHI)
+                                 ;     126 #define SDHI_NUM_1    (1<<1)
+                                 ;     127 #define DRV1_DEV_CH   (0 + SDHI_NUM_0)
+                                 ;     128 #else
+                                 ;     129 #define SDHI_NUM_1    (0)
+                                 ;     130 #endif // (TFAT_DRIVE_ALLOC_NUM_1 == TFAT_CTRL_SDHI)
+                                 ;     131 #if (TFAT_DRIVE_ALLOC_NUM_2 == TFAT_CTRL_SDHI)
+                                 ;     132 #define SDHI_NUM_2    (1<<2)
+                                 ;     133 #define DRV2_DEV_CH   (0 + SDHI_NUM_0 + (SDHI_NUM_1>>1))
+                                 ;     134 #else
+                                 ;     135 #define SDHI_NUM_2    (0)
+                                 ;     136 #endif // (TFAT_DRIVE_ALLOC_NUM_2 == TFAT_CTRL_SDHI)
+                                 ;     137 #if (TFAT_DRIVE_ALLOC_NUM_3 == TFAT_CTRL_SDHI)
+                                 ;     138 #define SDHI_NUM_3    (1<<3)
+                                 ;     139 #define DRV3_DEV_CH   (0 + SDHI_NUM_0 + (SDHI_NUM_1>>1) + (SDHI_NUM_2>>2))
+                                 ;     140 #else
+                                 ;     141 #define SDHI_NUM_3    (0)
+                                 ;     142 #endif //  (TFAT_DRIVE_ALLOC_NUM_3 == TFAT_CTRL_SDHI)
+                                 ;     143 #if (TFAT_DRIVE_ALLOC_NUM_4 == TFAT_CTRL_SDHI)
+                                 ;     144 #define SDHI_NUM_4    (1<<4)
+                                 ;     145 #define DRV4_DEV_CH   (0 + SDHI_NUM_0 + (SDHI_NUM_1>>1) + (SDHI_NUM_2>>2) + (SDHI_NUM_3>>3))
+                                 ;     146 #else
+                                 ;     147 #define SDHI_NUM_4    (0)
+                                 ;     148 #endif // (TFAT_DRIVE_ALLOC_NUM_4 == TFAT_CTRL_SDHI)
+                                 ;     149 #if (TFAT_DRIVE_ALLOC_NUM_5 == TFAT_CTRL_SDHI)
+                                 ;     150 #define SDHI_NUM_5    (1<<5)
+                                 ;     151 #define DRV5_DEV_CH   (0 + SDHI_NUM_0 + (SDHI_NUM_1>>1) + (SDHI_NUM_2>>2) + (SDHI_NUM_3>>3) + (SDHI_NUM_4>>4))
+                                 ;     152 #else
+                                 ;     153 #define SDHI_NUM_5    (0)
+                                 ;     154 #endif // (TFAT_DRIVE_ALLOC_NUM_5 == TFAT_CTRL_SDHI)
+                                 ;     155 #if (TFAT_DRIVE_ALLOC_NUM_6 == TFAT_CTRL_SDHI)
+                                 ;     156 #define SDHI_NUM_6    (1<<6)
+                                 ;     157 #define DRV6_DEV_CH   (0 + SDHI_NUM_0 + (SDHI_NUM_1>>1) + (SDHI_NUM_2>>2) + (SDHI_NUM_3>>3) + (SDHI_NUM_4>>4) + (SDHI_NUM_5>>5))
+                                 ;     158 #else
+                                 ;     159 #define SDHI_NUM_6    (0)
+                                 ;     160 #endif // (TFAT_DRIVE_ALLOC_NUM_6 == TFAT_CTRL_SDHI)
+                                 ;     161 #if (TFAT_DRIVE_ALLOC_NUM_7 == TFAT_CTRL_SDHI)
+                                 ;     162 #define SDHI_NUM_7    (1<<7)
+                                 ;     163 #define DRV7_DEV_CH   (0 + SDHI_NUM_0 + (SDHI_NUM_1>>1) + (SDHI_NUM_2>>2) + (SDHI_NUM_3>>3) + (SDHI_NUM_4>>4) + (SDHI_NUM_5>>5) + (SDHI_NUM_6>>6))
+                                 ;     164 #else
+                                 ;     165 #define SDHI_NUM_7    (0)
+                                 ;     166 #endif // (TFAT_DRIVE_ALLOC_NUM_7 == TFAT_CTRL_SDHI)
+                                 ;     167 #if (TFAT_DRIVE_ALLOC_NUM_8 == TFAT_CTRL_SDHI)
+                                 ;     168 #define SDHI_NUM_8    (1<<8)
+                                 ;     169 #define DRV8_DEV_CH   (0 + SDHI_NUM_0 + (SDHI_NUM_1>>1) + (SDHI_NUM_2>>2) + (SDHI_NUM_3>>3) + (SDHI_NUM_4>>4) + (SDHI_NUM_5>>5) + (SDHI_NUM_6>>6) + (SDHI_NUM
+                                 ;     170 #else
+                                 ;     171 #define SDHI_NUM_8    (0)
+                                 ;     172 #endif // (TFAT_DRIVE_ALLOC_NUM_8 == TFAT_CTRL_SDHI)
+                                 ;     173 #if (TFAT_DRIVE_ALLOC_NUM_9 == TFAT_CTRL_SDHI)
+                                 ;     174 #define SDHI_NUM_9    (1<<9)
+                                 ;     175 #define DRV9_DEV_CH   (0 + SDHI_NUM_0 + (SDHI_NUM_1>>1) + (SDHI_NUM_2>>2) + (SDHI_NUM_3>>3) + (SDHI_NUM_4>>4) + (SDHI_NUM_5>>5) + (SDHI_NUM_6>>6) + (SDHI_NUM
+                                 ;     176 #else
+                                 ;     177 #define SDHI_NUM_9    (0)
+                                 ;     178 #endif // (TFAT_DRIVE_ALLOC_NUM_9 == TFAT_CTRL_SDHI)
+                                 ;     179 
+                                 ;     180 static uint32_t TFAT_DRIVE_SDHI_ALLOC = (SDHI_NUM_9 | SDHI_NUM_8 | SDHI_NUM_7 | SDHI_NUM_6 | SDHI_NUM_5 | SDHI_NUM_4 | SDHI_NUM_3 | SDHI_NUM_2 | SDHI_NUM_1 |
+                                 ;     181 
+                                 ;     182 #if TFAT_SDHI_DRIVE_NUM != ( (SDHI_NUM_9>>9)+(SDHI_NUM_8>>8)+(SDHI_NUM_7>>7)+(SDHI_NUM_6>>6)+(SDHI_NUM_5>>5)+(SDHI_NUM_4>>4)+(SDHI_NUM_3>>3)+(SDHI_NUM_2>>2)+
+                                 ;     183 #error "Error! Invalid setting for TFAT_SDHI_DRIVE_NUM or TFAT_DRIVE_ALLOC_NUM_x in r_tfat_driver_rx_config.h"
+                                 ;     184 #endif
+                                 ;     185 
+                                 ;     186 #endif // (TFAT_SDHI_DRIVE_NUM > 0)
+                                 ;     187 
+                                 ;     188 
+                                 ;     189 /* for MMC */
+                                 ;     190 #if TFAT_MMC_DRIVE_NUM > 0
+                                 ;     191 #if (TFAT_DRIVE_ALLOC_NUM_0 == TFAT_CTRL_MMC)
+                                 ;     192 #define MMC_NUM_0    (1)
+                                 ;     193 #define DRV0_DEV_CH  (0)
+                                 ;     194 #else
+                                 ;     195 #define MMC_NUM_0    (0)
+                                 ;     196 #endif // (TFAT_DRIVE_ALLOC_NUM_0 == TFAT_CTRL_MMC)
+                                 ;     197 #if (TFAT_DRIVE_ALLOC_NUM_1 == TFAT_CTRL_MMC)
+                                 ;     198 #define MMC_NUM_1    (1<<1)
+                                 ;     199 #define DRV1_DEV_CH  (0 + MMC_NUM_0)
+                                 ;     200 #else
+                                 ;     201 #define MMC_NUM_1    (0)
+                                 ;     202 #endif // (TFAT_DRIVE_ALLOC_NUM_1 == TFAT_CTRL_MMC)
+                                 ;     203 #if (TFAT_DRIVE_ALLOC_NUM_2 == TFAT_CTRL_MMC)
+                                 ;     204 #define MMC_NUM_2    (1<<2)
+                                 ;     205 #define DRV2_DEV_CH  (0 + MMC_NUM_0 + (MMC_NUM_1>>1))
+                                 ;     206 #else
+                                 ;     207 #define MMC_NUM_2    (0)
+                                 ;     208 #endif // (TFAT_DRIVE_ALLOC_NUM_2 == TFAT_CTRL_MMC)
+                                 ;     209 #if (TFAT_DRIVE_ALLOC_NUM_3 == TFAT_CTRL_MMC)
+                                 ;     210 #define MMC_NUM_3    (1<<3)
+                                 ;     211 #define DRV3_DEV_CH  (0 + MMC_NUM_0 + (MMC_NUM_1>>1) + (MMC_NUM_2>>2))
+                                 ;     212 #else
+                                 ;     213 #define MMC_NUM_3    (0)
+                                 ;     214 #endif // (TFAT_DRIVE_ALLOC_NUM_3 == TFAT_CTRL_MMC)
+                                 ;     215 #if (TFAT_DRIVE_ALLOC_NUM_4 == TFAT_CTRL_MMC)
+                                 ;     216 #define MMC_NUM_4    (1<<4)
+                                 ;     217 #define DRV4_DEV_CH  (0 + MMC_NUM_0 + (MMC_NUM_1>>1) + (MMC_NUM_2>>2) + (MMC_NUM_3>>3))
+                                 ;     218 #else
+                                 ;     219 #define MMC_NUM_4    (0)
+                                 ;     220 #endif // (TFAT_DRIVE_ALLOC_NUM_4 == TFAT_CTRL_MMC)
+                                 ;     221 #if (TFAT_DRIVE_ALLOC_NUM_5 == TFAT_CTRL_MMC)
+                                 ;     222 #define MMC_NUM_5    (1<<5)
+                                 ;     223 #define DRV5_DEV_CH  (0 + MMC_NUM_0 + (MMC_NUM_1>>1) + (MMC_NUM_2>>2) + (MMC_NUM_3>>3) + (MMC_NUM_4>>4))
+                                 ;     224 #else
+                                 ;     225 #define MMC_NUM_5    (0)
+                                 ;     226 #endif // (TFAT_DRIVE_ALLOC_NUM_5 == TFAT_CTRL_MMC)
+                                 ;     227 #if (TFAT_DRIVE_ALLOC_NUM_6 == TFAT_CTRL_MMC)
+                                 ;     228 #define MMC_NUM_6    (1<<6)
+                                 ;     229 #define DRV6_DEV_CH  (0 + MMC_NUM_0 + (MMC_NUM_1>>1) + (MMC_NUM_2>>2) + (MMC_NUM_3>>3) + (MMC_NUM_4>>4) + (MMC_NUM_5>>5))
+                                 ;     230 #else
+                                 ;     231 #define MMC_NUM_6    (0)
+                                 ;     232 #endif // (TFAT_DRIVE_ALLOC_NUM_6 == TFAT_CTRL_MMC)
+                                 ;     233 #if (TFAT_DRIVE_ALLOC_NUM_7 == TFAT_CTRL_MMC)
+                                 ;     234 #define MMC_NUM_7    (1<<7)
+                                 ;     235 #define DRV7_DEV_CH  (0 + MMC_NUM_0 + (MMC_NUM_1>>1) + (MMC_NUM_2>>2) + (MMC_NUM_3>>3) + (MMC_NUM_4>>4) + (MMC_NUM_5>>5) + (MMC_NUM_6>>6))
+                                 ;     236 #else
+                                 ;     237 #define MMC_NUM_7    (0)
+                                 ;     238 #endif // (TFAT_DRIVE_ALLOC_NUM_7 == TFAT_CTRL_MMC)
+                                 ;     239 #if (TFAT_DRIVE_ALLOC_NUM_8 == TFAT_CTRL_MMC)
+                                 ;     240 #define MMC_NUM_8    (1<<8)
+                                 ;     241 #define DRV8_DEV_CH  (0 + MMC_NUM_0 + (MMC_NUM_1>>1) + (MMC_NUM_2>>2) + (MMC_NUM_3>>3) + (MMC_NUM_4>>4) + (MMC_NUM_5>>5) + (MMC_NUM_6>>6) + (MMC_NUM_7>>7))
+                                 ;     242 #else
+                                 ;     243 #define MMC_NUM_8    (0)
+                                 ;     244 #endif // (TFAT_DRIVE_ALLOC_NUM_8 == TFAT_CTRL_MMC)
+                                 ;     245 #if (TFAT_DRIVE_ALLOC_NUM_9 == TFAT_CTRL_MMC)
+                                 ;     246 #define MMC_NUM_9    (1<<9)
+                                 ;     247 #define DRV9_DEV_CH  (0 + MMC_NUM_0 + (MMC_NUM_1>>1) + (MMC_NUM_2>>2) + (MMC_NUM_3>>3) + (MMC_NUM_4>>4) + (MMC_NUM_5>>5) + (MMC_NUM_6>>6) + (MMC_NUM_7>>7) + 
+                                 ;     248 #else
+                                 ;     249 #define MMC_NUM_9    (0)
+                                 ;     250 #endif // (TFAT_DRIVE_ALLOC_NUM_9 == TFAT_CTRL_MMC)
+                                 ;     251 
+                                 ;     252 static uint32_t TFAT_DRIVE_MMC_ALLOC = (MMC_NUM_9 | MMC_NUM_8 | MMC_NUM_7 | MMC_NUM_6 | MMC_NUM_5 | MMC_NUM_4 | MMC_NUM_3 | MMC_NUM_2 | MMC_NUM_1 | MMC_NUM_0
+                                 ;     253 
+                                 ;     254 #if TFAT_MMC_DRIVE_NUM != ( (MMC_NUM_9>>9)+(MMC_NUM_8>>8)+(MMC_NUM_7>>7)+(MMC_NUM_6>>6)+(MMC_NUM_5>>5)+(MMC_NUM_4>>4)+(MMC_NUM_3>>3)+(MMC_NUM_2>>2)+(MMC_NUM_
+                                 ;     255 #error "Error! Invalid setting for TFAT_MMC_DRIVE_NUM or TFAT_DRIVE_ALLOC_NUM_x in r_tfat_driver_rx_config.h"
+                                 ;     256 #endif
+                                 ;     257 
+                                 ;     258 #endif // (TFAT_MMC_DRIVE_NUM > 0)
+                                 ;     259 
+                                 ;     260 
+                                 ;     261 #if (TFAT_USB_MINI_DRIVE_NUM > 0)
+                                 ;     262 #if (TFAT_DRIVE_ALLOC_NUM_0 == TFAT_CTRL_USB_MINI)
+                                 ;     263 #define USB_MINI_NUM_0    (1)
+                                 ;     264 #define DRV0_DEV_CH  (0)
+                                 ;     265 #else
+                                 ;     266 #define USB_MINI_NUM_0    (0)
+                                 ;     267 #endif // (TFAT_DRIVE_ALLOC_NUM_0 == TFAT_CTRL_USB_MINI)
+                                 ;     268 #if (TFAT_DRIVE_ALLOC_NUM_1 == TFAT_CTRL_USB_MINI)
+                                 ;     269 #define USB_MINI_NUM_1    (1<<1)
+                                 ;     270 #define DRV1_DEV_CH  (0 + USB_MINI_NUM_0)
+                                 ;     271 #else
+                                 ;     272 #define USB_MINI_NUM_1    (0)
+                                 ;     273 #endif // (TFAT_DRIVE_ALLOC_NUM_1 == TFAT_CTRL_USB_MINI)
+                                 ;     274 #if (TFAT_DRIVE_ALLOC_NUM_2 == TFAT_CTRL_USB_MINI)
+                                 ;     275 #define USB_MINI_NUM_2    (1<<2)
+                                 ;     276 #define DRV2_DEV_CH  (0 + USB_MINI_NUM_0 + (USB_MINI_NUM_1>>1))
+                                 ;     277 #else
+                                 ;     278 #define USB_MINI_NUM_2    (0)
+                                 ;     279 #endif // (TFAT_DRIVE_ALLOC_NUM_2 == TFAT_CTRL_USB_MINI)
+                                 ;     280 #if (TFAT_DRIVE_ALLOC_NUM_3 == TFAT_CTRL_USB_MINI)
+                                 ;     281 #define USB_MINI_NUM_3    (1<<3)
+                                 ;     282 #define DRV3_DEV_CH  (0 + USB_MINI_NUM_0 + (USB_MINI_NUM_1>>1) + (USB_MINI_NUM_2>>2))
+                                 ;     283 #else
+                                 ;     284 #define USB_MINI_NUM_3    (0)
+                                 ;     285 #endif // (TFAT_DRIVE_ALLOC_NUM_3 == TFAT_CTRL_USB_MINI)
+                                 ;     286 #if (TFAT_DRIVE_ALLOC_NUM_4 == TFAT_CTRL_USB_MINI)
+                                 ;     287 #define USB_MINI_NUM_4    (1<<4)
+                                 ;     288 #define DRV4_DEV_CH  (0 + USB_MINI_NUM_0 + (USB_MINI_NUM_1>>1) + (USB_MINI_NUM_2>>2) + (USB_MINI_NUM_3>>3))
+                                 ;     289 #else
+                                 ;     290 #define USB_MINI_NUM_4    (0)
+                                 ;     291 #endif // (TFAT_DRIVE_ALLOC_NUM_4 == TFAT_CTRL_USB_MINI)
+                                 ;     292 #if (TFAT_DRIVE_ALLOC_NUM_5 == TFAT_CTRL_USB_MINI)
+                                 ;     293 #define USB_MINI_NUM_5    (1<<5)
+                                 ;     294 #define DRV5_DEV_CH  (0 + USB_MINI_NUM_0 + (USB_MINI_NUM_1>>1) + (USB_MINI_NUM_2>>2) + (USB_MINI_NUM_3>>3) + (USB_MINI_NUM_4>>4))
+                                 ;     295 #else
+                                 ;     296 #define USB_MINI_NUM_5    (0)
+                                 ;     297 #endif // (TFAT_DRIVE_ALLOC_NUM_5 == TFAT_CTRL_USB_MINI)
+                                 ;     298 #if (TFAT_DRIVE_ALLOC_NUM_6 == TFAT_CTRL_USB_MINI)
+                                 ;     299 #define USB_MINI_NUM_6    (1<<6)
+                                 ;     300 #define DRV6_DEV_CH  (0 + USB_MINI_NUM_0 + (USB_MINI_NUM_1>>1) + (USB_MINI_NUM_2>>2) + (USB_MINI_NUM_3>>3) + (USB_MINI_NUM_4>>4) + (USB_MINI_NUM_5>>5))
+                                 ;     301 #else
+                                 ;     302 #define USB_MINI_NUM_6    (0)
+                                 ;     303 #endif // (TFAT_DRIVE_ALLOC_NUM_6 == TFAT_CTRL_USB_MINI)
+                                 ;     304 #if (TFAT_DRIVE_ALLOC_NUM_7 == TFAT_CTRL_USB_MINI)
+                                 ;     305 #define USB_MINI_NUM_7    (1<<7)
+                                 ;     306 #define DRV7_DEV_CH  (0 + USB_MINI_NUM_0 + (USB_MINI_NUM_1>>1) + (USB_MINI_NUM_2>>2) + (USB_MINI_NUM_3>>3) + (USB_MINI_NUM_4>>4) + (USB_MINI_NUM_5>>5) + (USB
+                                 ;     307 #else
+                                 ;     308 #define USB_MINI_NUM_7    (0)
+                                 ;     309 #endif // (TFAT_DRIVE_ALLOC_NUM_7 == TFAT_CTRL_USB_MINI)
+                                 ;     310 #if ( TFAT_DRIVE_ALLOC_NUM_8 == TFAT_CTRL_USB_MINI)
+                                 ;     311 #define USB_MINI_NUM_8    (1<<8)
+                                 ;     312 #define DRV8_DEV_CH  (0 + USB_MINI_NUM_0 + (USB_MINI_NUM_1>>1) + (USB_MINI_NUM_2>>2) + (USB_MINI_NUM_3>>3) + (USB_MINI_NUM_4>>4) + (USB_MINI_NUM_5>>5) + (USB
+                                 ;     313 #else
+                                 ;     314 #define USB_MINI_NUM_8    (0)
+                                 ;     315 #endif // ( TFAT_DRIVE_ALLOC_NUM_8 == TFAT_CTRL_USB_MINI)
+                                 ;     316 #if (TFAT_DRIVE_ALLOC_NUM_9 == TFAT_CTRL_USB_MINI)
+                                 ;     317 #define USB_MINI_NUM_9    (1<<9)
+                                 ;     318 #define DRV9_DEV_CH  (0 + USB_MINI_NUM_0 + (USB_MINI_NUM_1>>1) + (USB_MINI_NUM_2>>2) + (USB_MINI_NUM_3>>3) + (USB_MINI_NUM_4>>4) + (USB_MINI_NUM_5>>5) + (USB
+                                 ;     319 #else
+                                 ;     320 #define USB_MINI_NUM_9    (0)
+                                 ;     321 #endif // (TFAT_DRIVE_ALLOC_NUM_9 == TFAT_CTRL_USB_MINI)
+                                 ;     322 
+                                 ;     323 static uint32_t TFAT_DRIVE_USB_MINI_ALLOC = (USB_MINI_NUM_9 | USB_MINI_NUM_8 | USB_MINI_NUM_7 | USB_MINI_NUM_6 | USB_MINI_NUM_5 | USB_MINI_NUM_4 | USB_MINI_N
+                                 ;     324 
+                                 ;     325 #if TFAT_USB_MINI_DRIVE_NUM != ( (USB_MINI_NUM_9>>9)+(USB_MINI_NUM_8>>8)+(USB_MINI_NUM_7>>7)+(USB_MINI_NUM_6>>6)+(USB_MINI_NUM_5>>5)+(USB_MINI_NUM_4>>4)+(USB
+                                 ;     326 #error "Error! Invalid setting for TFAT_USB_MINI_DRIVE_NUM or TFAT_DRIVE_ALLOC_NUM_x in r_tfat_driver_rx_config.h"
+                                 ;     327 #endif
+                                 ;     328 
+                                 ;     329 #endif // (TFAT_USB_MINI_DRIVE_NUM > 0)
+                                 ;     330 
+                                 ;     331 
+                                 ;     332 #ifndef DRV0_DEV_CH
+                                 ;     333 #define DRV0_DEV_CH  (0)
+                                 ;     334 #endif
+                                 ;     335 #ifndef DRV1_DEV_CH
+                                 ;     336 #define DRV1_DEV_CH  (0)
+                                 ;     337 #endif
+                                 ;     338 #ifndef DRV2_DEV_CH
+                                 ;     339 #define DRV2_DEV_CH  (0)
+                                 ;     340 #endif
+                                 ;     341 #ifndef DRV3_DEV_CH
+                                 ;     342 #define DRV3_DEV_CH  (0)
+                                 ;     343 #endif
+                                 ;     344 #ifndef DRV4_DEV_CH
+                                 ;     345 #define DRV4_DEV_CH  (0)
+                                 ;     346 #endif
+                                 ;     347 #ifndef DRV5_DEV_CH
+                                 ;     348 #define DRV5_DEV_CH  (0)
+                                 ;     349 #endif
+                                 ;     350 #ifndef DRV6_DEV_CH
+                                 ;     351 #define DRV6_DEV_CH  (0)
+                                 ;     352 #endif
+                                 ;     353 #ifndef DRV7_DEV_CH
+                                 ;     354 #define DRV7_DEV_CH  (0)
+                                 ;     355 #endif
+                                 ;     356 #ifndef DRV8_DEV_CH
+                                 ;     357 #define DRV8_DEV_CH  (0)
+                                 ;     358 #endif
+                                 ;     359 #ifndef DRV9_DEV_CH
+                                 ;     360 #define DRV9_DEV_CH  (0)
+                                 ;     361 #endif
+                                 ;     362 
+                                 ;     363 #define TFAT_DRIVE_ALLOC_NUM_MAX    (TFAT_DRIVE_NUM_MAX)
+                                 ;     364 
+                                 ;     365 /******************************************************************************
+                                 ;     366 Exported global variables and functions (to be accessed by other files)
+                                 ;     367 ******************************************************************************/
+                                 ;     368 
+                                 ;     369 /******************************************************************************
+                                 ;     370 Private global variables and functions
+                                 ;     371 *******************************************************************************/
+                                 ;     372 static uint8_t drive_alloc_tbl[TFAT_DRIVE_ALLOC_NUM_MAX][2] =
+                                 ;     373 {
+                                 ;     374     { TFAT_DRIVE_ALLOC_NUM_0, DRV0_DEV_CH },
+                                 ;     375     { TFAT_DRIVE_ALLOC_NUM_1, DRV1_DEV_CH },
+                                 ;     376     { TFAT_DRIVE_ALLOC_NUM_2, DRV2_DEV_CH },
+                                 ;     377     { TFAT_DRIVE_ALLOC_NUM_3, DRV3_DEV_CH },
+                                 ;     378     { TFAT_DRIVE_ALLOC_NUM_4, DRV4_DEV_CH },
+                                 ;     379     { TFAT_DRIVE_ALLOC_NUM_5, DRV5_DEV_CH },
+                                 ;     380     { TFAT_DRIVE_ALLOC_NUM_6, DRV6_DEV_CH },
+                                 ;     381     { TFAT_DRIVE_ALLOC_NUM_7, DRV7_DEV_CH },
+                                 ;     382     { TFAT_DRIVE_ALLOC_NUM_8, DRV8_DEV_CH },
+                                 ;     383     { TFAT_DRIVE_ALLOC_NUM_9, DRV9_DEV_CH },
+                                 ;     384 };
+                                 ;     385 
+                                 ;     386 
+                                 ;     387 
+                                 ;     388 /*  Real Time Clock - Time set to 23 FEB 2009 15:02:20  */
+                                 ;     389 static uint8_t usb_ghmsc_rtcYear = 109;
+                                 ;     390 static uint8_t usb_ghmsc_rtcMon  = 2;
+                                 ;     391 static uint8_t usb_ghmsc_rtcMday = 23;
+                                 ;     392 static uint8_t usb_ghmsc_rtcHour = 15;
+                                 ;     393 static uint8_t usb_ghmsc_rtcMin  = 2;
+                                 ;     394 static uint8_t usb_ghmsc_rtcSec  = 20;
+                                 ;     395 
+                                 ;     396 /******************************************************************************
+                                 ;     397 * Function Name : check_use_usb
+                                 ;     398 * Description   : allocation check
+                                 ;     399 * Arguments     : uint8_t drive : Physical drive number for TFAT module
+                                 ;     400 * Return value  : true : 0x01
+                                 ;     401 ******************************************************************************/
+                                 ;     402 #if (TFAT_USB_DRIVE_NUM > 0)
+                                 ;     403 static uint8_t check_use_usb(uint8_t drive)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",403
+00000000 6080                    		SUB #08H, R0
+00000002 8189                    		MOV.B R1, 07H[R0]
+                                 ;     404 {
+                                 ;     405     return ( ( (TFAT_DRIVE_USB_ALLOC & (0x01 << drive) ) != 0) ?  0x01 : 0x00);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",405
+00000004 FBE2rrrrrrrr            		MOV.L #__$TFAT_DRIVE_USB_ALLOC, R14
+0000000A ECEE                    		MOV.L [R14], R14
+0000000C B189                    		MOVU.B 07H[R0], R1
+0000000E FC6BE1                  		BTST R1, R14
+00000011 10                   S  		BEQ L12
+00000012                         L11:	; bb
+00000012 F80601                  		MOV.L #00000001H, [R0]
+00000015 08                   S  		BRA L13
+00000016                         L12:	; bb9
+00000016 F80600                  		MOV.L #00000000H, [R0]
+00000019                         L13:	; bb10
+00000019 EC01                    		MOV.L [R0], R1
+0000001B 8181                    		MOV.B R1, 06H[R0]
+                                 ;     406 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",406
+0000001D B181                    		MOVU.B 06H[R0], R1
+0000001F 6702                    		RTSD #08H
+00000021                         _disk_initialize:
+                                 		.STACK	_disk_initialize=8
+                                 ;     407 #endif // USE_USB
+                                 ;     408 
+                                 ;     409 /******************************************************************************
+                                 ;     410 * Function Name : chk_use_sdhi
+                                 ;     411 * Description   : allocation check
+                                 ;     412 * Arguments     : uint8_t drive : Physical drive number for TFAT module
+                                 ;     413 * Return value  : true : 0x01
+                                 ;     414 ******************************************************************************/
+                                 ;     415 #if (TFAT_SDHI_DRIVE_NUM > 0)
+                                 ;     416 static uint8_t chk_use_sdhi(uint8_t drive)
+                                 ;     417 {
+                                 ;     418     return ( ( (TFAT_DRIVE_SDHI_ALLOC & (0x01 << drive) ) != 0) ?  0x01 : 0x00);
+                                 ;     419 }
+                                 ;     420 #endif // USE_SDHI
+                                 ;     421 
+                                 ;     422 /******************************************************************************
+                                 ;     423 * Function Name : chk_use__mmc
+                                 ;     424 * Description   : allocation check
+                                 ;     425 * Arguments     : uint8_t drive : Physical drive number for TFAT module
+                                 ;     426 * Return value  : true : 0x01
+                                 ;     427 ******************************************************************************/
+                                 ;     428 #if TFAT_MMC_DRIVE_NUM > 0
+                                 ;     429 static uint8_t chk_use__mmc(uint8_t drive)
+                                 ;     430 {
+                                 ;     431     return ( ( (TFAT_DRIVE_MMC_ALLOC & (0x01 << drive) ) != 0) ?  0x01 : 0x00);
+                                 ;     432 }
+                                 ;     433 #endif // USE_MMC
+                                 ;     434 
+                                 ;     435 /******************************************************************************
+                                 ;     436 * Function Name : check_use_usb_mini
+                                 ;     437 * Description   : allocation check
+                                 ;     438 * Arguments     : uint8_t drive : Physical drive number for TFAT module
+                                 ;     439 * Return value  : true : 0x01
+                                 ;     440 ******************************************************************************/
+                                 ;     441 #if (TFAT_USB_MINI_DRIVE_NUM > 0)
+                                 ;     442 static uint8_t check_use_usb_mini(uint8_t drive)
+                                 ;     443 {
+                                 ;     444     return ( ( (TFAT_DRIVE_USB_MINI_ALLOC & (0x01 << drive) ) != 0) ?  0x01 : 0x00);
+                                 ;     445 }
+                                 ;     446 #endif // USE_USB
+                                 ;     447 
+                                 ;     448 /******************************************************************************
+                                 ;     449 * Function Name : R_tfat_disk_initialize
+                                 ;     450 * Description   : This function initializes the memory medium
+                                 ;     451 *               :    for file operations
+                                 ;     452 * Arguments     : uint8_t  drive        : Physical drive number for FIT module
+                                 ;     453 * Return value  : Status of the memory medium
+                                 ;     454 ******************************************************************************/
+                                 ;     455 DSTATUS disk_initialize(uint8_t drive)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",455
+00000021 6040                    		SUB #04H, R0
+00000023 8089                    		MOV.B R1, 03H[R0]
+                                 ;     456 {
+                                 ;     457     DSTATUS ret = RES_PARERR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",457
+00000025 3C0104                  		MOV.B #04H, 01H[R0]
+00000028                         L15:	; entry.split
+                                 ;     458 
+                                 ;     459 #if (TFAT_USB_DRIVE_NUM > 0)
+                                 ;     460     if ( check_use_usb(drive) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",460
+00000028 B089                    		MOVU.B 03H[R0], R1
+0000002A 39rrrr               W  		BSR __$check_use_usb
+0000002D 6101                    		CMP #00H, R1
+0000002F 20rr                    		BEQ L17
+00000031                         L16:	; bb3
+                                 ;     461     {
+                                 ;     462         ret = R_tfat_usb_disk_initialize( drive_alloc_tbl[drive][1] ); /* function for USB */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",462
+00000031 B089                    		MOVU.B 03H[R0], R1
+00000033 6C11                    		SHLL #01H, R1
+00000035 FB22rrrrrrrr            		MOV.L #__$drive_alloc_tbl, R2
+0000003B 4B12                    		ADD R1, R2
+0000003D B029                    		MOVU.B 01H[R2], R1
+0000003F 05rrrrrr             A  		BSR _R_tfat_usb_disk_initialize
+00000043 8009                    		MOV.B R1, 01H[R0]
+00000045                         L17:	; bb16
+                                 ;     463     }
+                                 ;     464 #endif
+                                 ;     465 
+                                 ;     466 #if (TFAT_SDHI_DRIVE_NUM > 0)
+                                 ;     467     if ( chk_use_sdhi(drive) )
+                                 ;     468     {
+                                 ;     469         ret = R_tfat_sdhi_disk_initialize( drive_alloc_tbl[drive][1] ); /* function for SDHI */
+                                 ;     470     }
+                                 ;     471 #endif
+                                 ;     472 
+                                 ;     473 #if (TFAT_USB_MINI_DRIVE_NUM > 0)
+                                 ;     474     if ( check_use_usb_mini(drive) )
+                                 ;     475     {
+                                 ;     476         ret = R_tfat_usb_mini_disk_initialize( drive_alloc_tbl[drive][1] ); /* function for USB Mini */
+                                 ;     477     }
+                                 ;     478 #endif
+                                 ;     479 
+                                 ;     480     return  ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",480
+00000045 C5000102                		MOV.B 01H[R0], 02H[R0]
+00000049 B081                    		MOVU.B 02H[R0], R1
+0000004B                         L18:	; bb16.split
+                                 ;     481 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",481
+0000004B 5B11                    		MOVU.B R1, R1
+0000004D 6701                    		RTSD #04H
+0000004F                         _disk_read:
+                                 		.STACK	_disk_read=28
+                                 ;     482 
+                                 ;     483 /******************************************************************************
+                                 ;     484 * Function Name : R_tfat_disk_read
+                                 ;     485 * Description   : This function reads data from the specified location
+                                 ;     486 *               :    of the memory medium
+                                 ;     487 * Arguments     : uint8_t  drive        : Physical drive number
+                                 ;     488 *               : uint8_t* buffer       : Pointer to the read data buffer
+                                 ;     489 *               : uint32_t sector_number : uint32_t SectorNumber
+                                 ;     490 *               : uint8_t sector_count   : Number of sectors to read
+                                 ;     491 * Return value  : Result of function execution
+                                 ;     492 ******************************************************************************/
+                                 ;     493 DRESULT disk_read (
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",493
+0000004F 7100E8                  		ADD #0FFFFFFE8H, R0
+00000052 8589                    		MOV.B R1, 17H[R0]
+00000054 A102                    		MOV.L R2, 10H[R0]
+00000056 A08B                    		MOV.L R3, 0CH[R0]
+00000058 828C                    		MOV.B R4, 0BH[R0]
+                                 ;     494     uint8_t drive,          /* Physical drive number             */
+                                 ;     495     uint8_t* buffer,        /* Pointer to the read data buffer   */
+                                 ;     496     uint32_t sector_number, /* Start sector number               */
+                                 ;     497     uint8_t sector_count    /* Number of sectors to read         */
+                                 ;     498 )
+                                 ;     499 {
+                                 ;     500     DRESULT ret = RES_PARERR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",500
+0000005A F80604                  		MOV.L #00000004H, [R0]
+0000005D                         L20:	; entry.split
+                                 ;     501 
+                                 ;     502 #if (TFAT_USB_DRIVE_NUM > 0)
+                                 ;     503     if ( check_use_usb(drive) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",503
+0000005D B589                    		MOVU.B 17H[R0], R1
+0000005F 39rrrr               W  		BSR __$check_use_usb
+00000062 6101                    		CMP #00H, R1
+00000064 20rr                    		BEQ L22
+00000066                         L21:	; bb6
+                                 ;     504     {
+                                 ;     505         ret = R_tfat_usb_disk_read( drive_alloc_tbl[drive][1], buffer, sector_number, sector_count ); /* function for USB */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",505
+00000066 B589                    		MOVU.B 17H[R0], R1
+00000068 6C11                    		SHLL #01H, R1
+0000006A FB22rrrrrrrr            		MOV.L #__$drive_alloc_tbl, R2
+00000070 4B12                    		ADD R1, R2
+00000072 B029                    		MOVU.B 01H[R2], R1
+00000074 B28C                    		MOVU.B 0BH[R0], R4
+00000076 A88B                    		MOV.L 0CH[R0], R3
+00000078 A902                    		MOV.L 10H[R0], R2
+0000007A 05rrrrrr             A  		BSR _R_tfat_usb_disk_read
+0000007E E301                    		MOV.L R1, [R0]
+00000080                         L22:	; bb22
+                                 ;     506     }
+                                 ;     507 #endif
+                                 ;     508 
+                                 ;     509 #if (TFAT_SDHI_DRIVE_NUM > 0)
+                                 ;     510     if ( chk_use_sdhi(drive) )
+                                 ;     511     {
+                                 ;     512         ret = R_tfat_sdhi_disk_read( drive_alloc_tbl[drive][1], buffer, sector_number, sector_count ); /* function for SDHI */
+                                 ;     513     }
+                                 ;     514 #endif
+                                 ;     515 
+                                 ;     516 #if (TFAT_USB_MINI_DRIVE_NUM > 0)
+                                 ;     517     if ( check_use_usb_mini(drive) )
+                                 ;     518     {
+                                 ;     519         ret = R_tfat_usb_mini_disk_read( drive_alloc_tbl[drive][1], buffer, sector_number, sector_count ); /* function for USB Mini */
+                                 ;     520     }
+                                 ;     521 #endif
+                                 ;     522 
+                                 ;     523     return ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",523
+00000080 EC01                    		MOV.L [R0], R1
+00000082 A009                    		MOV.L R1, 04H[R0]
+00000084                         L23:	; bb22.split
+                                 ;     524 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",524
+00000084 6706                    		RTSD #18H
+00000086                         _disk_write:
+                                 		.STACK	_disk_write=28
+                                 ;     525 
+                                 ;     526 /******************************************************************************
+                                 ;     527 * Function Name : R_tfat_disk_write
+                                 ;     528 * Description   : This function writes data to a specified location
+                                 ;     529 *               :    of the memory medium
+                                 ;     530 * Arguments     : uint8_t Drive : Physical drive number
+                                 ;     531 *               : const uint8_t* buffer       : Pointer to the write data
+                                 ;     532 *               : uint32_t       sector_number : Sector number to write
+                                 ;     533 *               : uint8_t        sector_count  : Number of sectors to write
+                                 ;     534 * Return value  : Result of function execution
+                                 ;     535 ******************************************************************************/
+                                 ;     536 DRESULT disk_write (
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",536
+00000086 7100E8                  		ADD #0FFFFFFE8H, R0
+00000089 8589                    		MOV.B R1, 17H[R0]
+0000008B A102                    		MOV.L R2, 10H[R0]
+0000008D A08B                    		MOV.L R3, 0CH[R0]
+0000008F 828C                    		MOV.B R4, 0BH[R0]
+                                 ;     537     uint8_t drive,           /* Physical drive number           */
+                                 ;     538     const uint8_t* buffer,   /* Pointer to the write data       */
+                                 ;     539     uint32_t sector_number,  /* Sector number to write          */
+                                 ;     540     uint8_t sector_count     /* Number of sectors to write      */
+                                 ;     541 )
+                                 ;     542 {
+                                 ;     543     DRESULT ret = RES_PARERR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",543
+00000091 F80604                  		MOV.L #00000004H, [R0]
+00000094                         L25:	; entry.split
+                                 ;     544 
+                                 ;     545 #if (TFAT_USB_DRIVE_NUM > 0)
+                                 ;     546     if ( check_use_usb(drive) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",546
+00000094 B589                    		MOVU.B 17H[R0], R1
+00000096 39rrrr               W  		BSR __$check_use_usb
+00000099 6101                    		CMP #00H, R1
+0000009B 20rr                    		BEQ L27
+0000009D                         L26:	; bb6
+                                 ;     547     {
+                                 ;     548         ret = R_tfat_usb_disk_write( drive_alloc_tbl[drive][1], buffer, sector_number, sector_count ); /* function for USB */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",548
+0000009D B589                    		MOVU.B 17H[R0], R1
+0000009F 6C11                    		SHLL #01H, R1
+000000A1 FB22rrrrrrrr            		MOV.L #__$drive_alloc_tbl, R2
+000000A7 4B12                    		ADD R1, R2
+000000A9 B029                    		MOVU.B 01H[R2], R1
+000000AB B28C                    		MOVU.B 0BH[R0], R4
+000000AD A88B                    		MOV.L 0CH[R0], R3
+000000AF A902                    		MOV.L 10H[R0], R2
+000000B1 05rrrrrr             A  		BSR _R_tfat_usb_disk_write
+000000B5 E301                    		MOV.L R1, [R0]
+000000B7                         L27:	; bb22
+                                 ;     549     }
+                                 ;     550 #endif
+                                 ;     551 
+                                 ;     552 #if (TFAT_SDHI_DRIVE_NUM > 0)
+                                 ;     553     if ( chk_use_sdhi(drive) )
+                                 ;     554     {
+                                 ;     555         ret = R_tfat_sdhi_disk_write( drive_alloc_tbl[drive][1], buffer, sector_number, sector_count ); /* function for SDHI */
+                                 ;     556     }
+                                 ;     557 #endif
+                                 ;     558 
+                                 ;     559 #if (TFAT_USB_MINI_DRIVE_NUM > 0)
+                                 ;     560     if ( check_use_usb_mini(drive) )
+                                 ;     561     {
+                                 ;     562         ret = R_tfat_usb_mini_disk_write( drive_alloc_tbl[drive][1], buffer, sector_number, sector_count ); /* function for USB Mini */
+                                 ;     563     }
+                                 ;     564 #endif
+                                 ;     565 
+                                 ;     566     return ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",566
+000000B7 EC01                    		MOV.L [R0], R1
+000000B9 A009                    		MOV.L R1, 04H[R0]
+000000BB                         L28:	; bb22.split
+                                 ;     567 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",567
+000000BB 6706                    		RTSD #18H
+000000BD                         _disk_ioctl:
+                                 		.STACK	_disk_ioctl=20
+                                 ;     568 
+                                 ;     569 /******************************************************************************
+                                 ;     570 * Function Name : R_tfat_disk_ioctl
+                                 ;     571 * Description   : This function is used to execute memory operations
+                                 ;     572 *               :    other than read\write
+                                 ;     573 * Arguments     : uint8_t drive   : Drive number
+                                 ;     574 *               : uint8_t command : Control command code
+                                 ;     575 *               : void*   buffer  : Data transfer buffer
+                                 ;     576 * Return value  : Result of function execution
+                                 ;     577 ******************************************************************************/
+                                 ;     578 DRESULT disk_ioctl (
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",578
+000000BD 7100F0                  		ADD #0FFFFFFF0H, R0
+000000C0 8389                    		MOV.B R1, 0FH[R0]
+000000C2 8382                    		MOV.B R2, 0EH[R0]
+000000C4 A083                    		MOV.L R3, 08H[R0]
+                                 ;     579     uint8_t drive,           /* Drive number             */
+                                 ;     580     uint8_t command,         /* Control command code     */
+                                 ;     581     void* buffer             /* Data transfer buffer     */
+                                 ;     582 )
+                                 ;     583 {
+                                 ;     584     DRESULT ret = RES_PARERR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",584
+000000C6 F80604                  		MOV.L #00000004H, [R0]
+000000C9                         L30:	; entry.split
+                                 ;     585 
+                                 ;     586 #if (TFAT_USB_DRIVE_NUM > 0)
+                                 ;     587     if ( check_use_usb(drive) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",587
+000000C9 B389                    		MOVU.B 0FH[R0], R1
+000000CB 39rrrr               W  		BSR __$check_use_usb
+000000CE 6101                    		CMP #00H, R1
+000000D0 20rr                    		BEQ L32
+000000D2                         L31:	; bb5
+                                 ;     588     {
+                                 ;     589         ret = R_tfat_usb_disk_ioctl( drive_alloc_tbl[drive][1], command, buffer ); /* function for USB */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",589
+000000D2 B389                    		MOVU.B 0FH[R0], R1
+000000D4 6C11                    		SHLL #01H, R1
+000000D6 FB22rrrrrrrr            		MOV.L #__$drive_alloc_tbl, R2
+000000DC 4B12                    		ADD R1, R2
+000000DE B029                    		MOVU.B 01H[R2], R1
+000000E0 A883                    		MOV.L 08H[R0], R3
+000000E2 B382                    		MOVU.B 0EH[R0], R2
+000000E4 05rrrrrr             A  		BSR _R_tfat_usb_disk_ioctl
+000000E8 E301                    		MOV.L R1, [R0]
+000000EA                         L32:	; bb20
+                                 ;     590     }
+                                 ;     591 #endif
+                                 ;     592 
+                                 ;     593 #if (TFAT_SDHI_DRIVE_NUM > 0)
+                                 ;     594     if ( chk_use_sdhi(drive) )
+                                 ;     595     {
+                                 ;     596         ret = R_tfat_sdhi_disk_ioctl ( drive_alloc_tbl[drive][1], command, buffer ); /* function for SDHI */
+                                 ;     597     }
+                                 ;     598 #endif
+                                 ;     599 
+                                 ;     600 #if (TFAT_USB_MINI_DRIVE_NUM > 0)
+                                 ;     601     if ( check_use_usb_mini(drive) )
+                                 ;     602     {
+                                 ;     603         ret = R_tfat_usb_mini_disk_ioctl( drive_alloc_tbl[drive][1], command, buffer ); /* function for USB Mini */
+                                 ;     604     }
+                                 ;     605 #endif
+                                 ;     606 
+                                 ;     607     return ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",607
+000000EA EC01                    		MOV.L [R0], R1
+000000EC A009                    		MOV.L R1, 04H[R0]
+000000EE                         L33:	; bb20.split
+                                 ;     608 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",608
+000000EE 6704                    		RTSD #10H
+000000F0                         _disk_status:
+                                 		.STACK	_disk_status=8
+                                 ;     609 
+                                 ;     610 /******************************************************************************
+                                 ;     611 * Function Name : R_tfat_disk_status
+                                 ;     612 * Description   : This function is used to retrieve the current status
+                                 ;     613 *               :    of the disk
+                                 ;     614 * Arguments     : uint8_t drive : Physical drive number
+                                 ;     615 * Return value  : Status of the disk
+                                 ;     616 ******************************************************************************/
+                                 ;     617 DSTATUS disk_status (
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",617
+000000F0 6040                    		SUB #04H, R0
+000000F2 8089                    		MOV.B R1, 03H[R0]
+                                 ;     618     uint8_t drive             /* Physical drive number    */
+                                 ;     619 )
+                                 ;     620 {
+                                 ;     621     DSTATUS ret = RES_PARERR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",621
+000000F4 3C0104                  		MOV.B #04H, 01H[R0]
+000000F7                         L35:	; entry.split
+                                 ;     622 
+                                 ;     623 #if (TFAT_USB_DRIVE_NUM > 0)
+                                 ;     624     if ( check_use_usb(drive) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",624
+000000F7 B089                    		MOVU.B 03H[R0], R1
+000000F9 39rrrr               W  		BSR __$check_use_usb
+000000FC 6101                    		CMP #00H, R1
+000000FE 20rr                    		BEQ L37
+00000100                         L36:	; bb3
+                                 ;     625     {
+                                 ;     626         ret = R_tfat_usb_disk_status ( drive_alloc_tbl[drive][1] ); /* function for USB */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",626
+00000100 B089                    		MOVU.B 03H[R0], R1
+00000102 6C11                    		SHLL #01H, R1
+00000104 FB22rrrrrrrr            		MOV.L #__$drive_alloc_tbl, R2
+0000010A 4B12                    		ADD R1, R2
+0000010C B029                    		MOVU.B 01H[R2], R1
+0000010E 05rrrrrr             A  		BSR _R_tfat_usb_disk_status
+00000112 8009                    		MOV.B R1, 01H[R0]
+00000114                         L37:	; bb16
+                                 ;     627     }
+                                 ;     628 #endif
+                                 ;     629 
+                                 ;     630 #if (TFAT_SDHI_DRIVE_NUM > 0)
+                                 ;     631     if ( chk_use_sdhi(drive) )
+                                 ;     632     {
+                                 ;     633         ret = R_tfat_sdhi_disk_status ( drive_alloc_tbl[drive][1] ); /* function for SDHI */
+                                 ;     634     }
+                                 ;     635 #endif
+                                 ;     636 
+                                 ;     637 #if (TFAT_USB_DRIVE_MINI_NUM > 0)
+                                 ;     638     if ( check_use_usb_mini(drive) )
+                                 ;     639     {
+                                 ;     640         ret = R_tfat_usb_mini_disk_status ( drive_alloc_tbl[drive][1] ); /* function for USB Mini */
+                                 ;     641     }
+                                 ;     642 #endif
+                                 ;     643 
+                                 ;     644     return ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",644
+00000114 C5000102                		MOV.B 01H[R0], 02H[R0]
+00000118 B081                    		MOVU.B 02H[R0], R1
+0000011A                         L38:	; bb16.split
+                                 ;     645 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",645
+0000011A 5B11                    		MOVU.B R1, R1
+0000011C 6701                    		RTSD #04H
+0000011E                         _get_fattime:
+                                 		.STACK	_get_fattime=12
+                                 ;     646 
+                                 ;     647 /******************************************************************************
+                                 ;     648 * Function Name : R_tfat_get_fattime
+                                 ;     649 * Description   : This function returns the current date and time
+                                 ;     650 * Arguments     : none
+                                 ;     651 * Return value  : uint32_t
+                                 ;     652 * NOTE          : Please DO NOT modify this function. This function
+                                 ;     653 *               :    is used by the FAT library to get the current date
+                                 ;     654                 :    and time during file manipulations.
+                                 ;     655 ******************************************************************************/
+                                 ;     656 uint32_t get_fattime (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",656
+0000011E 6080                    		SUB #08H, R0
+                                 ;     657 {
+                                 ;     658     uint32_t tmr;
+                                 ;     659 
+                                 ;     660     /* Disable interrupts   */
+                                 ;     661     R_BSP_InterruptsDisable();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",661
+00000120 05rrrrrr             A  		BSR _R_BSP_InterruptsDisable
+00000124                         L40:	; entry.split
+                                 ;     662 
+                                 ;     663     /* Convert the time to store in FAT entry   */
+                                 ;     664     tmr =   (((uint32_t)usb_ghmsc_rtcYear - 80) << 25);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",664
+00000124 FBE2rrrrrrrr            		MOV.L #__$usb_ghmsc_rtcYear, R14
+0000012A 58E1                    		MOVU.B [R14], R1
+0000012C 7111B0                  		ADD #0FFFFFFB0H, R1
+0000012F 6D91                    		SHLL #19H, R1
+00000131 E301                    		MOV.L R1, [R0]
+00000133                         L41:	; entry.split1
+                                 ;     665     tmr |=  ((uint32_t)usb_ghmsc_rtcMon << 21);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",665
+00000133 FBE2rrrrrrrr            		MOV.L #__$usb_ghmsc_rtcMon, R14
+00000139 58E1                    		MOVU.B [R14], R1
+0000013B 6D51                    		SHLL #15H, R1
+0000013D 069401                  		OR [R0].L, R1
+00000140 E301                    		MOV.L R1, [R0]
+00000142                         L42:	; entry.split2
+                                 ;     666     tmr |=  ((uint32_t)usb_ghmsc_rtcMday << 16);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",666
+00000142 FBE2rrrrrrrr            		MOV.L #__$usb_ghmsc_rtcMday, R14
+00000148 58E1                    		MOVU.B [R14], R1
+0000014A 6D01                    		SHLL #10H, R1
+0000014C 069401                  		OR [R0].L, R1
+0000014F E301                    		MOV.L R1, [R0]
+00000151                         L43:	; entry.split3
+                                 ;     667     tmr |=  ((uint32_t)usb_ghmsc_rtcHour << 11);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",667
+00000151 FBE2rrrrrrrr            		MOV.L #__$usb_ghmsc_rtcHour, R14
+00000157 58E1                    		MOVU.B [R14], R1
+00000159 6CB1                    		SHLL #0BH, R1
+0000015B 069401                  		OR [R0].L, R1
+0000015E E301                    		MOV.L R1, [R0]
+00000160                         L44:	; entry.split4
+                                 ;     668     tmr |=  ((uint32_t)usb_ghmsc_rtcMin << 5);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",668
+00000160 FBE2rrrrrrrr            		MOV.L #__$usb_ghmsc_rtcMin, R14
+00000166 58E1                    		MOVU.B [R14], R1
+00000168 6C51                    		SHLL #05H, R1
+0000016A 069401                  		OR [R0].L, R1
+0000016D E301                    		MOV.L R1, [R0]
+0000016F                         L45:	; entry.split5
+                                 ;     669     tmr |=  ((uint32_t)usb_ghmsc_rtcSec >> 1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",669
+0000016F FBE2rrrrrrrr            		MOV.L #__$usb_ghmsc_rtcSec, R14
+00000175 58E1                    		MOVU.B [R14], R1
+00000177 6811                    		SHLR #01H, R1
+00000179 069401                  		OR [R0].L, R1
+0000017C E301                    		MOV.L R1, [R0]
+0000017E                         L46:	; entry.split6
+                                 ;     670 
+                                 ;     671     /* Enable interrupts    */
+                                 ;     672     R_BSP_InterruptsEnable();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",672
+0000017E 05rrrrrr             A  		BSR _R_BSP_InterruptsEnable
+00000182                         L47:	; entry.split7
+                                 ;     673 
+                                 ;     674     return tmr;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",674
+00000182 EC01                    		MOV.L [R0], R1
+00000184 A009                    		MOV.L R1, 04H[R0]
+00000186                         L48:	; entry.split8
+                                 ;     675 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",675
+00000186 6702                    		RTSD #08H
+00000188                         _R_tfat_drv_change_alloc:
+                                 		.STACK	_R_tfat_drv_change_alloc=20
+                                 ;     676 
+                                 ;     677 /******************************************************************************
+                                 ;     678 * Function Name : R_tfat_drv_change_alloc
+                                 ;     679 * Description   : This function is used to change drive allocation.
+                                 ;     680 *               :    of the disk
+                                 ;     681 * Arguments     : TFAT_DRV_NUM      tfat_drv : Physical drive number( in TFAT)
+                                 ;     682 *               : uint8_t dev_type           : device define
+                                 ;     683 *               : uint8_t dev_drv_num        : drive number/device channnel( in device driver)
+                                 ;     684 * Return value  : Result of function execution
+                                 ;     685 ******************************************************************************/
+                                 ;     686 DRESULT R_tfat_drv_change_alloc(TFAT_DRV_NUM tfat_drv, uint8_t dev_type, uint8_t dev_drv_num )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",686
+00000188 7100F0                  		ADD #0FFFFFFF0H, R0
+0000018B A089                    		MOV.L R1, 0CH[R0]
+0000018D 828A                    		MOV.B R2, 0BH[R0]
+0000018F 8283                    		MOV.B R3, 0AH[R0]
+                                 ;     687 {
+                                 ;     688     if ( TFAT_DRIVE_ALLOC_NUM_MAX <= tfat_drv )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",688
+00000191 A889                    		MOV.L 0CH[R0], R1
+00000193 61A1                    		CMP #0AH, R1
+00000195 29rr                    		BLT L51
+00000197                         L50:	; bb4
+                                 ;     689     {
+                                 ;     690         return RES_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",690
+00000197 F80601                  		MOV.L #00000001H, [R0]
+0000019A 2Err                 B  		BRA L57
+0000019C                         L51:	; bb10
+0000019C 661E                    		MOV.L #00000001H, R14
+                                 ;     691     }
+                                 ;     692 
+                                 ;     693 #if (TFAT_USB_DRIVE_NUM > 0)
+                                 ;     694     if ( TFAT_CTRL_USB == dev_type )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",694
+0000019E A889                    		MOV.L 0CH[R0], R1
+000001A0 FD621E                  		SHLL R1, R14
+000001A3 B289                    		MOVU.B 0BH[R0], R1
+000001A5 6111                    		CMP #01H, R1
+000001A7 21rr                    		BNE L53
+000001A9                         L52:	; bb11
+                                 ;     695     {
+                                 ;     696         TFAT_DRIVE_USB_ALLOC |= (0x01 << tfat_drv);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",696
+000001A9 FBF2rrrrrrrr            		MOV.L #__$TFAT_DRIVE_USB_ALLOC, R15
+000001AF 0694FE                  		OR [R15].L, R14
+000001B2 E3FE                    		MOV.L R14, [R15]
+000001B4 2Err                 B  		BRA L54
+000001B6                         L53:	; bb16
+                                 ;     697     }
+                                 ;     698     else
+                                 ;     699     {
+                                 ;     700         TFAT_DRIVE_USB_ALLOC &= ~(0x01 << tfat_drv);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",700
+000001B6 7E0E                    		NOT R14
+000001B8 FBF2rrrrrrrr            		MOV.L #__$TFAT_DRIVE_USB_ALLOC, R15
+000001BE 0690FE                  		AND [R15].L, R14
+000001C1 E3FE                    		MOV.L R14, [R15]
+000001C3                         L54:	; bb26
+                                 ;     701     }
+                                 ;     702 #endif
+                                 ;     703 #if (TFAT_SDHI_DRIVE_NUM > 0)
+                                 ;     704     if ( TFAT_CTRL_SDHI == dev_type )
+                                 ;     705     {
+                                 ;     706         TFAT_DRIVE_SDHI_ALLOC |= (0x01 << tfat_drv);
+                                 ;     707     }
+                                 ;     708     else
+                                 ;     709     {
+                                 ;     710         TFAT_DRIVE_SDHI_ALLOC &= ~(0x01 << tfat_drv);
+                                 ;     711     }
+                                 ;     712 #endif
+                                 ;     713 #if (TFAT_MMC_DRIVE_NUM > 0)
+                                 ;     714     if ( TFAT_CTRL_MMC == dev_type )
+                                 ;     715     {
+                                 ;     716         TFAT_DRIVE_MMC_ALLOC |= (0x01 << tfat_drv);
+                                 ;     717     }
+                                 ;     718     else
+                                 ;     719     {
+                                 ;     720         TFAT_DRIVE_MMC_ALLOC &= ~(0x01 << tfat_drv);
+                                 ;     721     }
+                                 ;     722 #endif
+                                 ;     723 #if (TFAT_USB_MINI_DRIVE_NUM > 0)
+                                 ;     724     if ( TFAT_CTRL_USB_MINI == dev_type )
+                                 ;     725     {
+                                 ;     726         TFAT_DRIVE_USB_MINI_ALLOC |= (0x01 << tfat_drv);
+                                 ;     727     }
+                                 ;     728     else
+                                 ;     729     {
+                                 ;     730         TFAT_DRIVE_USB_MINI_ALLOC &= ~(0x01 << tfat_drv);
+                                 ;     731     }
+                                 ;     732 #endif
+                                 ;     733 
+                                 ;     734     drive_alloc_tbl[tfat_drv][0] = dev_type;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",734
+000001C3 A889                    		MOV.L 0CH[R0], R1
+000001C5 6C11                    		SHLL #01H, R1
+000001C7 FBE2rrrrrrrr            		MOV.L #__$drive_alloc_tbl, R14
+000001CD B28A                    		MOVU.B 0BH[R0], R2
+000001CF FE0E12                  		MOV.B R2, [R14,R1]
+000001D2                         L55:	; bb26.split
+                                 ;     735     drive_alloc_tbl[tfat_drv][1] = dev_drv_num;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",735
+000001D2 A889                    		MOV.L 0CH[R0], R1
+000001D4 6C11                    		SHLL #01H, R1
+000001D6 FB22rrrrrrrr            		MOV.L #__$drive_alloc_tbl, R2
+000001DC 4B12                    		ADD R1, R2
+000001DE C5020A01                		MOV.B 0AH[R0], 01H[R2]
+000001E2                         L56:	; bb26.split1
+                                 ;     736 
+                                 ;     737     return RES_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",737
+000001E2 F80600                  		MOV.L #00000000H, [R0]
+000001E5                         L57:	; bb38
+000001E5 EC01                    		MOV.L [R0], R1
+000001E7 A009                    		MOV.L R1, 04H[R0]
+                                 ;     738 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_tfat_driver_rx\src\r_tfat_drv_if.c",738
+000001E9 6704                    		RTSD #10H
+                                 ;     739 
+                                 ;     740 /*******************************************************************************
+                                 ;     741 End  of file
+                                 ;     742 *******************************************************************************/
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         __$TFAT_DRIVE_USB_ALLOC:
+00000000 0F000000                		.lword	0000000FH
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$drive_alloc_tbl:
+00000000 0100                    		.byte	01H,00H
+00000002 0101                    		.byte	01H,01H
+00000004 0102                    		.byte	01H,02H
+00000006 0103                    		.byte	01H,03H
+00000008 00                      		.byte	0
+00000009 00                      		.byte	0
+0000000A 00                      		.byte	0
+0000000B 00                      		.byte	0
+0000000C 00                      		.byte	0
+0000000D 00                      		.byte	0
+0000000E 00                      		.byte	0
+0000000F 00                      		.byte	0
+00000010 00                      		.byte	0
+00000011 00                      		.byte	0
+00000012 00                      		.byte	0
+00000013 00                      		.byte	0
+00000014                         __$usb_ghmsc_rtcYear:
+00000014 6D                      		.byte	6DH
+00000015                         __$usb_ghmsc_rtcMon:
+00000015 02                      		.byte	02H
+00000016                         __$usb_ghmsc_rtcMday:
+00000016 17                      		.byte	17H
+00000017                         __$usb_ghmsc_rtcHour:
+00000017 0F                      		.byte	0FH
+00000018                         __$usb_ghmsc_rtcMin:
+00000018 02                      		.byte	02H
+00000019                         __$usb_ghmsc_rtcSec:
+00000019 14                      		.byte	14H
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01116   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000491(000001EBH)  P
+ROMDATA  0000000004(00000004H)  D
+ROMDATA  0000000026(0000001AH)  D_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\r_tfat_drv_if.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\Mobile_build\r_tfat_drv_if.lst
+-output=C:\Workspace\e2studio\git\MT01\Mobile_build\r_tfat_driver_rx\src\r_tfat_drv_if.obj

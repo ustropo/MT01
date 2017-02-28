@@ -1,0 +1,667 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:24 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:23
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_vee_rx63x.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_vee_rx63x.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;r_vee_rx63x.c
+                                 
+                                 		.glb	_g_flash_BlockAddresses
+                                 		.glb	_g_vee_Sectors
+                                 		.glb	_vee_enable_df
+                                 		.glb	_R_FlashDataAreaAccess
+                                 		.glb	_vee_get_block_info
+                                 		.glb	_vee_blank_check_address
+                                 		.glb	_FlashError
+                                 		.glb	_R_FlashDataAreaBlankCheck
+                                 		.glb	_vee_blank_check_block
+                                 		.glb	_vee_move_to_boundary
+                                 		.glb	_vee_check_record
+                                 		.glb	_R_VEE_GenerateCheck
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _vee_enable_df:
+                                 		.STACK	_vee_enable_df=4
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_vee_rx63x.c
+                                 ;      21 * Device       : RX63x
+                                 ;      22 * Tool Chain   : Renesas RX Standard Toolchain
+                                 ;      23 * Description  : This file implements specific MCU functions that are used along with the Virtual EEPROM Project.
+                                 ;      24 ************************************************************************************************************************
+                                 ;      25 * History : DD.MM.YYYY Version Description
+                                 ;      26 *         : 19.12.2011 1.00    First Release
+                                 ;      27 *         : 02.01.2013 1.10    Replaced use of 'magic number' for Flash API return with macro. New include name for
+                                 ;      28 *                              Flash API.
+                                 ;      29 ***********************************************************************************************************************/
+                                 ;      30 
+                                 ;      31 /***********************************************************************************************************************
+                                 ;      32 Includes   <System Includes> , "Project Includes"
+                                 ;      33 ***********************************************************************************************************************/
+                                 ;      34 /* Used for accessing peripheral registers */
+                                 ;      35 #include "platform.h"
+                                 ;      36 /* VEE interface. */
+                                 ;      37 #include "r_vee_if.h"
+                                 ;      38 /* Used for VEE types and MCU relevant data. */
+                                 ;      39 #include "r_vee_target.h"
+                                 ;      40 /* Used for accessing g_flash_BlockAddresses[] array. */
+                                 ;      41 #include "r_flash_api_rx_if.h"
+                                 ;      42 
+                                 ;      43 /* Only compile this file if a RX63x MCU is chosen. */
+                                 ;      44 #if defined(BSP_MCU_RX63_ALL)    
+                                 ;      45 
+                                 ;      46 #ifdef VEE_ENABLE_DF
+                                 ;      47 
+                                 ;      48 /***********************************************************************************************************************
+                                 ;      49 * Function Name: vee_enable_df
+                                 ;      50 * Description  : Enables the data flash on the MCU
+                                 ;      51 * Arguments    : none
+                                 ;      52 * Return Value : none
+                                 ;      53 ***********************************************************************************************************************/
+                                 ;      54 void vee_enable_df (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",54
+00000000 FB1EFFFF00              		MOV.L #0000FFFFH, R1
+                                 ;      55 {
+                                 ;      56 #if defined(FLASH_API_RX_CFG_COPY_CODE_BY_API) && defined(FLASH_API_RX_CFG_ENABLE_ROM_PROGRAMMING)
+                                 ;      57     /* Before calling any other API functions the API code needs to be copied to RAM. */
+                                 ;      58     R_FlashCodeCopy();
+                                 ;      59 #endif
+                                 ;      60 
+                                 ;      61     /* Enable access to the data flash blocks */
+                                 ;      62     R_FlashDataAreaAccess(0xFFFF, 0xFFFF);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",62
+00000005 EF12                    		MOV.L R1, R2
+00000007 05rrrrrr             A  		BSR _R_FlashDataAreaAccess
+0000000B 02                      		RTS
+0000000C                         _vee_get_block_info:
+                                 		.STACK	_vee_get_block_info=24
+                                 ;      63 }
+                                 ;      64 /***********************************************************************************************************************
+                                 ;      65 End of function vee_enable_df
+                                 ;      66 ***********************************************************************************************************************/
+                                 ;      67 
+                                 ;      68 #endif
+                                 ;      69 
+                                 ;      70 /***********************************************************************************************************************
+                                 ;      71 * Function Name: vee_get_block_info
+                                 ;      72 * Description  : Gets flag information for a VEE Block. This is separated from VEE.c since different methods will need 
+                                 ;      73 *                to be used for different MCUs. For instance, the R8C can read a flag and tell it has not been written 
+                                 ;      74 *                by reading 0xFF. The RX63N cannot do this though and you have to use the blank check command.
+                                 ;      75 * Arguments    : sector - 
+                                 ;      76 *                    Sector to look up
+                                 ;      77 *                block - 
+                                 ;      78 *                    Which VEE Block to look up
+                                 ;      79 *                vee_block - 
+                                 ;      80 *                    Structure to hold flags
+                                 ;      81 * Return Value : VEE_SUCCESS -  
+                                 ;      82 *                    Successful, structure filled in
+                                 ;      83 *                VEE_FAILURE -  
+                                 ;      84 *                    Failure
+                                 ;      85 ***********************************************************************************************************************/
+                                 ;      86 uint8_t vee_get_block_info (uint8_t sector, uint32_t block, vee_block_info_t * vee_block)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",86
+0000000C 7100EC                  		ADD #0FFFFFFECH, R0
+0000000F 8489                    		MOV.B R1, 13H[R0]
+00000011 A08A                    		MOV.L R2, 0CH[R0]
+00000013 A083                    		MOV.L R3, 08H[R0]
+                                 ;      87 {        
+                                 ;      88     uint8_t * ptr;
+                                 ;      89     
+                                 ;      90     /* Flags are at the lower addresses of the block */
+                                 ;      91     ptr = (uint8_t *) g_vee_Sectors[sector].VEE_block_addr[block];   
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",91
+00000015 B489                    		MOVU.B 13H[R0], R1
+00000017 751114                  		MUL #14H, R1
+0000001A FB22rrrrrrrr            		MOV.L #_g_vee_Sectors, R2
+00000020 4B12                    		ADD R1, R2
+00000022 A8A1                    		MOV.L 08H[R2], R1
+00000024 A88A                    		MOV.L 0CH[R0], R2
+00000026 FE6211                  		MOV.L [R2,R1], R1
+00000029 E301                    		MOV.L R1, [R0]
+0000002B                         L12:	; entry.split
+                                 ;      92     
+                                 ;      93     /* Start off with all flags as not set */     
+                                 ;      94     vee_block->erasing = VEE_BLOCK_FLAG_NOT_SET;    
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",94
+0000002B A881                    		MOV.L 08H[R0], R1
+0000002D F81400                  		MOV.B #00H, [R1]
+00000030                         L13:	; entry.split1
+                                 ;      95     vee_block->active = VEE_BLOCK_FLAG_NOT_SET;    
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",95
+00000030 A881                    		MOV.L 08H[R0], R1
+00000032 3C1100                  		MOV.B #00H, 01H[R1]
+00000035                         L14:	; entry.split2
+                                 ;      96     vee_block->full = VEE_BLOCK_FLAG_NOT_SET;    
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",96
+00000035 A881                    		MOV.L 08H[R0], R1
+00000037 3C1200                  		MOV.B #00H, 02H[R1]
+0000003A                         L15:	; entry.split3
+                                 ;      97     vee_block->nextup = VEE_BLOCK_FLAG_NOT_SET;    
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",97
+0000003A A881                    		MOV.L 08H[R0], R1
+0000003C 3C1300                  		MOV.B #00H, 03H[R1]
+0000003F                         L16:	; entry.split4
+                                 ;      98           
+                                 ;      99     /* Test for ERASING flag */  
+                                 ;     100     if (vee_blank_check_address((uint8_t *)ptr) != VEE_SUCCESS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",100
+0000003F EC01                    		MOV.L [R0], R1
+00000041 39rrrr               W  		BSR _vee_blank_check_address
+00000044 6101                    		CMP #00H, R1
+00000046 20rr                    		BEQ L19
+00000048                         L17:	; bb23
+                                 ;     101     {
+                                 ;     102         /* Make sure flag is correct */
+                                 ;     103         if (*(vee_var_min_t *)ptr == VEE_BLOCK_FLAG_ERASING)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",103
+00000048 EC01                    		MOV.L [R0], R1
+0000004A 5C1E                    		MOVU.W [R1], R14
+0000004C 770EAAAA00              		CMP #0AAAAH, R14
+00000051 18                   S  		BNE L19
+00000052                         L18:	; bb24
+                                 ;     104         {
+                                 ;     105             /* Flag was correct */
+                                 ;     106             vee_block->erasing = VEE_BLOCK_FLAG_SET;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",106
+00000052 A881                    		MOV.L 08H[R0], R1
+00000054 F81401                  		MOV.B #01H, [R1]
+00000057                         L19:	; bb40
+                                 ;     107         }
+                                 ;     108     }         
+                                 ;     109     
+                                 ;     110     /* Move to ACTIVE flag */
+                                 ;     111     ptr += sizeof(vee_var_min_t);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",111
+00000057 EC01                    		MOV.L [R0], R1
+00000059 6221                    		ADD #02H, R1
+0000005B E301                    		MOV.L R1, [R0]
+0000005D                         L20:	; bb40.split
+                                 ;     112     
+                                 ;     113     /* Test for ACTIVE flag */  
+                                 ;     114     if (vee_blank_check_address((uint8_t *)ptr) != VEE_SUCCESS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",114
+0000005D EC01                    		MOV.L [R0], R1
+0000005F 39rrrr               W  		BSR _vee_blank_check_address
+00000062 6101                    		CMP #00H, R1
+00000064 20rr                    		BEQ L23
+00000066                         L21:	; bb45
+                                 ;     115     {
+                                 ;     116         /* Make sure flag is correct */
+                                 ;     117         if (*(vee_var_min_t *)ptr == VEE_BLOCK_FLAG_ACTIVE)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",117
+00000066 EC01                    		MOV.L [R0], R1
+00000068 5C1E                    		MOVU.W [R1], R14
+0000006A 770EBBBB00              		CMP #0BBBBH, R14
+0000006F 18                   S  		BNE L23
+00000070                         L22:	; bb46
+                                 ;     118         {
+                                 ;     119             /* Flag was correct */
+                                 ;     120             vee_block->active = VEE_BLOCK_FLAG_SET;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",120
+00000070 A881                    		MOV.L 08H[R0], R1
+00000072 3C1101                  		MOV.B #01H, 01H[R1]
+00000075                         L23:	; bb63
+                                 ;     121         }
+                                 ;     122     }         
+                                 ;     123     
+                                 ;     124     /* Move to FULL flag */
+                                 ;     125     ptr += sizeof(vee_var_min_t);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",125
+00000075 EC01                    		MOV.L [R0], R1
+00000077 6221                    		ADD #02H, R1
+00000079 E301                    		MOV.L R1, [R0]
+0000007B                         L24:	; bb63.split
+                                 ;     126     
+                                 ;     127     /* Test for FULL flag */  
+                                 ;     128     if (vee_blank_check_address((uint8_t *)ptr) != VEE_SUCCESS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",128
+0000007B EC01                    		MOV.L [R0], R1
+0000007D 39rrrr               W  		BSR _vee_blank_check_address
+00000080 6101                    		CMP #00H, R1
+00000082 20rr                    		BEQ L27
+00000084                         L25:	; bb68
+                                 ;     129     {
+                                 ;     130         /* Make sure flag is correct */
+                                 ;     131         if(*(vee_var_min_t *)ptr == VEE_BLOCK_FLAG_FULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",131
+00000084 EC01                    		MOV.L [R0], R1
+00000086 5C1E                    		MOVU.W [R1], R14
+00000088 770ECCCC00              		CMP #0CCCCH, R14
+0000008D 18                   S  		BNE L27
+0000008E                         L26:	; bb69
+                                 ;     132         {
+                                 ;     133             /* Flag was correct */
+                                 ;     134             vee_block->full = VEE_BLOCK_FLAG_SET;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",134
+0000008E A881                    		MOV.L 08H[R0], R1
+00000090 3C1201                  		MOV.B #01H, 02H[R1]
+00000093                         L27:	; bb86
+                                 ;     135         }
+                                 ;     136     }         
+                                 ;     137 
+                                 ;     138     /* Move to NEXTUP flag */
+                                 ;     139     ptr += sizeof(vee_var_min_t);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",139
+00000093 EC01                    		MOV.L [R0], R1
+00000095 6221                    		ADD #02H, R1
+00000097 E301                    		MOV.L R1, [R0]
+00000099                         L28:	; bb86.split
+                                 ;     140 
+                                 ;     141     /* Test for NEXTUP flag */          
+                                 ;     142     if (vee_blank_check_address((uint8_t *)ptr) != VEE_SUCCESS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",142
+00000099 EC01                    		MOV.L [R0], R1
+0000009B 39rrrr               W  		BSR _vee_blank_check_address
+0000009E 6101                    		CMP #00H, R1
+000000A0 20rr                    		BEQ L31
+000000A2                         L29:	; bb91
+                                 ;     143     {
+                                 ;     144         /* Make sure flag is correct */
+                                 ;     145         if (*(vee_var_min_t *)ptr == VEE_BLOCK_FLAG_NEXTUP)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",145
+000000A2 EC01                    		MOV.L [R0], R1
+000000A4 5C1E                    		MOVU.W [R1], R14
+000000A6 770EDDDD00              		CMP #0DDDDH, R14
+000000AB 18                   S  		BNE L31
+000000AC                         L30:	; bb92
+                                 ;     146         {
+                                 ;     147             /* Flag was correct */
+                                 ;     148             vee_block->nextup = VEE_BLOCK_FLAG_SET;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",148
+000000AC A881                    		MOV.L 08H[R0], R1
+000000AE 3C1301                  		MOV.B #01H, 03H[R1]
+000000B1                         L31:	; bb109
+                                 ;     149         }
+                                 ;     150     }         
+                                 ;     151     
+                                 ;     152     /* Finished successfully */
+                                 ;     153     return VEE_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",153
+000000B1 3C0700                  		MOV.B #00H, 07H[R0]
+000000B4 B189                    		MOVU.B 07H[R0], R1
+000000B6                         L32:	; bb109.split
+                                 ;     154 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",154
+000000B6 5B11                    		MOVU.B R1, R1
+000000B8 6705                    		RTSD #14H
+000000BA                         _vee_blank_check_address:
+                                 		.STACK	_vee_blank_check_address=12
+                                 ;     155 /***********************************************************************************************************************
+                                 ;     156 End of function vee_get_block_info
+                                 ;     157 ***********************************************************************************************************************/
+                                 ;     158 
+                                 ;     159 /***********************************************************************************************************************
+                                 ;     160 * Function Name: vee_blank_check_address
+                                 ;     161 * Description  : Checks to see if this data address is blank
+                                 ;     162 * Arguments    : addr - 
+                                 ;     163 *                    Address to check
+                                 ;     164 * Return Value : VEE_SUCCESS - 
+                                 ;     165 *                    Address was blank
+                                 ;     166 *                VEE_FAILURE - 
+                                 ;     167 *                    Address has been written
+                                 ;     168 ***********************************************************************************************************************/
+                                 ;     169 uint8_t vee_blank_check_address(uint8_t *addr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",169
+000000BA 6080                    		SUB #08H, R0
+000000BC A009                    		MOV.L R1, 04H[R0]
+                                 ;     170 {
+                                 ;     171     /* Local variable */
+                                 ;     172     uint8_t ret;
+                                 ;     173     
+                                 ;     174     /* Verify that address is on 2 byte boundary */
+                                 ;     175     if( (((uint32_t)addr) & 0x00000001) != 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",175
+000000BE 7C01                    		BTST #00H, R1
+000000C0 10                   S  		BEQ L35
+000000C1                         L34:	; bb3
+                                 ;     176     {
+                                 ;     177         /* This should not happen */
+                                 ;     178         FlashError();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",178
+000000C1 05rrrrrr             A  		BSR _FlashError
+000000C5                         L35:	; bb9
+                                 ;     179     }
+                                 ;     180     
+                                 ;     181     /* Perform 2 byte blank check */
+                                 ;     182     ret = R_FlashDataAreaBlankCheck( (uint32_t)addr, BLANK_CHECK_2_BYTE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",182
+000000C5 A809                    		MOV.L 04H[R0], R1
+000000C7 6602                    		MOV.L #00000000H, R2
+000000C9 05rrrrrr             A  		BSR _R_FlashDataAreaBlankCheck
+000000CD 8081                    		MOV.B R1, 02H[R0]
+000000CF                         L36:	; bb9.split
+                                 ;     183     
+                                 ;     184     /* Check return value */
+                                 ;     185     if( ret == FLASH_BLANK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",185
+000000CF B081                    		MOVU.B 02H[R0], R1
+000000D1 6101                    		CMP #00H, R1
+000000D3 18                   S  		BNE L38
+000000D4                         L37:	; bb14
+                                 ;     186     {
+                                 ;     187         /* Address was blank */
+                                 ;     188         return VEE_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",188
+000000D4 3C0100                  		MOV.B #00H, 01H[R0]
+000000D7 2Err                 B  		BRA L42
+000000D9                         L38:	; bb17
+                                 ;     189     }
+                                 ;     190     else if( ret == FLASH_NOT_BLANK )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",190
+000000D9 B081                    		MOVU.B 02H[R0], R1
+000000DB 6111                    		CMP #01H, R1
+000000DD 18                   S  		BNE L40
+000000DE                         L39:	; bb18
+                                 ;     191     {
+                                 ;     192         /* Address was not blank */
+                                 ;     193         return VEE_FAILURE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",193
+000000DE 3C0101                  		MOV.B #01H, 01H[R0]
+000000E1 08                   S  		BRA L42
+000000E2                         L40:	; bb20
+                                 ;     194     }
+                                 ;     195     else
+                                 ;     196     {
+                                 ;     197         /* Operation failure in Flash API */
+                                 ;     198         FlashError();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",198
+000000E2 05rrrrrr             A  		BSR _FlashError
+000000E6                         L41:	; bb20.split
+                                 ;     199     }
+                                 ;     200     
+                                 ;     201     /* Return */
+                                 ;     202     return VEE_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",202
+000000E6 3C0100                  		MOV.B #00H, 01H[R0]
+000000E9                         L42:	; bb34
+000000E9 C5000103                		MOV.B 01H[R0], 03H[R0]
+                                 ;     203 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",203
+000000ED B089                    		MOVU.B 03H[R0], R1
+000000EF 6702                    		RTSD #08H
+000000F1                         _vee_blank_check_block:
+                                 		.STACK	_vee_blank_check_block=12
+                                 ;     204 /***********************************************************************************************************************
+                                 ;     205 End of function vee_blank_check_address
+                                 ;     206 ***********************************************************************************************************************/
+                                 ;     207 
+                                 ;     208 /***********************************************************************************************************************
+                                 ;     209 * Function Name: vee_blank_check_block
+                                 ;     210 * Description  : Checks to see if this data flash block is empty
+                                 ;     211 * Arguments    : block - 
+                                 ;     212 *                    block to check
+                                 ;     213 * Return Value : VEE_SUCCESS - 
+                                 ;     214 *                    Block was blank
+                                 ;     215 *                VEE_FAILURE - 
+                                 ;     216 *                    Block has been written
+                                 ;     217 ***********************************************************************************************************************/
+                                 ;     218 uint8_t vee_blank_check_block(uint32_t block)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",218
+000000F1 6080                    		SUB #08H, R0
+000000F3 A009                    		MOV.L R1, 04H[R0]
+                                 ;     219 {       
+                                 ;     220     /* Perform blank check */
+                                 ;     221     if( R_FlashDataAreaBlankCheck(g_flash_BlockAddresses[block], BLANK_CHECK_ENTIRE_BLOCK) == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",221
+000000F5 FBE2rrrrrrrr            		MOV.L #_g_flash_BlockAddresses, R14
+000000FB FE61E1                  		MOV.L [R1,R14], R1
+000000FE 6612                    		MOV.L #00000001H, R2
+00000100 05rrrrrr             A  		BSR _R_FlashDataAreaBlankCheck
+00000104 6101                    		CMP #00H, R1
+00000106 18                   S  		BNE L45
+00000107                         L44:	; bb2
+                                 ;     222     {
+                                 ;     223         /* Blank check is on-going */
+                                 ;     224         return VEE_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",224
+00000107 3C0200                  		MOV.B #00H, 02H[R0]
+0000010A 08                   S  		BRA L46
+0000010B                         L45:	; bb4
+                                 ;     225     }
+                                 ;     226     else
+                                 ;     227     {
+                                 ;     228         /* Problem with blank check in FlashAPI */
+                                 ;     229         return VEE_FAILURE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",229
+0000010B 3C0201                  		MOV.B #01H, 02H[R0]
+0000010E                         L46:	; bb14
+0000010E C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     230     }    
+                                 ;     231 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",231
+00000112 B089                    		MOVU.B 03H[R0], R1
+00000114 6702                    		RTSD #08H
+00000116                         _vee_move_to_boundary:
+                                 		.STACK	_vee_move_to_boundary=16
+                                 ;     232 /***********************************************************************************************************************
+                                 ;     233 End of function vee_blank_check_block
+                                 ;     234 ***********************************************************************************************************************/
+                                 ;     235 
+                                 ;     236 /***********************************************************************************************************************
+                                 ;     237 * Function Name: vee_move_to_boundary
+                                 ;     238 * Description  : Moves and address to a data flash programming boundary
+                                 ;     239 * Arguments    : address - 
+                                 ;     240 *                    Address to check
+                                 ;     241 * Return Value : The address aligned to the data flash boundary
+                                 ;     242 ***********************************************************************************************************************/
+                                 ;     243 uint32_t vee_move_to_boundary(uint32_t address)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",243
+00000116 60C0                    		SUB #0CH, R0
+00000118 A081                    		MOV.L R1, 08H[R0]
+                                 ;     244 {
+                                 ;     245     /* On the RX63N we have 2 byte boundaries */
+                                 ;     246     
+                                 ;     247     /* Check to see if it is already on an 2 byte boundary */
+                                 ;     248     if( (address & 0x00000001) != 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",248
+0000011A 7C01                    		BTST #00H, R1
+0000011C 10                   S  		BEQ L49
+0000011D                         L48:	; bb2
+                                 ;     249     {
+                                 ;     250         /* Address is not on a boundary. Since this MCU has 2 byte writes, we just need to move 1 byte forward. */
+                                 ;     251         return (address+1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",251
+0000011D 6211                    		ADD #01H, R1
+0000011F E301                    		MOV.L R1, [R0]
+00000121 08                   S  		BRA L50
+00000122                         L49:	; bb6
+                                 ;     252     }
+                                 ;     253     else
+                                 ;     254     {
+                                 ;     255         /* Address is already on boundary */
+                                 ;     256         return address;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",256
+00000122 E301                    		MOV.L R1, [R0]
+00000124                         L50:	; bb14
+00000124 EC01                    		MOV.L [R0], R1
+00000126 A009                    		MOV.L R1, 04H[R0]
+                                 ;     257     }
+                                 ;     258 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",258
+00000128 6703                    		RTSD #0CH
+0000012A                         _vee_check_record:
+                                 		.STACK	_vee_check_record=12
+                                 ;     259 /***********************************************************************************************************************
+                                 ;     260 End of function vee_move_to_boundary
+                                 ;     261 ***********************************************************************************************************************/
+                                 ;     262 
+                                 ;     263 #ifdef VEE_USE_DEFAULT_CHECK_FUNCTIONS
+                                 ;     264 
+                                 ;     265 /***********************************************************************************************************************
+                                 ;     266 * Function Name: vee_check_record
+                                 ;     267 * Description  : Validates a record.  The user could implement a CRC or checksum check here if the default flag is 
+                                 ;     268 *                not enough.
+                                 ;     269 * Arguments    : record - 
+                                 ;     270 *                    Address of record in data flash
+                                 ;     271 * Return Value : VEE_SUCCESS - 
+                                 ;     272 *                    Record is valid
+                                 ;     273 *                VEE_FAILURE - 
+                                 ;     274 *                    Record is not valid
+                                 ;     275 ***********************************************************************************************************************/
+                                 ;     276 uint8_t vee_check_record(vee_record_t *record)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",276
+0000012A 6080                    		SUB #08H, R0
+0000012C A009                    		MOV.L R1, 04H[R0]
+                                 ;     277 {
+                                 ;     278     /* By default we only check the flag that is written to a record once that record's data has been written. You 
+                                 ;     279        could use any check here. */
+                                 ;     280     /* First need to make sure the record has been written */
+                                 ;     281     if( vee_blank_check_address((uint8_t *)&record->check) == VEE_SUCCESS )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",281
+0000012E 6241                    		ADD #04H, R1
+00000130 39rrrr               W  		BSR _vee_blank_check_address
+00000133 6101                    		CMP #00H, R1
+00000135 18                   S  		BNE L53
+00000136                         L52:	; bb2
+                                 ;     282     {
+                                 ;     283         /* Record was blank so it is not valid */
+                                 ;     284         return VEE_FAILURE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",284
+00000136 3C0201                  		MOV.B #01H, 02H[R0]
+00000139 2Err                 B  		BRA L56
+0000013B                         L53:	; bb12
+                                 ;     285     }
+                                 ;     286     
+                                 ;     287     /* Check to see if the check field has the programmed flag */
+                                 ;     288     if( record->check == VEE_RECORD_WRITTEN )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",288
+0000013B A809                    		MOV.L 04H[R0], R1
+0000013D B891                    		MOVU.W 04H[R1], R1
+0000013F 7701CDAB00              		CMP #0ABCDH, R1
+00000144 18                   S  		BNE L55
+00000145                         L54:	; bb13
+                                 ;     289     {
+                                 ;     290         /* Record verified */
+                                 ;     291         return VEE_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",291
+00000145 3C0200                  		MOV.B #00H, 02H[R0]
+00000148 08                   S  		BRA L56
+00000149                         L55:	; bb15
+                                 ;     292     }
+                                 ;     293     else
+                                 ;     294     {
+                                 ;     295         /* Error with record */
+                                 ;     296         return VEE_FAILURE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",296
+00000149 3C0201                  		MOV.B #01H, 02H[R0]
+0000014C                         L56:	; bb25
+0000014C C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     297     }
+                                 ;     298 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",298
+00000150 B089                    		MOVU.B 03H[R0], R1
+00000152 6702                    		RTSD #08H
+00000154                         _R_VEE_GenerateCheck:
+                                 		.STACK	_R_VEE_GenerateCheck=12
+                                 ;     299 /***********************************************************************************************************************
+                                 ;     300 End of function vee_check_record
+                                 ;     301 ***********************************************************************************************************************/
+                                 ;     302 
+                                 ;     303 /***********************************************************************************************************************
+                                 ;     304 * Function Name: R_VEE_GenerateCheck
+                                 ;     305 * Description  : Generates the 'check' field for a record.  The user could implement a CRC or checksum check here if 
+                                 ;     306 *                the default static flag is not enough.
+                                 ;     307 * Arguments    : record - 
+                                 ;     308 *                    Pointer to record to generate check for
+                                 ;     309 * Return Value : VEE_SUCCESS - 
+                                 ;     310 *                    'check' field is filled in
+                                 ;     311 *                VEE_FAILURE - 
+                                 ;     312 *                    Invalid record
+                                 ;     313 ***********************************************************************************************************************/
+                                 ;     314 uint8_t R_VEE_GenerateCheck(vee_record_t *record)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",314
+00000154 6080                    		SUB #08H, R0
+00000156 A009                    		MOV.L R1, 04H[R0]
+                                 ;     315 {    
+                                 ;     316     /* Just fill in a predefined value */
+                                 ;     317     record->check = VEE_RECORD_WRITTEN;  
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",317
+00000158 F91902CDAB              		MOV.W #0ABCDH, 04H[R1]
+0000015D                         L58:	; entry.split
+                                 ;     318     
+                                 ;     319     /* Return success */
+                                 ;     320     return VEE_SUCCESS; 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",320
+0000015D 3C0300                  		MOV.B #00H, 03H[R0]
+00000160 B089                    		MOVU.B 03H[R0], R1
+00000162                         L59:	; entry.split1
+                                 ;     321 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_vee\src\targets\rx63x\r_vee_rx63x.c",321
+00000162 5B11                    		MOVU.B R1, R1
+00000164 6702                    		RTSD #08H
+                                 ;     322 /***********************************************************************************************************************
+                                 ;     323 End of function R_VEE_GenerateCheck
+                                 ;     324 ***********************************************************************************************************************/
+                                 ;     325 
+                                 ;     326 #endif //VEE_USE_DEFAULT_CHECK_FUNCTIONS
+                                 ;     327 
+                                 ;     328 #endif //BSP_MCU_RX63_ALL
+                                 ;     329 
+                                 ;     330 
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00634   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000358(00000166H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\r_vee_rx63x.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_vee_rx63x.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_vee\src\targets\rx63x\r_vee_rx63x.obj

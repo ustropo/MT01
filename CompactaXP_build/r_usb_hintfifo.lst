@@ -1,0 +1,772 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:29 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:29
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_usb_hintfifo.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_usb_hintfifo.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=1,EASYMAK=0,MOBILE=0,FREE_RTOS_PP
+                                 ;r_usb_hintfifo.c
+                                 
+                                 		.glb	_usb_ghstd_IgnoreCnt
+                                 		.glb	_usb_ghstd_Ctsq
+                                 		.glb	_usb_hstd_BrdyPipe
+                                 		.glb	_usb_cstd_read_data
+                                 		.glb	_usb_hstd_StatusStart
+                                 		.glb	_usb_hstd_ControlEnd
+                                 		.glb	_usb_cstd_BrdyPipe
+                                 		.glb	_usb_hstd_NrdyPipe
+                                 		.glb	_usb_cstd_GetPid
+                                 		.glb	_usb_cpu_DelayXms
+                                 		.glb	_usb_cstd_SetBuf
+                                 		.glb	_usb_cstd_NrdyPipe
+                                 		.glb	_usb_hstd_BempPipe
+                                 		.glb	_usb_cstd_write_data
+                                 		.glb	_usb_creg_set_bempenb
+                                 		.glb	_usb_cstd_NrdyEnable
+                                 		.glb	_usb_cstd_BempPipe
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _usb_hstd_BrdyPipe:
+                                 		.STACK	_usb_hstd_BrdyPipe=12
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_usb_hintfifo.c
+                                 ;      21 * Description  : USB Host and FIFO interrupt code
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Support Multi device.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 
+                                 ;      30 /******************************************************************************
+                                 ;      31 Includes   <System Includes> , "Project Includes"
+                                 ;      32 ******************************************************************************/
+                                 ;      33 #include "r_usb_basic_if.h"
+                                 ;      34 #include "r_usb_reg_access.h"
+                                 ;      35 
+                                 ;      36 
+                                 ;      37 #if (USB_FUNCSEL_USBIP0_PP == USB_HOST_PP) || (USB_FUNCSEL_USBIP1_PP == USB_HOST_PP)
+                                 ;      38 
+                                 ;      39 /******************************************************************************
+                                 ;      40 Constant macro definitions
+                                 ;      41 ******************************************************************************/
+                                 ;      42 
+                                 ;      43 
+                                 ;      44 /******************************************************************************
+                                 ;      45 External variables and functions
+                                 ;      46 ******************************************************************************/
+                                 ;      47 
+                                 ;      48 
+                                 ;      49 /******************************************************************************
+                                 ;      50 Private global variables and functions
+                                 ;      51 ******************************************************************************/
+                                 ;      52 
+                                 ;      53 
+                                 ;      54 /******************************************************************************
+                                 ;      55 Renesas Abstracted Host FIFO Interrupt functions
+                                 ;      56 ******************************************************************************/
+                                 ;      57 
+                                 ;      58 
+                                 ;      59 /******************************************************************************
+                                 ;      60 Function Name   : usb_hstd_BrdyPipe
+                                 ;      61 Description     : BRDY Interrupt
+                                 ;      62 Arguments       : USB_UTR_t *ptr
+                                 ;      63                 : uint16_t bitsts           : BRDYSTS Reg & BRDYENB Reg
+                                 ;      64 Return value    : none
+                                 ;      65 ******************************************************************************/
+                                 ;      66 //void usb_hstd_BrdyPipe(uint16_t bitsts)
+                                 ;      67 void usb_hstd_BrdyPipe(USB_UTR_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",67
+00000000 6080                    		SUB #08H, R0
+00000002 A009                    		MOV.L R1, 04H[R0]
+                                 ;      68 {
+                                 ;      69     uint16_t    bitsts;
+                                 ;      70 
+                                 ;      71     bitsts = ptr->status;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",71
+00000004 D5101001                		MOV.W 20H[R1], 02H[R0]
+00000008                         L11:	; entry.split
+                                 ;      72 
+                                 ;      73     /* When operating by the host function, usb_cstd_brdy_pipe() is executed without fail because */
+                                 ;      74     /* only one BRDY message is issued even when the demand of PIPE0 and PIPEx has been generated at the same time. */
+                                 ;      75     if( (bitsts & USB_BRDY0) == USB_BRDY0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",75
+00000008 B809                    		MOVU.W 02H[R0], R1
+0000000A 6411                    		AND #01H, R1
+0000000C 6111                    		CMP #01H, R1
+0000000E 3Brrrr               W  		BNE L30
+00000011                         L12:	; bb5
+                                 ;      76     {
+                                 ;      77         /* Branch  by the Control transfer stage management */
+                                 ;      78         switch( usb_ghstd_Ctsq[ptr->ip] )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",78
+00000011 A809                    		MOV.L 04H[R0], R1
+00000013 B991                    		MOVU.W 0CH[R1], R1
+00000015 FBE2rrrrrrrr            		MOV.L #_usb_ghstd_Ctsq, R14
+0000001B FED1EE                  		MOVU.W [R1,R14], R14
+0000001E 755E14                  		CMP #14H, R14
+00000021 20rr                    		BEQ L21
+00000023                         L13:	; bb5
+00000023 617E                    		CMP #07H, R14
+00000025 3Arrrr               W  		BEQ L29
+00000028                         L14:	; bb5
+00000028 615E                    		CMP #05H, R14
+0000002A 3Brrrr               W  		BNE L30
+0000002D                         L15:	; bb13
+                                 ;      79         {
+                                 ;      80         /* Data stage of Control read transfer */
+                                 ;      81         case USB_DATARD:
+                                 ;      82             switch( usb_cstd_read_data( ptr, USB_PIPE0, USB_CUSE ) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",82
+0000002D A809                    		MOV.L 04H[R0], R1
+0000002F 6602                    		MOV.L #00000000H, R2
+00000031 EF23                    		MOV.L R2, R3
+00000033 05rrrrrr             A  		BSR _usb_cstd_read_data
+00000037 7701FFFF00              		CMP #0FFFFH, R1
+0000003C 20rr                    		BEQ L20
+0000003E                         L16:	; bb13
+0000003E 6131                    		CMP #03H, R1
+00000040 20rr                    		BEQ L19
+00000042                         L17:	; bb13
+00000042 6111                    		CMP #01H, R1
+00000044 24rr                    		BGTU L30
+00000046                         L18:	; bb17
+                                 ;      83             {
+                                 ;      84             /* End of data read */
+                                 ;      85             case USB_READEND:
+                                 ;      86                 /* continue */
+                                 ;      87             /* End of data read */
+                                 ;      88             case USB_READSHRT:
+                                 ;      89                 usb_hstd_StatusStart(ptr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",89
+00000046 A809                    		MOV.L 04H[R0], R1
+00000048 05rrrrrr             A  		BSR _usb_hstd_StatusStart
+0000004C 2Err                 B  		BRA L30
+0000004E                         L19:	; bb20
+                                 ;      90                 break;
+                                 ;      91             /* Continue of data read */
+                                 ;      92             case USB_READING:
+                                 ;      93                 break;
+                                 ;      94             /* FIFO access error */
+                                 ;      95             case USB_READOVER:
+                                 ;      96                 USB_PRINTF0("### Receive data over PIPE0 \n");
+                                 ;      97                 /* Control Read/Write End */
+                                 ;      98                 usb_hstd_ControlEnd(ptr, (uint16_t)USB_DATA_OVR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",98
+0000004E A809                    		MOV.L 04H[R0], R1
+00000050 6652                    		MOV.L #00000005H, R2
+00000052 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+00000056 2Err                 B  		BRA L30
+00000058                         L20:	; bb22
+                                 ;      99                 break;
+                                 ;     100             /* FIFO access error */
+                                 ;     101             case USB_FIFOERROR:
+                                 ;     102                 USB_PRINTF0("### FIFO access error \n");
+                                 ;     103                 /* Control Read/Write End */
+                                 ;     104                 usb_hstd_ControlEnd(ptr, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",104
+00000058 A809                    		MOV.L 04H[R0], R1
+0000005A 6672                    		MOV.L #00000007H, R2
+0000005C 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+00000060 2Err                 B  		BRA L30
+00000062                         L21:	; bb26
+                                 ;     105                 break;
+                                 ;     106             default:
+                                 ;     107                 break;
+                                 ;     108             }
+                                 ;     109             break;
+                                 ;     110         /* Data stage of Control read transfer */
+                                 ;     111         case USB_DATARDCNT:
+                                 ;     112             switch( usb_cstd_read_data( ptr, USB_PIPE0, USB_CUSE ) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",112
+00000062 A809                    		MOV.L 04H[R0], R1
+00000064 6602                    		MOV.L #00000000H, R2
+00000066 EF23                    		MOV.L R2, R3
+00000068 05rrrrrr             A  		BSR _usb_cstd_read_data
+0000006C 7701FFFF00              		CMP #0FFFFH, R1
+00000071 20rr                    		BEQ L28
+00000073                         L22:	; bb26
+00000073 6111                    		CMP #01H, R1
+00000075 20rr                    		BEQ L26
+00000077                         L23:	; bb26
+00000077 6131                    		CMP #03H, R1
+00000079 20rr                    		BEQ L27
+0000007B                         L24:	; bb26
+0000007B 6101                    		CMP #00H, R1
+0000007D 21rr                    		BNE L30
+0000007F                         L25:	; bb30
+                                 ;     113             {
+                                 ;     114             /* End of data read */
+                                 ;     115             case USB_READEND:
+                                 ;     116                 /* Control Read/Write End */
+                                 ;     117                 usb_hstd_ControlEnd(ptr, (uint16_t)USB_CTRL_READING);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",117
+0000007F A809                    		MOV.L 04H[R0], R1
+00000081 754211                  		MOV.L #00000011H, R2
+00000084 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+00000088 2Err                 B  		BRA L30
+0000008A                         L26:	; bb32
+                                 ;     118                 break;
+                                 ;     119             /* End of data read */
+                                 ;     120             case USB_READSHRT:
+                                 ;     121                 /* Control Read/Write Status */
+                                 ;     122                 usb_hstd_StatusStart(ptr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",122
+0000008A A809                    		MOV.L 04H[R0], R1
+0000008C 05rrrrrr             A  		BSR _usb_hstd_StatusStart
+00000090 2Err                 B  		BRA L30
+00000092                         L27:	; bb35
+                                 ;     123                 break;
+                                 ;     124             /* Continue of data read */
+                                 ;     125             case USB_READING:
+                                 ;     126                 break;
+                                 ;     127             /* FIFO access error */
+                                 ;     128             case USB_READOVER:
+                                 ;     129                 USB_PRINTF0("### Receive data over PIPE0 \n");
+                                 ;     130                 /* Control Read/Write End */
+                                 ;     131                 usb_hstd_ControlEnd(ptr, (uint16_t)USB_DATA_OVR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",131
+00000092 A809                    		MOV.L 04H[R0], R1
+00000094 6652                    		MOV.L #00000005H, R2
+00000096 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+0000009A 2Err                 B  		BRA L30
+0000009C                         L28:	; bb37
+                                 ;     132                 break;
+                                 ;     133             /* FIFO access error */
+                                 ;     134             case USB_FIFOERROR:
+                                 ;     135                 USB_PRINTF0("### FIFO access error \n");
+                                 ;     136                 /* Control Read/Write End */
+                                 ;     137                 usb_hstd_ControlEnd(ptr, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",137
+0000009C A809                    		MOV.L 04H[R0], R1
+0000009E 6672                    		MOV.L #00000007H, R2
+000000A0 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+000000A4 08                   S  		BRA L30
+000000A5                         L29:	; bb41
+                                 ;     138                 break;
+                                 ;     139             default:
+                                 ;     140                 break;
+                                 ;     141             }
+                                 ;     142             break;
+                                 ;     143 
+                                 ;     144         /* Status stage of Control write (NoData control) transfer */
+                                 ;     145         case USB_STATUSWR:
+                                 ;     146             /* Control Read/Write End */
+                                 ;     147             usb_hstd_ControlEnd(ptr, (uint16_t)USB_CTRL_END);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",147
+000000A5 A809                    		MOV.L 04H[R0], R1
+000000A7 6602                    		MOV.L #00000000H, R2
+000000A9 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+000000AD                         L30:	; bb50
+                                 ;     148             break;
+                                 ;     149         default:
+                                 ;     150             break;
+                                 ;     151         }
+                                 ;     152     }
+                                 ;     153     /* BRDY interrupt */
+                                 ;     154     usb_cstd_BrdyPipe(ptr, bitsts);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",154
+000000AD B80A                    		MOVU.W 02H[R0], R2
+000000AF A809                    		MOV.L 04H[R0], R1
+000000B1 05rrrrrr             A  		BSR _usb_cstd_BrdyPipe
+000000B5 6702                    		RTSD #08H
+000000B7                         _usb_hstd_NrdyPipe:
+                                 		.STACK	_usb_hstd_NrdyPipe=12
+                                 ;     155 }
+                                 ;     156 /******************************************************************************
+                                 ;     157 End of function usb_hstd_BrdyPipe
+                                 ;     158 ******************************************************************************/
+                                 ;     159 
+                                 ;     160 /******************************************************************************
+                                 ;     161 Function Name   : usb_hstd_NrdyPipe
+                                 ;     162 Description     : NRDY Interrupt
+                                 ;     163 Arguments       : USB_UTR_t *ptr
+                                 ;     164                 : uint16_t bitsts           : NRDYSTS Reg & NRDYENB Reg
+                                 ;     165 Return value    : none
+                                 ;     166 ******************************************************************************/
+                                 ;     167 void usb_hstd_NrdyPipe(USB_UTR_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",167
+000000B7 6080                    		SUB #08H, R0
+000000B9 A009                    		MOV.L R1, 04H[R0]
+                                 ;     168 {
+                                 ;     169     uint16_t        buffer;
+                                 ;     170     uint16_t        bitsts;
+                                 ;     171 
+                                 ;     172     bitsts = ptr->status;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",172
+000000BB D5101001                		MOV.W 20H[R1], 02H[R0]
+000000BF                         L32:	; entry.split
+                                 ;     173 
+                                 ;     174     /* When operating by the host function, usb_cstd_nrdy_pipe() is executed without fail because */
+                                 ;     175     /* only one NRDY message is issued even when the demand of PIPE0 and PIPEx has been generated at the same time. */
+                                 ;     176     if( (bitsts & USB_NRDY0) == USB_NRDY0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",176
+000000BF B809                    		MOVU.W 02H[R0], R1
+000000C1 6411                    		AND #01H, R1
+000000C3 6111                    		CMP #01H, R1
+000000C5 21rr                    		BNE L41
+000000C7                         L33:	; bb6
+                                 ;     177     {
+                                 ;     178         /* Get Pipe PID from pipe number */
+                                 ;     179         buffer = usb_cstd_GetPid(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",179
+000000C7 A809                    		MOV.L 04H[R0], R1
+000000C9 6602                    		MOV.L #00000000H, R2
+000000CB 05rrrrrr             A  		BSR _usb_cstd_GetPid
+000000CF D301                    		MOV.W R1, [R0]
+000000D1                         L34:	; bb6.split
+                                 ;     180         /* STALL ? */
+                                 ;     181         if( (buffer & USB_PID_STALL) == USB_PID_STALL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",181
+000000D1 5C01                    		MOVU.W [R0], R1
+000000D3 6421                    		AND #02H, R1
+000000D5 6121                    		CMP #02H, R1
+000000D7 A809                    		MOV.L 04H[R0], R1
+000000D9 18                   S  		BNE L36
+000000DA                         L35:	; bb10
+000000DA 6662                    		MOV.L #00000006H, R2
+                                 ;     182         {           
+                                 ;     183             USB_PRINTF0("### STALL Pipe 0\n");
+                                 ;     184             /* PIPE0 STALL call back */
+                                 ;     185             usb_hstd_ControlEnd(ptr, (uint16_t)USB_DATA_STALL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",185
+000000DC 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+000000E0 2Err                 B  		BRA L41
+000000E2                         L36:	; bb12
+                                 ;     186         }
+                                 ;     187         else
+                                 ;     188         {
+                                 ;     189             /* Ignore count */
+                                 ;     190             usb_ghstd_IgnoreCnt[ptr->ip][USB_PIPE0]++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",190
+000000E2 B991                    		MOVU.W 0CH[R1], R1
+000000E4 751114                  		MUL #14H, R1
+000000E7 FBE2rrrrrrrr            		MOV.L #_usb_ghstd_IgnoreCnt, R14
+000000ED 4B1E                    		ADD R1, R14
+000000EF DCEF                    		MOV.W [R14], R15
+000000F1 621F                    		ADD #01H, R15
+000000F3 D3EF                    		MOV.W R15, [R14]
+000000F5                         L37:	; bb12.split
+                                 ;     191             USB_PRINTF2("### IGNORE Pipe %d is %d times \n", USB_PIPE0, usb_ghstd_IgnoreCnt[ptr->ip][USB_PIPE0]);
+                                 ;     192             /* Pipe error check */
+                                 ;     193             if( usb_ghstd_IgnoreCnt[ptr->ip][USB_PIPE0] == USB_PIPEERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",193
+000000F5 A809                    		MOV.L 04H[R0], R1
+000000F7 B991                    		MOVU.W 0CH[R1], R1
+000000F9 751114                  		MUL #14H, R1
+000000FC FBE2rrrrrrrr            		MOV.L #_usb_ghstd_IgnoreCnt, R14
+00000102 4B1E                    		ADD R1, R14
+00000104 5CEE                    		MOVU.W [R14], R14
+00000106 611E                    		CMP #01H, R14
+00000108 21rr                    		BNE L39
+0000010A                         L38:	; bb23
+                                 ;     194             {
+                                 ;     195                 /* Control Data Stage Device Ignore X 3 call back */
+                                 ;     196                 usb_hstd_ControlEnd(ptr, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",196
+0000010A A809                    		MOV.L 04H[R0], R1
+0000010C 6672                    		MOV.L #00000007H, R2
+0000010E 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+00000112 2Err                 B  		BRA L41
+00000114                         L39:	; bb25
+00000114 6651                    		MOV.L #00000005H, R1
+                                 ;     197             }
+                                 ;     198             else
+                                 ;     199             {
+                                 ;     200                 /* Control Data Stage Retry */
+                                 ;     201                 /* 5ms wait */
+                                 ;     202                 usb_cpu_DelayXms((uint16_t)5);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",202
+00000116 05rrrrrr             A  		BSR _usb_cpu_DelayXms
+0000011A                         L40:	; bb25.split
+                                 ;     203                 /* PIPE0 Send IN or OUT token */
+                                 ;     204                 usb_cstd_SetBuf(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",204
+0000011A A809                    		MOV.L 04H[R0], R1
+0000011C 6602                    		MOV.L #00000000H, R2
+0000011E 05rrrrrr             A  		BSR _usb_cstd_SetBuf
+00000122                         L41:	; bb52
+                                 ;     205             }
+                                 ;     206         }
+                                 ;     207     }
+                                 ;     208     /* Nrdy Pipe interrupt */
+                                 ;     209     usb_cstd_NrdyPipe(ptr, bitsts);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",209
+00000122 B80A                    		MOVU.W 02H[R0], R2
+00000124 A809                    		MOV.L 04H[R0], R1
+00000126 05rrrrrr             A  		BSR _usb_cstd_NrdyPipe
+0000012A 6702                    		RTSD #08H
+0000012C                         _usb_hstd_BempPipe:
+                                 		.STACK	_usb_hstd_BempPipe=12
+                                 ;     210 }
+                                 ;     211 /******************************************************************************
+                                 ;     212 End of function usb_hstd_NrdyPipe
+                                 ;     213 ******************************************************************************/
+                                 ;     214 
+                                 ;     215 /******************************************************************************
+                                 ;     216 Function Name   : usb_hstd_BempPipe
+                                 ;     217 Description     : BEMP interrupt
+                                 ;     218 Arguments       : USB_UTR_t *ptr
+                                 ;     219                 : uint16_t bitsts           : BEMPSTS Reg & BEMPENB Reg
+                                 ;     220 Return value    : none
+                                 ;     221 ******************************************************************************/
+                                 ;     222 void usb_hstd_BempPipe(USB_UTR_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",222
+0000012C 6080                    		SUB #08H, R0
+0000012E A009                    		MOV.L R1, 04H[R0]
+                                 ;     223 {
+                                 ;     224     uint16_t        buffer;
+                                 ;     225     uint16_t        bitsts;
+                                 ;     226 
+                                 ;     227     bitsts = ptr->status;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",227
+00000130 D5101001                		MOV.W 20H[R1], 02H[R0]
+00000134                         L43:	; entry.split
+                                 ;     228 
+                                 ;     229     /* When operating by the host function, usb_cstd_bemp_pipe() is executed without fail because */
+                                 ;     230     /* only one BEMP message is issued even when the demand of PIPE0 and PIPEx has been generated at the same time. */
+                                 ;     231     if( (bitsts & USB_BEMP0) == USB_BEMP0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",231
+00000134 B809                    		MOVU.W 02H[R0], R1
+00000136 6411                    		AND #01H, R1
+00000138 6111                    		CMP #01H, R1
+0000013A 3Brrrr               W  		BNE L74
+0000013D                         L44:	; bb6
+                                 ;     232     {
+                                 ;     233         /* Get Pipe PID from pipe number */
+                                 ;     234         buffer = usb_cstd_GetPid(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",234
+0000013D A809                    		MOV.L 04H[R0], R1
+0000013F 6602                    		MOV.L #00000000H, R2
+00000141 05rrrrrr             A  		BSR _usb_cstd_GetPid
+00000145 D301                    		MOV.W R1, [R0]
+00000147                         L45:	; bb6.split
+                                 ;     235         /* MAX packet size error ? */
+                                 ;     236         if( (buffer & USB_PID_STALL) == USB_PID_STALL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",236
+00000147 5C01                    		MOVU.W [R0], R1
+00000149 6421                    		AND #02H, R1
+0000014B 6121                    		CMP #02H, R1
+0000014D A809                    		MOV.L 04H[R0], R1
+0000014F 18                   S  		BNE L47
+00000150                         L46:	; bb10
+00000150 6662                    		MOV.L #00000006H, R2
+                                 ;     237         {
+                                 ;     238             USB_PRINTF0("### STALL Pipe 0\n");
+                                 ;     239             /* PIPE0 STALL call back */
+                                 ;     240             usb_hstd_ControlEnd(ptr, (uint16_t)USB_DATA_STALL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",240
+00000152 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+00000156 38rrrr               W  		BRA L74
+00000159                         L47:	; bb12
+                                 ;     241         } 
+                                 ;     242         else
+                                 ;     243         {
+                                 ;     244             /* Branch  by the Control transfer stage management */
+                                 ;     245             switch( usb_ghstd_Ctsq[ptr->ip] )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",245
+00000159 B991                    		MOVU.W 0CH[R1], R1
+0000015B FBE2rrrrrrrr            		MOV.L #_usb_ghstd_Ctsq, R14
+00000161 FED1EE                  		MOVU.W [R1,R14], R14
+00000164 755E13                  		CMP #13H, R14
+00000167 20rr                    		BEQ L61
+00000169                         L48:	; bb12
+00000169 616E                    		CMP #06H, R14
+0000016B 3Arrrr               W  		BEQ L73
+0000016E                         L49:	; bb12
+0000016E 617E                    		CMP #07H, R14
+00000170 3Arrrr               W  		BEQ L72
+00000173                         L50:	; bb12
+00000173 614E                    		CMP #04H, R14
+00000175 3Brrrr               W  		BNE L74
+00000178                         L51:	; bb20
+                                 ;     246             {
+                                 ;     247             /* Continuas of data stage (Control write) */
+                                 ;     248             case USB_DATAWR:
+                                 ;     249                 /* Buffer to CFIFO data write */
+                                 ;     250                 switch( usb_cstd_write_data( ptr, USB_PIPE0, USB_CUSE ) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",250
+00000178 A809                    		MOV.L 04H[R0], R1
+0000017A 6602                    		MOV.L #00000000H, R2
+0000017C EF23                    		MOV.L R2, R3
+0000017E 05rrrrrr             A  		BSR _usb_cstd_write_data
+00000182 6101                    		CMP #00H, R1
+00000184 20rr                    		BEQ L58
+00000186                         L52:	; bb20
+00000186 7701FFFF00              		CMP #0FFFFH, R1
+0000018B 20rr                    		BEQ L60
+0000018D                         L53:	; bb20
+0000018D 6121                    		CMP #02H, R1
+0000018F 20rr                    		BEQ L58
+00000191                         L54:	; bb20
+00000191 6111                    		CMP #01H, R1
+00000193 3Brrrr               W  		BNE L74
+00000196                         L55:	; bb24
+                                 ;     251                 {
+                                 ;     252                 /* End of data write */
+                                 ;     253                 case USB_WRITESHRT:
+                                 ;     254                     /* Next stage is Control write status stage */
+                                 ;     255                     usb_ghstd_Ctsq[ptr->ip] = USB_STATUSWR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",255
+00000196 A809                    		MOV.L 04H[R0], R1
+00000198 B991                    		MOVU.W 0CH[R1], R1
+0000019A FBE2rrrrrrrr            		MOV.L #_usb_ghstd_Ctsq, R14
+000001A0 667F                    		MOV.L #00000007H, R15
+000001A2 FE11EF                  		MOV.W R15, [R1,R14]
+000001A5                         L56:	; bb24.split
+                                 ;     256                     /* Enable Empty Interrupt */
+                                 ;     257                     usb_creg_set_bempenb(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",257
+000001A5 A809                    		MOV.L 04H[R0], R1
+000001A7 6602                    		MOV.L #00000000H, R2
+000001A9 05rrrrrr             A  		BSR _usb_creg_set_bempenb
+000001AD                         L57:	; bb24.split1
+                                 ;     258                     /* Enable Not Ready Interrupt */
+                                 ;     259                     usb_cstd_NrdyEnable(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",259
+000001AD A809                    		MOV.L 04H[R0], R1
+000001AF 6602                    		MOV.L #00000000H, R2
+000001B1 05rrrrrr             A  		BSR _usb_cstd_NrdyEnable
+000001B5 38rrrr               W  		BRA L74
+000001B8                         L58:	; bb32
+                                 ;     260                     break;
+                                 ;     261                 /* End of data write (not null) */
+                                 ;     262                 case USB_WRITEEND:
+                                 ;     263                     /* continue */
+                                 ;     264                 /* Continue of data write */
+                                 ;     265                 case USB_WRITING:
+                                 ;     266                     /* Enable Empty Interrupt */
+                                 ;     267                     usb_creg_set_bempenb(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",267
+000001B8 A809                    		MOV.L 04H[R0], R1
+000001BA 6602                    		MOV.L #00000000H, R2
+000001BC 05rrrrrr             A  		BSR _usb_creg_set_bempenb
+000001C0                         L59:	; bb32.split
+                                 ;     268                     /* Enable Not Ready Interrupt */
+                                 ;     269                     usb_cstd_NrdyEnable(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",269
+000001C0 A809                    		MOV.L 04H[R0], R1
+000001C2 6602                    		MOV.L #00000000H, R2
+000001C4 05rrrrrr             A  		BSR _usb_cstd_NrdyEnable
+000001C8 38rrrr               W  		BRA L74
+000001CB                         L60:	; bb35
+                                 ;     270                     break;
+                                 ;     271                 /* FIFO access error */
+                                 ;     272                 case USB_FIFOERROR:
+                                 ;     273                     USB_PRINTF0("### FIFO access error \n");
+                                 ;     274                     /* Control Read/Write End */
+                                 ;     275                     usb_hstd_ControlEnd(ptr, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",275
+000001CB A809                    		MOV.L 04H[R0], R1
+000001CD 6672                    		MOV.L #00000007H, R2
+000001CF 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+000001D3 2Err                 B  		BRA L74
+000001D5                         L61:	; bb39
+                                 ;     276                     break;
+                                 ;     277                 default:
+                                 ;     278                     break;
+                                 ;     279                 }
+                                 ;     280                 break;
+                                 ;     281             /* Next stage to Control write data */
+                                 ;     282             case USB_DATAWRCNT:
+                                 ;     283                 /* Buffer to CFIFO data write */
+                                 ;     284                 switch( usb_cstd_write_data( ptr, USB_PIPE0, USB_CUSE ) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",284
+000001D5 A809                    		MOV.L 04H[R0], R1
+000001D7 6602                    		MOV.L #00000000H, R2
+000001D9 EF23                    		MOV.L R2, R3
+000001DB 05rrrrrr             A  		BSR _usb_cstd_write_data
+000001DF 6101                    		CMP #00H, R1
+000001E1 20rr                    		BEQ L68
+000001E3                         L62:	; bb39
+000001E3 7701FFFF00              		CMP #0FFFFH, R1
+000001E8 20rr                    		BEQ L71
+000001EA                         L63:	; bb39
+000001EA 6121                    		CMP #02H, R1
+000001EC 20rr                    		BEQ L69
+000001EE                         L64:	; bb39
+000001EE 6111                    		CMP #01H, R1
+000001F0 21rr                    		BNE L74
+000001F2                         L65:	; bb43
+                                 ;     285                 {
+                                 ;     286                 /* End of data write */
+                                 ;     287                 case USB_WRITESHRT:
+                                 ;     288                     /* Next stage is Control write status stage */
+                                 ;     289                     usb_ghstd_Ctsq[ptr->ip] = USB_STATUSWR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",289
+000001F2 A809                    		MOV.L 04H[R0], R1
+000001F4 B991                    		MOVU.W 0CH[R1], R1
+000001F6 FBE2rrrrrrrr            		MOV.L #_usb_ghstd_Ctsq, R14
+000001FC 667F                    		MOV.L #00000007H, R15
+000001FE FE11EF                  		MOV.W R15, [R1,R14]
+00000201                         L66:	; bb43.split
+                                 ;     290                     /* Enable Empty Interrupt */
+                                 ;     291                     usb_creg_set_bempenb(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",291
+00000201 A809                    		MOV.L 04H[R0], R1
+00000203 6602                    		MOV.L #00000000H, R2
+00000205 05rrrrrr             A  		BSR _usb_creg_set_bempenb
+00000209                         L67:	; bb43.split2
+                                 ;     292                     /* Enable Not Ready Interrupt */
+                                 ;     293                     usb_cstd_NrdyEnable(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",293
+00000209 A809                    		MOV.L 04H[R0], R1
+0000020B 6602                    		MOV.L #00000000H, R2
+0000020D 05rrrrrr             A  		BSR _usb_cstd_NrdyEnable
+00000211 2Err                 B  		BRA L74
+00000213                         L68:	; bb51
+                                 ;     294                     break;
+                                 ;     295                 /* End of data write (not null) */
+                                 ;     296                 case USB_WRITEEND:
+                                 ;     297                     /* Control Read/Write End */
+                                 ;     298                     usb_hstd_ControlEnd(ptr, (uint16_t)USB_CTRL_WRITING);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",298
+00000213 A809                    		MOV.L 04H[R0], R1
+00000215 754212                  		MOV.L #00000012H, R2
+00000218 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+0000021C 2Err                 B  		BRA L74
+0000021E                         L69:	; bb53
+                                 ;     299                     break;
+                                 ;     300                 /* Continue of data write */
+                                 ;     301                 case USB_WRITING:
+                                 ;     302                     /* Enable Empty Interrupt */
+                                 ;     303                     usb_creg_set_bempenb(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",303
+0000021E A809                    		MOV.L 04H[R0], R1
+00000220 6602                    		MOV.L #00000000H, R2
+00000222 05rrrrrr             A  		BSR _usb_creg_set_bempenb
+00000226                         L70:	; bb53.split
+                                 ;     304                     /* Enable Not Ready Interrupt */
+                                 ;     305                     usb_cstd_NrdyEnable(ptr, (uint16_t)USB_PIPE0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",305
+00000226 A809                    		MOV.L 04H[R0], R1
+00000228 6602                    		MOV.L #00000000H, R2
+0000022A 05rrrrrr             A  		BSR _usb_cstd_NrdyEnable
+0000022E 2Err                 B  		BRA L74
+00000230                         L71:	; bb56
+                                 ;     306                     break;
+                                 ;     307                 /* FIFO access error */
+                                 ;     308                 case USB_FIFOERROR:
+                                 ;     309                     USB_PRINTF0("### FIFO access error \n");
+                                 ;     310                     /* Control Read/Write End */
+                                 ;     311                     usb_hstd_ControlEnd(ptr, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",311
+00000230 A809                    		MOV.L 04H[R0], R1
+00000232 6672                    		MOV.L #00000007H, R2
+00000234 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+00000238 2Err                 B  		BRA L74
+0000023A                         L72:	; bb60
+                                 ;     312                     break;
+                                 ;     313                 default:
+                                 ;     314                     break;
+                                 ;     315                 }
+                                 ;     316                 break;
+                                 ;     317             /* End of data stage (Control write) */
+                                 ;     318             case USB_STATUSWR:
+                                 ;     319                 usb_hstd_StatusStart(ptr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",319
+0000023A A809                    		MOV.L 04H[R0], R1
+0000023C 05rrrrrr             A  		BSR _usb_hstd_StatusStart
+00000240 08                   S  		BRA L74
+00000241                         L73:	; bb62
+                                 ;     320                 break;
+                                 ;     321             /* Status stage of Control read transfer */
+                                 ;     322             case USB_STATUSRD:
+                                 ;     323                 /* Control Read/Write End */
+                                 ;     324                 usb_hstd_ControlEnd(ptr, (uint16_t)USB_CTRL_END);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",324
+00000241 A809                    		MOV.L 04H[R0], R1
+00000243 6602                    		MOV.L #00000000H, R2
+00000245 05rrrrrr             A  		BSR _usb_hstd_ControlEnd
+00000249                         L74:	; bb78
+                                 ;     325                 break;
+                                 ;     326             default:
+                                 ;     327                 break;
+                                 ;     328             }
+                                 ;     329         }
+                                 ;     330     }
+                                 ;     331     /* BEMP interrupt */
+                                 ;     332     usb_cstd_BempPipe(ptr, bitsts);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_usb_basic\src\driver\host\r_usb_hintfifo.c",332
+00000249 B80A                    		MOVU.W 02H[R0], R2
+0000024B A809                    		MOV.L 04H[R0], R1
+0000024D 05rrrrrr             A  		BSR _usb_cstd_BempPipe
+00000251 6702                    		RTSD #08H
+                                 ;     333 }
+                                 ;     334 /******************************************************************************
+                                 ;     335 End of function usb_hstd_BempPipe
+                                 ;     336 ******************************************************************************/
+                                 ;     337 
+                                 ;     338 #endif  /* (USB_FUNCSEL_USBIP0_PP == USB_HOST_PP) || (USB_FUNCSEL_USBIP1_PP == USB_HOST_PP) */
+                                 ;     339 
+                                 ;     340 /******************************************************************************
+                                 ;     341 End  Of File
+                                 ;     342 ******************************************************************************/
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00739   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000595(00000253H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\r_usb_hintfifo.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_usb_hintfifo.lst
+-output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_usb_basic\src\driver\host\r_usb_hintfifo.obj
