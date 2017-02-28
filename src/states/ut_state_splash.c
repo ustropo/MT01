@@ -14,6 +14,8 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "state_functions.h"
+#include "eeprom.h"
 
 #include "r_usb_basic_if.h"
 
@@ -215,6 +217,7 @@ static unsigned char mobile_bits[] = {
  */
 ut_state ut_state_splash(ut_context* pContext)
 {
+	maq_name ret;
 	WDT_FEED
 	currentLine = 0;
 	ut_lcd_clear();
@@ -244,7 +247,12 @@ ut_state ut_state_splash(ut_context* pContext)
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 
-//	check_machine_type();
+//	ret = check_machine_type();
+//
+//	if (ret == UNDEFINED_MAQ)
+//	{
+//
+//	}
 
 	R_FL_StateMachine();
 

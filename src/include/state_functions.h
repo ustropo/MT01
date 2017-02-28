@@ -8,6 +8,7 @@
 #ifndef INCLUDE_STATE_FUNCTIONS_H_
 #define INCLUDE_STATE_FUNCTIONS_H_
 
+#include "eeprom.h"
 extern uint32_t LineM5;
 extern float selecionarLinhas;
 
@@ -25,7 +26,7 @@ uint32_t delay_esc(uint32_t timems);
 uint32_t delay_esc_enter(uint32_t timems);
 uint8_t get_dec_digits(float fnum);
 uint8_t get_decimal_digits(float fnum);
-uint8_t check_machine_type(void);
+maq_name check_machine_type(void);
 void idle(void *var);
 
 #endif /* INCLUDE_STATE_FUNCTIONS_H_ */

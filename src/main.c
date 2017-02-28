@@ -88,6 +88,10 @@ extern void	usb_hmsc_task_start(void);
 extern void	usb_apl_task_switch(void);
 extern void FreeRTOSConfig(void);
 
+#pragma address teste=0xffff4000
+const int teste = 100;
+
+
 USB_UTR_t       msc_utr;
 TimerHandle_t swTimers[TIMER_SIZE];
 
