@@ -91,7 +91,7 @@ static unsigned char metalique128_bits[] = {
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
    0x00, 0x00, 0x00, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-#if (EASYMAK == 1)
+
 #define easymax_width 128
 #define easymax_height 25
 static unsigned char easymax_bits[] = {
@@ -129,7 +129,7 @@ static unsigned char easymax_bits[] = {
    0xfd, 0x3f, 0xe0, 0x0f, 0xfc, 0x01, 0xfe, 0xf8, 0xf3, 0xf3, 0xf7, 0x0f,
    0xfc, 0x7f, 0xfe, 0xfc, 0xf0, 0x07, 0xe0, 0x07, 0xfc, 0x00, 0x7e, 0xf8,
    0xf9, 0xf1, 0xf3, 0x07 };
-#elif (COMPACTAXP  == 1)
+
 #define CompactXp_width 128
 #define CompactXp_height 25
 static unsigned char CompactXp_bits[] = {
@@ -167,7 +167,7 @@ static unsigned char CompactXp_bits[] = {
    0xe0, 0xc7, 0x0f, 0x7c, 0x3e, 0xff, 0x03, 0x3f, 0xf8, 0x7e, 0x00, 0x00,
    0xfc, 0xc1, 0x1f, 0x7e, 0xe0, 0xe7, 0x07, 0x7c, 0x3e, 0xfe, 0x01, 0x3f,
    0xfc, 0x7e, 0x00, 0x00 };
-#elif (MOBILE  == 1)
+
 #define mobile_width 128
 #define mobile_height 25
 static unsigned char mobile_bits[] = {
@@ -206,8 +206,6 @@ static unsigned char mobile_bits[] = {
    0xff, 0x03, 0xf8, 0x0f, 0xfc, 0x3f, 0xf8, 0xff, 0x0f, 0xff, 0xe3, 0xff,
    0x7f, 0xff, 0xff, 0x01 };
 
-#endif
-
 /**
  * Execute a splash screen and
  * do some other initialization.
@@ -217,7 +215,6 @@ static unsigned char mobile_bits[] = {
  */
 ut_state ut_state_splash(ut_context* pContext)
 {
-	maq_name ret;
 	WDT_FEED
 	currentLine = 0;
 	ut_lcd_clear();
@@ -227,9 +224,14 @@ ut_state ut_state_splash(ut_context* pContext)
 
 	ut_lcd_bitmap(0,11,metalique128_width,metalique128_height,metalique128_bits,"\n");
 
-
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+	if (g_maq.model == UNDEFINED_MAQ)
+	{
+		return STATE_MAQ_MODEL_SELECTION;
+	}
+
 	/* Initialize pointer to current app's load image header */
 	g_app_header = (fl_image_header_t *)__sectop("APPHEADER_1");
 	sprintf(Str, "Versão:%d.%d.%d.%03d", g_app_header->version_major,
@@ -237,26 +239,22 @@ ut_state ut_state_splash(ut_context* pContext)
 								g_app_header->version_minor,
 								g_app_header->version_comp);
 
-#if (EASYMAK == 1)
-	ut_lcd_bitmap(0,11,easymax_width,easymax_height,easymax_bits,Str);
-#elif (COMPACTAXP  == 1)
-	ut_lcd_bitmap(0,11,CompactXp_width,CompactXp_height,CompactXp_bits,Str);
-#elif (MOBILE  == 1)
-	ut_lcd_bitmap(0,11,mobile_width,mobile_height,mobile_bits,Str);
-#endif
+	if (g_maq.model == EASYMAK_MAQ)
+	{
+		ut_lcd_bitmap(0,11,easymax_width,easymax_height,easymax_bits,Str);
+	}
+	else if (g_maq.model == COMPACTA_MAQ)
+	{
+		ut_lcd_bitmap(0,11,CompactXp_width,CompactXp_height,CompactXp_bits,Str);
+	}
+	else if (g_maq.model == MOBILE_MAQ)
+	{
+		ut_lcd_bitmap(0,11,mobile_width,mobile_height,mobile_bits,Str);
+	}
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 
-//	ret = check_machine_type();
-//
-//	if (ret == UNDEFINED_MAQ)
-//	{
-//
-//	}
-
 	R_FL_StateMachine();
-
- //   R_USB_Close( (usb_ip_t)msc_utr.ip );
 
     if(spiffs_init() == SPIFFS_ERR_NOT_A_FS)
     {

@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:11 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:18:41 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:11
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:18:41
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=switch.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=switch.lst
@@ -117,7 +117,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      66 void switch_init(void)
                                  ;      67 {
                                  ;      68     ICU.IRQCR[2].BIT.IRQMD = 2;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",68
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",68
 00000000 FBEE427008              		MOV.L #00087042H, R14
 00000005 5AEFC004                		MOVU.B 04C0H[R14], R15
 00000009 783F                    		BSET #03H, R15
@@ -125,12 +125,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000000F CBEFC004                		MOV.B R15, 04C0H[R14]
 00000013                         L11:	; entry.split
                                  ;      69     IR(ICU, IRQ2)  = 0;            //Clear any previously pending interrupts
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",69
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",69
 00000013 FBEE427008              		MOV.L #00087042H, R14
 00000018 F0E8                    		BCLR #00H, [R14].B
 0000001A                         L12:	; entry.split1
                                  ;      70     IPR(ICU, IRQ2) = 5;            //Set interrupt priority
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",70
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",70
 0000001A FBEE427008              		MOV.L #00087042H, R14
 0000001F 5AEF0003                		MOVU.B 0300H[R14], R15
 00000023 655F                    		OR #05H, R15
@@ -138,12 +138,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000029 CBEF0003                		MOV.B R15, 0300H[R14]
 0000002D                         L13:	; entry.split2
                                  ;      71     IEN(ICU, IRQ2) = 0;            // Enable interrupt
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",71
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",71
 0000002D FBEE427008              		MOV.L #00087042H, R14
 00000032 F2EAC601                		BCLR #02H, 01C6H[R14].B
 00000036                         L14:	; entry.split3
                                  ;      72     reset_switches();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",72
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",72
 00000036 39rrrr               W  		BSR _reset_switches
 00000039 02                      		RTS
 0000003A                         __$IRQ2_isr:
@@ -153,13 +153,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      74 
                                  ;      75 #pragma interrupt IRQ2_isr(vect=VECT(ICU, IRQ2))
                                  ;      76 static void IRQ2_isr (void) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",76
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",76
 0000003A 6EEF                    		PUSHM R14-R15
 0000003C 6E15                    		PUSHM R1-R5
 0000003E 6040                    		SUB #04H, R0
                                  ;      77 //	_switch_isr_helper(SW_MIN_Z);
                                  ;      78 	if ((cm.cycle_state == CYCLE_HOMING) || (cm.cycle_state == CYCLE_PROBE)) {		// regardless of switch type
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",78
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",78
 00000040 FB12rrrrrrrr            		MOV.L #_cm, R1
 00000046 5A111E02                		MOVU.B 021EH[R1], R1
 0000004A 6131                    		CMP #03H, R1
@@ -167,17 +167,17 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000004E 2Err                 B  		BRA L19
 00000050                         L16:	; bb1
                                  ;      79 		zinhibitor = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",79
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",79
 00000050 FB12rrrrrrrr            		MOV.L #_zinhibitor, R1
 00000056 F81401                  		MOV.B #01H, [R1]
 00000059                         L17:	; bb1.split
                                  ;      80 		cm_request_feedhold();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",80
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",80
 00000059 05rrrrrr             A  		BSR _cm_request_feedhold
 0000005D                         L18:	; bb1.split1
 0000005D FB1E087208              		MOV.L #00087208H, R1
                                  ;      81 	    IEN(ICU, IRQ2) = 0;            // Disable interrupt
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",81
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",81
 00000062 F01A                    		BCLR #02H, [R1].B
 00000064 6240                    		ADD #04H, R0
 00000066 6F15                    		POPM R1-R5
@@ -200,7 +200,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000086                         L23:	; return
                                  ;      82 	}
                                  ;      83 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",83
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",83
 00000086 6240                    		ADD #04H, R0
 00000088 6F15                    		POPM R1-R5
 0000008A 6FEF                    		POPM R14-R15
@@ -232,17 +232,17 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     106 }
                                  ;     107 
                                  ;     108 void switch_rtc_callback(void)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",108
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",108
 0000008E 7EA6                    		PUSH.L R6
 00000090 6080                    		SUB #08H, R0
                                  ;     109 {
                                  ;     110 	for (uint8_t i=0; i < NUM_SWITCHES; i++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",110
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",110
 00000092 3C0600                  		MOV.B #00H, 06H[R0]
 00000095 38rrrr               W  		BRA L48
 00000098                         L25:	; bb3
                                  ;     111 		if (sw.mode[i] == SW_MODE_DISABLED || sw.debounce[i] == SW_IDLE)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",111
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",111
 00000098 FB12rrrrrrrr            		MOV.L #_sw, R1
 0000009E 490106                  		ADD 06H[R0].UB, R1
 000000A1 B299                    		MOVU.B 0BH[R1], R1
@@ -267,7 +267,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     112             continue;
                                  ;     113 
                                  ;     114 		if (++sw.count[i] == SW_LOCKOUT_TICKS) {		// state is either lockout or deglitching
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",114
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",114
 000000C3 FB12rrrrrrrr            		MOV.L #_sw, R1
 000000C9 490106                  		ADD 06H[R0].UB, R1
 000000CC B69A                    		MOVU.B 1BH[R1], R2
@@ -278,20 +278,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000D7 21rr                    		BNE L36
 000000D9                         L31:	; bb28
                                  ;     115 			sw.debounce[i] = SW_IDLE;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",115
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",115
 000000D9 FB12rrrrrrrr            		MOV.L #_sw, R1
 000000DF 490106                  		ADD 06H[R0].UB, R1
 000000E2 3C9300                  		MOV.B #00H, 13H[R1]
 000000E5                         L32:	; bb28.split
                                  ;     116             // check if the state has changed while we were in lockout...
                                  ;     117             uint8_t old_state = sw.state[i];
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",117
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",117
 000000E5 FB12rrrrrrrr            		MOV.L #_sw, R1
 000000EB 490106                  		ADD 06H[R0].UB, R1
 000000EE C5100307                		MOV.B 03H[R1], 07H[R0]
 000000F2                         L33:	; bb28.split1
                                  ;     118             if(old_state != read_switch(i)) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",118
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",118
 000000F2 B181                    		MOVU.B 06H[R0], R1
 000000F4 B18E                    		MOVU.B 07H[R0], R6
 000000F6 39rrrr               W  		BSR _read_switch
@@ -299,13 +299,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000FB 3Arrrr               W  		BEQ L47
 000000FE                         L34:	; bb37
                                  ;     119                 sw.debounce[i] = SW_DEGLITCHING;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",119
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",119
 000000FE FB12rrrrrrrr            		MOV.L #_sw, R1
 00000104 490106                  		ADD 06H[R0].UB, R1
 00000107 3C9301                  		MOV.B #01H, 13H[R1]
 0000010A                         L35:	; bb37.split
                                  ;     120                 sw.count[i] = -SW_DEGLITCH_TICKS;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",120
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",120
 0000010A FB12rrrrrrrr            		MOV.L #_sw, R1
 00000110 490106                  		ADD 06H[R0].UB, R1
 00000113 3C9BFB                  		MOV.B #0FBH, 1BH[R1]
@@ -315,7 +315,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     122             continue;
                                  ;     123 		}
                                  ;     124 		if (sw.count[i] == 0) {							// trigger point
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",124
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",124
 00000118 FB12rrrrrrrr            		MOV.L #_sw, R1
 0000011E 490106                  		ADD 06H[R0].UB, R1
 00000121 8E99                    		MOV.B 1BH[R1], R1
@@ -323,12 +323,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000125 21rr                    		BNE L47
 00000127                         L37:	; bb66
                                  ;     125 			sw.sw_num_thrown = i;						// record number of thrown switch
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",125
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",125
 00000127 FBE2rrrrrrrr            		MOV.L #_sw, R14
 0000012D C50E0602                		MOV.B 06H[R0], 02H[R14]
 00000131                         L38:	; bb66.split
                                  ;     126 			sw.debounce[i] = SW_LOCKOUT;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",126
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",126
 00000131 FB12rrrrrrrr            		MOV.L #_sw, R1
 00000137 490106                  		ADD 06H[R0].UB, R1
 0000013A 3C9302                  		MOV.B #02H, 13H[R1]
@@ -336,7 +336,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     127 //			sw_show_switch();							// only called if __DEBUG enabled
                                  ;     128 
                                  ;     129 			if ((cm.cycle_state == CYCLE_HOMING) || (cm.cycle_state == CYCLE_PROBE)) {		// regardless of switch type
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",129
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",129
 0000013D FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000143 5AEE1E02                		MOVU.B 021EH[R14], R14
 00000147 613E                    		CMP #03H, R14
@@ -344,19 +344,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000014B 2Err                 B  		BRA L43
 0000014D                         L40:	; bb72
                                  ;     130 				cm_request_feedhold();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",130
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",130
 0000014D 05rrrrrr             A  		BSR _cm_request_feedhold
 00000151 2Err                 B  		BRA L47
 00000153                         L41:	; bb74
                                  ;     131 			} else if (sw.mode[i] & SW_LIMIT_BIT) {		// should be a limit switch, so fire it.
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",131
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",131
 00000153 FBE2rrrrrrrr            		MOV.L #_sw, R14
 00000159 490E06                  		ADD 06H[R0].UB, R14
 0000015C F5E10B                  		BTST #01H, 0BH[R14].B
 0000015F 20rr                    		BEQ L47
 00000161                         L42:	; bb75
                                  ;     132 				sw.limit_flag = true;					// triggers an emergency shutdown
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",132
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",132
 00000161 FB12rrrrrrrr            		MOV.L #_sw, R1
 00000167 3C1101                  		MOV.B #01H, 01H[R1]
 0000016A 2Err                 B  		BRA L47
@@ -380,7 +380,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000018A 6211                    		ADD #01H, R1
 0000018C 8181                    		MOV.B R1, 06H[R0]
 0000018E                         L48:	; bb116
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",110
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",110
 0000018E B181                    		MOVU.B 06H[R0], R1
 00000190 6181                    		CMP #08H, R1
 00000192 28rr                  * 		BLT L25
@@ -390,7 +390,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     134 		}
                                  ;     135 	}
                                  ;     136 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",136
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",136
 00000197 3F6603                  		RTSD #0CH, R6-R6
 0000019A                         _get_switch_mode:
                                  		.STACK	_get_switch_mode=8
@@ -402,7 +402,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     142  */
                                  ;     143 
                                  ;     144 uint8_t get_switch_mode(uint8_t sw_num) { return (sw.mode[sw_num]);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",144
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",144
 0000019A 6040                    		SUB #04H, R0
 0000019C 8089                    		MOV.B R1, 03H[R0]
 0000019E FBE2rrrrrrrr            		MOV.L #_sw, R14
@@ -413,7 +413,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001AF                         _get_limit_switch_thrown:
                                  		.STACK	_get_limit_switch_thrown=8
                                  ;     145 uint8_t get_limit_switch_thrown(void) { return(sw.limit_flag);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",145
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",145
 000001AF 6040                    		SUB #04H, R0
 000001B1 FBE2rrrrrrrr            		MOV.L #_sw, R14
 000001B7 C5E00103                		MOV.B 01H[R14], 03H[R0]
@@ -422,7 +422,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001BF                         _get_switch_thrown:
                                  		.STACK	_get_switch_thrown=8
                                  ;     146 uint8_t get_switch_thrown(void) { return(sw.sw_num_thrown);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",146
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",146
 000001BF 6040                    		SUB #04H, R0
 000001C1 FBE2rrrrrrrr            		MOV.L #_sw, R14
 000001C7 C5E00203                		MOV.B 02H[R14], 03H[R0]
@@ -434,7 +434,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     148 
                                  ;     149 // global switch type
                                  ;     150 void set_switch_type( uint8_t switch_type ) { sw.switch_type = switch_type; }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",150
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",150
 000001CF 6040                    		SUB #04H, R0
 000001D1 8089                    		MOV.B R1, 03H[R0]
 000001D3 FBE2rrrrrrrr            		MOV.L #_sw, R14
@@ -443,7 +443,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001DD                         _get_switch_type:
                                  		.STACK	_get_switch_type=8
                                  ;     151 uint8_t get_switch_type() { return sw.switch_type; }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",151
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",151
 000001DD 6040                    		SUB #04H, R0
 000001DF FBE2rrrrrrrr            		MOV.L #_sw, R14
 000001E5 C4E003                  		MOV.B [R14], 03H[R0]
@@ -457,36 +457,36 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     155  */
                                  ;     156 
                                  ;     157 void reset_switches()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",157
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",157
 000001EC 6040                    		SUB #04H, R0
                                  ;     158 {
                                  ;     159 	for (uint8_t i=0; i < NUM_SWITCHES; i++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",159
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",159
 000001EE 3C0300                  		MOV.B #00H, 03H[R0]
 000001F1 2Err                 B  		BRA L58
 000001F3                         L56:	; bb
                                  ;     160 		sw.debounce[i] = SW_IDLE;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",160
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",160
 000001F3 FB12rrrrrrrr            		MOV.L #_sw, R1
 000001F9 490103                  		ADD 03H[R0].UB, R1
 000001FC 3C9300                  		MOV.B #00H, 13H[R1]
 000001FF                         L57:	; bb.split
                                  ;     161         read_switch(i);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",161
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",161
 000001FF B089                    		MOVU.B 03H[R0], R1
 00000201 39rrrr               W  		BSR _read_switch
 00000204 B089                    		MOVU.B 03H[R0], R1
 00000206 6211                    		ADD #01H, R1
 00000208 8089                    		MOV.B R1, 03H[R0]
 0000020A                         L58:	; bb8
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",159
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",159
 0000020A B089                    		MOVU.B 03H[R0], R1
 0000020C 6181                    		CMP #08H, R1
 0000020E 29rr                    		BLT L56
 00000210                         L59:	; bb13
                                  ;     162 	}
                                  ;     163 	sw.limit_flag = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",163
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",163
 00000210 FB12rrrrrrrr            		MOV.L #_sw, R1
 00000216 3C1100                  		MOV.B #00H, 01H[R1]
 00000219 6701                    		RTSD #04H
@@ -498,12 +498,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     167  * read_switch() - read a switch directly with no interrupts or deglitching
                                  ;     168  */
                                  ;     169 uint8_t read_switch(uint8_t sw_num)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",169
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",169
 0000021B 6080                    		SUB #08H, R0
 0000021D 8189                    		MOV.B R1, 07H[R0]
                                  ;     170 {
                                  ;     171 	if (sw_num >= NUM_SWITCHES) return (uint8_t)(SW_DISABLED);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",171
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",171
 0000021F B189                    		MOVU.B 07H[R0], R1
 00000221 6181                    		CMP #08H, R1
 00000223 29rr                    		BLT L62
@@ -513,11 +513,11 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000022A                         L62:	; bb9
                                  ;     172 
                                  ;     173 	uint8_t read = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",173
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",173
 0000022A 3C0500                  		MOV.B #00H, 05H[R0]
 0000022D                         L63:	; bb9.split
                                  ;     174 	switch (sw_num) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",174
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",174
 0000022D B189                    		MOVU.B 07H[R0], R1
 0000022F 6141                    		CMP #04H, R1
 00000231 21rr                    		BNE L65
@@ -528,7 +528,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     177 //		case SW_MIN_Y: { read = hw.sw_port[AXIS_Y]->IN & SW_MIN_BIT_bm; break;}
                                  ;     178 //		case SW_MAX_Y: { read = hw.sw_port[AXIS_Y]->IN & SW_MAX_BIT_bm; break;}
                                  ;     179 		case SW_MIN_Z: { read = MATERIAL; break;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",179
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",179
 00000238 58E1                    		MOVU.B [R14], R1
 0000023A 6821                    		SHLR #02H, R1
 0000023C 6411                    		AND #01H, R1
@@ -539,7 +539,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     182 //		case SW_MAX_A: { read = hw.sw_port[AXIS_A]->IN & SW_MAX_BIT_bm; break;}
                                  ;     183 	}
                                  ;     184 	if (sw.switch_type == SW_TYPE_NORMALLY_OPEN) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",184
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",184
 00000240 FBE2rrrrrrrr            		MOV.L #_sw, R14
 00000246 58EE                    		MOVU.B [R14], R14
 00000248 610E                    		CMP #00H, R14
@@ -548,7 +548,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000024E 21rr                    		BNE L70
 00000250                         L66:	; bb20
                                  ;     185 		sw.state[sw_num] = ((read == 0) ? SW_CLOSED : SW_OPEN);// confusing. An NO switch drives the pin LO when thrown
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",185
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",185
 00000250 6101                    		CMP #00H, R1
 00000252 18                   S  		BNE L68
 00000253                         L67:	; bb28
@@ -562,7 +562,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000262 EC01                    		MOV.L [R0], R1
 00000264 FE02E1                  		MOV.B R1, [R2,R14]
                                  ;     186 		return (sw.state[sw_num]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",186
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",186
 00000267 B189                    		MOVU.B 07H[R0], R1
 00000269 FECE11                  		MOVU.B [R14,R1], R1
 0000026C 8101                    		MOV.B R1, 04H[R0]
@@ -570,7 +570,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000270                         L70:	; bb39
                                  ;     187 	} else {
                                  ;     188 		sw.state[sw_num] = ((read != 0) ? SW_CLOSED : SW_OPEN);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",188
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",188
 00000270 6101                    		CMP #00H, R1
 00000272 10                   S  		BEQ L72
 00000273                         L71:	; bb47
@@ -584,7 +584,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000282 EC01                    		MOV.L [R0], R1
 00000284 FE02E1                  		MOV.B R1, [R2,R14]
                                  ;     189 		return (sw.state[sw_num]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",189
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",189
 00000287 B189                    		MOVU.B 07H[R0], R1
 00000289 FECE11                  		MOVU.B [R14,R1], R1
 0000028C 8101                    		MOV.B R1, 04H[R0]
@@ -592,7 +592,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000028E C5000406                		MOV.B 04H[R0], 06H[R0]
                                  ;     190 	}
                                  ;     191 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",191
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",191
 00000292 B181                    		MOVU.B 06H[R0], R1
 00000294 6702                    		RTSD #08H
 00000296                         _sw_set_st:
@@ -620,62 +620,62 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     212  ***********************************************************************************/
                                  ;     213 
                                  ;     214 stat_t sw_set_st(nvObj_t *nv)			// switch type (global)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",214
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",214
 00000296 6080                    		SUB #08H, R0
 00000298 A009                    		MOV.L R1, 04H[R0]
                                  ;     215 {
                                  ;     216 	set_01(nv);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",216
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",216
 0000029A 05rrrrrr             A  		BSR _set_01
 0000029E                         L76:	; entry.split
                                  ;     217 	switch_init();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",217
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",217
 0000029E 39rrrr               W  		BSR _switch_init
 000002A1                         L77:	; entry.split1
                                  ;     218 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",218
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",218
 000002A1 3C0300                  		MOV.B #00H, 03H[R0]
 000002A4 B089                    		MOVU.B 03H[R0], R1
 000002A6                         L78:	; entry.split2
                                  ;     219 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",219
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",219
 000002A6 5B11                    		MOVU.B R1, R1
 000002A8 6702                    		RTSD #08H
 000002AA                         _sw_set_sw:
                                  		.STACK	_sw_set_sw=12
                                  ;     220 
                                  ;     221 stat_t sw_set_sw(nvObj_t *nv)			// switch setting
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",221
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",221
 000002AA 6080                    		SUB #08H, R0
 000002AC A009                    		MOV.L R1, 04H[R0]
 000002AE FBE200004040            		MOV.L #40400000H, R14
                                  ;     222 {
                                  ;     223 	if (nv->value > SW_MODE_MAX_VALUE)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",223
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",223
 000002B4 FC851E04                		FCMP 10H[R1].L, R14
 000002B8 26rr                    		BPZ L81
 000002BA                         L80:	; bb2
                                  ;     224         return (STAT_INPUT_VALUE_RANGE_ERROR);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",224
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",224
 000002BA 3C026E                  		MOV.B #6EH, 02H[R0]
 000002BD 2Err                 B  		BRA L84
 000002BF                         L81:	; bb9
                                  ;     225 	set_ui8(nv);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",225
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",225
 000002BF A809                    		MOV.L 04H[R0], R1
 000002C1 05rrrrrr             A  		BSR _set_ui8
 000002C5                         L82:	; bb9.split
                                  ;     226 	switch_init();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",226
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",226
 000002C5 39rrrr               W  		BSR _switch_init
 000002C8                         L83:	; bb9.split1
                                  ;     227 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",227
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",227
 000002C8 3C0200                  		MOV.B #00H, 02H[R0]
 000002CB                         L84:	; bb13
 000002CB C5000203                		MOV.B 02H[R0], 03H[R0]
                                  ;     228 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",228
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",228
 000002CF B089                    		MOVU.B 03H[R0], R1
 000002D1 6702                    		RTSD #08H
 000002D3                         _sw_print_st:
@@ -690,7 +690,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     236 
                                  ;     237 static const char fmt_st[] PROGMEM = "[st]  switch type%18d [0=NO,1=NC]\n";
                                  ;     238 void sw_print_st(nvObj_t *nv) { text_print_ui8(nv, fmt_st);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\switch.c",238
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\switch.c",238
 000002D3 6040                    		SUB #04H, R0
 000002D5 E301                    		MOV.L R1, [R0]
 000002D7 FB22rrrrrrrr            		MOV.L #__$fmt_st, R2
@@ -900,7 +900,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx7E87\$ccrx\switch.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4D06\$ccrx\switch.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -909,5 +909,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\switch.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\cnc\switch.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\switch.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\src\cnc\switch.obj

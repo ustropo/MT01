@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:45 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:19:17 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:44
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:19:17
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=resetprg.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=resetprg.lst
@@ -190,7 +190,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     149     #pragma entry PowerON_Reset_PC
                                  ;     150 
                                  ;     151 void PowerON_Reset_PC(void)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",151
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",151
 00000000 FD7302rrrrrrrr          		MVTC #(TOPOF SU + SIZEOF SU), USP
 00000007 FD730Arrrrrrrr          		MVTC #(TOPOF SI + SIZEOF SI), ISP
                                  ;     152 #else
@@ -201,19 +201,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     157 {
                                  ;     158     /* Stack pointers are setup prior to calling this function - see comments above */    
                                  ;     159 	PORT2.PODR.BYTE = 0x08 ;    /* All outputs low to start except TORCH*/
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",159
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",159
 0000000E FBEE02C008              		MOV.L #0008C002H, R14
 00000013 F9E42008                		MOV.B #08H, 20H[R14]
 00000017                         L11:	; entry.split
                                  ;     160 	PORT2.PDR.BYTE  = 0xFE ;    /* All outputs - Emergencia (Input)  */
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",160
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",160
 00000017 FBEE02C008              		MOV.L #0008C002H, R14
 0000001C F8E4FE                  		MOV.B #0FEH, [R14]
 0000001F                         L12:	; entry.split1
                                  ;     161     /* Initialize the MCU processor word */
                                  ;     162 #if __RENESAS_VERSION__ >= 0x01010000    
                                  ;     163     set_intb((void *)__sectop("C$VECT"));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",163
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",163
 0000001F FBE2rrrrrrrr            		MOV.L #TOPOF C$VECT, R14
 00000025 FD68EC                  		MVTC R14, INTB
 00000028                         L13:	; entry.split2
@@ -235,13 +235,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     178 #endif 
                                  ;     179 
                                  ;     180     set_fpsw(FPSW_init | FPU_ROUND | FPU_DENOM);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",180
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",180
 0000002C FD68E3                  		MVTC R14, FPSW
 0000002F                         L14:	; entry.split3
                                  ;     181 
                                  ;     182     /* Switch to high-speed operation */
                                  ;     183     operating_frequency_set();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",183
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",183
 0000002F 39rrrr               W  		BSR __$operating_frequency_set
 00000032                         L15:	; entry.split4
                                  ;     184 
@@ -252,7 +252,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     189 
                                  ;     190     /* Initialize C runtime environment */
                                  ;     191     _INITSCT();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",191
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",191
 00000032 05rrrrrr             A  		BSR __INITSCT
 00000036                         L16:	; entry.split5
                                  ;     192 
@@ -264,37 +264,37 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     198 #if BSP_CFG_IO_LIB_ENABLE == 1
                                  ;     199     /* Comment this out if not using I/O lib */
                                  ;     200     _INIT_IOLIB();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",200
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",200
 00000036 05rrrrrr             A  		BSR __INIT_IOLIB
 0000003A                         L17:	; entry.split6
                                  ;     201 #endif
                                  ;     202 
                                  ;     203     /* Initialize MCU interrupt callbacks. */
                                  ;     204     bsp_interrupt_open();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",204
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",204
 0000003A 05rrrrrr             A  		BSR _bsp_interrupt_open
 0000003E                         L18:	; entry.split7
                                  ;     205 
                                  ;     206     /* Initialize register protection functionality. */
                                  ;     207     bsp_register_protect_open();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",207
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",207
 0000003E 05rrrrrr             A  		BSR _bsp_register_protect_open
 00000042                         L19:	; entry.split8
                                  ;     208 
                                  ;     209     /* Configure the MCU and board hardware */
                                  ;     210     hardware_setup();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",210
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",210
 00000042 05rrrrrr             A  		BSR _hardware_setup
 00000046                         L20:	; entry.split9
                                  ;     211 
                                  ;     212     /* Change the MCU's user mode from supervisor to user */
                                  ;     213     nop();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",213
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",213
 00000046 03                      		NOP
 00000047                         L21:	; entry.split10
 00000047 FBEE000003              		MOV.L #00030000H, R14
                                  ;     214     set_psw(PSW_init);      
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",214
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",214
 0000004C FD68E0                  		MVTC R14, PSW
 0000004F                         L22:	; entry.split11
 0000004F FB3200000010            		MOV.L #10000000H, R3
@@ -311,20 +311,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     223 
                                  ;     224     /* Enable the bus error interrupt to catch accesses to illegal/reserved areas of memory */
                                  ;     225     R_BSP_InterruptControl(BSP_INT_SRC_BUS_ERROR, BSP_INT_CMD_INTERRUPT_ENABLE, FIT_NO_PTR);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",225
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",225
 00000059 05rrrrrr             A  		BSR _R_BSP_InterruptControl
 0000005D                         L23:	; entry.split12
                                  ;     226 
                                  ;     227     /* Call the main program function (should not return) */
                                  ;     228     main();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",228
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",228
 0000005D 05rrrrrr             A  		BSR _main
 00000061                         L24:	; entry.split13
                                  ;     229     
                                  ;     230 #if BSP_CFG_IO_LIB_ENABLE == 1
                                  ;     231     /* Comment this out if not using I/O lib - cleans up open files */
                                  ;     232     _CLOSEALL();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",232
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",232
 00000061 05rrrrrr             A  		BSR __CLOSEALL
 00000065                         L25:	; bb1
                                  ;     233 #endif
@@ -332,7 +332,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     235     /* BCH - 01/16/2013 */
                                  ;     236     /* Infinite loop is intended here. */    
                                  ;     237     while(1) /* PRQA S 2740 */
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",237
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",237
 00000065 2Err                 B  		BRA L25
 00000067                         __$operating_frequency_set:
                                  		.STACK	__$operating_frequency_set=12
@@ -348,12 +348,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     247 * Return value : none
                                  ;     248 ***********************************************************************************************************************/
                                  ;     249 static void operating_frequency_set (void)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",249
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",249
 00000067 6080                    		SUB #08H, R0
                                  ;     250 {
                                  ;     251     /* Used for constructing value to write to SCKCR register. */
                                  ;     252     uint32_t temp_clock = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",252
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",252
 00000069 F80600                  		MOV.L #00000000H, [R0]
 0000006C                         L27:	; entry.split
                                  ;     253     
@@ -370,14 +370,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     264 
                                  ;     265     /* Protect off. */
                                  ;     266     SYSTEM.PRCR.WORD = 0xA50B;           
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",266
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",266
 0000006C FBEE200008              		MOV.L #00080020H, R14
 00000071 FAE9EF010BA5            		MOV.W #0A50BH, 03DEH[R14]
 00000077                         L28:	; entry.split1
                                  ;     267 
                                  ;     268     /* Select the clock based upon user's choice. */
                                  ;     269     clock_source_select();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",269
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",269
 00000077 39rrrr               W  		BSR __$clock_source_select
 0000007A                         L29:	; entry.split2
                                  ;     270 
@@ -388,7 +388,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     275     temp_clock |= 0x10000000;
                                  ;     276 #elif BSP_CFG_FCK_DIV == 4
                                  ;     277     temp_clock |= 0x20000000;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",277
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",277
 0000007A EC01                    		MOV.L [R0], R1
 0000007C 79D1                    		BSET #1DH, R1
 0000007E E301                    		MOV.L R1, [R0]
@@ -410,7 +410,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     292     /* Do nothing since ICK bits should be 0. */
                                  ;     293 #elif BSP_CFG_ICK_DIV == 2
                                  ;     294     temp_clock |= 0x01000000;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",294
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",294
 00000080 EC01                    		MOV.L [R0], R1
 00000082 7981                    		BSET #18H, R1
 00000084 E301                    		MOV.L R1, [R0]
@@ -438,7 +438,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     315     temp_clock |= 0x00020000;
                                  ;     316 #elif BSP_CFG_BCK_DIV == 8
                                  ;     317     temp_clock |= 0x00030000;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",317
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",317
 00000086 EC01                    		MOV.L [R0], R1
 00000088 7731000003              		OR #00030000H, R1
 0000008D E301                    		MOV.L R1, [R0]
@@ -457,7 +457,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     329 #if BSP_CFG_BCLK_OUTPUT == 0    
                                  ;     330     /* Set PSTOP1 bit */
                                  ;     331     temp_clock |= 0x00800000;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",331
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",331
 0000008F EC01                    		MOV.L [R0], R1
 00000091 7971                    		BSET #17H, R1
 00000093 E301                    		MOV.L R1, [R0]
@@ -478,7 +478,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     345 #if BSP_CFG_SDCLK_OUTPUT == 0    
                                  ;     346     /* Set PSTOP0 bit */
                                  ;     347     temp_clock |= 0x00400000;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",347
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",347
 00000095 EC01                    		MOV.L [R0], R1
 00000097 7961                    		BSET #16H, R1
 00000099 E301                    		MOV.L R1, [R0]
@@ -497,7 +497,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     359     temp_clock |= 0x00001000;
                                  ;     360 #elif BSP_CFG_PCKA_DIV == 4
                                  ;     361     temp_clock |= 0x00002000;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",361
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",361
 0000009B EC01                    		MOV.L [R0], R1
 0000009D 78D1                    		BSET #0DH, R1
 0000009F E301                    		MOV.L R1, [R0]
@@ -521,7 +521,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     378     temp_clock |= 0x00000100;
                                  ;     379 #elif BSP_CFG_PCKB_DIV == 4
                                  ;     380     temp_clock |= 0x00000200;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",380
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",380
 000000A1 EC01                    		MOV.L [R0], R1
 000000A3 7891                    		BSET #09H, R1
 000000A5 E301                    		MOV.L R1, [R0]
@@ -540,7 +540,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     392 
                                  ;     393     /* Bottom byte of SCKCR register must be set to 0x11 */
                                  ;     394     temp_clock |= 0x00000011;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",394
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",394
 000000A7 EC01                    		MOV.L [R0], R1
 000000A9 753111                  		OR #11H, R1
 000000AC E301                    		MOV.L R1, [R0]
@@ -548,14 +548,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     395 
                                  ;     396     /* Set SCKCR register. */
                                  ;     397     SYSTEM.SCKCR.LONG = temp_clock;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",397
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",397
 000000AE FBEE200008              		MOV.L #00080020H, R14
 000000B3 E00E                    		MOV.L [R0], [R14]
 000000B5                         L38:	; entry.split11
                                  ;     398     
                                  ;     399     /* Re-init temp_clock to use to set SCKCR2. */
                                  ;     400     temp_clock = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",400
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",400
 000000B5 F80600                  		MOV.L #00000000H, [R0]
 000000B8                         L39:	; entry.split12
                                  ;     401 
@@ -568,7 +568,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     408     temp_clock |= 0x0000000C;
                                  ;     409 #elif BSP_CFG_IEBCK_DIV == 8
                                  ;     410     temp_clock |= 0x00000003;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",410
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",410
 000000B8 EC01                    		MOV.L [R0], R1
 000000BA 6531                    		OR #03H, R1
 000000BC E301                    		MOV.L R1, [R0]
@@ -588,7 +588,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     423     temp_clock |= 0x00000020;
                                  ;     424 #elif BSP_CFG_UCK_DIV == 4
                                  ;     425     temp_clock |= 0x00000030;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",425
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",425
 000000BE EC01                    		MOV.L [R0], R1
 000000C0 753130                  		OR #30H, R1
 000000C3 E301                    		MOV.L R1, [R0]
@@ -599,7 +599,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     429 
                                  ;     430     /* Set SCKCR2 register. */
                                  ;     431     SYSTEM.SCKCR2.WORD = (uint16_t)temp_clock;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",431
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",431
 000000C5 EC01                    		MOV.L [R0], R1
 000000C7 FB2E200008              		MOV.L #00080020H, R2
 000000CC 90A1                    		MOV.W R1, 04H[R2]
@@ -607,7 +607,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     432 
                                  ;     433     /* Choose clock source. Default for r_bsp_config.h is PLL. */
                                  ;     434     SYSTEM.SCKCR3.WORD = ((uint16_t)BSP_CFG_CLOCK_SOURCE) << 8;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",434
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",434
 000000CE FBEE200008              		MOV.L #00080020H, R14
 000000D3 F9E9030004              		MOV.W #0400H, 06H[R14]
 000000D8                         L43:	; entry.split16
@@ -615,32 +615,32 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     436 #if (BSP_CFG_CLOCK_SOURCE != 0)
                                  ;     437     /* We can now turn LOCO off since it is not going to be used. */
                                  ;     438     SYSTEM.LOCOCR.BYTE = 0x01;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",438
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",438
 000000D8 FB1E200008              		MOV.L #00080020H, R1
 000000DD 3C9401                  		MOV.B #01H, 14H[R1]
 000000E0                         L44:	; entry.split17
                                  ;     439 #endif
                                  ;     440 
                                  ;     441     SYSTEM.ILOCOCR.BIT.ILCSTP = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",441
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",441
 000000E0 FBEE200008              		MOV.L #00080020H, R14
 000000E5 F1E815                  		BCLR #00H, 15H[R14].B
 000000E8                         L45:	; entry.split18
                                  ;     442     for(uint16_t i = 0; i < 2000; i++)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",442
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",442
 000000E8 3D0300                  		MOV.W #0000H, 06H[R0]
 000000EB 08                   S  		BRA L47
 000000EC                         L46:	; bb
                                  ;     443     {
                                  ;     444         /* Wait 12ms. See comment above for why. */
                                  ;     445         nop() ;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",445
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",445
 000000EC 03                      		NOP
 000000ED 9889                    		MOV.W 06H[R0], R1
 000000EF 6211                    		ADD #01H, R1
 000000F1 9089                    		MOV.W R1, 06H[R0]
 000000F3                         L47:	; bb30
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",442
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",442
 000000F3 B889                    		MOVU.W 06H[R0], R1
 000000F5 7601D007                		CMP #07D0H, R1
 000000F9 29rr                    		BLT L46
@@ -648,7 +648,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     446     }
                                  ;     447     /* Protect on. */
                                  ;     448     SYSTEM.PRCR.WORD = 0xA500;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",448
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",448
 000000FB FBEE200008              		MOV.L #00080020H, R14
 00000100 FAE9EF0100A5            		MOV.W #0A500H, 03DEH[R14]
 00000106 6702                    		RTSD #08H
@@ -665,7 +665,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     457 * Return value : none
                                  ;     458 ***********************************************************************************************************************/
                                  ;     459 static void clock_source_select (void)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",459
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",459
 00000108 6040                    		SUB #04H, R0
                                  ;     460 {
                                  ;     461     /* Declared volatile for software delay purposes. */
@@ -692,14 +692,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     482     /* HOCO is not chosen. */
                                  ;     483     /* Stop the HOCO. */
                                  ;     484     SYSTEM.HOCOCR.BYTE = 0x01;          
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",484
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",484
 0000010A FB1E280008              		MOV.L #00080028H, R1
 0000010F 3C1E01                  		MOV.B #01H, 0EH[R1]
 00000112                         L50:	; entry.split
                                  ;     485 
                                  ;     486     /* Turn off power to HOCO. */
                                  ;     487     SYSTEM.HOCOPCR.BYTE = 0x01;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",487
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",487
 00000112 FBEE280008              		MOV.L #00080028H, R14
 00000117 FAE46CC201              		MOV.B #01H, 0C26CH[R14]
 0000011C                         L51:	; entry.split1
@@ -731,7 +731,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     513 #else
                                  ;     514     /* Set the main clock to stopped. */
                                  ;     515     SYSTEM.MOSCCR.BYTE = 0x01;          
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",515
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",515
 0000011C FB1E280008              		MOV.L #00080028H, R1
 00000121 3C1A01                  		MOV.B #01H, 0AH[R1]
 00000124                         L52:	; entry.split2
@@ -757,7 +757,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     535 #else
                                  ;     536     /* Set the sub-clock to stopped. */
                                  ;     537     SYSTEM.SOSCCR.BYTE = 0x01;          
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",537
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",537
 00000124 FB1E280008              		MOV.L #00080028H, R1
 00000129 3C1B01                  		MOV.B #01H, 0BH[R1]
 0000012C                         L53:	; entry.split3
@@ -767,28 +767,28 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     541     /* PLL is chosen. Start it operating. Must start main clock as well since PLL uses it. */
                                  ;     542     /* Wait 65,536 cycles * 12 MHz = 5.46 ms */
                                  ;     543     SYSTEM.MOSCWTCR.BYTE = 0x0C;        
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",543
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",543
 0000012C FBEE280008              		MOV.L #00080028H, R14
 00000131 F9E47A0C                		MOV.B #0CH, 7AH[R14]
 00000135                         L54:	; entry.split4
                                  ;     544 
                                  ;     545     /* Set the main clock to operating. */
                                  ;     546     SYSTEM.MOSCCR.BYTE = 0x00;          
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",546
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",546
 00000135 FB1E280008              		MOV.L #00080028H, R1
 0000013A 3C1A00                  		MOV.B #00H, 0AH[R1]
 0000013D                         L55:	; entry.split5
                                  ;     547 
                                  ;     548     /* PLL wait is 1,048,576 cycles * 192 MHz (12 MHz * 16) = 5.46 ms*/
                                  ;     549     SYSTEM.PLLWTCR.BYTE = 0x0D;         
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",549
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",549
 0000013D FBEE280008              		MOV.L #00080028H, R14
 00000142 F9E47E0D                		MOV.B #0DH, 7EH[R14]
 00000146                         L56:	; entry.split6
                                  ;     550 
                                  ;     551     /* Set PLL Input Divisor. */
                                  ;     552     SYSTEM.PLLCR.BIT.PLIDIV = BSP_CFG_PLL_DIV >> 1;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",552
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",552
 00000146 FBEE280008              		MOV.L #00080028H, R14
 0000014B 5CEF                    		MOVU.W [R14], R15
 0000014D 772FFCFF00              		AND #0FFFCH, R15
@@ -797,7 +797,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     553 
                                  ;     554     /* Set PLL Multiplier. */
                                  ;     555     SYSTEM.PLLCR.BIT.STC = BSP_CFG_PLL_MUL - 1;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",555
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",555
 00000154 FBEE280008              		MOV.L #00080028H, R14
 00000159 DCEF                    		MOV.W [R14], R15
 0000015B 763F000F                		OR #0F00H, R15
@@ -807,7 +807,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     556 
                                  ;     557     /* Set the PLL to operating. */
                                  ;     558     SYSTEM.PLLCR2.BYTE = 0x00;          
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",558
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",558
 00000166 FB1E280008              		MOV.L #00080028H, R1
 0000016B 3C1200                  		MOV.B #00H, 02H[R1]
 0000016E                         L59:	; entry.split9
@@ -824,20 +824,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     569        A delay of 12ms has been used below to account for variations in the LOCO. 
                                  ;     570        12ms / 86us (per iteration) = 140 iterations */
                                  ;     571     for(i = 0; i < 140; i++)             
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",571
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",571
 0000016E F80600                  		MOV.L #00000000H, [R0]
 00000171 08                   S  		BRA L61
 00000172                         L60:	; bb
                                  ;     572     {
                                  ;     573         /* Wait 12ms. See comment above for why. */
                                  ;     574         nop() ;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",574
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",574
 00000172 03                      		NOP
 00000173 EC01                    		MOV.L [R0], R1
 00000175 6211                    		ADD #01H, R1
 00000177 E301                    		MOV.L R1, [R0]
 00000179                         L61:	; bb9
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",571
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",571
 00000179 EC01                    		MOV.L [R0], R1
 0000017B 75518C                  		CMP #8CH, R1
 0000017E 23rr                    		BLTU L60
@@ -862,7 +862,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     592     #error "ERROR - Valid clock source must be chosen in r_bsp_config.h using BSP_CFG_CLOCK_SOURCE macro."
                                  ;     593 #endif 
                                  ;     594 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\board\MT01\resetprg.c",594
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\board\MT01\resetprg.c",594
 00000180 6701                    		RTSD #04H
                                  ;     595 
                                  ;     596 /***********************************************************************************************************************
@@ -914,7 +914,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\resetprg.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\resetprg.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -923,5 +923,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\resetprg.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_bsp\board\MT01\resetprg.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\resetprg.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\r_bsp\board\MT01\resetprg.obj

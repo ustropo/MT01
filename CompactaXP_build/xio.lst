@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:12 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:18:43 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:12
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:18:43
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=xio.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=xio.lst
@@ -153,26 +153,26 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      97  * xio_init() - initialize entire xio sub-system
                                  ;      98  */
                                  ;      99 void xio_init()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",99
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",99
 00000000 6601                    		MOV.L #00000000H, R1
                                  ;     100 {
                                  ;     101 	// set memory integrity check
                                  ;     102 	xio_set_stderr(0);				// set a bogus value; may be overwritten with a real value
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",102
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",102
 00000002 39rrrr               W  		BSR _xio_set_stderr
 00000005                         L11:	; entry.split
                                  ;     103 
                                  ;     104 	// setup device types
                                  ;     105 	xio_init_fsfat();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",105
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",105
 00000005 05rrrrrr             A  		BSR _xio_init_fsfat
 00000009                         L12:	; entry.split1
                                  ;     106 	xio_init_command();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",106
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",106
 00000009 05rrrrrr             A  		BSR _xio_init_command
 0000000D                         L13:	; entry.split2
                                  ;     107 	xio_init_spiffs();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",107
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",107
 0000000D 05rrrrrr             A  		BSR _xio_init_spiffs
 00000011                         L14:	; entry.split3
                                  ;     108 //	xio_init_usart();
@@ -187,7 +187,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     117 //	xio_open(XIO_DEV_SPI2, 0, SPI_FLAGS);
                                  ;     118 
                                  ;     119 	xio_init_assertions();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",119
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",119
 00000011 39rrrr               W  		BSR _xio_init_assertions
 00000014 02                      		RTS
 00000015                         _xio_init_assertions:
@@ -204,13 +204,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     129  */
                                  ;     130 
                                  ;     131 void xio_init_assertions() {}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",131
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",131
 00000015 02                      		RTS
 00000016                         _xio_test_assertions:
                                  		.STACK	_xio_test_assertions=8
                                  ;     132 
                                  ;     133 uint8_t xio_test_assertions()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",133
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",133
 00000016 6040                    		SUB #04H, R0
                                  ;     134 {
                                  ;     135 //RXMOD	if (ds[XIO_DEV_USB].magic_start		!= MAGICNUM) return (STAT_XIO_ASSERTION_FAILURE);
@@ -224,7 +224,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     143 //	if (ds[XIO_DEV_PGM].magic_start		!= MAGICNUM) return (STAT_XIO_ASSERTION_FAILURE);
                                  ;     144 //	if (ds[XIO_DEV_PGM].magic_end		!= MAGICNUM) return (STAT_XIO_ASSERTION_FAILURE);
                                  ;     145 	if (stderr != xio.stderr_shadow) 				 return (STAT_XIO_ASSERTION_FAILURE);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",145
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",145
 00000018 FBE2rrrrrrrr            		MOV.L #_xio, R14
 0000001E FBF2rrrrrrrr            		MOV.L #__Stderr, R15
 00000024 0684EF                  		CMP [R14].L, R15
@@ -234,12 +234,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000002B 08                   S  		BRA L19
 0000002C                         L18:	; bb6
                                  ;     146 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",146
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",146
 0000002C 3C0200                  		MOV.B #00H, 02H[R0]
 0000002F                         L19:	; bb8
 0000002F C5000203                		MOV.B 02H[R0], 03H[R0]
                                  ;     147 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",147
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",147
 00000033 B089                    		MOVU.B 03H[R0], R1
 00000035 6701                    		RTSD #04H
 00000037                         _xio_isbusy:
@@ -259,19 +259,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     160  */
                                  ;     161 
                                  ;     162 uint8_t xio_isbusy()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",162
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",162
 00000037 6040                    		SUB #04H, R0
                                  ;     163 {
                                  ;     164 //	if (xio_get_rx_bufcount_usart(&USBu) != 0) return (false);
                                  ;     165 //	if (xio_get_tx_bufcount_usart(&USBu) != 0) return (false);
                                  ;     166 //	return (true);
                                  ;     167 	return (false);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",167
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",167
 00000039 3C0300                  		MOV.B #00H, 03H[R0]
 0000003C B089                    		MOVU.B 03H[R0], R1
 0000003E                         L21:	; entry.split
                                  ;     168 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",168
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",168
 0000003E 5B11                    		MOVU.B R1, R1
 00000040 6701                    		RTSD #04H
 00000042                         _xio_reset_working_flags:
@@ -282,26 +282,26 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     172  */
                                  ;     173 
                                  ;     174 void xio_reset_working_flags(xioDev_t *d)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",174
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",174
 00000042 6040                    		SUB #04H, R0
 00000044 E301                    		MOV.L R1, [R0]
                                  ;     175 {
                                  ;     176 	d->signal = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",176
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",176
 00000046 F9147900                		MOV.B #00H, 79H[R1]
 0000004A                         L23:	; entry.split
                                  ;     177 	d->flag_in_line = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",177
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",177
 0000004A EC01                    		MOV.L [R0], R1
 0000004C F9147A00                		MOV.B #00H, 7AH[R1]
 00000050                         L24:	; entry.split1
                                  ;     178 	d->flag_eol = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",178
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",178
 00000050 EC01                    		MOV.L [R0], R1
 00000052 F9147B00                		MOV.B #00H, 7BH[R1]
 00000056                         L25:	; entry.split2
                                  ;     179 	d->flag_eof = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",179
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",179
 00000056 EC01                    		MOV.L [R0], R1
 00000058 F9147C00                		MOV.B #00H, 7CH[R1]
 0000005C 6701                    		RTSD #04H
@@ -319,7 +319,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     189  *	Requires device open() to be run prior to using the device
                                  ;     190  */
                                  ;     191 void xio_open_generic(uint8_t dev, x_open_t x_open,
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",191
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",191
 0000005E 7100DC                  		ADD #0FFFFFFDCH, R0
 00000061 C70123                  		MOV.B R1, 23H[R0]
 00000064 A18A                    		MOV.L R2, 1CH[R0]
@@ -338,7 +338,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     197 								   x_flow_t x_flow)
                                  ;     198 {
                                  ;     199 	xioDev_t *d = &ds[dev];
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",199
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",199
 0000007D 4D0E23                  		MUL 23H[R0].UB, R14
 00000080 FB12rrrrrrrr            		MOV.L #_ds, R1
 00000086 4BE1                    		ADD R14, R1
@@ -347,22 +347,22 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000008A 754388                  		MOV.L #00000088H, R3
 0000008D 6602                    		MOV.L #00000000H, R2
                                  ;     200 	memset (d, 0, sizeof(xioDev_t));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",200
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",200
 0000008F EC01                    		MOV.L [R0], R1
 00000091 7F88                    		SSTR.B
 00000093                         L28:	; entry.split1
                                  ;     201 	d->magic_start = MAGICNUM;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",201
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",201
 00000093 EC01                    		MOV.L [R0], R1
 00000095 F819EF12                		MOV.W #12EFH, [R1]
 00000099                         L29:	; entry.split2
                                  ;     202 	d->magic_end = MAGICNUM;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",202
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",202
 00000099 EC01                    		MOV.L [R0], R1
 0000009B F91942EF12              		MOV.W #12EFH, 84H[R1]
 000000A0                         L30:	; entry.split3
                                  ;     203 	d->dev = dev;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",203
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",203
 000000A0 590123                  		MOVU.B 23H[R0], R1
 000000A3 EC02                    		MOV.L [R0], R2
 000000A5 80A1                    		MOV.B R1, 02H[R2]
@@ -370,43 +370,43 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     204 
                                  ;     205 	// bind functions to device structure
                                  ;     206 	d->x_open = x_open;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",206
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",206
 000000A7 A989                    		MOV.L 1CH[R0], R1
 000000A9 EC02                    		MOV.L [R0], R2
 000000AB A521                    		MOV.L R1, 50H[R2]
 000000AD                         L32:	; entry.split5
                                  ;     207 	d->x_ctrl = x_ctrl;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",207
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",207
 000000AD A981                    		MOV.L 18H[R0], R1
 000000AF EC02                    		MOV.L [R0], R2
 000000B1 A529                    		MOV.L R1, 54H[R2]
 000000B3                         L33:	; entry.split6
                                  ;     208 	d->x_close = x_close;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",208
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",208
 000000B3 A909                    		MOV.L 14H[R0], R1
 000000B5 EC02                    		MOV.L [R0], R2
 000000B7 A5A1                    		MOV.L R1, 58H[R2]
 000000B9                         L34:	; entry.split7
                                  ;     209 	d->x_gets = x_gets;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",209
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",209
 000000B9 A901                    		MOV.L 10H[R0], R1
 000000BB EC02                    		MOV.L [R0], R2
 000000BD A5A9                    		MOV.L R1, 5CH[R2]
 000000BF                         L35:	; entry.split8
                                  ;     210 	d->x_getc = x_getc;	// you don't need to bind getc & putc unless you are going to use them directly
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",210
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",210
 000000BF A889                    		MOV.L 0CH[R0], R1
 000000C1 EC02                    		MOV.L [R0], R2
 000000C3 A621                    		MOV.L R1, 60H[R2]
 000000C5                         L36:	; entry.split9
                                  ;     211 	d->x_putc = x_putc;	// they are bound into the fdev stream struct
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",211
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",211
 000000C5 A881                    		MOV.L 08H[R0], R1
 000000C7 EC02                    		MOV.L [R0], R2
 000000C9 A629                    		MOV.L R1, 64H[R2]
 000000CB                         L37:	; entry.split10
                                  ;     212 	d->x_flow = x_flow;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",212
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",212
 000000CB A809                    		MOV.L 04H[R0], R1
 000000CD EC02                    		MOV.L [R0], R2
 000000CF A6A1                    		MOV.L R1, 68H[R2]
@@ -431,14 +431,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     228  *	else  return (_FDEV_ERR);	// XIO_NO_SUCH_DEVICE
                                  ;     229  */
                                  ;     230 FILE *xio_open(uint8_t dev, const char *addr, flags_t flags)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",230
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",230
 000000D3 7100F0                  		ADD #0FFFFFFF0H, R0
 000000D6 8389                    		MOV.B R1, 0FH[R0]
 000000D8 A082                    		MOV.L R2, 08H[R0]
 000000DA 908B                    		MOV.W R3, 06H[R0]
                                  ;     231 {
                                  ;     232 	return (ds[dev].x_open(dev, addr, flags));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",232
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",232
 000000DC B389                    		MOVU.B 0FH[R0], R1
 000000DE EF1E                    		MOV.L R1, R14
 000000E0 761E8800                		MUL #88H, R14
@@ -451,19 +451,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000F4 E301                    		MOV.L R1, [R0]
 000000F6                         L39:	; entry.split
                                  ;     233 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",233
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",233
 000000F6 6704                    		RTSD #10H
 000000F8                         _xio_close:
                                  		.STACK	_xio_close=8
                                  ;     234 
                                  ;     235 void xio_close(const uint8_t dev)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",235
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",235
 000000F8 6040                    		SUB #04H, R0
 000000FA 8089                    		MOV.B R1, 03H[R0]
 000000FC 754E88                  		MOV.L #00000088H, R14
                                  ;     236 {
                                  ;     237 	ds[dev].x_close(&ds[dev]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",237
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",237
 000000FF 4D0E03                  		MUL 03H[R0].UB, R14
 00000102 FB12rrrrrrrr            		MOV.L #_ds, R1
 00000108 4BE1                    		ADD R14, R1
@@ -475,7 +475,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     238 }
                                  ;     239 
                                  ;     240 int xio_gets(const uint8_t dev, char *buf, const int size)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",240
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",240
 00000110 7100F0                  		ADD #0FFFFFFF0H, R0
 00000113 8389                    		MOV.B R1, 0FH[R0]
 00000115 A082                    		MOV.L R2, 08H[R0]
@@ -483,7 +483,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000119 754E88                  		MOV.L #00000088H, R14
                                  ;     241 {
                                  ;     242 	return (ds[dev].x_gets(&ds[dev], buf, size));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",242
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",242
 0000011C 4D0E0F                  		MUL 0FH[R0].UB, R14
 0000011F FB12rrrrrrrr            		MOV.L #_ds, R1
 00000125 4BE1                    		ADD R14, R1
@@ -493,19 +493,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000012D E301                    		MOV.L R1, [R0]
 0000012F                         L42:	; entry.split
                                  ;     243 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",243
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",243
 0000012F 6704                    		RTSD #10H
 00000131                         _xio_getc:
                                  		.STACK	_xio_getc=12
                                  ;     244 
                                  ;     245 int xio_getc(const uint8_t dev)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",245
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",245
 00000131 6080                    		SUB #08H, R0
 00000133 8189                    		MOV.B R1, 07H[R0]
 00000135 754E88                  		MOV.L #00000088H, R14
                                  ;     246 {
                                  ;     247 	return (ds[dev].x_getc(&ds[dev].file));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",247
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",247
 00000138 4D0E07                  		MUL 07H[R0].UB, R14
 0000013B FB12rrrrrrrr            		MOV.L #_ds, R1
 00000141 4BE1                    		ADD R14, R1
@@ -515,20 +515,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000149 E301                    		MOV.L R1, [R0]
 0000014B                         L44:	; entry.split
                                  ;     248 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",248
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",248
 0000014B 6702                    		RTSD #08H
 0000014D                         _xio_putc:
                                  		.STACK	_xio_putc=12
                                  ;     249 
                                  ;     250 int xio_putc(const uint8_t dev, const char c)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",250
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",250
 0000014D 6080                    		SUB #08H, R0
 0000014F 8189                    		MOV.B R1, 07H[R0]
 00000151 8182                    		MOV.B R2, 06H[R0]
 00000153 754E88                  		MOV.L #00000088H, R14
                                  ;     251 {
                                  ;     252 	return (ds[dev].x_putc(c, &ds[dev].file));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",252
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",252
 00000156 4D0E07                  		MUL 07H[R0].UB, R14
 00000159 FB22rrrrrrrr            		MOV.L #_ds, R2
 0000015F 4BE2                    		ADD R14, R2
@@ -539,7 +539,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000169 E301                    		MOV.L R1, [R0]
 0000016B                         L46:	; entry.split
                                  ;     253 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",253
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",253
 0000016B 6702                    		RTSD #08H
 0000016D                         _xio_ctrl:
                                  		.STACK	_xio_ctrl=12
@@ -549,14 +549,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     257  * xio_ctrl_generic() - PRIVATE but generic set-control-flags
                                  ;     258  */
                                  ;     259 int xio_ctrl(const uint8_t dev, const flags_t flags)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",259
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",259
 0000016D 6080                    		SUB #08H, R0
 0000016F 8189                    		MOV.B R1, 07H[R0]
 00000171 9082                    		MOV.W R2, 04H[R0]
 00000173 754E88                  		MOV.L #00000088H, R14
                                  ;     260 {
                                  ;     261 	return (xio_ctrl_generic(&ds[dev], flags));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",261
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",261
 00000176 4D0E07                  		MUL 07H[R0].UB, R14
 00000179 B882                    		MOVU.W 04H[R0], R2
 0000017B FB12rrrrrrrr            		MOV.L #_ds, R1
@@ -565,7 +565,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000186 E301                    		MOV.L R1, [R0]
 00000188                         L48:	; entry.split
                                  ;     262 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",262
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",262
 00000188 6702                    		RTSD #08H
 0000018A                         _xio_ctrl_generic:
                                  		.STACK	_xio_ctrl_generic=16
@@ -574,13 +574,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     265 #define CLRFLAG(t,f) if ((flags & t) != 0) { d->f = false; }
                                  ;     266 
                                  ;     267 int xio_ctrl_generic(xioDev_t *d, const flags_t flags)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",267
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",267
 0000018A 60C0                    		SUB #0CH, R0
 0000018C A081                    		MOV.L R1, 08H[R0]
 0000018E 908A                    		MOV.W R2, 06H[R0]
                                  ;     268 {
                                  ;     269 	SETFLAG(XIO_BLOCK,		flag_block);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",269
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",269
 00000190 B889                    		MOVU.W 06H[R0], R1
 00000192 7C01                    		BTST #00H, R1
 00000194 10                   S  		BEQ L51
@@ -589,7 +589,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000197 F9146C01                		MOV.B #01H, 6CH[R1]
 0000019B                         L51:	; bb12
                                  ;     270 	CLRFLAG(XIO_NOBLOCK,	flag_block);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",270
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",270
 0000019B B889                    		MOVU.W 06H[R0], R1
 0000019D 7C11                    		BTST #01H, R1
 0000019F 10                   S  		BEQ L53
@@ -598,7 +598,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001A2 F9146C00                		MOV.B #00H, 6CH[R1]
 000001A6                         L53:	; bb23
                                  ;     271 	SETFLAG(XIO_XOFF,		flag_xoff);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",271
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",271
 000001A6 B889                    		MOVU.W 06H[R0], R1
 000001A8 7C21                    		BTST #02H, R1
 000001AA 10                   S  		BEQ L55
@@ -607,7 +607,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001AD F9147201                		MOV.B #01H, 72H[R1]
 000001B1                         L55:	; bb34
                                  ;     272 	CLRFLAG(XIO_NOXOFF,		flag_xoff);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",272
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",272
 000001B1 B889                    		MOVU.W 06H[R0], R1
 000001B3 7C31                    		BTST #03H, R1
 000001B5 10                   S  		BEQ L57
@@ -616,7 +616,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001B8 F9147200                		MOV.B #00H, 72H[R1]
 000001BC                         L57:	; bb45
                                  ;     273 	SETFLAG(XIO_ECHO,		flag_echo);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",273
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",273
 000001BC B889                    		MOVU.W 06H[R0], R1
 000001BE 7C41                    		BTST #04H, R1
 000001C0 10                   S  		BEQ L59
@@ -625,7 +625,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001C3 F9146D01                		MOV.B #01H, 6DH[R1]
 000001C7                         L59:	; bb56
                                  ;     274 	CLRFLAG(XIO_NOECHO,		flag_echo);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",274
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",274
 000001C7 B889                    		MOVU.W 06H[R0], R1
 000001C9 7C51                    		BTST #05H, R1
 000001CB 10                   S  		BEQ L61
@@ -634,7 +634,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001CE F9146D00                		MOV.B #00H, 6DH[R1]
 000001D2                         L61:	; bb67
                                  ;     275 	SETFLAG(XIO_CRLF,		flag_crlf);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",275
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",275
 000001D2 B889                    		MOVU.W 06H[R0], R1
 000001D4 7C61                    		BTST #06H, R1
 000001D6 10                   S  		BEQ L63
@@ -643,7 +643,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001D9 F9146E01                		MOV.B #01H, 6EH[R1]
 000001DD                         L63:	; bb78
                                  ;     276 	CLRFLAG(XIO_NOCRLF,		flag_crlf);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",276
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",276
 000001DD B889                    		MOVU.W 06H[R0], R1
 000001DF 7C71                    		BTST #07H, R1
 000001E1 10                   S  		BEQ L65
@@ -652,7 +652,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001E4 F9146E00                		MOV.B #00H, 6EH[R1]
 000001E8                         L65:	; bb89
                                  ;     277 	SETFLAG(XIO_IGNORECR,	flag_ignorecr);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",277
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",277
 000001E8 B889                    		MOVU.W 06H[R0], R1
 000001EA 7C81                    		BTST #08H, R1
 000001EC 10                   S  		BEQ L67
@@ -661,7 +661,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001EF F9146F01                		MOV.B #01H, 6FH[R1]
 000001F3                         L67:	; bb100
                                  ;     278 	CLRFLAG(XIO_NOIGNORECR,	flag_ignorecr);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",278
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",278
 000001F3 B889                    		MOVU.W 06H[R0], R1
 000001F5 7C91                    		BTST #09H, R1
 000001F7 10                   S  		BEQ L69
@@ -670,7 +670,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001FA F9146F00                		MOV.B #00H, 6FH[R1]
 000001FE                         L69:	; bb111
                                  ;     279 	SETFLAG(XIO_IGNORELF,	flag_ignorelf);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",279
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",279
 000001FE B889                    		MOVU.W 06H[R0], R1
 00000200 7CA1                    		BTST #0AH, R1
 00000202 10                   S  		BEQ L71
@@ -679,7 +679,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000205 F9147001                		MOV.B #01H, 70H[R1]
 00000209                         L71:	; bb122
                                  ;     280 	CLRFLAG(XIO_NOIGNORELF,	flag_ignorelf);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",280
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",280
 00000209 B889                    		MOVU.W 06H[R0], R1
 0000020B 7CB1                    		BTST #0BH, R1
 0000020D 10                   S  		BEQ L73
@@ -688,7 +688,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000210 F9147000                		MOV.B #00H, 70H[R1]
 00000214                         L73:	; bb133
                                  ;     281 	SETFLAG(XIO_LINEMODE,	flag_linemode);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",281
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",281
 00000214 B889                    		MOVU.W 06H[R0], R1
 00000216 7CC1                    		BTST #0CH, R1
 00000218 10                   S  		BEQ L75
@@ -697,7 +697,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000021B F9147101                		MOV.B #01H, 71H[R1]
 0000021F                         L75:	; bb144
                                  ;     282 	CLRFLAG(XIO_NOLINEMODE,	flag_linemode);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",282
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",282
 0000021F B889                    		MOVU.W 06H[R0], R1
 00000221 7CD1                    		BTST #0DH, R1
 00000223 10                   S  		BEQ L77
@@ -706,12 +706,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000226 F9147100                		MOV.B #00H, 71H[R1]
 0000022A                         L77:	; bb154
                                  ;     283 	return (XIO_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",283
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",283
 0000022A F80600                  		MOV.L #00000000H, [R0]
 0000022D 6601                    		MOV.L #00000000H, R1
 0000022F                         L78:	; bb154.split
                                  ;     284 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",284
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",284
 0000022F 6703                    		RTSD #0CH
 00000231                         _xio_set_baud:
                                  		.STACK	_xio_set_baud=12
@@ -721,7 +721,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     288  *	Currently this only works on USART devices
                                  ;     289  */
                                  ;     290 int xio_set_baud(const uint8_t dev, const uint8_t baud)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",290
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",290
 00000231 6080                    		SUB #08H, R0
 00000233 8189                    		MOV.B R1, 07H[R0]
 00000235 8182                    		MOV.B R2, 06H[R0]
@@ -729,12 +729,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     292 //RXMOD	xioUsart_t *dx = (xioUsart_t *)&us[dev - XIO_DEV_USART_OFFSET];
                                  ;     293 //	xio_set_baud_usart(dx, baud);
                                  ;     294 	return (XIO_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",294
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",294
 00000237 F80600                  		MOV.L #00000000H, [R0]
 0000023A 6601                    		MOV.L #00000000H, R1
 0000023C                         L80:	; entry.split
                                  ;     295 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",295
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",295
 0000023C 6702                    		RTSD #08H
 0000023E                         _xio_fc_null:
                                  		.STACK	_xio_fc_null=8
@@ -743,12 +743,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     298  * xio_fc_null() - flow control null function
                                  ;     299  */
                                  ;     300 void xio_fc_null(xioDev_t *d)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",300
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",300
 0000023E 6040                    		SUB #04H, R0
 00000240 E301                    		MOV.L R1, [R0]
                                  ;     301 {
                                  ;     302 	return;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",302
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",302
 00000242 6701                    		RTSD #04H
 00000244                         _xio_set_stdin:
                                  		.STACK	_xio_set_stdin=8
@@ -764,10 +764,10 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     312  *	of __iob[2] for stack overflow detection and other memory corruption.
                                  ;     313  */
                                  ;     314 void xio_set_stdin(const uint8_t dev)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",314
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",314
 00000244 6040                    		SUB #04H, R0
 00000246 8089                    		MOV.B R1, 03H[R0]
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",317
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",317
 00000248 6701                    		RTSD #04H
 0000024A                         _xio_set_stdout:
                                  		.STACK	_xio_set_stdout=8
@@ -775,10 +775,10 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     316 //RXMOD	stdin  = &ds[dev].file;
                                  ;     317 }
                                  ;     318 void xio_set_stdout(const uint8_t dev)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",318
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",318
 0000024A 6040                    		SUB #04H, R0
 0000024C 8089                    		MOV.B R1, 03H[R0]
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",321
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",321
 0000024E 6701                    		RTSD #04H
 00000250                         _xio_set_stderr:
                                  		.STACK	_xio_set_stderr=8
@@ -786,13 +786,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     320 //RXMOD	stdout = &ds[dev].file;
                                  ;     321 }
                                  ;     322 void xio_set_stderr(const uint8_t dev)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",322
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",322
 00000250 6040                    		SUB #04H, R0
 00000252 8089                    		MOV.B R1, 03H[R0]
                                  ;     323 {
                                  ;     324 //RXMOD	stderr = &ds[dev].file;
                                  ;     325 	xio.stderr_shadow = stderr;		// this is the last thing in RAM, so we use it as a memory corruption canary
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\xio.c",325
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\xio.c",325
 00000254 FBE2rrrrrrrr            		MOV.L #_xio, R14
 0000025A FBF2rrrrrrrr            		MOV.L #__Stderr, R15
 00000260 E3EF                    		MOV.L R15, [R14]
@@ -823,7 +823,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\xio.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4D06\$ccrx\xio.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -832,5 +832,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\xio.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\cnc\xio.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\xio.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\src\cnc\xio.obj

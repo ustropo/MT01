@@ -73,6 +73,12 @@ static char* boolEn[2] =
 	"HABILITADO"
 };
 
+static char* boolCrem[2] =
+{
+	"RETA",
+	"HELICOIDAL"
+};
+
 
 /**
  * Config boolean variable
@@ -93,7 +99,7 @@ void config_bool(ut_config_var* var)
 	menu.itemMarked = 0;
 	switch(configsVar->currentState)
 	{
-	case STATE_AUTO_MODE:
+		case STATE_AUTO_MODE:
 			switch(configsVar->currentItem)
 			{
 				case CONFIG_AUTO_MODO_SIM_RUN:
@@ -103,7 +109,7 @@ void config_bool(ut_config_var* var)
 				default: break;
 			}
 			break;
-#if (COMPACTAXP == 0)
+
 		case STATE_CONFIG_MAQUINA:
 			switch(configsVar->currentItem)
 			{
@@ -116,7 +122,6 @@ void config_bool(ut_config_var* var)
 				default: break;
 			}
 			break;
-#endif
 		case STATE_CONFIG_AUTO_MODE:
 			switch(configsVar->currentItem)
 			{
@@ -136,7 +141,10 @@ void config_bool(ut_config_var* var)
 			menu.itemMarked = *value + 1;
 			boolStr = boolEn;
 			break;
-
+		case STATE_MAQ_MODEL_SELECTION:
+			value = var->value;
+			boolStr = boolCrem;
+			break;
 		default: break;
 	}
 	 menu.title = var->name;

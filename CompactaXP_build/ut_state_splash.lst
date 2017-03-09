@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:02 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:18:30 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:02
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:18:30
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=ut_state_splash.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=ut_state_splash.lst
@@ -26,6 +26,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;ut_state_splash.c
                                  
                                  		.glb	_g_app_header
+                                 		.glb	_g_maq
                                  		.glb	_currentLine
                                  		.glb	_ut_state_splash
                                  		.glb	_ut_lcd_clear
@@ -40,7 +41,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  		.SECTION	P,CODE
 00000000                         _ut_state_splash:
-                                 		.STACK	_ut_state_splash=32
+                                 		.STACK	_ut_state_splash=36
                                  ;       1 /*
                                  ;       2  * ut_state_splash.c
                                  ;       3  *
@@ -134,7 +135,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      91    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                  ;      92    0x00, 0x00, 0x00, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                  ;      93    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-                                 ;      94 #if (EASYMAK == 1)
+                                 ;      94 
                                  ;      95 #define easymax_width 128
                                  ;      96 #define easymax_height 25
                                  ;      97 static unsigned char easymax_bits[] = {
@@ -172,7 +173,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     129    0xfd, 0x3f, 0xe0, 0x0f, 0xfc, 0x01, 0xfe, 0xf8, 0xf3, 0xf3, 0xf7, 0x0f,
                                  ;     130    0xfc, 0x7f, 0xfe, 0xfc, 0xf0, 0x07, 0xe0, 0x07, 0xfc, 0x00, 0x7e, 0xf8,
                                  ;     131    0xf9, 0xf1, 0xf3, 0x07 };
-                                 ;     132 #elif (COMPACTAXP  == 1)
+                                 ;     132 
                                  ;     133 #define CompactXp_width 128
                                  ;     134 #define CompactXp_height 25
                                  ;     135 static unsigned char CompactXp_bits[] = {
@@ -210,7 +211,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     167    0xe0, 0xc7, 0x0f, 0x7c, 0x3e, 0xff, 0x03, 0x3f, 0xf8, 0x7e, 0x00, 0x00,
                                  ;     168    0xfc, 0xc1, 0x1f, 0x7e, 0xe0, 0xe7, 0x07, 0x7c, 0x3e, 0xfe, 0x01, 0x3f,
                                  ;     169    0xfc, 0x7e, 0x00, 0x00 };
-                                 ;     170 #elif (MOBILE  == 1)
+                                 ;     170 
                                  ;     171 #define mobile_width 128
                                  ;     172 #define mobile_height 25
                                  ;     173 static unsigned char mobile_bits[] = {
@@ -249,47 +250,44 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     206    0xff, 0x03, 0xf8, 0x0f, 0xfc, 0x3f, 0xf8, 0xff, 0x0f, 0xff, 0xe3, 0xff,
                                  ;     207    0x7f, 0xff, 0xff, 0x01 };
                                  ;     208 
-                                 ;     209 #endif
-                                 ;     210 
-                                 ;     211 /**
-                                 ;     212  * Execute a splash screen and
-                                 ;     213  * do some other initialization.
-                                 ;     214  *
-                                 ;     215  * @param pContext Context pointer
-                                 ;     216  * @return Next state.
-                                 ;     217  */
-                                 ;     218 ut_state ut_state_splash(ut_context* pContext)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",218
-00000000 6080                    		SUB #08H, R0
-00000002 A009                    		MOV.L R1, 04H[R0]
+                                 ;     209 /**
+                                 ;     210  * Execute a splash screen and
+                                 ;     211  * do some other initialization.
+                                 ;     212  *
+                                 ;     213  * @param pContext Context pointer
+                                 ;     214  * @return Next state.
+                                 ;     215  */
+                                 ;     216 ut_state ut_state_splash(ut_context* pContext)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",216
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
 00000004 FBEE308008              		MOV.L #00088030H, R14
-                                 ;     219 {
-                                 ;     220 	maq_name ret;
-                                 ;     221 	WDT_FEED
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",221
+                                 ;     217 {
+                                 ;     218 	WDT_FEED
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",218
 00000009 F8E400                  		MOV.B #00H, [R14]
 0000000C F8E4FF                  		MOV.B #0FFH, [R14]
 0000000F                         L14:	; entry.split
-                                 ;     222 	currentLine = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",222
+                                 ;     219 	currentLine = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",219
 0000000F FBE2rrrrrrrr            		MOV.L #_currentLine, R14
 00000015 F8E600                  		MOV.L #00000000H, [R14]
 00000018                         L15:	; entry.split1
-                                 ;     223 	ut_lcd_clear();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",223
+                                 ;     220 	ut_lcd_clear();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",220
 00000018 05rrrrrr             A  		BSR _ut_lcd_clear
 0000001C                         L16:	; entry.split2
 0000001C 66A1                    		MOV.L #0000000AH, R1
-                                 ;     224 
-                                 ;     225 	/* Delay para a inicialização do Display */
-                                 ;     226 	vTaskDelay(10 / portTICK_PERIOD_MS);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",226
+                                 ;     221 
+                                 ;     222 	/* Delay para a inicialização do Display */
+                                 ;     223 	vTaskDelay(10 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",223
 0000001E 05rrrrrr             A  		BSR _vTaskDelay
 00000022                         L17:	; entry.split3
 00000022 6080                    		SUB #08H, R0
-                                 ;     227 
-                                 ;     228 	ut_lcd_bitmap(0,11,metalique128_width,metalique128_height,metalique128_bits,"\n");
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",228
+                                 ;     224 
+                                 ;     225 	ut_lcd_bitmap(0,11,metalique128_width,metalique128_height,metalique128_bits,"\n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",225
 00000024 FB12rrrrrrrr            		MOV.L #_L10, R1
 0000002A A009                    		MOV.L R1, 04H[R0]
 0000002C FBE2rrrrrrrr            		MOV.L #__$metalique128_bits, R14
@@ -302,112 +300,170 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000042 6280                    		ADD #08H, R0
 00000044                         L18:	; entry.split4
 00000044 FB1AD007                		MOV.L #000007D0H, R1
-                                 ;     229 
-                                 ;     230 
-                                 ;     231 	/* Delay */
-                                 ;     232 	vTaskDelay(2000 / portTICK_PERIOD_MS);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",232
+                                 ;     226 
+                                 ;     227 	/* Delay */
+                                 ;     228 	vTaskDelay(2000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",228
 00000048 05rrrrrr             A  		BSR _vTaskDelay
 0000004C                         L19:	; entry.split5
-                                 ;     233 	/* Initialize pointer to current app's load image header */
-                                 ;     234 	g_app_header = (fl_image_header_t *)__sectop("APPHEADER_1");
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",234
-0000004C FBE2rrrrrrrr            		MOV.L #_g_app_header, R14
-00000052 FBF2rrrrrrrr            		MOV.L #TOPOF APPHEADER_1, R15
-00000058 E3EF                    		MOV.L R15, [R14]
-0000005A                         L20:	; entry.split6
-                                 ;     235 	sprintf(Str, "Vers�o:%d.%d.%d.%03d", g_app_header->version_major,
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",235
-0000005A FBE2rrrrrrrr            		MOV.L #_g_app_header, R14
-00000060 ECE1                    		MOV.L [R14], R1
-00000062 B112                    		MOVU.B 04H[R1], R2
-00000064 B09B                    		MOVU.B 03H[R1], R3
-00000066 B094                    		MOVU.B 02H[R1], R4
-00000068 B019                    		MOVU.B 01H[R1], R1
-0000006A 7100EC                  		ADD #0FFFFFFECH, R0
-0000006D A102                    		MOV.L R2, 10H[R0]
-0000006F A08B                    		MOV.L R3, 0CH[R0]
-00000071 A084                    		MOV.L R4, 08H[R0]
-00000073 A009                    		MOV.L R1, 04H[R0]
-00000075 FBE2rrrrrrrr            		MOV.L #_L11, R14
-0000007B E30E                    		MOV.L R14, [R0]
-0000007D FB12rrrrrrrr            		MOV.L #__$Str, R1
-00000083 05rrrrrr             A  		BSR _sprintf
-00000087 710014                  		ADD #14H, R0
-0000008A                         L21:	; entry.split7
-0000008A 6080                    		SUB #08H, R0
-                                 ;     236 								g_app_header->version_middle,
-                                 ;     237 								g_app_header->version_minor,
-                                 ;     238 								g_app_header->version_comp);
-                                 ;     239 
-                                 ;     240 #if (EASYMAK == 1)
-                                 ;     241 	ut_lcd_bitmap(0,11,easymax_width,easymax_height,easymax_bits,Str);
-                                 ;     242 #elif (COMPACTAXP  == 1)
-                                 ;     243 	ut_lcd_bitmap(0,11,CompactXp_width,CompactXp_height,CompactXp_bits,Str);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",243
-0000008C FB12rrrrrrrr            		MOV.L #__$Str, R1
-00000092 A009                    		MOV.L R1, 04H[R0]
-00000094 FBE2rrrrrrrr            		MOV.L #__$CompactXp_bits, R14
-0000009A E30E                    		MOV.L R14, [R0]
-0000009C 754419                  		MOV.L #00000019H, R4
-0000009F 754380                  		MOV.L #00000080H, R3
-000000A2 66B2                    		MOV.L #0000000BH, R2
-000000A4 6601                    		MOV.L #00000000H, R1
-000000A6 05rrrrrr             A  		BSR _ut_lcd_bitmap
-000000AA 6280                    		ADD #08H, R0
-000000AC                         L22:	; entry.split8
-000000AC FB1AD007                		MOV.L #000007D0H, R1
-                                 ;     244 #elif (MOBILE  == 1)
-                                 ;     245 	ut_lcd_bitmap(0,11,mobile_width,mobile_height,mobile_bits,Str);
-                                 ;     246 #endif
-                                 ;     247 	/* Delay */
-                                 ;     248 	vTaskDelay(2000 / portTICK_PERIOD_MS);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",248
-000000B0 05rrrrrr             A  		BSR _vTaskDelay
-000000B4                         L23:	; entry.split9
-                                 ;     249 
-                                 ;     250 //	ret = check_machine_type();
-                                 ;     251 //
-                                 ;     252 //	if (ret == UNDEFINED_MAQ)
-                                 ;     253 //	{
-                                 ;     254 //
-                                 ;     255 //	}
+                                 ;     229 
+                                 ;     230 	if (g_maq.model == UNDEFINED_MAQ)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",230
+0000004C FBE2rrrrrrrr            		MOV.L #_g_maq, R14
+00000052 ECEE                    		MOV.L [R14], R14
+00000054 610E                    		CMP #00H, R14
+00000056 18                   S  		BNE L21
+00000057                         L20:	; bb2
+                                 ;     231 	{
+                                 ;     232 		return STATE_MAQ_MODEL_SELECTION;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",232
+00000057 F80611                  		MOV.L #00000011H, [R0]
+0000005A 38rrrr               W  		BRA L35
+0000005D                         L21:	; bb7
+                                 ;     233 	}
+                                 ;     234 
+                                 ;     235 	/* Initialize pointer to current app's load image header */
+                                 ;     236 	g_app_header = (fl_image_header_t *)__sectop("APPHEADER_1");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",236
+0000005D FBE2rrrrrrrr            		MOV.L #_g_app_header, R14
+00000063 FBF2rrrrrrrr            		MOV.L #TOPOF APPHEADER_1, R15
+00000069 E3EF                    		MOV.L R15, [R14]
+0000006B                         L22:	; bb7.split
+                                 ;     237 	sprintf(Str, "Vers�o:%d.%d.%d.%03d", g_app_header->version_major,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",237
+0000006B FBE2rrrrrrrr            		MOV.L #_g_app_header, R14
+00000071 ECE1                    		MOV.L [R14], R1
+00000073 B112                    		MOVU.B 04H[R1], R2
+00000075 B09B                    		MOVU.B 03H[R1], R3
+00000077 B094                    		MOVU.B 02H[R1], R4
+00000079 B019                    		MOVU.B 01H[R1], R1
+0000007B 7100EC                  		ADD #0FFFFFFECH, R0
+0000007E A102                    		MOV.L R2, 10H[R0]
+00000080 A08B                    		MOV.L R3, 0CH[R0]
+00000082 A084                    		MOV.L R4, 08H[R0]
+00000084 A009                    		MOV.L R1, 04H[R0]
+00000086 FBE2rrrrrrrr            		MOV.L #_L11, R14
+0000008C E30E                    		MOV.L R14, [R0]
+0000008E FB12rrrrrrrr            		MOV.L #__$Str, R1
+00000094 05rrrrrr             A  		BSR _sprintf
+00000098 710014                  		ADD #14H, R0
+0000009B                         L23:	; bb7.split6
+                                 ;     238 								g_app_header->version_middle,
+                                 ;     239 								g_app_header->version_minor,
+                                 ;     240 								g_app_header->version_comp);
+                                 ;     241 
+                                 ;     242 	if (g_maq.model == EASYMAK_MAQ)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",242
+0000009B FBE2rrrrrrrr            		MOV.L #_g_maq, R14
+000000A1 ECEE                    		MOV.L [R14], R14
+000000A3 613E                    		CMP #03H, R14
+000000A5 21rr                    		BNE L25
+000000A7                         L24:	; bb26
+000000A7 6080                    		SUB #08H, R0
+                                 ;     243 	{
+                                 ;     244 		ut_lcd_bitmap(0,11,easymax_width,easymax_height,easymax_bits,Str);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",244
+000000A9 FB12rrrrrrrr            		MOV.L #__$Str, R1
+000000AF A009                    		MOV.L R1, 04H[R0]
+000000B1 FBE2rrrrrrrr            		MOV.L #__$easymax_bits, R14
+000000B7 E30E                    		MOV.L R14, [R0]
+000000B9 754419                  		MOV.L #00000019H, R4
+000000BC 754380                  		MOV.L #00000080H, R3
+000000BF 66B2                    		MOV.L #0000000BH, R2
+000000C1 6601                    		MOV.L #00000000H, R1
+000000C3 05rrrrrr             A  		BSR _ut_lcd_bitmap
+000000C7 6280                    		ADD #08H, R0
+000000C9 2Err                 B  		BRA L29
+000000CB                         L25:	; bb28
+                                 ;     245 	}
+                                 ;     246 	else if (g_maq.model == COMPACTA_MAQ)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",246
+000000CB FBE2rrrrrrrr            		MOV.L #_g_maq, R14
+000000D1 ECEE                    		MOV.L [R14], R14
+000000D3 611E                    		CMP #01H, R14
+000000D5 21rr                    		BNE L27
+000000D7                         L26:	; bb29
+000000D7 6080                    		SUB #08H, R0
+                                 ;     247 	{
+                                 ;     248 		ut_lcd_bitmap(0,11,CompactXp_width,CompactXp_height,CompactXp_bits,Str);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",248
+000000D9 FB12rrrrrrrr            		MOV.L #__$Str, R1
+000000DF A009                    		MOV.L R1, 04H[R0]
+000000E1 FBE2rrrrrrrr            		MOV.L #__$CompactXp_bits, R14
+000000E7 E30E                    		MOV.L R14, [R0]
+000000E9 754419                  		MOV.L #00000019H, R4
+000000EC 754380                  		MOV.L #00000080H, R3
+000000EF 66B2                    		MOV.L #0000000BH, R2
+000000F1 6601                    		MOV.L #00000000H, R1
+000000F3 05rrrrrr             A  		BSR _ut_lcd_bitmap
+000000F7 6280                    		ADD #08H, R0
+000000F9 2Err                 B  		BRA L29
+000000FB                         L27:	; bb31
+                                 ;     249 	}
+                                 ;     250 	else if (g_maq.model == MOBILE_MAQ)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",250
+000000FB FBE2rrrrrrrr            		MOV.L #_g_maq, R14
+00000101 ECEE                    		MOV.L [R14], R14
+00000103 612E                    		CMP #02H, R14
+00000105 21rr                    		BNE L29
+00000107                         L28:	; bb32
+00000107 6080                    		SUB #08H, R0
+                                 ;     251 	{
+                                 ;     252 		ut_lcd_bitmap(0,11,mobile_width,mobile_height,mobile_bits,Str);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",252
+00000109 FB12rrrrrrrr            		MOV.L #__$Str, R1
+0000010F A009                    		MOV.L R1, 04H[R0]
+00000111 FBE2rrrrrrrr            		MOV.L #__$mobile_bits, R14
+00000117 E30E                    		MOV.L R14, [R0]
+00000119 754419                  		MOV.L #00000019H, R4
+0000011C 754380                  		MOV.L #00000080H, R3
+0000011F 66B2                    		MOV.L #0000000BH, R2
+00000121 6601                    		MOV.L #00000000H, R1
+00000123 05rrrrrr             A  		BSR _ut_lcd_bitmap
+00000127 6280                    		ADD #08H, R0
+00000129                         L29:	; bb47
+00000129 FB1AD007                		MOV.L #000007D0H, R1
+                                 ;     253 	}
+                                 ;     254 	/* Delay */
+                                 ;     255 	vTaskDelay(2000 / portTICK_PERIOD_MS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",255
+0000012D 05rrrrrr             A  		BSR _vTaskDelay
+00000131                         L30:	; bb47.split
                                  ;     256 
                                  ;     257 	R_FL_StateMachine();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",257
-000000B4 05rrrrrr             A  		BSR _R_FL_StateMachine
-000000B8                         L24:	; entry.split10
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",257
+00000131 05rrrrrr             A  		BSR _R_FL_StateMachine
+00000135                         L31:	; bb47.split7
                                  ;     258 
-                                 ;     259  //   R_USB_Close( (usb_ip_t)msc_utr.ip );
-                                 ;     260 
-                                 ;     261     if(spiffs_init() == SPIFFS_ERR_NOT_A_FS)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",261
-000000B8 05rrrrrr             A  		BSR _spiffs_init
-000000BC 7601D7D8                		CMP #0FFFFD8D7H, R1
-000000C0 21rr                    		BNE L27
-000000C2                         L25:	; bb20
-                                 ;     262     {
-                                 ;     263 		ut_lcd_output_warning("PREPARANDO\nDISPOSITIVO...\n");
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",263
-000000C2 FB12rrrrrrrr            		MOV.L #_L12, R1
-000000C8 05rrrrrr             A  		BSR _ut_lcd_output_warning
-000000CC                         L26:	; bb20.split
-                                 ;     264     	spiffs_format();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",264
-000000CC 05rrrrrr             A  		BSR _spiffs_format
-000000D0                         L27:	; bb25
-                                 ;     265     }
-                                 ;     266 
-                                 ;     267 	/* Next state */
-                                 ;     268 	return STATE_WARNING;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",268
-000000D0 F80601                  		MOV.L #00000001H, [R0]
-000000D3 6611                    		MOV.L #00000001H, R1
-000000D5                         L28:	; bb25.split
-                                 ;     269 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\states\ut_state_splash.c",269
-000000D5 6702                    		RTSD #08H
-                                 ;     270 
+                                 ;     259     if(spiffs_init() == SPIFFS_ERR_NOT_A_FS)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",259
+00000135 05rrrrrr             A  		BSR _spiffs_init
+00000139 7601D7D8                		CMP #0FFFFD8D7H, R1
+0000013D 21rr                    		BNE L34
+0000013F                         L32:	; bb49
+                                 ;     260     {
+                                 ;     261 		ut_lcd_output_warning("PREPARANDO\nDISPOSITIVO...\n");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",261
+0000013F FB12rrrrrrrr            		MOV.L #_L12, R1
+00000145 05rrrrrr             A  		BSR _ut_lcd_output_warning
+00000149                         L33:	; bb49.split
+                                 ;     262     	spiffs_format();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",262
+00000149 05rrrrrr             A  		BSR _spiffs_format
+0000014D                         L34:	; bb55
+                                 ;     263     }
+                                 ;     264 
+                                 ;     265 	/* Next state */
+                                 ;     266 	return STATE_WARNING;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",266
+0000014D F80601                  		MOV.L #00000001H, [R0]
+00000150                         L35:	; bb57
+00000150 EC01                    		MOV.L [R0], R1
+00000152 A009                    		MOV.L R1, 04H[R0]
+                                 ;     267 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\states\ut_state_splash.c",267
+00000154 6703                    		RTSD #0CH
+                                 ;     268 
                                  		.SECTION	L,ROMDATA,ALIGN=4
 00000000                         _L10:
 00000000 0A00                    		.byte	0AH,00H
@@ -693,185 +749,427 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
          00000000                
          00000000                
 0000029C 00000000                		.byte	00H,00H,00H,00H
-000002A0                         __$CompactXp_bits:
-000002A0 8003FEF0                		.byte	80H,03H,0FEH,0F0H,83H
+000002A0                         __$easymax_bits:
+000002A0 00000000                		.byte	00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H
+         00000000                
+         00000000                
+         00000000                
+000002B0 E0FF07FE                		.byte	0E0H,0FFH,07H,0FEH,81H,0FFH,0F9H,0F3H,0E7H,1FH,0F8H,0FH,0FCH,83H,0BFH,7FH
+         81FFF9F3                
+         E71FF80F                
+         FC83BF7F                
+000002C0 E0FF07FF                		.byte	0E0H,0FFH,07H,0FFH,0C1H,0FFH,0FBH,0F3H,0E7H,1FH,0F8H,0FH,0FCH,83H,0BFH
+         C1FFFBF3                
+         E71FF80F                
+         FC83BF                  
+000002CF 3F                      		.byte	"?"
+000002D0 E0FF07FF                		.byte	0E0H,0FFH,07H,0FFH,0E1H,0FFH,0FBH,0F3H,0E7H,1FH,0FCH,07H,0FEH,83H,0BFH
+         E1FFFBF3                
+         E71FFC07                
+         FE83BF                  
+000002DF 3F                      		.byte	"?"
+000002E0 E0FF07FF                		.byte	0E0H,0FFH,07H,0FFH,0F1H,0FFH,0FBH,0F3H,0E7H
+         F1FFFBF3                
+         E7                      
+000002E9 3F                      		.byte	"?"
+000002EA FC07FE83                		.byte	0FCH,07H,0FEH,83H,0BFH
+         BF                      
+000002EF 3F                      		.byte	"?"
+000002F0 E0FF83FF                		.byte	0E0H,0FFH,83H,0FFH,0F1H,0F3H,0FBH,0F3H,0E3H
+         F1F3FBF3                
+         E3                      
+000002F9 3F                      		.byte	"?"
+000002FA FE07FE83                		.byte	0FEH,07H,0FEH,83H,9FH,1FH,0E0H,0E7H,83H,0FFH,0F1H,0F1H,0F1H,0FBH,0E1H
+         9F1FE0E7                
+         83FFF1F1                
+         F1FBE1                  
+00000309 3F                      		.byte	"?"
+0000030A FF03FF83                		.byte	0FFH,03H,0FFH,83H,9FH,1FH,0E0H,0E7H,0C3H,0FFH,0F9H,0F1H,0F1H,0FBH,0E0H
+         9F1FE0E7                
+         C3FFF9F1                
+         F1FBE0                  
+00000319 3F                      		.byte	"?"
+0000031A FF03FF83                		.byte	0FFH,03H,0FFH,83H,0CFH,0FH,0F0H,0E7H,0C3H,0F7H,0F9H,03H,0E0H,0FFH,0E0H,7FH
+         CF0FF0E7                
+         C3F7F903                
+         E0FFE07F                
+0000032A FF03EFC3                		.byte	0FFH,03H,0EFH,0C3H,0EFH,07H,0F0H,03H,0C0H,0F3H,0F9H,0FH,0E0H,7FH,0E0H,0FFH
+         EF07F003                
+         C0F3F90F                
+         E07FE0FF                
+0000033A FF83EFC3                		.byte	0FFH,83H,0EFH,0C3H,0FFH,03H,0F0H
+         FF03F0                  
+00000341 3F                      		.byte	"?"
+00000342 C0F3F91F                		.byte	0C0H,0F3H,0F9H,1FH,0C0H
+         C0                      
+00000347 3F                      		.byte	"?"
+00000348 F0FFFF83                		.byte	0F0H,0FFH,0FFH,83H,0EFH,0C3H,0FFH,03H,0F0H
+         EFC3FF03                
+         F0                      
+00000351 3F                      		.byte	"?"
+00000352 E0F3F17F                		.byte	0E0H,0F3H,0F1H,7FH,0C0H
+         C0                      
+00000357 3F                      		.byte	"?"
+00000358 F0FFF781                		.byte	0F0H,0FFH,0F7H,81H,0E7H,0C3H,0FFH,01H,0F0H
+         E7C3FF01                
+         F0                      
+00000361 3F                      		.byte	"?"
+00000362 E0F9F1FF                		.byte	0E0H,0F9H,0F1H,0FFH,80H,1FH,0F0H,0FBH,0F3H,0C1H,0E7H,0C3H,0FFH,00H,0F0H
+         801FF0FB                
+         F3C1E7C3                
+         FF00F0                  
+00000371 3F                      		.byte	"?"
+00000372 E0F9E1FF                		.byte	0E0H,0F9H,0E1H,0FFH,80H,0FH,0F0H,0F3H,0F1H,0C1H,0E7H,0E3H,0FFH,00H,0F8H,0FH
+         800FF0F3                
+         F1C1E7E3                
+         FF00F80F                
+00000382 F0FF81FF                		.byte	0F0H,0FFH,81H,0FFH,80H,0FH,0F0H,0F3H,0F9H,0C1H,0FFH,0E3H,0FFH,01H,0F8H,01H
+         800FF0F3                
+         F9C1FFE3                
+         FF01F801                
+00000392 F0FF01FE                		.byte	0F0H,0FFH,01H,0FEH,80H,0FH,0F0H,0F1H,0F8H,0E1H,0FFH,0E3H,0FFH,01H,0F8H,0F1H
+         800FF0F1                
+         F8E1FFE3                
+         FF01F8F1                
+000003A2 F0FFF9FC                		.byte	0F0H,0FFH,0F9H,0FCH,80H,0FH,0F8H,0E1H,0F8H,0E0H,0FFH,0E3H,0F7H,03H,0F8H,0F1H
+         800FF8E1                
+         F8E0FFE3                
+         F703F8F1                
+000003B2 F8FFFDFC                		.byte	0F8H,0FFH,0FDH,0FCH,80H,0FH,0F8H
+         800FF8                  
+000003B9 61                      		.byte	"a"
+000003BA F8E0FFE3                		.byte	0F8H,0E0H,0FFH,0E3H,0F7H,03H,0F8H,0F9H,0F8H,0F8H,0FDH,0FCH,0C0H,0FH,0F8H
+         F703F8F9                
+         F8F8FDFC                
+         C00FF8                  
+000003C9 21                      		.byte	"!"
+000003CA F8F0F3E3                		.byte	0F8H,0F0H,0F3H,0E3H,0E7H,07H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H
+         E7070000                
+         00000000                
+         00000000                
+000003DA 00000000                		.byte	00H,00H,00H,00H,00H,00H,0FCH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH
+         0000FCFF                
+         FFFFFFFF                
+         FFFFFFFF                
+000003EA FFFFFFFF                		.byte	0FFH,0FFH,0FFH,0FFH,0FFH,07H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H
+         FF070000                
+         00000000                
+         00000000                
+000003FA 00000000                		.byte	00H,00H,00H,00H,00H,00H,0FEH,0FFH,0FEH,0FCH,0FDH,7FH,0E0H,0FH,0FCH,01H
+         0000FEFF                
+         FEFCFD7F                
+         E00FFC01                
+0000040A FEF8F3F3                		.byte	0FEH,0F8H,0F3H,0F3H,0F7H,0FH,0FEH,0FFH,0FEH,0FCH,0FDH
+         F70FFEFF                
+         FEFCFD                  
+00000415 3F                      		.byte	"?"
+00000416 E00FFC01                		.byte	0E0H,0FH,0FCH,01H,0FEH,0F8H,0F3H,0F3H,0F7H,0FH,0FCH,7FH,0FEH,0FCH,0F0H,07H
+         FEF8F3F3                
+         F70FFC7F                
+         FEFCF007                
+00000426 E007FC00                		.byte	0E0H,07H,0FCH,00H
+0000042A 7E                      		.byte	"~"
+0000042B F8F9F1F3                		.byte	0F8H,0F9H,0F1H,0F3H,07H
+         07                      
+00000430                         __$CompactXp_bits:
+00000430 8003FEF0                		.byte	80H,03H,0FEH,0F0H,83H
          83                      
-000002A5 3F                      		.byte	"?"
-000002A6 FF017FC0                		.byte	0FFH,01H,7FH,0C0H,81H,0FFH,1FH
+00000435 3F                      		.byte	"?"
+00000436 FF017FC0                		.byte	0FFH,01H,7FH,0C0H,81H,0FFH,1FH
          81FF1F                  
-000002AD 7E                      		.byte	"~"
-000002AE 0000F00F                		.byte	00H,00H,0F0H,0FH,0FFH,0F1H,83H
+0000043D 7E                      		.byte	"~"
+0000043E 0000F00F                		.byte	00H,00H,0F0H,0FH,0FFH,0F1H,83H
          FFF183                  
-000002B5 3F                      		.byte	"?"
-000002B6 FF077FF0                		.byte	0FFH,07H,7FH,0F0H,8FH,0FFH,1FH,7FH,00H,00H,0F0H,0FH,0FFH,0F1H,83H
+00000445 3F                      		.byte	"?"
+00000446 FF077FF0                		.byte	0FFH,07H,7FH,0F0H,8FH,0FFH,1FH,7FH,00H,00H,0F0H,0FH,0FFH,0F1H,83H
          8FFF1F7F                
          0000F00F                
          FFF183                  
-000002C5 3F                      		.byte	"?"
-000002C6 FF077FF0                		.byte	0FFH,07H,7FH,0F0H,8FH,0FFH,1FH,7FH,00H,00H,0F8H,9FH,0FFH,0F9H,0C3H
+00000455 3F                      		.byte	"?"
+00000456 FF077FF0                		.byte	0FFH,07H,7FH,0F0H,8FH,0FFH,1FH,7FH,00H,00H,0F8H,9FH,0FFH,0F9H,0C3H
          8FFF1F7F                
          0000F89F                
          FFF9C3                  
-000002D5 3F                      		.byte	"?"
-000002D6 FF8F7FF8                		.byte	0FFH,8FH,7FH,0F8H,0DFH,0FFH,1FH,7FH,00H,00H,0F8H,0DFH,0FFH,0F9H,0C7H
+00000465 3F                      		.byte	"?"
+00000466 FF8F7FF8                		.byte	0FFH,8FH,7FH,0F8H,0DFH,0FFH,1FH,7FH,00H,00H,0F8H,0DFH,0FFH,0F9H,0C7H
          DFFF1F7F                
          0000F8DF                
          FFF9C7                  
-000002E5 3F                      		.byte	"?"
-000002E6 FF8F7FFC                		.byte	0FFH,8FH,7FH,0FCH,0DFH,0FFH,1FH,7FH,00H,00H,0FCH,0DFH,0FFH,0F1H,0E7H,1FH
+00000475 3F                      		.byte	"?"
+00000476 FF8F7FFC                		.byte	0FFH,8FH,7FH,0FCH,0DFH,0FFH,1FH,7FH,00H,00H,0FCH,0DFH,0FFH,0F1H,0E7H,1FH
          DFFF1F7F                
          0000FCDF                
          FFF1E71F                
-000002F6 FF8F                    		.byte	0FFH,8FH
-000002F8 3F                      		.byte	"?"
-000002F9 FCDFFF8F                		.byte	0FCH,0DFH,0FFH,8FH,7FH,00H,00H
+00000486 FF8F                    		.byte	0FFH,8FH
+00000488 3F                      		.byte	"?"
+00000489 FCDFFF8F                		.byte	0FCH,0DFH,0FFH,8FH,7FH,00H,00H
          7F0000                  
-00000300 7C                      		.byte	"|"
-00000301 DFE7F1F7                		.byte	0DFH,0E7H,0F1H,0F7H,1FH,9FH,0CFH
+00000490 7C                      		.byte	"|"
+00000491 DFE7F1F7                		.byte	0DFH,0E7H,0F1H,0F7H,1FH,9FH,0CFH
          1F9FCF                  
-00000308 3F3E                    		.byte	"?>"
-0000030A CF                      		.byte	0CFH
-0000030B 7D                      		.byte	"}"
-0000030C 8E7F0000                		.byte	8EH,7FH,00H,00H
-00000310 7C                      		.byte	"|"
-00000311 DFE7F1F7                		.byte	0DFH,0E7H,0F1H,0F7H,1FH,9FH,0CFH
+00000498 3F3E                    		.byte	"?>"
+0000049A CF                      		.byte	0CFH
+0000049B 7D                      		.byte	"}"
+0000049C 8E7F0000                		.byte	8EH,7FH,00H,00H
+000004A0 7C                      		.byte	"|"
+000004A1 DFE7F1F7                		.byte	0DFH,0E7H,0F1H,0F7H,1FH,9FH,0CFH
          1F9FCF                  
-00000318 3F3E                    		.byte	"?>"
-0000031A CF                      		.byte	0CFH
-0000031B 7D                      		.byte	"}"
-0000031C 8E7F0000                		.byte	8EH,7FH,00H,00H
-00000320 7C                      		.byte	"|"
-00000321 DFF7F9F7                		.byte	0DFH,0F7H,0F9H,0F7H,0FH,9FH,0CFH
+000004A8 3F3E                    		.byte	"?>"
+000004AA CF                      		.byte	0CFH
+000004AB 7D                      		.byte	"}"
+000004AC 8E7F0000                		.byte	8EH,7FH,00H,00H
+000004B0 7C                      		.byte	"|"
+000004B1 DFF7F9F7                		.byte	0DFH,0F7H,0F9H,0F7H,0FH,9FH,0CFH
          0F9FCF                  
-00000328 3F3E                    		.byte	"?>"
-0000032A CF                      		.byte	0CFH
-0000032B 7C                      		.byte	"|"
-0000032C 8E                      		.byte	8EH
-0000032D 7B                      		.byte	"{"
-0000032E 0000                    		.byte	00H,00H
-00000330 7E                      		.byte	"~"
-00000331 DFF7F9FF                		.byte	0DFH,0F7H,0F9H,0FFH,0FH,0C0H,0EFH
+000004B8 3F3E                    		.byte	"?>"
+000004BA CF                      		.byte	0CFH
+000004BB 7C                      		.byte	"|"
+000004BC 8E                      		.byte	8EH
+000004BD 7B                      		.byte	"{"
+000004BE 0000                    		.byte	00H,00H
+000004C0 7E                      		.byte	"~"
+000004C1 DFF7F9FF                		.byte	0DFH,0F7H,0F9H,0FFH,0FH,0C0H,0EFH
          0FC0EF                  
-00000338 3D                      		.byte	"="
-00000339 BE0F                    		.byte	0BEH,0FH
-0000033B 7C                      		.byte	"|"
-0000033C C0                      		.byte	0C0H
-0000033D 7B                      		.byte	"{"
-0000033E 0000                    		.byte	00H,00H
-00000340 3E                      		.byte	">"
-00000341 C0F7F97F                		.byte	0C0H,0F7H,0F9H,7FH,0FH,0FFH,0E7H
+000004C8 3D                      		.byte	"="
+000004C9 BE0F                    		.byte	0BEH,0FH
+000004CB 7C                      		.byte	"|"
+000004CC C0                      		.byte	0C0H
+000004CD 7B                      		.byte	"{"
+000004CE 0000                    		.byte	00H,00H
+000004D0 3E                      		.byte	">"
+000004D1 C0F7F97F                		.byte	0C0H,0F7H,0F9H,7FH,0FH,0FFH,0E7H
          0FFFE7                  
-00000348 3D3E                    		.byte	"=>"
-0000034A 00                      		.byte	00H
-0000034B 7C                      		.byte	"|"
-0000034C C0                      		.byte	0C0H
-0000034D 7B                      		.byte	"{"
-0000034E 0000                    		.byte	00H,00H
-00000350 3E                      		.byte	">"
-00000351 E0F3F9BF                		.byte	0E0H,0F3H,0F9H,0BFH,0FH,0FFH,0E3H
+000004D8 3D3E                    		.byte	"=>"
+000004DA 00                      		.byte	00H
+000004DB 7C                      		.byte	"|"
+000004DC C0                      		.byte	0C0H
+000004DD 7B                      		.byte	"{"
+000004DE 0000                    		.byte	00H,00H
+000004E0 3E                      		.byte	">"
+000004E1 E0F3F9BF                		.byte	0E0H,0F3H,0F9H,0BFH,0FH,0FFH,0E3H
          0FFFE3                  
-00000358 3D                      		.byte	"="
-00000359 1E00                    		.byte	1EH,00H
-0000035B 7C                      		.byte	"|"
-0000035C C0                      		.byte	0C0H
-0000035D 7B                      		.byte	"{"
-0000035E 0000                    		.byte	00H,00H
-00000360 3E                      		.byte	">"
-00000361 E0F3F9BF                		.byte	0E0H,0F3H,0F9H,0BFH,0FH,0FFH,0E3H
+000004E8 3D                      		.byte	"="
+000004E9 1E00                    		.byte	1EH,00H
+000004EB 7C                      		.byte	"|"
+000004EC C0                      		.byte	0C0H
+000004ED 7B                      		.byte	"{"
+000004EE 0000                    		.byte	00H,00H
+000004F0 3E                      		.byte	">"
+000004F1 E0F3F9BF                		.byte	0E0H,0F3H,0F9H,0BFH,0FH,0FFH,0E3H
          0FFFE3                  
-00000368 3D                      		.byte	"="
-00000369 1E00                    		.byte	1EH,00H
-0000036B 7C                      		.byte	"|"
-0000036C C0                      		.byte	0C0H
-0000036D 7B                      		.byte	"{"
-0000036E 0000                    		.byte	00H,00H
-00000370 3E                      		.byte	">"
-00000371 E0F3F8BE                		.byte	0E0H,0F3H,0F8H,0BEH,8FH,0FFH,0F1H
+000004F8 3D                      		.byte	"="
+000004F9 1E00                    		.byte	1EH,00H
+000004FB 7C                      		.byte	"|"
+000004FC C0                      		.byte	0C0H
+000004FD 7B                      		.byte	"{"
+000004FE 0000                    		.byte	00H,00H
+00000500 3E                      		.byte	">"
+00000501 E0F3F8BE                		.byte	0E0H,0F3H,0F8H,0BEH,8FH,0FFH,0F1H
          8FFFF1                  
-00000378 3C                      		.byte	"<"
-00000379 1F00                    		.byte	1FH,00H
-0000037B 7E                      		.byte	"~"
-0000037C E0                      		.byte	0E0H
-0000037D 79                      		.byte	"y"
-0000037E 0000                    		.byte	00H,00H
-00000380 3E                      		.byte	">"
-00000381 E0F3F89E                		.byte	0E0H,0F3H,0F8H,9EH,8FH,0FFH,0F0H
+00000508 3C                      		.byte	"<"
+00000509 1F00                    		.byte	1FH,00H
+0000050B 7E                      		.byte	"~"
+0000050C E0                      		.byte	0E0H
+0000050D 79                      		.byte	"y"
+0000050E 0000                    		.byte	00H,00H
+00000510 3E                      		.byte	">"
+00000511 E0F3F89E                		.byte	0E0H,0F3H,0F8H,9EH,8FH,0FFH,0F0H
          8FFFF0                  
-00000388 3F                      		.byte	"?"
-00000389 1F00                    		.byte	1FH,00H
-0000038B 3E                      		.byte	">"
-0000038C E07FDC7F                		.byte	0E0H,7FH,0DCH,7FH,9EH,0EFH,0FBH
+00000518 3F                      		.byte	"?"
+00000519 1F00                    		.byte	1FH,00H
+0000051B 3E                      		.byte	">"
+0000051C E07FDC7F                		.byte	0E0H,7FH,0DCH,7FH,9EH,0EFH,0FBH
          9EEFFB                  
-00000393 7C                      		.byte	"|"
-00000394 9E871FF0                		.byte	9EH,87H,1FH,0F0H
-00000398 3F                      		.byte	"?"
-00000399 9F07                    		.byte	9FH,07H
-0000039B 3E                      		.byte	">"
-0000039C E07FD8C4                		.byte	0E0H,7FH,0D8H,0C4H,9FH,0EFH,0F9H
+00000523 7C                      		.byte	"|"
+00000524 9E871FF0                		.byte	9EH,87H,1FH,0F0H
+00000528 3F                      		.byte	"?"
+00000529 9F07                    		.byte	9FH,07H
+0000052B 3E                      		.byte	">"
+0000052C E07FD8C4                		.byte	0E0H,7FH,0D8H,0C4H,9FH,0EFH,0F9H
          9FEFF9                  
-000003A3 7C                      		.byte	"|"
-000003A4 8C870FF8                		.byte	8CH,87H,0FH,0F8H
-000003A8 3F                      		.byte	"?"
-000003A9 DF07                    		.byte	0DFH,07H
-000003AB 3E                      		.byte	">"
-000003AC F07F                    		.byte	0F0H,7FH
-000003AE 30                      		.byte	"0"
-000003AF 869FEFF9                		.byte	86H,9FH,0EFH,0F9H
-000003B3 7C                      		.byte	"|"
-000003B4 8C870FF8                		.byte	8CH,87H,0FH,0F8H
-000003B8 3F                      		.byte	"?"
-000003B9 DF07                    		.byte	0DFH,07H
-000003BB 3E                      		.byte	">"
-000003BC F07F                    		.byte	0F0H,7FH
-000003BE 30                      		.byte	"0"
-000003BF 869FEFF9                		.byte	86H,9FH,0EFH,0F9H
-000003C3 7C                      		.byte	"|"
-000003C4 C4870FF8                		.byte	0C4H,87H,0FH,0F8H
-000003C8 3F                      		.byte	"?"
-000003C9 DF07                    		.byte	0DFH,07H
-000003CB 3E                      		.byte	">"
-000003CC F07F                    		.byte	0F0H,7FH
-000003CE 387E                    		.byte	"8~"
-000003D0 00000000                		.byte	00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H
+00000533 7C                      		.byte	"|"
+00000534 8C870FF8                		.byte	8CH,87H,0FH,0F8H
+00000538 3F                      		.byte	"?"
+00000539 DF07                    		.byte	0DFH,07H
+0000053B 3E                      		.byte	">"
+0000053C F07F                    		.byte	0F0H,7FH
+0000053E 30                      		.byte	"0"
+0000053F 869FEFF9                		.byte	86H,9FH,0EFH,0F9H
+00000543 7C                      		.byte	"|"
+00000544 8C870FF8                		.byte	8CH,87H,0FH,0F8H
+00000548 3F                      		.byte	"?"
+00000549 DF07                    		.byte	0DFH,07H
+0000054B 3E                      		.byte	">"
+0000054C F07F                    		.byte	0F0H,7FH
+0000054E 30                      		.byte	"0"
+0000054F 869FEFF9                		.byte	86H,9FH,0EFH,0F9H
+00000553 7C                      		.byte	"|"
+00000554 C4870FF8                		.byte	0C4H,87H,0FH,0F8H
+00000558 3F                      		.byte	"?"
+00000559 DF07                    		.byte	0DFH,07H
+0000055B 3E                      		.byte	">"
+0000055C F07F                    		.byte	0F0H,7FH
+0000055E 387E                    		.byte	"8~"
+00000560 00000000                		.byte	00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H
          00000000                
          00000000                
          0000                    
-000003DE 24                      		.byte	"$"
-000003DF 02FFFFFF                		.byte	02H,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH
+0000056E 24                      		.byte	"$"
+0000056F 02FFFFFF                		.byte	02H,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH
          FFFFFFFF                
          FFFFFFFF                
          FFFFFF                  
-000003EE 77                      		.byte	"w"
-000003EF 07000000                		.byte	07H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H
+0000057E 77                      		.byte	"w"
+0000057F 07000000                		.byte	07H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H
          00000000                
          00000000                
          00000000                
-000003FF 00FEE77F                		.byte	00H,0FEH,0E7H,7FH
-00000403 7E                      		.byte	"~"
-00000404 E0C70F                  		.byte	0E0H,0C7H,0FH
-00000407 7C3E                    		.byte	"|>"
-00000409 FF03                    		.byte	0FFH,03H
-0000040B 3F                      		.byte	"?"
-0000040C F8                      		.byte	0F8H
-0000040D 7E                      		.byte	"~"
-0000040E 0000FEE3                		.byte	00H,00H,0FEH,0E3H
-00000412 3F7E                    		.byte	"?~"
-00000414 E0C70F                  		.byte	0E0H,0C7H,0FH
-00000417 7C3E                    		.byte	"|>"
-00000419 FF03                    		.byte	0FFH,03H
-0000041B 3F                      		.byte	"?"
-0000041C F8                      		.byte	0F8H
-0000041D 7E                      		.byte	"~"
-0000041E 0000FCC1                		.byte	00H,00H,0FCH,0C1H,1FH
+0000058F 00FEE77F                		.byte	00H,0FEH,0E7H,7FH
+00000593 7E                      		.byte	"~"
+00000594 E0C70F                  		.byte	0E0H,0C7H,0FH
+00000597 7C3E                    		.byte	"|>"
+00000599 FF03                    		.byte	0FFH,03H
+0000059B 3F                      		.byte	"?"
+0000059C F8                      		.byte	0F8H
+0000059D 7E                      		.byte	"~"
+0000059E 0000FEE3                		.byte	00H,00H,0FEH,0E3H
+000005A2 3F7E                    		.byte	"?~"
+000005A4 E0C70F                  		.byte	0E0H,0C7H,0FH
+000005A7 7C3E                    		.byte	"|>"
+000005A9 FF03                    		.byte	0FFH,03H
+000005AB 3F                      		.byte	"?"
+000005AC F8                      		.byte	0F8H
+000005AD 7E                      		.byte	"~"
+000005AE 0000FCC1                		.byte	00H,00H,0FCH,0C1H,1FH
          1F                      
-00000423 7E                      		.byte	"~"
-00000424 E0E707                  		.byte	0E0H,0E7H,07H
-00000427 7C3E                    		.byte	"|>"
-00000429 FE01                    		.byte	0FEH,01H
-0000042B 3F                      		.byte	"?"
-0000042C FC                      		.byte	0FCH
-0000042D 7E                      		.byte	"~"
-0000042E 0000                    		.byte	00H,00H
+000005B3 7E                      		.byte	"~"
+000005B4 E0E707                  		.byte	0E0H,0E7H,07H
+000005B7 7C3E                    		.byte	"|>"
+000005B9 FE01                    		.byte	0FEH,01H
+000005BB 3F                      		.byte	"?"
+000005BC FC                      		.byte	0FCH
+000005BD 7E                      		.byte	"~"
+000005BE 0000                    		.byte	00H,00H
+000005C0                         __$mobile_bits:
+000005C0 C0FF00FF                		.byte	0C0H,0FFH,00H,0FFH,03H,0FFH,07H,0FEH,7FH,0C0H,0FFH,0F8H,0FH,0C0H,0FFH,0FFH
+         03FF07FE                
+         7FC0FFF8                
+         0FC0FFFF                
+000005D0 C0FF80FF                		.byte	0C0H,0FFH,80H,0FFH,83H,0FFH,0FH,0FEH,0FFH,0C0H,0FFH,0F8H,0FH,0E0H,0FFH,0FFH
+         83FF0FFE                
+         FFC0FFF8                
+         0FE0FFFF                
+000005E0 C0FFC0FF                		.byte	0C0H,0FFH,0C0H,0FFH,0E3H,0FFH,0FH,0FFH,0FFH,0C3H,7FH,0F8H,0FH,0E0H,0FFH,0FFH
+         E3FF0FFF                
+         FFC37FF8                
+         0FE0FFFF                
+000005F0 C0FFC0FF                		.byte	0C0H,0FFH,0C0H,0FFH,0F1H,0FFH,1FH,0FFH,0FFH,0C3H,7FH,0F8H,0FH,0E0H,0FFH
+         F1FF1FFF                
+         FFC37FF8                
+         0FE0FF                  
+000005FF 3F                      		.byte	"?"
+00000600 C0FFE0FF                		.byte	0C0H,0FFH,0E0H,0FFH,0F1H,0FFH,1FH,0FFH,0FFH,0C3H,7FH,0F8H,07H,0E0H,0FFH
+         F1FF1FFF                
+         FFC37FF8                
+         07E0FF                  
+0000060F 3F                      		.byte	"?"
+00000610 C0FFE1FF                		.byte	0C0H,0FFH,0E1H,0FFH,0F1H,0E7H,1FH,0FFH,0FFH,0C3H
+         F1E71FFF                
+         FFC3                    
+0000061A 3F                      		.byte	"?"
+0000061B F807E0FF                		.byte	0F8H,07H,0E0H,0FFH
+0000061F 3F                      		.byte	"?"
+00000620 C0FFF97F                		.byte	0C0H,0FFH,0F9H,7FH,0F8H,0C7H,0FH,0FFH,0FCH,0E3H
+         F8C70FFF                
+         FCE3                    
+0000062A 3F                      		.byte	"?"
+0000062B F803E0DF                		.byte	0F8H,03H,0E0H,0DFH
+0000062F 3F                      		.byte	"?"
+00000630 E0FFFD7F                		.byte	0E0H,0FFH,0FDH,7FH,0F8H,0E3H,0FH,7FH,0FCH,0E3H
+         F8E30F7F                
+         FCE3                    
+0000063A 3F                      		.byte	"?"
+0000063B F803E0CF                		.byte	0F8H,03H,0E0H,0CFH
+0000063F 3F                      		.byte	"?"
+00000640 E0FFFD7F                		.byte	0E0H,0FFH,0FDH,7FH,0F8H,0E3H,0FH,00H,0FEH,0E3H,1FH,0FEH,03H,0E0H,0CFH,0FH
+         F8E30F00                
+         FEE31FFE                
+         03E0CF0F                
+00000650 E0FFFF7F                		.byte	0E0H,0FFH,0FFH,7FH,0F8H,0E3H,0FH,00H,0FEH,0E0H,1FH,0FEH,03H,0F8H,0FH,00H
+         F8E30F00                
+         FEE01FFE                
+         03F80F00                
+00000660 E0FF7F                  		.byte	0E0H,0FFH,7FH
+00000663 3F                      		.byte	"?"
+00000664 F8E30FFF                		.byte	0F8H,0E3H,0FH,0FFH,0FFH,0E0H,1FH,0FEH,01H,0F8H,0FFH,01H,0E0H,0FFH,0BFH
+         FFE01FFE                
+         01F8FF01                
+         E0FFBF                  
+00000673 3F                      		.byte	"?"
+00000674 FCF9C7FF                		.byte	0FCH,0F9H,0C7H,0FFH,7FH,0F0H,1FH,0FEH,01H,0F8H,0FFH,00H,0F0H,0FFH,0BFH
+         7FF01FFE                
+         01F8FF00                
+         F0FFBF                  
+00000683 3F                      		.byte	"?"
+00000684 FCF9C7FF                		.byte	0FCH,0F9H,0C7H,0FFH
+00000688 3F                      		.byte	"?"
+00000689 F01FFE01                		.byte	0F0H,1FH,0FEH,01H,0F8H,0FFH,00H,0F0H,0E7H,9FH
+         F8FF00F0                
+         E79F                    
+00000693 3F                      		.byte	"?"
+00000694 FCF9C7FF                		.byte	0FCH,0F9H,0C7H,0FFH,7FH,0F0H,07H,0FFH,01H,0F8H,0FFH,00H,0F0H,0E7H,87H
+         7FF007FF                
+         01F8FF00                
+         F0E787                  
+000006A3 3F                      		.byte	"?"
+000006A4 FCF9C7FF                		.byte	0FCH,0F9H,0C7H,0FFH,7FH,0F0H,07H,0FFH,01H,0FCH,0FFH,00H,0F0H,0C7H,0C7H,1FH
+         7FF007FF                
+         01FCFF00                
+         F0C7C71F                
+000006B4 FEF9C7FF                		.byte	0FEH,0F9H,0C7H,0FFH,7FH,0F0H,07H,7FH,00H,0FCH,07H,00H,0F0H,0C7H,0C3H,1FH
+         7FF0077F                
+         00FC0700                
+         F0C7C31F                
+000006C4 FEFCE3BF                		.byte	0FEH,0FCH,0E3H,0BFH,7FH,0F0H,07H,7FH,0FCH,0FDH,0E3H,07H,0FCH,0C7H,0C1H,1FH
+         7FF0077F                
+         FCFDE307                
+         FCC7C11F                
+000006D4 FEFCE3BF                		.byte	0FEH,0FCH,0E3H,0BFH,7FH,0F8H,07H,7FH,0FCH,0FCH,0F3H,07H,0FCH,03H,0C1H,1FH
+         7FF8077F                
+         FCFCF307                
+         FC03C11F                
+000006E4 FEFCE38F                		.byte	0FEH,0FCH,0E3H,8FH
+000006E8 3F                      		.byte	"?"
+000006E9 F8037FFC                		.byte	0F8H,03H,7FH,0FCH,0FCH,0F3H,07H,0FCH,03H,0C0H,0FH,00H,0FCH,0E3H,0FH
+         FCF307FC                
+         03C00F00                
+         FCE30F                  
+000006F8 3C                      		.byte	"<"
+000006F9 F803                    		.byte	0F8H,03H
+000006FB 3F                      		.byte	"?"
+000006FC 00FCFB03                		.byte	00H,0FCH,0FBH,03H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H
+         00000000                
+         00000000                
+         00000000                
+0000070C 00000000                		.byte	00H,00H,00H,00H,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH,0FFH
+         FFFFFFFF                
+         FFFFFFFF                
+         FFFFFFFF                
+0000071C FFFFFFFF                		.byte	0FFH,0FFH,0FFH,0FFH,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H,00H
+         00000000                
+         00000000                
+         00000000                
+0000072C 00000000                		.byte	00H,00H,00H,00H,0FEH,03H,0F8H,0FH,0FEH,7FH,0F8H,0FFH,1FH,0FFH,0C3H,0FFH
+         FE03F80F                
+         FE7FF8FF                
+         1FFFC3FF                
+0000073C 7FFFFF03                		.byte	7FH,0FFH,0FFH,03H,0FFH,03H,0F8H,0FH,0FCH
+         FF03F80F                
+         FC                      
+00000745 3F                      		.byte	"?"
+00000746 F8FF0FFF                		.byte	0F8H,0FFH,0FH,0FFH,0E3H,0FFH,7FH,0FFH,0FFH,01H
+         E3FF7FFF                
+         FF01                    
                                  		.SECTION	B_1,DATA
 00000000                         __$Str:
 00000000(00000028H)              		.blkb	40
@@ -882,15 +1180,15 @@ Information List
 
 TOTAL ERROR(S)    00000
 TOTAL WARNING(S)  00000
-TOTAL LINE(S)     00728   LINES
+TOTAL LINE(S)     00884   LINES
 
 Section List
 
 Attr         Size               Name
-CODE     0000000215(000000D7H)  P
+CODE     0000000342(00000156H)  P
 DATA     0000000000(00000000H)  APPHEADER_1
 ROMDATA  0000000050(00000032H)  L
-ROMDATA  0000001072(00000430H)  D_1
+ROMDATA  0000001872(00000750H)  D_1
 DATA     0000000040(00000028H)  B_1
 
 Cpu Type
@@ -899,7 +1197,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\ut_state_splash.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\ut_state_splash.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -908,5 +1206,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\ut_state_splash.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\states\ut_state_splash.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\ut_state_splash.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\src\states\ut_state_splash.obj

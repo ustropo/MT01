@@ -11,6 +11,7 @@
 #include "config_menu_pl.h"
 #include "config_menu_ox.h"
 #include "config_par_maquina.h"
+#include "state_functions.h"
 
 typedef enum
 {
@@ -29,6 +30,18 @@ typedef enum
 	EASYMAK_MAQ,			//!< Easymak
 	TYPE_MAX_MAQ        //!< MAQ_TYPE_MAX
 } maq_name;
+
+enum
+{
+	MODEL_RETA = 0,
+	MODEL_HELI,
+};
+
+typedef struct
+{
+	maq_name model;
+	bool crem;
+}maq_st;
 
 enum{
 	CONFIGVAR_OX = 0,    //!< Indice da variavel EEPROM para oxicorte (configVarOx)
@@ -71,6 +84,7 @@ extern float configVarParMaq[CFG_PAR_MAQ_MAX];
 extern float zeroPiece[3];
 extern uint32_t configFlags[FLAG_MAX];
 extern uint32_t configTHCVel;
+extern maq_st g_maq;
 
 
 void eepromInit(void);
@@ -79,5 +93,7 @@ void eepromReadConfig(uint8_t varType);
 void eepromConsistencyCheck(void);
 void eepromFormat(void);
 mem_check eepromIntegrityCheck(void);
+void machine_type_write(const char * p_str_model,const char * p_str_crem);
+maq_st check_machine_type(void);
 
 #endif /* INCLUDE_EEPROM_H_ */

@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:09 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:18:39 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:09
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:18:39
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=plan_arc.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=plan_arc.lst
@@ -106,12 +106,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      53 void cm_arc_init()
                                  ;      54 {
                                  ;      55 	arc.magic_start = MAGICNUM;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",55
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",55
 00000000 FBE2rrrrrrrr            		MOV.L #_arc, R14
 00000006 F8E9EF12                		MOV.W #12EFH, [R14]
 0000000A                         L11:	; entry.split
                                  ;      56 	arc.magic_end = MAGICNUM;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",56
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",56
 0000000A FBE2rrrrrrrr            		MOV.L #_arc, R14
 00000010 F9E964EF12              		MOV.W #12EFH, 0C8H[R14]
 00000015 02                      		RTS
@@ -126,7 +126,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      63  * approximated by generating a large number of tiny, linear arc_segments.
                                  ;      64  */
                                  ;      65 stat_t cm_arc_feed(float target[], float flags[],       // arc endpoints
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",65
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",65
 00000016 7EA6                    		PUSH.L R6
 00000018 7100D4                  		ADD #0FFFFFFD4H, R0
 0000001B A281                    		MOV.L R1, 28H[R0]
@@ -145,7 +145,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      72 
                                  ;      73 	// trap missing feed rate
                                  ;      74 	if ((cm.gm.feed_rate_mode != INVERSE_TIME_MODE) && (fp_ZERO(cm.gm.feed_rate))) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",74
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",74
 0000002F FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000035 5AEEA002                		MOVU.B 02A0H[R14], R14
 00000039 610E                    		CMP #00H, R14
@@ -153,7 +153,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000003C 2Err                 B  		BRA L16
 0000003E                         L13:	; bb15
                                  ;      75     	return (STAT_GCODE_FEEDRATE_NOT_SPECIFIED);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",75
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",75
 0000003E 3C0A8E                  		MOV.B #8EH, 0AH[R0]
 00000041 38rrrr               W  		BRA L119
 00000044                         L14:	; bb21
@@ -176,7 +176,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      77 
                                  ;      78     // set radius mode flag and do simple test(s)
                                  ;      79 	bool radius_f = fp_NOT_ZERO(cm.gf.arc_radius);			    // set true if radius arc
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",79
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",79
 00000065 FBE2rrrrrrrr            		MOV.L #_cm, R14
 0000006B EDEEF7                  		MOV.L 03DCH[R14], R14
 0000006E 7BFE                    		BCLR #1FH, R14
@@ -185,14 +185,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000079 FCD1070B                		SCN.B 0BH[R0]
 0000007D                         L19:	; bb32.split
                                  ;      80     if ((radius_f) && (cm.gn.arc_radius < MIN_ARC_RADIUS)) {    // radius value must be + and > minimum radius
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",80
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",80
 0000007D B289                    		MOVU.B 0BH[R0], R1
 0000007F 6101                    		CMP #00H, R1
 00000081 18                   S  		BNE L21
 00000082 2Err                 B  		BRA L23
 00000084                         L20:	; bb41
                                  ;      81         return (STAT_ARC_RADIUS_OUT_OF_TOLERANCE);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",81
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",81
 00000084 3C0A9E                  		MOV.B #9EH, 0AH[R0]
 00000087 38rrrr               W  		BRA L119
 0000008A                         L21:	; bb47
@@ -214,7 +214,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      83 
                                  ;      84     // setup some flags
                                  ;      85 	bool target_x = fp_NOT_ZERO(flags[AXIS_X]);	                // set true if X axis has been specified
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",85
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",85
 000000A9 AA09                    		MOV.L 24H[R0], R1
 000000AB EC1E                    		MOV.L [R1], R14
 000000AD 7BFE                    		BCLR #1FH, R14
@@ -223,7 +223,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000B8 FCD1070C                		SCN.B 0CH[R0]
 000000BC                         L26:	; bb58.split
                                  ;      86 	bool target_y = fp_NOT_ZERO(flags[AXIS_Y]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",86
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",86
 000000BC AA09                    		MOV.L 24H[R0], R1
 000000BE A819                    		MOV.L 04H[R1], R1
 000000C0 7BF1                    		BCLR #1FH, R1
@@ -232,7 +232,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000CB FCD1070D                		SCN.B 0DH[R0]
 000000CF                         L27:	; bb58.split1
                                  ;      87 	bool target_z = fp_NOT_ZERO(flags[AXIS_Z]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",87
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",87
 000000CF AA09                    		MOV.L 24H[R0], R1
 000000D1 A891                    		MOV.L 08H[R1], R1
 000000D3 7BF1                    		BCLR #1FH, R1
@@ -242,7 +242,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000E2                         L28:	; bb58.split2
                                  ;      88 
                                  ;      89     bool offset_i = fp_NOT_ZERO(cm.gf.arc_offset[0]);	        // set true if offset I has been specified
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",89
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",89
 000000E2 FBE2rrrrrrrr            		MOV.L #_cm, R14
 000000E8 EDEEF8                  		MOV.L 03E0H[R14], R14
 000000EB 7BFE                    		BCLR #1FH, R14
@@ -251,7 +251,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000F6 FCD1070F                		SCN.B 0FH[R0]
 000000FA                         L29:	; bb58.split3
                                  ;      90     bool offset_j = fp_NOT_ZERO(cm.gf.arc_offset[1]);           // J
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",90
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",90
 000000FA FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000100 EDEEF9                  		MOV.L 03E4H[R14], R14
 00000103 7BFE                    		BCLR #1FH, R14
@@ -260,7 +260,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000010E FCD10710                		SCN.B 10H[R0]
 00000112                         L30:	; bb58.split4
                                  ;      91     bool offset_k = fp_NOT_ZERO(cm.gf.arc_offset[2]);           // K
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",91
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",91
 00000112 FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000118 EDEEFA                  		MOV.L 03E8H[R14], R14
 0000011B 7BFE                    		BCLR #1FH, R14
@@ -272,42 +272,42 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      93 	// Set the arc plane for the current G17/G18/G19 setting and test arc specification
                                  ;      94 	// Plane axis 0 and 1 are the arc plane, the linear axis is normal to the arc plane.
                                  ;      95 	if (cm.gm.select_plane == CANON_PLANE_XY) {	// G17 - the vast majority of arcs are in the G17 (XY) plane
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",95
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",95
 0000012A FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000130 5AEEA102                		MOVU.B 02A1H[R14], R14
 00000134 610E                    		CMP #00H, R14
 00000136 21rr                    		BNE L47
 00000138                         L32:	; bb108
                                  ;      96     	arc.plane_axis_0 = AXIS_X;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",96
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",96
 00000138 FBE2rrrrrrrr            		MOV.L #_arc, R14
 0000013E F9E44C00                		MOV.B #00H, 4CH[R14]
 00000142                         L33:	; bb108.split
                                  ;      97     	arc.plane_axis_1 = AXIS_Y;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",97
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",97
 00000142 FBE2rrrrrrrr            		MOV.L #_arc, R14
 00000148 F9E44D01                		MOV.B #01H, 4DH[R14]
 0000014C                         L34:	; bb108.split6
                                  ;      98     	arc.linear_axis  = AXIS_Z;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",98
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",98
 0000014C FBE2rrrrrrrr            		MOV.L #_arc, R14
 00000152 F9E44E02                		MOV.B #02H, 4EH[R14]
 00000156                         L35:	; bb108.split7
                                  ;      99         if (radius_f) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",99
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",99
 00000156 B289                    		MOVU.B 0BH[R0], R1
 00000158 6101                    		CMP #00H, R1
 0000015A 20rr                    		BEQ L45
 0000015C                         L36:	; bb111
                                  ;     100             if (!(target_x || target_y)) {                      // must have at least one endpoint specified
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",100
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",100
 0000015C B301                    		MOVU.B 0CH[R0], R1
 0000015E 6101                    		CMP #00H, R1
 00000160 21rr                    		BNE L39
 00000162 08                   S  		BRA L38
 00000163                         L37:	; bb112
                                  ;     101         	    return (STAT_ARC_AXIS_MISSING_FOR_SELECTED_PLANE);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",101
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",101
 00000163 3C0A9C                  		MOV.B #9CH, 0AH[R0]
 00000166 38rrrr               W  		BRA L119
 00000169                         L38:	; bb118
@@ -337,13 +337,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     102             }
                                  ;     103         } else { // center format arc tests
                                  ;     104             if (offset_k) { // it's OK to be missing either or both i and j, but error if k is present
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",104
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",104
 0000018A B409                    		MOVU.B 11H[R0], R1
 0000018C 6101                    		CMP #00H, R1
 0000018E 3Arrrr               W  		BEQ L79
 00000191                         L46:	; bb138
                                  ;     105         	    return (STAT_ARC_SPECIFICATION_ERROR);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",105
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",105
 00000191 3C0A9B                  		MOV.B #9BH, 0AH[R0]
 00000194 38rrrr               W  		BRA L119
 00000197                         L47:	; bb153
@@ -351,42 +351,42 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     107         }
                                  ;     108 
                                  ;     109     } else if (cm.gm.select_plane == CANON_PLANE_XZ) {	// G18
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",109
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",109
 00000197 FBE2rrrrrrrr            		MOV.L #_cm, R14
 0000019D 5AEEA102                		MOVU.B 02A1H[R14], R14
 000001A1 611E                    		CMP #01H, R14
 000001A3 21rr                    		BNE L63
 000001A5                         L48:	; bb154
                                  ;     110     	arc.plane_axis_0 = AXIS_X;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",110
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",110
 000001A5 FBE2rrrrrrrr            		MOV.L #_arc, R14
 000001AB F9E44C00                		MOV.B #00H, 4CH[R14]
 000001AF                         L49:	; bb154.split
                                  ;     111     	arc.plane_axis_1 = AXIS_Z;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",111
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",111
 000001AF FBE2rrrrrrrr            		MOV.L #_arc, R14
 000001B5 F9E44D02                		MOV.B #02H, 4DH[R14]
 000001B9                         L50:	; bb154.split8
                                  ;     112     	arc.linear_axis  = AXIS_Y;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",112
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",112
 000001B9 FBE2rrrrrrrr            		MOV.L #_arc, R14
 000001BF F9E44E01                		MOV.B #01H, 4EH[R14]
 000001C3                         L51:	; bb154.split9
                                  ;     113         if (radius_f) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",113
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",113
 000001C3 B289                    		MOVU.B 0BH[R0], R1
 000001C5 6101                    		CMP #00H, R1
 000001C7 20rr                    		BEQ L61
 000001C9                         L52:	; bb157
                                  ;     114             if (!(target_x || target_z))
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",114
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",114
 000001C9 B301                    		MOVU.B 0CH[R0], R1
 000001CB 6101                    		CMP #00H, R1
 000001CD 21rr                    		BNE L55
 000001CF 08                   S  		BRA L54
 000001D0                         L53:	; bb158
                                  ;     115                 return (STAT_ARC_AXIS_MISSING_FOR_SELECTED_PLANE);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",115
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",115
 000001D0 3C0A9C                  		MOV.B #9CH, 0AH[R0]
 000001D3 38rrrr               W  		BRA L119
 000001D6                         L54:	; bb164
@@ -415,55 +415,55 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001F6                         L61:	; bb183
                                  ;     116         } else {
                                  ;     117             if (offset_j)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",117
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",117
 000001F6 B401                    		MOVU.B 10H[R0], R1
 000001F8 6101                    		CMP #00H, R1
 000001FA 20rr                    		BEQ L79
 000001FC                         L62:	; bb184
                                  ;     118                 return (STAT_ARC_SPECIFICATION_ERROR);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",118
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",118
 000001FC 3C0A9B                  		MOV.B #9BH, 0AH[R0]
 000001FF 38rrrr               W  		BRA L119
 00000202                         L63:	; bb199
                                  ;     119         }
                                  ;     120 
                                  ;     121     } else if (cm.gm.select_plane == CANON_PLANE_YZ) {	// G19
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",121
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",121
 00000202 FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000208 5AEEA102                		MOVU.B 02A1H[R14], R14
 0000020C 612E                    		CMP #02H, R14
 0000020E 21rr                    		BNE L79
 00000210                         L64:	; bb200
                                  ;     122     	arc.plane_axis_0 = AXIS_Y;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",122
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",122
 00000210 FBE2rrrrrrrr            		MOV.L #_arc, R14
 00000216 F9E44C01                		MOV.B #01H, 4CH[R14]
 0000021A                         L65:	; bb200.split
                                  ;     123     	arc.plane_axis_1 = AXIS_Z;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",123
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",123
 0000021A FBE2rrrrrrrr            		MOV.L #_arc, R14
 00000220 F9E44D02                		MOV.B #02H, 4DH[R14]
 00000224                         L66:	; bb200.split10
                                  ;     124     	arc.linear_axis  = AXIS_X;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",124
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",124
 00000224 FBE2rrrrrrrr            		MOV.L #_arc, R14
 0000022A F9E44E00                		MOV.B #00H, 4EH[R14]
 0000022E                         L67:	; bb200.split11
                                  ;     125         if (radius_f) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",125
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",125
 0000022E B289                    		MOVU.B 0BH[R0], R1
 00000230 6101                    		CMP #00H, R1
 00000232 20rr                    		BEQ L77
 00000234                         L68:	; bb203
                                  ;     126             if (!(target_y || target_z))
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",126
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",126
 00000234 B309                    		MOVU.B 0DH[R0], R1
 00000236 6101                    		CMP #00H, R1
 00000238 21rr                    		BNE L71
 0000023A 08                   S  		BRA L70
 0000023B                         L69:	; bb204
                                  ;     127                 return (STAT_ARC_AXIS_MISSING_FOR_SELECTED_PLANE);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",127
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",127
 0000023B 3C0A9C                  		MOV.B #9CH, 0AH[R0]
 0000023E 38rrrr               W  		BRA L119
 00000241                         L70:	; bb210
@@ -492,13 +492,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000261                         L77:	; bb229
                                  ;     128         } else {
                                  ;     129             if (offset_i)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",129
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",129
 00000261 B389                    		MOVU.B 0FH[R0], R1
 00000263 6101                    		CMP #00H, R1
 00000265 10                   S  		BEQ L79
 00000266                         L78:	; bb230
                                  ;     130                 return (STAT_ARC_SPECIFICATION_ERROR);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",130
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",130
 00000266 3C0A9B                  		MOV.B #9BH, 0AH[R0]
 00000269 38rrrr               W  		BRA L119
 0000026C                         L79:	; bb261
@@ -507,7 +507,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     133 
                                  ;     134 	// set values in the Gcode model state & copy it (linenum was already captured)
                                  ;     135 	cm_set_model_target(target, flags);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",135
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",135
 0000026C AA0A                    		MOV.L 24H[R0], R2
 0000026E AA81                    		MOV.L 28H[R0], R1
 00000270 05rrrrrr             A  		BSR _cm_set_model_target
@@ -515,13 +515,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     136 
                                  ;     137     // in radius mode it's an error for start == end
                                  ;     138     if(radius_f) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",138
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",138
 00000274 B289                    		MOVU.B 0BH[R0], R1
 00000276 6101                    		CMP #00H, R1
 00000278 20rr                    		BEQ L91
 0000027A                         L81:	; bb266
                                  ;     139         if ((fp_EQ(cm.gmx.position[AXIS_X], cm.gm.target[AXIS_X])) &&
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",139
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",139
 0000027A FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000280 EDEFAD                  		MOV.L 02B4H[R14], R15
 00000283 FC81EF97                		FSUB 025CH[R14].L, R15
@@ -533,7 +533,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     140             (fp_EQ(cm.gmx.position[AXIS_Y], cm.gm.target[AXIS_Y])) &&
                                  ;     141             (fp_EQ(cm.gmx.position[AXIS_Z], cm.gm.target[AXIS_Z]))) {
                                  ;     142             return (STAT_ARC_ENDPOINT_IS_STARTING_POINT);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",142
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",142
 00000294 3C0A9F                  		MOV.B #9FH, 0AH[R0]
 00000297 38rrrr               W  		BRA L119
 0000029A                         L83:	; bb275
@@ -574,18 +574,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     145 
                                  ;     146     // now get down to the rest of the work setting up the arc for execution
                                  ;     147 	cm.gm.motion_mode = motion_mode;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",147
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",147
 000002E4 FBE2rrrrrrrr            		MOV.L #_cm, R14
 000002EA C90E135802              		MOV.B 13H[R0], 0258H[R14]
 000002EF                         L92:	; bb308.split
                                  ;     148 	cm_set_work_offsets(&cm.gm);					// capture the fully resolved offsets to gm
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",148
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",148
 000002EF FB12rrrrrrrr            		MOV.L #_cm, R1
 000002F5 72115402                		ADD #0254H, R1
 000002F9 05rrrrrr             A  		BSR _cm_set_work_offsets
 000002FD                         L93:	; bb308.split12
                                  ;     149 	memcpy(&arc.gm, &cm.gm, sizeof(GCodeState_t));	// copy GCode context to arc singleton - some will be overwritten to run segments
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",149
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",149
 000002FD FB22rrrrrrrr            		MOV.L #_cm, R2
 00000303 72225402                		ADD #0254H, R2
 00000307 FB12rrrrrrrr            		MOV.L #_arc, R1
@@ -594,7 +594,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000313 7F8F                    		SMOVF
 00000315                         L94:	; bb308.split13
                                  ;     150 	copy_vector(arc.position, cm.gmx.position);		// set initial arc position from gcode model
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",150
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",150
 00000315 FB22rrrrrrrr            		MOV.L #_cm, R2
 0000031B 7222B402                		ADD #02B4H, R2
 0000031F FB12rrrrrrrr            		MOV.L #_arc, R1
@@ -604,7 +604,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000032C                         L95:	; bb308.split14
                                  ;     151 
                                  ;     152 	arc.radius = _to_millimeters(radius);			// set arc radius or zero
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",152
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",152
 0000032C FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000332 5AEEA202                		MOVU.B 02A2H[R14], R14
 00000336 610E                    		CMP #00H, R14
@@ -621,7 +621,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000034E E40E0D                  		MOV.L [R0], 34H[R14]
                                  ;     153 
                                  ;     154 	arc.offset[0] = _to_millimeters(i);				// copy offsets with conversion to canonical form (mm)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",154
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",154
 00000351 FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000357 5AEEA202                		MOVU.B 02A2H[R14], R14
 0000035B 610E                    		CMP #00H, R14
@@ -637,7 +637,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000036D FBE2rrrrrrrr            		MOV.L #_arc, R14
 00000373 E40E07                  		MOV.L [R0], 1CH[R14]
                                  ;     155 	arc.offset[1] = _to_millimeters(j);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",155
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",155
 00000376 FBE2rrrrrrrr            		MOV.L #_cm, R14
 0000037C 5AEEA202                		MOVU.B 02A2H[R14], R14
 00000380 610E                    		CMP #00H, R14
@@ -653,7 +653,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000392 FBE2rrrrrrrr            		MOV.L #_arc, R14
 00000398 E40E08                  		MOV.L [R0], 20H[R14]
                                  ;     156 	arc.offset[2] = _to_millimeters(k);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",156
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",156
 0000039B FBE2rrrrrrrr            		MOV.L #_cm, R14
 000003A1 5AEEA202                		MOVU.B 02A2H[R14], R14
 000003A5 610E                    		CMP #00H, R14
@@ -670,7 +670,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000003BD E40609                  		MOV.L [R0], 24H[R6]
                                  ;     157 
                                  ;     158 	arc.rotations = floor(fabs(cm.gn.parameter));   // P must be a positive integer - force it if not
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",158
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",158
 000003C0 FBE2rrrrrrrr            		MOV.L #_cm, R14
 000003C6 EDE1DE                  		MOV.L 0378H[R14], R1
 000003C9 7BF1                    		BCLR #1FH, R1
@@ -686,7 +686,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     159 
                                  ;     160 	// determine if this is a full circle arc. Evaluates true if no target is set
                                  ;     161 	arc.full_circle = (fp_ZERO(flags[arc.plane_axis_0]) & fp_ZERO(flags[arc.plane_axis_1]));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",161
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",161
 000003E4 FBE2rrrrrrrr            		MOV.L #_arc, R14
 000003EA 59EF4C                  		MOVU.B 4CH[R14], R15
 000003ED AA09                    		MOV.L 24H[R0], R1
@@ -705,7 +705,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     162 
                                  ;     163 	// compute arc runtime values
                                  ;     164 	ritorno(_compute_arc());
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",164
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",164
 00000415 39rrrr               W  		BSR __$_compute_arc
 00000418 FBE2rrrrrrrr            		MOV.L #_status_code, R14
 0000041E C3E1                    		MOV.B R1, [R14]
@@ -718,7 +718,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000042F                         L113:	; bb392
                                  ;     165 
                                  ;     166 	if (fp_ZERO(arc.length)) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",166
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",166
 0000042F FB12rrrrrrrr            		MOV.L #_arc, R1
 00000435 AA91                    		MOV.L 28H[R1], R1
 00000437 7BF1                    		BCLR #1FH, R1
@@ -726,7 +726,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000440 26rr                    		BPZ L115
 00000442                         L114:	; bb393
                                  ;     167         return (STAT_MINIMUM_LENGTH_MOVE);          // trap zero length arcs that _compute_arc can throw
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",167
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",167
 00000442 3C0AC9                  		MOV.B #0C9H, 0AH[R0]
 00000445 2Err                 B  		BRA L119
 00000447                         L115:	; bb400
@@ -741,25 +741,25 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     176 	}
                                  ;     177 */
                                  ;     178 	cm_cycle_start();						// if not already started
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",178
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",178
 00000447 05rrrrrr             A  		BSR _cm_cycle_start
 0000044B                         L116:	; bb400.split
                                  ;     179 	arc.run_state = MOVE_RUN;				// enable arc to be run from the callback
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",179
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",179
 0000044B FB12rrrrrrrr            		MOV.L #_arc, R1
 00000451 3C1202                  		MOV.B #02H, 02H[R1]
 00000454                         L117:	; bb400.split16
                                  ;     180 	cm_finalize_move();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",180
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",180
 00000454 05rrrrrr             A  		BSR _cm_finalize_move
 00000458                         L118:	; bb400.split17
                                  ;     181 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",181
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",181
 00000458 3C0A00                  		MOV.B #00H, 0AH[R0]
 0000045B                         L119:	; bb402
 0000045B C5000A12                		MOV.B 0AH[R0], 12H[R0]
                                  ;     182 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",182
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",182
 0000045F B481                    		MOVU.B 12H[R0], R1
 00000461 3F660C                  		RTSD #30H, R6-R6
 00000464                         _cm_arc_callback:
@@ -775,44 +775,44 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     191  */
                                  ;     192 
                                  ;     193 stat_t cm_arc_callback()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",193
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",193
 00000464 6E68                    		PUSHM R6-R8
 00000466 6040                    		SUB #04H, R0
                                  ;     194 {
                                  ;     195 	if (arc.run_state == MOVE_OFF)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",195
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",195
 00000468 FB12rrrrrrrr            		MOV.L #_arc, R1
 0000046E B091                    		MOVU.B 02H[R1], R1
 00000470 6101                    		CMP #00H, R1
 00000472 18                   S  		BNE L122
 00000473                         L121:	; bb1
                                  ;     196         return (STAT_NOOP);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",196
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",196
 00000473 3C0203                  		MOV.B #03H, 02H[R0]
 00000476 38rrrr               W  		BRA L134
 00000479                         L122:	; bb8
                                  ;     197 
                                  ;     198 	if (mp_get_planner_buffers_available() < PLANNER_BUFFER_HEADROOM)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",198
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",198
 00000479 05rrrrrr             A  		BSR _mp_get_planner_buffers_available
 0000047D 6131                    		CMP #03H, R1
 0000047F 2Arr                    		BGT L124
 00000481                         L123:	; bb9
                                  ;     199         return (STAT_EAGAIN);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",199
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",199
 00000481 3C0202                  		MOV.B #02H, 02H[R0]
 00000484 38rrrr               W  		BRA L134
 00000487                         L124:	; bb16
                                  ;     200 
                                  ;     201 	arc.theta += arc.arc_segment_theta;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",201
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",201
 00000487 FB12rrrrrrrr            		MOV.L #_arc, R1
 0000048D AA9A                    		MOV.L 2CH[R1], R2
 0000048F FC891217                		FADD 5CH[R1].L, R2
 00000493 A29A                    		MOV.L R2, 2CH[R1]
 00000495                         L125:	; bb16.split
                                  ;     202 	arc.gm.target[arc.plane_axis_0] = arc.center_0 + sin(arc.theta) * arc.radius;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",202
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",202
 00000495 FB62rrrrrrrr            		MOV.L #_arc, R6
 0000049B AAE9                    		MOV.L 2CH[R6], R1
 0000049D AE6F                    		MOV.L 64H[R6], R7
@@ -825,7 +825,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000004B1 A76F                    		MOV.L R7, 74H[R6]
 000004B3                         L126:	; bb16.split1
                                  ;     203 	arc.gm.target[arc.plane_axis_1] = arc.center_1 + cos(arc.theta) * arc.radius;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",203
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",203
 000004B3 FB62rrrrrrrr            		MOV.L #_arc, R6
 000004B9 AAE9                    		MOV.L 2CH[R6], R1
 000004BB AEE7                    		MOV.L 68H[R6], R7
@@ -838,7 +838,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000004CF A76F                    		MOV.L R7, 74H[R6]
 000004D1                         L127:	; bb16.split2
                                  ;     204 	arc.gm.target[arc.linear_axis] += arc.arc_segment_linear_travel;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",204
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",204
 000004D1 FBE2rrrrrrrr            		MOV.L #_arc, R14
 000004D7 59E14E                  		MOVU.B 4EH[R14], R1
 000004DA 6C21                    		SHLL #02H, R1
@@ -848,13 +848,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000004E4 A71A                    		MOV.L R2, 74H[R1]
 000004E6                         L128:	; bb16.split3
                                  ;     205 	mp_aline(&arc.gm);								// run the line
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",205
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",205
 000004E6 FB12rrrrrrrr            		MOV.L #_arc, R1
 000004EC 71116C                  		ADD #6CH, R1
 000004EF 05rrrrrr             A  		BSR _mp_aline
 000004F3                         L129:	; bb16.split4
                                  ;     206 	copy_vector(arc.position, arc.gm.target);		// update arc current position
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",206
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",206
 000004F3 FB12rrrrrrrr            		MOV.L #_arc, R1
 000004F9 711274                  		ADD #74H, R1, R2
 000004FC 6241                    		ADD #04H, R1
@@ -863,7 +863,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000503                         L130:	; bb16.split5
                                  ;     207 
                                  ;     208 	if (--arc.arc_segment_count > 0)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",208
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",208
 00000503 FB12rrrrrrrr            		MOV.L #_arc, R1
 00000509 AD92                    		MOV.L 58H[R1], R2
 0000050B 6012                    		SUB #01H, R2
@@ -872,22 +872,22 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000511 2Brr                    		BLE L132
 00000513                         L131:	; bb47
                                  ;     209         return (STAT_EAGAIN);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",209
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",209
 00000513 3C0202                  		MOV.B #02H, 02H[R0]
 00000516 2Err                 B  		BRA L134
 00000518                         L132:	; bb55
                                  ;     210 	arc.run_state = MOVE_OFF;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",210
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",210
 00000518 FB12rrrrrrrr            		MOV.L #_arc, R1
 0000051E 3C1200                  		MOV.B #00H, 02H[R1]
 00000521                         L133:	; bb55.split
                                  ;     211 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",211
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",211
 00000521 3C0200                  		MOV.B #00H, 02H[R0]
 00000524                         L134:	; bb57
 00000524 C5000203                		MOV.B 02H[R0], 03H[R0]
                                  ;     212 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",212
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",212
 00000528 B089                    		MOVU.B 03H[R0], R1
 0000052A 3F6804                  		RTSD #10H, R6-R8
 0000052D                         _cm_abort_arc:
@@ -902,7 +902,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     220 void cm_abort_arc()
                                  ;     221 {
                                  ;     222 	arc.run_state = MOVE_OFF;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",222
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",222
 0000052D FB12rrrrrrrr            		MOV.L #_arc, R1
 00000533 3C1200                  		MOV.B #00H, 02H[R1]
 00000536 02                      		RTS
@@ -929,13 +929,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     241  */
                                  ;     242 
                                  ;     243 static stat_t _compute_arc()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",243
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",243
 00000537 6E67                    		PUSHM R6-R7
 00000539 7100D8                  		ADD #0FFFFFFD8H, R0
                                  ;     244 {
                                  ;     245 	// Compute radius. A non-zero radius value indicates a radius arc
                                  ;     246     if (fp_NOT_ZERO(arc.radius)) {                  // indicates a radius arc
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",246
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",246
 0000053C FB12rrrrrrrr            		MOV.L #_arc, R1
 00000542 AB19                    		MOV.L 34H[R1], R1
 00000544 7BF1                    		BCLR #1FH, R1
@@ -944,13 +944,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000054F 26rr                    		BPZ L138
 00000551                         L137:	; bb8
                                  ;     247         _compute_arc_offsets_from_radius();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",247
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",247
 00000551 39rrrr               W  		BSR __$_compute_arc_offsets_from_radius
 00000554 2Err                 B  		BRA L139
 00000556                         L138:	; bb10
                                  ;     248     } else {                                        // compute start radius
                                  ;     249         arc.radius = hypotf(-arc.offset[arc.plane_axis_0], -arc.offset[arc.plane_axis_1]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",249
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",249
 00000556 FB62rrrrrrrr            		MOV.L #_arc, R6
 0000055C 596E4D                  		MOVU.B 4DH[R6], R14
 0000055F 596F4C                  		MOVU.B 4CH[R6], R15
@@ -972,7 +972,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     257 
                                  ;     258     // Compute end radius from the center of circle (offsets) to target endpoint
                                  ;     259     float end_0 = arc.gm.target[arc.plane_axis_0] - arc.position[arc.plane_axis_0] - arc.offset[arc.plane_axis_0];
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",259
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",259
 00000577 FB12rrrrrrrr            		MOV.L #_arc, R1
 0000057D 591E4C                  		MOVU.B 4CH[R1], R14
 00000580 6C2E                    		SHLL #02H, R14
@@ -983,7 +983,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000058E A082                    		MOV.L R2, 08H[R0]
 00000590                         L140:	; bb26.split
                                  ;     260     float end_1 = arc.gm.target[arc.plane_axis_1] - arc.position[arc.plane_axis_1] - arc.offset[arc.plane_axis_1];
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",260
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",260
 00000590 FB12rrrrrrrr            		MOV.L #_arc, R1
 00000596 591E4D                  		MOVU.B 4DH[R1], R14
 00000599 6C2E                    		SHLL #02H, R14
@@ -994,7 +994,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000005A7 A08A                    		MOV.L R2, 0CH[R0]
 000005A9                         L141:	; bb26.split1
                                  ;     261     float err = fabs(hypotf(end_0, end_1) - arc.radius);   // end radius - start radius
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",261
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",261
 000005A9 A88A                    		MOV.L 0CH[R0], R2
 000005AB A881                    		MOV.L 08H[R0], R1
 000005AD 05rrrrrr             A  		BSR _hypotf
@@ -1005,7 +1005,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000005BF                         L142:	; bb26.split2
 000005BF FBE20000803F            		MOV.L #3F800000H, R14
                                  ;     262     if ( (err > ARC_RADIUS_ERROR_MAX) ||
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",262
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",262
 000005C5 FC850E04                		FCMP 10H[R0].L, R14
 000005C9 27rr                    		BN L149
 000005CB 08                   S  		BRA L144
@@ -1013,7 +1013,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     263         ((err > ARC_RADIUS_ERROR_MIN) && (err > arc.radius * ARC_RADIUS_TOLERANCE)) ) {
                                  ;     264 //        return (STAT_ARC_HAS_IMPOSSIBLE_CENTER_POINT);
                                  ;     265         return (STAT_ARC_SPECIFICATION_ERROR);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",265
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",265
 000005CC 3C079B                  		MOV.B #9BH, 07H[R0]
 000005CF 38rrrr               W  		BRA L194
 000005D2                         L144:	; bb67
@@ -1050,7 +1050,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     268 	// Calculate the theta (angle) of the current point (position)
                                  ;     269 	// arc.theta is angular starting point for the arc (also needed later for calculating center point)
                                  ;     270     arc.theta = atan2(-arc.offset[arc.plane_axis_0], -arc.offset[arc.plane_axis_1]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",270
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",270
 0000060C FB62rrrrrrrr            		MOV.L #_arc, R6
 00000612 596E4D                  		MOVU.B 4DH[R6], R14
 00000615 596F4C                  		MOVU.B 4CH[R6], R15
@@ -1065,7 +1065,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     271 
                                  ;     272     // g18_correction is used to invert G18 XZ plane arcs for proper CW orientation
                                  ;     273     float g18_correction = (cm.gm.select_plane == CANON_PLANE_XZ) ? -1 : 1;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",273
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",273
 0000062D FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000633 5AEEA102                		MOVU.B 02A1H[R14], R14
 00000637 611E                    		CMP #01H, R14
@@ -1080,19 +1080,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000645 A109                    		MOV.L R1, 14H[R0]
                                  ;     274 
                                  ;     275 	if (arc.full_circle) {                                  // if full circle you can skip the stuff in the else clause
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",275
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",275
 00000647 FBE2rrrrrrrr            		MOV.L #_arc, R14
 0000064D 59EE44                  		MOVU.B 44H[R14], R14
 00000650 610E                    		CMP #00H, R14
 00000652 20rr                    		BEQ L163
 00000654                         L157:	; bb113
                                  ;     276     	arc.angular_travel = 0;                             // angular travel always starts as zero for full circles
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",276
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",276
 00000654 FB12rrrrrrrr            		MOV.L #_arc, R1
 0000065A 3E1E00                  		MOV.L #00000000H, 38H[R1]
 0000065D                         L158:	; bb113.split
                                  ;     277     	if (fp_ZERO(arc.rotations)) {                       // handle the valid case of a full circle arc w/P=0
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",277
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",277
 0000065D FB12rrrrrrrr            		MOV.L #_arc, R1
 00000663 AC91                    		MOV.L 48H[R1], R1
 00000665 7DF1                    		BTST #1FH, R1
@@ -1113,7 +1113,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
          38rrrr                  
 00000688                         L162:	; bb115
                                  ;     278             arc.rotations = 1.0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",278
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",278
 00000688 FB12rrrrrrrr            		MOV.L #_arc, R1
 0000068E 3E9201                  		MOV.L #00000001H, 48H[R1]
 00000691 38rrrr               W  		BRA L171
@@ -1121,7 +1121,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     279         }
                                  ;     280     } else {                                                // ... it's not a full circle
                                  ;     281         arc.theta_end = atan2(end_0, end_1);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",281
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",281
 00000694 A88A                    		MOV.L 0CH[R0], R2
 00000696 A881                    		MOV.L 08H[R0], R1
 00000698 05rrrrrr             A  		BSR _atan2
@@ -1131,7 +1131,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     282 
                                  ;     283         // Compute the angular travel
                                  ;     284         if (fp_EQ(arc.theta_end, arc.theta)) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",284
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",284
 000006A4 FB12rrrrrrrr            		MOV.L #_arc, R1
 000006AA AB12                    		MOV.L 30H[R1], R2
 000006AC FC81120B                		FSUB 2CH[R1].L, R2
@@ -1140,21 +1140,21 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006B9 26rr                    		BPZ L166
 000006BB                         L165:	; bb128
                                  ;     285 	        arc.angular_travel = 0;                         // very large radii arcs can have zero angular travel (thanks PartKam)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",285
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",285
 000006BB FB12rrrrrrrr            		MOV.L #_arc, R1
 000006C1 3E1E00                  		MOV.L #00000000H, 38H[R1]
 000006C4 2Err                 B  		BRA L171
 000006C6                         L166:	; bb130
                                  ;     286         } else {
                                  ;     287 	        if (arc.theta_end < arc.theta) {                // make the difference positive so we have clockwise travel
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",287
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",287
 000006C6 FB12rrrrrrrr            		MOV.L #_arc, R1
 000006CC AB12                    		MOV.L 30H[R1], R2
 000006CE FC85120B                		FCMP 2CH[R1].L, R2
 000006D2 26rr                    		BPZ L168
 000006D4                         L167:	; bb131
                                  ;     288                 arc.theta_end += (2*M_PI * g18_correction);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",288
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",288
 000006D4 A909                    		MOV.L 14H[R0], R1
 000006D6 FD7231DB0FC940          		FMUL #40C90FDBH, R1
 000006DD FB22rrrrrrrr            		MOV.L #_arc, R2
@@ -1163,21 +1163,21 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006E9                         L168:	; bb141
                                  ;     289             }
                                  ;     290 	        arc.angular_travel = arc.theta_end - arc.theta; // compute positive angular travel
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",290
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",290
 000006E9 FB12rrrrrrrr            		MOV.L #_arc, R1
 000006EF AB12                    		MOV.L 30H[R1], R2
 000006F1 FC81120B                		FSUB 2CH[R1].L, R2
 000006F5 A392                    		MOV.L R2, 38H[R1]
 000006F7                         L169:	; bb141.split
                                  ;     291     	    if (cm.gm.motion_mode == MOTION_MODE_CCW_ARC) { // reverse travel direction if it's CCW arc
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",291
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",291
 000006F7 FBE2rrrrrrrr            		MOV.L #_cm, R14
 000006FD 5AEE5802                		MOVU.B 0258H[R14], R14
 00000701 613E                    		CMP #03H, R14
 00000703 21rr                    		BNE L171
 00000705                         L170:	; bb146
                                  ;     292                 arc.angular_travel -= (2*M_PI * g18_correction);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",292
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",292
 00000705 A909                    		MOV.L 14H[R0], R1
 00000707 FD7231DB0FC9C0          		FMUL #0C0C90FDBH, R1
 0000070E FB22rrrrrrrr            		MOV.L #_arc, R2
@@ -1190,7 +1190,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     296 
                                  ;     297     // Add in travel for rotations
                                  ;     298     if (cm.gm.motion_mode == MOTION_MODE_CW_ARC) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",298
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",298
 0000071A FB12rrrrrrrr            		MOV.L #_arc, R1
 00000720 AC92                    		MOV.L 48H[R1], R2
 00000722 7DF2                    		BTST #1FH, R2
@@ -1214,7 +1214,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000750 21rr                    		BNE L176
 00000752                         L175:	; bb172
                                  ;     299         arc.angular_travel += (2*M_PI * arc.rotations * g18_correction);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",299
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",299
 00000752 FC8BE1                  		FADD R14, R1
 00000755 FBE2rrrrrrrr            		MOV.L #_arc, R14
 0000075B E7E10E                  		MOV.L R1, 38H[R14]
@@ -1222,7 +1222,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000760                         L176:	; bb180
                                  ;     300     } else {
                                  ;     301         arc.angular_travel -= (2*M_PI * arc.rotations * g18_correction);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",301
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",301
 00000760 FC83E1                  		FSUB R14, R1
 00000763 FB22rrrrrrrr            		MOV.L #_arc, R2
 00000769 A3A1                    		MOV.L R1, 38H[R2]
@@ -1232,7 +1232,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     304 	// Calculate travel in the depth axis of the helix and compute the time it should take to perform the move
                                  ;     305 	// arc.length is the total mm of travel of the helix (or just a planar arc)
                                  ;     306 	arc.linear_travel = arc.gm.target[arc.linear_axis] - arc.position[arc.linear_axis];
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",306
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",306
 0000076B FB12rrrrrrrr            		MOV.L #_arc, R1
 00000771 59124E                  		MOVU.B 4EH[R1], R2
 00000774 6C22                    		SHLL #02H, R2
@@ -1242,14 +1242,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000077E A39B                    		MOV.L R3, 3CH[R1]
 00000780                         L178:	; bb193.split
                                  ;     307 	arc.planar_travel = arc.angular_travel * arc.radius;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",307
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",307
 00000780 FB12rrrrrrrr            		MOV.L #_arc, R1
 00000786 AB92                    		MOV.L 38H[R1], R2
 00000788 FC8D120D                		FMUL 34H[R1].L, R2
 0000078C A412                    		MOV.L R2, 40H[R1]
 0000078E                         L179:	; bb193.split3
                                  ;     308 	arc.length = hypotf(arc.planar_travel, arc.linear_travel);  // NB: hypot is insensitive to +/- signs
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",308
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",308
 0000078E FB62rrrrrrrr            		MOV.L #_arc, R6
 00000794 ABEA                    		MOV.L 3CH[R6], R2
 00000796 AC61                    		MOV.L 40H[R6], R1
@@ -1257,13 +1257,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000079C A2E1                    		MOV.L R1, 28H[R6]
 0000079E                         L180:	; bb193.split4
                                  ;     309 	_estimate_arc_time();	// get an estimate of execution time to inform arc_segment calculation
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",309
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",309
 0000079E 39rrrr               W  		BSR __$_estimate_arc_time
 000007A1                         L181:	; bb193.split5
                                  ;     310 
                                  ;     311 	// Find the minimum number of arc_segments that meets these constraints...
                                  ;     312 	float arc_segments_for_chordal_accuracy = arc.length / sqrt(4*cm.chordal_tolerance * (2 * arc.radius - cm.chordal_tolerance));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",312
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",312
 000007A1 FB12rrrrrrrr            		MOV.L #_cm, R1
 000007A7 A891                    		MOV.L 08H[R1], R1
 000007A9 FB22rrrrrrrr            		MOV.L #_arc, R2
@@ -1278,7 +1278,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000007CA A186                    		MOV.L R6, 18H[R0]
 000007CC                         L182:	; bb193.split6
                                  ;     313 	float arc_segments_for_minimum_distance = arc.length / cm.arc_segment_len;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",313
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",313
 000007CC FB12rrrrrrrr            		MOV.L #_arc, R1
 000007D2 AA91                    		MOV.L 28H[R1], R1
 000007D4 FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1286,7 +1286,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000007DE A189                    		MOV.L R1, 1CH[R0]
 000007E0                         L183:	; bb193.split7
                                  ;     314 	float arc_segments_for_minimum_time = arc.arc_time * MICROSECONDS_PER_MINUTE / MIN_ARC_SEGMENT_USEC;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",314
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",314
 000007E0 FB12rrrrrrrr            		MOV.L #_arc, R1
 000007E6 AD11                    		MOV.L 50H[R1], R1
 000007E8 FD7231C0E1644C          		FMUL #4C64E1C0H, R1
@@ -1295,7 +1295,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000007F8                         L184:	; bb193.split8
                                  ;     315 
                                  ;     316 	arc.arc_segments = floor(min3(arc_segments_for_chordal_accuracy,
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",316
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",316
 000007F8 AA03                    		MOV.L 20H[R0], R3
 000007FA A98A                    		MOV.L 1CH[R0], R2
 000007FC A981                    		MOV.L 18H[R0], R1
@@ -1308,7 +1308,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     318 							      arc_segments_for_minimum_time));
                                  ;     319 
                                  ;     320 	arc.arc_segments = fmaxf(arc.arc_segments, 1);            //...but is at least 1 arc_segment
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",320
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",320
 0000080E FB62rrrrrrrr            		MOV.L #_arc, R6
 00000814 AD69                    		MOV.L 54H[R6], R1
 00000816 FB220000803F            		MOV.L #3F800000H, R2
@@ -1316,34 +1316,34 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000820 A569                    		MOV.L R1, 54H[R6]
 00000822                         L186:	; bb193.split10
                                  ;     321  	arc.gm.move_time = arc.arc_time / arc.arc_segments;     // gcode state struct gets arc_segment_time, not arc time
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",321
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",321
 00000822 FB12rrrrrrrr            		MOV.L #_arc, R1
 00000828 AD12                    		MOV.L 50H[R1], R2
 0000082A FC911215                		FDIV 54H[R1].L, R2
 0000082E E71229                  		MOV.L R2, 0A4H[R1]
 00000831                         L187:	; bb193.split11
                                  ;     322 	arc.arc_segment_count = (int32_t)arc.arc_segments;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",322
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",322
 00000831 FB12rrrrrrrr            		MOV.L #_arc, R1
 00000837 FC951215                		FTOI 54H[R1].L, R2
 0000083B A592                    		MOV.L R2, 58H[R1]
 0000083D                         L188:	; bb193.split12
                                  ;     323 	arc.arc_segment_theta = arc.angular_travel / arc.arc_segments;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",323
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",323
 0000083D FB12rrrrrrrr            		MOV.L #_arc, R1
 00000843 AB92                    		MOV.L 38H[R1], R2
 00000845 FC911215                		FDIV 54H[R1].L, R2
 00000849 A59A                    		MOV.L R2, 5CH[R1]
 0000084B                         L189:	; bb193.split13
                                  ;     324 	arc.arc_segment_linear_travel = arc.linear_travel / arc.arc_segments;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",324
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",324
 0000084B FB12rrrrrrrr            		MOV.L #_arc, R1
 00000851 AB9A                    		MOV.L 3CH[R1], R2
 00000853 FC911215                		FDIV 54H[R1].L, R2
 00000857 A612                    		MOV.L R2, 60H[R1]
 00000859                         L190:	; bb193.split14
                                  ;     325     arc.center_0 = arc.position[arc.plane_axis_0] - sin(arc.theta) * arc.radius;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",325
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",325
 00000859 FB62rrrrrrrr            		MOV.L #_arc, R6
 0000085F 59624C                  		MOVU.B 4CH[R6], R2
 00000862 6C22                    		SHLL #02H, R2
@@ -1356,7 +1356,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000875 A66F                    		MOV.L R7, 64H[R6]
 00000877                         L191:	; bb193.split15
                                  ;     326     arc.center_1 = arc.position[arc.plane_axis_1] - cos(arc.theta) * arc.radius;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",326
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",326
 00000877 FB62rrrrrrrr            		MOV.L #_arc, R6
 0000087D 59624D                  		MOVU.B 4DH[R6], R2
 00000880 6C22                    		SHLL #02H, R2
@@ -1369,7 +1369,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000893 A6E7                    		MOV.L R7, 68H[R6]
 00000895                         L192:	; bb193.split16
                                  ;     327 	arc.gm.target[arc.linear_axis] = arc.position[arc.linear_axis];	// initialize the linear target
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",327
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",327
 00000895 FBE2rrrrrrrr            		MOV.L #_arc, R14
 0000089B 59EF4E                  		MOVU.B 4EH[R14], R15
 0000089E 6C2F                    		SHLL #02H, R15
@@ -1377,12 +1377,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000008A2 E5EE011D                		MOV.L 04H[R14], 74H[R14]
 000008A6                         L193:	; bb193.split17
                                  ;     328 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",328
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",328
 000008A6 3C0700                  		MOV.B #00H, 07H[R0]
 000008A9                         L194:	; bb269
 000008A9 C5000727                		MOV.B 07H[R0], 27H[R0]
                                  ;     329 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",329
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",329
 000008AD 590127                  		MOVU.B 27H[R0], R1
 000008B0 3F670C                  		RTSD #30H, R6-R7
 000008B3                         __$_compute_arc_offsets_from_radius:
@@ -1464,13 +1464,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     404  *	Parts of this routine were originally sourced from the grbl project.
                                  ;     405  */
                                  ;     406 static stat_t _compute_arc_offsets_from_radius()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",406
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",406
 000008B3 7EA6                    		PUSH.L R6
 000008B5 7100E8                  		ADD #0FFFFFFE8H, R0
                                  ;     407 {
                                  ;     408 	// Calculate the change in position along each selected axis
                                  ;     409 	float x = cm.gm.target[arc.plane_axis_0] - cm.gmx.position[arc.plane_axis_0];
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",409
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",409
 000008B8 FBE2rrrrrrrr            		MOV.L #_arc, R14
 000008BE 59EE4C                  		MOVU.B 4CH[R14], R14
 000008C1 6C2E                    		SHLL #02H, R14
@@ -1481,7 +1481,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000008D2 A009                    		MOV.L R1, 04H[R0]
 000008D4                         L196:	; entry.split
                                  ;     410 	float y = cm.gm.target[arc.plane_axis_1] - cm.gmx.position[arc.plane_axis_1];
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",410
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",410
 000008D4 FBE2rrrrrrrr            		MOV.L #_arc, R14
 000008DA 59EE4D                  		MOVU.B 4DH[R14], R14
 000008DD 6C2E                    		SHLL #02H, R14
@@ -1503,7 +1503,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     420 	// but ensures that all valid arcs end up reasonably close to their intended
                                  ;     421 	// paths regardless of any numerical issues.
                                  ;     422 	float disc = 4 * square(arc.radius) - (square(x) + square(y));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",422
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",422
 000008F0 A809                    		MOV.L 04H[R0], R1
 000008F2 FC8F11                  		FMUL R1, R1
 000008F5 A882                    		MOV.L 08H[R0], R2
@@ -1520,7 +1520,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     423 
                                  ;     424 	// h_x2_div_d == -(h * 2 / d)
                                  ;     425 	float h_x2_div_d = (disc > 0) ? -sqrt(disc) / hypotf(x,y) : 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",425
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",425
 00000916 FC850E03                		FCMP 0CH[R0].L, R14
 0000091A 26rr                    		BPZ L200
 0000091C                         L199:	; bb
@@ -1541,7 +1541,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     426 
                                  ;     427 	// Invert the sign of h_x2_div_d if circle is counter clockwise (see header notes)
                                  ;     428 	if (cm.gm.motion_mode == MOTION_MODE_CCW_ARC) { h_x2_div_d = -h_x2_div_d;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",428
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",428
 0000093B FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000941 5AEE5802                		MOVU.B 0258H[R14], R14
 00000945 613E                    		CMP #03H, R14
@@ -1558,7 +1558,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     433 	// h_x2_div_d the center of the circles is placed on the opposite side of
                                  ;     434 	// the line of travel and thus we get the unadvisably long arcs as prescribed.
                                  ;     435 	if (arc.radius < 0) { h_x2_div_d = -h_x2_div_d; }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",435
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",435
 0000094F FB12rrrrrrrr            		MOV.L #_arc, R1
 00000955 AB19                    		MOV.L 34H[R1], R1
 00000957 FD721100000000          		FCMP #00000000H, R1
@@ -1571,7 +1571,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     436 
                                  ;     437 	// Complete the operation by calculating the actual center of the arc
                                  ;     438 	arc.offset[arc.plane_axis_0] = (x-(y*h_x2_div_d))/2;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",438
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",438
 00000967 FB12rrrrrrrr            		MOV.L #_arc, R1
 0000096D 591E4C                  		MOVU.B 4CH[R1], R14
 00000970 6C2E                    		SHLL #02H, R14
@@ -1584,7 +1584,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000986 A19B                    		MOV.L R3, 1CH[R1]
 00000988                         L206:	; bb66.split
                                  ;     439 	arc.offset[arc.plane_axis_1] = (y+(x*h_x2_div_d))/2;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",439
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",439
 00000988 FB12rrrrrrrr            		MOV.L #_arc, R1
 0000098E 591E4D                  		MOVU.B 4DH[R1], R14
 00000991 6C2E                    		SHLL #02H, R14
@@ -1596,7 +1596,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000009A6 A19A                    		MOV.L R2, 1CH[R1]
 000009A8                         L207:	; bb66.split3
                                  ;     440 	arc.offset[arc.linear_axis] = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",440
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",440
 000009A8 FB12rrrrrrrr            		MOV.L #_arc, R1
 000009AE 591E4E                  		MOVU.B 4EH[R1], R14
 000009B1 6C2E                    		SHLL #02H, R14
@@ -1604,12 +1604,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000009B5 3E1700                  		MOV.L #00000000H, 1CH[R1]
 000009B8                         L208:	; bb66.split4
                                  ;     441 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",441
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",441
 000009B8 3C8700                  		MOV.B #00H, 17H[R0]
 000009BB B589                    		MOVU.B 17H[R0], R1
 000009BD                         L209:	; bb66.split5
                                  ;     442 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",442
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",442
 000009BD 5B11                    		MOVU.B R1, R1
 000009BF 3F6607                  		RTSD #1CH, R6-R6
 000009C2                         __$_estimate_arc_time:
@@ -1626,37 +1626,37 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     452  *	with the result that the time returned may be less than optimal.
                                  ;     453  */
                                  ;     454 static void _estimate_arc_time ()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",454
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",454
 000009C2 7EA6                    		PUSH.L R6
                                  ;     455 {
                                  ;     456 	// Determine move time at requested feed rate
                                  ;     457 	if (cm.gm.feed_rate_mode == INVERSE_TIME_MODE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",457
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",457
 000009C4 FBE2rrrrrrrr            		MOV.L #_cm, R14
 000009CA 5AEEA002                		MOVU.B 02A0H[R14], R14
 000009CE 610E                    		CMP #00H, R14
 000009D0 21rr                    		BNE L214
 000009D2                         L211:	; bb1
                                  ;     458 		arc.arc_time = cm.gm.feed_rate;	                // inverse feed rate has been normalized to minutes
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",458
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",458
 000009D2 FBE2rrrrrrrr            		MOV.L #_arc, R14
 000009D8 FBF2rrrrrrrr            		MOV.L #_cm, R15
 000009DE E5FEA514                		MOV.L 0294H[R15], 50H[R14]
 000009E2                         L212:	; bb1.split
                                  ;     459 		cm.gm.feed_rate = 0;                            // reset feed rate so next block requires an explicit feed rate setting
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",459
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",459
 000009E2 FBE2rrrrrrrr            		MOV.L #_cm, R14
 000009E8 F9E6A500                		MOV.L #00000000H, 0294H[R14]
 000009EC                         L213:	; bb1.split1
                                  ;     460 		cm.gm.feed_rate_mode = UNITS_PER_MINUTE_MODE;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",460
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",460
 000009EC FBE2rrrrrrrr            		MOV.L #_cm, R14
 000009F2 FAE4A00201              		MOV.B #01H, 02A0H[R14]
 000009F7 2Err                 B  		BRA L215
 000009F9                         L214:	; bb2
                                  ;     461 	} else {
                                  ;     462 		arc.arc_time = arc.length / cm.gm.feed_rate;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",462
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",462
 000009F9 FB12rrrrrrrr            		MOV.L #_arc, R1
 000009FF AA92                    		MOV.L 28H[R1], R2
 00000A01 FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1667,7 +1667,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     464 
                                  ;     465 	// Downgrade the time if there is a rate-limiting axis
                                  ;     466 	arc.arc_time = fmaxf(arc.arc_time, arc.planar_travel/cm.a[arc.plane_axis_0].feedrate_max);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",466
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",466
 00000A0D FB62rrrrrrrr            		MOV.L #_arc, R6
 00000A13 596E4C                  		MOVU.B 4CH[R6], R14
 00000A16 751E38                  		MUL #38H, R14
@@ -1680,7 +1680,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A2D A561                    		MOV.L R1, 50H[R6]
 00000A2F                         L216:	; bb10.split
                                  ;     467 	arc.arc_time = fmaxf(arc.arc_time, arc.planar_travel/cm.a[arc.plane_axis_1].feedrate_max);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",467
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",467
 00000A2F FB62rrrrrrrr            		MOV.L #_arc, R6
 00000A35 596E4D                  		MOVU.B 4DH[R6], R14
 00000A38 751E38                  		MUL #38H, R14
@@ -1693,7 +1693,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A4F A561                    		MOV.L R1, 50H[R6]
 00000A51                         L217:	; bb10.split2
                                  ;     468 	if (fabs(arc.linear_travel) > 0) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",468
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",468
 00000A51 FB12rrrrrrrr            		MOV.L #_arc, R1
 00000A57 AB99                    		MOV.L 3CH[R1], R1
 00000A59 7BF1                    		BCLR #1FH, R1
@@ -1702,7 +1702,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A60 26rr                    		BPZ L219
 00000A62                         L218:	; bb30
                                  ;     469 		arc.arc_time = fmaxf(arc.arc_time, fabs(arc.linear_travel/cm.a[arc.linear_axis].feedrate_max));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",469
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",469
 00000A62 FB62rrrrrrrr            		MOV.L #_arc, R6
 00000A68 596E4E                  		MOVU.B 4EH[R6], R14
 00000A6B 751E38                  		MUL #38H, R14
@@ -1718,7 +1718,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A89                         L219:	; return
                                  ;     470 	}
                                  ;     471 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_arc.c",471
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_arc.c",471
 00000A89 3F6601                  		RTSD #04H, R6-R6
                                  ;     472 
                                  ;     473 /*
@@ -1831,7 +1831,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx7E87\$ccrx\plan_arc.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\plan_arc.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -1840,5 +1840,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\plan_arc.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\cnc\plan_arc.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\plan_arc.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\src\cnc\plan_arc.obj

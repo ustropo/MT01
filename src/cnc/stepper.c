@@ -741,7 +741,18 @@ void timer_dwell_callback(void *pdata)
 		MOTOR1_DIR = MOTOR_REVERSE;
 	}
 	if(zmove != 0){
-		step += Z_STEP_PULSE;
+		switch (g_maq.model)
+		{
+			case EASYMAK_MAQ:
+				step += Z_STEP_PULSE_EM;
+			break;
+			case COMPACTA_MAQ:
+				step += Z_STEP_PULSE_CP;
+			break;
+			case MOBILE_MAQ:
+				step += Z_STEP_PULSE_MB;
+			break;
+		}
 		MOTOR1_STEP = !MOTOR1_STEP;		// turn step bit on
 	}
 

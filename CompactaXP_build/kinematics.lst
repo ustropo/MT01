@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:08 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:18:38 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:08
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:18:37
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=kinematics.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=kinematics.lst
@@ -85,7 +85,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      50  */
                                  ;      51 
                                  ;      52 void ik_kinematics(const float travel[], float steps[])
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\kinematics.c",52
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\kinematics.c",52
 00000000 7100DC                  		ADD #0FFFFFFDCH, R0
 00000003 A201                    		MOV.L R1, 20H[R0]
 00000005 A18A                    		MOV.L R2, 1CH[R0]
@@ -96,7 +96,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      55 
                                  ;      56 //	_inverse_kinematics(travel, joint);				// you can insert inverse kinematics transformations here
                                  ;      57 	memcpy(joint, travel, sizeof(float)*AXES);		//...or just do a memcpy for Cartesian machines
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\kinematics.c",57
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\kinematics.c",57
 0000000C AA02                    		MOV.L 20H[R0], R2
 0000000E 7F8F                    		SMOVF
 00000010                         L11:	; entry.split
@@ -105,12 +105,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      60 	// Most of the conversion math has already been done in during config in steps_per_unit()
                                  ;      61 	// which takes axis travel, step angle and microsteps into account.
                                  ;      62 	for (uint8_t axis=0; axis<AXES; axis++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\kinematics.c",62
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\kinematics.c",62
 00000010 3C8B00                  		MOV.B #00H, 1BH[R0]
 00000013 38rrrr               W  		BRA L23
 00000016                         L12:	; bb8
                                  ;      63 		if (cm.a[axis].axis_mode == AXIS_INHIBITED) { joint[axis] = 0;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\kinematics.c",63
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\kinematics.c",63
 00000016 B689                    		MOVU.B 1BH[R0], R1
 00000018 751138                  		MUL #38H, R1
 0000001B FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -125,7 +125,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000002F FE21EF                  		MOV.L R15, [R1,R14]
 00000032                         L14:	; bb23
                                  ;      64 		if (st_cfg.mot[MOTOR_1].motor_map == axis) { steps[MOTOR_1] = joint[axis] * st_cfg.mot[MOTOR_1].steps_per_unit;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\kinematics.c",64
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\kinematics.c",64
 00000032 FB12rrrrrrrr            		MOV.L #_st_cfg, R1
 00000038 B111                    		MOVU.B 04H[R1], R1
 0000003A 45011B                  		CMP 1BH[R0].UB, R1
@@ -140,7 +140,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000052 E31E                    		MOV.L R14, [R1]
 00000054                         L16:	; bb42
                                  ;      65 		if (st_cfg.mot[MOTOR_2].motor_map == axis) { steps[MOTOR_2] = joint[axis] * st_cfg.mot[MOTOR_2].steps_per_unit;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\kinematics.c",65
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\kinematics.c",65
 00000054 FBE2rrrrrrrr            		MOV.L #_st_cfg, R14
 0000005A 59EE28                  		MOVU.B 28H[R14], R14
 0000005D 450E1B                  		CMP 1BH[R0].UB, R14
@@ -155,7 +155,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000075 A029                    		MOV.L R1, 04H[R2]
 00000077                         L18:	; bb61
                                  ;      66 		if (st_cfg.mot[MOTOR_3].motor_map == axis) { steps[MOTOR_3] = joint[axis] * st_cfg.mot[MOTOR_3].steps_per_unit;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\kinematics.c",66
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\kinematics.c",66
 00000077 FBE2rrrrrrrr            		MOV.L #_st_cfg, R14
 0000007D 59EE4C                  		MOVU.B 4CH[R14], R14
 00000080 450E1B                  		CMP 1BH[R0].UB, R14
@@ -170,7 +170,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000098 A0A1                    		MOV.L R1, 08H[R2]
 0000009A                         L20:	; bb80
                                  ;      67 		if (st_cfg.mot[MOTOR_4].motor_map == axis) { steps[MOTOR_4] = joint[axis] * st_cfg.mot[MOTOR_4].steps_per_unit;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\kinematics.c",67
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\kinematics.c",67
 0000009A FBE2rrrrrrrr            		MOV.L #_st_cfg, R14
 000000A0 59EE70                  		MOVU.B 70H[R14], R14
 000000A3 450E1B                  		CMP 1BH[R0].UB, R14
@@ -188,7 +188,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000BF 6211                    		ADD #01H, R1
 000000C1 8689                    		MOV.B R1, 1BH[R0]
 000000C3                         L23:	; bb101
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\kinematics.c",62
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\kinematics.c",62
 000000C3 B689                    		MOVU.B 1BH[R0], R1
 000000C5 6161                    		CMP #06H, R1
 000000C7 28rr                  * 		BLT L12
@@ -212,7 +212,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      83 	}
                                  ;      84 */
                                  ;      85 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\kinematics.c",85
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\kinematics.c",85
 000000CC 6709                    		RTSD #24H
                                  ;      86 
                                  ;      87 /*
@@ -257,7 +257,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx12DB\$ccrx\kinematics.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx305E\$ccrx\kinematics.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -266,5 +266,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\kinematics.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\cnc\kinematics.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\kinematics.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\src\cnc\kinematics.obj

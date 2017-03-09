@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:37 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:19:12 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:37
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:19:12
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=r_fl_downloader.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=r_fl_downloader.lst
@@ -124,177 +124,169 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      59 #include <string.h>
                                  ;      60 #include <stdio.h>
                                  ;      61 
-                                 ;      62 #if (EASYMAK == 1)
-                                 ;      63 const char proj_name[] = "MT01_proj.bin";
-                                 ;      64 const char proj_programmed[] = "MT01_done.bin";
-                                 ;      65 #elif (COMPACTAXP  == 1)
-                                 ;      66 const char proj_name[] = "CompactaXP_proj.bin";
-                                 ;      67 const char proj_programmed[] = "CompactaXP_done.bin";
-                                 ;      68 #elif (MOBILE  == 1)
-                                 ;      69 const char proj_name[] = "Mobile_proj.bin";
-                                 ;      70 const char proj_programmed[] = "Mobile_done.bin";
-                                 ;      71 #endif
-                                 ;      72 
-                                 ;      73 #define CRC_ADDRESS (((uint32_t)__sectop("APPHEADER_1"))-0xFFF00000)
-                                 ;      74 extern bool drivemountFlag;
-                                 ;      75 FATFS media;
-                                 ;      76 FIL file;
-                                 ;      77 const fl_image_header_t *g_app_header;
-                                 ;      78 
-                                 ;      79 /******************************************************************************
-                                 ;      80 Exported global variables (to be accessed by other files)
-                                 ;      81 ******************************************************************************/
-                                 ;      82 /* Declares transmit and receive buffers.  The receive buffer
-                                 ;      83    is for commuincations to the host as well as when reading
-                                 ;      84    the external memory.  This is done to save space. */
-                                 ;      85 uint8_t g_fl_tx_buffer[5]; 
-                                 ;      86 uint8_t g_fl_rx_buffer[FL_CFG_DATA_BLOCK_MAX_BYTES];
-                                 ;      87 
-                                 ;      88 /* Data structure to hold load image headers */
-                                 ;      89 fl_image_header_t   g_fl_load_image_headers[FL_CFG_MEM_NUM_LOAD_IMAGES];
-                                 ;      90 static const char* gszbootMsg[MAX_ROW] =
-                                 ;      91 {
-                                 ;      92 		/* "12345678901234567890" */
-                                 ;      93 		   "    DETECTADO NOVO  ",
-                                 ;      94 		   "       FIRMWARE     ",
-                                 ;      95 		   "                    ",
-                                 ;      96 		   "                    ",
-                                 ;      97 		   " ENTER: CONTINUA    ",
-                                 ;      98 		   " ESC  : PULA        ",
-                                 ;      99 };
-                                 ;     100 
-                                 ;     101 static const char* gszCarMsg[17] =
-                                 ;     102 {
-                                 ;     103 		/* "12345678901234567890" */
-                                 ;     104 		   "CARREGANDO\n[                ]\n",
-                                 ;     105 		   "CARREGANDO\n[*               ]\n",
-                                 ;     106 		   "CARREGANDO\n[**              ]\n",
-                                 ;     107 		   "CARREGANDO\n[***             ]\n",
-                                 ;     108 		   "CARREGANDO\n[****            ]\n",
-                                 ;     109 		   "CARREGANDO\n[*****           ]\n",
-                                 ;     110 		   "CARREGANDO\n[******          ]\n",
-                                 ;     111 		   "CARREGANDO\n[*******         ]\n",
-                                 ;     112 		   "CARREGANDO\n[********        ]\n",
-                                 ;     113 		   "CARREGANDO\n[*********       ]\n",
-                                 ;     114 		   "CARREGANDO\n[**********      ]\n",
-                                 ;     115 		   "CARREGANDO\n[***********     ]\n",
-                                 ;     116 		   "CARREGANDO\n[************    ]\n",
-                                 ;     117 		   "CARREGANDO\n[*************   ]\n",
-                                 ;     118 		   "CARREGANDO\n[**************  ]\n",
-                                 ;     119 		   "CARREGANDO\n[*************** ]\n",
-                                 ;     120 		   "CARREGANDO\n[****************]\n",
-                                 ;     121 };
-                                 ;     122 
-                                 ;     123 
-                                 ;     124 char StrBoot[MAX_COLUMN];
+                                 ;      62 const char proj_name[] = "MT01_proj.bin";
+                                 ;      63 const char proj_programmed[] = "MT01_done.bin";
+                                 ;      64 
+                                 ;      65 #define CRC_ADDRESS (((uint32_t)__sectop("APPHEADER_1"))-0xFFF00000)
+                                 ;      66 extern bool drivemountFlag;
+                                 ;      67 FATFS media;
+                                 ;      68 FIL file;
+                                 ;      69 const fl_image_header_t *g_app_header;
+                                 ;      70 
+                                 ;      71 /******************************************************************************
+                                 ;      72 Exported global variables (to be accessed by other files)
+                                 ;      73 ******************************************************************************/
+                                 ;      74 /* Declares transmit and receive buffers.  The receive buffer
+                                 ;      75    is for commuincations to the host as well as when reading
+                                 ;      76    the external memory.  This is done to save space. */
+                                 ;      77 uint8_t g_fl_tx_buffer[5]; 
+                                 ;      78 uint8_t g_fl_rx_buffer[FL_CFG_DATA_BLOCK_MAX_BYTES];
+                                 ;      79 
+                                 ;      80 /* Data structure to hold load image headers */
+                                 ;      81 fl_image_header_t   g_fl_load_image_headers[FL_CFG_MEM_NUM_LOAD_IMAGES];
+                                 ;      82 static const char* gszbootMsg[MAX_ROW] =
+                                 ;      83 {
+                                 ;      84 		/* "12345678901234567890" */
+                                 ;      85 		   "    DETECTADO NOVO  ",
+                                 ;      86 		   "       FIRMWARE     ",
+                                 ;      87 		   "                    ",
+                                 ;      88 		   "                    ",
+                                 ;      89 		   " ENTER: CONTINUA    ",
+                                 ;      90 		   " ESC  : PULA        ",
+                                 ;      91 };
+                                 ;      92 
+                                 ;      93 static const char* gszCarMsg[17] =
+                                 ;      94 {
+                                 ;      95 		/* "12345678901234567890" */
+                                 ;      96 		   "CARREGANDO\n[                ]\n",
+                                 ;      97 		   "CARREGANDO\n[*               ]\n",
+                                 ;      98 		   "CARREGANDO\n[**              ]\n",
+                                 ;      99 		   "CARREGANDO\n[***             ]\n",
+                                 ;     100 		   "CARREGANDO\n[****            ]\n",
+                                 ;     101 		   "CARREGANDO\n[*****           ]\n",
+                                 ;     102 		   "CARREGANDO\n[******          ]\n",
+                                 ;     103 		   "CARREGANDO\n[*******         ]\n",
+                                 ;     104 		   "CARREGANDO\n[********        ]\n",
+                                 ;     105 		   "CARREGANDO\n[*********       ]\n",
+                                 ;     106 		   "CARREGANDO\n[**********      ]\n",
+                                 ;     107 		   "CARREGANDO\n[***********     ]\n",
+                                 ;     108 		   "CARREGANDO\n[************    ]\n",
+                                 ;     109 		   "CARREGANDO\n[*************   ]\n",
+                                 ;     110 		   "CARREGANDO\n[**************  ]\n",
+                                 ;     111 		   "CARREGANDO\n[*************** ]\n",
+                                 ;     112 		   "CARREGANDO\n[****************]\n",
+                                 ;     113 };
+                                 ;     114 
+                                 ;     115 
+                                 ;     116 char StrBoot[MAX_COLUMN];
+                                 ;     117 
+                                 ;     118 /******************************************************************************
+                                 ;     119 Private global variables and functions
+                                 ;     120 ******************************************************************************/
+                                 ;     121 
+                                 ;     122 /* Points to info on current application */
+                                 ;     123 fl_image_header_t * g_pfl_cur_app_header;
+                                 ;     124 uint32_t	address = 0;
                                  ;     125 
                                  ;     126 /******************************************************************************
-                                 ;     127 Private global variables and functions
-                                 ;     128 ******************************************************************************/
-                                 ;     129 
-                                 ;     130 /* Points to info on current application */
-                                 ;     131 fl_image_header_t * g_pfl_cur_app_header;
-                                 ;     132 uint32_t	address = 0;
-                                 ;     133 
-                                 ;     134 /******************************************************************************
-                                 ;     135 * Function Name: R_FL_DownloaderInit
-                                 ;     136 * Description  : Initializes communications for FlashLoader operations
-                                 ;     137 * Arguments    : none
-                                 ;     138 * Return value : none
-                                 ;     139 ******************************************************************************/
-                                 ;     140 void R_FL_DownloaderInit(void)
-                                 ;     141 {
-                                 ;     142     /* Initialize pointer to current app's load image header */
-                                 ;     143     g_pfl_cur_app_header = (fl_image_header_t *)__sectop("APPHEADER_1");
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",143
+                                 ;     127 * Function Name: R_FL_DownloaderInit
+                                 ;     128 * Description  : Initializes communications for FlashLoader operations
+                                 ;     129 * Arguments    : none
+                                 ;     130 * Return value : none
+                                 ;     131 ******************************************************************************/
+                                 ;     132 void R_FL_DownloaderInit(void)
+                                 ;     133 {
+                                 ;     134     /* Initialize pointer to current app's load image header */
+                                 ;     135     g_pfl_cur_app_header = (fl_image_header_t *)__sectop("APPHEADER_1");
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",135
 00000000 FBE2rrrrrrrr            		MOV.L #_g_pfl_cur_app_header, R14
 00000006 FBF2rrrrrrrr            		MOV.L #TOPOF APPHEADER_1, R15
 0000000C E3EF                    		MOV.L R15, [R14]
 0000000E                         L34:	; entry.split
-                                 ;     144     
-                                 ;     145     /* Initialize resources needed for using external memory */
-                                 ;     146     fl_mem_init();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",146
+                                 ;     136     
+                                 ;     137     /* Initialize resources needed for using external memory */
+                                 ;     138     fl_mem_init();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",138
 0000000E 05rrrrrr             A  		BSR _fl_mem_init
 00000012                         L35:	; entry.split1
-                                 ;     147 
-                                 ;     148     /* Initialize CRC. */
-                                 ;     149     R_CRC_Init();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",149
+                                 ;     139 
+                                 ;     140     /* Initialize CRC. */
+                                 ;     141     R_CRC_Init();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",141
 00000012 05rrrrrr             A  		BSR _R_CRC_Init
 00000016 02                      		RTS
 00000017                         _R_FL_StateMachine:
                                  		.STACK	_R_FL_StateMachine=588
-                                 ;     150     
-                                 ;     151 }
-                                 ;     152 /******************************************************************************
-                                 ;     153 End of function FL_Downloader_Init
-                                 ;     154 ******************************************************************************/
-                                 ;     155 uint8_t     chargeIndex = 0;
-                                 ;     156 
-                                 ;     157 /******************************************************************************
-                                 ;     158 * Function Name: R_FL_StateMachine
-                                 ;     159 * Description  : This is the state machine that runs the FL project. This 
-                                 ;     160 *                function should be called on a periodic basis by the user.
-                                 ;     161 * Arguments    : none
-                                 ;     162 * Return value : none
-                                 ;     163 ******************************************************************************/
-                                 ;     164 void R_FL_StateMachine(void)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",164
+                                 ;     142     
+                                 ;     143 }
+                                 ;     144 /******************************************************************************
+                                 ;     145 End of function FL_Downloader_Init
+                                 ;     146 ******************************************************************************/
+                                 ;     147 uint8_t     chargeIndex = 0;
+                                 ;     148 
+                                 ;     149 /******************************************************************************
+                                 ;     150 * Function Name: R_FL_StateMachine
+                                 ;     151 * Description  : This is the state machine that runs the FL project. This 
+                                 ;     152 *                function should be called on a periodic basis by the user.
+                                 ;     153 * Arguments    : none
+                                 ;     154 * Return value : none
+                                 ;     155 ******************************************************************************/
+                                 ;     156 void R_FL_StateMachine(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",156
 00000017 7200CCFD                		ADD #0FFFFFDCCH, R0
-                                 ;     165 {
-                                 ;     166     FIL         file;
-                                 ;     167     FRESULT     res;
-                                 ;     168     uint16_t    file_rw_cnt;
-                                 ;     169 	uint8_t     uiMsgRow = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",169
+                                 ;     157 {
+                                 ;     158     FIL         file;
+                                 ;     159     FRESULT     res;
+                                 ;     160     uint16_t    file_rw_cnt;
+                                 ;     161 	uint8_t     uiMsgRow = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",161
 0000001B FA042F0200              		MOV.B #00H, 022FH[R0]
 00000020                         L37:	; entry.split
-                                 ;     170 
-                                 ;     171 	uint32_t    keyEntry = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",171
+                                 ;     162 
+                                 ;     163 	uint32_t    keyEntry = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",163
 00000020 F9068C00                		MOV.L #00000000H, 0230H[R0]
 00000024                         L38:	; entry.split1
-                                 ;     172 
-                                 ;     173 
-                                 ;     174     R_FL_DownloaderInit();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",174
+                                 ;     164 
+                                 ;     165 
+                                 ;     166     R_FL_DownloaderInit();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",166
 00000024 39rrrr               W  		BSR _R_FL_DownloaderInit
 00000027                         L39:	; entry.split2
-                                 ;     175 
-                                 ;     176 	/* Open a text file */
-                                 ;     177 	if(drivemountFlag){
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",177
+                                 ;     167 
+                                 ;     168 	/* Open a text file */
+                                 ;     169 	if(drivemountFlag){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",169
 00000027 FBE2rrrrrrrr            		MOV.L #_drivemountFlag, R14
 0000002D 58EE                    		MOVU.B [R14], R14
 0000002F 610E                    		CMP #00H, R14
 00000031 3Arrrr               W  		BEQ L83
 00000034                         L40:	; bb6
 00000034 6633                    		MOV.L #00000003H, R3
-                                 ;     178 		res = f_open(&file, proj_name, FA_READ | FA_WRITE);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",178
+                                 ;     170 		res = f_open(&file, proj_name, FA_READ | FA_WRITE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",170
 00000036 FB22rrrrrrrr            		MOV.L #_proj_name, R2
 0000003C 710104                  		ADD #04H, R0, R1
 0000003F 05rrrrrr             A  		BSR _f_open
 00000043 E7018A                  		MOV.L R1, 0228H[R0]
 00000046                         L41:	; bb6.split
-                                 ;     179 		if(FR_OK != res)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",179
+                                 ;     171 		if(FR_OK != res)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",171
 00000046 ED018A                  		MOV.L 0228H[R0], R1
 00000049 6101                    		CMP #00H, R1
 0000004B 10                   S  		BEQ L43
 0000004C                         L42:	; bb8
-                                 ;     180 		{
-                                 ;     181 			nop();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",181
+                                 ;     172 		{
+                                 ;     173 			nop();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",173
 0000004C 03                      		NOP
 0000004D 678D                    		RTSD #0234H
 0000004F                         L43:	; bb9
-                                 ;     182 		}
-                                 ;     183 		else
-                                 ;     184 		{
-                                 ;     185 			res = f_lseek(&file,CRC_ADDRESS);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",185
+                                 ;     174 		}
+                                 ;     175 		else
+                                 ;     176 		{
+                                 ;     177 			res = f_lseek(&file,CRC_ADDRESS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",177
 0000004F FB22rrrrrrrr            		MOV.L #TOPOF APPHEADER_1, R2
 00000055 7322000010              		ADD #00100000H, R2
 0000005A 710104                  		ADD #04H, R0, R1
@@ -303,14 +295,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000064                         L44:	; bb9.split
 00000064 72042C02                		ADD #022CH, R0, R4
 00000068 6673                    		MOV.L #00000007H, R3
-                                 ;     186 			f_read(&file, g_fl_load_image_headers, sizeof(g_fl_load_image_headers), (UINT *)&file_rw_cnt);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",186
+                                 ;     178 			f_read(&file, g_fl_load_image_headers, sizeof(g_fl_load_image_headers), (UINT *)&file_rw_cnt);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",178
 0000006A FB22rrrrrrrr            		MOV.L #_g_fl_load_image_headers, R2
 00000070 710104                  		ADD #04H, R0, R1
 00000073 05rrrrrr             A  		BSR _f_read
 00000077                         L45:	; bb9.split3
-                                 ;     187 			sprintf(StrBoot, "   Versão:%d.%d.%d.%03d", g_fl_load_image_headers[0].version_major,
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",187
+                                 ;     179 			sprintf(StrBoot, "   Versão:%d.%d.%d.%03d", g_fl_load_image_headers[0].version_major,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",179
 00000077 FB12rrrrrrrr            		MOV.L #_g_fl_load_image_headers, R1
 0000007D B112                    		MOVU.B 04H[R1], R2
 0000007F B09B                    		MOVU.B 03H[R1], R3
@@ -327,24 +319,24 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000009E 05rrrrrr             A  		BSR _sprintf
 000000A2 710014                  		ADD #14H, R0
 000000A5                         L46:	; bb9.split4
-                                 ;     188 													 g_fl_load_image_headers[0].version_middle,
-                                 ;     189 					                                 g_fl_load_image_headers[0].version_minor,
-                                 ;     190 					                                 g_fl_load_image_headers[0].version_comp);
-                                 ;     191 			gszbootMsg[2] = StrBoot;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",191
+                                 ;     180 													 g_fl_load_image_headers[0].version_middle,
+                                 ;     181 					                                 g_fl_load_image_headers[0].version_minor,
+                                 ;     182 					                                 g_fl_load_image_headers[0].version_comp);
+                                 ;     183 			gszbootMsg[2] = StrBoot;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",183
 000000A5 FB12rrrrrrrr            		MOV.L #__$gszbootMsg, R1
 000000AB FB22rrrrrrrr            		MOV.L #_StrBoot, R2
 000000B1 A092                    		MOV.L R2, 08H[R1]
 000000B3                         L47:	; bb9.split5
-                                 ;     192 			/* Write strings */
-                                 ;     193 			for(uiMsgRow = 0; uiMsgRow < MAX_ROW; uiMsgRow++)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",193
+                                 ;     184 			/* Write strings */
+                                 ;     185 			for(uiMsgRow = 0; uiMsgRow < MAX_ROW; uiMsgRow++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",185
 000000B3 FA042F0200              		MOV.B #00H, 022FH[R0]
 000000B8 2Err                 B  		BRA L49
 000000BA                         L48:	; bb23
-                                 ;     194 			{
-                                 ;     195 				ut_lcd_drawStr(uiMsgRow, 0, gszbootMsg[uiMsgRow], false,ITEM_NO_MARKED,u8g_font_6x10);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",195
+                                 ;     186 			{
+                                 ;     187 				ut_lcd_drawStr(uiMsgRow, 0, gszbootMsg[uiMsgRow], false,ITEM_NO_MARKED,u8g_font_6x10);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",187
 000000BA 5A012F02                		MOVU.B 022FH[R0], R1
 000000BE FBE2rrrrrrrr            		MOV.L #__$gszbootMsg, R14
 000000C4 FE61E3                  		MOV.L [R1,R14], R3
@@ -360,30 +352,30 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000E2 6211                    		ADD #01H, R1
 000000E4 CB012F02                		MOV.B R1, 022FH[R0]
 000000E8                         L49:	; bb31
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",193
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",185
 000000E8 5A012F02                		MOVU.B 022FH[R0], R1
 000000EC 6161                    		CMP #06H, R1
 000000EE 29rr                    		BLT L48
 000000F0                         L50:	; bb36
-                                 ;     196 			}
-                                 ;     197 			/* Output */
-                                 ;     198 			ut_lcd_output_str();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",198
+                                 ;     188 			}
+                                 ;     189 			/* Output */
+                                 ;     190 			ut_lcd_output_str();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",190
 000000F0 05rrrrrr             A  		BSR _ut_lcd_output_str
 000000F4 2Err                 B  		BRA L54
 000000F6                         L51:	; bb37
 000000F6 FBEE308008              		MOV.L #00088030H, R14
-                                 ;     199 
-                                 ;     200 			while(keyEntry != KEY_ENTER && keyEntry != KEY_ESC){
-                                 ;     201 				WDT_FEED
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",201
+                                 ;     191 
+                                 ;     192 			while(keyEntry != KEY_ENTER && keyEntry != KEY_ESC){
+                                 ;     193 				WDT_FEED
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",193
 000000FB F8E400                  		MOV.B #00H, [R14]
 000000FE                         L52:	; bb37.split
 000000FE FBEE308008              		MOV.L #00088030H, R14
 00000103 F8E4FF                  		MOV.B #0FFH, [R14]
 00000106                         L53:	; bb37.split6
-                                 ;     202 				xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",202
+                                 ;     194 				xQueueReceive( qKeyboard, &keyEntry, portMAX_DELAY );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",194
 00000106 FBE2rrrrrrrr            		MOV.L #_qKeyboard, R14
 0000010C ECE1                    		MOV.L [R14], R1
 0000010E 6604                    		MOV.L #00000000H, R4
@@ -391,7 +383,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000113 72023002                		ADD #0230H, R0, R2
 00000117 05rrrrrr             A  		BSR _xQueueGenericReceive
 0000011B                         L54:	; bb41
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",200
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",192
 0000011B ED018C                  		MOV.L 0230H[R0], R1
 0000011E 6141                    		CMP #04H, R1
 00000120 20rr                    		BEQ L57
@@ -409,36 +401,36 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000131 6101                    		CMP #00H, R1
 00000133 21rr                    		BNE L51
 00000135                         L59:	; bb57
-                                 ;     203 			}
-                                 ;     204 			if(keyEntry == KEY_ESC){
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",204
+                                 ;     195 			}
+                                 ;     196 			if(keyEntry == KEY_ESC){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",196
 00000135 ED018C                  		MOV.L 0230H[R0], R1
 00000138 6111                    		CMP #01H, R1
 0000013A 3Arrrr               W  		BEQ L83
 0000013D                         L60:	; bb64
 0000013D 6602                    		MOV.L #00000000H, R2
 0000013F 710104                  		ADD #04H, R0, R1
-                                 ;     205 				return;
-                                 ;     206 			}
-                                 ;     207 
-                                 ;     208             res = f_lseek(&file,0);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",208
+                                 ;     197 				return;
+                                 ;     198 			}
+                                 ;     199 
+                                 ;     200             res = f_lseek(&file,0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",200
 00000142 05rrrrrr             A  		BSR _f_lseek
 00000146 E7018A                  		MOV.L R1, 0228H[R0]
 00000149                         L61:	; bb64.split
 00000149 6622                    		MOV.L #00000002H, R2
 0000014B 6601                    		MOV.L #00000000H, R1
-                                 ;     209 		    fl_mem_erase(0, FL_MEM_ERASE_BLOCK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",209
+                                 ;     201 		    fl_mem_erase(0, FL_MEM_ERASE_BLOCK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",201
 0000014D 05rrrrrr             A  		BSR _fl_mem_erase
 00000151                         L62:	; bb64.split7
-                                 ;     210 		    chargeIndex = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",210
+                                 ;     202 		    chargeIndex = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",202
 00000151 FBE2rrrrrrrr            		MOV.L #_chargeIndex, R14
 00000157 F8E400                  		MOV.B #00H, [R14]
 0000015A                         L63:	; bb64.split8
-                                 ;     211 			ut_lcd_output_warning(gszCarMsg[chargeIndex]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",211
+                                 ;     203 			ut_lcd_output_warning(gszCarMsg[chargeIndex]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",203
 0000015A FBE2rrrrrrrr            		MOV.L #_chargeIndex, R14
 00000160 58EE                    		MOVU.B [R14], R14
 00000162 FBF2rrrrrrrr            		MOV.L #__$gszCarMsg, R15
@@ -448,76 +440,76 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000172                         L64:	; bb71
 00000172 72042C02                		ADD #022CH, R0, R4
 00000176 FB3A0001                		MOV.L #00000100H, R3
-                                 ;     212 		   while(!f_eof(&file)){
-                                 ;     213 				f_read(&file, g_fl_rx_buffer, sizeof(g_fl_rx_buffer), (UINT *)&file_rw_cnt);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",213
+                                 ;     204 		   while(!f_eof(&file)){
+                                 ;     205 				f_read(&file, g_fl_rx_buffer, sizeof(g_fl_rx_buffer), (UINT *)&file_rw_cnt);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",205
 0000017A FB22rrrrrrrr            		MOV.L #_g_fl_rx_buffer, R2
 00000180 710104                  		ADD #04H, R0, R1
 00000183 05rrrrrr             A  		BSR _f_read
 00000187                         L65:	; bb71.split
 00000187 FB3A0001                		MOV.L #00000100H, R3
 0000018B 7542FF                  		MOV.L #000000FFH, R2
-                                 ;     214 				if(memcmp(g_fl_rx_buffer, 0xFF, sizeof(g_fl_rx_buffer)) != 0)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",214
+                                 ;     206 				if(memcmp(g_fl_rx_buffer, 0xFF, sizeof(g_fl_rx_buffer)) != 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",206
 0000018E FB12rrrrrrrr            		MOV.L #_g_fl_rx_buffer, R1
 00000194 05rrrrrr             A  		BSR _memcmp
 00000198 6101                    		CMP #00H, R1
 0000019A 20rr                    		BEQ L67
 0000019C                         L66:	; bb75
-                                 ;     215 					fl_mem_write(address, g_fl_rx_buffer, sizeof(g_fl_rx_buffer));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",215
+                                 ;     207 					fl_mem_write(address, g_fl_rx_buffer, sizeof(g_fl_rx_buffer));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",207
 0000019C FBE2rrrrrrrr            		MOV.L #_address, R14
 000001A2 ECE1                    		MOV.L [R14], R1
 000001A4 FB3A0001                		MOV.L #00000100H, R3
 000001A8 FB22rrrrrrrr            		MOV.L #_g_fl_rx_buffer, R2
 000001AE 05rrrrrr             A  		BSR _fl_mem_write
 000001B2                         L67:	; bb81
-                                 ;     216 				address += sizeof(g_fl_rx_buffer);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",216
+                                 ;     208 				address += sizeof(g_fl_rx_buffer);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",208
 000001B2 FBE2rrrrrrrr            		MOV.L #_address, R14
 000001B8 ECEF                    		MOV.L [R14], R15
 000001BA 72FF0001                		ADD #0100H, R15
 000001BE E3EF                    		MOV.L R15, [R14]
 000001C0                         L68:	; bb81.split
-                                 ;     217 				if((address % 0x10000) == 0){
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",217
+                                 ;     209 				if((address % 0x10000) == 0){
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",209
 000001C0 FBE2rrrrrrrr            		MOV.L #_address, R14
 000001C6 5CEE                    		MOVU.W [R14], R14
 000001C8 610E                    		CMP #00H, R14
 000001CA 21rr                    		BNE L72
 000001CC                         L69:	; bb85
-                                 ;     218 					chargeIndex++;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",218
+                                 ;     210 					chargeIndex++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",210
 000001CC FBE2rrrrrrrr            		MOV.L #_chargeIndex, R14
 000001D2 58EF                    		MOVU.B [R14], R15
 000001D4 621F                    		ADD #01H, R15
 000001D6 C3EF                    		MOV.B R15, [R14]
 000001D8                         L70:	; bb85.split
-                                 ;     219 					ut_lcd_output_warning(gszCarMsg[chargeIndex]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",219
+                                 ;     211 					ut_lcd_output_warning(gszCarMsg[chargeIndex]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",211
 000001D8 FBE2rrrrrrrr            		MOV.L #_chargeIndex, R14
 000001DE 58EE                    		MOVU.B [R14], R14
 000001E0 FBF2rrrrrrrr            		MOV.L #__$gszCarMsg, R15
 000001E6 FE6EF1                  		MOV.L [R14,R15], R1
 000001E9 05rrrrrr             A  		BSR _ut_lcd_output_warning
 000001ED                         L71:	; bb85.split9
-                                 ;     220 				    fl_mem_erase(address, FL_MEM_ERASE_BLOCK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",220
+                                 ;     212 				    fl_mem_erase(address, FL_MEM_ERASE_BLOCK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",212
 000001ED FBE2rrrrrrrr            		MOV.L #_address, R14
 000001F3 ECE1                    		MOV.L [R14], R1
 000001F5 6622                    		MOV.L #00000002H, R2
 000001F7 05rrrrrr             A  		BSR _fl_mem_erase
 000001FB                         L72:	; bb99
 000001FB FBEE308008              		MOV.L #00088030H, R14
-                                 ;     221 				}
-                                 ;     222 				WDT_FEED
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",222
+                                 ;     213 				}
+                                 ;     214 				WDT_FEED
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",214
 00000200 F8E400                  		MOV.B #00H, [R14]
 00000203                         L73:	; bb99.split
 00000203 FBEE308008              		MOV.L #00088030H, R14
 00000208 F8E4FF                  		MOV.B #0FFH, [R14]
 0000020B                         L74:	; bb100
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",212
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",204
 0000020B A889                    		MOV.L 0CH[R0], R1
 0000020D 06850104                		CMP 10H[R0].L, R1
 00000211 18                   S  		BNE L76
@@ -532,60 +524,58 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000021D 3Brrrr               W  		BNE L64
 00000220                         L78:	; bb113
 00000220 710104                  		ADD #04H, R0, R1
-                                 ;     223 		   }
-                                 ;     224 			res = f_close(&file);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",224
+                                 ;     215 		   }
+                                 ;     216 			res = f_close(&file);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",216
 00000223 05rrrrrr             A  		BSR _f_close
 00000227 E7018A                  		MOV.L R1, 0228H[R0]
 0000022A                         L79:	; bb113.split
 0000022A 6623                    		MOV.L #00000002H, R3
-                                 ;     225 			res = f_open(&file, proj_name, FA_WRITE);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",225
+                                 ;     217 			res = f_open(&file, proj_name, FA_WRITE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",217
 0000022C FB22rrrrrrrr            		MOV.L #_proj_name, R2
 00000232 710104                  		ADD #04H, R0, R1
 00000235 05rrrrrr             A  		BSR _f_open
 00000239 E7018A                  		MOV.L R1, 0228H[R0]
 0000023C                         L80:	; bb113.split10
-                                 ;     226 		    f_rename(proj_name, proj_programmed);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",226
+                                 ;     218 		    f_rename(proj_name, proj_programmed);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",218
 0000023C FB22rrrrrrrr            		MOV.L #_proj_programmed, R2
 00000242 FB12rrrrrrrr            		MOV.L #_proj_name, R1
 00000248 05rrrrrr             A  		BSR _f_rename
 0000024C                         L81:	; bb113.split11
 0000024C 6611                    		MOV.L #00000001H, R1
-                                 ;     227 		    RESET
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",227
+                                 ;     219 		    RESET
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",219
 0000024E 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
 00000252                         L82:	; bb113.split12
 00000252 FBEEC20008              		MOV.L #000800C2H, R14
 00000257 F8E901A5                		MOV.W #0A501H, [R14]
 0000025B 678D                    		RTSD #0234H
 0000025D                         L83:	; return
-                                 ;     228 		}
-                                 ;     229 	}
-                                 ;     230     
-                                 ;     231 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_flash_loader_rx\src\r_fl_downloader.c",231
+                                 ;     220 		}
+                                 ;     221 	}
+                                 ;     222     
+                                 ;     223 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_downloader.c",223
 0000025D 678D                    		RTSD #0234H
-                                 ;     232 /******************************************************************************
-                                 ;     233 End of function R_FL_StateMachine
-                                 ;     234 ******************************************************************************/
-                                 ;     235 
+                                 ;     224 /******************************************************************************
+                                 ;     225 End of function R_FL_StateMachine
+                                 ;     226 ******************************************************************************/
+                                 ;     227 
                                  		.SECTION	C_1,ROMDATA
 00000000                         _proj_name:
-00000000 436F6D70                		.byte	"CompactaXP_proj.bin"
-         61637461                
-         58505F70                
-         726F6A2E                
-         62696E                  
-00000013 00                      		.byte	00H
-00000014                         _proj_programmed:
-00000014 436F6D70                		.byte	"CompactaXP_done.bin"
-         61637461                
-         58505F64                
-         6F6E652E                
-         62696E                  
-00000027 00                      		.byte	00H
+00000000 4D543031                		.byte	"MT01_proj.bin"
+         5F70726F                
+         6A2E6269                
+         6E                      
+0000000D 00                      		.byte	00H
+0000000E                         _proj_programmed:
+0000000E 4D543031                		.byte	"MT01_done.bin"
+         5F646F6E                
+         652E6269                
+         6E                      
+0000001B 00                      		.byte	00H
                                  		.SECTION	L,ROMDATA,ALIGN=4
 00000000                         _L10:
 00000000 20202020                		.byte	"    DETECTADO NOVO  "
@@ -874,14 +864,14 @@ Information List
 
 TOTAL ERROR(S)    00000
 TOTAL WARNING(S)  00000
-TOTAL LINE(S)     00733   LINES
+TOTAL LINE(S)     00725   LINES
 
 Section List
 
 Attr         Size               Name
 CODE     0000000607(0000025FH)  P
 DATA     0000000000(00000000H)  APPHEADER_1
-ROMDATA  0000000040(00000028H)  C_1
+ROMDATA  0000000028(0000001CH)  C_1
 ROMDATA  0000000656(00000290H)  L
 ROMDATA  0000000096(00000060H)  D
 ROMDATA  0000000001(00000001H)  D_1
@@ -894,7 +884,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx7E87\$ccrx\r_fl_downloader.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\r_fl_downloader.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -903,5 +893,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_fl_downloader.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_flash_loader_rx\src\r_fl_downloader.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\r_fl_downloader.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\r_flash_loader_rx\src\r_fl_downloader.obj

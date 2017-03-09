@@ -356,20 +356,6 @@ uint8_t get_decimal_digits(float fnum)
 	return decimalDigits;
 }
 
-maq_name check_machine_type(void)
-{
-	maq_name ret = UNDEFINED_MAQ;
-	char  str_src[10];
-	memcpy(str_src,(uint8_t *)(0x00100000 + 32*1023),10);
-	if (strcmp(str_src,"EASYMAK"))
-		ret = EASYMAK_MAQ;
-	if (strcmp(str_src,"COMPACTA"))
-		ret = COMPACTA_MAQ;
-	if (strcmp(str_src,"MOBILE"))
-		ret = MOBILE_MAQ;
-	return ret;
-}
-
 void idle(void *var)
 {
 

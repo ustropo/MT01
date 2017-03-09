@@ -32,6 +32,7 @@ typedef enum
 	STATE_DESLOCAZERO_MODE,                   //!< Funçao da tela de deslocar para zero
 	STATE_AUTO_MODE,                          //!< Funçao da tela de corte automatico
 	STATE_LINE_SELECTION,                     //!< Funçao da tela de selecionar linhas
+	STATE_MAQ_MODEL_SELECTION,                //!< Funçao da tela de selecionar modelo de maquina
 	/* This should be always the last one! */
 	STATE_NUMBER
 } ut_state;
@@ -101,9 +102,7 @@ typedef enum
 typedef enum
 {
 	CFG_MAQUINA_ALT_DESLOCAMENTO,     //!< Altura de deslocamento
-#if (COMPACTAXP == 0)
 	CFG_MAQUINA_MODOMAQUINA,          //!< Modo da maquina
-#endif
 	CFG_MAQUINA_PARAMETROS,			  //!< Parametros da maquina
 	CFG_MAQUINA_PARAMETROS_THC,		  //!< Parametros de THC
 	CFG_MAQUINA_MAX        			  //!< CONFIG_MAX
@@ -132,6 +131,14 @@ typedef enum
 	CFG_FORMAT,                         //!< FORMAT MEM
 	CFG_PAR_MAQ_MAX        			    //!< CFG PAR MAX
 } ut_config_par_maquina;
+
+typedef enum
+{
+	CFG_MODEL_EASYMAK = 0,
+	CFG_MODEL_COMPACTA,
+	CFG_MODEL_MOBILE,
+	CFG_MODEL_MAX
+} ut_config_model;
 
 /**
  * Function pointer to a state execution.
@@ -164,6 +171,7 @@ extern ut_state ut_state_deslocaZero_mode(ut_context* pContext);
 extern ut_state ut_state_config_auto_menu(ut_context* pContext);
 extern ut_state ut_state_line_selection(ut_context* pContext);
 extern ut_state ut_state_config_maq_thc(ut_context* pContext);
+extern ut_state ut_state_config_maq_model(ut_context* pContext);
 
 
 /**

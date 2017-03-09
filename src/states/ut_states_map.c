@@ -30,5 +30,6 @@ const state_func_ptr states_table[STATE_NUMBER] =
 		&ut_state_manual_mode,                  //!< Funçao da tela de corte manual
 		&ut_state_deslocaZero_mode,             //!< Funçao da tela de deslocar para zero
 		&ut_state_auto_mode,                    //!< Funçao da tela de corte automatico
-		&ut_state_line_selection,                //!< Funçao da tela de selecionar linhas
+		&ut_state_line_selection,               //!< Funçao da tela de selecionar linhas
+		&ut_state_config_maq_model,				//!< Funçao da tela de selecionar modelo de maquina
 };

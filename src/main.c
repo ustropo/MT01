@@ -40,6 +40,7 @@ Includes   <System Includes> , "Project Includes"
 #include "r_lvd_rx_if.h"
 #include "eeprom.h"
 #include "config_SwTimers.h"
+#include "state_functions.h"
 /* Flash Loader project includes. */
 #include "r_fl_includes.h"
 
@@ -88,10 +89,7 @@ extern void	usb_hmsc_task_start(void);
 extern void	usb_apl_task_switch(void);
 extern void FreeRTOSConfig(void);
 
-#pragma address teste=0xffff4000
-const int teste = 100;
-
-
+maq_name maq;
 USB_UTR_t       msc_utr;
 TimerHandle_t swTimers[TIMER_SIZE];
 
@@ -122,10 +120,12 @@ void main(void)
 
  /* Inicialização das variaveis EEPROM */
 	eepromInit();
+	g_maq = check_machine_type();
 	eepromConsistencyCheck();
 
 	/* Initialize USB */
 	usb_main();
+
 
 	/* Initialize RTOS */
 	FreeRTOSConfig();

@@ -59,16 +59,8 @@ Includes   <System Includes> , "Project Includes"
 #include <string.h>
 #include <stdio.h>
 
-#if (EASYMAK == 1)
 const char proj_name[] = "MT01_proj.bin";
 const char proj_programmed[] = "MT01_done.bin";
-#elif (COMPACTAXP  == 1)
-const char proj_name[] = "CompactaXP_proj.bin";
-const char proj_programmed[] = "CompactaXP_done.bin";
-#elif (MOBILE  == 1)
-const char proj_name[] = "Mobile_proj.bin";
-const char proj_programmed[] = "Mobile_done.bin";
-#endif
 
 #define CRC_ADDRESS (((uint32_t)__sectop("APPHEADER_1"))-0xFFF00000)
 extern bool drivemountFlag;

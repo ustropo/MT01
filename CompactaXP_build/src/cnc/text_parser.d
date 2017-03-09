@@ -21,17 +21,17 @@ src/cnc/text_parser.obj src/cnc/text_parser.d: ../src/cnc/xio.h
 ../src/cnc/xio.h:
 src/cnc/text_parser.obj src/cnc/text_parser.d: ../src/cnc/./xio/xio_SPIFFS.h
 ../src/cnc/./xio/xio_SPIFFS.h:
-src/cnc/text_parser.obj src/cnc/text_parser.d: C:\Workspace\e2studio\git\MT01\spiffs\spiffs.h
-C:\Workspace\e2studio\git\MT01\spiffs\spiffs.h:
-src/cnc/text_parser.obj src/cnc/text_parser.d: C:\Workspace\e2studio\git\MT01\spiffs\spiffs_config.h
-C:\Workspace\e2studio\git\MT01\spiffs\spiffs_config.h:
+src/cnc/text_parser.obj src/cnc/text_parser.d: C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs.h
+C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs.h:
+src/cnc/text_parser.obj src/cnc/text_parser.d: C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_config.h
+C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_config.h:
 src/cnc/text_parser.obj src/cnc/text_parser.d: ../src/cnc/./xio/xio_FsFat.h
 ../src/cnc/./xio/xio_FsFat.h:
-src/cnc/text_parser.obj src/cnc/text_parser.d: C:\Workspace\e2studio\git\MT01\fsystem\ff.h
-C:\Workspace\e2studio\git\MT01\fsystem\ff.h:
-src/cnc/text_parser.obj src/cnc/text_parser.d: C:\Workspace\e2studio\git\MT01\fsystem\integer.h
-C:\Workspace\e2studio\git\MT01\fsystem\integer.h:
-src/cnc/text_parser.obj src/cnc/text_parser.d: C:\Workspace\e2studio\git\MT01\fsystem\ffconf.h
-C:\Workspace\e2studio\git\MT01\fsystem\ffconf.h:
+src/cnc/text_parser.obj src/cnc/text_parser.d: C:\Workspace\e2studio\git\MT01_master\fsystem\ff.h
+C:\Workspace\e2studio\git\MT01_master\fsystem\ff.h:
+src/cnc/text_parser.obj src/cnc/text_parser.d: C:\Workspace\e2studio\git\MT01_master\fsystem\integer.h
+C:\Workspace\e2studio\git\MT01_master\fsystem\integer.h:
+src/cnc/text_parser.obj src/cnc/text_parser.d: C:\Workspace\e2studio\git\MT01_master\fsystem\ffconf.h
+C:\Workspace\e2studio\git\MT01_master\fsystem\ffconf.h:
 src/cnc/text_parser.obj src/cnc/text_parser.d: ../src/cnc/./xio/xio_Command.h
 ../src/cnc/./xio/xio_Command.h:

@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:41 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:19:15 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:41
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:19:15
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=locking.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=locking.lst
@@ -100,19 +100,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      63 *                    Lock was not acquired.
                                  ;      64 ***********************************************************************************************************************/
                                  ;      65 bool R_BSP_SoftwareLock (BSP_CFG_USER_LOCKING_TYPE * const plock)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",65
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",65
 00000000 7100F0                  		ADD #0FFFFFFF0H, R0
 00000003 A089                    		MOV.L R1, 0CH[R0]
                                  ;      66 {
                                  ;      67 #if BSP_CFG_USER_LOCKING_ENABLED == 0
                                  ;      68     bool ret = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",68
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",68
 00000005 3C0300                  		MOV.B #00H, 03H[R0]
 00000008                         L11:	; entry.split
                                  ;      69 
                                  ;      70     /* Variable used in trying to acquire lock. Using the xchg instruction makes this atomic */
                                  ;      71     int32_t is_locked = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",71
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",71
 00000008 3E0101                  		MOV.L #00000001H, 04H[R0]
 0000000B                         L12:	; entry.split1
                                  ;      72     
@@ -126,7 +126,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      80 
                                  ;      81     /* Try to acquire semaphore to obtain lock */
                                  ;      82     xchg(&is_locked, &plock->lock);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",82
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",82
 0000000B A889                    		MOV.L 0CH[R0], R1
 0000000D A80A                    		MOV.L 04H[R0], R2
 0000000F 06A01012                		XCHG [R1].L, R2
@@ -135,7 +135,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      83     
                                  ;      84     /* Check to see if semaphore was successfully taken */
                                  ;      85     if (is_locked == false)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",85
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",85
 00000015 A809                    		MOV.L 04H[R0], R1
 00000017 6101                    		CMP #00H, R1
 00000019 18                   S  		BNE L15
@@ -143,7 +143,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      86     {        
                                  ;      87         /* Lock obtained, return success. */
                                  ;      88         ret = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",88
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",88
 0000001A 3C0301                  		MOV.B #01H, 03H[R0]
 0000001D                         L15:	; bb13
                                  ;      89     }
@@ -153,7 +153,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      93     }
                                  ;      94 
                                  ;      95     return ret;   
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",95
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",95
 0000001D C500030B                		MOV.B 03H[R0], 0BH[R0]
 00000021 B289                    		MOVU.B 0BH[R0], R1
 00000023                         L16:	; bb13.split
@@ -162,7 +162,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      98     return BSP_CFG_USER_LOCKING_SW_LOCK_FUNCTION(plock);
                                  ;      99 #endif
                                  ;     100 } /* End of function R_BSP_SoftwareLock() */
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",100
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",100
 00000023 5B11                    		MOVU.B R1, R1
 00000025 6704                    		RTSD #10H
 00000027                         _R_BSP_SoftwareUnlock:
@@ -179,19 +179,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     110 *                    Lock was not released.
                                  ;     111 ***********************************************************************************************************************/
                                  ;     112 bool R_BSP_SoftwareUnlock (BSP_CFG_USER_LOCKING_TYPE * const plock)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",112
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",112
 00000027 6080                    		SUB #08H, R0
 00000029 A009                    		MOV.L R1, 04H[R0]
                                  ;     113 {
                                  ;     114 #if BSP_CFG_USER_LOCKING_ENABLED == 0
                                  ;     115     /* Set lock back to unlocked. */
                                  ;     116     plock->lock = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",116
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",116
 0000002B F81600                  		MOV.L #00000000H, [R1]
 0000002E                         L18:	; entry.split
                                  ;     117 
                                  ;     118     return true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",118
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",118
 0000002E 3C0301                  		MOV.B #01H, 03H[R0]
 00000031 B089                    		MOVU.B 03H[R0], R1
 00000033                         L19:	; entry.split1
@@ -200,7 +200,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     121     return BSP_CFG_USER_LOCKING_SW_UNLOCK_FUNCTION(plock);
                                  ;     122 #endif
                                  ;     123 } /* End of function R_BSP_SoftwareUnlock() */
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",123
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",123
 00000033 5B11                    		MOVU.B R1, R1
 00000035 6702                    		RTSD #08H
 00000037                         _R_BSP_HardwareLock:
@@ -219,14 +219,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     135 *                    Lock was not acquired.
                                  ;     136 ***********************************************************************************************************************/
                                  ;     137 bool R_BSP_HardwareLock (mcu_lock_t const hw_index)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",137
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",137
 00000037 6080                    		SUB #08H, R0
 00000039 A009                    		MOV.L R1, 04H[R0]
                                  ;     138 {
                                  ;     139 #if BSP_CFG_USER_LOCKING_ENABLED == 0
                                  ;     140     /* Pass actual lock to software lock function. */
                                  ;     141     return R_BSP_SoftwareLock(&g_bsp_Locks[hw_index]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",141
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",141
 0000003B EF1E                    		MOV.L R1, R14
 0000003D 6C2E                    		SHLL #02H, R14
 0000003F FB12rrrrrrrr            		MOV.L #_g_bsp_Locks, R1
@@ -240,7 +240,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     144     return BSP_CFG_USER_LOCKING_HW_LOCK_FUNCTION(hw_index);
                                  ;     145 #endif
                                  ;     146 } /* End of function R_BSP_HardwareLock() */
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",146
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",146
 0000004E 5B11                    		MOVU.B R1, R1
 00000050 6702                    		RTSD #08H
 00000052                         _R_BSP_HardwareUnlock:
@@ -257,14 +257,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     156 *                    Lock was not released.
                                  ;     157 ***********************************************************************************************************************/
                                  ;     158 bool R_BSP_HardwareUnlock (mcu_lock_t const hw_index)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",158
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",158
 00000052 6080                    		SUB #08H, R0
 00000054 A009                    		MOV.L R1, 04H[R0]
                                  ;     159 {
                                  ;     160 #if BSP_CFG_USER_LOCKING_ENABLED == 0
                                  ;     161     /* Pass actual lock to software unlock function. */
                                  ;     162     return R_BSP_SoftwareUnlock(&g_bsp_Locks[hw_index]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",162
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",162
 00000056 EF1E                    		MOV.L R1, R14
 00000058 6C2E                    		SHLL #02H, R14
 0000005A FB12rrrrrrrr            		MOV.L #_g_bsp_Locks, R1
@@ -278,7 +278,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     165     return BSP_CFG_USER_LOCKING_HW_UNLOCK_FUNCTION(hw_index);
                                  ;     166 #endif
                                  ;     167 } /* End of function R_BSP_HardwareUnlock() */
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\locking.c",167
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\locking.c",167
 00000069 5B11                    		MOVU.B R1, R1
 0000006B 6702                    		RTSD #08H
                                  		.END
@@ -300,7 +300,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\locking.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4DB7\$ccrx\locking.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -309,5 +309,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\locking.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_bsp\mcu\rx63n\locking.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\locking.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\r_bsp\mcu\rx63n\locking.obj

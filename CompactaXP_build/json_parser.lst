@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:08 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:18:38 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:08
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:18:38
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=json_parser.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=json_parser.lst
@@ -163,17 +163,17 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      88  */
                                  ;      89 
                                  ;      90 void json_parser(char_t *str)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",90
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",90
 00000000 6080                    		SUB #08H, R0
 00000002 A009                    		MOV.L R1, 04H[R0]
                                  ;      91 {
                                  ;      92 	stat_t status = _json_parser_kernal(str);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",92
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",92
 00000004 39rrrr               W  		BSR __$_json_parser_kernal
 00000007 8089                    		MOV.B R1, 03H[R0]
 00000009                         L31:	; entry.split
                                  ;      93 	nv_print_list(status, TEXT_NO_PRINT, JSON_RESPONSE_FORMAT);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",93
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",93
 00000009 B089                    		MOVU.B 03H[R0], R1
 0000000B 6623                    		MOV.L #00000002H, R3
 0000000D 6602                    		MOV.L #00000000H, R2
@@ -181,7 +181,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000013                         L32:	; entry.split1
 00000013 6611                    		MOV.L #00000001H, R1
                                  ;      94 	sr_request_status_report(SR_IMMEDIATE_REQUEST); // generate incremental status report to show any changes
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",94
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",94
 00000015 05rrrrrr             A  		BSR _sr_request_status_report
 00000019 6702                    		RTSD #08H
 0000001B                         __$_json_parser_kernal:
@@ -189,7 +189,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      95 }
                                  ;      96 
                                  ;      97 static stat_t _json_parser_kernal(char_t *str)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",97
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",97
 0000001B 7EA6                    		PUSH.L R6
 0000001D 7100E8                  		ADD #0FFFFFFE8H, R0
 00000020 A109                    		MOV.L R1, 14H[R0]
@@ -197,12 +197,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      99 	stat_t status;
                                  ;     100 	int8_t depth;
                                  ;     101 	nvObj_t *nv = nv_reset_nv_list();				// get a fresh nvObj list
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",101
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",101
 00000022 05rrrrrr             A  		BSR _nv_reset_nv_list
 00000026 A081                    		MOV.L R1, 08H[R0]
 00000028                         L34:	; entry.split
                                  ;     102 	char_t group[GROUP_LEN+1] = {""};				// group identifier - starts as NUL
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",102
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",102
 00000028 FBE2rrrrrrrr            		MOV.L #_L10, R14
 0000002E C4E00E                  		MOV.B [R14], 0EH[R0]
 00000031 C5E0010F                		MOV.B 01H[R14], 0FH[R0]
@@ -210,12 +210,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000039 C5E00311                		MOV.B 03H[R14], 11H[R0]
 0000003D                         L35:	; entry.split1
                                  ;     103 	int8_t i = NV_BODY_LEN;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",103
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",103
 0000003D 3C821E                  		MOV.B #1EH, 12H[R0]
 00000040                         L36:	; entry.split2
                                  ;     104 
                                  ;     105 	ritorno(_normalize_json_string(str, JSON_OUTPUT_STRING_MAX));	// return if error
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",105
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",105
 00000040 A909                    		MOV.L 14H[R0], R1
 00000042 FB2A0002                		MOV.L #00000200H, R2
 00000046 39rrrr               W  		BSR __$_normalize_json_string
@@ -232,7 +232,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     107 	// parse the JSON command into the nv body
                                  ;     108 	do {
                                  ;     109 		if (--i == 0)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",109
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",109
 00000061 B481                    		MOVU.B 12H[R0], R1
 00000063 6011                    		SUB #01H, R1
 00000065 8481                    		MOV.B R1, 12H[R0]
@@ -241,7 +241,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000006B 18                   S  		BNE L40
 0000006C                         L39:	; bb28
                                  ;     110             return (STAT_JSON_TOO_MANY_PAIRS);      // length error
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",110
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",110
 0000006C 3C0570                  		MOV.B #70H, 05H[R0]
 0000006F 38rrrr               W  		BRA L65
 00000072                         L40:	; bb38
@@ -249,7 +249,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     112         // Use relaxed parser. Will read eitehr strict or relaxed mode. To use strict-only parser refer
                                  ;     113         // to build earlier than 407.03. Substitute _get_nv_pair_strict() for _get_nv_pair()
                                  ;     114 		if ((status = _get_nv_pair(nv, &str, &depth)) > STAT_EAGAIN) { // erred out
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",114
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",114
 00000072 A881                    		MOV.L 08H[R0], R1
 00000074 710307                  		ADD #07H, R0, R3
 00000077 710214                  		ADD #14H, R0, R2
@@ -260,20 +260,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000083 29rr                    		BLT L42
 00000085                         L41:	; bb39
                                  ;     115 			return (status);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",115
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",115
 00000085 C5000605                		MOV.B 06H[R0], 05H[R0]
 00000089 38rrrr               W  		BRA L65
 0000008C                         L42:	; bb50
                                  ;     116 		}
                                  ;     117 		// propagate the group from previous NV pair (if relevant)
                                  ;     118 		if (group[0] != NUL) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",118
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",118
 0000008C B381                    		MOVU.B 0EH[R0], R1
 0000008E 6101                    		CMP #00H, R1
 00000090 20rr                    		BEQ L44
 00000092                         L43:	; bb51
                                  ;     119 			strncpy(nv->group, group, GROUP_LEN);	// copy the parent's group to this child
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",119
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",119
 00000092 A884                    		MOV.L 08H[R0], R4
 00000094 714114                  		ADD #14H, R4, R1
 00000097 6633                    		MOV.L #00000003H, R3
@@ -288,7 +288,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     120 		}
                                  ;     121 		// validate the token and get the index
                                  ;     122 		if ((nv->index = nv_get_index(nv->group, nv->token)) == NO_MATCH) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",122
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",122
 000000A9 A886                    		MOV.L 08H[R0], R6
 000000AB 716218                  		ADD #18H, R6, R2
 000000AE 716114                  		ADD #14H, R6, R1
@@ -298,13 +298,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000BC 18                   S  		BNE L46
 000000BD                         L45:	; bb65
                                  ;     123 			return (STAT_UNRECOGNIZED_NAME);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",123
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",123
 000000BD 3C0564                  		MOV.B #64H, 05H[R0]
 000000C0 38rrrr               W  		BRA L65
 000000C3                         L46:	; bb82
                                  ;     124 		}
                                  ;     125 		if ((nv_index_is_group(nv->index)) && (nv_group_is_prefixed(nv->token))) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",125
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",125
 000000C3 A881                    		MOV.L 08H[R0], R1
 000000C5 B911                    		MOVU.W 08H[R1], R1
 000000C7 05rrrrrr             A  		BSR _nv_index_is_group
@@ -313,7 +313,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000CF 2Err                 B  		BRA L50
 000000D1                         L47:	; bb83
                                  ;     126 			strncpy(group, nv->token, GROUP_LEN);	// record the group ID
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",126
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",126
 000000D1 A882                    		MOV.L 08H[R0], R2
 000000D3 712218                  		ADD #18H, R2
 000000D6 6633                    		MOV.L #00000003H, R3
@@ -342,7 +342,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000101                         L52:	; bb111
                                  ;     127 		}
                                  ;     128 		if ((nv = nv->nx) == NULL)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",128
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",128
 00000101 A881                    		MOV.L 08H[R0], R1
 00000103 A819                    		MOV.L 04H[R1], R1
 00000105 A081                    		MOV.L R1, 08H[R0]
@@ -350,11 +350,11 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000109 18                   S  		BNE L54
 0000010A                         L53:	; bb112
                                  ;     129             return (STAT_JSON_TOO_MANY_PAIRS);      // Not supposed to encounter a NULL
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",129
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",129
 0000010A 3C0570                  		MOV.B #70H, 05H[R0]
 0000010D 2Err                 B  		BRA L65
 0000010F                         L54:	; bb121
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",108
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",108
 0000010F B181                    		MOVU.B 06H[R0], R1
 00000111 6101                    		CMP #00H, R1
 00000113 3Brrrr               W  		BNE L38
@@ -363,20 +363,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     131 
                                  ;     132 	// execute the command
                                  ;     133 	nv = nv_body;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",133
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",133
 00000116 FB12rrrrrrrr            		MOV.L #_nvl, R1
 0000011C 711128                  		ADD #28H, R1
 0000011F A081                    		MOV.L R1, 08H[R0]
 00000121                         L56:	; bb127.split
                                  ;     134 	if (nv->valuetype == TYPE_NULL){				// means GET the value
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",134
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",134
 00000121 A881                    		MOV.L 08H[R0], R1
 00000123 8A99                    		MOV.B 0BH[R1], R1
 00000125 6101                    		CMP #00H, R1
 00000127 21rr                    		BNE L59
 00000129                         L57:	; bb130
                                  ;     135 		ritorno(nv_get(nv));						// ritorno returns w/status on any errors
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",135
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",135
 00000129 A881                    		MOV.L 08H[R0], R1
 0000012B 05rrrrrr             A  		BSR _nv_get
 0000012F FBE2rrrrrrrr            		MOV.L #_status_code, R14
@@ -390,19 +390,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000146                         L59:	; bb143
                                  ;     136 	} else {
                                  ;     137 		if (cm.machine_state == MACHINE_ALARM)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",137
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",137
 00000146 FBE2rrrrrrrr            		MOV.L #_cm, R14
 0000014C 5AEE1D02                		MOVU.B 021DH[R14], R14
 00000150 612E                    		CMP #02H, R14
 00000152 18                   S  		BNE L61
 00000153                         L60:	; bb144
                                  ;     138             return (STAT_MACHINE_ALARMED);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",138
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",138
 00000153 3C05CB                  		MOV.B #0CBH, 05H[R0]
 00000156 2Err                 B  		BRA L65
 00000158                         L61:	; bb152
                                  ;     139 		ritorno(nv_set(nv));						// set value or call a function (e.g. gcode)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",139
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",139
 00000158 A881                    		MOV.L 08H[R0], R1
 0000015A 05rrrrrr             A  		BSR _nv_set
 0000015E FBE2rrrrrrrr            		MOV.L #_status_code, R14
@@ -415,18 +415,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000173 08                   S  		BRA L65
 00000174                         L63:	; bb163
                                  ;     140 		nv_persist(nv);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",140
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",140
 00000174 A881                    		MOV.L 08H[R0], R1
 00000176 05rrrrrr             A  		BSR _nv_persist
 0000017A                         L64:	; bb173
                                  ;     141 	}
                                  ;     142 	return (STAT_OK);								// only successful commands exit through this point
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",142
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",142
 0000017A 3C0500                  		MOV.B #00H, 05H[R0]
 0000017D                         L65:	; bb175
 0000017D C5000513                		MOV.B 05H[R0], 13H[R0]
                                  ;     143 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",143
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",143
 00000181 B489                    		MOVU.B 13H[R0], R1
 00000183 3F6607                  		RTSD #1CH, R6-R6
 00000186                         __$_normalize_json_string:
@@ -440,21 +440,21 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     150  */
                                  ;     151 
                                  ;     152 static stat_t _normalize_json_string(char_t *str, uint16_t size)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",152
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",152
 00000186 7100EC                  		ADD #0FFFFFFECH, R0
 00000189 A101                    		MOV.L R1, 10H[R0]
 0000018B 918A                    		MOV.W R2, 0EH[R0]
                                  ;     153 {
                                  ;     154 	char_t *wr;								// write pointer
                                  ;     155 	uint8_t in_comment = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",155
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",155
 0000018D 3C0C00                  		MOV.B #00H, 0CH[R0]
 00000190                         L67:	; entry.split
 00000190 FB36FF                  		MOV.L #0FFFFFFFFH, R3
 00000193 6602                    		MOV.L #00000000H, R2
                                  ;     156 
                                  ;     157 	if (strlen(str) > size)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",157
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",157
 00000195 A901                    		MOV.L 10H[R0], R1
 00000197 7F80                    		SUNTIL.B
 00000199 FBE6FE                  		MOV.L #0FFFFFFFEH, R14
@@ -463,32 +463,32 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001A2 25rr                    		BLEU L69
 000001A4                         L68:	; bb5
                                  ;     158         return (STAT_INPUT_EXCEEDS_MAX_LENGTH);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",158
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",158
 000001A4 3C076B                  		MOV.B #6BH, 07H[R0]
 000001A7 38rrrr               W  		BRA L89
 000001AA                         L69:	; bb13
                                  ;     159 
                                  ;     160 	for (wr = str; *str != NUL; str++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",160
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",160
 000001AA E5000402                		MOV.L 10H[R0], 08H[R0]
 000001AE 38rrrr               W  		BRA L86
 000001B1                         L70:	; bb16
                                  ;     161 		if (!in_comment) {					// normal processing
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",161
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",161
 000001B1 B301                    		MOVU.B 0CH[R0], R1
 000001B3 6101                    		CMP #00H, R1
 000001B5 21rr                    		BNE L82
 000001B7 2Err                 B  		BRA L83
 000001B9                         L71:	; bb18
                                  ;     162 			if (*str == '(') in_comment = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",162
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",162
 000001B9 755E28                  		CMP #28H, R14
 000001BC 18                   S  		BNE L73
 000001BD                         L72:	; bb19
 000001BD 3C0C01                  		MOV.B #01H, 0CH[R0]
 000001C0                         L73:	; bb27
                                  ;     163 			if ((*str <= ' ') || (*str == DEL)) continue; // toss ctrls, WS & DEL
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",163
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",163
 000001C0 ED0E04                  		MOV.L 10H[R0], R14
 000001C3 58EE                    		MOVU.B [R14], R14
 000001C5 755E21                  		CMP #21H, R14
@@ -509,7 +509,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001DE 21rr                    		BNE L85
 000001E0                         L78:	; bb48
                                  ;     164 			*wr++ = tolower(*str);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",164
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",164
 000001E0 FBE2rrrrrrrr            		MOV.L #__Tolotab, R14
 000001E6 ECEE                    		MOV.L [R14], R14
 000001E8 A901                    		MOV.L 10H[R0], R1
@@ -525,14 +525,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001FF                         L79:	; bb60
                                  ;     165 		} else {							// Gcode comment processing
                                  ;     166 			if (*str == ')') in_comment = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",166
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",166
 000001FF 755E29                  		CMP #29H, R14
 00000202 18                   S  		BNE L81
 00000203                         L80:	; bb61
 00000203 3C0C00                  		MOV.B #00H, 0CH[R0]
 00000206                         L81:	; bb68
                                  ;     167 			*wr++ = *str;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",167
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",167
 00000206 ED0E04                  		MOV.L 10H[R0], R14
 00000209 A881                    		MOV.L 08H[R0], R1
 0000020B C0E1                    		MOV.B [R14], [R1]
@@ -557,7 +557,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000022D 6211                    		ADD #01H, R1
 0000022F A101                    		MOV.L R1, 10H[R0]
 00000231                         L86:	; bb88
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",160
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",160
 00000231 A901                    		MOV.L 10H[R0], R1
 00000233 581E                    		MOVU.B [R1], R14
 00000235 610E                    		CMP #00H, R14
@@ -566,17 +566,17 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     168 		}
                                  ;     169 	}
                                  ;     170 	*wr = NUL;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",170
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",170
 0000023A A881                    		MOV.L 08H[R0], R1
 0000023C F81400                  		MOV.B #00H, [R1]
 0000023F                         L88:	; bb95.split
                                  ;     171 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",171
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",171
 0000023F 3C0700                  		MOV.B #00H, 07H[R0]
 00000242                         L89:	; bb98
 00000242 C500070D                		MOV.B 07H[R0], 0DH[R0]
                                  ;     172 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",172
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",172
 00000246 B309                    		MOVU.B 0DH[R0], R1
 00000248 6705                    		RTSD #14H
 0000024A                         __$_get_nv_pair:
@@ -614,7 +614,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     203 #define MAX_NAME_CHARS 32
                                  ;     204 
                                  ;     205 static stat_t _get_nv_pair(nvObj_t *nv, char_t **pstr, int8_t *depth)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",205
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",205
 0000024A 7EA6                    		PUSH.L R6
 0000024C 7100C8                  		ADD #0FFFFFFC8H, R0
 0000024F A309                    		MOV.L R1, 34H[R0]
@@ -624,7 +624,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     207 	uint8_t i;
                                  ;     208 	char_t *tmp;
                                  ;     209 	char_t leaders[] = {"{,\""};				// open curly, quote and leading comma
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",209
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",209
 00000255 FBE2rrrrrrrr            		MOV.L #_L11, R14
 0000025B C4E00F                  		MOV.B [R14], 0FH[R0]
 0000025E C5E00110                		MOV.B 01H[R14], 10H[R0]
@@ -632,14 +632,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000266 C5E00312                		MOV.B 03H[R14], 12H[R0]
 0000026A                         L91:	; entry.split
                                  ;     210 	char_t separators[] = {":\""};				// colon and quote
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",210
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",210
 0000026A FBE2rrrrrrrr            		MOV.L #_L12, R14
 00000270 C4E013                  		MOV.B [R14], 13H[R0]
 00000273 C5E00114                		MOV.B 01H[R14], 14H[R0]
 00000277 C5E00215                		MOV.B 02H[R14], 15H[R0]
 0000027B                         L92:	; entry.split1
                                  ;     211 	char_t terminators[] = {"},\""};			// close curly, comma and quote
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",211
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",211
 0000027B FBE2rrrrrrrr            		MOV.L #_L13, R14
 00000281 C4E016                  		MOV.B [R14], 16H[R0]
 00000284 C5E00117                		MOV.B 01H[R14], 17H[R0]
@@ -647,7 +647,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000028C C5E00319                		MOV.B 03H[R14], 19H[R0]
 00000290                         L93:	; entry.split2
                                  ;     212 	char_t value[] = {"{\".-+"};				// open curly, quote, period, minus and plus
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",212
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",212
 00000290 FBE2rrrrrrrr            		MOV.L #_L14, R14
 00000296 C4E01A                  		MOV.B [R14], 1AH[R0]
 00000299 C5E0011B                		MOV.B 01H[R14], 1BH[R0]
@@ -658,7 +658,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000002AD                         L94:	; entry.split3
                                  ;     213 
                                  ;     214 	nv_reset_nv(nv);							// wipes the object and sets the depth
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",214
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",214
 000002AD AB09                    		MOV.L 34H[R0], R1
 000002AF 05rrrrrr             A  		BSR _nv_reset_nv
 000002B3                         L95:	; entry.split4
@@ -666,18 +666,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     216 	// --- Process name part ---
                                  ;     217 	// Find, terminate and set pointers for the name. Allow for leading and trailing name quotes.
                                  ;     218 	char_t * name = *pstr;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",218
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",218
 000002B3 AB01                    		MOV.L 30H[R0], R1
 000002B5 E41008                  		MOV.L [R1], 20H[R0]
 000002B8                         L96:	; entry.split5
                                  ;     219 	for (i=0; true; i++, (*pstr)++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",219
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",219
 000002B8 3C0700                  		MOV.B #00H, 07H[R0]
 000002BB 2Err                 B  		BRA L102
 000002BD                         L97:	; bb52
                                  ;     220 		if (strchr(leaders, (int)**pstr) == NULL) { 		// find leading character of name
                                  ;     221 			name = (*pstr)++;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",221
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",221
 000002BD AB01                    		MOV.L 30H[R0], R1
 000002BF EC12                    		MOV.L [R1], R2
 000002C1 A202                    		MOV.L R2, 20H[R0]
@@ -692,16 +692,16 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     227 
                                  ;     228 	// Find the end of name, NUL terminate and copy token
                                  ;     229 	for (i=0; true; i++, (*pstr)++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",229
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",229
 000002C7 3C0700                  		MOV.B #00H, 07H[R0]
 000002CA 2Err                 B  		BRA L109
 000002CC                         L99:	; bb66
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",224
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",224
 000002CC B189                    		MOVU.B 07H[R0], R1
 000002CE 6181                    		CMP #08H, R1
 000002D0 18                   S  		BNE L101
 000002D1                         L100:	; bb67
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",225
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",225
 000002D1 3C066F                  		MOV.B #6FH, 06H[R0]
 000002D4 38rrrr               W  		BRA L181
 000002D7                         L101:	; bb74
@@ -713,7 +713,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000002E1 621E                    		ADD #01H, R14
 000002E3 E31E                    		MOV.L R14, [R1]
 000002E5                         L102:	; bb81.split
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",220
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",220
 000002E5 AB01                    		MOV.L 30H[R0], R1
 000002E7 EC1E                    		MOV.L [R1], R14
 000002E9 58E2                    		MOVU.B [R14], R2
@@ -725,7 +725,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000002F8                         L103:	; bb86
                                  ;     230 		if (strchr(separators, (int)**pstr) != NULL) {
                                  ;     231 			*(*pstr)++ = NUL;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",231
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",231
 000002F8 AB01                    		MOV.L 30H[R0], R1
 000002FA EC1E                    		MOV.L [R1], R14
 000002FC 660F                    		MOV.L #00000000H, R15
@@ -733,7 +733,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000301 E31E                    		MOV.L R14, [R1]
 00000303                         L104:	; bb86.split
                                  ;     232 			strncpy(nv->token, name, TOKEN_LEN+1);			// copy the string to the token
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",232
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",232
 00000303 AB0C                    		MOV.L 34H[R0], R4
 00000305 714118                  		ADD #18H, R4, R1
 00000308 6663                    		MOV.L #00000006H, R3
@@ -755,16 +755,16 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     240 
                                  ;     241 	// Find the start of the value part
                                  ;     242 	for (i=0; true; i++, (*pstr)++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",242
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",242
 00000319 3C0700                  		MOV.B #00H, 07H[R0]
 0000031C 2Err                 B  		BRA L114
 0000031E                         L106:	; bb105
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",235
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",235
 0000031E B189                    		MOVU.B 07H[R0], R1
 00000320 755120                  		CMP #20H, R1
 00000323 18                   S  		BNE L108
 00000324                         L107:	; bb106
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",236
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",236
 00000324 3C066F                  		MOV.B #6FH, 06H[R0]
 00000327 38rrrr               W  		BRA L181
 0000032A                         L108:	; bb113
@@ -776,7 +776,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000334 621E                    		ADD #01H, R14
 00000336 E31E                    		MOV.L R14, [R1]
 00000338                         L109:	; bb120.split
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",230
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",230
 00000338 AB01                    		MOV.L 30H[R0], R1
 0000033A EC1E                    		MOV.L [R1], R14
 0000033C 58E2                    		MOVU.B [R14], R2
@@ -788,7 +788,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000034B                         L110:	; bb140
                                  ;     243 		if (isalnum((int)**pstr)) break;
                                  ;     244 		if (strchr(value, (int)**pstr) != NULL) break;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",244
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",244
 0000034B AB01                    		MOV.L 30H[R0], R1
 0000034D EC1E                    		MOV.L [R1], R14
 0000034F 58E2                    		MOVU.B [R14], R2
@@ -798,13 +798,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000035A 21rr                    		BNE L115
 0000035C                         L111:	; bb153
                                  ;     245 		if (i == MAX_PAD_CHARS)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",245
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",245
 0000035C B189                    		MOVU.B 07H[R0], R1
 0000035E 6181                    		CMP #08H, R1
 00000360 18                   S  		BNE L113
 00000361                         L112:	; bb154
                                  ;     246             return (STAT_JSON_SYNTAX_ERROR);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",246
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",246
 00000361 3C066F                  		MOV.B #6FH, 06H[R0]
 00000364 38rrrr               W  		BRA L181
 00000367                         L113:	; bb161
@@ -816,7 +816,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000371 621E                    		ADD #01H, R14
 00000373 E31E                    		MOV.L R14, [R1]
 00000375                         L114:	; bb168.split
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",243
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",243
 00000375 FBE2rrrrrrrr            		MOV.L #__Ctype, R14
 0000037B ECEE                    		MOV.L [R14], R14
 0000037D AB01                    		MOV.L 30H[R0], R1
@@ -831,7 +831,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     248 
                                  ;     249 	// nulls (gets)
                                  ;     250 	if ((**pstr == 'n') || ((**pstr == '\"') && (*(*pstr+1) == '\"'))) { // process null value
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",250
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",250
 0000038F AB01                    		MOV.L 30H[R0], R1
 00000391 EC1E                    		MOV.L [R1], R14
 00000393 58EE                    		MOVU.B [R14], R14
@@ -840,12 +840,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000039B 38rrrr               W  		BRA L164
 0000039E                         L116:	; bb172
                                  ;     251 		nv->valuetype = TYPE_NULL;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",251
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",251
 0000039E AB09                    		MOV.L 34H[R0], R1
 000003A0 3C1B00                  		MOV.B #00H, 0BH[R1]
 000003A3                         L117:	; bb172.split
                                  ;     252 		nv->value = TYPE_NULL;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",252
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",252
 000003A3 AB09                    		MOV.L 34H[R0], R1
 000003A5 3E1400                  		MOV.L #00000000H, 10H[R1]
 000003A8 38rrrr               W  		BRA L172
@@ -853,7 +853,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     253 
                                  ;     254 	// numbers
                                  ;     255 	} else if (isdigit(**pstr) || (**pstr == '-')) {// value is a number
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",255
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",255
 000003AB FBE2rrrrrrrr            		MOV.L #__Ctype, R14
 000003B1 ECEE                    		MOV.L [R14], R14
 000003B3 AB01                    		MOV.L 30H[R0], R1
@@ -865,7 +865,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000003C1 38rrrr               W  		BRA L160
 000003C4                         L119:	; bb179
                                  ;     256 		nv->value = (float)strtod(*pstr, &tmp);	// tmp is the end pointer
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",256
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",256
 000003C4 AB01                    		MOV.L 30H[R0], R1
 000003C6 EC11                    		MOV.L [R1], R1
 000003C8 AB0E                    		MOV.L 34H[R0], R6
@@ -874,19 +874,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000003D1 A161                    		MOV.L R1, 10H[R6]
 000003D3                         L120:	; bb179.split
                                  ;     257 		if(tmp == *pstr)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",257
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",257
 000003D3 AB01                    		MOV.L 30H[R0], R1
 000003D5 A882                    		MOV.L 08H[R0], R2
 000003D7 068412                  		CMP [R1].L, R2
 000003DA 18                   S  		BNE L122
 000003DB                         L121:	; bb186
                                  ;     258             return (STAT_BAD_NUMBER_FORMAT);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",258
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",258
 000003DB 3C0666                  		MOV.B #66H, 06H[R0]
 000003DE 38rrrr               W  		BRA L181
 000003E1                         L122:	; bb194
                                  ;     259 		nv->valuetype = TYPE_FLOAT;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",259
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",259
 000003E1 AB09                    		MOV.L 34H[R0], R1
 000003E3 3C1B04                  		MOV.B #04H, 0BH[R1]
 000003E6 38rrrr               W  		BRA L172
@@ -894,7 +894,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     260 
                                  ;     261 	// object parent
                                  ;     262 	} else if (**pstr == '{') {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",262
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",262
 000003E9 AB01                    		MOV.L 30H[R0], R1
 000003EB EC1E                    		MOV.L [R1], R14
 000003ED 58EE                    		MOVU.B [R14], R14
@@ -902,27 +902,27 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000003F2 21rr                    		BNE L127
 000003F4                         L124:	; bb199
                                  ;     263 		nv->valuetype = TYPE_PARENT;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",263
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",263
 000003F4 AB09                    		MOV.L 34H[R0], R1
 000003F6 3C1B07                  		MOV.B #07H, 0BH[R1]
 000003F9                         L125:	; bb199.split
                                  ;     264 //		*depth += 1;							// nv_reset_nv() sets the next object's level so this is redundant
                                  ;     265 		(*pstr)++;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",265
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",265
 000003F9 AB01                    		MOV.L 30H[R0], R1
 000003FB EC1E                    		MOV.L [R1], R14
 000003FD 621E                    		ADD #01H, R14
 000003FF E31E                    		MOV.L R14, [R1]
 00000401                         L126:	; bb199.split9
                                  ;     266 		return(STAT_EAGAIN);					// signal that there is more to parse
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",266
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",266
 00000401 3C0602                  		MOV.B #02H, 06H[R0]
 00000404 38rrrr               W  		BRA L181
 00000407                         L127:	; bb207
                                  ;     267 
                                  ;     268 	// strings
                                  ;     269 	} else if (**pstr == '\"') { 				// value is a string
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",269
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",269
 00000407 AB01                    		MOV.L 30H[R0], R1
 00000409 EC1E                    		MOV.L [R1], R14
 0000040B 58EF                    		MOVU.B [R14], R15
@@ -930,17 +930,17 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000410 3Brrrr               W  		BNE L148
 00000413                         L128:	; bb208
                                  ;     270 		(*pstr)++;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",270
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",270
 00000413 621E                    		ADD #01H, R14
 00000415 E31E                    		MOV.L R14, [R1]
 00000417                         L129:	; bb208.split
                                  ;     271 		nv->valuetype = TYPE_STRING;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",271
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",271
 00000417 ED0E0D                  		MOV.L 34H[R0], R14
 0000041A F9E40B05                		MOV.B #05H, 0BH[R14]
 0000041E                         L130:	; bb208.split10
                                  ;     272 		if ((tmp = strchr(*pstr, '\"')) == NULL)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",272
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",272
 0000041E ED0E0C                  		MOV.L 30H[R0], R14
 00000421 ECE1                    		MOV.L [R14], R1
 00000423 754222                  		MOV.L #00000022H, R2
@@ -950,19 +950,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000042E 18                   S  		BNE L132
 0000042F                         L131:	; bb215
                                  ;     273             return (STAT_JSON_SYNTAX_ERROR);    // find the end of the string
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",273
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",273
 0000042F 3C066F                  		MOV.B #6FH, 06H[R0]
 00000432 38rrrr               W  		BRA L181
 00000435                         L132:	; bb224
                                  ;     274 		*tmp = NUL;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",274
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",274
 00000435 ED0E02                  		MOV.L 08H[R0], R14
 00000438 F8E400                  		MOV.B #00H, [R14]
 0000043B                         L133:	; bb224.split
                                  ;     275 
                                  ;     276 		// if string begins with 0x it might be data, needs to be at least 3 chars long
                                  ;     277 		if( strlen(*pstr)>=3 && (*pstr)[0]=='0' && (*pstr)[1]=='x')
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",277
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",277
 0000043B ED0E0C                  		MOV.L 30H[R0], R14
 0000043E ECE1                    		MOV.L [R14], R1
 00000440 FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -976,12 +976,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000452                         L134:	; bb227
                                  ;     278 		{
                                  ;     279 			uint32_t *v = (uint32_t*)&nv->value;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",279
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",279
 00000452 711110                  		ADD #10H, R1
 00000455 A209                    		MOV.L R1, 24H[R0]
 00000457                         L135:	; bb227.split
                                  ;     280 			*v = strtoul((const char *)*pstr, 0L, 0);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",280
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",280
 00000457 ED0E0C                  		MOV.L 30H[R0], R14
 0000045A ECE1                    		MOV.L [R14], R1
 0000045C AA0E                    		MOV.L 24H[R0], R6
@@ -991,14 +991,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000466 E361                    		MOV.L R1, [R6]
 00000468                         L136:	; bb227.split11
                                  ;     281 			nv->valuetype = TYPE_DATA;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",281
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",281
 00000468 ED0E0D                  		MOV.L 34H[R0], R14
 0000046B F9E40B03                		MOV.B #03H, 0BH[R14]
 0000046F 2Err                 B  		BRA L147
 00000471                         L137:	; bb238
                                  ;     282 		} else {
                                  ;     283 			ritorno(nv_copy_string(nv, *pstr));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",283
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",283
 00000471 ED0E0C                  		MOV.L 30H[R0], R14
 00000474 ECE2                    		MOV.L [R14], R2
 00000476 05rrrrrr             A  		BSR _nv_copy_string
@@ -1046,7 +1046,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     284 		}
                                  ;     285 
                                  ;     286 		*pstr = ++tmp;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",286
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",286
 000004C7 ED0E02                  		MOV.L 08H[R0], R14
 000004CA 621E                    		ADD #01H, R14
 000004CC AB01                    		MOV.L 30H[R0], R1
@@ -1057,24 +1057,24 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     287 
                                  ;     288 	// boolean true/false
                                  ;     289 	} else if (**pstr == 't') {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",289
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",289
 000004D6 58EE                    		MOVU.B [R14], R14
 000004D8 755E74                  		CMP #74H, R14
 000004DB 21rr                    		BNE L151
 000004DD                         L149:	; bb293
                                  ;     290 		nv->valuetype = TYPE_BOOL;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",290
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",290
 000004DD AB09                    		MOV.L 34H[R0], R1
 000004DF 3C1B01                  		MOV.B #01H, 0BH[R1]
 000004E2                         L150:	; bb293.split
                                  ;     291 		nv->value = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",291
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",291
 000004E2 AB09                    		MOV.L 34H[R0], R1
 000004E4 F912040000803F          		MOV.L #3F800000H, 10H[R1]
 000004EB 38rrrr               W  		BRA L172
 000004EE                         L151:	; bb299
                                  ;     292 	} else if (**pstr == 'f') {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",292
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",292
 000004EE AB01                    		MOV.L 30H[R0], R1
 000004F0 EC1E                    		MOV.L [R1], R14
 000004F2 58EE                    		MOVU.B [R14], R14
@@ -1082,12 +1082,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000004F7 21rr                    		BNE L154
 000004F9                         L152:	; bb300
                                  ;     293 		nv->valuetype = TYPE_BOOL;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",293
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",293
 000004F9 AB09                    		MOV.L 34H[R0], R1
 000004FB 3C1B01                  		MOV.B #01H, 0BH[R1]
 000004FE                         L153:	; bb300.split
                                  ;     294 		nv->value = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",294
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",294
 000004FE AB09                    		MOV.L 34H[R0], R1
 00000500 3E1400                  		MOV.L #00000000H, 10H[R1]
 00000503 38rrrr               W  		BRA L172
@@ -1095,7 +1095,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     295 
                                  ;     296 	// arrays
                                  ;     297 	} else if (**pstr == '[') {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",297
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",297
 00000506 AB01                    		MOV.L 30H[R0], R1
 00000508 EC1E                    		MOV.L [R1], R14
 0000050A 58EE                    		MOVU.B [R14], R14
@@ -1103,12 +1103,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000050F 21rr                    		BNE L159
 00000511                         L155:	; bb307
                                  ;     298 		nv->valuetype = TYPE_ARRAY;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",298
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",298
 00000511 AB09                    		MOV.L 34H[R0], R1
 00000513 3C1B06                  		MOV.B #06H, 0BH[R1]
 00000516                         L156:	; bb307.split
                                  ;     299 		ritorno(nv_copy_string(nv, *pstr));		// copy array into string for error displays
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",299
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",299
 00000516 AB01                    		MOV.L 30H[R0], R1
 00000518 EC12                    		MOV.L [R1], R2
 0000051A AB09                    		MOV.L 34H[R0], R1
@@ -1123,7 +1123,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000535 38rrrr               W  		BRA L181
 00000538                         L158:	; bb323
                                  ;     300 		return (STAT_UNSUPPORTED_TYPE);	        // return error as the parser doesn't do input arrays yet
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",300
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",300
 00000538 3C0667                  		MOV.B #67H, 06H[R0]
 0000053B 38rrrr               W  		BRA L181
 0000053E                         L159:	; bb325
@@ -1131,7 +1131,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     302 	// general error condition
                                  ;     303 	} else {
                                  ;     304         return (STAT_JSON_SYNTAX_ERROR);	    // ill-formed JSON
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",304
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",304
 0000053E 3C066F                  		MOV.B #6FH, 06H[R0]
 00000541 38rrrr               W  		BRA L181
 00000544                         L160:	; bb378
@@ -1186,7 +1186,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     306 
                                  ;     307 	// process comma separators and end curlies
                                  ;     308 	if ((*pstr = strpbrk(*pstr, terminators)) == NULL) { // advance to terminator or err out
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",308
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",308
 00000591 AB06                    		MOV.L 30H[R0], R6
 00000593 EC61                    		MOV.L [R6], R1
 00000595 710216                  		ADD #16H, R0, R2
@@ -1196,13 +1196,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000005A0 18                   S  		BNE L174
 000005A1                         L173:	; bb429
                                  ;     309 		return (STAT_JSON_SYNTAX_ERROR);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",309
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",309
 000005A1 3C066F                  		MOV.B #6FH, 06H[R0]
 000005A4 2Err                 B  		BRA L181
 000005A6                         L174:	; bb441
                                  ;     310 	}
                                  ;     311 	if (**pstr == '}') {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",311
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",311
 000005A6 AB01                    		MOV.L 30H[R0], R1
 000005A8 EC1E                    		MOV.L [R1], R14
 000005AA 58EE                    		MOVU.B [R14], R14
@@ -1210,14 +1210,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000005AF 21rr                    		BNE L177
 000005B1                         L175:	; bb442
                                  ;     312 		*depth -= 1;							// pop up a nesting level
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",312
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",312
 000005B1 AA89                    		MOV.L 2CH[R0], R1
 000005B3 CC1E                    		MOV.B [R1], R14
 000005B5 601E                    		SUB #01H, R14
 000005B7 C31E                    		MOV.B R14, [R1]
 000005B9                         L176:	; bb442.split
                                  ;     313 		(*pstr)++;								// advance to comma or whatever follows
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",313
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",313
 000005B9 AB01                    		MOV.L 30H[R0], R1
 000005BB EC1E                    		MOV.L [R1], R14
 000005BD 621E                    		ADD #01H, R14
@@ -1225,7 +1225,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000005C1                         L177:	; bb459
                                  ;     314 	}
                                  ;     315 	if (**pstr == ',')
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",315
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",315
 000005C1 AB01                    		MOV.L 30H[R0], R1
 000005C3 EC1E                    		MOV.L [R1], R14
 000005C5 58EE                    		MOVU.B [R14], R14
@@ -1233,25 +1233,25 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000005CA 18                   S  		BNE L179
 000005CB                         L178:	; bb460
                                  ;     316         return (STAT_EAGAIN);                   // signal that there is more to parse
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",316
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",316
 000005CB 3C0602                  		MOV.B #02H, 06H[R0]
 000005CE 2Err                 B  		BRA L181
 000005D0                         L179:	; bb469
                                  ;     317 
                                  ;     318 	(*pstr)++;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",318
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",318
 000005D0 AB01                    		MOV.L 30H[R0], R1
 000005D2 EC1E                    		MOV.L [R1], R14
 000005D4 621E                    		ADD #01H, R14
 000005D6 E31E                    		MOV.L R14, [R1]
 000005D8                         L180:	; bb469.split
                                  ;     319 	return (STAT_OK);							// signal that parsing is complete
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",319
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",319
 000005D8 3C0600                  		MOV.B #00H, 06H[R0]
 000005DB                         L181:	; bb474
 000005DB C500062B                		MOV.B 06H[R0], 2BH[R0]
                                  ;     320 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",320
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",320
 000005DF 59012B                  		MOVU.B 2BH[R0], R1
 000005E2 3F660F                  		RTSD #3CH, R6-R6
 000005E5                         _json_serialize:
@@ -1292,7 +1292,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     354 #define BUFFER_MARGIN 8			// safety margin to avoid buffer overruns during footer checksum generation
                                  ;     355 
                                  ;     356 uint16_t json_serialize(nvObj_t *nv, char_t *out_buf, uint16_t size)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",356
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",356
 000005E5 7100DC                  		ADD #0FFFFFFDCH, R0
 000005E8 A201                    		MOV.L R1, 20H[R0]
 000005EA A18A                    		MOV.L R2, 1CH[R0]
@@ -1302,32 +1302,32 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     359 	return (0);
                                  ;     360 #else
                                  ;     361 	char_t *str = out_buf;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",361
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",361
 000005EE E5000702                		MOV.L 1CH[R0], 08H[R0]
 000005F2                         L183:	; entry.split
                                  ;     362 	char_t *str_max = out_buf + size - BUFFER_MARGIN;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",362
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",362
 000005F2 A989                    		MOV.L 1CH[R0], R1
 000005F4 06C9010D                		ADD 1AH[R0].UW, R1
 000005F8 6081                    		SUB #08H, R1
 000005FA A089                    		MOV.L R1, 0CH[R0]
 000005FC                         L184:	; entry.split1
                                  ;     363 	int8_t initial_depth = nv->depth;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",363
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",363
 000005FC AA01                    		MOV.L 20H[R0], R1
 000005FE C5100A11                		MOV.B 0AH[R1], 11H[R0]
 00000602                         L185:	; entry.split2
                                  ;     364 	int8_t prev_depth = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",364
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",364
 00000602 3C8200                  		MOV.B #00H, 12H[R0]
 00000605                         L186:	; entry.split3
                                  ;     365 	uint8_t need_a_comma = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",365
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",365
 00000605 3C8300                  		MOV.B #00H, 13H[R0]
 00000608                         L187:	; entry.split4
                                  ;     366 
                                  ;     367 	*str++ = '{'; 								// write opening curly
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",367
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",367
 00000608 A881                    		MOV.L 08H[R0], R1
 0000060A F8147B                  		MOV.B #7BH, [R1]
 0000060D A881                    		MOV.L 08H[R0], R1
@@ -1339,7 +1339,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     369 	while (true) {
                                  ;     370 		if (nv->valuetype != TYPE_EMPTY) {
                                  ;     371 			if (need_a_comma) { *str++ = ',';}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",371
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",371
 00000616 B489                    		MOVU.B 13H[R0], R1
 00000618 6101                    		CMP #00H, R1
 0000061A 20rr                    		BEQ L190
@@ -1351,11 +1351,11 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000625 A081                    		MOV.L R1, 08H[R0]
 00000627                         L190:	; bb33
                                  ;     372 			need_a_comma = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",372
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",372
 00000627 3C8301                  		MOV.B #01H, 13H[R0]
 0000062A                         L191:	; bb33.split
                                  ;     373 			if (js.json_syntax == JSON_SYNTAX_RELAXED) {		// write name
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",373
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",373
 0000062A AA02                    		MOV.L 20H[R0], R2
 0000062C 712218                  		ADD #18H, R2
 0000062F FB12rrrrrrrr            		MOV.L #_js, R1
@@ -1366,7 +1366,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000063D                         L192:	; bb35
 0000063D 6080                    		SUB #08H, R0
                                  ;     374 				str += sprintf((char *)str, "%s:", nv->token);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",374
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",374
 0000063F FBE2rrrrrrrr            		MOV.L #_L15, R14
 00000645 E30E                    		MOV.L R14, [R0]
 00000647 A00A                    		MOV.L R2, 04H[R0]
@@ -1379,7 +1379,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000657 6080                    		SUB #08H, R0
                                  ;     375 			} else {
                                  ;     376 				str += sprintf((char *)str, "\"%s\":", nv->token);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",376
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",376
 00000659 FBE2rrrrrrrr            		MOV.L #_L16, R14
 0000065F E30E                    		MOV.L R14, [R0]
 00000661 A00A                    		MOV.L R2, 04H[R0]
@@ -1392,7 +1392,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     378 
                                  ;     379 			// check for illegal float values
                                  ;     380 			if (nv->valuetype == TYPE_FLOAT) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",380
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",380
 0000066F AA01                    		MOV.L 20H[R0], R1
 00000671 8A99                    		MOV.B 0BH[R1], R1
 00000673 6141                    		CMP #04H, R1
@@ -1404,7 +1404,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000067D 2Err                 B  		BRA L201
 0000067F                         L196:	; bb63
                                  ;     381 				if (isnan((double)nv->value) || isinf((double)nv->value)) { nv->value = 0;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",381
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",381
 0000067F AA01                    		MOV.L 20H[R0], R1
 00000681 A911                    		MOV.L 10H[R1], R1
 00000683 05rrrrrr             A  		BSR __FDclass
@@ -1432,7 +1432,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     383 
                                  ;     384 			// serialize output value
                                  ;     385 			if		(nv->valuetype == TYPE_NULL)		{ str += (char_t)sprintf((char *)str, "null");} // Note that that "" is NOT null
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",385
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",385
 000006A7 AA01                    		MOV.L 20H[R0], R1
 000006A9 8A99                    		MOV.B 0BH[R1], R1
 000006AB 6101                    		CMP #00H, R1
@@ -1450,14 +1450,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006C9 38rrrr               W  		BRA L218
 000006CC                         L203:	; bb133
                                  ;     386 			else if (nv->valuetype == TYPE_INTEGER)	{
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",386
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",386
 000006CC AA01                    		MOV.L 20H[R0], R1
 000006CE 8A99                    		MOV.B 0BH[R1], R1
 000006D0 6121                    		CMP #02H, R1
 000006D2 21rr                    		BNE L205
 000006D4                         L204:	; bb134
                                  ;     387 				str += (char_t)sprintf((char *)str, "%1.0f", (double)nv->value);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",387
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",387
 000006D4 AA02                    		MOV.L 20H[R0], R2
 000006D6 A881                    		MOV.L 08H[R0], R1
 000006D8 6080                    		SUB #08H, R0
@@ -1473,19 +1473,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006F7                         L205:	; bb145
                                  ;     388 			}
                                  ;     389 			else if (nv->valuetype == TYPE_DATA)	{
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",389
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",389
 000006F7 AA01                    		MOV.L 20H[R0], R1
 000006F9 8A9A                    		MOV.B 0BH[R1], R2
 000006FB 6132                    		CMP #03H, R2
 000006FD 21rr                    		BNE L208
 000006FF                         L206:	; bb146
                                  ;     390 				uint32_t *v = (uint32_t*)&nv->value;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",390
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",390
 000006FF 711110                  		ADD #10H, R1
 00000702 A109                    		MOV.L R1, 14H[R0]
 00000704                         L207:	; bb146.split
                                  ;     391 				str += (char_t)sprintf((char *)str, "\"0x%lx\"", *v);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",391
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",391
 00000704 A90A                    		MOV.L 14H[R0], R2
 00000706 A881                    		MOV.L 08H[R0], R1
 00000708 6080                    		SUB #08H, R0
@@ -1501,7 +1501,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000726                         L208:	; bb159
                                  ;     392 			}
                                  ;     393 			else if (nv->valuetype == TYPE_STRING)	{ str += (char_t)sprintf((char *)str, "\"%s\"",(char *)*nv->stringp);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",393
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",393
 00000726 8A99                    		MOV.B 0BH[R1], R1
 00000728 6151                    		CMP #05H, R1
 0000072A 21rr                    		BNE L210
@@ -1520,7 +1520,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000074C 38rrrr               W  		BRA L218
 0000074F                         L210:	; bb172
                                  ;     394 			else if (nv->valuetype == TYPE_ARRAY)	{ str += (char_t)sprintf((char *)str, "[%s]",  (char *)*nv->stringp);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",394
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",394
 0000074F AA01                    		MOV.L 20H[R0], R1
 00000751 8A99                    		MOV.B 0BH[R1], R1
 00000753 6161                    		CMP #06H, R1
@@ -1540,7 +1540,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000777 2Err                 B  		BRA L218
 00000779                         L212:	; bb185
                                  ;     395 			else if (nv->valuetype == TYPE_FLOAT)	{ preprocess_float(nv);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",395
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",395
 00000779 AA01                    		MOV.L 20H[R0], R1
 0000077B 8A9A                    		MOV.B 0BH[R1], R2
 0000077D 6142                    		CMP #04H, R2
@@ -1549,7 +1549,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000781 05rrrrrr             A  		BSR _preprocess_float
                                  ;     396 //													  str += fntoa((char *)str, nv->value, nv->precision);
                                  ;     397 													  str += fntoa(str, nv->value, nv->precision);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",397
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",397
 00000785 AA01                    		MOV.L 20H[R0], R1
 00000787 B313                    		MOVU.B 0CH[R1], R3
 00000789 A912                    		MOV.L 10H[R1], R2
@@ -1561,13 +1561,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000799                         L214:	; bb200
                                  ;     398 			}
                                  ;     399 			else if (nv->valuetype == TYPE_BOOL) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",399
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",399
 00000799 8A99                    		MOV.B 0BH[R1], R1
 0000079B 6111                    		CMP #01H, R1
 0000079D 21rr                    		BNE L218
 0000079F                         L215:	; bb202
                                  ;     400 				if (fp_FALSE(nv->value)) { str += sprintf((char *)str, "false");}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",400
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",400
 0000079F AA01                    		MOV.L 20H[R0], R1
 000007A1 A911                    		MOV.L 10H[R1], R1
 000007A3 FD7211BD378635          		FCMP #358637BDH, R1
@@ -1585,7 +1585,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000007C6                         L217:	; bb208
 000007C6 6040                    		SUB #04H, R0
                                  ;     401 				else { str += (char_t)sprintf((char *)str, "true"); }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",401
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",401
 000007C8 FBE2rrrrrrrr            		MOV.L #_L23, R14
 000007CE E30E                    		MOV.L R14, [R0]
 000007D0 05rrrrrr             A  		BSR _sprintf
@@ -1596,14 +1596,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000007DE                         L218:	; bb278
                                  ;     402 			}
                                  ;     403 			if (nv->valuetype == TYPE_PARENT) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",403
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",403
 000007DE AA01                    		MOV.L 20H[R0], R1
 000007E0 8A99                    		MOV.B 0BH[R1], R1
 000007E2 6171                    		CMP #07H, R1
 000007E4 21rr                    		BNE L221
 000007E6                         L219:	; bb279
                                  ;     404 				*str++ = '{';
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",404
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",404
 000007E6 A881                    		MOV.L 08H[R0], R1
 000007E8 F8147B                  		MOV.B #7BH, [R1]
 000007EB A881                    		MOV.L 08H[R0], R1
@@ -1611,13 +1611,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000007EF A081                    		MOV.L R1, 08H[R0]
 000007F1                         L220:	; bb279.split
                                  ;     405 				need_a_comma = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",405
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",405
 000007F1 3C8300                  		MOV.B #00H, 13H[R0]
 000007F4                         L221:	; bb299
                                  ;     406 			}
                                  ;     407 		}
                                  ;     408 		if (str >= str_max) { return (uint16_t)(-1);}		// signal buffer overrun
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",408
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",408
 000007F4 A881                    		MOV.L 08H[R0], R1
 000007F6 06850103                		CMP 0CH[R0].L, R1
 000007FA 23rr                    		BLTU L223
@@ -1626,7 +1626,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000801 38rrrr               W  		BRA L235
 00000804                         L223:	; bb308
                                  ;     409 		if ((nv = nv->nx) == NULL) { break;}	// end of the list
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",409
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",409
 00000804 AA01                    		MOV.L 20H[R0], R1
 00000806 A819                    		MOV.L 04H[R1], R1
 00000808 A201                    		MOV.L R1, 20H[R0]
@@ -1637,18 +1637,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     410 
                                  ;     411 		while (nv->depth < prev_depth--) {		// iterate the closing curlies
                                  ;     412 			need_a_comma = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",412
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",412
 00000810 3C8301                  		MOV.B #01H, 13H[R0]
 00000813                         L225:	; bb319.split
                                  ;     413 			*str++ = '}';
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",413
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",413
 00000813 A881                    		MOV.L 08H[R0], R1
 00000815 F8147D                  		MOV.B #7DH, [R1]
 00000818 A881                    		MOV.L 08H[R0], R1
 0000081A 6211                    		ADD #01H, R1
 0000081C A081                    		MOV.L R1, 08H[R0]
 0000081E                         L226:	; bb323
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",411
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",411
 0000081E 8C81                    		MOV.B 12H[R0], R1
 00000820 7112FF                  		ADD #0FFFFFFFFH, R1, R2
 00000823 AA03                    		MOV.L 20H[R0], R3
@@ -1659,11 +1659,11 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000082D                         L227:	; bb335
                                  ;     414 		}
                                  ;     415 		prev_depth = nv->depth;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",415
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",415
 0000082D AA01                    		MOV.L 20H[R0], R1
 0000082F C5100A12                		MOV.B 0AH[R1], 12H[R0]
 00000833                         L228:	; bb339.split
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",370
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",370
 00000833 AA01                    		MOV.L 20H[R0], R1
 00000835 8A99                    		MOV.B 0BH[R1], R1
 00000837 7501FF                  		CMP #0FFFFFFFFH, R1
@@ -1679,7 +1679,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     417 
                                  ;     418 	// closing curlies and NEWLINE
                                  ;     419 	while (prev_depth-- > initial_depth) { *str++ = '}';}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",419
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",419
 00000848 8C81                    		MOV.B 12H[R0], R1
 0000084A 7112FF                  		ADD #0FFFFFFFFH, R1, R2
 0000084D 8C0B                    		MOV.B 11H[R0], R3
@@ -1690,7 +1690,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000857                         L231:	; bb356
 00000857 6040                    		SUB #04H, R0
                                  ;     420 	str += sprintf((char *)str, "}\n");	// using sprintf for this last one ensures a NUL termination
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",420
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",420
 00000859 FBE2rrrrrrrr            		MOV.L #_L24, R14
 0000085F E30E                    		MOV.L R14, [R0]
 00000861 05rrrrrr             A  		BSR _sprintf
@@ -1699,7 +1699,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000086B A081                    		MOV.L R1, 08H[R0]
 0000086D                         L232:	; bb356.split
                                  ;     421 	if (str > out_buf + size) { return (uint16_t)(-1);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",421
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",421
 0000086D A989                    		MOV.L 1CH[R0], R1
 0000086F 06C9010D                		ADD 1AH[R0].UW, R1
 00000873 06850102                		CMP 08H[R0].L, R1
@@ -1709,7 +1709,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000087E 08                   S  		BRA L235
 0000087F                         L234:	; bb372
                                  ;     422 	return (str - out_buf);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",422
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",422
 0000087F A881                    		MOV.L 08H[R0], R1
 00000881 06810107                		SUB 1CH[R0].L, R1
 00000885 9089                    		MOV.W R1, 06H[R0]
@@ -1717,7 +1717,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000887 D500030C                		MOV.W 06H[R0], 18H[R0]
                                  ;     423 #endif
                                  ;     424 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",424
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",424
 0000088B BB01                    		MOVU.W 18H[R0], R1
 0000088D 6709                    		RTSD #24H
 0000088F                         _json_print_object:
@@ -1731,7 +1731,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     431  *	Object list should be terminated by nv->nx == NULL
                                  ;     432  */
                                  ;     433 void json_print_object(nvObj_t *nv)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",433
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",433
 0000088F 6040                    		SUB #04H, R0
 00000891 E301                    		MOV.L R1, [R0]
                                  ;     434 {
@@ -1740,7 +1740,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     437 #endif
                                  ;     438 
                                  ;     439 	json_serialize(nv, cs.out_buf, sizeof(cs.out_buf));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",439
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",439
 00000893 FB22rrrrrrrr            		MOV.L #_cs, R2
 00000899 72224301                		ADD #0143H, R2
 0000089D FB3A0002                		MOV.L #00000200H, R3
@@ -1748,7 +1748,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000008A4                         L237:	; entry.split
 000008A4 6080                    		SUB #08H, R0
                                  ;     440 	fprintf(stderr, "%s", (char *)cs.out_buf);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",440
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",440
 000008A6 FB12rrrrrrrr            		MOV.L #_cs, R1
 000008AC 72114301                		ADD #0143H, R1
 000008B0 A009                    		MOV.L R1, 04H[R0]
@@ -1767,13 +1767,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     445  */
                                  ;     446 
                                  ;     447 void json_print_list(stat_t status, uint8_t flags)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",447
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",447
 000008C8 6040                    		SUB #04H, R0
 000008CA 8089                    		MOV.B R1, 03H[R0]
 000008CC 8082                    		MOV.B R2, 02H[R0]
                                  ;     448 {
                                  ;     449 	switch (flags) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",449
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",449
 000008CE B081                    		MOVU.B 02H[R0], R1
 000008D0 6121                    		CMP #02H, R1
 000008D2 20rr                    		BEQ L241
@@ -1783,21 +1783,21 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000008D8                         L240:	; bb5
                                  ;     450 		case JSON_NO_PRINT: { break; }
                                  ;     451 		case JSON_OBJECT_FORMAT: { json_print_object(nv_body); break; }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",451
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",451
 000008D8 FB12rrrrrrrr            		MOV.L #_nvl, R1
 000008DE 711128                  		ADD #28H, R1
 000008E1 39rrrr               W  		BSR _json_print_object
 000008E4 6701                    		RTSD #04H
 000008E6                         L241:	; bb7
                                  ;     452 		case JSON_RESPONSE_FORMAT: { json_print_response(status); break; }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",452
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",452
 000008E6 B089                    		MOVU.B 03H[R0], R1
 000008E8 39rrrr               W  		BSR _json_print_response
 000008EB 6701                    		RTSD #04H
 000008ED                         L242:	; return
                                  ;     453 	}
                                  ;     454 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",454
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",454
 000008ED 6701                    		RTSD #04H
 000008EF                         _json_print_response:
                                  		.STACK	_json_print_response=68
@@ -1823,7 +1823,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     474 #define MAX_TAIL_LEN 8
                                  ;     475 
                                  ;     476 void json_print_response(uint8_t status)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",476
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",476
 000008EF 6E67                    		PUSHM R6-R7
 000008F1 7100D8                  		ADD #0FFFFFFD8H, R0
 000008F4 C70127                  		MOV.B R1, 27H[R0]
@@ -1833,7 +1833,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     480 #endif
                                  ;     481 
                                  ;     482 	if (js.json_verbosity == JV_SILENT) return;			// silent responses
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",482
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",482
 000008F7 FBE2rrrrrrrr            		MOV.L #_js, R14
 000008FD 58EE                    		MOVU.B [R14], R14
 000008FF 610E                    		CMP #00H, R14
@@ -1842,23 +1842,23 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     483 
                                  ;     484 	// Body processing
                                  ;     485 	nvObj_t *nv = nv_body;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",485
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",485
 00000904 FB12rrrrrrrr            		MOV.L #_nvl, R1
 0000090A 711128                  		ADD #28H, R1
 0000090D A009                    		MOV.L R1, 04H[R0]
 0000090F                         L245:	; bb13.split
                                  ;     486 	if (status == STAT_JSON_SYNTAX_ERROR) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",486
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",486
 0000090F 590127                  		MOVU.B 27H[R0], R1
 00000912 75516F                  		CMP #6FH, R1
 00000915 21rr                    		BNE L248
 00000917                         L246:	; bb15
                                  ;     487 		nv_reset_nv_list();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",487
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",487
 00000917 05rrrrrr             A  		BSR _nv_reset_nv_list
 0000091B                         L247:	; bb15.split
                                  ;     488 		nv_add_string((const char_t *)"err", escape_string(cs.in_buf, cs.saved_buf));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",488
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",488
 0000091B FB12rrrrrrrr            		MOV.L #_cs, R1
 00000921 72124303                		ADD #0343H, R1, R2
 00000925 711144                  		ADD #44H, R1
@@ -1870,7 +1870,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000093B                         L248:	; bb20
                                  ;     489 
                                  ;     490 	} else if (cm.machine_state != MACHINE_INITIALIZING) {	// always do full echo during startup
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",490
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",490
 0000093B FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000941 5AEE1D02                		MOVU.B 021DH[R14], R14
 00000945 610E                    		CMP #00H, R14
@@ -1879,7 +1879,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     491 		uint8_t nv_type;
                                  ;     492 		do {
                                  ;     493 			if ((nv_type = nv_get_type(nv)) == NV_TYPE_NULL) break;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",493
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",493
 0000094A A809                    		MOV.L 04H[R0], R1
 0000094C 05rrrrrr             A  		BSR _nv_get_type
 00000950 C70126                  		MOV.B R1, 26H[R0]
@@ -1888,20 +1888,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000958                         L250:	; bb34
                                  ;     494 
                                  ;     495 			if (nv_type == NV_TYPE_GCODE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",495
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",495
 00000958 590126                  		MOVU.B 26H[R0], R1
 0000095B 6121                    		CMP #02H, R1
 0000095D 21rr                    		BNE L253
 0000095F                         L251:	; bb36
                                  ;     496 				if (js.echo_json_gcode_block == false) {	// kill command echo if not enabled
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",496
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",496
 0000095F FB12rrrrrrrr            		MOV.L #_js, R1
 00000965 B199                    		MOVU.B 07H[R1], R1
 00000967 6101                    		CMP #00H, R1
 00000969 21rr                    		BNE L263
 0000096B                         L252:	; bb37
                                  ;     497 					nv->valuetype = TYPE_EMPTY;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",497
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",497
 0000096B A809                    		MOV.L 04H[R0], R1
 0000096D 3C1BFF                  		MOV.B #0FFH, 0BH[R1]
 00000970 2Err                 B  		BRA L263
@@ -1914,20 +1914,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     503 //				}
                                  ;     504 
                                  ;     505 			} else if (nv_type == NV_TYPE_MESSAGE) {		// kill message echo if not enabled
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",505
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",505
 00000972 590126                  		MOVU.B 26H[R0], R1
 00000975 6141                    		CMP #04H, R1
 00000977 21rr                    		BNE L256
 00000979                         L254:	; bb49
                                  ;     506 				if (js.echo_json_messages == false) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",506
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",506
 00000979 FB12rrrrrrrr            		MOV.L #_js, R1
 0000097F B111                    		MOVU.B 04H[R1], R1
 00000981 6101                    		CMP #00H, R1
 00000983 21rr                    		BNE L263
 00000985                         L255:	; bb50
                                  ;     507 					nv->valuetype = TYPE_EMPTY;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",507
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",507
 00000985 A809                    		MOV.L 04H[R0], R1
 00000987 3C1BFF                  		MOV.B #0FFH, 0BH[R1]
 0000098A 2Err                 B  		BRA L263
@@ -1935,13 +1935,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     508 				}
                                  ;     509 
                                  ;     510 			} else if (nv_type == NV_TYPE_LINENUM) {		// kill line number echo if not enabled
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",510
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",510
 0000098C 590126                  		MOVU.B 26H[R0], R1
 0000098F 6151                    		CMP #05H, R1
 00000991 21rr                    		BNE L263
 00000993                         L257:	; bb62
                                  ;     511 				if ((js.echo_json_linenum == false) || (fp_ZERO(nv->value))) { // do not report line# 0
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",511
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",511
 00000993 FB12rrrrrrrr            		MOV.L #_js, R1
 00000999 B191                    		MOVU.B 06H[R1], R1
 0000099B 6101                    		CMP #00H, R1
@@ -1949,7 +1949,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000099F 08                   S  		BRA L259
 000009A0                         L258:	; bb63
                                  ;     512 					nv->valuetype = TYPE_EMPTY;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",512
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",512
 000009A0 A809                    		MOV.L 04H[R0], R1
 000009A2 3C1BFF                  		MOV.B #0FFH, 0BH[R1]
 000009A5 2Err                 B  		BRA L263
@@ -1969,7 +1969,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000009BF 6101                    		CMP #00H, R1
 000009C1 21rr                    		BNE L258
 000009C3                         L263:	; bb102
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",492
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",492
 000009C3 A809                    		MOV.L 04H[R0], R1
 000009C5 A819                    		MOV.L 04H[R1], R1
 000009C7 A009                    		MOV.L R1, 04H[R0]
@@ -1985,7 +1985,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     518 	// Footer processing
                                  ;     519 	while(nv->valuetype != TYPE_EMPTY) {					// find a free nvObj at end of the list...
                                  ;     520 		if ((nv = nv->nx) == NULL) {						//...or hit the NULL and return w/o a footer
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",520
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",520
 000009D0 A809                    		MOV.L 04H[R0], R1
 000009D2 A819                    		MOV.L 04H[R1], R1
 000009D4 A009                    		MOV.L R1, 04H[R0]
@@ -1993,7 +1993,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000009D8 21rr                    		BNE L267
 000009DA                         L265:	; bb126
                                  ;     521 			json_serialize(nv_header, cs.out_buf, sizeof(cs.out_buf));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",521
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",521
 000009DA FB22rrrrrrrr            		MOV.L #_cs, R2
 000009E0 72224301                		ADD #0143H, R2
 000009E4 FB12rrrrrrrr            		MOV.L #_nvl, R1
@@ -2002,10 +2002,10 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000009F0 39rrrr               W  		BSR _json_serialize
 000009F3                         L266:	; bb126.split
                                  ;     522 			return;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",522
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",522
 000009F3 3F670C                  		RTSD #30H, R6-R7
 000009F6                         L267:	; bb137
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",519
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",519
 000009F6 A809                    		MOV.L 04H[R0], R1
 000009F8 8A99                    		MOV.B 0BH[R1], R1
 000009FA 7501FF                  		CMP #0FFFFFFFFH, R1
@@ -2015,7 +2015,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     524 	}
                                  ;     525 	char_t footer_string[NV_FOOTER_LEN];
                                  ;     526 	sprintf((char *)footer_string, "%d,%d,%d,0", FOOTER_REVISION, status, cs.linelen);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",526
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",526
 000009FF FB12rrrrrrrr            		MOV.L #_cs, R1
 00000A05 BB91                    		MOVU.W 1CH[R1], R1
 00000A07 590227                  		MOVU.B 27H[R0], R2
@@ -2030,44 +2030,44 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A23 710010                  		ADD #10H, R0
 00000A26                         L269:	; bb145.split
                                  ;     527 	cs.linelen = 0;											// reset linelen so it's only reported once
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",527
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",527
 00000A26 FB12rrrrrrrr            		MOV.L #_cs, R1
 00000A2C 3D1E00                  		MOV.W #0000H, 1CH[R1]
 00000A2F                         L270:	; bb145.split1
                                  ;     528 
                                  ;     529 	nv_copy_string(nv, footer_string);						// link string to nv object
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",529
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",529
 00000A2F A809                    		MOV.L 04H[R0], R1
 00000A31 710208                  		ADD #08H, R0, R2
 00000A34 05rrrrrr             A  		BSR _nv_copy_string
 00000A38                         L271:	; bb145.split2
                                  ;     530 //	nv->depth = 0;											// footer 'f' is a peer to response 'r' (hard wired to 0
                                  ;     531 	nv->depth = js.json_footer_depth;						// 0=footer is peer to response 'r', 1=child of response 'r'
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",531
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",531
 00000A38 FBE2rrrrrrrr            		MOV.L #_js, R14
 00000A3E A809                    		MOV.L 04H[R0], R1
 00000A40 C5E1010A                		MOV.B 01H[R14], 0AH[R1]
 00000A44                         L272:	; bb145.split3
                                  ;     532 	nv->valuetype = TYPE_ARRAY;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",532
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",532
 00000A44 A809                    		MOV.L 04H[R0], R1
 00000A46 3C1B06                  		MOV.B #06H, 0BH[R1]
 00000A49                         L273:	; bb145.split4
                                  ;     533 	strcpy(nv->token, "f");									// terminate the list
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",533
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",533
 00000A49 A809                    		MOV.L 04H[R0], R1
 00000A4B FBE2rrrrrrrr            		MOV.L #_L28, R14
 00000A51 D4E10C                  		MOV.W [R14], 18H[R1]
 00000A54                         L274:	; bb145.split5
                                  ;     534 	nv->nx = NULL;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",534
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",534
 00000A54 A809                    		MOV.L 04H[R0], R1
 00000A56 3E1100                  		MOV.L #00000000H, 04H[R1]
 00000A59                         L275:	; bb145.split6
                                  ;     535 
                                  ;     536 	// do all this to avoid having to serialize it twice
                                  ;     537 	int16_t strcount = json_serialize(nv_header, cs.out_buf, sizeof(cs.out_buf));// make JSON string w/o checksum
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",537
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",537
 00000A59 FB22rrrrrrrr            		MOV.L #_cs, R2
 00000A5F 72224301                		ADD #0143H, R2
 00000A63 FB12rrrrrrrr            		MOV.L #_nvl, R1
@@ -2077,21 +2077,21 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A72 9309                    		MOV.W R1, 1AH[R0]
 00000A74                         L276:	; bb145.split7
                                  ;     538 	if (strcount < 0) { return;}							// encountered an overrun during serialization
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",538
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",538
 00000A74 9B09                    		MOV.W 1AH[R0], R1
 00000A76 6101                    		CMP #00H, R1
 00000A78 28rr                  * 		BLT L286
          38rrrr                  
 00000A7D                         L277:	; bb175
                                  ;     539 	if (strcount > OUTPUT_BUFFER_LEN - MAX_TAIL_LEN) { return;}	// would overrun during checksum generation
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",539
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",539
 00000A7D 9B09                    		MOV.W 1AH[R0], R1
 00000A7F 7601F801                		CMP #01F8H, R1
 00000A83 2Brr                  * 		BGT L286
          38rrrr                  
 00000A88                         L278:	; bb183
                                  ;     540 	int16_t strcount2 = strcount;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",540
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",540
 00000A88 D5000D0E                		MOV.W 1AH[R0], 1CH[R0]
 00000A8C 08                   S  		BRA L280
 00000A8D                         L279:	; bb185
@@ -2102,7 +2102,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     541 	char tail[MAX_TAIL_LEN];
                                  ;     542 
                                  ;     543 	while (cs.out_buf[strcount] != '0') { strcount--; }		// find end of checksum
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",543
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",543
 00000A93 FBE2rrrrrrrr            		MOV.L #_cs, R14
 00000A99 06490E0D                		ADD 1AH[R0].W, R14
 00000A9D 5AEE4301                		MOVU.B 0143H[R14], R14
@@ -2110,7 +2110,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000AA4 21rr                    		BNE L279
 00000AA6                         L281:	; bb197
                                  ;     544 	strcpy(tail, cs.out_buf + strcount + 1);				// save the json termination
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",544
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",544
 00000AA6 FB22rrrrrrrr            		MOV.L #_cs, R2
 00000AAC 0649020D                		ADD 1AH[R0].W, R2
 00000AB0 72224401                		ADD #0144H, R2
@@ -2125,7 +2125,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000AC3                         L283:	; bb206
                                  ;     545 
                                  ;     546 	while (cs.out_buf[strcount2] != ',') { strcount2--; }// find start of checksum
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",546
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",546
 00000AC3 FBE2rrrrrrrr            		MOV.L #_cs, R14
 00000AC9 06490E0E                		ADD 1CH[R0].W, R14
 00000ACD 5AEE4301                		MOVU.B 0143H[R14], R14
@@ -2133,7 +2133,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000AD4 21rr                    		BNE L282
 00000AD6                         L284:	; bb215
                                  ;     547 	sprintf((char *)cs.out_buf + strcount2 + 1, "%d%s", compute_checksum(cs.out_buf, strcount2), tail);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",547
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",547
 00000AD6 BB86                    		MOVU.W 1CH[R0], R6
 00000AD8 FB72rrrrrrrr            		MOV.L #_cs, R7
 00000ADE 72774301                		ADD #0143H, R7
@@ -2155,7 +2155,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000B09                         L285:	; bb215.split
 00000B09 6080                    		SUB #08H, R0
                                  ;     548 	fprintf(stderr, "%s", cs.out_buf);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",548
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",548
 00000B0B FB12rrrrrrrr            		MOV.L #_cs, R1
 00000B11 72114301                		ADD #0143H, R1
 00000B15 A009                    		MOV.L R1, 04H[R0]
@@ -2167,7 +2167,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000B2B 3F670C                  		RTSD #30H, R6-R7
 00000B2E                         L286:	; return
                                  ;     549 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",549
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",549
 00000B2E 3F670C                  		RTSD #30H, R6-R7
 00000B31                         _json_set_jv:
                                  		.STACK	_json_set_jv=12
@@ -2182,23 +2182,23 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     558  */
                                  ;     559 
                                  ;     560 stat_t json_set_jv(nvObj_t *nv)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",560
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",560
 00000B31 6080                    		SUB #08H, R0
 00000B33 A009                    		MOV.L R1, 04H[R0]
 00000B35 FBE20000A040            		MOV.L #40A00000H, R14
                                  ;     561 {
                                  ;     562 	if (nv->value > JV_VERBOSE)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",562
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",562
 00000B3B FC851E04                		FCMP 10H[R1].L, R14
 00000B3F 26rr                    		BPZ L289
 00000B41                         L288:	; bb2
                                  ;     563         return (STAT_INPUT_VALUE_RANGE_ERROR);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",563
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",563
 00000B41 3C026E                  		MOV.B #6EH, 02H[R0]
 00000B44 38rrrr               W  		BRA L308
 00000B47                         L289:	; bb9
                                  ;     564 	js.json_verbosity = nv->value;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",564
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",564
 00000B47 A809                    		MOV.L 04H[R0], R1
 00000B49 A911                    		MOV.L 10H[R1], R1
 00000B4B FD72110000004F          		FCMP #4F000000H, R1
@@ -2212,33 +2212,33 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000B66                         L292:	; bb9.split
                                  ;     565 
                                  ;     566 	js.echo_json_footer = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",566
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",566
 00000B66 FB12rrrrrrrr            		MOV.L #_js, R1
 00000B6C 3C1300                  		MOV.B #00H, 03H[R1]
 00000B6F                         L293:	; bb9.split1
                                  ;     567 	js.echo_json_messages = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",567
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",567
 00000B6F FB12rrrrrrrr            		MOV.L #_js, R1
 00000B75 3C1400                  		MOV.B #00H, 04H[R1]
 00000B78                         L294:	; bb9.split2
                                  ;     568 	js.echo_json_configs = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",568
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",568
 00000B78 FB12rrrrrrrr            		MOV.L #_js, R1
 00000B7E 3C1500                  		MOV.B #00H, 05H[R1]
 00000B81                         L295:	; bb9.split3
                                  ;     569 	js.echo_json_linenum = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",569
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",569
 00000B81 FB12rrrrrrrr            		MOV.L #_js, R1
 00000B87 3C1600                  		MOV.B #00H, 06H[R1]
 00000B8A                         L296:	; bb9.split4
                                  ;     570 	js.echo_json_gcode_block = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",570
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",570
 00000B8A FB12rrrrrrrr            		MOV.L #_js, R1
 00000B90 3C1700                  		MOV.B #00H, 07H[R1]
 00000B93                         L297:	; bb9.split5
                                  ;     571 
                                  ;     572 	if (nv->value >= JV_FOOTER) 	{ js.echo_json_footer = true;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",572
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",572
 00000B93 A809                    		MOV.L 04H[R0], R1
 00000B95 A911                    		MOV.L 10H[R1], R1
 00000B97 FD72110000803F          		FCMP #3F800000H, R1
@@ -2248,7 +2248,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000BA6 3C1301                  		MOV.B #01H, 03H[R1]
 00000BA9                         L299:	; bb23
                                  ;     573 	if (nv->value >= JV_MESSAGES)	{ js.echo_json_messages = true;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",573
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",573
 00000BA9 A809                    		MOV.L 04H[R0], R1
 00000BAB A911                    		MOV.L 10H[R1], R1
 00000BAD FD721100000040          		FCMP #40000000H, R1
@@ -2258,7 +2258,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000BBC 3C1401                  		MOV.B #01H, 04H[R1]
 00000BBF                         L301:	; bb32
                                  ;     574 	if (nv->value >= JV_CONFIGS)	{ js.echo_json_configs = true;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",574
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",574
 00000BBF A809                    		MOV.L 04H[R0], R1
 00000BC1 A911                    		MOV.L 10H[R1], R1
 00000BC3 FD721100004040          		FCMP #40400000H, R1
@@ -2268,7 +2268,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000BD2 3C1501                  		MOV.B #01H, 05H[R1]
 00000BD5                         L303:	; bb41
                                  ;     575 	if (nv->value >= JV_LINENUM)	{ js.echo_json_linenum = true;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",575
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",575
 00000BD5 A809                    		MOV.L 04H[R0], R1
 00000BD7 A911                    		MOV.L 10H[R1], R1
 00000BD9 FD721100008040          		FCMP #40800000H, R1
@@ -2278,7 +2278,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000BE8 3C1601                  		MOV.B #01H, 06H[R1]
 00000BEB                         L305:	; bb50
                                  ;     576 	if (nv->value >= JV_VERBOSE)	{ js.echo_json_gcode_block = true;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",576
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",576
 00000BEB A809                    		MOV.L 04H[R0], R1
 00000BED A911                    		MOV.L 10H[R1], R1
 00000BEF FD72110000A040          		FCMP #40A00000H, R1
@@ -2289,12 +2289,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000C01                         L307:	; bb58
                                  ;     577 
                                  ;     578 	return(STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",578
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",578
 00000C01 3C0200                  		MOV.B #00H, 02H[R0]
 00000C04                         L308:	; bb60
 00000C04 C5000203                		MOV.B 02H[R0], 03H[R0]
                                  ;     579 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",579
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",579
 00000C08 B089                    		MOVU.B 03H[R0], R1
 00000C0A 6702                    		RTSD #08H
 00000C0C                         _js_print_ej:
@@ -2321,7 +2321,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     599 static const char fmt_fs[] PROGMEM = "[fs]  footer style%17d [0=new,1=old]\n";
                                  ;     600 
                                  ;     601 void js_print_ej(nvObj_t *nv) { text_print_ui8(nv, fmt_ej);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",601
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",601
 00000C0C 6040                    		SUB #04H, R0
 00000C0E E301                    		MOV.L R1, [R0]
 00000C10 FB22rrrrrrrr            		MOV.L #__$fmt_ej, R2
@@ -2330,7 +2330,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000C1C                         _js_print_jv:
                                  		.STACK	_js_print_jv=8
                                  ;     602 void js_print_jv(nvObj_t *nv) { text_print_ui8(nv, fmt_jv);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",602
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",602
 00000C1C 6040                    		SUB #04H, R0
 00000C1E E301                    		MOV.L R1, [R0]
 00000C20 FB22rrrrrrrr            		MOV.L #__$fmt_jv, R2
@@ -2339,7 +2339,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000C2C                         _js_print_js:
                                  		.STACK	_js_print_js=8
                                  ;     603 void js_print_js(nvObj_t *nv) { text_print_ui8(nv, fmt_js);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",603
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",603
 00000C2C 6040                    		SUB #04H, R0
 00000C2E E301                    		MOV.L R1, [R0]
 00000C30 FB22rrrrrrrr            		MOV.L #__$fmt_js, R2
@@ -2348,7 +2348,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000C3C                         _js_print_fs:
                                  		.STACK	_js_print_fs=8
                                  ;     604 void js_print_fs(nvObj_t *nv) { text_print_ui8(nv, fmt_fs);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\json_parser.c",604
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\json_parser.c",604
 00000C3C 6040                    		SUB #04H, R0
 00000C3E E301                    		MOV.L R1, [R0]
 00000C40 FB22rrrrrrrr            		MOV.L #__$fmt_fs, R2
@@ -2524,7 +2524,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx7E87\$ccrx\json_parser.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\json_parser.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -2533,5 +2533,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\json_parser.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\cnc\json_parser.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\json_parser.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\src\cnc\json_parser.obj

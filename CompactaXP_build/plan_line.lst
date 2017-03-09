@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:09 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:18:39 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:09
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:18:39
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=plan_line.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=plan_line.lst
@@ -124,14 +124,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      55  */
                                  ;      56 
                                  ;      57 void mp_zero_segment_velocity() { mr.segment_velocity = 0;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",57
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",57
 00000000 FBE2rrrrrrrr            		MOV.L #_mr, R14
 00000006 F9E64800                		MOV.L #00000000H, 0120H[R14]
 0000000A 02                      		RTS
 0000000B                         _mp_get_runtime_velocity:
                                  		.STACK	_mp_get_runtime_velocity=8
                                  ;      58 float mp_get_runtime_velocity(void) { return (mr.segment_velocity);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",58
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",58
 0000000B 6040                    		SUB #04H, R0
 0000000D FBE2rrrrrrrr            		MOV.L #_mr, R14
 00000013 EDE148                  		MOV.L 0120H[R14], R1
@@ -140,7 +140,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000001A                         _mp_get_runtime_absolute_position:
                                  		.STACK	_mp_get_runtime_absolute_position=12
                                  ;      59 float mp_get_runtime_absolute_position(uint8_t axis) { return (mr.position[axis]);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",59
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",59
 0000001A 6080                    		SUB #08H, R0
 0000001C 8189                    		MOV.B R1, 07H[R0]
 0000001E B189                    		MOVU.B 07H[R0], R1
@@ -153,7 +153,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000030                         _mp_set_runtime_work_offset:
                                  		.STACK	_mp_set_runtime_work_offset=8
                                  ;      60 void mp_set_runtime_work_offset(float offset[]) { copy_vector(mr.gm.work_offset, offset);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",60
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",60
 00000030 6040                    		SUB #04H, R0
 00000032 EF12                    		MOV.L R1, R2
 00000034 E302                    		MOV.L R2, [R0]
@@ -165,7 +165,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000047                         _mp_get_runtime_work_position:
                                  		.STACK	_mp_get_runtime_work_position=12
                                  ;      61 float mp_get_runtime_work_position(uint8_t axis) { return (mr.position[axis] - mr.gm.work_offset[axis]);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",61
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",61
 00000047 6080                    		SUB #08H, R0
 00000049 8189                    		MOV.B R1, 07H[R0]
 0000004B B189                    		MOVU.B 07H[R0], R1
@@ -187,11 +187,11 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      68  */
                                  ;      69 
                                  ;      70 uint8_t mp_get_runtime_busy()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",70
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",70
 00000061 6080                    		SUB #08H, R0
                                  ;      71 {
                                  ;      72 	if ((st_runtime_isbusy() == true) || (mr.move_state == MOVE_RUN)) return (true);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",72
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",72
 00000063 05rrrrrr             A  		BSR _st_runtime_isbusy
 00000067 6111                    		CMP #01H, R1
 00000069 20rr                    		BEQ L18
@@ -215,12 +215,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000087 21rr                    		BNE L16
 00000089                         L21:	; bb18
                                  ;      73 	return (false);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",73
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",73
 00000089 3C0600                  		MOV.B #00H, 06H[R0]
 0000008C                         L22:	; bb20
 0000008C C5000607                		MOV.B 06H[R0], 07H[R0]
                                  ;      74 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",74
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",74
 00000090 B189                    		MOVU.B 07H[R0], R1
 00000092 6702                    		RTSD #08H
 00000094                         _mp_aline:
@@ -248,19 +248,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      95 #define longest_tail bf->head_length
                                  ;      96 */
                                  ;      97 stat_t mp_aline(GCodeState_t *gm_in)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",97
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",97
 00000094 7EA6                    		PUSH.L R6
 00000096 710090                  		ADD #0FFFFFF90H, R0
 00000099 A689                    		MOV.L R1, 6CH[R0]
                                  ;      98 {
                                  ;      99 	mpBuf_t *bf; 						// current move pointer
                                  ;     100 	float exact_stop = 0;				// preset this value OFF
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",100
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",100
 0000009B 3E0200                  		MOV.L #00000000H, 08H[R0]
 0000009E                         L24:	; entry.split
                                  ;     101 	float junction_velocity;
                                  ;     102 	uint8_t mr_flag = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",102
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",102
 0000009E 3C8300                  		MOV.B #00H, 13H[R0]
 000000A1                         L25:	; entry.split1
                                  ;     103 
@@ -268,17 +268,17 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     105 	float axis_length[AXES];
                                  ;     106 	float axis_square[AXES];
                                  ;     107 	float length_square = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",107
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",107
 000000A1 3E8100                  		MOV.L #00000000H, 44H[R0]
 000000A4                         L26:	; entry.split2
                                  ;     108 
                                  ;     109 	for (uint8_t axis=0; axis<AXES; axis++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",109
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",109
 000000A4 F9045B00                		MOV.B #00H, 5BH[R0]
 000000A8 2Err                 B  		BRA L30
 000000AA                         L27:	; bb
                                  ;     110 		axis_length[axis] = gm_in->target[axis] - mm.position[axis];
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",110
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",110
 000000AA 59015B                  		MOVU.B 5BH[R0], R1
 000000AD FDC212                  		SHLL #02H, R1, R2
 000000B0 FBE2rrrrrrrr            		MOV.L #_mm, R14
@@ -290,7 +290,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000C5 FE21E2                  		MOV.L R2, [R1,R14]
 000000C8                         L28:	; bb.split
                                  ;     111 		axis_square[axis] = square(axis_length[axis]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",111
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",111
 000000C8 59015B                  		MOVU.B 5BH[R0], R1
 000000CB 710E14                  		ADD #14H, R0, R14
 000000CE FE61EE                  		MOV.L [R1,R14], R14
@@ -300,7 +300,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000DA                         L29:	; bb.split3
 000000DA 710E2C                  		ADD #2CH, R0, R14
                                  ;     112 		length_square += axis_square[axis];
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",112
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",112
 000000DD 59015B                  		MOVU.B 5BH[R0], R1
 000000E0 FE61E1                  		MOV.L [R1,R14], R1
 000000E3 FC890111                		FADD 44H[R0].L, R1
@@ -309,21 +309,21 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000EC 6211                    		ADD #01H, R1
 000000EE C7015B                  		MOV.B R1, 5BH[R0]
 000000F1                         L30:	; bb59
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",109
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",109
 000000F1 59015B                  		MOVU.B 5BH[R0], R1
 000000F4 6161                    		CMP #06H, R1
 000000F6 29rr                    		BLT L27
 000000F8                         L31:	; bb64
                                  ;     113 	}
                                  ;     114 	float length = sqrt(length_square);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",114
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",114
 000000F8 AC09                    		MOV.L 44H[R0], R1
 000000FA 05rrrrrr             A  		BSR _sqrt
 000000FE A481                    		MOV.L R1, 48H[R0]
 00000100                         L32:	; bb64.split
                                  ;     115 
                                  ;     116 	if (fp_ZERO(length)) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",116
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",116
 00000100 AC81                    		MOV.L 48H[R0], R1
 00000102 7BF1                    		BCLR #1FH, R1
 00000104 FD7211BD378635          		FCMP #358637BDH, R1
@@ -331,7 +331,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000010D                         L33:	; bb68
                                  ;     117 //		sr_request_status_report();
                                  ;     118 		return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",118
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",118
 0000010D 3C0300                  		MOV.B #00H, 03H[R0]
 00000110 38rrrr               W  		BRA L81
 00000113                         L34:	; bb75
@@ -347,21 +347,21 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     128 	//	(3) Previous block is not optimally planned. Vi <= previous block's entry_velocity + delta_velocity
                                  ;     129 
                                  ;     130 	_calc_move_times(gm_in, axis_length, axis_square);						// set move time and minimum time in the state
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",130
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",130
 00000113 AE89                    		MOV.L 6CH[R0], R1
 00000115 71032C                  		ADD #2CH, R0, R3
 00000118 710214                  		ADD #14H, R0, R2
 0000011B 39rrrr               W  		BSR __$_calc_move_times
 0000011E                         L35:	; bb75.split
                                  ;     131 	if (gm_in->move_time < MIN_BLOCK_TIME) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",131
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",131
 0000011E AE89                    		MOV.L 6CH[R0], R1
 00000120 AB91                    		MOV.L 38H[R1], R1
 00000122 FD721117B75137          		FCMP #3751B717H, R1
 00000129 26rr                    		BPZ L45
 0000012B                         L36:	; bb80
                                  ;     132 		float delta_velocity = pow(length, 0.66666666) * mm.cbrt_jerk;		// max velocity change for this move
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",132
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",132
 0000012B AC81                    		MOV.L 48H[R0], R1
 0000012D FB22ABAA2A3F            		MOV.L #3F2AAAABH, R2
 00000133 05rrrrrr             A  		BSR _pow
@@ -370,25 +370,25 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000141 A589                    		MOV.L R1, 5CH[R0]
 00000143                         L37:	; bb80.split
                                  ;     133 		float entry_velocity = 0;											// pre-set as if no previous blo
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",133
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",133
 00000143 3E8800                  		MOV.L #00000000H, 60H[R0]
 00000146                         L38:	; bb80.split4
                                  ;     134 		if ((bf = mp_get_run_buffer()) != NULL) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",134
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",134
 00000146 05rrrrrr             A  		BSR _mp_get_run_buffer
 0000014A A009                    		MOV.L R1, 04H[R0]
 0000014C 6101                    		CMP #00H, R1
 0000014E 20rr                    		BEQ L42
 00000150                         L39:	; bb87
                                  ;     135 			if (bf->replannable == true) {									// not optimally planned
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",135
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",135
 00000150 A809                    		MOV.L 04H[R0], R1
 00000152 B612                    		MOVU.B 18H[R1], R2
 00000154 6112                    		CMP #01H, R2
 00000156 21rr                    		BNE L41
 00000158                         L40:	; bb88
                                  ;     136 				entry_velocity = bf->entry_velocity + bf->delta_vmax;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",136
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",136
 00000158 AC19                    		MOV.L 44H[R1], R1
 0000015A A80A                    		MOV.L 04H[R0], R2
 0000015C FC892117                		FADD 5CH[R2].L, R1
@@ -397,13 +397,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000163                         L41:	; bb96
                                  ;     137 			} else {														// optimally pla
                                  ;     138 				entry_velocity = bf->exit_velocity;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",138
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",138
 00000163 E5101318                		MOV.L 4CH[R1], 60H[R0]
 00000167                         L42:	; bb113
                                  ;     139 			}
                                  ;     140 		}
                                  ;     141 		float move_time = (2 * length) / (2*entry_velocity + delta_velocity);// compute execution time for this move
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",141
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",141
 00000167 AC81                    		MOV.L 48H[R0], R1
 00000169 FC8B11                  		FADD R1, R1
 0000016C AE02                    		MOV.L 60H[R0], R2
@@ -413,13 +413,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000178 A609                    		MOV.L R1, 64H[R0]
 0000017A                         L43:	; bb113.split
                                  ;     142 		if (move_time < MIN_BLOCK_TIME)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",142
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",142
 0000017A AE09                    		MOV.L 64H[R0], R1
 0000017C FD721117B75137          		FCMP #3751B717H, R1
 00000183 26rr                    		BPZ L45
 00000185                         L44:	; bb122
                                  ;     143 			return (STAT_MINIMUM_TIME_MOVE);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",143
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",143
 00000185 3C03CA                  		MOV.B #0CAH, 03H[R0]
 00000188 38rrrr               W  		BRA L81
 0000018B                         L45:	; bb136
@@ -427,7 +427,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     145 
                                  ;     146 	// get a cleared buffer and setup move variables
                                  ;     147 	if ((bf = mp_get_write_buffer()) == NULL)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",147
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",147
 0000018B 05rrrrrr             A  		BSR _mp_get_write_buffer
 0000018F A009                    		MOV.L R1, 04H[R0]
 00000191 6101                    		CMP #00H, R1
@@ -435,25 +435,25 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000195                         L46:	; bb137
 00000195 66E1                    		MOV.L #0000000EH, R1
                                  ;     148         return(cm_hard_alarm(STAT_BUFFER_FULL_FATAL));                  // never supposed to fail
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",148
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",148
 00000197 05rrrrrr             A  		BSR _cm_hard_alarm
 0000019B 8089                    		MOV.B R1, 03H[R0]
 0000019D 38rrrr               W  		BRA L81
 000001A0                         L47:	; bb145
                                  ;     149 	bf->bf_func = mp_exec_aline;										// register the callback to the exec function
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",149
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",149
 000001A0 A809                    		MOV.L 04H[R0], R1
 000001A2 FB22rrrrrrrr            		MOV.L #_mp_exec_aline, R2
 000001A8 A092                    		MOV.L R2, 08H[R1]
 000001AA                         L48:	; bb145.split
                                  ;     150 	bf->length = length;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",150
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",150
 000001AA AC81                    		MOV.L 48H[R0], R1
 000001AC A80A                    		MOV.L 04H[R0], R2
 000001AE A329                    		MOV.L R1, 34H[R2]
 000001B0                         L49:	; bb145.split5
                                  ;     151 	memcpy(&bf->gm, gm_in, sizeof(GCodeState_t));						// copy model state into planner buffer
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",151
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",151
 000001B0 A809                    		MOV.L 04H[R0], R1
 000001B2 711174                  		ADD #74H, R1
 000001B5 75435C                  		MOV.L #0000005CH, R3
@@ -522,24 +522,24 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     211 
                                  ;     212 	float C;					// contribution term. C = T * a
                                  ;     213 	float maxC = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",213
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",213
 000001BC 3E8400                  		MOV.L #00000000H, 50H[R0]
 000001BF                         L51:	; bb145.split7
 000001BF FB120000803F            		MOV.L #3F800000H, R1
                                  ;     214 	float recip_L2 = 1/length_square;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",214
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",214
 000001C5 FC910111                		FDIV 44H[R0].L, R1
 000001C9 A509                    		MOV.L R1, 54H[R0]
 000001CB                         L52:	; bb145.split8
                                  ;     215 
                                  ;     216 	for (uint8_t axis=0; axis<AXES; axis++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",216
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",216
 000001CB F9046A00                		MOV.B #00H, 6AH[R0]
 000001CF 2Err                 B  		BRA L60
 000001D1                         L53:	; bb159
 000001D1 710E14                  		ADD #14H, R0, R14
                                  ;     217 		if (fabs(axis_length[axis]) > 0) {								// You cannot use the fp_XXX comparisons here!
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",217
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",217
 000001D4 59016A                  		MOVU.B 6AH[R0], R1
 000001D7 FE61EE                  		MOV.L [R1,R14], R14
 000001DA 7BFE                    		BCLR #1FH, R14
@@ -548,7 +548,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001E1 26rr                    		BPZ L59
 000001E3                         L54:	; bb160
                                  ;     218 			bf->unit[axis] = axis_length[axis] / bf->length;			// compute unit vector term (zeros are already zero)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",218
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",218
 000001E3 59016A                  		MOVU.B 6AH[R0], R1
 000001E6 710E14                  		ADD #14H, R0, R14
 000001E9 FE61E2                  		MOV.L [R1,R14], R2
@@ -559,7 +559,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000001F6 A1BA                    		MOV.L R2, 1CH[R3]
 000001F8                         L55:	; bb160.split
                                  ;     219 			C = axis_square[axis] * recip_L2 * cm.a[axis].recip_jerk;	// squaring axis_length ensures it's positive
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",219
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",219
 000001F8 59016A                  		MOVU.B 6AH[R0], R1
 000001FB 710E2C                  		ADD #2CH, R0, R14
 000001FE FE61E2                  		MOV.L [R1,R14], R2
@@ -571,17 +571,17 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000214 A48A                    		MOV.L R2, 4CH[R0]
 00000216                         L56:	; bb160.split9
                                  ;     220 			if (C > maxC) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",220
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",220
 00000216 AD01                    		MOV.L 50H[R0], R1
 00000218 FC850113                		FCMP 4CH[R0].L, R1
 0000021C 26rr                    		BPZ L59
 0000021E                         L57:	; bb190
                                  ;     221 				maxC = C;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",221
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",221
 0000021E E5001314                		MOV.L 4CH[R0], 50H[R0]
 00000222                         L58:	; bb190.split
                                  ;     222 				bf->jerk_axis = axis;						// also needed for junction vmax calculation
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",222
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",222
 00000222 59016A                  		MOVU.B 6AH[R0], R1
 00000225 A80A                    		MOV.L 04H[R0], R2
 00000227 C72164                  		MOV.B R1, 64H[R2]
@@ -590,7 +590,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000022D 6211                    		ADD #01H, R1
 0000022F C7016A                  		MOV.B R1, 6AH[R0]
 00000232                         L60:	; bb213
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",216
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",216
 00000232 59016A                  		MOVU.B 6AH[R0], R1
 00000235 6161                    		CMP #06H, R1
 00000237 29rr                    		BLT L53
@@ -600,7 +600,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     225 	}
                                  ;     226 	// set up and pre-compute the jerk terms needed for this round of planning
                                  ;     227 	bf->jerk = cm.a[bf->jerk_axis].jerk_max * JERK_MULTIPLIER / fabs(bf->unit[bf->jerk_axis]);	// scale the jerk
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",227
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",227
 00000239 A809                    		MOV.L 04H[R0], R1
 0000023B 591264                  		MOVU.B 64H[R1], R2
 0000023E EF2E                    		MOV.L R2, R14
@@ -618,7 +618,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000262                         L62:	; bb219.split
                                  ;     228 
                                  ;     229 	if (fabs(bf->jerk - mm.jerk) > JERK_MATCH_PRECISION) {	// specialized comparison for tolerance of delta
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",229
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",229
 00000262 A809                    		MOV.L 04H[R0], R1
 00000264 AE91                    		MOV.L 68H[R1], R1
 00000266 FBE2rrrrrrrr            		MOV.L #_mm, R14
@@ -629,21 +629,21 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000027B 26rr                    		BPZ L66
 0000027D                         L63:	; bb242
                                  ;     230 		mm.jerk = bf->jerk;									// used before this point next time around
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",230
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",230
 0000027D A809                    		MOV.L 04H[R0], R1
 0000027F FBE2rrrrrrrr            		MOV.L #_mm, R14
 00000285 E51E1A07                		MOV.L 68H[R1], 1CH[R14]
 00000289                         L64:	; bb242.split
 00000289 FB120000803F            		MOV.L #3F800000H, R1
                                  ;     231 		mm.recip_jerk = 1/bf->jerk;							// compute cached jerk terms used by planning
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",231
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",231
 0000028F A80A                    		MOV.L 04H[R0], R2
 00000291 FC91211A                		FDIV 68H[R2].L, R1
 00000295 FB22rrrrrrrr            		MOV.L #_mm, R2
 0000029B A221                    		MOV.L R1, 20H[R2]
 0000029D                         L65:	; bb242.split10
                                  ;     232 		mm.cbrt_jerk = cbrt(bf->jerk);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",232
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",232
 0000029D A809                    		MOV.L 04H[R0], R1
 0000029F AE91                    		MOV.L 68H[R1], R1
 000002A1 05rrrrrr             A  		BSR _cbrt
@@ -652,13 +652,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000002AD                         L66:	; bb263
                                  ;     233 	}
                                  ;     234 	bf->recip_jerk = mm.recip_jerk;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",234
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",234
 000002AD FBE2rrrrrrrr            		MOV.L #_mm, R14
 000002B3 A809                    		MOV.L 04H[R0], R1
 000002B5 E5E1081B                		MOV.L 20H[R14], 6CH[R1]
 000002B9                         L67:	; bb263.split
                                  ;     235 	bf->cbrt_jerk = mm.cbrt_jerk;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",235
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",235
 000002B9 FBE2rrrrrrrr            		MOV.L #_mm, R14
 000002BF A809                    		MOV.L 04H[R0], R1
 000002C1 E5E1091C                		MOV.L 24H[R14], 70H[R1]
@@ -666,7 +666,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     236 
                                  ;     237 	// finish up the current block variables
                                  ;     238 	if (cm_get_path_control(MODEL) != PATH_EXACT_STOP) { 	// exact stop cases already zeroed
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",238
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",238
 000002C5 FB12rrrrrrrr            		MOV.L #_cm, R1
 000002CB 72115402                		ADD #0254H, R1
 000002CF 05rrrrrr             A  		BSR _cm_get_path_control
@@ -674,24 +674,24 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000002D5 20rr                    		BEQ L71
 000002D7                         L69:	; bb271
                                  ;     239 		bf->replannable = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",239
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",239
 000002D7 A809                    		MOV.L 04H[R0], R1
 000002D9 3C9801                  		MOV.B #01H, 18H[R1]
 000002DC                         L70:	; bb271.split
                                  ;     240 		exact_stop = 8675309;								// an arbitrarily large floating point number
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",240
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",240
 000002DC F90202ED5F044B          		MOV.L #4B045FEDH, 08H[R0]
 000002E3                         L71:	; bb279
                                  ;     241 	}
                                  ;     242 	bf->cruise_vmax = bf->length / bf->gm.move_time;		// target velocity requested
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",242
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",242
 000002E3 A809                    		MOV.L 04H[R0], R1
 000002E5 AB1A                    		MOV.L 34H[R1], R2
 000002E7 FC91122B                		FDIV 0ACH[R1].L, R2
 000002EB A51A                    		MOV.L R2, 54H[R1]
 000002ED                         L72:	; bb279.split
                                  ;     243 	junction_velocity = _get_junction_vmax(bf->pv->unit, bf->unit);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",243
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",243
 000002ED A80A                    		MOV.L 04H[R0], R2
 000002EF EC21                    		MOV.L [R2], R1
 000002F1 71221C                  		ADD #1CH, R2
@@ -700,7 +700,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000002FA A089                    		MOV.L R1, 0CH[R0]
 000002FC                         L73:	; bb279.split12
                                  ;     244 	bf->entry_vmax = min3(bf->cruise_vmax, junction_velocity, exact_stop);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",244
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",244
 000002FC A80E                    		MOV.L 04H[R0], R6
 000002FE AD69                    		MOV.L 54H[R6], R1
 00000300 A883                    		MOV.L 08H[R0], R3
@@ -709,7 +709,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000308 A561                    		MOV.L R1, 50H[R6]
 0000030A                         L74:	; bb279.split13
                                  ;     245 	bf->delta_vmax = mp_get_target_velocity(0, bf->length, bf);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",245
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",245
 0000030A A80E                    		MOV.L 04H[R0], R6
 0000030C AB6A                    		MOV.L 34H[R6], R2
 0000030E 6601                    		MOV.L #00000000H, R1
@@ -718,7 +718,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000316 A5E9                    		MOV.L R1, 5CH[R6]
 00000318                         L75:	; bb279.split14
                                  ;     246 	bf->exit_vmax = min3(bf->cruise_vmax, (bf->entry_vmax + bf->delta_vmax), exact_stop);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",246
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",246
 00000318 A80E                    		MOV.L 04H[R0], R6
 0000031A AD62                    		MOV.L 50H[R6], R2
 0000031C FC896217                		FADD 5CH[R6].L, R2
@@ -728,20 +728,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000328 A5E1                    		MOV.L R1, 58H[R6]
 0000032A                         L76:	; bb279.split15
                                  ;     247 	bf->braking_velocity = bf->delta_vmax;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",247
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",247
 0000032A A809                    		MOV.L 04H[R0], R1
 0000032C E5111718                		MOV.L 5CH[R1], 60H[R1]
 00000330                         L77:	; bb279.split16
                                  ;     248 
                                  ;     249 	// Note: these next lines must remain in exact order. Position must update before committing the buffer.
                                  ;     250 	_plan_block_list(bf, &mr_flag);				// replan block list
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",250
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",250
 00000330 A809                    		MOV.L 04H[R0], R1
 00000332 710213                  		ADD #13H, R0, R2
 00000335 39rrrr               W  		BSR __$_plan_block_list
 00000338                         L78:	; bb279.split17
                                  ;     251 	copy_vector(mm.position, bf->gm.target);	// set the planner position
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",251
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",251
 00000338 A80A                    		MOV.L 04H[R0], R2
 0000033A 71227C                  		ADD #7CH, R2
 0000033D FB12rrrrrrrr            		MOV.L #_mm, R1
@@ -751,16 +751,16 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000034A                         L79:	; bb279.split18
 0000034A 6611                    		MOV.L #00000001H, R1
                                  ;     252 	mp_commit_write_buffer(MOVE_TYPE_ALINE); 	// commit current block (must follow the position update)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",252
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",252
 0000034C 05rrrrrr             A  		BSR _mp_commit_write_buffer
 00000350                         L80:	; bb279.split19
                                  ;     253 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",253
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",253
 00000350 3C0300                  		MOV.B #00H, 03H[R0]
 00000353                         L81:	; bb340
 00000353 C500036B                		MOV.B 03H[R0], 6BH[R0]
                                  ;     254 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",254
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",254
 00000357 59016B                  		MOVU.B 6BH[R0], R1
 0000035A 3F661D                  		RTSD #74H, R6-R6
 0000035D                         __$_calc_move_times:
@@ -832,7 +832,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     319  */
                                  ;     320 
                                  ;     321 static void _calc_move_times(GCodeState_t *gms, const float axis_length[], const float axis_square[])
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",321
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",321
 0000035D 7EA6                    		PUSH.L R6
 0000035F 7100D8                  		ADD #0FFFFFFD8H, R0
 00000362 A209                    		MOV.L R1, 24H[R0]
@@ -841,41 +841,41 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     322 										// gms = Gcode model state
                                  ;     323 {
                                  ;     324 	float inv_time=0;				// inverse time if doing a feed in G93 mode
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",324
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",324
 00000368 F80600                  		MOV.L #00000000H, [R0]
 0000036B                         L83:	; entry.split
                                  ;     325 	float xyz_time=0;				// coordinated move linear part at requested feed rate
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",325
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",325
 0000036B 3E0100                  		MOV.L #00000000H, 04H[R0]
 0000036E                         L84:	; entry.split1
                                  ;     326 	float abc_time=0;				// coordinated move rotary part at requested feed rate
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",326
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",326
 0000036E 3E0200                  		MOV.L #00000000H, 08H[R0]
 00000371                         L85:	; entry.split2
                                  ;     327 	float max_time=0;				// time required for the rate-limiting axis
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",327
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",327
 00000371 3E0300                  		MOV.L #00000000H, 0CH[R0]
 00000374                         L86:	; entry.split3
                                  ;     328 	float tmp_time=0;				// used in computation
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",328
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",328
 00000374 3E0400                  		MOV.L #00000000H, 10H[R0]
 00000377                         L87:	; entry.split4
                                  ;     329 	gms->minimum_time = 8675309;	// arbitrarily large number
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",329
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",329
 00000377 AA09                    		MOV.L 24H[R0], R1
 00000379 F9120FED5F044B          		MOV.L #4B045FEDH, 3CH[R1]
 00000380                         L88:	; entry.split5
                                  ;     330 
                                  ;     331 	// compute times for feed motion
                                  ;     332 	if (gms->motion_mode != MOTION_MODE_STRAIGHT_TRAVERSE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",332
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",332
 00000380 AA09                    		MOV.L 24H[R0], R1
 00000382 B111                    		MOVU.B 04H[R1], R1
 00000384 6101                    		CMP #00H, R1
 00000386 20rr                    		BEQ L96
 00000388                         L89:	; bb13
                                  ;     333 		if (gms->feed_rate_mode == INVERSE_TIME_MODE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",333
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",333
 00000388 AA09                    		MOV.L 24H[R0], R1
 0000038A 591E4C                  		MOVU.B 4CH[R1], R14
 0000038D 610E                    		CMP #00H, R14
@@ -883,7 +883,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000391 21rr                    		BNE L92
 00000393                         L90:	; bb14
                                  ;     334 			inv_time = gms->feed_rate;	// NB: feed rate was un-inverted to minutes by cm_set_feed_rate()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",334
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",334
 00000393 E301                    		MOV.L R1, [R0]
 00000395                         L91:	; bb14.split
                                  ;     335             // inject feed rate override here for inverse time moves
@@ -894,7 +894,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     340             }
                                  ;     341 #endif
                                  ;     342 			gms->feed_rate_mode = UNITS_PER_MINUTE_MODE;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",342
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",342
 00000395 AA09                    		MOV.L 24H[R0], R1
 00000397 F9144C01                		MOV.B #01H, 4CH[R1]
 0000039B 2Err                 B  		BRA L96
@@ -916,14 +916,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     357             }
                                  ;     358 #else
                                  ;     359             float feed_rate = gms->feed_rate;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",359
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",359
 0000039D A109                    		MOV.L R1, 14H[R0]
 0000039F                         L93:	; bb20.split
                                  ;     360 #endif
                                  ;     361 
                                  ;     362 			// compute length of linear move in millimeters. Feed rate is provided as mm/min
                                  ;     363 			xyz_time = sqrt(axis_square[AXIS_X] + axis_square[AXIS_Y] + axis_square[AXIS_Z]) / feed_rate;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",363
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",363
 0000039F A98A                    		MOV.L 1CH[R0], R2
 000003A1 EC21                    		MOV.L [R2], R1
 000003A3 FC892101                		FADD 04H[R2].L, R1
@@ -935,14 +935,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     364 
                                  ;     365 			// if no linear axes, compute length of multi-axis rotary move in degrees. Feed rate is provided as degrees/min
                                  ;     366 			if (fp_ZERO(xyz_time)) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",366
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",366
 000003B5 A809                    		MOV.L 04H[R0], R1
 000003B7 7BF1                    		BCLR #1FH, R1
 000003B9 FD7211BD378635          		FCMP #358637BDH, R1
 000003C0 26rr                    		BPZ L96
 000003C2                         L95:	; bb39
                                  ;     367 				abc_time = sqrt(axis_square[AXIS_A] + axis_square[AXIS_B] + axis_square[AXIS_C]) / feed_rate;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",367
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",367
 000003C2 A98A                    		MOV.L 1CH[R0], R2
 000003C4 A8A9                    		MOV.L 0CH[R2], R1
 000003C6 FC892104                		FADD 10H[R2].L, R1
@@ -955,12 +955,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     369 		}
                                  ;     370 	}
                                  ;     371 	for (uint8_t axis = AXIS_X; axis < AXES; axis++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",371
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",371
 000003D8 3C8B00                  		MOV.B #00H, 1BH[R0]
 000003DB 2Err                 B  		BRA L104
 000003DD                         L97:	; bb76
                                  ;     372 		if (gms->motion_mode == MOTION_MODE_STRAIGHT_TRAVERSE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",372
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",372
 000003DD AA01                    		MOV.L 20H[R0], R1
 000003DF B68A                    		MOVU.B 1BH[R0], R2
 000003E1 FE6211                  		MOV.L [R2,R1], R1
@@ -969,7 +969,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000003E8 21rr                    		BNE L99
 000003EA                         L98:	; bb77
                                  ;     373 			tmp_time = fabs(axis_length[axis]) / cm.a[axis].velocity_max;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",373
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",373
 000003EA B68E                    		MOVU.B 1BH[R0], R6
 000003EC 751638                  		MUL #38H, R6
 000003EF FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -981,7 +981,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000401                         L99:	; bb90
                                  ;     374 		} else { // MOTION_MODE_STRAIGHT_FEED
                                  ;     375 			tmp_time = fabs(axis_length[axis]) / cm.a[axis].feedrate_max;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",375
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",375
 00000401 B68E                    		MOVU.B 1BH[R0], R6
 00000403 751638                  		MUL #38H, R6
 00000406 FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -992,7 +992,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000416                         L100:	; bb110
                                  ;     376 		}
                                  ;     377 		max_time = fmaxf(max_time, tmp_time);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",377
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",377
 00000416 A902                    		MOV.L 10H[R0], R2
 00000418 A889                    		MOV.L 0CH[R0], R1
 0000041A 05rrrrrr             A  		BSR _fmaxf
@@ -1001,12 +1001,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000420 660E                    		MOV.L #00000000H, R14
                                  ;     378 
                                  ;     379 		if (tmp_time > 0) { 	// collect minimum time if this axis is not zero
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",379
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",379
 00000422 FC850E04                		FCMP 10H[R0].L, R14
 00000426 26rr                    		BPZ L103
 00000428                         L102:	; bb115
                                  ;     380 			gms->minimum_time = fminf(gms->minimum_time, tmp_time);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",380
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",380
 00000428 AA0E                    		MOV.L 24H[R0], R6
 0000042A ABE9                    		MOV.L 3CH[R6], R1
 0000042C A902                    		MOV.L 10H[R0], R2
@@ -1017,7 +1017,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000436 6216                    		ADD #01H, R6
 00000438 868E                    		MOV.B R6, 1BH[R0]
 0000043A                         L104:	; bb130
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",371
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",371
 0000043A B68E                    		MOVU.B 1BH[R0], R6
 0000043C 6166                    		CMP #06H, R6
 0000043E AA0E                    		MOV.L 24H[R0], R6
@@ -1026,7 +1026,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     381 		}
                                  ;     382 	}
                                  ;     383 	gms->move_time = max4(inv_time, max_time, xyz_time, abc_time);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",383
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",383
 00000442 A884                    		MOV.L 08H[R0], R4
 00000444 A80B                    		MOV.L 04H[R0], R3
 00000446 A88A                    		MOV.L 0CH[R0], R2
@@ -1107,14 +1107,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     452  *		mr's Vx is always found in the provided bf buffer. Used to replan feedholds
                                  ;     453  */
                                  ;     454 static void _plan_block_list(mpBuf_t *bf, uint8_t *mr_flag)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",454
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",454
 00000453 7EA6                    		PUSH.L R6
 00000455 7100F0                  		ADD #0FFFFFFF0H, R0
 00000458 A089                    		MOV.L R1, 0CH[R0]
 0000045A A082                    		MOV.L R2, 08H[R0]
                                  ;     455 {
                                  ;     456 	mpBuf_t *bp = bf;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",456
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",456
 0000045C E5000301                		MOV.L 0CH[R0], 04H[R0]
 00000460 2Err                 B  		BRA L109
 00000462                         L107:	; bb4
@@ -1123,14 +1123,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     459 	// At the end *bp points to the buffer before the first block.
                                  ;     460 	while ((bp = mp_get_prev_buffer(bp)) != bf) {
                                  ;     461 		if (bp->replannable == false) { break; }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",461
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",461
 00000462 A809                    		MOV.L 04H[R0], R1
 00000464 B611                    		MOVU.B 18H[R1], R1
 00000466 6101                    		CMP #00H, R1
 00000468 3Arrrr               W  		BEQ L135
 0000046B                         L108:	; bb13
                                  ;     462 		bp->braking_velocity = fminf(bp->nx->entry_vmax, bp->nx->braking_velocity) + bp->delta_vmax;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",462
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",462
 0000046B A80E                    		MOV.L 04H[R0], R6
 0000046D A869                    		MOV.L 04H[R6], R1
 0000046F AE12                    		MOV.L 60H[R1], R2
@@ -1140,7 +1140,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000479 FC892117                		FADD 5CH[R2].L, R1
 0000047D A661                    		MOV.L R1, 60H[R6]
 0000047F                         L109:	; bb31
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",460
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",460
 0000047F A809                    		MOV.L 04H[R0], R1
 00000481 EC11                    		MOV.L [R1], R1
 00000483 A009                    		MOV.L R1, 04H[R0]
@@ -1153,25 +1153,25 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     465 	// forward planning pass - recomputes trapezoids in the list from the first block to the bf block.
                                  ;     466 	while ((bp = mp_get_next_buffer(bp)) != bf) {
                                  ;     467 		if ((bp->pv == bf) || (*mr_flag == true))  {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",467
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",467
 0000048E EC1E                    		MOV.L [R1], R14
 00000490 06850E03                		CMP 0CH[R0].L, R14
 00000494 20rr                    		BEQ L115
 00000496 2Err                 B  		BRA L114
 00000498                         L111:	; bb44
                                  ;     468 			bp->entry_velocity = bp->entry_vmax;		// first block in the list
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",468
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",468
 00000498 E5111411                		MOV.L 50H[R1], 44H[R1]
 0000049C                         L112:	; bb44.split
                                  ;     469 			*mr_flag = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",469
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",469
 0000049C A881                    		MOV.L 08H[R0], R1
 0000049E F81400                  		MOV.B #00H, [R1]
 000004A1 2Err                 B  		BRA L118
 000004A3                         L113:	; bb51
                                  ;     470 		} else {
                                  ;     471 			bp->entry_velocity = bp->pv->exit_velocity;	// other blocks in the list
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",471
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",471
 000004A3 EC1E                    		MOV.L [R1], R14
 000004A5 E5E11311                		MOV.L 4CH[R14], 44H[R1]
 000004A9 2Err                 B  		BRA L118
@@ -1194,12 +1194,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000004C3                         L118:	; bb78
                                  ;     472 		}
                                  ;     473 		bp->cruise_velocity = bp->cruise_vmax;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",473
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",473
 000004C3 A809                    		MOV.L 04H[R0], R1
 000004C5 E5111512                		MOV.L 54H[R1], 48H[R1]
 000004C9                         L119:	; bb78.split
                                  ;     474 		bp->exit_velocity = min4( bp->exit_vmax,
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",474
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",474
 000004C9 A80E                    		MOV.L 04H[R0], R6
 000004CB AC6C                    		MOV.L 44H[R6], R4
 000004CD FC896417                		FADD 5CH[R6].L, R4
@@ -1215,14 +1215,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     477 								 (bp->entry_velocity + bp->delta_vmax) );
                                  ;     478 
                                  ;     479 		mp_calculate_trapezoid(bp);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",479
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",479
 000004DF A809                    		MOV.L 04H[R0], R1
 000004E1 05rrrrrr             A  		BSR _mp_calculate_trapezoid
 000004E5                         L121:	; bb78.split2
                                  ;     480 
                                  ;     481 		// test for optimally planned trapezoids - only need to check various exit conditions
                                  ;     482 		if  ( ( (fp_EQ(bp->exit_velocity, bp->exit_vmax)) ||
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",482
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",482
 000004E5 A809                    		MOV.L 04H[R0], R1
 000004E7 AC9A                    		MOV.L 4CH[R1], R2
 000004E9 FC811216                		FSUB 58H[R1].L, R2
@@ -1235,7 +1235,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     484 			  ( (bp->pv->replannable == false) &&
                                  ;     485 				(fp_EQ(bp->exit_velocity, (bp->entry_velocity + bp->delta_vmax))) ) ) {
                                  ;     486 			bp->replannable = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",486
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",486
 000004F9 A809                    		MOV.L 04H[R0], R1
 000004FB 3C9800                  		MOV.B #00H, 18H[R1]
 000004FE 2Err                 B  		BRA L135
@@ -1290,7 +1290,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000559 6101                    		CMP #00H, R1
 0000055B 21rr                    		BNE L122
 0000055D                         L135:	; bb179
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",466
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",466
 0000055D A809                    		MOV.L 04H[R0], R1
 0000055F A819                    		MOV.L 04H[R1], R1
 00000561 A009                    		MOV.L R1, 04H[R0]
@@ -1301,23 +1301,23 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     488 	}
                                  ;     489 	// finish up the last block move
                                  ;     490 	bp->entry_velocity = bp->pv->exit_velocity;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",490
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",490
 0000056A A80A                    		MOV.L 04H[R0], R2
 0000056C EC2E                    		MOV.L [R2], R14
 0000056E E5E11311                		MOV.L 4CH[R14], 44H[R1]
 00000572                         L137:	; bb188.split
                                  ;     491 	bp->cruise_velocity = bp->cruise_vmax;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",491
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",491
 00000572 A809                    		MOV.L 04H[R0], R1
 00000574 E5111512                		MOV.L 54H[R1], 48H[R1]
 00000578                         L138:	; bb188.split3
                                  ;     492 	bp->exit_velocity = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",492
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",492
 00000578 A809                    		MOV.L 04H[R0], R1
 0000057A 3E9300                  		MOV.L #00000000H, 4CH[R1]
 0000057D                         L139:	; bb188.split4
                                  ;     493 	mp_calculate_trapezoid(bp);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",493
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",493
 0000057D A809                    		MOV.L 04H[R0], R1
 0000057F 05rrrrrr             A  		BSR _mp_calculate_trapezoid
 00000583 3F6605                  		RTSD #14H, R6-R6
@@ -1329,31 +1329,31 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     497  *	_reset_replannable_list() - resets all blocks in the planning list to be replannable
                                  ;     498  */
                                  ;     499 static void _reset_replannable_list()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",499
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",499
 00000586 60C0                    		SUB #0CH, R0
                                  ;     500 {
                                  ;     501 	mpBuf_t *bf = mp_get_first_buffer();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",501
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",501
 00000588 05rrrrrr             A  		BSR _mp_get_first_buffer
 0000058C A009                    		MOV.L R1, 04H[R0]
 0000058E                         L141:	; entry.split
                                  ;     502 	if (bf == NULL) return;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",502
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",502
 0000058E A809                    		MOV.L 04H[R0], R1
 00000590 6101                    		CMP #00H, R1
 00000592 20rr                    		BEQ L149
 00000594                         L142:	; bb8
                                  ;     503 	mpBuf_t *bp = bf;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",503
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",503
 00000594 E5000102                		MOV.L 04H[R0], 08H[R0]
 00000598                         L143:	; bb10
                                  ;     504 	do {
                                  ;     505 		bp->replannable = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",505
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",505
 00000598 A881                    		MOV.L 08H[R0], R1
 0000059A 3C9801                  		MOV.B #01H, 18H[R1]
 0000059D                         L144:	; bb10.split
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",504
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",504
 0000059D A881                    		MOV.L 08H[R0], R1
 0000059F A819                    		MOV.L 04H[R1], R1
 000005A1 A081                    		MOV.L R1, 08H[R0]
@@ -1376,7 +1376,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000005BD                         L149:	; return
                                  ;     506 	} while (((bp = mp_get_next_buffer(bp)) != bf) && (bp->move_state != MOVE_OFF));
                                  ;     507 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",507
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",507
 000005BD 6703                    		RTSD #0CH
 000005BF                         __$_get_junction_vmax:
                                  		.STACK	__$_get_junction_vmax=52
@@ -1440,14 +1440,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     565  */
                                  ;     566 
                                  ;     567 static float _get_junction_vmax(const float a_unit[], const float b_unit[])
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",567
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",567
 000005BF 7EA6                    		PUSH.L R6
 000005C1 7100D4                  		ADD #0FFFFFFD4H, R0
 000005C4 A281                    		MOV.L R1, 28H[R0]
 000005C6 A20A                    		MOV.L R2, 24H[R0]
                                  ;     568 {
                                  ;     569 	float costheta = - (a_unit[AXIS_X] * b_unit[AXIS_X])
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",569
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",569
 000005C8 AA81                    		MOV.L 28H[R0], R1
 000005CA A81B                    		MOV.L 04H[R1], R3
 000005CC FC8D2301                		FMUL 04H[R2].L, R3
@@ -1476,7 +1476,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     574 					 - (a_unit[AXIS_C] * b_unit[AXIS_C]);
                                  ;     575 
                                  ;     576 	if (costheta < -0.99) { return (10000000); } 		// straight line cases
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",576
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",576
 00000601 A809                    		MOV.L 04H[R0], R1
 00000603 FD7211A4707DBF          		FCMP #0BF7D70A4H, R1
 0000060A 26rr                    		BPZ L153
@@ -1486,7 +1486,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000615                         L153:	; bb64
 00000615 FBE2A4707D3F            		MOV.L #3F7D70A4H, R14
                                  ;     577 	if (costheta > 0.99)  { return (0); } 				// reversal cases
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",577
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",577
 0000061B FC850E01                		FCMP 04H[R0].L, R14
 0000061F 26rr                    		BPZ L155
 00000621                         L154:	; bb65
@@ -1496,7 +1496,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     578 
                                  ;     579 	// Fuse the junction deviations into a vector sum
                                  ;     580 	float a_delta = square(a_unit[AXIS_X] * cm.a[AXIS_X].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",580
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",580
 00000627 AA81                    		MOV.L 28H[R0], R1
 00000629 EC11                    		MOV.L [R1], R1
 0000062B FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1505,7 +1505,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000638 A081                    		MOV.L R1, 08H[R0]
 0000063A                         L156:	; bb71.split
                                  ;     581 	a_delta += square(a_unit[AXIS_Y] * cm.a[AXIS_Y].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",581
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",581
 0000063A AA81                    		MOV.L 28H[R0], R1
 0000063C A819                    		MOV.L 04H[R1], R1
 0000063E FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1515,7 +1515,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000064F A081                    		MOV.L R1, 08H[R0]
 00000651                         L157:	; bb71.split1
                                  ;     582 	a_delta += square(a_unit[AXIS_Z] * cm.a[AXIS_Z].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",582
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",582
 00000651 AA81                    		MOV.L 28H[R0], R1
 00000653 A891                    		MOV.L 08H[R1], R1
 00000655 FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1525,7 +1525,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000666 A081                    		MOV.L R1, 08H[R0]
 00000668                         L158:	; bb71.split2
                                  ;     583 	a_delta += square(a_unit[AXIS_A] * cm.a[AXIS_A].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",583
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",583
 00000668 AA81                    		MOV.L 28H[R0], R1
 0000066A A899                    		MOV.L 0CH[R1], R1
 0000066C FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1535,7 +1535,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000067D A081                    		MOV.L R1, 08H[R0]
 0000067F                         L159:	; bb71.split3
                                  ;     584 	a_delta += square(a_unit[AXIS_B] * cm.a[AXIS_B].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",584
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",584
 0000067F AA81                    		MOV.L 28H[R0], R1
 00000681 A911                    		MOV.L 10H[R1], R1
 00000683 FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1545,7 +1545,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000694 A081                    		MOV.L R1, 08H[R0]
 00000696                         L160:	; bb71.split4
                                  ;     585 	a_delta += square(a_unit[AXIS_C] * cm.a[AXIS_C].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",585
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",585
 00000696 AA81                    		MOV.L 28H[R0], R1
 00000698 A919                    		MOV.L 14H[R1], R1
 0000069A FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1556,7 +1556,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006AD                         L161:	; bb71.split5
                                  ;     586 
                                  ;     587 	float b_delta = square(b_unit[AXIS_X] * cm.a[AXIS_X].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",587
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",587
 000006AD AA09                    		MOV.L 24H[R0], R1
 000006AF EC11                    		MOV.L [R1], R1
 000006B1 FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1565,7 +1565,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006BE A089                    		MOV.L R1, 0CH[R0]
 000006C0                         L162:	; bb71.split6
                                  ;     588 	b_delta += square(b_unit[AXIS_Y] * cm.a[AXIS_Y].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",588
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",588
 000006C0 AA09                    		MOV.L 24H[R0], R1
 000006C2 A819                    		MOV.L 04H[R1], R1
 000006C4 FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1575,7 +1575,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006D5 A089                    		MOV.L R1, 0CH[R0]
 000006D7                         L163:	; bb71.split7
                                  ;     589 	b_delta += square(b_unit[AXIS_Z] * cm.a[AXIS_Z].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",589
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",589
 000006D7 AA09                    		MOV.L 24H[R0], R1
 000006D9 A891                    		MOV.L 08H[R1], R1
 000006DB FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1585,7 +1585,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006EC A089                    		MOV.L R1, 0CH[R0]
 000006EE                         L164:	; bb71.split8
                                  ;     590 	b_delta += square(b_unit[AXIS_A] * cm.a[AXIS_A].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",590
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",590
 000006EE AA09                    		MOV.L 24H[R0], R1
 000006F0 A899                    		MOV.L 0CH[R1], R1
 000006F2 FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1595,7 +1595,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000703 A089                    		MOV.L R1, 0CH[R0]
 00000705                         L165:	; bb71.split9
                                  ;     591 	b_delta += square(b_unit[AXIS_B] * cm.a[AXIS_B].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",591
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",591
 00000705 AA09                    		MOV.L 24H[R0], R1
 00000707 A911                    		MOV.L 10H[R1], R1
 00000709 FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1605,7 +1605,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000071A A089                    		MOV.L R1, 0CH[R0]
 0000071C                         L166:	; bb71.split10
                                  ;     592 	b_delta += square(b_unit[AXIS_C] * cm.a[AXIS_C].junction_dev);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",592
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",592
 0000071C AA09                    		MOV.L 24H[R0], R1
 0000071E A919                    		MOV.L 14H[R1], R1
 00000720 FBE2rrrrrrrr            		MOV.L #_cm, R14
@@ -1616,7 +1616,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000733                         L167:	; bb71.split11
                                  ;     593 
                                  ;     594 	float delta = (sqrt(a_delta) + sqrt(b_delta))/2;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",594
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",594
 00000733 A881                    		MOV.L 08H[R0], R1
 00000735 05rrrrrr             A  		BSR _sqrt
 00000739 EF16                    		MOV.L R1, R6
@@ -1628,14 +1628,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000074D                         L168:	; bb71.split12
 0000074D FB120000803F            		MOV.L #3F800000H, R1
                                  ;     595 	float sintheta_over2 = sqrt((1 - costheta)/2);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",595
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",595
 00000753 FC810101                		FSUB 04H[R0].L, R1
 00000757 FD724100000040          		FDIV #40000000H, R1
 0000075E 05rrrrrr             A  		BSR _sqrt
 00000762 A109                    		MOV.L R1, 14H[R0]
 00000764                         L169:	; bb71.split13
                                  ;     596 	float radius = delta * sintheta_over2 / (1-sintheta_over2);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",596
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",596
 00000764 A909                    		MOV.L 14H[R0], R1
 00000766 FBE20000803F            		MOV.L #3F800000H, R14
 0000076C FC831E                  		FSUB R1, R14
@@ -1644,7 +1644,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000776 A181                    		MOV.L R1, 18H[R0]
 00000778                         L170:	; bb71.split14
                                  ;     597 	float velocity = sqrt(radius * cm.junction_acceleration);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",597
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",597
 00000778 FB12rrrrrrrr            		MOV.L #_cm, R1
 0000077E A819                    		MOV.L 04H[R1], R1
 00000780 FC8D0106                		FMUL 18H[R0].L, R1
@@ -1653,13 +1653,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000078A                         L171:	; bb71.split15
                                  ;     598 //	printf ("v:%f\n", velocity);	//+++++
                                  ;     599 	return (velocity);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",599
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",599
 0000078A E10007                  		MOV.L 1CH[R0], [R0]
 0000078D                         L172:	; bb246
 0000078D EC01                    		MOV.L [R0], R1
 0000078F A201                    		MOV.L R1, 20H[R0]
                                  ;     600 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",600
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",600
 00000791 3F660C                  		RTSD #30H, R6-R6
 00000794                         __$_compute_next_segment_velocity:
                                  		.STACK	__$_compute_next_segment_velocity=12
@@ -1721,11 +1721,11 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     656  */
                                  ;     657 
                                  ;     658 static float _compute_next_segment_velocity()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",658
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",658
 00000794 6080                    		SUB #08H, R0
                                  ;     659 {
                                  ;     660 	if (mr.section == SECTION_BODY) return (mr.segment_velocity);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",660
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",660
 00000796 FB12rrrrrrrr            		MOV.L #_mr, R1
 0000079C B09A                    		MOVU.B 03H[R1], R2
 0000079E 6112                    		CMP #01H, R2
@@ -1739,7 +1739,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     662 	return (mr.segment_velocity);	// an approximation
                                  ;     663 #else
                                  ;     664 	return (mr.segment_velocity + mr.forward_diff_5);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",664
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",664
 000007A8 FBE2rrrrrrrr            		MOV.L #_mr, R14
 000007AE FC89E14F                		FADD 013CH[R14].L, R1
 000007B2 E301                    		MOV.L R1, [R0]
@@ -1748,45 +1748,45 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000007B6 A009                    		MOV.L R1, 04H[R0]
                                  ;     665 #endif
                                  ;     666 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",666
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",666
 000007B8 6702                    		RTSD #08H
 000007BA                         _mp_plan_hold_callback:
                                  		.STACK	_mp_plan_hold_callback=44
                                  ;     667 
                                  ;     668 stat_t mp_plan_hold_callback()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",668
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",668
 000007BA 6E67                    		PUSHM R6-R7
 000007BC 7100E0                  		ADD #0FFFFFFE0H, R0
                                  ;     669 {
                                  ;     670 	if (cm.hold_state != FEEDHOLD_PLAN)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",670
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",670
 000007BF FBE2rrrrrrrr            		MOV.L #_cm, R14
 000007C5 5AEE2002                		MOVU.B 0220H[R14], R14
 000007C9 612E                    		CMP #02H, R14
 000007CB 10                   S  		BEQ L179
 000007CC                         L178:	; bb7
                                  ;     671         return (STAT_NOOP);                     // not planning a feedhold
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",671
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",671
 000007CC 3C0703                  		MOV.B #03H, 07H[R0]
 000007CF 38rrrr               W  		BRA L235
 000007D2                         L179:	; bb14
                                  ;     672 
                                  ;     673 	mpBuf_t *bp; 				                // working buffer pointer
                                  ;     674 	if ((bp = mp_get_run_buffer()) == NULL)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",674
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",674
 000007D2 05rrrrrr             A  		BSR _mp_get_run_buffer
 000007D6 A081                    		MOV.L R1, 08H[R0]
 000007D8 6101                    		CMP #00H, R1
 000007DA 18                   S  		BNE L181
 000007DB                         L180:	; bb15
                                  ;     675         return (STAT_NOOP);                     // Oops! nothing's running
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",675
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",675
 000007DB 3C0703                  		MOV.B #03H, 07H[R0]
 000007DE 38rrrr               W  		BRA L235
 000007E1                         L181:	; bb22
                                  ;     676 
                                  ;     677 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",677
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",677
 000007E1 3C0F01                  		MOV.B #01H, 0FH[R0]
 000007E4                         L182:	; bb22.split
                                  ;     678 	float mr_available_length;                  // available length left in mr buffer for deceleration
@@ -1795,7 +1795,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     681 
                                  ;     682 	// examine and process mr buffer
                                  ;     683 	mr_available_length = get_axis_vector_length(mr.target, mr.position);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",683
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",683
 000007E4 FB12rrrrrrrr            		MOV.L #_mr, R1
 000007EA 711238                  		ADD #38H, R1, R2
 000007ED 711120                  		ADD #20H, R1
@@ -1817,12 +1817,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     696 //	braking_velocity = mr.segment_velocity;
                                  ;     697 //	if (mr.section != SECTION_BODY) { braking_velocity += mr.forward_diff_1;}
                                  ;     698 	braking_velocity = _compute_next_segment_velocity();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",698
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",698
 000007F6 39rrrr               W  		BSR __$_compute_next_segment_velocity
 000007F9 A109                    		MOV.L R1, 14H[R0]
 000007FB                         L184:	; bb22.split2
                                  ;     699 	braking_length = mp_get_target_length(braking_velocity, 0, bp); // bp is OK to use here
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",699
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",699
 000007FB A883                    		MOV.L 08H[R0], R3
 000007FD A909                    		MOV.L 14H[R0], R1
 000007FF 6602                    		MOV.L #00000000H, R2
@@ -1836,14 +1836,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     704 	// The braking_velocity needs to be the velocity of the next segment that has not yet
                                  ;     705 	// been computed. In the mean time, this hack will work.
                                  ;     706 	if ((braking_length > mr_available_length) && (fp_ZERO(bp->exit_velocity))) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",706
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",706
 00000807 A901                    		MOV.L 10H[R0], R1
 00000809 FC850106                		FCMP 18H[R0].L, R1
 0000080D 27rr                    		BN L187
 0000080F 2Err                 B  		BRA L189
 00000811                         L186:	; bb29
                                  ;     707 		braking_length = mr_available_length;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",707
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",707
 00000811 E5000406                		MOV.L 10H[R0], 18H[R0]
 00000815 2Err                 B  		BRA L191
 00000817                         L187:	; bb35
@@ -1866,48 +1866,48 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     709 
                                  ;     710 	// Case 1: deceleration fits entirely into the length remaining in mr buffer
                                  ;     711 	if (braking_length <= mr_available_length) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",711
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",711
 00000833 A901                    		MOV.L 10H[R0], R1
 00000835 FC850106                		FCMP 18H[R0].L, R1
 00000839 29rr                    		BLT L205
 0000083B                         L192:	; bb51
                                  ;     712 		// set mr to a tail to perform the deceleration
                                  ;     713 		mr.exit_velocity = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",713
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",713
 0000083B FBE2rrrrrrrr            		MOV.L #_mr, R14
 00000841 F9E64500                		MOV.L #00000000H, 0114H[R14]
 00000845                         L193:	; bb51.split
                                  ;     714 		mr.tail_length = braking_length;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",714
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",714
 00000845 FBE2rrrrrrrr            		MOV.L #_mr, R14
 0000084B E50E0642                		MOV.L 18H[R0], 0108H[R14]
 0000084F                         L194:	; bb51.split4
                                  ;     715 		mr.cruise_velocity = braking_velocity;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",715
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",715
 0000084F FBE2rrrrrrrr            		MOV.L #_mr, R14
 00000855 E50E0544                		MOV.L 14H[R0], 0110H[R14]
 00000859                         L195:	; bb51.split5
                                  ;     716 		mr.section = SECTION_TAIL;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",716
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",716
 00000859 FB12rrrrrrrr            		MOV.L #_mr, R1
 0000085F 3C1302                  		MOV.B #02H, 03H[R1]
 00000862                         L196:	; bb51.split6
                                  ;     717 		mr.section_state = SECTION_NEW;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",717
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",717
 00000862 FB12rrrrrrrr            		MOV.L #_mr, R1
 00000868 3C1401                  		MOV.B #01H, 04H[R1]
 0000086B                         L197:	; bb51.split7
                                  ;     718 
                                  ;     719 		// re-use bp+0 to be the hold point and to run the remaining block length
                                  ;     720 		bp->length = mr_available_length - braking_length;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",720
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",720
 0000086B A901                    		MOV.L 10H[R0], R1
 0000086D FC810106                		FSUB 18H[R0].L, R1
 00000871 A882                    		MOV.L 08H[R0], R2
 00000873 A329                    		MOV.L R1, 34H[R2]
 00000875                         L198:	; bb51.split8
                                  ;     721 		bp->delta_vmax = mp_get_target_velocity(0, bp->length, bp);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",721
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",721
 00000875 A886                    		MOV.L 08H[R0], R6
 00000877 AB6A                    		MOV.L 34H[R6], R2
 00000879 6601                    		MOV.L #00000000H, R1
@@ -1916,33 +1916,33 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000881 A5E9                    		MOV.L R1, 5CH[R6]
 00000883                         L199:	; bb51.split9
                                  ;     722 		bp->entry_vmax = 0;						// set bp+0 as hold point
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",722
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",722
 00000883 A881                    		MOV.L 08H[R0], R1
 00000885 3E9400                  		MOV.L #00000000H, 50H[R1]
 00000888                         L200:	; bb51.split10
                                  ;     723 		bp->move_state = MOVE_NEW;				// tell _exec to re-use the bf buffer
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",723
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",723
 00000888 A881                    		MOV.L 08H[R0], R1
 0000088A 3C9701                  		MOV.B #01H, 17H[R1]
 0000088D                         L201:	; bb51.split11
                                  ;     724 
                                  ;     725 		_reset_replannable_list();				// make it replan all the blocks
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",725
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",725
 0000088D 39rrrr               W  		BSR __$_reset_replannable_list
 00000890                         L202:	; bb51.split12
                                  ;     726 		_plan_block_list(mp_get_last_buffer(), &mr_flag);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",726
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",726
 00000890 05rrrrrr             A  		BSR _mp_get_last_buffer
 00000894 71020F                  		ADD #0FH, R0, R2
 00000897 39rrrr               W  		BSR __$_plan_block_list
 0000089A                         L203:	; bb51.split13
                                  ;     727 		cm.hold_state = FEEDHOLD_DECEL;			// set state to decelerate and exit
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",727
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",727
 0000089A FBE2rrrrrrrr            		MOV.L #_cm, R14
 000008A0 FAE4200203              		MOV.B #03H, 0220H[R14]
 000008A5                         L204:	; bb51.split14
                                  ;     728 		return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",728
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",728
 000008A5 3C0700                  		MOV.B #00H, 07H[R0]
 000008A8 38rrrr               W  		BRA L235
 000008AB                         L205:	; bb77
@@ -1952,27 +1952,27 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     732 	// First, replan mr to minimum (but non-zero) exit velocity
                                  ;     733 
                                  ;     734 	mr.section = SECTION_TAIL;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",734
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",734
 000008AB FB12rrrrrrrr            		MOV.L #_mr, R1
 000008B1 3C1302                  		MOV.B #02H, 03H[R1]
 000008B4                         L206:	; bb77.split
                                  ;     735 	mr.section_state = SECTION_NEW;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",735
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",735
 000008B4 FB12rrrrrrrr            		MOV.L #_mr, R1
 000008BA 3C1401                  		MOV.B #01H, 04H[R1]
 000008BD                         L207:	; bb77.split15
                                  ;     736 	mr.tail_length = mr_available_length;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",736
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",736
 000008BD FBE2rrrrrrrr            		MOV.L #_mr, R14
 000008C3 E50E0442                		MOV.L 10H[R0], 0108H[R14]
 000008C7                         L208:	; bb77.split16
                                  ;     737 	mr.cruise_velocity = braking_velocity;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",737
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",737
 000008C7 FBE2rrrrrrrr            		MOV.L #_mr, R14
 000008CD E50E0544                		MOV.L 14H[R0], 0110H[R14]
 000008D1                         L209:	; bb77.split17
                                  ;     738 	mr.exit_velocity = braking_velocity - mp_get_target_velocity(0, mr_available_length, bp);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",738
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",738
 000008D1 A883                    		MOV.L 08H[R0], R3
 000008D3 A902                    		MOV.L 10H[R0], R2
 000008D5 A90E                    		MOV.L 14H[R0], R6
@@ -1985,46 +1985,46 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     739 
                                  ;     740 	// Find the point where deceleration reaches zero. This could span multiple buffers.
                                  ;     741 	braking_velocity = mr.exit_velocity;		// adjust braking velocity downward
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",741
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",741
 000008E9 FBE2rrrrrrrr            		MOV.L #_mr, R14
 000008EF E5E04505                		MOV.L 0114H[R14], 14H[R0]
 000008F3                         L211:	; bb77.split19
                                  ;     742 	bp->move_state = MOVE_NEW;					// tell _exec to re-use buffer
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",742
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",742
 000008F3 A881                    		MOV.L 08H[R0], R1
 000008F5 3C9701                  		MOV.B #01H, 17H[R1]
 000008F8                         L212:	; bb77.split20
                                  ;     743 	for (uint8_t i=0; i<PLANNER_BUFFER_POOL_SIZE; i++) {// a safety to avoid wraparound
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",743
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",743
 000008F8 3C8E00                  		MOV.B #00H, 1EH[R0]
 000008FB 2Err                 B  		BRA L223
 000008FD                         L213:	; bb88
                                  ;     744 		mp_copy_buffer(bp, bp->nx);				// copy bp+1 into bp+0 (and onward...)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",744
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",744
 000008FD A881                    		MOV.L 08H[R0], R1
 000008FF A81A                    		MOV.L 04H[R1], R2
 00000901 05rrrrrr             A  		BSR _mp_copy_buffer
 00000905                         L214:	; bb88.split
                                  ;     745 		if (bp->move_type != MOVE_TYPE_ALINE) {	// skip any non-move buffers
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",745
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",745
 00000905 A881                    		MOV.L 08H[R0], R1
 00000907 B51A                    		MOVU.B 15H[R1], R2
 00000909 6112                    		CMP #01H, R2
 0000090B 10                   S  		BEQ L216
 0000090C                         L215:	; bb94
                                  ;     746 			bp = mp_get_next_buffer(bp);		// point to next buffer
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",746
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",746
 0000090C E5100102                		MOV.L 04H[R1], 08H[R0]
 00000910 2Err                 B  		BRA L222
 00000912                         L216:	; bb106
                                  ;     747 			continue;
                                  ;     748 		}
                                  ;     749 		bp->entry_vmax = braking_velocity;		// velocity we need to shed
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",749
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",749
 00000912 E5010514                		MOV.L 14H[R0], 50H[R1]
 00000916                         L217:	; bb106.split
                                  ;     750 		braking_length = mp_get_target_length(braking_velocity, 0, bp);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",750
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",750
 00000916 A883                    		MOV.L 08H[R0], R3
 00000918 A909                    		MOV.L 14H[R0], R1
 0000091A 6602                    		MOV.L #00000000H, R2
@@ -2033,14 +2033,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000922                         L218:	; bb106.split21
                                  ;     751 
                                  ;     752 		if (braking_length > bp->length) {		// decel does not fit in bp buffer
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",752
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",752
 00000922 A881                    		MOV.L 08H[R0], R1
 00000924 AB19                    		MOV.L 34H[R1], R1
 00000926 FC850106                		FCMP 18H[R0].L, R1
 0000092A 26rr                    		BPZ L224
 0000092C                         L219:	; bb114
                                  ;     753 			bp->exit_vmax = braking_velocity - mp_get_target_velocity(0, bp->length, bp);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",753
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",753
 0000092C A886                    		MOV.L 08H[R0], R6
 0000092E AB6A                    		MOV.L 34H[R6], R2
 00000930 A90F                    		MOV.L 14H[R0], R7
@@ -2051,12 +2051,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000093D A5E7                    		MOV.L R7, 58H[R6]
 0000093F                         L220:	; bb114.split
                                  ;     754 			braking_velocity = bp->exit_vmax;	// braking velocity for next buffer
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",754
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",754
 0000093F A881                    		MOV.L 08H[R0], R1
 00000941 E5101605                		MOV.L 58H[R1], 14H[R0]
 00000945                         L221:	; bb114.split22
                                  ;     755 			bp = mp_get_next_buffer(bp);		// point to next buffer
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",755
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",755
 00000945 A881                    		MOV.L 08H[R0], R1
 00000947 E5100102                		MOV.L 04H[R1], 08H[R0]
 0000094B                         L222:	; bb140
@@ -2064,7 +2064,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000094D 6211                    		ADD #01H, R1
 0000094F 8781                    		MOV.B R1, 1EH[R0]
 00000951                         L223:	; bb143
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",743
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",743
 00000951 B781                    		MOVU.B 1EH[R0], R1
 00000953 755120                  		CMP #20H, R1
 00000956 29rr                    		BLT L213
@@ -2076,36 +2076,36 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     760 	// Deceleration now fits in the current bp buffer
                                  ;     761 	// Plan the first buffer of the pair as the decel, the second as the accel
                                  ;     762 	bp->length = braking_length;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",762
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",762
 00000958 A981                    		MOV.L 18H[R0], R1
 0000095A A882                    		MOV.L 08H[R0], R2
 0000095C A329                    		MOV.L R1, 34H[R2]
 0000095E                         L225:	; bb150.split
                                  ;     763 	bp->exit_vmax = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",763
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",763
 0000095E A881                    		MOV.L 08H[R0], R1
 00000960 3E9600                  		MOV.L #00000000H, 58H[R1]
 00000963                         L226:	; bb150.split24
                                  ;     764 
                                  ;     765 	bp = mp_get_next_buffer(bp);				// point to the acceleration buffer
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",765
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",765
 00000963 A881                    		MOV.L 08H[R0], R1
 00000965 E5100102                		MOV.L 04H[R1], 08H[R0]
 00000969                         L227:	; bb150.split25
                                  ;     766 	bp->entry_vmax = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",766
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",766
 00000969 A881                    		MOV.L 08H[R0], R1
 0000096B 3E9400                  		MOV.L #00000000H, 50H[R1]
 0000096E                         L228:	; bb150.split26
                                  ;     767 	bp->length -= braking_length;				// the buffers were identical (and hence their lengths)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",767
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",767
 0000096E A881                    		MOV.L 08H[R0], R1
 00000970 AB1A                    		MOV.L 34H[R1], R2
 00000972 FC810206                		FSUB 18H[R0].L, R2
 00000976 A31A                    		MOV.L R2, 34H[R1]
 00000978                         L229:	; bb150.split27
                                  ;     768 	bp->delta_vmax = mp_get_target_velocity(0, bp->length, bp);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",768
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",768
 00000978 A886                    		MOV.L 08H[R0], R6
 0000097A AB6A                    		MOV.L 34H[R6], R2
 0000097C 6601                    		MOV.L #00000000H, R1
@@ -2114,33 +2114,33 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000984 A5E9                    		MOV.L R1, 5CH[R6]
 00000986                         L230:	; bb150.split28
                                  ;     769 	bp->exit_vmax = bp->delta_vmax;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",769
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",769
 00000986 A881                    		MOV.L 08H[R0], R1
 00000988 E5111716                		MOV.L 5CH[R1], 58H[R1]
 0000098C                         L231:	; bb150.split29
                                  ;     770 
                                  ;     771 	_reset_replannable_list();					// make it replan all the blocks
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",771
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",771
 0000098C 39rrrr               W  		BSR __$_reset_replannable_list
 0000098F                         L232:	; bb150.split30
                                  ;     772 	_plan_block_list(mp_get_last_buffer(), &mr_flag);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",772
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",772
 0000098F 05rrrrrr             A  		BSR _mp_get_last_buffer
 00000993 71020F                  		ADD #0FH, R0, R2
 00000996 39rrrr               W  		BSR __$_plan_block_list
 00000999                         L233:	; bb150.split31
                                  ;     773 	cm.hold_state = FEEDHOLD_DECEL;				// set state to decelerate and exit
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",773
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",773
 00000999 FBE2rrrrrrrr            		MOV.L #_cm, R14
 0000099F FAE4200203              		MOV.B #03H, 0220H[R14]
 000009A4                         L234:	; bb150.split32
                                  ;     774 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",774
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",774
 000009A4 3C0700                  		MOV.B #00H, 07H[R0]
 000009A7                         L235:	; bb180
 000009A7 C500071F                		MOV.B 07H[R0], 1FH[R0]
                                  ;     775 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",775
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",775
 000009AB B789                    		MOVU.B 1FH[R0], R1
 000009AD 3F670A                  		RTSD #28H, R6-R7
 000009B0                         _mp_end_hold:
@@ -2150,74 +2150,74 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     778  * mp_end_hold() - end a feedhold
                                  ;     779  */
                                  ;     780 stat_t mp_end_hold()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",780
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",780
 000009B0 6040                    		SUB #04H, R0
                                  ;     781 {
                                  ;     782 	if (cm.hold_state == FEEDHOLD_END_HOLD) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",782
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",782
 000009B2 FBE2rrrrrrrr            		MOV.L #_cm, R14
 000009B8 5AEE2002                		MOVU.B 0220H[R14], R14
 000009BC 615E                    		CMP #05H, R14
 000009BE 21rr                    		BNE L243
 000009C0                         L237:	; bb1
                                  ;     783 		cm.hold_state = FEEDHOLD_OFF;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",783
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",783
 000009C0 FBE2rrrrrrrr            		MOV.L #_cm, R14
 000009C6 FAE4200200              		MOV.B #00H, 0220H[R14]
 000009CB                         L238:	; bb1.split
                                  ;     784 		if ((mp_get_run_buffer()) == NULL) {	// NULL means nothing's running
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",784
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",784
 000009CB 05rrrrrr             A  		BSR _mp_get_run_buffer
 000009CF 6101                    		CMP #00H, R1
 000009D1 21rr                    		BNE L241
 000009D3                         L239:	; bb3
 000009D3 6601                    		MOV.L #00000000H, R1
                                  ;     785 			cm_set_motion_state(MOTION_STOP);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",785
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",785
 000009D5 05rrrrrr             A  		BSR _cm_set_motion_state
 000009D9                         L240:	; bb3.split
                                  ;     786 			return (STAT_NOOP);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",786
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",786
 000009D9 3C0203                  		MOV.B #03H, 02H[R0]
 000009DC 2Err                 B  		BRA L244
 000009DE                         L241:	; bb8
                                  ;     787 		}
                                  ;     788 		cm.motion_state = MOTION_RUN;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",788
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",788
 000009DE FBE2rrrrrrrr            		MOV.L #_cm, R14
 000009E4 FAE41F0201              		MOV.B #01H, 021FH[R14]
 000009E9                         L242:	; bb8.split
                                  ;     789 		st_request_exec_move();					// restart the steppers
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",789
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",789
 000009E9 05rrrrrr             A  		BSR _st_request_exec_move
 000009ED                         L243:	; bb14
                                  ;     790 	}
                                  ;     791 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",791
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",791
 000009ED 3C0200                  		MOV.B #00H, 02H[R0]
 000009F0                         L244:	; bb16
 000009F0 C5000203                		MOV.B 02H[R0], 03H[R0]
                                  ;     792 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",792
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",792
 000009F4 B089                    		MOVU.B 03H[R0], R1
 000009F6 6701                    		RTSD #04H
 000009F8                         _mp_plan_zmove_callback:
                                  		.STACK	_mp_plan_zmove_callback=24
                                  ;     793 
                                  ;     794 stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",794
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",794
 000009F8 7100EC                  		ADD #0FFFFFFECH, R0
 000009FB A101                    		MOV.L R1, 10H[R0]
 000009FD A08A                    		MOV.L R2, 0CH[R0]
                                  ;     795 {
                                  ;     796 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",796
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",796
 000009FF 3C0301                  		MOV.B #01H, 03H[R0]
 00000A02                         L246:	; entry.split
                                  ;     797 	float value;
                                  ;     798 	//if (configFlags[MODOMAQUINA] == MODO_PLASMA){
                                  ;     799 		value = mr.gm.target[AXIS_Z] - bf->gm.target[AXIS_Z];
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",799
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",799
 00000A02 FBE2rrrrrrrr            		MOV.L #_mr, R14
 00000A08 EDE154                  		MOV.L 0150H[R14], R1
 00000A0B A902                    		MOV.L 10H[R0], R2
@@ -2225,7 +2225,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A11 A009                    		MOV.L R1, 04H[R0]
 00000A13                         L247:	; entry.split1
                                  ;     800 		if(bf->unit[AXIS_Z] > 0)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",800
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",800
 00000A13 A901                    		MOV.L 10H[R0], R1
 00000A15 660E                    		MOV.L #00000000H, R14
 00000A17 FC851E09                		FCMP 24H[R1].L, R14
@@ -2235,13 +2235,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A1F 660E                    		MOV.L #00000000H, R14
                                  ;     801 		{
                                  ;     802 			if(value>0)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",802
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",802
 00000A21 FC871E                  		FCMP R1, R14
 00000A24 26rr                    		BPZ L252
 00000A26                         L249:	; bb15
                                  ;     803 			{
                                  ;     804 					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",804
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",804
 00000A26 A901                    		MOV.L 10H[R0], R1
 00000A28 AA1A                    		MOV.L 24H[R1], R2
 00000A2A FDFFF2                  		BNOT #1FH, R2
@@ -2253,13 +2253,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     807 		else
                                  ;     808 		{
                                  ;     809 			if(value<0)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",809
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",809
 00000A31 FD721100000000          		FCMP #00000000H, R1
 00000A38 26rr                    		BPZ L252
 00000A3A                         L251:	; bb32
                                  ;     810 			{
                                  ;     811 					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",811
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",811
 00000A3A A901                    		MOV.L 10H[R0], R1
 00000A3C AA1A                    		MOV.L 24H[R1], R2
 00000A3E FDFFF2                  		BNOT #1FH, R2
@@ -2268,7 +2268,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     812 			}
                                  ;     813 		}
                                  ;     814 		bf->length =fabs(value);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",814
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",814
 00000A43 A809                    		MOV.L 04H[R0], R1
 00000A45 7BF1                    		BCLR #1FH, R1
 00000A47 A902                    		MOV.L 10H[R0], R2
@@ -2276,12 +2276,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A4B                         L253:	; bb56.split
                                  ;     815 
                                  ;     816 		bf->replannable = 1;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",816
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",816
 00000A4B A901                    		MOV.L 10H[R0], R1
 00000A4D 3C9801                  		MOV.B #01H, 18H[R1]
 00000A50                         L254:	; bb56.split2
                                  ;     817 		_plan_block_list(bf, &mr_flag);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",817
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",817
 00000A50 A901                    		MOV.L 10H[R0], R1
 00000A52 710203                  		ADD #03H, R0, R2
 00000A55 39rrrr               W  		BSR __$_plan_block_list
@@ -2289,12 +2289,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     818 	//}
                                  ;     819 
                                  ;     820 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",820
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",820
 00000A58 3C0B00                  		MOV.B #00H, 0BH[R0]
 00000A5B B289                    		MOVU.B 0BH[R0], R1
 00000A5D                         L256:	; bb56.split4
                                  ;     821 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\plan_line.c",821
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",821
 00000A5D 5B11                    		MOVU.B R1, R1
 00000A5F 6705                    		RTSD #14H
                                  ;     822 #ifdef VEL_CHANGE
@@ -2358,7 +2358,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\plan_line.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4DB7\$ccrx\plan_line.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -2367,5 +2367,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\plan_line.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\cnc\plan_line.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\plan_line.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\src\cnc\plan_line.obj

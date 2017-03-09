@@ -162,7 +162,7 @@ all: CompactaXP_proj.mot
 # Tool invocations
 CompactaXP_proj.mot: $(LINKER_OUTPUT_OUTPUTS)
 	@echo 'Invoking: Converter'
-	rlink   "C:\Workspace\e2studio\git\MT01\CompactaXP_build\CompactaXP_proj.abs" -form=stype  -output="C:\Workspace\e2studio\git\MT01\CompactaXP_build\CompactaXP_proj.mot" -crc=FFFFFE05=FFF00000-FFFFFE04,FFFFFE07-FFFFFFFF:little
+	rlink   "C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\CompactaXP_proj.abs" -form=stype  -output="C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\CompactaXP_proj.mot" -crc=FFFFFE05=FFF00000-FFFFFE04,FFFFFE07-FFFFFFFF:little
 	@echo 'Finished building target:'
 	@echo.
 	$(MAKE) --no-print-directory post-build
@@ -170,7 +170,7 @@ CompactaXP_proj.mot: $(LINKER_OUTPUT_OUTPUTS)
 CompactaXP_proj.abs: $(OBJS) $(LIBRARY_GENERATOR_OUTPUTTYPE_OUTPUTS) $(ALL_ASMS) 
 	@echo 'Invoking: Linker'
 	@echo 'Building target:'
-	rlink  -subcommand="LinkerSubCommand.tmp"  -list="CompactaXP_proj.map" -show=symbol,reference,total_size -nooptimize -debug -output="C:\Workspace\e2studio\git\MT01\CompactaXP_build\CompactaXP_proj.abs" -rom=D=R,D_1=R_1,D_2=R_2 -nocompress -nologo -nomessage
+	rlink  -subcommand="LinkerSubCommand.tmp"  -list="CompactaXP_proj.map" -show=symbol,reference,total_size -nooptimize -debug -output="C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\CompactaXP_proj.abs" -rom=D=R,D_1=R_1,D_2=R_2 -nocompress -nologo -nomessage
 	@echo 'Finished building:'
 	@echo.
 

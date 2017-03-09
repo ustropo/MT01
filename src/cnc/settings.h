@@ -104,14 +104,11 @@
 /**** MACHINE PROFILES ******************************************************/
 
 // machine default profiles - choose only one:
+#include "settings/settings_default.h"				// Default
+#include "settings/settings_easymak.h"				// Easymak Plasma
+#include "settings/settings_compacta.h"				// Compacta Plasma
+#include "settings/settings_mobile.h"				// Mobile Plasma
 
-#if (EASYMAK == 1)
-	#include "settings/settings_easymak.h"				// Easymak Plasma
-#elif (COMPACTAXP  == 1)
-	#include "settings/settings_compacta.h"				// Compacta Plasma
-#elif (MOBILE  == 1)
-	#include "settings/settings_mobile.h"				// Mobile Plasma
-#endif
 
 
 

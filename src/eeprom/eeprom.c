@@ -1,6 +1,7 @@
 #include "platform.h"
 #include "eeprom.h"
 #include "r_vee_if.h"
+#include "r_flash_api_rx_if.h"
 #include <string.h>
 #include "settings.h"
 
@@ -40,17 +41,49 @@ const float configVarMaqInit[CFG_MAQUINA_MAX - 1] = {
 };
 
 /*! configVarParMaqInit - Constante inicial de parametrização da maquina */
-const float configVarParMaqInit[CFG_PAR_MAQ_MAX] = {
-	TRAVELX,                            //!< EIXO_X1
-	TRAVELX,                            //!< EIXO_X2
-	TRAVELY,                            //!< EIXO_Y
-	X_JERK_MAX,                         //!< JERK X
-	Y_JERK_MAX,                         //!< JERK Y
-	X_VELOCITY_MAX,                     //!< VEL X
-	Y_VELOCITY_MAX,                     //!< VEL Y
-	Z_VELOCITY_MAX,                     //!< VEL Z
-	JUNCTION_DEVIATION,                  //!< JUNCTION DEV
-	JUNCTION_ACCELERATION,               //!< JUNCTION ACCEL
+const float configVarParMaqInit_CP[CFG_PAR_MAQ_MAX] = {
+	M4_TRAVEL_PER_REV_CP,               //!< EIXO_X1
+	M3_TRAVEL_PER_REV_CP,               //!< EIXO_X2
+	M2_TRAVEL_PER_REV_CP,                //!< EIXO_Y
+	X_JERK_MAX_CP,                         //!< JERK X
+	Y_JERK_MAX_CP,                         //!< JERK Y
+	X_VELOCITY_MAX_CP,                     //!< VEL X
+	Y_VELOCITY_MAX_CP,                     //!< VEL Y
+	Z_VELOCITY_MAX_CP,                     //!< VEL Z
+	JUNCTION_DEVIATION_CP,                  //!< JUNCTION DEV
+	JUNCTION_ACCELERATION_CP,               //!< JUNCTION ACCEL
+	CHORDAL_TOLERANCE,
+	0
+};
+
+/*! configVarParMaqInit - Constante inicial de parametrização da maquina */
+const float configVarParMaqInit_EM[CFG_PAR_MAQ_MAX] = {
+	M4_TRAVEL_PER_REV_EM,               //!< EIXO_X1
+	M3_TRAVEL_PER_REV_EM,               //!< EIXO_X2
+	M2_TRAVEL_PER_REV_EM,                //!< EIXO_Y
+	X_JERK_MAX_EM,                         //!< JERK X
+	Y_JERK_MAX_EM,                         //!< JERK Y
+	X_VELOCITY_MAX_EM,                     //!< VEL X
+	Y_VELOCITY_MAX_EM,                     //!< VEL Y
+	Z_VELOCITY_MAX_EM,                     //!< VEL Z
+	JUNCTION_DEVIATION_EM,                  //!< JUNCTION DEV
+	JUNCTION_ACCELERATION_EM,               //!< JUNCTION ACCEL
+	CHORDAL_TOLERANCE,
+	0
+};
+
+/*! configVarParMaqInit - Constante inicial de parametrização da maquina */
+const float configVarParMaqInit_MB[CFG_PAR_MAQ_MAX] = {
+	M4_TRAVEL_PER_REV_MB,               //!< EIXO_X1
+	M3_TRAVEL_PER_REV_MB,               //!< EIXO_X2
+	M2_TRAVEL_PER_REV_MB,                //!< EIXO_Y
+	X_JERK_MAX_MB,                         //!< JERK X
+	Y_JERK_MAX_MB,                         //!< JERK Y
+	X_VELOCITY_MAX_MB,                     //!< VEL X
+	Y_VELOCITY_MAX_MB,                     //!< VEL Y
+	Z_VELOCITY_MAX_MB,                     //!< VEL Z
+	JUNCTION_DEVIATION_MB,                  //!< JUNCTION DEV
+	JUNCTION_ACCELERATION_MB,               //!< JUNCTION ACCEL
 	CHORDAL_TOLERANCE,
 	0
 };
@@ -68,6 +101,8 @@ float zeroPieceInit[3] = {0,0,0};
 float zeroPiece[3];
 
 vee_record_t dataRecord;
+
+maq_st g_maq;
 
 void eepromInit(void)
 {
@@ -175,10 +210,7 @@ void eepromReadConfig(uint8_t varType)
 	}
 	if( ret != VEE_SUCCESS )
 	{
-	    while(1)
-	    {
-	        /* Error */
-	    }
+		eepromFormat();
 	}
     R_VEE_ReleaseState();
     switch (varType)
@@ -192,6 +224,68 @@ void eepromReadConfig(uint8_t varType)
     	case ZEROPIECE: memcpy(&zeroPiece,dataRecord.pData,sizeof(zeroPiece)); break;
     	default: break;
     }
+}
+
+void machine_type_write(const char * p_str_model,const char * p_str_crem)
+{
+	uint8_t ret;
+	sample_state = NOT_READY;
+	ret = R_FlashEraseRange(0x00107FE0, 32);
+	while(sample_state == NOT_READY)
+	{
+	}
+	if (ret != FLASH_SUCCESS)
+	{
+		while(1);
+	}
+	sample_state = NOT_READY;
+	ret = R_FlashWrite(0x00107FE0,(uint32_t)p_str_model,12);
+	while(sample_state == NOT_READY)
+	{
+	}
+	if (ret != FLASH_SUCCESS)
+	{
+		while(1);
+	}
+	sample_state = NOT_READY;
+	ret = R_FlashWrite(0x00107FE0 + 12,(uint32_t)p_str_crem,12);
+	while(sample_state == NOT_READY)
+	{
+	}
+	if (ret != FLASH_SUCCESS)
+	{
+		while(1);
+	}
+}
+
+maq_st check_machine_type(void)
+{
+	maq_st ret;
+	ret.model = UNDEFINED_MAQ;
+	char  str_src[10];
+	memcpy(str_src,(uint8_t *)0x00107FE0,10);
+	if (strcmp(str_src,"EASYMAK") == 0)
+	{
+		ret.model = EASYMAK_MAQ;
+	}
+	else if (strcmp(str_src,"COMPACTA") == 0)
+	{
+		ret.model = COMPACTA_MAQ;
+	}
+	else if (strcmp(str_src,"MOBILE") == 0)
+	{
+		ret.model = MOBILE_MAQ;
+	}
+	memcpy(str_src,(uint8_t *)(0x00107FE0 + 12),10);
+	if (strcmp(str_src,"RETA") == 0)
+	{
+		ret.crem = (bool)MODEL_RETA;
+	}
+	else if (strcmp(str_src,"HELI") == 0)
+	{
+		ret.crem = (bool)MODEL_HELI;
+	}
+	return ret;
 }
 
 /***********************************************************************************************************************
@@ -275,7 +369,26 @@ void eepromFormat(void)
 		memcpy(&configFlags,&configFlagsInit,sizeof(configFlags));
 		memcpy(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece));
 		memcpy(configVarMaq,configVarMaqInit,sizeof(configVarMaq));
-		memcpy(configVarParMaq,configVarParMaqInit,sizeof(configVarParMaq));
+		if (g_maq.model == EASYMAK_MAQ)
+		{
+			memcpy(configVarParMaq,configVarParMaqInit_EM,sizeof(configVarParMaq));
+		}
+		else if (g_maq.model == COMPACTA_MAQ)
+		{
+			memcpy(configVarParMaq,configVarParMaqInit_CP,sizeof(configVarParMaq));
+		}
+		else if (g_maq.model == MOBILE_MAQ)
+		{
+			memcpy(configVarParMaq,configVarParMaqInit_MB,sizeof(configVarParMaq));
+		}
+
+		if (g_maq.crem)
+		{
+			configVarParMaq[CFG_PAR_MAQ_EIXO_X1] = CREM_HELI;
+			configVarParMaq[CFG_PAR_MAQ_EIXO_X2] = CREM_HELI;
+			configVarParMaq[CFG_PAR_MAQ_EIXO_Y]  = CREM_HELI;
+		}
+
 		R_VEE_Open();
 		eepromWriteConfig(CONFIGVAR_OX);
 		eepromWriteConfig(CONFIGVAR_PL);
@@ -307,8 +420,21 @@ mem_check eepromIntegrityCheck(void)
 		res = MEM_FAIL;
 	if(memcmp(configVarMaq,configVarMaqInit,sizeof(configVarMaq)))
 		res = MEM_FAIL;
-	if(memcmp(configVarParMaq,configVarParMaqInit,sizeof(configVarParMaq)))
-		res = MEM_FAIL;
+	if (g_maq.model == EASYMAK_MAQ)
+	{
+		if(memcmp(configVarParMaq,configVarParMaqInit_EM,sizeof(configVarParMaq)))
+			res = MEM_FAIL;
+	}
+	else if (g_maq.model == COMPACTA_MAQ)
+	{
+		if(memcmp(configVarParMaq,configVarParMaqInit_CP,sizeof(configVarParMaq)))
+			res = MEM_FAIL;
+	}
+	else if (g_maq.model == MOBILE_MAQ)
+	{
+		if(memcmp(configVarParMaq,configVarParMaqInit_MB,sizeof(configVarParMaq)))
+			res = MEM_FAIL;
+	}
 
 	return res;
 }

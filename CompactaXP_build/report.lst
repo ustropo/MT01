@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:10 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:18:40 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:10
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:18:40
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=report.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=report.lst
@@ -152,18 +152,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      55  *			or there is a potential for deadlock in the TX buffer.
                                  ;      56  */
                                  ;      57 stat_t rpt_exception(uint8_t status)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",57
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",57
 00000000 7EA6                    		PUSH.L R6
 00000002 6040                    		SUB #04H, R0
 00000004 8089                    		MOV.B R1, 03H[R0]
                                  ;      58 {
                                  ;      59 	if (status != STAT_OK) {	// makes it possible to call exception reports w/o checking status value
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",59
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",59
 00000006 6101                    		CMP #00H, R1
 00000008 20rr                    		BEQ L52
 0000000A                         L49:	; bb3
                                  ;      60 		if (js.json_syntax == JSON_SYNTAX_RELAXED) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",60
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",60
 0000000A FB12rrrrrrrr            		MOV.L #_js, R1
 00000010 B091                    		MOVU.B 02H[R1], R1
 00000012 6101                    		CMP #00H, R1
@@ -171,7 +171,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000016 21rr                    		BNE L51
 00000018                         L50:	; bb4
                                  ;      61 			printf_P(PSTR("{er:{fb:%0.2f,st:%d,msg:\"%s\"}}\n"),
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",61
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",61
 00000018 5B61                    		MOVU.B R6, R1
 0000001A 05rrrrrr             A  		BSR _get_status_message
 0000001E 7100F0                  		ADD #0FFFFFFF0H, R0
@@ -187,7 +187,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      62 				TINYG_FIRMWARE_BUILD, status, get_status_message(status));
                                  ;      63 		} else {
                                  ;      64 			printf_P(PSTR("{\"er\":{\"fb\":%0.2f,\"st\":%d,\"msg\":\"%s\"}}\n"),
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",64
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",64
 0000003D 5B61                    		MOVU.B R6, R1
 0000003F 05rrrrrr             A  		BSR _get_status_message
 00000043 7100F0                  		ADD #0FFFFFFF0H, R0
@@ -203,12 +203,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      66 		}
                                  ;      67 	}
                                  ;      68 	return (status);			// makes it possible to inline, e.g: return(rpt_exception(status));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",68
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",68
 00000060 C5000302                		MOV.B 03H[R0], 02H[R0]
 00000064 B081                    		MOVU.B 02H[R0], R1
 00000066                         L53:	; bb26.split
                                  ;      69 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",69
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",69
 00000066 5B11                    		MOVU.B R1, R1
 00000068 3F6602                  		RTSD #08H, R6-R6
 0000006B                         _rpt_er:
@@ -218,19 +218,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      72  * rpt_er()	- send a bogus exception report for testing purposes (it's not real)
                                  ;      73  */
                                  ;      74 stat_t rpt_er(nvObj_t *nv)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",74
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",74
 0000006B 6080                    		SUB #08H, R0
 0000006D A009                    		MOV.L R1, 04H[R0]
 0000006F 75411D                  		MOV.L #0000001DH, R1
                                  ;      75 {
                                  ;      76 	return(rpt_exception(STAT_GENERIC_EXCEPTION_REPORT)); // bogus exception report for testing
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",76
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",76
 00000072 39rrrr               W  		BSR _rpt_exception
 00000075 8089                    		MOV.B R1, 03H[R0]
 00000077 B089                    		MOVU.B 03H[R0], R1
 00000079                         L55:	; entry.split
                                  ;      77 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",77
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",77
 00000079 5B11                    		MOVU.B R1, R1
 0000007B 6702                    		RTSD #08H
 0000007D                         __startup_helper:
@@ -246,48 +246,48 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      86 
                                  ;      87 //void _startup_helper(stat_t status, const char_t *msg)
                                  ;      88 void _startup_helper(stat_t status, const char *msg)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",88
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",88
 0000007D 6080                    		SUB #08H, R0
 0000007F 8189                    		MOV.B R1, 07H[R0]
 00000081 E302                    		MOV.L R2, [R0]
                                  ;      89 {
                                  ;      90 #ifndef __SUPPRESS_STARTUP_MESSAGES
                                  ;      91 	js.json_footer_depth = JSON_FOOTER_DEPTH;	//++++ temporary until changeover is complete
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",91
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",91
 00000083 FB12rrrrrrrr            		MOV.L #_js, R1
 00000089 3C1100                  		MOV.B #00H, 01H[R1]
 0000008C                         L57:	; entry.split
                                  ;      92 	nv_reset_nv_list();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",92
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",92
 0000008C 05rrrrrr             A  		BSR _nv_reset_nv_list
 00000090                         L58:	; entry.split1
                                  ;      93 	nv_add_object((const char_t *)"fv");		// firmware version
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",93
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",93
 00000090 FB12rrrrrrrr            		MOV.L #_L12, R1
 00000096 05rrrrrr             A  		BSR _nv_add_object
 0000009A                         L59:	; entry.split2
                                  ;      94 	nv_add_object((const char_t *)"fb");		// firmware build
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",94
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",94
 0000009A FB12rrrrrrrr            		MOV.L #_L13, R1
 000000A0 05rrrrrr             A  		BSR _nv_add_object
 000000A4                         L60:	; entry.split3
                                  ;      95 	nv_add_object((const char_t *)"hp");		// hardware platform
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",95
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",95
 000000A4 FB12rrrrrrrr            		MOV.L #_L14, R1
 000000AA 05rrrrrr             A  		BSR _nv_add_object
 000000AE                         L61:	; entry.split4
                                  ;      96 	nv_add_object((const char_t *)"hv");		// hardware version
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",96
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",96
 000000AE FB12rrrrrrrr            		MOV.L #_L15, R1
 000000B4 05rrrrrr             A  		BSR _nv_add_object
 000000B8                         L62:	; entry.split5
                                  ;      97 	nv_add_object((const char_t *)"id");		// hardware ID
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",97
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",97
 000000B8 FB12rrrrrrrr            		MOV.L #_L16, R1
 000000BE 05rrrrrr             A  		BSR _nv_add_object
 000000C2                         L63:	; entry.split6
                                  ;      98 	nv_add_string((const char_t *)"msg", pstr2str(msg));	// startup message
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",98
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",98
 000000C2 EC01                    		MOV.L [R0], R1
 000000C4 05rrrrrr             A  		BSR _pstr2str
 000000C8 EF12                    		MOV.L R1, R2
@@ -295,7 +295,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000D0 05rrrrrr             A  		BSR _nv_add_string
 000000D4                         L64:	; entry.split7
                                  ;      99 	json_print_response(status);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",99
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",99
 000000D4 B189                    		MOVU.B 07H[R0], R1
 000000D6 05rrrrrr             A  		BSR _json_print_response
 000000DA 6702                    		RTSD #08H
@@ -307,7 +307,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     103 void rpt_print_initializing_message(void)
                                  ;     104 {
                                  ;     105 	_startup_helper(STAT_INITIALIZING, PSTR(INIT_MESSAGE));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",105
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",105
 000000DC FB22rrrrrrrr            		MOV.L #_L18, R2
 000000E2 66F1                    		MOV.L #0000000FH, R1
 000000E4 39rrrr               W  		BSR __startup_helper
@@ -319,7 +319,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     108 void rpt_print_loading_configs_message(void)
                                  ;     109 {
                                  ;     110 	_startup_helper(STAT_INITIALIZING, PSTR("Loading configs from EEPROM"));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",110
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",110
 000000E8 FB22rrrrrrrr            		MOV.L #_L19, R2
 000000EE 66F1                    		MOV.L #0000000FH, R1
 000000F0 39rrrr               W  		BSR __startup_helper
@@ -331,27 +331,27 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     113 void rpt_print_system_ready_message(void)
                                  ;     114 {
                                  ;     115 	_startup_helper(STAT_OK, PSTR("SYSTEM READY"));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",115
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",115
 000000F4 FB22rrrrrrrr            		MOV.L #_L20, R2
 000000FA 6601                    		MOV.L #00000000H, R1
 000000FC 39rrrr               W  		BSR __startup_helper
 000000FF                         L68:	; entry.split
                                  ;     116 	if (cfg.comm_mode == TEXT_MODE)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",116
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",116
 000000FF FB12rrrrrrrr            		MOV.L #_cfg, R1
 00000105 B091                    		MOVU.B 02H[R1], R1
 00000107 6101                    		CMP #00H, R1
 00000109 21rr                    		BNE L70
 0000010B                         L69:	; bb1
                                  ;     117         text_response(STAT_OK, (char_t *)"");   // prompt
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",117
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",117
 0000010B FB22rrrrrrrr            		MOV.L #_L21, R2
 00000111 6601                    		MOV.L #00000000H, R1
 00000113 05rrrrrr             A  		BSR _text_response
 00000117 02                      		RTS
 00000118                         L70:	; return
                                  ;     118 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",118
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",118
 00000118 02                      		RTS
 00000119                         __is_stat:
                                  		.STACK	__is_stat=16
@@ -402,7 +402,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     163 static uint8_t _populate_filtered_status_report(void);
                                  ;     164 
                                  ;     165 uint8_t _is_stat(nvObj_t *nv)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",165
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",165
 00000119 60C0                    		SUB #0CH, R0
 0000011B A081                    		MOV.L R1, 08H[R0]
 0000011D FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -411,7 +411,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     168 
                                  ;     169 //RXMOD	GET_TOKEN_STRING(nv->value, tok);
                                  ;     170 	if (strcmp(tok, "stat") == 0) { return (true);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",170
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",170
 00000120 FB22rrrrrrrr            		MOV.L #_L22, R2
 00000126 710101                  		ADD #01H, R0, R1
 00000129 7F83                    		SCMPU
@@ -425,12 +425,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000139 08                   S  		BRA L74
 0000013A                         L73:	; bb9
                                  ;     171 	return (false);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",171
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",171
 0000013A F80400                  		MOV.B #00H, [R0]
 0000013D                         L74:	; bb11
 0000013D C40007                  		MOV.B [R0], 07H[R0]
                                  ;     172 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",172
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",172
 00000140 B189                    		MOVU.B 07H[R0], R1
 00000142 6703                    		RTSD #0CH
 00000144                         _sr_init_status_report:
@@ -443,17 +443,17 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     178  *	Sets SR list to hard-coded defaults and re-initializes SR values in NVM
                                  ;     179  */
                                  ;     180 void sr_init_status_report()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",180
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",180
 00000144 7EA6                    		PUSH.L R6
 00000146 72004CFF                		ADD #0FFFFFF4CH, R0
                                  ;     181 {
                                  ;     182 	nvObj_t *nv = nv_reset_nv_list();	// used for status report persistence locations
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",182
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",182
 0000014A 05rrrrrr             A  		BSR _nv_reset_nv_list
 0000014E E301                    		MOV.L R1, [R0]
 00000150                         L76:	; entry.split
                                  ;     183 	sr.status_report_requested = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",183
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",183
 00000150 FB12rrrrrrrr            		MOV.L #_sr, R1
 00000156 3C1800                  		MOV.B #00H, 08H[R1]
 00000159                         L77:	; entry.split1
@@ -461,7 +461,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000015C 6602                    		MOV.L #00000000H, R2
 0000015E 710105                  		ADD #05H, R0, R1
                                  ;     184 	char_t sr_defaults[NV_STATUS_REPORT_LEN][TOKEN_LEN+1] = { STATUS_REPORT_DEFAULTS };	// see settings.h
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",184
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",184
 00000161 7F88                    		SSTR.B
 00000163 FBE2rrrrrrrr            		MOV.L #_L23, R14
 00000169 C4E005                  		MOV.B [R14], 05H[R0]
@@ -542,7 +542,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000029E C5E00546                		MOV.B 05H[R14], 46H[R0]
 000002A2                         L78:	; entry.split2
                                  ;     185 	nv->index = nv_get_index((const char_t *)"", (const char_t *)"se00");	// set first SR persistence index
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",185
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",185
 000002A2 EC06                    		MOV.L [R0], R6
 000002A4 FB22rrrrrrrr            		MOV.L #_L34, R2
 000002AA FB12rrrrrrrr            		MOV.L #_L21, R1
@@ -550,18 +550,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000002B4 9161                    		MOV.W R1, 08H[R6]
 000002B6                         L79:	; entry.split3
                                  ;     186 	sr.stat_index = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",186
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",186
 000002B6 FB12rrrrrrrr            		MOV.L #_sr, R1
 000002BC 3D1800                  		MOV.W #0000H, 10H[R1]
 000002BF                         L80:	; entry.split4
                                  ;     187 
                                  ;     188 	for (uint8_t i=0; i < NV_STATUS_REPORT_LEN ; i++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",188
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",188
 000002BF F904B300                		MOV.B #00H, 0B3H[R0]
 000002C3 38rrrr               W  		BRA L94
 000002C6                         L81:	; bb151
                                  ;     189 		if (sr_defaults[i][0] == NUL) break;				// quit on first blank array entry
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",189
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",189
 000002C6 5901B3                  		MOVU.B 0B3H[R0], R1
 000002C9 6361                    		MUL #06H, R1
 000002CB 710E05                  		ADD #05H, R0, R14
@@ -570,7 +570,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000002D3 3Arrrr               W  		BEQ L95
 000002D6                         L82:	; bb164
                                  ;     190 		sr.status_report_value[i] = -1234567;				// pre-load values with an unlikely number
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",190
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",190
 000002D6 5901B3                  		MOVU.B 0B3H[R0], R1
 000002D9 6C21                    		SHLL #02H, R1
 000002DB FBE2rrrrrrrr            		MOV.L #_sr, R14
@@ -578,7 +578,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000002E3 F9E21338B496C9          		MOV.L #0C996B438H, 4CH[R14]
 000002EA                         L83:	; bb164.split
                                  ;     191 		nv->value = nv_get_index((const char_t *)"", sr_defaults[i]);// load the index for the SR element
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",191
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",191
 000002EA 5901B3                  		MOVU.B 0B3H[R0], R1
 000002ED EC06                    		MOV.L [R0], R6
 000002EF 6361                    		MUL #06H, R1
@@ -590,7 +590,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000303 A161                    		MOV.L R1, 10H[R6]
 00000305                         L84:	; bb164.split5
                                  ;     192 		if (nv->value == NO_MATCH) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",192
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",192
 00000305 EC01                    		MOV.L [R0], R1
 00000307 A911                    		MOV.L 10H[R1], R1
 00000309 FD721100FF7F47          		FCMP #477FFF00H, R1
@@ -598,23 +598,23 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000311                         L85:	; bb178
 00000311 754123                  		MOV.L #00000023H, R1
                                  ;     193 			rpt_exception(STAT_BAD_STATUS_REPORT_SETTING);	// trap mis-configured profile settings
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",193
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",193
 00000314 39rrrr               W  		BSR _rpt_exception
 00000317                         L86:	; bb178.split
                                  ;     194 			return;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",194
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",194
 00000317 3F662E                  		RTSD #0B8H, R6-R6
 0000031A                         L87:	; bb188
                                  ;     195 		}
                                  ;     196 		if (_is_stat(nv) == true)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",196
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",196
 0000031A EC01                    		MOV.L [R0], R1
 0000031C 39rrrr               W  		BSR __is_stat
 0000031F 6111                    		CMP #01H, R1
 00000321 21rr                    		BNE L91
 00000323                         L88:	; bb189
                                  ;     197 			sr.stat_index = nv->value;						// identify index for 'stat' if status is in the report
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",197
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",197
 00000323 EC01                    		MOV.L [R0], R1
 00000325 A911                    		MOV.L 10H[R1], R1
 00000327 FD72110000004F          		FCMP #4F000000H, R1
@@ -627,17 +627,17 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000340 9221                    		MOV.W R1, 10H[R2]
 00000342                         L91:	; bb200
                                  ;     198 		nv_set(nv);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",198
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",198
 00000342 EC01                    		MOV.L [R0], R1
 00000344 05rrrrrr             A  		BSR _nv_set
 00000348                         L92:	; bb200.split
                                  ;     199 		nv_persist(nv);										// conditionally persist - automatic by nv_persist()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",199
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",199
 00000348 EC01                    		MOV.L [R0], R1
 0000034A 05rrrrrr             A  		BSR _nv_persist
 0000034E                         L93:	; bb200.split6
                                  ;     200 		nv->index++;										// increment SR NVM index
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",200
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",200
 0000034E EC01                    		MOV.L [R0], R1
 00000350 9912                    		MOV.W 08H[R1], R2
 00000352 6212                    		ADD #01H, R2
@@ -646,7 +646,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000359 6211                    		ADD #01H, R1
 0000035B C701B3                  		MOV.B R1, 0B3H[R0]
 0000035E                         L94:	; bb211
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",188
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",188
 0000035E 5901B3                  		MOVU.B 0B3H[R0], R1
 00000361 75511D                  		CMP #1DH, R1
 00000364 28rr                  * 		BLT L81
@@ -654,7 +654,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000369                         L95:	; return
                                  ;     201 	}
                                  ;     202 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",202
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",202
 00000369 3F662E                  		RTSD #0B8H, R6-R6
 0000036C                         _sr_set_status_report:
                                  		.STACK	_sr_set_status_report=76
@@ -667,12 +667,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     209  *	there is an unrecognized token in the SR string.
                                  ;     210  */
                                  ;     211 stat_t sr_set_status_report(nvObj_t *nv)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",211
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",211
 0000036C 7100B8                  		ADD #0FFFFFFB8H, R0
 0000036F A409                    		MOV.L R1, 44H[R0]
                                  ;     212 {
                                  ;     213 	uint8_t elements = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",213
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",213
 00000371 3C0500                  		MOV.B #00H, 05H[R0]
 00000374                         L97:	; entry.split
 00000374 75433A                  		MOV.L #0000003AH, R3
@@ -680,11 +680,11 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000379 710106                  		ADD #06H, R0, R1
                                  ;     214 	index_t status_report_list[NV_STATUS_REPORT_LEN];
                                  ;     215 	memset(status_report_list, 0, sizeof(status_report_list));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",215
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",215
 0000037C 7F88                    		SSTR.B
 0000037E                         L98:	; entry.split1
                                  ;     216 	index_t sr_start = nv_get_index((const char_t *)"",(const char_t *)"se00");// set first SR persistence index
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",216
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",216
 0000037E FB22rrrrrrrr            		MOV.L #_L34, R2
 00000384 FB12rrrrrrrr            		MOV.L #_L21, R1
 0000038A 05rrrrrr             A  		BSR _nv_get_index
@@ -692,12 +692,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000391                         L99:	; entry.split2
                                  ;     217 
                                  ;     218 	for (uint8_t i=0; i<NV_STATUS_REPORT_LEN; i++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",218
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",218
 00000391 F9044200                		MOV.B #00H, 42H[R0]
 00000395 38rrrr               W  		BRA L116
 00000398                         L100:	; bb9
                                  ;     219 		if (((nv = nv->nx) == NULL) || (nv->valuetype == TYPE_EMPTY)) break;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",219
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",219
 00000398 AC09                    		MOV.L 44H[R0], R1
 0000039A A819                    		MOV.L 04H[R1], R1
 0000039C A409                    		MOV.L R1, 44H[R0]
@@ -719,7 +719,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000003B4 21rr                    		BNE L117
 000003B6                         L105:	; bb32
                                  ;     220 		if ((nv->valuetype == TYPE_BOOL) && (fp_TRUE(nv->value))) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",220
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",220
 000003B6 AC09                    		MOV.L 44H[R0], R1
 000003B8 8A99                    		MOV.B 0BH[R1], R1
 000003BA 6111                    		CMP #01H, R1
@@ -727,7 +727,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000003BE 2Err                 B  		BRA L114
 000003C0                         L106:	; bb33
                                  ;     221 			status_report_list[i] = nv->index;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",221
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",221
 000003C0 AC09                    		MOV.L 44H[R0], R1
 000003C2 9911                    		MOV.W 08H[R1], R1
 000003C4 710E06                  		ADD #06H, R0, R14
@@ -735,25 +735,25 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000003CA FE12E1                  		MOV.W R1, [R2,R14]
 000003CD                         L107:	; bb33.split
                                  ;     222 			nv->value = nv->index;							// persist the index as the value
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",222
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",222
 000003CD AC09                    		MOV.L 44H[R0], R1
 000003CF 06E1111204              		ITOF 08H[R1].UW, R2
 000003D4 A112                    		MOV.L R2, 10H[R1]
 000003D6                         L108:	; bb33.split3
                                  ;     223 			nv->index = sr_start + i;						// index of the SR persistence location
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",223
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",223
 000003D6 5D0120                  		MOVU.W 40H[R0], R1
 000003D9 490142                  		ADD 42H[R0].UB, R1
 000003DC AC0A                    		MOV.L 44H[R0], R2
 000003DE 9121                    		MOV.W R1, 08H[R2]
 000003E0                         L109:	; bb33.split4
                                  ;     224 			nv_persist(nv);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",224
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",224
 000003E0 AC09                    		MOV.L 44H[R0], R1
 000003E2 05rrrrrr             A  		BSR _nv_persist
 000003E6                         L110:	; bb33.split5
                                  ;     225 			elements++;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",225
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",225
 000003E6 B109                    		MOVU.B 05H[R0], R1
 000003E8 6211                    		ADD #01H, R1
 000003EA 8109                    		MOV.B R1, 05H[R0]
@@ -764,7 +764,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000003F6                         L111:	; bb59
                                  ;     226 		} else {
                                  ;     227 			return (STAT_UNRECOGNIZED_NAME);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",227
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",227
 000003F6 3C0464                  		MOV.B #64H, 04H[R0]
 000003F9 2Err                 B  		BRA L121
 000003FB                         L112:	; bb67
@@ -783,7 +783,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000414 21rr                    		BNE L106
 00000416 2Err                 B  		BRA L111
 00000418                         L116:	; bb83
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",218
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",218
 00000418 590142                  		MOVU.B 42H[R0], R1
 0000041B 75511D                  		CMP #1DH, R1
 0000041E 28rr                  * 		BLT L100
@@ -792,18 +792,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     228 		}
                                  ;     229 	}
                                  ;     230 	if (elements == 0)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",230
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",230
 00000423 B109                    		MOVU.B 05H[R0], R1
 00000425 6101                    		CMP #00H, R1
 00000427 18                   S  		BNE L119
 00000428                         L118:	; bb92
                                  ;     231         return (STAT_INVALID_OR_MALFORMED_COMMAND);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",231
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",231
 00000428 3C0465                  		MOV.B #65H, 04H[R0]
 0000042B 2Err                 B  		BRA L121
 0000042D                         L119:	; bb99
                                  ;     232 	memcpy(sr.status_report_list, status_report_list, sizeof(status_report_list));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",232
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",232
 0000042D FB12rrrrrrrr            		MOV.L #_sr, R1
 00000433 711112                  		ADD #12H, R1
 00000436 75433A                  		MOV.L #0000003AH, R3
@@ -811,13 +811,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000043C 7F8F                    		SMOVF
 0000043E                         L120:	; bb99.split
                                  ;     233 	return(_populate_unfiltered_status_report());			// return current values
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",233
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",233
 0000043E 39rrrr               W  		BSR __$_populate_unfiltered_status_report
 00000441 8101                    		MOV.B R1, 04H[R0]
 00000443                         L121:	; bb104
 00000443 C5000443                		MOV.B 04H[R0], 43H[R0]
                                  ;     234 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",234
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",234
 00000447 590143                  		MOVU.B 43H[R0], R1
 0000044A 6712                    		RTSD #48H
 0000044C                         _sr_request_status_report:
@@ -836,7 +836,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     246  *	but will not be provided more frequently than the status report interval
                                  ;     247  */
                                  ;     248 stat_t sr_request_status_report(uint8_t request_type)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",248
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",248
 0000044C 6040                    		SUB #04H, R0
 0000044E 8089                    		MOV.B R1, 03H[R0]
                                  ;     249 {
@@ -857,24 +857,24 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     264 	}
                                  ;     265 #endif
                                  ;     266 	sr.status_report_requested = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",266
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",266
 00000450 FB12rrrrrrrr            		MOV.L #_sr, R1
 00000456 3C1801                  		MOV.B #01H, 08H[R1]
 00000459                         L123:	; entry.split
                                  ;     267 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",267
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",267
 00000459 3C0200                  		MOV.B #00H, 02H[R0]
 0000045C B081                    		MOVU.B 02H[R0], R1
 0000045E                         L124:	; entry.split1
                                  ;     268 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",268
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",268
 0000045E 5B11                    		MOVU.B R1, R1
 00000460 6701                    		RTSD #04H
 00000462                         _sr_status_report_callback:
                                  		.STACK	_sr_status_report_callback=8
                                  ;     269 
                                  ;     270 stat_t sr_status_report_callback() 		// called by controller dispatcher
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",270
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",270
 00000462 6040                    		SUB #04H, R0
                                  ;     271 {
                                  ;     272 #ifdef __SUPPRESS_STATUS_REPORTS
@@ -882,27 +882,27 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     274 #endif
                                  ;     275 
                                  ;     276 	if (sr.status_report_verbosity == SR_OFF)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",276
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",276
 00000464 FBE2rrrrrrrr            		MOV.L #_sr, R14
 0000046A 58EE                    		MOVU.B [R14], R14
 0000046C 610E                    		CMP #00H, R14
 0000046E 18                   S  		BNE L127
 0000046F                         L126:	; bb1
                                  ;     277         return (STAT_NOOP);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",277
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",277
 0000046F 3C0203                  		MOV.B #03H, 02H[R0]
 00000472 2Err                 B  		BRA L136
 00000474                         L127:	; bb8
                                  ;     278 
                                  ;     279 	if (sr.status_report_requested == false)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",279
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",279
 00000474 FB12rrrrrrrr            		MOV.L #_sr, R1
 0000047A B211                    		MOVU.B 08H[R1], R1
 0000047C 6101                    		CMP #00H, R1
 0000047E 18                   S  		BNE L129
 0000047F                         L128:	; bb9
                                  ;     280         return (STAT_NOOP);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",280
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",280
 0000047F 3C0203                  		MOV.B #03H, 02H[R0]
 00000482 2Err                 B  		BRA L136
 00000484                         L129:	; bb16
@@ -917,32 +917,32 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     289 #endif
                                  ;     290 
                                  ;     291 	sr.status_report_requested = false;		// disable reports until requested again
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",291
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",291
 00000484 FB12rrrrrrrr            		MOV.L #_sr, R1
 0000048A 3C1800                  		MOV.B #00H, 08H[R1]
 0000048D                         L130:	; bb16.split
                                  ;     292 
                                  ;     293 	if (sr.status_report_verbosity == SR_VERBOSE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",293
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",293
 0000048D FBE2rrrrrrrr            		MOV.L #_sr, R14
 00000493 58EE                    		MOVU.B [R14], R14
 00000495 612E                    		CMP #02H, R14
 00000497 18                   S  		BNE L132
 00000498                         L131:	; bb18
                                  ;     294 		_populate_unfiltered_status_report();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",294
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",294
 00000498 39rrrr               W  		BSR __$_populate_unfiltered_status_report
 0000049B 2Err                 B  		BRA L134
 0000049D                         L132:	; bb21
                                  ;     295 	} else {
                                  ;     296 		if (_populate_filtered_status_report() == false) {	// no new data
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",296
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",296
 0000049D 39rrrr               W  		BSR __$_populate_filtered_status_report
 000004A0 6101                    		CMP #00H, R1
 000004A2 18                   S  		BNE L134
 000004A3                         L133:	; bb22
                                  ;     297 			return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",297
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",297
 000004A3 3C0200                  		MOV.B #00H, 02H[R0]
 000004A6 2Err                 B  		BRA L136
 000004A8                         L134:	; bb35
@@ -951,17 +951,17 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     298 		}
                                  ;     299 	}
                                  ;     300 	nv_print_list(STAT_OK, TEXT_INLINE_PAIRS, JSON_OBJECT_FORMAT);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",300
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",300
 000004AC EF23                    		MOV.L R2, R3
 000004AE 05rrrrrr             A  		BSR _nv_print_list
 000004B2                         L135:	; bb35.split
                                  ;     301 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",301
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",301
 000004B2 3C0200                  		MOV.B #00H, 02H[R0]
 000004B5                         L136:	; bb37
 000004B5 C5000203                		MOV.B 02H[R0], 03H[R0]
                                  ;     302 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",302
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",302
 000004B9 B089                    		MOVU.B 03H[R0], R1
 000004BB 6701                    		RTSD #04H
 000004BD                         _sr_run_text_status_report:
@@ -971,27 +971,27 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     305  * sr_run_text_status_report() - generate a text mode status report in multiline format
                                  ;     306  */
                                  ;     307 stat_t sr_run_text_status_report()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",307
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",307
 000004BD 6040                    		SUB #04H, R0
                                  ;     308 {
                                  ;     309 	_populate_unfiltered_status_report();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",309
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",309
 000004BF 39rrrr               W  		BSR __$_populate_unfiltered_status_report
 000004C2                         L138:	; entry.split
 000004C2 6623                    		MOV.L #00000002H, R3
 000004C4 6632                    		MOV.L #00000003H, R2
 000004C6 6601                    		MOV.L #00000000H, R1
                                  ;     310 	nv_print_list(STAT_OK, TEXT_MULTILINE_FORMATTED, JSON_RESPONSE_FORMAT);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",310
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",310
 000004C8 05rrrrrr             A  		BSR _nv_print_list
 000004CC                         L139:	; entry.split1
                                  ;     311 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",311
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",311
 000004CC 3C0300                  		MOV.B #00H, 03H[R0]
 000004CF B089                    		MOVU.B 03H[R0], R1
 000004D1                         L140:	; entry.split2
                                  ;     312 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",312
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",312
 000004D1 5B11                    		MOVU.B R1, R1
 000004D3 6701                    		RTSD #04H
 000004D5                         __$_populate_unfiltered_status_report:
@@ -1003,12 +1003,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     317  *	Designed to be run as a response; i.e. have a "r" header and a footer.
                                  ;     318  */
                                  ;     319 static stat_t _populate_unfiltered_status_report()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",319
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",319
 000004D5 7EA6                    		PUSH.L R6
 000004D7 7100EC                  		ADD #0FFFFFFECH, R0
                                  ;     320 {
                                  ;     321 	const char_t sr_str[] = "sr";
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",321
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",321
 000004DA FBE2rrrrrrrr            		MOV.L #_L35, R14
 000004E0 C4E003                  		MOV.B [R14], 03H[R0]
 000004E3 C5E00104                		MOV.B 01H[R14], 04H[R0]
@@ -1016,18 +1016,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000004EB                         L142:	; entry.split
                                  ;     322 	char_t tmp[TOKEN_LEN+1];
                                  ;     323 	nvObj_t *nv = nv_reset_nv_list();		// sets *nv to the start of the body
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",323
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",323
 000004EB 05rrrrrr             A  		BSR _nv_reset_nv_list
 000004EF A089                    		MOV.L R1, 0CH[R0]
 000004F1                         L143:	; entry.split1
                                  ;     324 
                                  ;     325 	nv->valuetype = TYPE_PARENT; 			// setup the parent object (no length checking required)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",325
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",325
 000004F1 A889                    		MOV.L 0CH[R0], R1
 000004F3 3C1B07                  		MOV.B #07H, 0BH[R1]
 000004F6                         L144:	; entry.split2
                                  ;     326 	strcpy(nv->token, sr_str);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",326
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",326
 000004F6 A889                    		MOV.L 0CH[R0], R1
 000004F8 711118                  		ADD #18H, R1
 000004FB FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -1035,7 +1035,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000501 7F87                    		SMOVU
 00000503                         L145:	; entry.split3
                                  ;     327 	nv->index = nv_get_index((const char_t *)"", sr_str);// set the index - may be needed by calling function
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",327
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",327
 00000503 A88E                    		MOV.L 0CH[R0], R6
 00000505 710203                  		ADD #03H, R0, R2
 00000508 FB12rrrrrrrr            		MOV.L #_L21, R1
@@ -1043,18 +1043,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000512 9161                    		MOV.W R1, 08H[R6]
 00000514                         L146:	; entry.split4
                                  ;     328 	nv = nv->nx;							// no need to check for NULL as list has just been reset
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",328
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",328
 00000514 A889                    		MOV.L 0CH[R0], R1
 00000516 E5100103                		MOV.L 04H[R1], 0CH[R0]
 0000051A                         L147:	; entry.split5
                                  ;     329 
                                  ;     330 	for (uint8_t i=0; i<NV_STATUS_REPORT_LEN; i++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",330
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",330
 0000051A 3C8200                  		MOV.B #00H, 12H[R0]
 0000051D 2Err                 B  		BRA L156
 0000051F                         L148:	; bb26
                                  ;     331 		if ((nv->index = sr.status_report_list[i]) == 0) { break;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",331
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",331
 0000051F B481                    		MOVU.B 12H[R0], R1
 00000521 6C11                    		SHLL #01H, R1
 00000523 FB22rrrrrrrr            		MOV.L #_sr, R2
@@ -1066,13 +1066,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000533 20rr                    		BEQ L157
 00000535                         L149:	; bb39
                                  ;     332 		nv_get_nvObj(nv);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",332
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",332
 00000535 A889                    		MOV.L 0CH[R0], R1
 00000537 05rrrrrr             A  		BSR _nv_get_nvObj
 0000053B                         L150:	; bb39.split
                                  ;     333 
                                  ;     334 		strcpy(tmp, nv->group);			// flatten out groups - WARNING - you cannot use strncpy here...
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",334
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",334
 0000053B A88A                    		MOV.L 0CH[R0], R2
 0000053D 712214                  		ADD #14H, R2
 00000540 FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -1083,7 +1083,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000054B 6602                    		MOV.L #00000000H, R2
 0000054D 710106                  		ADD #06H, R0, R1
                                  ;     335 		strcat(tmp, nv->token);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",335
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",335
 00000550 A88C                    		MOV.L 0CH[R0], R4
 00000552 7F80                    		SUNTIL.B
 00000554 6011                    		SUB #01H, R1
@@ -1092,7 +1092,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000055B 7F87                    		SMOVU
 0000055D                         L152:	; bb39.split7
                                  ;     336 		strcpy(nv->token, tmp);			//...or here.
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",336
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",336
 0000055D A889                    		MOV.L 0CH[R0], R1
 0000055F 711118                  		ADD #18H, R1
 00000562 FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -1101,7 +1101,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000056A                         L153:	; bb39.split8
                                  ;     337 
                                  ;     338 		if ((nv = nv->nx) == NULL)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",338
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",338
 0000056A A889                    		MOV.L 0CH[R0], R1
 0000056C A819                    		MOV.L 04H[R1], R1
 0000056E A089                    		MOV.L R1, 0CH[R0]
@@ -1110,7 +1110,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000574                         L154:	; bb54
 00000574 66E1                    		MOV.L #0000000EH, R1
                                  ;     339 			return (cm_hard_alarm(STAT_BUFFER_FULL_FATAL));	// should never be NULL unless SR length exceeds available buffer array
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",339
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",339
 00000576 05rrrrrr             A  		BSR _cm_hard_alarm
 0000057A 8081                    		MOV.B R1, 02H[R0]
 0000057C 2Err                 B  		BRA L158
@@ -1119,19 +1119,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000580 6211                    		ADD #01H, R1
 00000582 8481                    		MOV.B R1, 12H[R0]
 00000584                         L156:	; bb67
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",330
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",330
 00000584 B481                    		MOVU.B 12H[R0], R1
 00000586 75511D                  		CMP #1DH, R1
 00000589 29rr                    		BLT L148
 0000058B                         L157:	; bb74
                                  ;     340 	}
                                  ;     341 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",341
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",341
 0000058B 3C0200                  		MOV.B #00H, 02H[R0]
 0000058E                         L158:	; bb76
 0000058E C5000213                		MOV.B 02H[R0], 13H[R0]
                                  ;     342 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",342
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",342
 00000592 B489                    		MOVU.B 13H[R0], R1
 00000594 3F6606                  		RTSD #18H, R6-R6
 00000597                         __$_populate_filtered_status_report:
@@ -1151,34 +1151,34 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     355  *		  cached value for all remaining reports.
                                  ;     356  */
                                  ;     357 static uint8_t _populate_filtered_status_report()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",357
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",357
 00000597 7100EC                  		ADD #0FFFFFFECH, R0
                                  ;     358 {
                                  ;     359 	const char_t sr_str[] = "sr";
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",359
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",359
 0000059A FBE2rrrrrrrr            		MOV.L #_L36, R14
 000005A0 C4E002                  		MOV.B [R14], 02H[R0]
 000005A3 C5E00103                		MOV.B 01H[R14], 03H[R0]
 000005A7 C5E00204                		MOV.B 02H[R14], 04H[R0]
 000005AB                         L160:	; entry.split
                                  ;     360 	uint8_t has_data = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",360
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",360
 000005AB 3C0500                  		MOV.B #00H, 05H[R0]
 000005AE                         L161:	; entry.split1
                                  ;     361 	char_t tmp[TOKEN_LEN+1];
                                  ;     362 	nvObj_t *nv = nv_reset_nv_list();		// sets nv to the start of the body
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",362
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",362
 000005AE 05rrrrrr             A  		BSR _nv_reset_nv_list
 000005B2 A089                    		MOV.L R1, 0CH[R0]
 000005B4                         L162:	; entry.split2
                                  ;     363 
                                  ;     364 	nv->valuetype = TYPE_PARENT; 			// setup the parent object (no need to length check the copy)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",364
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",364
 000005B4 A889                    		MOV.L 0CH[R0], R1
 000005B6 3C1B07                  		MOV.B #07H, 0BH[R1]
 000005B9                         L163:	; entry.split3
                                  ;     365 	strcpy(nv->token, sr_str);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",365
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",365
 000005B9 A889                    		MOV.L 0CH[R0], R1
 000005BB 711118                  		ADD #18H, R1
 000005BE FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -1187,18 +1187,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000005C6                         L164:	; entry.split4
                                  ;     366 //	nv->index = nv_get_index((const char_t *)"", sr_str);// OMITTED - set the index - may be needed by calling function
                                  ;     367 	nv = nv->nx;							// no need to check for NULL as list has just been reset
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",367
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",367
 000005C6 A889                    		MOV.L 0CH[R0], R1
 000005C8 E5100103                		MOV.L 04H[R1], 0CH[R0]
 000005CC                         L165:	; entry.split5
                                  ;     368 
                                  ;     369 	for (uint8_t i=0; i<NV_STATUS_REPORT_LEN; i++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",369
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",369
 000005CC 3C8200                  		MOV.B #00H, 12H[R0]
 000005CF 38rrrr               W  		BRA L178
 000005D2                         L166:	; bb23
                                  ;     370 		if ((nv->index = sr.status_report_list[i]) == 0) { break;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",370
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",370
 000005D2 B481                    		MOVU.B 12H[R0], R1
 000005D4 6C11                    		SHLL #01H, R1
 000005D6 FB22rrrrrrrr            		MOV.L #_sr, R2
@@ -1211,14 +1211,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000005E9                         L167:	; bb36
                                  ;     371 
                                  ;     372 		nv_get_nvObj(nv);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",372
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",372
 000005E9 A889                    		MOV.L 0CH[R0], R1
 000005EB 05rrrrrr             A  		BSR _nv_get_nvObj
 000005EF                         L168:	; bb36.split
                                  ;     373 		// do not report values that have not changed...
                                  ;     374 		// ...except for stat=3 (STOP), which is an exception
                                  ;     375 		if (fp_EQ(nv->value, sr.status_report_value[i])) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",375
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",375
 000005EF B481                    		MOVU.B 12H[R0], R1
 000005F1 6C21                    		SHLL #02H, R1
 000005F3 FBE2rrrrrrrr            		MOV.L #_sr, R14
@@ -1233,7 +1233,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     376 //			if (nv->index != sr.stat_index) {
                                  ;     377 //				if (fp_EQ(nv->value, COMBINED_PROGRAM_STOP)) {
                                  ;     378 					nv->valuetype = TYPE_EMPTY;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",378
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",378
 0000060E A889                    		MOV.L 0CH[R0], R1
 00000610 3C1BFF                  		MOV.B #0FFH, 0BH[R1]
 00000613 2Err                 B  		BRA L177
@@ -1244,7 +1244,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     382 			// report anything that has changed
                                  ;     383 		} else {
                                  ;     384 			strcpy(tmp, nv->group);		// flatten out groups - WARNING - you cannot use strncpy here...
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",384
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",384
 00000615 A88A                    		MOV.L 0CH[R0], R2
 00000617 712214                  		ADD #14H, R2
 0000061A FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -1255,7 +1255,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000625 6602                    		MOV.L #00000000H, R2
 00000627 710106                  		ADD #06H, R0, R1
                                  ;     385 			strcat(tmp, nv->token);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",385
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",385
 0000062A A88C                    		MOV.L 0CH[R0], R4
 0000062C 7F80                    		SUNTIL.B
 0000062E 6011                    		SUB #01H, R1
@@ -1264,7 +1264,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000635 7F87                    		SMOVU
 00000637                         L172:	; bb43.split6
                                  ;     386 			strcpy(nv->token, tmp);		//...or here.
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",386
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",386
 00000637 A889                    		MOV.L 0CH[R0], R1
 00000639 711118                  		ADD #18H, R1
 0000063C FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -1272,7 +1272,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000642 7F87                    		SMOVU
 00000644                         L173:	; bb43.split7
                                  ;     387 			sr.status_report_value[i] = nv->value;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",387
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",387
 00000644 B481                    		MOVU.B 12H[R0], R1
 00000646 6C21                    		SHLL #02H, R1
 00000648 FBE2rrrrrrrr            		MOV.L #_sr, R14
@@ -1281,7 +1281,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000652 E51E0413                		MOV.L 10H[R1], 4CH[R14]
 00000656                         L174:	; bb43.split8
                                  ;     388 			if ((nv = nv->nx) == NULL) return (false); // should never be NULL unless SR length exceeds available buffer array
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",388
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",388
 00000656 A889                    		MOV.L 0CH[R0], R1
 00000658 A819                    		MOV.L 04H[R1], R1
 0000065A A089                    		MOV.L R1, 0CH[R0]
@@ -1292,14 +1292,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000662 2Err                 B  		BRA L180
 00000664                         L176:	; bb72
                                  ;     389 			has_data = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",389
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",389
 00000664 3C0501                  		MOV.B #01H, 05H[R0]
 00000667                         L177:	; bb86
 00000667 B481                    		MOVU.B 12H[R0], R1
 00000669 6211                    		ADD #01H, R1
 0000066B 8481                    		MOV.B R1, 12H[R0]
 0000066D                         L178:	; bb89
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",369
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",369
 0000066D B481                    		MOVU.B 12H[R0], R1
 0000066F 75511D                  		CMP #1DH, R1
 00000672 28rr                  * 		BLT L166
@@ -1308,12 +1308,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     390 		}
                                  ;     391 	}
                                  ;     392 	return (has_data);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",392
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",392
 00000677 C5000501                		MOV.B 05H[R0], 01H[R0]
 0000067B                         L180:	; bb99
 0000067B C5000113                		MOV.B 01H[R0], 13H[R0]
                                  ;     393 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",393
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",393
 0000067F B489                    		MOVU.B 13H[R0], R1
 00000681 6705                    		RTSD #14H
 00000683                         _sr_get:
@@ -1327,7 +1327,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     400  * sr_set_si()	- set status report interval
                                  ;     401  */
                                  ;     402 stat_t sr_get(nvObj_t *nv) { return (_populate_unfiltered_status_report());}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",402
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",402
 00000683 6080                    		SUB #08H, R0
 00000685 A009                    		MOV.L R1, 04H[R0]
 00000687 39rrrr               W  		BSR __$_populate_unfiltered_status_report
@@ -1337,7 +1337,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000690                         _sr_set:
                                  		.STACK	_sr_set=12
                                  ;     403 stat_t sr_set(nvObj_t *nv) { return (sr_set_status_report(nv));}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",403
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",403
 00000690 6080                    		SUB #08H, R0
 00000692 A009                    		MOV.L R1, 04H[R0]
 00000694 39rrrr               W  		BSR _sr_set_status_report
@@ -1348,12 +1348,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  		.STACK	_sr_set_si=12
                                  ;     404 
                                  ;     405 stat_t sr_set_si(nvObj_t *nv)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",405
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",405
 0000069D 6080                    		SUB #08H, R0
 0000069F A009                    		MOV.L R1, 04H[R0]
                                  ;     406 {
                                  ;     407 	if (nv->value < STATUS_REPORT_MIN_MS) { nv->value = STATUS_REPORT_MIN_MS;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",407
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",407
 000006A1 A911                    		MOV.L 10H[R1], R1
 000006A3 FD72110000C842          		FCMP #42C80000H, R1
 000006AA 26rr                    		BPZ L185
@@ -1362,7 +1362,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006AE F912040000C842          		MOV.L #42C80000H, 10H[R1]
 000006B5                         L185:	; bb10
                                  ;     408 	sr.status_report_interval = (uint32_t)nv->value;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",408
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",408
 000006B5 A809                    		MOV.L 04H[R0], R1
 000006B7 A911                    		MOV.L 10H[R1], R1
 000006B9 FD72110000004F          		FCMP #4F000000H, R1
@@ -1375,12 +1375,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006D2 A029                    		MOV.L R1, 04H[R2]
 000006D4                         L188:	; bb10.split
                                  ;     409 	return(STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",409
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",409
 000006D4 3C0300                  		MOV.B #00H, 03H[R0]
 000006D7 B089                    		MOVU.B 03H[R0], R1
 000006D9                         L189:	; bb10.split1
                                  ;     410 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",410
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",410
 000006D9 5B11                    		MOVU.B R1, R1
 000006DB 6702                    		RTSD #08H
 000006DD                         _sr_print_sr:
@@ -1395,7 +1395,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     418 static const char fmt_sv[] PROGMEM = "[sv]  status report verbosity%6d [0=off,1=filtered,2=verbose]\n";
                                  ;     419 
                                  ;     420 void sr_print_sr(nvObj_t *nv) { _populate_unfiltered_status_report();}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",420
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",420
 000006DD 6040                    		SUB #04H, R0
 000006DF E301                    		MOV.L R1, [R0]
 000006E1 39rrrr               W  		BSR __$_populate_unfiltered_status_report
@@ -1403,7 +1403,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006E6                         _sr_print_si:
                                  		.STACK	_sr_print_si=8
                                  ;     421 void sr_print_si(nvObj_t *nv) { text_print_flt(nv, fmt_si);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",421
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",421
 000006E6 6040                    		SUB #04H, R0
 000006E8 E301                    		MOV.L R1, [R0]
 000006EA FB22rrrrrrrr            		MOV.L #__$fmt_si, R2
@@ -1412,7 +1412,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000006F6                         _sr_print_sv:
                                  		.STACK	_sr_print_sv=8
                                  ;     422 void sr_print_sv(nvObj_t *nv) { text_print_ui8(nv, fmt_sv);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",422
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",422
 000006F6 6040                    		SUB #04H, R0
 000006F8 E301                    		MOV.L R1, [R0]
 000006FA FB22rrrrrrrr            		MOV.L #__$fmt_sv, R2
@@ -1448,22 +1448,22 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     448 void qr_init_queue_report()
                                  ;     449 {
                                  ;     450 	qr.queue_report_requested = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",450
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",450
 00000706 FB12rrrrrrrr            		MOV.L #_qr, R1
 0000070C 3C1100                  		MOV.B #00H, 01H[R1]
 0000070F                         L194:	; entry.split
                                  ;     451 	qr.buffers_added = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",451
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",451
 0000070F FB12rrrrrrrr            		MOV.L #_qr, R1
 00000715 3D1200                  		MOV.W #0000H, 04H[R1]
 00000718                         L195:	; entry.split1
                                  ;     452 	qr.buffers_removed = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",452
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",452
 00000718 FB12rrrrrrrr            		MOV.L #_qr, R1
 0000071E 3D1300                  		MOV.W #0000H, 06H[R1]
 00000721                         L196:	; entry.split2
                                  ;     453 	qr.init_tick = SysTickTimer_getValue();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",453
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",453
 00000721 05rrrrrr             A  		BSR _SysTickTimer_getValue
 00000725 FB22rrrrrrrr            		MOV.L #_qr, R2
 0000072B A0A9                    		MOV.L R1, 0CH[R2]
@@ -1479,25 +1479,25 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     460  *	since the last init (usually re-initted when a report is generated).
                                  ;     461  */
                                  ;     462 void qr_request_queue_report(int8_t buffers)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",462
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",462
 0000072E 60C0                    		SUB #0CH, R0
 00000730 8289                    		MOV.B R1, 0BH[R0]
                                  ;     463 {
                                  ;     464 	// get buffer depth and added/removed count
                                  ;     465 	qr.buffers_available = mp_get_planner_buffers_available();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",465
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",465
 00000732 05rrrrrr             A  		BSR _mp_get_planner_buffers_available
 00000736 FB22rrrrrrrr            		MOV.L #_qr, R2
 0000073C 80A1                    		MOV.B R1, 02H[R2]
 0000073E                         L198:	; entry.split
                                  ;     466 	if (buffers > 0) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",466
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",466
 0000073E 8A89                    		MOV.B 0BH[R0], R1
 00000740 6101                    		CMP #00H, R1
 00000742 2Brr                    		BLE L200
 00000744                         L199:	; bb3
                                  ;     467 		qr.buffers_added += buffers;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",467
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",467
 00000744 FB22rrrrrrrr            		MOV.L #_qr, R2
 0000074A 06C92102                		ADD 04H[R2].UW, R1
 0000074E 90A1                    		MOV.W R1, 04H[R2]
@@ -1505,7 +1505,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000752                         L200:	; bb10
                                  ;     468 	} else {
                                  ;     469 		qr.buffers_removed -= buffers;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",469
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",469
 00000752 FB22rrrrrrrr            		MOV.L #_qr, R2
 00000758 B8AB                    		MOVU.W 06H[R2], R3
 0000075A 4313                    		SUB R1, R3
@@ -1515,7 +1515,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     471 
                                  ;     472 	// time-throttle requests while generating arcs
                                  ;     473 	qr.motion_mode = cm_get_motion_mode(ACTIVE_MODEL);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",473
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",473
 0000075E FBE2rrrrrrrr            		MOV.L #_cm, R14
 00000764 EDE194                  		MOV.L 0250H[R14], R1
 00000767 05rrrrrr             A  		BSR _cm_get_motion_mode
@@ -1523,7 +1523,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000771 8221                    		MOV.B R1, 08H[R2]
 00000773                         L202:	; bb21.split
                                  ;     474 	if ((qr.motion_mode == MOTION_MODE_CW_ARC) || (qr.motion_mode == MOTION_MODE_CCW_ARC)) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",474
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",474
 00000773 FB12rrrrrrrr            		MOV.L #_qr, R1
 00000779 B211                    		MOVU.B 08H[R1], R1
 0000077B 6121                    		CMP #02H, R1
@@ -1531,12 +1531,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000077F 2Err                 B  		BRA L207
 00000781                         L203:	; bb25
                                  ;     475 		uint32_t tick = SysTickTimer_getValue();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",475
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",475
 00000781 05rrrrrr             A  		BSR _SysTickTimer_getValue
 00000785 A009                    		MOV.L R1, 04H[R0]
 00000787                         L204:	; bb25.split
                                  ;     476 		if (tick - qr.init_tick < MIN_ARC_QR_INTERVAL) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",476
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",476
 00000787 A809                    		MOV.L 04H[R0], R1
 00000789 FBE2rrrrrrrr            		MOV.L #_qr, R14
 0000078F 0681E103                		SUB 0CH[R14].L, R1
@@ -1544,12 +1544,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000796 24rr                    		BGTU L211
 00000798                         L205:	; bb28
                                  ;     477 			qr.queue_report_requested = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",477
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",477
 00000798 FB12rrrrrrrr            		MOV.L #_qr, R1
 0000079E 3C1100                  		MOV.B #00H, 01H[R1]
 000007A1                         L206:	; bb28.split
                                  ;     478 			return;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",478
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",478
 000007A1 6703                    		RTSD #0CH
 000007A3                         L207:	; bb41
 000007A3 FB12rrrrrrrr            		MOV.L #_qr, R1
@@ -1571,21 +1571,21 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     481 
                                  ;     482 	// either return or request a report
                                  ;     483 	if (qr.queue_report_verbosity != QR_OFF) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",483
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",483
 000007BB FBE2rrrrrrrr            		MOV.L #_qr, R14
 000007C1 58EE                    		MOVU.B [R14], R14
 000007C3 610E                    		CMP #00H, R14
 000007C5 20rr                    		BEQ L213
 000007C7                         L212:	; bb56
                                  ;     484 		qr.queue_report_requested = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",484
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",484
 000007C7 FB12rrrrrrrr            		MOV.L #_qr, R1
 000007CD 3C1101                  		MOV.B #01H, 01H[R1]
 000007D0 6703                    		RTSD #0CH
 000007D2                         L213:	; return
                                  ;     485 	}
                                  ;     486 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",486
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",486
 000007D2 6703                    		RTSD #0CH
 000007D4                         _qr_queue_report_callback:
                                  		.STACK	_qr_queue_report_callback=24
@@ -1594,7 +1594,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     489  * qr_queue_report_callback() - generate a queue report if one has been requested
                                  ;     490  */
                                  ;     491 stat_t qr_queue_report_callback() 		// called by controller dispatcher
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",491
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",491
 000007D4 6040                    		SUB #04H, R0
                                  ;     492 {
                                  ;     493 #ifdef __SUPPRESS_QUEUE_REPORTS
@@ -1602,46 +1602,46 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     495 #endif
                                  ;     496 
                                  ;     497 	if (qr.queue_report_verbosity == QR_OFF)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",497
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",497
 000007D6 FBE2rrrrrrrr            		MOV.L #_qr, R14
 000007DC 58EE                    		MOVU.B [R14], R14
 000007DE 610E                    		CMP #00H, R14
 000007E0 18                   S  		BNE L216
 000007E1                         L215:	; bb1
                                  ;     498         return (STAT_NOOP);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",498
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",498
 000007E1 3C0203                  		MOV.B #03H, 02H[R0]
 000007E4 38rrrr               W  		BRA L232
 000007E7                         L216:	; bb8
                                  ;     499 
                                  ;     500 	if (qr.queue_report_requested == false)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",500
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",500
 000007E7 FB12rrrrrrrr            		MOV.L #_qr, R1
 000007ED B019                    		MOVU.B 01H[R1], R1
 000007EF 6101                    		CMP #00H, R1
 000007F1 18                   S  		BNE L218
 000007F2                         L217:	; bb9
                                  ;     501         return (STAT_NOOP);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",501
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",501
 000007F2 3C0203                  		MOV.B #03H, 02H[R0]
 000007F5 38rrrr               W  		BRA L232
 000007F8                         L218:	; bb16
                                  ;     502 
                                  ;     503 	qr.queue_report_requested = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",503
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",503
 000007F8 FB12rrrrrrrr            		MOV.L #_qr, R1
 000007FE 3C1100                  		MOV.B #00H, 01H[R1]
 00000801                         L219:	; bb16.split
                                  ;     504 
                                  ;     505 	if (cfg.comm_mode == TEXT_MODE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",505
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",505
 00000801 FB12rrrrrrrr            		MOV.L #_cfg, R1
 00000807 B091                    		MOVU.B 02H[R1], R1
 00000809 6101                    		CMP #00H, R1
 0000080B 21rr                    		BNE L223
 0000080D                         L220:	; bb19
                                  ;     506 		if (qr.queue_report_verbosity == QR_SINGLE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",506
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",506
 0000080D FB12rrrrrrrr            		MOV.L #_qr, R1
 00000813 581E                    		MOVU.B [R1], R14
 00000815 611E                    		CMP #01H, R14
@@ -1650,7 +1650,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000081B                         L221:	; bb20
 0000081B 6080                    		SUB #08H, R0
                                  ;     507 			fprintf(stderr, "qr:%d\n", qr.buffers_available);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",507
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",507
 0000081D FBE2rrrrrrrr            		MOV.L #_L37, R14
 00000823 E30E                    		MOV.L R14, [R0]
 00000825 A009                    		MOV.L R1, 04H[R0]
@@ -1661,7 +1661,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000836                         L222:	; bb24
                                  ;     508 		} else  {
                                  ;     509 			fprintf(stderr, "qr:%d, qi:%d, qo:%d\n", qr.buffers_available,qr.buffers_added,qr.buffers_removed);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",509
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",509
 00000836 FB22rrrrrrrr            		MOV.L #_qr, R2
 0000083C B8AB                    		MOVU.W 06H[R2], R3
 0000083E B8A2                    		MOVU.W 04H[R2], R2
@@ -1679,7 +1679,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     510 		}
                                  ;     511 
                                  ;     512 	} else if (js.json_syntax == JSON_SYNTAX_RELAXED) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",512
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",512
 00000861 FB12rrrrrrrr            		MOV.L #_qr, R1
 00000867 581E                    		MOVU.B [R1], R14
 00000869 611E                    		CMP #01H, R14
@@ -1691,14 +1691,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000087A 21rr                    		BNE L227
 0000087C                         L224:	; bb42
                                  ;     513 		if (qr.queue_report_verbosity == QR_SINGLE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",513
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",513
 0000087C 5BEE                    		MOVU.B R14, R14
 0000087E 610E                    		CMP #00H, R14
 00000880 20rr                    		BEQ L226
 00000882                         L225:	; bb43
 00000882 6080                    		SUB #08H, R0
                                  ;     514 			fprintf(stderr, "{qr:%d}\n", qr.buffers_available);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",514
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",514
 00000884 FBE2rrrrrrrr            		MOV.L #_L39, R14
 0000088A E30E                    		MOV.L R14, [R0]
 0000088C A009                    		MOV.L R1, 04H[R0]
@@ -1709,7 +1709,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000089C                         L226:	; bb47
                                  ;     515 		} else {
                                  ;     516 			fprintf(stderr, "{qr:%d,qi:%d,qo:%d}\n", qr.buffers_available, qr.buffers_added,qr.buffers_removed);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",516
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",516
 0000089C FBE2rrrrrrrr            		MOV.L #_qr, R14
 000008A2 5DE203                  		MOVU.W 06H[R14], R2
 000008A5 5DEE02                  		MOVU.W 04H[R14], R14
@@ -1728,14 +1728,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     518 
                                  ;     519 	} else {
                                  ;     520 		if (qr.queue_report_verbosity == QR_SINGLE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",520
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",520
 000008C9 5BEE                    		MOVU.B R14, R14
 000008CB 610E                    		CMP #00H, R14
 000008CD 20rr                    		BEQ L229
 000008CF                         L228:	; bb63
 000008CF 6080                    		SUB #08H, R0
                                  ;     521 			fprintf(stderr, "{\"qr\":%d}\n", qr.buffers_available);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",521
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",521
 000008D1 FBE2rrrrrrrr            		MOV.L #_L41, R14
 000008D7 E30E                    		MOV.L R14, [R0]
 000008D9 A009                    		MOV.L R1, 04H[R0]
@@ -1746,7 +1746,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000008E9                         L229:	; bb67
                                  ;     522 		} else {
                                  ;     523 			fprintf(stderr, "{\"qr\":%d,\"qi\":%d,\"qo\":%d}\n", qr.buffers_available, qr.buffers_added,qr.buffers_removed);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",523
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",523
 000008E9 FB22rrrrrrrr            		MOV.L #_qr, R2
 000008EF B8AB                    		MOVU.W 06H[R2], R3
 000008F1 B8A2                    		MOVU.W 04H[R2], R2
@@ -1763,16 +1763,16 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     524 		}
                                  ;     525 	}
                                  ;     526 	qr_init_queue_report();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",526
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",526
 00000911 39rrrr               W  		BSR _qr_init_queue_report
 00000914                         L231:	; bb92.split
                                  ;     527 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",527
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",527
 00000914 3C0200                  		MOV.B #00H, 02H[R0]
 00000917                         L232:	; bb94
 00000917 C5000203                		MOV.B 02H[R0], 03H[R0]
                                  ;     528 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",528
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",528
 0000091B B089                    		MOVU.B 03H[R0], R1
 0000091D 6701                    		RTSD #04H
 0000091F                         _rx_request_rx_report:
@@ -1783,7 +1783,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     532  */
                                  ;     533 void rx_request_rx_report(void) {
                                  ;     534     rx.rx_report_requested = true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",534
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",534
 0000091F FBE2rrrrrrrr            		MOV.L #_rx, R14
 00000925 F8E401                  		MOV.B #01H, [R14]
 00000928 02                      		RTS
@@ -1796,10 +1796,10 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     539  * rx_report_callback() - send rx report if one has been requested
                                  ;     540  */
                                  ;     541 stat_t rx_report_callback(void) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",541
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",541
 00000929 6080                    		SUB #08H, R0
                                  ;     542     if (!rx.rx_report_requested)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",542
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",542
 0000092B FBE2rrrrrrrr            		MOV.L #_rx, R14
 00000931 58EE                    		MOVU.B [R14], R14
 00000933 610E                    		CMP #00H, R14
@@ -1807,7 +1807,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000936 08                   S  		BRA L237
 00000937                         L235:	; bb1
                                  ;     543         return (STAT_NOOP);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",543
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",543
 00000937 3C0603                  		MOV.B #03H, 06H[R0]
 0000093A 2Err                 B  		BRA L242
 0000093C                         L236:	; bb7
@@ -1822,13 +1822,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000949                         L239:	; bb12
                                  ;     544 
                                  ;     545     rx.rx_report_requested = false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",545
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",545
 00000949 FBE2rrrrrrrr            		MOV.L #_rx, R14
 0000094F F8E400                  		MOV.B #00H, [R14]
 00000952                         L240:	; bb12.split
                                  ;     546 
                                  ;     547     fprintf(stderr, "{\"rx\":%d}\n", rx.space_available);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",547
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",547
 00000952 FB12rrrrrrrr            		MOV.L #_rx, R1
 00000958 B819                    		MOVU.W 02H[R1], R1
 0000095A 6080                    		SUB #08H, R0
@@ -1840,12 +1840,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000970 6280                    		ADD #08H, R0
 00000972                         L241:	; bb12.split1
                                  ;     548     return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",548
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",548
 00000972 3C0600                  		MOV.B #00H, 06H[R0]
 00000975                         L242:	; bb17
 00000975 C5000607                		MOV.B 06H[R0], 07H[R0]
                                  ;     549 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",549
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",549
 00000979 B189                    		MOVU.B 07H[R0], R1
 0000097B 6702                    		RTSD #08H
 0000097D                         _qr_get:
@@ -1875,96 +1875,96 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     572  * qo_get() - run a queue report - buffers out
                                  ;     573  */
                                  ;     574 stat_t qr_get(nvObj_t *nv)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",574
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",574
 0000097D 7EA6                    		PUSH.L R6
 0000097F 6080                    		SUB #08H, R0
 00000981 EF16                    		MOV.L R1, R6
 00000983 A00E                    		MOV.L R6, 04H[R0]
                                  ;     575 {
                                  ;     576 	nv->value = (float)mp_get_planner_buffers_available(); // ensure that manually requested QR count is always up to date
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",576
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",576
 00000985 05rrrrrr             A  		BSR _mp_get_planner_buffers_available
 00000989 FC4711                  		ITOF R1, R1
 0000098C A161                    		MOV.L R1, 10H[R6]
 0000098E                         L244:	; entry.split
                                  ;     577 	nv->valuetype = TYPE_INTEGER;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",577
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",577
 0000098E A809                    		MOV.L 04H[R0], R1
 00000990 3C1B02                  		MOV.B #02H, 0BH[R1]
 00000993                         L245:	; entry.split1
                                  ;     578 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",578
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",578
 00000993 3C0300                  		MOV.B #00H, 03H[R0]
 00000996 B089                    		MOVU.B 03H[R0], R1
 00000998                         L246:	; entry.split2
                                  ;     579 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",579
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",579
 00000998 5B11                    		MOVU.B R1, R1
 0000099A 3F6603                  		RTSD #0CH, R6-R6
 0000099D                         _qi_get:
                                  		.STACK	_qi_get=12
                                  ;     580 
                                  ;     581 stat_t qi_get(nvObj_t *nv)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",581
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",581
 0000099D 6080                    		SUB #08H, R0
 0000099F A009                    		MOV.L R1, 04H[R0]
                                  ;     582 {
                                  ;     583 	nv->value = (float)qr.buffers_added;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",583
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",583
 000009A1 FBE2rrrrrrrr            		MOV.L #_qr, R14
 000009A7 06E111E202              		ITOF 04H[R14].UW, R2
 000009AC A112                    		MOV.L R2, 10H[R1]
 000009AE                         L248:	; entry.split
                                  ;     584 	nv->valuetype = TYPE_INTEGER;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",584
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",584
 000009AE A809                    		MOV.L 04H[R0], R1
 000009B0 3C1B02                  		MOV.B #02H, 0BH[R1]
 000009B3                         L249:	; entry.split1
                                  ;     585 	qr.buffers_added = 0;				// reset it
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",585
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",585
 000009B3 FB12rrrrrrrr            		MOV.L #_qr, R1
 000009B9 3D1200                  		MOV.W #0000H, 04H[R1]
 000009BC                         L250:	; entry.split2
                                  ;     586 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",586
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",586
 000009BC 3C0300                  		MOV.B #00H, 03H[R0]
 000009BF B089                    		MOVU.B 03H[R0], R1
 000009C1                         L251:	; entry.split3
                                  ;     587 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",587
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",587
 000009C1 5B11                    		MOVU.B R1, R1
 000009C3 6702                    		RTSD #08H
 000009C5                         _qo_get:
                                  		.STACK	_qo_get=12
                                  ;     588 
                                  ;     589 stat_t qo_get(nvObj_t *nv)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",589
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",589
 000009C5 6080                    		SUB #08H, R0
 000009C7 A009                    		MOV.L R1, 04H[R0]
                                  ;     590 {
                                  ;     591 	nv->value = (float)qr.buffers_removed;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",591
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",591
 000009C9 FBE2rrrrrrrr            		MOV.L #_qr, R14
 000009CF 06E111E203              		ITOF 06H[R14].UW, R2
 000009D4 A112                    		MOV.L R2, 10H[R1]
 000009D6                         L253:	; entry.split
                                  ;     592 	nv->valuetype = TYPE_INTEGER;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",592
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",592
 000009D6 A809                    		MOV.L 04H[R0], R1
 000009D8 3C1B02                  		MOV.B #02H, 0BH[R1]
 000009DB                         L254:	; entry.split1
                                  ;     593 	qr.buffers_removed = 0;				// reset it
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",593
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",593
 000009DB FB12rrrrrrrr            		MOV.L #_qr, R1
 000009E1 3D1300                  		MOV.W #0000H, 06H[R1]
 000009E4                         L255:	; entry.split2
                                  ;     594 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",594
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",594
 000009E4 3C0300                  		MOV.B #00H, 03H[R0]
 000009E7 B089                    		MOVU.B 03H[R0], R1
 000009E9                         L256:	; entry.split3
                                  ;     595 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",595
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",595
 000009E9 5B11                    		MOVU.B R1, R1
 000009EB 6702                    		RTSD #08H
 000009ED                         _job_populate_job_report:
@@ -1981,11 +1981,11 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     605  *	job_print_job()
                                  ;     606  */
                                  ;     607 stat_t job_populate_job_report()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",607
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",607
 000009ED 7100EC                  		ADD #0FFFFFFECH, R0
                                  ;     608 {
                                  ;     609 	const char_t job_str[] = "job";
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",609
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",609
 000009F0 FBE2rrrrrrrr            		MOV.L #_L44, R14
 000009F6 C4E002                  		MOV.B [R14], 02H[R0]
 000009F9 C5E00103                		MOV.B 01H[R14], 03H[R0]
@@ -1994,18 +1994,18 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A05                         L258:	; entry.split
                                  ;     610 	char_t tmp[TOKEN_LEN+1];
                                  ;     611 	nvObj_t *nv = nv_reset_nv_list();		// sets *nv to the start of the body
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",611
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",611
 00000A05 05rrrrrr             A  		BSR _nv_reset_nv_list
 00000A09 A089                    		MOV.L R1, 0CH[R0]
 00000A0B                         L259:	; entry.split1
                                  ;     612 
                                  ;     613 	nv->valuetype = TYPE_PARENT; 			// setup the parent object
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",613
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",613
 00000A0B A889                    		MOV.L 0CH[R0], R1
 00000A0D 3C1B07                  		MOV.B #07H, 0BH[R1]
 00000A10                         L260:	; entry.split2
                                  ;     614 	strcpy(nv->token, job_str);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",614
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",614
 00000A10 A889                    		MOV.L 0CH[R0], R1
 00000A12 711118                  		ADD #18H, R1
 00000A15 FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -2015,39 +2015,39 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     615 
                                  ;     616 	//nv->index = nv_get_index((const char_t *)"", job_str);// set the index - may be needed by calling function
                                  ;     617 	nv = nv->nx;							// no need to check for NULL as list has just been reset
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",617
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",617
 00000A1D A889                    		MOV.L 0CH[R0], R1
 00000A1F E5100103                		MOV.L 04H[R1], 0CH[R0]
 00000A23                         L262:	; entry.split4
                                  ;     618 
                                  ;     619 	index_t job_start = nv_get_index((const char_t *)"",(const char_t *)"job1");// set first job persistence index
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",619
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",619
 00000A23 FB22rrrrrrrr            		MOV.L #_L45, R2
 00000A29 FB12rrrrrrrr            		MOV.L #_L21, R1
 00000A2F 05rrrrrr             A  		BSR _nv_get_index
 00000A33 9201                    		MOV.W R1, 10H[R0]
 00000A35                         L263:	; entry.split5
                                  ;     620 	for (uint8_t i=0; i<4; i++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",620
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",620
 00000A35 3C8200                  		MOV.B #00H, 12H[R0]
 00000A38 2Err                 B  		BRA L272
 00000A3A                         L264:	; bb
                                  ;     621 
                                  ;     622 		nv->index = job_start + i;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",622
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",622
 00000A3A BA01                    		MOVU.W 10H[R0], R1
 00000A3C 490112                  		ADD 12H[R0].UB, R1
 00000A3F A88A                    		MOV.L 0CH[R0], R2
 00000A41 9121                    		MOV.W R1, 08H[R2]
 00000A43                         L265:	; bb.split
                                  ;     623 		nv_get_nvObj(nv);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",623
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",623
 00000A43 A889                    		MOV.L 0CH[R0], R1
 00000A45 05rrrrrr             A  		BSR _nv_get_nvObj
 00000A49                         L266:	; bb.split6
                                  ;     624 
                                  ;     625 		strcpy(tmp, nv->group);				// concatenate groups and tokens - do NOT use strncpy()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",625
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",625
 00000A49 A88A                    		MOV.L 0CH[R0], R2
 00000A4B 712214                  		ADD #14H, R2
 00000A4E FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -2058,7 +2058,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A59 6602                    		MOV.L #00000000H, R2
 00000A5B 710106                  		ADD #06H, R0, R1
                                  ;     626 		strcat(tmp, nv->token);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",626
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",626
 00000A5E A88C                    		MOV.L 0CH[R0], R4
 00000A60 7F80                    		SUNTIL.B
 00000A62 6011                    		SUB #01H, R1
@@ -2067,7 +2067,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A69 7F87                    		SMOVU
 00000A6B                         L268:	; bb.split8
                                  ;     627 		strcpy(nv->token, tmp);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",627
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",627
 00000A6B A889                    		MOV.L 0CH[R0], R1
 00000A6D 711118                  		ADD #18H, R1
 00000A70 FB36FF                  		MOV.L #0FFFFFFFFH, R3
@@ -2076,7 +2076,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A78                         L269:	; bb.split9
                                  ;     628 
                                  ;     629 		if ((nv = nv->nx) == NULL)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",629
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",629
 00000A78 A889                    		MOV.L 0CH[R0], R1
 00000A7A A819                    		MOV.L 04H[R1], R1
 00000A7C A089                    		MOV.L R1, 0CH[R0]
@@ -2084,7 +2084,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A80 18                   S  		BNE L271
 00000A81                         L270:	; bb48
                                  ;     630             return (STAT_OK);               // should never be NULL unless SR length exceeds available buffer array
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",630
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",630
 00000A81 3C0100                  		MOV.B #00H, 01H[R0]
 00000A84 2Err                 B  		BRA L274
 00000A86                         L271:	; bb56
@@ -2092,31 +2092,31 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000A88 6211                    		ADD #01H, R1
 00000A8A 8481                    		MOV.B R1, 12H[R0]
 00000A8C                         L272:	; bb59
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",620
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",620
 00000A8C B481                    		MOVU.B 12H[R0], R1
 00000A8E 6141                    		CMP #04H, R1
 00000A90 29rr                    		BLT L264
 00000A92                         L273:	; bb65
                                  ;     631 	}
                                  ;     632 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",632
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",632
 00000A92 3C0100                  		MOV.B #00H, 01H[R0]
 00000A95                         L274:	; bb67
 00000A95 C5000113                		MOV.B 01H[R0], 13H[R0]
                                  ;     633 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",633
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",633
 00000A99 B489                    		MOVU.B 13H[R0], R1
 00000A9B 6705                    		RTSD #14H
 00000A9D                         _job_set_job_report:
                                  		.STACK	_job_set_job_report=20
                                  ;     634 
                                  ;     635 stat_t job_set_job_report(nvObj_t *nv)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",635
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",635
 00000A9D 7100F0                  		ADD #0FFFFFFF0H, R0
 00000AA0 A089                    		MOV.L R1, 0CH[R0]
                                  ;     636 {
                                  ;     637 	index_t job_start = nv_get_index((const char_t *)"",(const char_t *)"job1");// set first job persistence index
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",637
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",637
 00000AA2 FB22rrrrrrrr            		MOV.L #_L45, R2
 00000AA8 FB12rrrrrrrr            		MOV.L #_L21, R1
 00000AAE 05rrrrrr             A  		BSR _nv_get_index
@@ -2124,12 +2124,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000AB4                         L276:	; entry.split
                                  ;     638 
                                  ;     639 	for (uint8_t i=0; i<4; i++) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",639
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",639
 00000AB4 3C0A00                  		MOV.B #00H, 0AH[R0]
 00000AB7 2Err                 B  		BRA L287
 00000AB9                         L277:	; bb5
                                  ;     640 		if (((nv = nv->nx) == NULL) || (nv->valuetype == TYPE_EMPTY)) { break;}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",640
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",640
 00000AB9 A889                    		MOV.L 0CH[R0], R1
 00000ABB A819                    		MOV.L 04H[R1], R1
 00000ABD A089                    		MOV.L R1, 0CH[R0]
@@ -2151,14 +2151,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000AD5 21rr                    		BNE L288
 00000AD7                         L282:	; bb28
                                  ;     641 		if (nv->valuetype == TYPE_INTEGER) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",641
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",641
 00000AD7 A889                    		MOV.L 0CH[R0], R1
 00000AD9 8A99                    		MOV.B 0BH[R1], R1
 00000ADB 6121                    		CMP #02H, R1
 00000ADD 21rr                    		BNE L286
 00000ADF                         L283:	; bb29
                                  ;     642 			cs.job_id[i] = nv->value;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",642
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",642
 00000ADF B281                    		MOVU.B 0AH[R0], R1
 00000AE1 6C21                    		SHLL #02H, R1
 00000AE3 FB22rrrrrrrr            		MOV.L #_cs, R2
@@ -2168,14 +2168,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000AF1 A321                    		MOV.L R1, 30H[R2]
 00000AF3                         L284:	; bb29.split
                                  ;     643 			nv->index = job_start + i;		// index of the SR persistence location
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",643
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",643
 00000AF3 B901                    		MOVU.W 08H[R0], R1
 00000AF5 49010A                  		ADD 0AH[R0].UB, R1
 00000AF8 A88A                    		MOV.L 0CH[R0], R2
 00000AFA 9121                    		MOV.W R1, 08H[R2]
 00000AFC                         L285:	; bb29.split1
                                  ;     644 			nv_persist(nv);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",644
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",644
 00000AFC A889                    		MOV.L 0CH[R0], R1
 00000AFE 05rrrrrr             A  		BSR _nv_persist
 00000B02 B281                    		MOVU.B 0AH[R0], R1
@@ -2185,11 +2185,11 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000B09                         L286:	; bb47
                                  ;     645 		} else {
                                  ;     646 			return (STAT_UNSUPPORTED_TYPE);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",646
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",646
 00000B09 3C0767                  		MOV.B #67H, 07H[R0]
 00000B0C 2Err                 B  		BRA L290
 00000B0E                         L287:	; bb59
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",639
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",639
 00000B0E B281                    		MOVU.B 0AH[R0], R1
 00000B10 6141                    		CMP #04H, R1
 00000B12 29rr                    		BLT L277
@@ -2197,27 +2197,27 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     647 		}
                                  ;     648 	}
                                  ;     649 	job_populate_job_report();				// return current values
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",649
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",649
 00000B14 39rrrr               W  		BSR _job_populate_job_report
 00000B17                         L289:	; bb66.split
                                  ;     650 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",650
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",650
 00000B17 3C0700                  		MOV.B #00H, 07H[R0]
 00000B1A                         L290:	; bb69
 00000B1A C500070B                		MOV.B 07H[R0], 0BH[R0]
                                  ;     651 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",651
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",651
 00000B1E B289                    		MOVU.B 0BH[R0], R1
 00000B20 6704                    		RTSD #10H
 00000B22                         _job_report_callback:
                                  		.STACK	_job_report_callback=28
                                  ;     652 
                                  ;     653 uint8_t job_report_callback()
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",653
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",653
 00000B22 6040                    		SUB #04H, R0
                                  ;     654 {
                                  ;     655 	if (cfg.comm_mode == TEXT_MODE) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",655
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",655
 00000B24 FB12rrrrrrrr            		MOV.L #_cfg, R1
 00000B2A B091                    		MOVU.B 02H[R1], R1
 00000B2C 6101                    		CMP #00H, R1
@@ -2225,7 +2225,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000B30                         L292:	; bb3
                                  ;     656 		// no-op, job_ids are client app state
                                  ;     657 	} else if (js.json_syntax == JSON_SYNTAX_RELAXED) {
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",657
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",657
 00000B30 FB12rrrrrrrr            		MOV.L #_js, R1
 00000B36 B091                    		MOVU.B 02H[R1], R1
 00000B38 6101                    		CMP #00H, R1
@@ -2238,7 +2238,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000B4A                         L293:	; bb4
 00000B4A 7100EC                  		ADD #0FFFFFFECH, R0
                                  ;     658 		fprintf(stderr, "{job:[%lu,%lu,%lu,%lu]}\n", cs.job_id[0], cs.job_id[1], cs.job_id[2], cs.job_id[3] );
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",658
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",658
 00000B4D FBE2rrrrrrrr            		MOV.L #_L46, R14
 00000B53 E30E                    		MOV.L R14, [R0]
 00000B55 A102                    		MOV.L R2, 10H[R0]
@@ -2253,7 +2253,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000B6C 7100EC                  		ADD #0FFFFFFECH, R0
                                  ;     659 	} else {
                                  ;     660 		fprintf(stderr, "{\"job\":[%lu,%lu,%lu,%lu]}\n", cs.job_id[0], cs.job_id[1], cs.job_id[2], cs.job_id[3] );
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",660
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",660
 00000B6F FBE2rrrrrrrr            		MOV.L #_L47, R14
 00000B75 E30E                    		MOV.L R14, [R0]
 00000B77 A102                    		MOV.L R2, 10H[R0]
@@ -2267,19 +2267,19 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     661 		//job_clear_report();
                                  ;     662 	}
                                  ;     663 	return (STAT_OK);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",663
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",663
 00000B8C 3C0300                  		MOV.B #00H, 03H[R0]
 00000B8F B089                    		MOVU.B 03H[R0], R1
 00000B91                         L296:	; bb26.split
                                  ;     664 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",664
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",664
 00000B91 5B11                    		MOVU.B R1, R1
 00000B93 6701                    		RTSD #04H
 00000B95                         _job_get:
                                  		.STACK	_job_get=12
                                  ;     665 
                                  ;     666 stat_t job_get(nvObj_t *nv) { return (job_populate_job_report());}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",666
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",666
 00000B95 6080                    		SUB #08H, R0
 00000B97 A009                    		MOV.L R1, 04H[R0]
 00000B99 39rrrr               W  		BSR _job_populate_job_report
@@ -2289,7 +2289,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000BA2                         _job_set:
                                  		.STACK	_job_set=12
                                  ;     667 stat_t job_set(nvObj_t *nv) { return (job_set_job_report(nv));}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",667
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",667
 00000BA2 6080                    		SUB #08H, R0
 00000BA4 A009                    		MOV.L R1, 04H[R0]
 00000BA6 39rrrr               W  		BSR _job_set_job_report
@@ -2299,7 +2299,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000BAF                         _job_print_job:
                                  		.STACK	_job_print_job=8
                                  ;     668 void job_print_job(nvObj_t *nv) { job_populate_job_report();}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",668
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",668
 00000BAF 6040                    		SUB #04H, R0
 00000BB1 E301                    		MOV.L R1, [R0]
 00000BB3 39rrrr               W  		BSR _job_populate_job_report
@@ -2318,7 +2318,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     678 static const char fmt_qv[] PROGMEM = "[qv]  queue report verbosity%7d [0=off,1=single,2=triple]\n";
                                  ;     679 
                                  ;     680 void qr_print_qr(nvObj_t *nv) { text_print_int(nv, fmt_qr);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",680
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",680
 00000BB8 6040                    		SUB #04H, R0
 00000BBA E301                    		MOV.L R1, [R0]
 00000BBC FB22rrrrrrrr            		MOV.L #__$fmt_qr, R2
@@ -2327,7 +2327,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000BC8                         _qr_print_qi:
                                  		.STACK	_qr_print_qi=8
                                  ;     681 void qr_print_qi(nvObj_t *nv) { text_print_int(nv, fmt_qi);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",681
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",681
 00000BC8 6040                    		SUB #04H, R0
 00000BCA E301                    		MOV.L R1, [R0]
 00000BCC FB22rrrrrrrr            		MOV.L #__$fmt_qi, R2
@@ -2336,7 +2336,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000BD8                         _qr_print_qo:
                                  		.STACK	_qr_print_qo=8
                                  ;     682 void qr_print_qo(nvObj_t *nv) { text_print_int(nv, fmt_qo);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",682
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",682
 00000BD8 6040                    		SUB #04H, R0
 00000BDA E301                    		MOV.L R1, [R0]
 00000BDC FB22rrrrrrrr            		MOV.L #__$fmt_qo, R2
@@ -2345,7 +2345,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000BE8                         _qr_print_qv:
                                  		.STACK	_qr_print_qv=8
                                  ;     683 void qr_print_qv(nvObj_t *nv) { text_print_ui8(nv, fmt_qv);}
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\src\cnc\report.c",683
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\report.c",683
 00000BE8 6040                    		SUB #04H, R0
 00000BEA E301                    		MOV.L R1, [R0]
 00000BEC FB22rrrrrrrr            		MOV.L #__$fmt_qv, R2
@@ -2652,7 +2652,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\report.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4DB7\$ccrx\report.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -2661,5 +2661,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\report.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\src\cnc\report.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\report.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\src\cnc\report.obj

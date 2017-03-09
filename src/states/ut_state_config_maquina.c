@@ -32,23 +32,39 @@ static const char* gszConfigMenuTitle = "CONFIG. DE MÁQUINA";
  */
 static void init()
 {
-	uint8_t i;
+	uint8_t i,j;
 
 	/* Check if already initialized */
+	j = 0;
 	if(initialized) {
 		for(i = 0; i < CFG_MAQUINA_MAX; i++)
 		{
-			configsMaq[i].name = mq_init_names[i];
+			if (g_maq.model == COMPACTA_MAQ)
+			{
+				if (i == CFG_MAQUINA_MODOMAQUINA)
+				{
+					i++;
+				}
+			}
+			configsMaq[j].name = mq_init_names[j];
+			j++;
 		}
 		return;
 	}
 
 	/* Zero all values */
 	memset(configsMaq, 0, sizeof(configsMaq));
-
+	j = 0;
 	/* Initialize all variables */
 	for(i = 0; i < CFG_MAQUINA_MAX; i++)
 	{
+		if (g_maq.model == COMPACTA_MAQ)
+		{
+			if (i == CFG_MAQUINA_MODOMAQUINA)
+			{
+				i++;
+			}
+		}
 		configsMaq[i].type = mq_init_types[i];
 		configsMaq[i].valueMax = mq_init_max[i];
 		configsMaq[i].valueMin = mq_init_min[i];
@@ -58,9 +74,13 @@ static void init()
 		configsMaq[i].point = mq_init_point[i];
 		configsMaq[i].currentState = STATE_CONFIG_MAQUINA;
 		configsMaq[i].currentItem = i;
+		j++;
 	}
 	configsMaq[0].value = &configVarMaq[CFG_MAQUINA_ALT_DESLOCAMENTO];
-	configsMaq[1].value = &configFlags[MODOMAQUINA];
+	if (g_maq.model != COMPACTA_MAQ)
+	{
+		configsMaq[1].value = &configFlags[MODOMAQUINA];
+	}
 	initialized = true;
 }
 
@@ -73,7 +93,7 @@ static void init()
 ut_state ut_state_config_maquina(ut_context* pContext)
 {
 	ut_menu config_menu;
-	uint8_t i;
+	uint8_t i,j;
 
 	/* Initialize variables */
 	init();
@@ -85,9 +105,18 @@ ut_state ut_state_config_maquina(ut_context* pContext)
 	config_menu.title = gszConfigMenuTitle;
 //	config_menu.offset = 1;
 	/* Items */
+	j = 0;
 	for(i = 0; i < CFG_MAQUINA_MAX; i++)
 	{
+		if (g_maq.model == COMPACTA_MAQ)
+		{
+			if (i == CFG_MAQUINA_MODOMAQUINA)
+			{
+				i++;
+			}
+		}
 		config_menu.items[config_menu.numItems++].text = configsMaq[i].name;
+		j++;
 	}
 
 	/* Show menu */
@@ -97,6 +126,13 @@ ut_state ut_state_config_maquina(ut_context* pContext)
 		return STATE_MAIN_MENU;
 	}
 	eepromReadConfig(CONFIGVAR_MAQ);
+	if (g_maq.model == COMPACTA_MAQ)
+		{
+			if (config_menu.selectedItem > CFG_MAQUINA_ALT_DESLOCAMENTO)
+			{
+				config_menu.selectedItem++;
+			}
+		}
 	/* Set selected item */
 	pContext->value[0] = STATE_CONFIG_MAQUINA;
 	configsVar = &configsMaq[config_menu.selectedItem];

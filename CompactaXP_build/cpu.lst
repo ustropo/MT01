@@ -1,8 +1,8 @@
-* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Feb 28 14:07:39 2017
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Thu Mar 09 14:19:15 2017
 
 LOC.     OBJ.              0XMDA SOURCE STATEMENT
 
-                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  28-Feb-2017 14:07:39
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  09-Mar-2017 14:19:15
                                  
                                  ;*** CPU TYPE ***
                                  
@@ -12,7 +12,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  
                                  ;-output=src=cpu.src
                                  ;-lang=c99
-                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01\r_lvd_rx,C:\Workspace\e2studio\git\MT01\r_lvd_rx\src,C:/Workspace/e2studio/git/MT01/r_tfa
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
                                  ;-debug
                                  ;-show=source,conditionals,definitions,expansions
                                  ;-listfile=cpu.lst
@@ -117,7 +117,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      78     /* Use the compiler intrinsic function to clear the I flag. This function is available with for the Renesas RX 
                                  ;      79        compiler. This may need to be changed for other compilers. */
                                  ;      80     clrpsw_i();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",80
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",80
 00000000 7FB8                    		CLRPSW I
 00000002 02                      		RTS
 00000003                         _R_BSP_InterruptsEnable:
@@ -137,7 +137,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;      93     /* Use the compiler intrinsic function to set the I flag. This function is available with for the Renesas RX 
                                  ;      94        compiler. This may need to be changed for other compilers. */
                                  ;      95     setpsw_i();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",95
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",95
 00000003 7FA8                    		SETPSW I
 00000005 02                      		RTS
 00000006                         _R_BSP_CpuInterruptLevelRead:
@@ -152,14 +152,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     103 * Return Value : The current processor IPL
                                  ;     104 ***********************************************************************************************************************/
                                  ;     105 uint32_t R_BSP_CpuInterruptLevelRead (void)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",105
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",105
 00000006 6040                    		SUB #04H, R0
                                  ;     106 {
                                  ;     107 #if defined(__RENESAS__)
                                  ;     108     /* Use the compiler intrinsic function to read the CPU IPL. This function is available with for the Renesas RX 
                                  ;     109        compiler. This may need to be changed for other compilers. */
                                  ;     110     return (uint32_t)get_ipl();
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",110
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",110
 00000008 FD6A0E                  		MVFC PSW, R14
 0000000B FD67E1                  		REVL R14, R1
 0000000E 64F1                    		AND #0FH, R1
@@ -167,7 +167,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000012                         L13:	; entry.split
                                  ;     111 #endif
                                  ;     112 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",112
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",112
 00000012 6701                    		RTSD #04H
 00000014                         _R_BSP_CpuInterruptLevelWrite:
                                  		.STACK	_R_BSP_CpuInterruptLevelWrite=12
@@ -183,20 +183,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     122 *                    Invalid level input. 
                                  ;     123 ***********************************************************************************************************************/
                                  ;     124 bool R_BSP_CpuInterruptLevelWrite (uint32_t level)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",124
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",124
 00000014 6080                    		SUB #08H, R0
 00000016 A009                    		MOV.L R1, 04H[R0]
                                  ;     125 {
                                  ;     126 #if (BSP_CFG_PARAM_CHECKING_ENABLE == 1)
                                  ;     127     /* Check for valid level. */
                                  ;     128     if (level > BSP_MCU_IPL_MAX)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",128
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",128
 00000018 755110                  		CMP #10H, R1
 0000001B 23rr                    		BLTU L16
 0000001D                         L15:	; bb2
                                  ;     129     {
                                  ;     130         return false;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",130
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",130
 0000001D 3C0200                  		MOV.B #00H, 02H[R0]
 00000020 2Err                 B  		BRA L18
 00000022                         L16:	; bb7
@@ -207,7 +207,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     135     /* Use the compiler intrinsic function to set the CPU IPL. This function is available with for the Renesas RX 
                                  ;     136        compiler. This may need to be changed for other compilers. */
                                  ;     137     set_ipl((signed long)level);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",137
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",137
 00000022 A809                    		MOV.L 04H[R0], R1
 00000024 6DC1                    		SHLL #1CH, R1
 00000026 6841                    		SHLR #04H, R1
@@ -219,12 +219,12 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     138 #endif
                                  ;     139 
                                  ;     140     return true;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",140
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",140
 00000036 3C0201                  		MOV.B #01H, 02H[R0]
 00000039                         L18:	; bb10
 00000039 C5000203                		MOV.B 02H[R0], 03H[R0]
                                  ;     141 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",141
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",141
 0000003D B089                    		MOVU.B 03H[R0], R1
 0000003F 6702                    		RTSD #08H
 00000041                         _R_BSP_RegisterProtectEnable:
@@ -238,13 +238,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     148 * Return Value : none
                                  ;     149 ***********************************************************************************************************************/
                                  ;     150 void R_BSP_RegisterProtectEnable (bsp_reg_protect_t regs_to_protect)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",150
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",150
 00000041 6040                    		SUB #04H, R0
 00000043 E301                    		MOV.L R1, [R0]
                                  ;     151 {
                                  ;     152     /* Is it safe to disable write access? */
                                  ;     153     if (0 != g_protect_counters[regs_to_protect])
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",153
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",153
 00000045 FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
 0000004B FED1EE                  		MOVU.W [R1,R14], R14
 0000004E 610E                    		CMP #00H, R14
@@ -253,7 +253,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     154     {
                                  ;     155         /* Decrement the protect counter */
                                  ;     156         g_protect_counters[regs_to_protect]--;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",156
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",156
 00000052 EC01                    		MOV.L [R0], R1
 00000054 FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
 0000005A FE51EF                  		MOV.W [R1,R14], R15
@@ -264,7 +264,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     158 
                                  ;     159     /* Is it safe to disable write access? */
                                  ;     160     if (0 == g_protect_counters[regs_to_protect])
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",160
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",160
 00000062 EC01                    		MOV.L [R0], R1
 00000064 FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
 0000006A FED1EE                  		MOVU.W [R1,R14], R14
@@ -273,7 +273,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 00000071                         L22:	; bb15
                                  ;     161     {
                                  ;     162         if (BSP_REG_PROTECT_MPC != regs_to_protect)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",162
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",162
 00000071 EC01                    		MOV.L [R0], R1
 00000073 6131                    		CMP #03H, R1
 00000075 20rr                    		BEQ L24
@@ -295,7 +295,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     176                               PLLCR, PLLCR2, MOSCCR, SOSCCR,LOCOCR, ILOCOCR, HOCOCR, OSTDCR, OSTDSR, CKOCR.
                                  ;     177             */
                                  ;     178             SYSTEM.PRCR.WORD = (uint16_t)((SYSTEM.PRCR.WORD | BSP_PRV_PRCR_KEY) & (~g_prcr_masks[regs_to_protect]));
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",178
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",178
 0000007C 5CEF                    		MOVU.W [R14], R15
 0000007E FB52rrrrrrrr            		MOV.L #__$g_prcr_masks, R5
 00000084 EC01                    		MOV.L [R0], R1
@@ -315,26 +315,26 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     184                protection disable function, but it is written here to make sure that the PFSWE bit always gets 
                                  ;     185                cleared. */
                                  ;     186             MPC.PWPR.BIT.B0WI = 0;     
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",186
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",186
 0000009B F0EF                    		BCLR #07H, [R14].B
 0000009D                         L25:	; bb26.split
 0000009D FBEE1FC108              		MOV.L #0008C11FH, R14
                                  ;     187             /* Disable writing to PFS registers. */ 
                                  ;     188             MPC.PWPR.BIT.PFSWE = 0;    
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",188
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",188
 000000A2 F0EE                    		BCLR #06H, [R14].B
 000000A4                         L26:	; bb26.split1
 000000A4 FBEE1FC108              		MOV.L #0008C11FH, R14
                                  ;     189             /* Disable writing of PFSWE bit. */
                                  ;     190             MPC.PWPR.BIT.B0WI = 1;     
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",190
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",190
 000000A9 F0E7                    		BSET #07H, [R14].B
 000000AB 6701                    		RTSD #04H
 000000AD                         L27:	; return
                                  ;     191         }
                                  ;     192     }
                                  ;     193 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",193
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",193
 000000AD 6701                    		RTSD #04H
 000000AF                         _R_BSP_RegisterProtectDisable:
                                  		.STACK	_R_BSP_RegisterProtectDisable=8
@@ -347,13 +347,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     200 * Return Value : none
                                  ;     201 ***********************************************************************************************************************/
                                  ;     202 void R_BSP_RegisterProtectDisable (bsp_reg_protect_t regs_to_unprotect)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",202
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",202
 000000AF 6040                    		SUB #04H, R0
 000000B1 E301                    		MOV.L R1, [R0]
                                  ;     203 {
                                  ;     204     /* If this is first entry then disable protection. */
                                  ;     205     if (0 == g_protect_counters[regs_to_unprotect])
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",205
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",205
 000000B3 FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
 000000B9 FED1EE                  		MOVU.W [R1,R14], R14
 000000BC 610E                    		CMP #00H, R14
@@ -361,7 +361,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 000000C0                         L29:	; bb3
                                  ;     206     {
                                  ;     207         if (BSP_REG_PROTECT_MPC != regs_to_unprotect)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",207
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",207
 000000C0 EC01                    		MOV.L [R0], R1
 000000C2 6131                    		CMP #03H, R1
 000000C4 20rr                    		BEQ L31
@@ -383,7 +383,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     221                               PLLCR, PLLCR2, MOSCCR, SOSCCR,LOCOCR, ILOCOCR, HOCOCR, OSTDCR, OSTDSR, CKOCR.
                                  ;     222             */
                                  ;     223             SYSTEM.PRCR.WORD = (uint16_t)((SYSTEM.PRCR.WORD | BSP_PRV_PRCR_KEY) | g_prcr_masks[regs_to_unprotect]);
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",223
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",223
 000000CB 5CEF                    		MOVU.W [R14], R15
 000000CD EC01                    		MOV.L [R0], R1
 000000CF 6C11                    		SHLL #01H, R1
@@ -401,13 +401,13 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     227             /* Disable protection for MPC using PWPR register. */
                                  ;     228             /* Enable writing of PFSWE bit. */
                                  ;     229             MPC.PWPR.BIT.B0WI = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",229
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",229
 000000EA F0EF                    		BCLR #07H, [R14].B
 000000EC                         L32:	; bb13.split
 000000EC FBEE1FC108              		MOV.L #0008C11FH, R14
                                  ;     230             /* Enable writing to PFS registers. */ 
                                  ;     231             MPC.PWPR.BIT.PFSWE = 1;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",231
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",231
 000000F1 F0E6                    		BSET #06H, [R14].B
 000000F3                         L33:	; bb31
                                  ;     232         }
@@ -415,7 +415,7 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     234 
                                  ;     235     /* Increment the protect counter */
                                  ;     236     g_protect_counters[regs_to_unprotect]++;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",236
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",236
 000000F3 EC01                    		MOV.L [R0], R1
 000000F5 FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
 000000FB FE51EF                  		MOV.W [R1,R14], R15
@@ -433,20 +433,20 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
                                  ;     243 * Return Value : none
                                  ;     244 ***********************************************************************************************************************/
                                  ;     245 void bsp_register_protect_open (void)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",245
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",245
 00000105 6040                    		SUB #04H, R0
                                  ;     246 {
                                  ;     247     uint32_t i;
                                  ;     248 
                                  ;     249     /* Initialize reference counters to 0. */
                                  ;     250     for (i = 0; i < BSP_REG_PROTECT_TOTAL_ITEMS; i++)
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",250
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",250
 00000107 F80600                  		MOV.L #00000000H, [R0]
 0000010A 2Err                 B  		BRA L36
 0000010C                         L35:	; bb
                                  ;     251     {
                                  ;     252         g_protect_counters[i] = 0;
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",252
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",252
 0000010C EC01                    		MOV.L [R0], R1
 0000010E FBE2rrrrrrrr            		MOV.L #__$g_protect_counters, R14
 00000114 660F                    		MOV.L #00000000H, R15
@@ -455,14 +455,14 @@ LOC.     OBJ.              0XMDA SOURCE STATEMENT
 0000011B 6211                    		ADD #01H, R1
 0000011D E301                    		MOV.L R1, [R0]
 0000011F                         L36:	; bb5
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",250
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",250
 0000011F EC01                    		MOV.L [R0], R1
 00000121 6141                    		CMP #04H, R1
 00000123 23rr                    		BLTU L35
 00000125                         L37:	; return
                                  ;     253     }
                                  ;     254 }
-                                 		.LINE  "C:\Workspace\e2studio\git\MT01\r_bsp\mcu\rx63n\cpu.c",254
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_bsp\mcu\rx63n\cpu.c",254
 00000125 6701                    		RTSD #04H
                                  ;     255 
                                  ;     256 
@@ -495,7 +495,7 @@ Cpu Type
 
 Command Parameter
 
--subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx99\$ccrx\cpu.src.cmd
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4D06\$ccrx\cpu.src.cmd
     -nologo
     -isa=rxv1
     -fpu
@@ -504,5 +504,5 @@ Command Parameter
     -fint_register=0
     -debug
     -endian=little
--listfile=C:\Workspace\e2studio\git\MT01\CompactaXP_build\cpu.lst
--output=C:\Workspace\e2studio\git\MT01\CompactaXP_build\r_bsp\mcu\rx63n\cpu.obj
+-listfile=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\cpu.lst
+-output=C:\Workspace\e2studio\git\MT01_master\CompactaXP_build\r_bsp\mcu\rx63n\cpu.obj
