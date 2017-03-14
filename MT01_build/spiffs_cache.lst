@@ -1,0 +1,1427 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:02:54 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:02:54
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=spiffs_cache.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=spiffs_cache.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;spiffs_cache.c
+                                 
+                                 		.glb	_spiffs_cache_drop_page
+                                 		.glb	_spiffs_phys_rd
+                                 		.glb	_spiffs_phys_wr
+                                 		.glb	_spiffs_cache_page_get_by_fd
+                                 		.glb	_spiffs_cache_page_allocate_by_fd
+                                 		.glb	_spiffs_cache_fd_release
+                                 		.glb	_spiffs_cache_init
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         __$spiffs_cache_page_get:
+                                 		.STACK	__$spiffs_cache_page_get=36
+                                 ;       1 /*
+                                 ;       2  * spiffs_cache.c
+                                 ;       3  *
+                                 ;       4  *  Created on: Jun 23, 2013
+                                 ;       5  *      Author: petera
+                                 ;       6  */
+                                 ;       7 
+                                 ;       8 #include "spiffs.h"
+                                 ;       9 #include "spiffs_nucleus.h"
+                                 ;      10 
+                                 ;      11 #if SPIFFS_CACHE
+                                 ;      12 
+                                 ;      13 // returns cached page for give page index, or null if no such cached page
+                                 ;      14 static spiffs_cache_page *spiffs_cache_page_get(spiffs *fs, spiffs_page_ix pix) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",14
+00000000 7100E0                  		ADD #0FFFFFFE0H, R0
+00000003 A189                    		MOV.L R1, 1CH[R0]
+00000005 930A                    		MOV.W R2, 1AH[R0]
+                                 ;      15   spiffs_cache *cache = spiffs_get_cache(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",15
+00000007 A989                    		MOV.L 1CH[R0], R1
+00000009 E5101202                		MOV.L 48H[R1], 08H[R0]
+0000000D                         L11:	; entry.split
+                                 ;      16   if ((cache->cpage_use_map & cache->cpage_use_mask) == 0) return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",16
+0000000D A881                    		MOV.L 08H[R0], R1
+0000000F A89A                    		MOV.L 0CH[R1], R2
+00000011 06A10C1202              		TST 08H[R1].L, R2
+00000016 18                   S  		BNE L13
+00000017                         L12:	; bb10
+00000017 3E0100                  		MOV.L #00000000H, 04H[R0]
+0000001A 2Err                 B  		BRA L29
+0000001C                         L13:	; bb21
+                                 ;      17   int i;
+                                 ;      18   for (i = 0; i < cache->cpage_count; i++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",18
+0000001C 3E0300                  		MOV.L #00000000H, 0CH[R0]
+0000001F 2Err                 B  		BRA L27
+00000021                         L14:	; bb22
+                                 ;      19     spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",19
+00000021 A889                    		MOV.L 0CH[R0], R1
+00000023 76111401                		MUL #0114H, R1
+00000027 A882                    		MOV.L 08H[R0], R2
+00000029 06892104                		ADD 10H[R2].L, R1
+0000002D A101                    		MOV.L R1, 10H[R0]
+0000002F                         L15:	; bb22.split
+                                 ;      20     if ((cache->cpage_use_map & (1<<i)) &&
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",20
+0000002F A881                    		MOV.L 08H[R0], R1
+00000031 A891                    		MOV.L 08H[R1], R1
+00000033 A88A                    		MOV.L 0CH[R0], R2
+00000035 FC6B12                  		BTST R2, R1
+00000038 21rr                    		BNE L18
+0000003A 2Err                 B  		BRA L20
+0000003C                         L16:	; bb31
+                                 ;      21         (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) == 0 &&
+                                 ;      22         cp->pix == pix ) {
+                                 ;      23       SPIFFS_CACHE_DBG("CACHE_GET: have cache page %i for %04x\n", i, pix);
+                                 ;      24       cp->last_access = cache->last_access;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",24
+0000003C A881                    		MOV.L 08H[R0], R1
+0000003E A902                    		MOV.L 10H[R0], R2
+00000040 E5120101                		MOV.L 04H[R1], 04H[R2]
+00000044                         L17:	; bb31.split
+                                 ;      25       return cp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",25
+00000044 E5000401                		MOV.L 10H[R0], 04H[R0]
+00000048 2Err                 B  		BRA L29
+0000004A                         L18:	; bb47
+0000004A A901                    		MOV.L 10H[R0], R1
+0000004C F417                    		BTST #07H, [R1].B
+0000004E 18                   S  		BNE L20
+0000004F                         L19:	; bb55
+0000004F F80601                  		MOV.L #00000001H, [R0]
+00000052 08                   S  		BRA L21
+00000053                         L20:	; bb56
+00000053 F80600                  		MOV.L #00000000H, [R0]
+00000056                         L21:	; bb57
+00000056 EC01                    		MOV.L [R0], R1
+00000058 6101                    		CMP #00H, R1
+0000005A 20rr                    		BEQ L24
+0000005C                         L22:	; bb61
+0000005C A901                    		MOV.L 10H[R0], R1
+0000005E B911                    		MOVU.W 08H[R1], R1
+00000060 06C5010D                		CMP 1AH[R0].UW, R1
+00000064 18                   S  		BNE L24
+00000065                         L23:	; bb73
+00000065 F80601                  		MOV.L #00000001H, [R0]
+00000068 08                   S  		BRA L25
+00000069                         L24:	; bb74
+00000069 F80600                  		MOV.L #00000000H, [R0]
+0000006C                         L25:	; bb75
+0000006C EC01                    		MOV.L [R0], R1
+0000006E 6101                    		CMP #00H, R1
+00000070 21rr                    		BNE L16
+00000072                         L26:	; bb80
+00000072 A889                    		MOV.L 0CH[R0], R1
+00000074 6211                    		ADD #01H, R1
+00000076 A089                    		MOV.L R1, 0CH[R0]
+00000078                         L27:	; bb83
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",18
+00000078 A881                    		MOV.L 08H[R0], R1
+0000007A 581E                    		MOVU.B [R1], R14
+0000007C 06850E03                		CMP 0CH[R0].L, R14
+00000080 2Arr                    		BGT L14
+00000082                         L28:	; bb93
+                                 ;      26     }
+                                 ;      27   }
+                                 ;      28   //SPIFFS_CACHE_DBG("CACHE_GET: no cache for %04x\n", pix);
+                                 ;      29   return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",29
+00000082 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000085                         L29:	; bb95
+00000085 A809                    		MOV.L 04H[R0], R1
+00000087 A109                    		MOV.L R1, 14H[R0]
+                                 ;      30 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",30
+00000089 6708                    		RTSD #20H
+0000008B                         __$spiffs_cache_page_free:
+                                 		.STACK	__$spiffs_cache_page_free=40
+                                 ;      31 
+                                 ;      32 // frees cached page
+                                 ;      33 static s32_t spiffs_cache_page_free(spiffs *fs, int ix, u8_t write_back) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",33
+0000008B 7100DC                  		ADD #0FFFFFFDCH, R0
+0000008E A201                    		MOV.L R1, 20H[R0]
+00000090 A18A                    		MOV.L R2, 1CH[R0]
+00000092 868B                    		MOV.B R3, 1BH[R0]
+                                 ;      34   s32_t res = SPIFFS_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",34
+00000094 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000097                         L31:	; entry.split
+                                 ;      35   spiffs_cache *cache = spiffs_get_cache(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",35
+00000097 AA01                    		MOV.L 20H[R0], R1
+00000099 E5101202                		MOV.L 48H[R1], 08H[R0]
+0000009D                         L32:	; entry.split1
+                                 ;      36   spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, ix);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",36
+0000009D A989                    		MOV.L 1CH[R0], R1
+0000009F 76111401                		MUL #0114H, R1
+000000A3 A882                    		MOV.L 08H[R0], R2
+000000A5 06892104                		ADD 10H[R2].L, R1
+000000A9 A089                    		MOV.L R1, 0CH[R0]
+000000AB                         L33:	; entry.split2
+                                 ;      37   if (cache->cpage_use_map & (1<<ix)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",37
+000000AB A881                    		MOV.L 08H[R0], R1
+000000AD A891                    		MOV.L 08H[R1], R1
+000000AF A98A                    		MOV.L 1CH[R0], R2
+000000B1 FC6B12                  		BTST R2, R1
+000000B4 20rr                    		BEQ L47
+000000B6                         L34:	; bb20
+                                 ;      38     if (write_back &&
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",38
+000000B6 B689                    		MOVU.B 1BH[R0], R1
+000000B8 6101                    		CMP #00H, R1
+000000BA 21rr                    		BNE L37
+000000BC 2Err                 B  		BRA L39
+000000BE                         L35:	; bb21
+                                 ;      39         (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) == 0 &&
+                                 ;      40         (cp->flags & SPIFFS_CACHE_FLAG_DIRTY)) {
+                                 ;      41       u8_t *mem =  spiffs_get_cache_page(fs, cache, ix);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",41
+000000BE A989                    		MOV.L 1CH[R0], R1
+000000C0 76111401                		MUL #0114H, R1
+000000C4 A882                    		MOV.L 08H[R0], R2
+000000C6 06892104                		ADD 10H[R2].L, R1
+000000CA 711114                  		ADD #14H, R1
+000000CD A101                    		MOV.L R1, 10H[R0]
+000000CF                         L36:	; bb21.split
+                                 ;      42       res = SPIFFS_HAL_WRITE(fs, SPIFFS_PAGE_TO_PADDR(fs, cp->pix), SPIFFS_CFG_LOG_PAGE_SZ(fs), mem);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",42
+000000CF A889                    		MOV.L 0CH[R0], R1
+000000D1 B911                    		MOVU.W 08H[R1], R1
+000000D3 AA02                    		MOV.L 20H[R0], R2
+000000D5 A82C                    		MOV.L 04H[R2], R4
+000000D7 A903                    		MOV.L 10H[R0], R3
+000000D9 6C81                    		SHLL #08H, R1
+000000DB 7311000010              		ADD #00100000H, R1
+000000E0 FB2A0001                		MOV.L #00000100H, R2
+000000E4 7F14                    		JSR R4
+000000E6 A009                    		MOV.L R1, 04H[R0]
+000000E8 2Err                 B  		BRA L45
+000000EA                         L37:	; bb48
+000000EA A889                    		MOV.L 0CH[R0], R1
+000000EC F417                    		BTST #07H, [R1].B
+000000EE 18                   S  		BNE L39
+000000EF                         L38:	; bb56
+000000EF F80601                  		MOV.L #00000001H, [R0]
+000000F2 08                   S  		BRA L40
+000000F3                         L39:	; bb57
+000000F3 F80600                  		MOV.L #00000000H, [R0]
+000000F6                         L40:	; bb58
+000000F6 EC01                    		MOV.L [R0], R1
+000000F8 6101                    		CMP #00H, R1
+000000FA 10                   S  		BEQ L43
+000000FB                         L41:	; bb61
+000000FB A889                    		MOV.L 0CH[R0], R1
+000000FD F410                    		BTST #00H, [R1].B
+000000FF 10                   S  		BEQ L43
+00000100                         L42:	; bb69
+00000100 F80601                  		MOV.L #00000001H, [R0]
+00000103 08                   S  		BRA L44
+00000104                         L43:	; bb70
+00000104 F80600                  		MOV.L #00000000H, [R0]
+00000107                         L44:	; bb71
+00000107 EC01                    		MOV.L [R0], R1
+00000109 6101                    		CMP #00H, R1
+0000010B 21rr                    		BNE L35
+0000010D                         L45:	; bb76
+                                 ;      43     }
+                                 ;      44 
+                                 ;      45     cp->flags = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",45
+0000010D A889                    		MOV.L 0CH[R0], R1
+0000010F F81400                  		MOV.B #00H, [R1]
+00000112                         L46:	; bb76.split
+00000112 FB16FF                  		MOV.L #0FFFFFFFFH, R1
+                                 ;      46     cache->cpage_use_map &= ~(1 << ix);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",46
+00000115 A98A                    		MOV.L 1CH[R0], R2
+00000117 FC6F12                  		BNOT R2, R1
+0000011A A882                    		MOV.L 08H[R0], R2
+0000011C 06912102                		AND 08H[R2].L, R1
+00000120 A0A1                    		MOV.L R1, 08H[R2]
+00000122                         L47:	; bb106
+                                 ;      47 
+                                 ;      48     if (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) {
+                                 ;      49       SPIFFS_CACHE_DBG("CACHE_FREE: free cache page %i objid %04x\n", ix, cp->obj_id);
+                                 ;      50     } else {
+                                 ;      51       SPIFFS_CACHE_DBG("CACHE_FREE: free cache page %i pix %04x\n", ix, cp->pix);
+                                 ;      52     }
+                                 ;      53   }
+                                 ;      54 
+                                 ;      55   return res;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",55
+00000122 A809                    		MOV.L 04H[R0], R1
+00000124 A109                    		MOV.L R1, 14H[R0]
+00000126                         L48:	; bb106.split
+                                 ;      56 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",56
+00000126 6709                    		RTSD #24H
+00000128                         __$spiffs_cache_page_remove_oldest:
+                                 		.STACK	__$spiffs_cache_page_remove_oldest=48
+                                 ;      57 
+                                 ;      58 // removes the oldest accessed cached page
+                                 ;      59 static s32_t spiffs_cache_page_remove_oldest(spiffs *fs, u8_t flag_mask, u8_t flags) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",59
+00000128 7100D4                  		ADD #0FFFFFFD4H, R0
+0000012B A281                    		MOV.L R1, 28H[R0]
+0000012D C70227                  		MOV.B R2, 27H[R0]
+00000130 C70326                  		MOV.B R3, 26H[R0]
+                                 ;      60   s32_t res = SPIFFS_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",60
+00000133 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000136                         L50:	; entry.split
+                                 ;      61   spiffs_cache *cache = spiffs_get_cache(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",61
+00000136 AA81                    		MOV.L 28H[R0], R1
+00000138 E5101203                		MOV.L 48H[R1], 0CH[R0]
+0000013C                         L51:	; entry.split1
+                                 ;      62 
+                                 ;      63   if ((cache->cpage_use_map & cache->cpage_use_mask) != cache->cpage_use_mask) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",63
+0000013C A889                    		MOV.L 0CH[R0], R1
+0000013E A89A                    		MOV.L 0CH[R1], R2
+00000140 EF2E                    		MOV.L R2, R14
+00000142 06911E02                		AND 08H[R1].L, R14
+00000146 472E                    		CMP R2, R14
+00000148 10                   S  		BEQ L53
+00000149                         L52:	; bb14
+                                 ;      64     // at least one free cpage
+                                 ;      65     return SPIFFS_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",65
+00000149 3E0100                  		MOV.L #00000000H, 04H[R0]
+0000014C 38rrrr               W  		BRA L69
+0000014F                         L53:	; bb28
+                                 ;      66   }
+                                 ;      67 
+                                 ;      68   // all busy, scan thru all to find the cpage which has oldest access
+                                 ;      69   int i;
+                                 ;      70   int cand_ix = -1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",70
+0000014F F90605FF                		MOV.L #0FFFFFFFFH, 14H[R0]
+00000153                         L54:	; bb28.split
+                                 ;      71   u32_t oldest_val = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",71
+00000153 3E0600                  		MOV.L #00000000H, 18H[R0]
+00000156                         L55:	; bb28.split2
+                                 ;      72   for (i = 0; i < cache->cpage_count; i++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",72
+00000156 3E0400                  		MOV.L #00000000H, 10H[R0]
+00000159 2Err                 B  		BRA L65
+0000015B                         L56:	; bb29
+                                 ;      73     spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",73
+0000015B A901                    		MOV.L 10H[R0], R1
+0000015D 76111401                		MUL #0114H, R1
+00000161 A88A                    		MOV.L 0CH[R0], R2
+00000163 06892104                		ADD 10H[R2].L, R1
+00000167 A189                    		MOV.L R1, 1CH[R0]
+00000169                         L57:	; bb29.split
+                                 ;      74     if ((cache->last_access - cp->last_access) > oldest_val &&
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",74
+00000169 A889                    		MOV.L 0CH[R0], R1
+0000016B A819                    		MOV.L 04H[R1], R1
+0000016D A98A                    		MOV.L 1CH[R0], R2
+0000016F 06812101                		SUB 04H[R2].L, R1
+00000173 06850106                		CMP 18H[R0].L, R1
+00000177 24rr                    		BGTU L60
+00000179 2Err                 B  		BRA L62
+0000017B                         L58:	; bb38
+                                 ;      75         (cp->flags & flag_mask) == flags) {
+                                 ;      76       oldest_val = cache->last_access - cp->last_access;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",76
+0000017B A889                    		MOV.L 0CH[R0], R1
+0000017D A819                    		MOV.L 04H[R1], R1
+0000017F A98A                    		MOV.L 1CH[R0], R2
+00000181 06812101                		SUB 04H[R2].L, R1
+00000185 A181                    		MOV.L R1, 18H[R0]
+00000187                         L59:	; bb38.split
+                                 ;      77       cand_ix = i;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",77
+00000187 E5000405                		MOV.L 10H[R0], 14H[R0]
+0000018B 2Err                 B  		BRA L64
+0000018D                         L60:	; bb57
+0000018D A989                    		MOV.L 1CH[R0], R1
+0000018F 581E                    		MOVU.B [R1], R14
+00000191 510E27                  		AND 27H[R0].UB, R14
+00000194 5BEE                    		MOVU.B R14, R14
+00000196 450E26                  		CMP 26H[R0].UB, R14
+00000199 18                   S  		BNE L62
+0000019A                         L61:	; bb69
+0000019A F80601                  		MOV.L #00000001H, [R0]
+0000019D 08                   S  		BRA L63
+0000019E                         L62:	; bb70
+0000019E F80600                  		MOV.L #00000000H, [R0]
+000001A1                         L63:	; bb71
+000001A1 EC01                    		MOV.L [R0], R1
+000001A3 6101                    		CMP #00H, R1
+000001A5 21rr                    		BNE L58
+000001A7                         L64:	; bb76
+000001A7 A901                    		MOV.L 10H[R0], R1
+000001A9 6211                    		ADD #01H, R1
+000001AB A101                    		MOV.L R1, 10H[R0]
+000001AD                         L65:	; bb79
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",72
+000001AD A889                    		MOV.L 0CH[R0], R1
+000001AF 581E                    		MOVU.B [R1], R14
+000001B1 06850E04                		CMP 10H[R0].L, R14
+000001B5 2Arr                    		BGT L56
+000001B7                         L66:	; bb89
+                                 ;      78     }
+                                 ;      79   }
+                                 ;      80 
+                                 ;      81   if (cand_ix >= 0) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",81
+000001B7 A909                    		MOV.L 14H[R0], R1
+000001B9 6101                    		CMP #00H, R1
+000001BB 29rr                    		BLT L68
+000001BD                         L67:	; bb90
+                                 ;      82     res = spiffs_cache_page_free(fs, cand_ix, 1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",82
+000001BD A90A                    		MOV.L 14H[R0], R2
+000001BF AA81                    		MOV.L 28H[R0], R1
+000001C1 6613                    		MOV.L #00000001H, R3
+000001C3 39rrrr               W  		BSR __$spiffs_cache_page_free
+000001C6 A081                    		MOV.L R1, 08H[R0]
+000001C8                         L68:	; bb98
+                                 ;      83   }
+                                 ;      84 
+                                 ;      85   return res;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",85
+000001C8 E5000201                		MOV.L 08H[R0], 04H[R0]
+000001CC                         L69:	; bb101
+000001CC A809                    		MOV.L 04H[R0], R1
+000001CE A201                    		MOV.L R1, 20H[R0]
+                                 ;      86 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",86
+000001D0 670B                    		RTSD #2CH
+000001D2                         __$spiffs_cache_page_allocate:
+                                 		.STACK	__$spiffs_cache_page_allocate=28
+                                 ;      87 
+                                 ;      88 // allocates a new cached page and returns it, or null if all cache pages are busy
+                                 ;      89 static spiffs_cache_page *spiffs_cache_page_allocate(spiffs *fs) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",89
+000001D2 7100E8                  		ADD #0FFFFFFE8H, R0
+000001D5 A109                    		MOV.L R1, 14H[R0]
+                                 ;      90   spiffs_cache *cache = spiffs_get_cache(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",90
+000001D7 E5101201                		MOV.L 48H[R1], 04H[R0]
+000001DB                         L71:	; entry.split
+                                 ;      91   if (cache->cpage_use_map == 0xffffffff) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",91
+000001DB A809                    		MOV.L 04H[R0], R1
+000001DD A891                    		MOV.L 08H[R1], R1
+000001DF 7501FF                  		CMP #0FFFFFFFFH, R1
+000001E2 18                   S  		BNE L73
+000001E3                         L72:	; bb9
+                                 ;      92     // out of cache memory
+                                 ;      93     return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",93
+000001E3 F80600                  		MOV.L #00000000H, [R0]
+000001E6 2Err                 B  		BRA L82
+000001E8                         L73:	; bb16
+                                 ;      94   }
+                                 ;      95   int i;
+                                 ;      96   for (i = 0; i < cache->cpage_count; i++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",96
+000001E8 3E0200                  		MOV.L #00000000H, 08H[R0]
+000001EB 2Err                 B  		BRA L80
+000001ED                         L74:	; bb18
+                                 ;      97     if ((cache->cpage_use_map & (1<<i)) == 0) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",97
+000001ED A809                    		MOV.L 04H[R0], R1
+000001EF A891                    		MOV.L 08H[R1], R1
+000001F1 A882                    		MOV.L 08H[R0], R2
+000001F3 FC6B12                  		BTST R2, R1
+000001F6 21rr                    		BNE L79
+000001F8                         L75:	; bb19
+                                 ;      98       spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",98
+000001F8 A881                    		MOV.L 08H[R0], R1
+000001FA 76111401                		MUL #0114H, R1
+000001FE A80A                    		MOV.L 04H[R0], R2
+00000200 06892104                		ADD 10H[R2].L, R1
+00000204 A089                    		MOV.L R1, 0CH[R0]
+00000206                         L76:	; bb19.split
+00000206 6611                    		MOV.L #00000001H, R1
+                                 ;      99       cache->cpage_use_map |= (1<<i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",99
+00000208 A882                    		MOV.L 08H[R0], R2
+0000020A FD6221                  		SHLL R2, R1
+0000020D A80A                    		MOV.L 04H[R0], R2
+0000020F 06952102                		OR 08H[R2].L, R1
+00000213 A0A1                    		MOV.L R1, 08H[R2]
+00000215                         L77:	; bb19.split1
+                                 ;     100       cp->last_access = cache->last_access;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",100
+00000215 A809                    		MOV.L 04H[R0], R1
+00000217 A88A                    		MOV.L 0CH[R0], R2
+00000219 E5120101                		MOV.L 04H[R1], 04H[R2]
+0000021D                         L78:	; bb19.split2
+                                 ;     101       SPIFFS_CACHE_DBG("CACHE_ALLO: allocated cache page %i\n", i);
+                                 ;     102       return cp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",102
+0000021D E10003                  		MOV.L 0CH[R0], [R0]
+00000220 2Err                 B  		BRA L82
+00000222                         L79:	; bb49
+00000222 A881                    		MOV.L 08H[R0], R1
+00000224 6211                    		ADD #01H, R1
+00000226 A081                    		MOV.L R1, 08H[R0]
+00000228                         L80:	; bb52
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",96
+00000228 A809                    		MOV.L 04H[R0], R1
+0000022A 581E                    		MOVU.B [R1], R14
+0000022C 06850E02                		CMP 08H[R0].L, R14
+00000230 2Arr                    		BGT L74
+00000232                         L81:	; bb61
+                                 ;     103     }
+                                 ;     104   }
+                                 ;     105   // out of cache entries
+                                 ;     106   return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",106
+00000232 F80600                  		MOV.L #00000000H, [R0]
+00000235                         L82:	; bb63
+00000235 EC01                    		MOV.L [R0], R1
+00000237 A101                    		MOV.L R1, 10H[R0]
+                                 ;     107 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",107
+00000239 6706                    		RTSD #18H
+0000023B                         _spiffs_cache_drop_page:
+                                 		.STACK	_spiffs_cache_drop_page=16
+                                 ;     108 
+                                 ;     109 // drops the cache page for give page index
+                                 ;     110 void spiffs_cache_drop_page(spiffs *fs, spiffs_page_ix pix) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",110
+0000023B 60C0                    		SUB #0CH, R0
+0000023D A081                    		MOV.L R1, 08H[R0]
+0000023F 908A                    		MOV.W R2, 06H[R0]
+                                 ;     111   spiffs_cache_page *cp =  spiffs_cache_page_get(fs, pix);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",111
+00000241 B88A                    		MOVU.W 06H[R0], R2
+00000243 A881                    		MOV.L 08H[R0], R1
+00000245 39rrrr               W  		BSR __$spiffs_cache_page_get
+00000248 E301                    		MOV.L R1, [R0]
+0000024A                         L84:	; entry.split
+                                 ;     112   if (cp) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",112
+0000024A EC01                    		MOV.L [R0], R1
+0000024C 6101                    		CMP #00H, R1
+0000024E 20rr                    		BEQ L86
+00000250                         L85:	; bb6
+                                 ;     113     spiffs_cache_page_free(fs, cp->ix, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",113
+00000250 EC01                    		MOV.L [R0], R1
+00000252 B01A                    		MOVU.B 01H[R1], R2
+00000254 A881                    		MOV.L 08H[R0], R1
+00000256 6603                    		MOV.L #00000000H, R3
+00000258 39rrrr               W  		BSR __$spiffs_cache_page_free
+0000025B 6703                    		RTSD #0CH
+0000025D                         L86:	; return
+                                 ;     114   }
+                                 ;     115 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",115
+0000025D 6703                    		RTSD #0CH
+0000025F                         _spiffs_phys_rd:
+                                 		.STACK	_spiffs_phys_rd=60
+                                 ;     116 
+                                 ;     117 // ------------------------------
+                                 ;     118 
+                                 ;     119 // reads from spi flash or the cache
+                                 ;     120 s32_t spiffs_phys_rd(
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",120
+0000025F 7100C8                  		ADD #0FFFFFFC8H, R0
+00000262 A309                    		MOV.L R1, 34H[R0]
+00000264 C70233                  		MOV.B R2, 33H[R0]
+00000267 9603                    		MOV.W R3, 30H[R0]
+00000269 A28C                    		MOV.L R4, 2CH[R0]
+0000026B E5000F0A                		MOV.L 3CH[R0], 28H[R0]
+0000026F E5001009                		MOV.L 40H[R0], 24H[R0]
+00000273                         L88:	; entry.split
+                                 ;     121     spiffs *fs,
+                                 ;     122     u8_t op,
+                                 ;     123     spiffs_file fh,
+                                 ;     124     u32_t addr,
+                                 ;     125     u32_t len,
+                                 ;     126     u8_t *dst) {
+                                 ;     127   (void)fh;
+                                 ;     128   s32_t res = SPIFFS_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",128
+00000273 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000276                         L89:	; entry.split1
+                                 ;     129   spiffs_cache *cache = spiffs_get_cache(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",129
+00000276 AB09                    		MOV.L 34H[R0], R1
+00000278 E5101202                		MOV.L 48H[R1], 08H[R0]
+0000027C                         L90:	; entry.split2
+                                 ;     130   spiffs_cache_page *cp =  spiffs_cache_page_get(fs, SPIFFS_PADDR_TO_PAGE(fs, addr));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",130
+0000027C AA8A                    		MOV.L 2CH[R0], R2
+0000027E AB09                    		MOV.L 34H[R0], R1
+00000280 73220000F0              		ADD #0FFF00000H, R2
+00000285 6882                    		SHLR #08H, R2
+00000287 5F22                    		MOVU.W R2, R2
+00000289 39rrrr               W  		BSR __$spiffs_cache_page_get
+0000028C A089                    		MOV.L R1, 0CH[R0]
+0000028E                         L91:	; entry.split3
+                                 ;     131   cache->last_access++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",131
+0000028E A881                    		MOV.L 08H[R0], R1
+00000290 A81A                    		MOV.L 04H[R1], R2
+00000292 6212                    		ADD #01H, R2
+00000294 A01A                    		MOV.L R2, 04H[R1]
+00000296                         L92:	; entry.split4
+                                 ;     132   if (cp) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",132
+00000296 A889                    		MOV.L 0CH[R0], R1
+00000298 6101                    		CMP #00H, R1
+0000029A 20rr                    		BEQ L96
+0000029C                         L93:	; bb31
+                                 ;     133     // we've already got one, you see
+                                 ;     134 #if SPIFFS_CACHE_STATS
+                                 ;     135     fs->cache_hits++;
+                                 ;     136 #endif
+                                 ;     137     cp->last_access = cache->last_access;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",137
+0000029C A881                    		MOV.L 08H[R0], R1
+0000029E A88A                    		MOV.L 0CH[R0], R2
+000002A0 E5120101                		MOV.L 04H[R1], 04H[R2]
+000002A4                         L94:	; bb31.split
+                                 ;     138     u8_t *mem =  spiffs_get_cache_page(fs, cache, cp->ix);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",138
+000002A4 A889                    		MOV.L 0CH[R0], R1
+000002A6 B019                    		MOVU.B 01H[R1], R1
+000002A8 76111401                		MUL #0114H, R1
+000002AC A882                    		MOV.L 08H[R0], R2
+000002AE 06892104                		ADD 10H[R2].L, R1
+000002B2 711114                  		ADD #14H, R1
+000002B5 A101                    		MOV.L R1, 10H[R0]
+000002B7                         L95:	; bb31.split5
+                                 ;     139     memcpy(dst, &mem[SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr)], len);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",139
+000002B7 AA89                    		MOV.L 2CH[R0], R1
+000002B9 73110000F0              		ADD #0FFF00000H, R1
+000002BE 5B12                    		MOVU.B R1, R2
+000002C0 06890204                		ADD 10H[R0].L, R2
+000002C4 AA83                    		MOV.L 28H[R0], R3
+000002C6 AA09                    		MOV.L 24H[R0], R1
+000002C8 7F8F                    		SMOVF
+000002CA 38rrrr               W  		BRA L111
+000002CD                         L96:	; bb55
+                                 ;     140   } else {
+                                 ;     141     if ((op & SPIFFS_OP_TYPE_MASK) == SPIFFS_OP_T_OBJ_LU2) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",141
+000002CD 590133                  		MOVU.B 33H[R0], R1
+000002D0 6431                    		AND #03H, R1
+000002D2 6111                    		CMP #01H, R1
+000002D4 AB09                    		MOV.L 34H[R0], R1
+000002D6 21rr                    		BNE L98
+000002D8                         L97:	; bb56
+                                 ;     142       // for second layer lookup functions, we do not cache in order to prevent shredding
+                                 ;     143       return SPIFFS_HAL_READ(fs, addr, len, dst);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",143
+000002D8 EC1E                    		MOV.L [R1], R14
+000002DA AA0B                    		MOV.L 24H[R0], R3
+000002DC AA82                    		MOV.L 28H[R0], R2
+000002DE AA89                    		MOV.L 2CH[R0], R1
+000002E0 7F1E                    		JSR R14
+000002E2 E301                    		MOV.L R1, [R0]
+000002E4 38rrrr               W  		BRA L112
+000002E7                         L98:	; bb71
+000002E7 6603                    		MOV.L #00000000H, R3
+000002E9 754280                  		MOV.L #00000080H, R2
+                                 ;     144     }
+                                 ;     145 #if SPIFFS_CACHE_STATS
+                                 ;     146     fs->cache_misses++;
+                                 ;     147 #endif
+                                 ;     148     // this operation will always free one cache page (unless all already free),
+                                 ;     149     // the result code stems from the write operation of the possibly freed cache page
+                                 ;     150     res = spiffs_cache_page_remove_oldest(fs, SPIFFS_CACHE_FLAG_TYPE_WR, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",150
+000002EC 39rrrr               W  		BSR __$spiffs_cache_page_remove_oldest
+000002EF A009                    		MOV.L R1, 04H[R0]
+000002F1                         L99:	; bb71.split
+                                 ;     151 
+                                 ;     152     cp = spiffs_cache_page_allocate(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",152
+000002F1 AB09                    		MOV.L 34H[R0], R1
+000002F3 39rrrr               W  		BSR __$spiffs_cache_page_allocate
+000002F6 A089                    		MOV.L R1, 0CH[R0]
+000002F8                         L100:	; bb71.split6
+                                 ;     153     if (cp) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",153
+000002F8 A889                    		MOV.L 0CH[R0], R1
+000002FA 6101                    		CMP #00H, R1
+000002FC 20rr                    		BEQ L108
+000002FE                         L101:	; bb77
+                                 ;     154       cp->flags = SPIFFS_CACHE_FLAG_WRTHRU;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",154
+000002FE A889                    		MOV.L 0CH[R0], R1
+00000300 F81402                  		MOV.B #02H, [R1]
+00000303                         L102:	; bb77.split
+                                 ;     155       cp->pix = SPIFFS_PADDR_TO_PAGE(fs, addr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",155
+00000303 AA89                    		MOV.L 2CH[R0], R1
+00000305 73110000F0              		ADD #0FFF00000H, R1
+0000030A 6881                    		SHLR #08H, R1
+0000030C A88A                    		MOV.L 0CH[R0], R2
+0000030E 9121                    		MOV.W R1, 08H[R2]
+00000310                         L103:	; bb77.split7
+                                 ;     156 
+                                 ;     157       s32_t res2 = SPIFFS_HAL_READ(fs,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",157
+00000310 A889                    		MOV.L 0CH[R0], R1
+00000312 B01B                    		MOVU.B 01H[R1], R3
+00000314 76131401                		MUL #0114H, R3
+00000318 A881                    		MOV.L 08H[R0], R1
+0000031A 06891304                		ADD 10H[R1].L, R3
+0000031E AB09                    		MOV.L 34H[R0], R1
+00000320 EC1E                    		MOV.L [R1], R14
+00000322 AA89                    		MOV.L 2CH[R0], R1
+00000324 731F0000F0              		ADD #0FFF00000H, R1, R15
+00000329 5BFF                    		MOVU.B R15, R15
+0000032B 43F1                    		SUB R15, R1
+0000032D 713314                  		ADD #14H, R3
+00000330 FB2A0001                		MOV.L #00000100H, R2
+00000334 7F1E                    		JSR R14
+00000336 A109                    		MOV.L R1, 14H[R0]
+00000338                         L104:	; bb77.split8
+                                 ;     158           addr - SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr),
+                                 ;     159           SPIFFS_CFG_LOG_PAGE_SZ(fs),
+                                 ;     160           spiffs_get_cache_page(fs, cache, cp->ix));
+                                 ;     161       if (res2 != SPIFFS_OK) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",161
+00000338 A909                    		MOV.L 14H[R0], R1
+0000033A 6101                    		CMP #00H, R1
+0000033C 10                   S  		BEQ L106
+0000033D                         L105:	; bb110
+                                 ;     162         // honor read failure before possible write failure (bad idea?)
+                                 ;     163         res = res2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",163
+0000033D E5000501                		MOV.L 14H[R0], 04H[R0]
+00000341                         L106:	; bb116
+                                 ;     164       }
+                                 ;     165       u8_t *mem =  spiffs_get_cache_page(fs, cache, cp->ix);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",165
+00000341 A889                    		MOV.L 0CH[R0], R1
+00000343 B019                    		MOVU.B 01H[R1], R1
+00000345 76111401                		MUL #0114H, R1
+00000349 A882                    		MOV.L 08H[R0], R2
+0000034B 06892104                		ADD 10H[R2].L, R1
+0000034F 711114                  		ADD #14H, R1
+00000352 A181                    		MOV.L R1, 18H[R0]
+00000354                         L107:	; bb116.split
+                                 ;     166       memcpy(dst, &mem[SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr)], len);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",166
+00000354 AA89                    		MOV.L 2CH[R0], R1
+00000356 73110000F0              		ADD #0FFF00000H, R1
+0000035B 5B12                    		MOVU.B R1, R2
+0000035D 06890206                		ADD 18H[R0].L, R2
+00000361 AA83                    		MOV.L 28H[R0], R3
+00000363 AA09                    		MOV.L 24H[R0], R1
+00000365 7F8F                    		SMOVF
+00000367 2Err                 B  		BRA L111
+00000369                         L108:	; bb134
+                                 ;     167     } else {
+                                 ;     168       // this will never happen, last resort for sake of symmetry
+                                 ;     169       s32_t res2 = SPIFFS_HAL_READ(fs, addr, len, dst);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",169
+00000369 AB09                    		MOV.L 34H[R0], R1
+0000036B EC1E                    		MOV.L [R1], R14
+0000036D AA0B                    		MOV.L 24H[R0], R3
+0000036F AA82                    		MOV.L 28H[R0], R2
+00000371 AA89                    		MOV.L 2CH[R0], R1
+00000373 7F1E                    		JSR R14
+00000375 A189                    		MOV.L R1, 1CH[R0]
+00000377                         L109:	; bb134.split
+                                 ;     170       if (res2 != SPIFFS_OK) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",170
+00000377 A989                    		MOV.L 1CH[R0], R1
+00000379 6101                    		CMP #00H, R1
+0000037B 10                   S  		BEQ L111
+0000037C                         L110:	; bb144
+                                 ;     171         // honor read failure before possible write failure (bad idea?)
+                                 ;     172         res = res2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",172
+0000037C E5000701                		MOV.L 1CH[R0], 04H[R0]
+00000380                         L111:	; bb160
+                                 ;     173       }
+                                 ;     174     }
+                                 ;     175   }
+                                 ;     176   return res;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",176
+00000380 E10001                  		MOV.L 04H[R0], [R0]
+00000383                         L112:	; bb163
+00000383 EC01                    		MOV.L [R0], R1
+00000385 A201                    		MOV.L R1, 20H[R0]
+                                 ;     177 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",177
+00000387 670E                    		RTSD #38H
+00000389                         _spiffs_phys_wr:
+                                 		.STACK	_spiffs_phys_wr=52
+                                 ;     178 
+                                 ;     179 // writes to spi flash and/or the cache
+                                 ;     180 s32_t spiffs_phys_wr(
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",180
+00000389 7100D0                  		ADD #0FFFFFFD0H, R0
+0000038C A289                    		MOV.L R1, 2CH[R0]
+0000038E C7022B                  		MOV.B R2, 2BH[R0]
+00000391 9503                    		MOV.W R3, 28H[R0]
+00000393 A20C                    		MOV.L R4, 24H[R0]
+00000395 E5000D08                		MOV.L 34H[R0], 20H[R0]
+00000399 E5000E07                		MOV.L 38H[R0], 1CH[R0]
+0000039D                         L114:	; entry.split
+                                 ;     181     spiffs *fs,
+                                 ;     182     u8_t op,
+                                 ;     183     spiffs_file fh,
+                                 ;     184     u32_t addr,
+                                 ;     185     u32_t len,
+                                 ;     186     u8_t *src) {
+                                 ;     187   (void)fh;
+                                 ;     188   spiffs_page_ix pix = SPIFFS_PADDR_TO_PAGE(fs, addr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",188
+0000039D AA09                    		MOV.L 24H[R0], R1
+0000039F 73110000F0              		ADD #0FFF00000H, R1
+000003A4 6881                    		SHLR #08H, R1
+000003A6 9109                    		MOV.W R1, 0AH[R0]
+000003A8                         L115:	; entry.split1
+                                 ;     189   spiffs_cache *cache = spiffs_get_cache(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",189
+000003A8 AA89                    		MOV.L 2CH[R0], R1
+000003AA E5101203                		MOV.L 48H[R1], 0CH[R0]
+000003AE                         L116:	; entry.split2
+                                 ;     190   spiffs_cache_page *cp =  spiffs_cache_page_get(fs, pix);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",190
+000003AE B90A                    		MOVU.W 0AH[R0], R2
+000003B0 AA89                    		MOV.L 2CH[R0], R1
+000003B2 39rrrr               W  		BSR __$spiffs_cache_page_get
+000003B5 A101                    		MOV.L R1, 10H[R0]
+000003B7                         L117:	; entry.split3
+                                 ;     191 
+                                 ;     192   if (cp && (op & SPIFFS_OP_COM_MASK) != SPIFFS_OP_C_WRTHRU) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",192
+000003B7 A901                    		MOV.L 10H[R0], R1
+000003B9 6101                    		CMP #00H, R1
+000003BB 3Brrrr               W  		BNE L133
+000003BE 38rrrr               W  		BRA L135
+000003C1                         L118:	; bb24
+000003C1 754E1C                  		MOV.L #0000001CH, R14
+                                 ;     193     // have a cache page
+                                 ;     194     // copy in data to cache page
+                                 ;     195 
+                                 ;     196     if ((op & SPIFFS_OP_COM_MASK) == SPIFFS_OP_C_DELE &&
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",196
+000003C4 FC310E2B                		TST 2BH[R0].UB, R14
+000003C8 20rr                    		BEQ L121
+000003CA 2Err                 B  		BRA L123
+000003CC                         L119:	; bb25
+                                 ;     197         (op & SPIFFS_OP_TYPE_MASK) != SPIFFS_OP_T_OBJ_LU) {
+                                 ;     198       // page is being deleted, wipe from cache - unless it is a lookup page
+                                 ;     199       spiffs_cache_page_free(fs, cp->ix, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",199
+000003CC A901                    		MOV.L 10H[R0], R1
+000003CE B01A                    		MOVU.B 01H[R1], R2
+000003D0 AA89                    		MOV.L 2CH[R0], R1
+000003D2 6603                    		MOV.L #00000000H, R3
+000003D4 39rrrr               W  		BSR __$spiffs_cache_page_free
+000003D7                         L120:	; bb25.split
+                                 ;     200       return SPIFFS_HAL_WRITE(fs, addr, len, src);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",200
+000003D7 AA89                    		MOV.L 2CH[R0], R1
+000003D9 A81C                    		MOV.L 04H[R1], R4
+000003DB A98B                    		MOV.L 1CH[R0], R3
+000003DD AA02                    		MOV.L 20H[R0], R2
+000003DF AA09                    		MOV.L 24H[R0], R1
+000003E1 7F14                    		JSR R4
+000003E3 A009                    		MOV.L R1, 04H[R0]
+000003E5 38rrrr               W  		BRA L137
+000003E8                         L121:	; bb46
+000003E8 663E                    		MOV.L #00000003H, R14
+000003EA FC310E2B                		TST 2BH[R0].UB, R14
+000003EE 10                   S  		BEQ L123
+000003EF                         L122:	; bb52
+000003EF F80601                  		MOV.L #00000001H, [R0]
+000003F2 08                   S  		BRA L124
+000003F3                         L123:	; bb53
+000003F3 F80600                  		MOV.L #00000000H, [R0]
+000003F6                         L124:	; bb54
+000003F6 EC01                    		MOV.L [R0], R1
+000003F8 6101                    		CMP #00H, R1
+000003FA 21rr                    		BNE L119
+000003FC                         L125:	; bb58
+                                 ;     201     }
+                                 ;     202 
+                                 ;     203     u8_t *mem =  spiffs_get_cache_page(fs, cache, cp->ix);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",203
+000003FC A901                    		MOV.L 10H[R0], R1
+000003FE B019                    		MOVU.B 01H[R1], R1
+00000400 76111401                		MUL #0114H, R1
+00000404 A88A                    		MOV.L 0CH[R0], R2
+00000406 06892104                		ADD 10H[R2].L, R1
+0000040A 711114                  		ADD #14H, R1
+0000040D A109                    		MOV.L R1, 14H[R0]
+0000040F                         L126:	; bb58.split
+                                 ;     204     memcpy(&mem[SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr)], src, len);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",204
+0000040F AA09                    		MOV.L 24H[R0], R1
+00000411 73110000F0              		ADD #0FFF00000H, R1
+00000416 5B11                    		MOVU.B R1, R1
+00000418 06890105                		ADD 14H[R0].L, R1
+0000041C AA03                    		MOV.L 20H[R0], R3
+0000041E A98A                    		MOV.L 1CH[R0], R2
+00000420 7F8F                    		SMOVF
+00000422                         L127:	; bb58.split4
+                                 ;     205 
+                                 ;     206     cache->last_access++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",206
+00000422 A889                    		MOV.L 0CH[R0], R1
+00000424 A81A                    		MOV.L 04H[R1], R2
+00000426 6212                    		ADD #01H, R2
+00000428 A01A                    		MOV.L R2, 04H[R1]
+0000042A                         L128:	; bb58.split5
+                                 ;     207     cp->last_access = cache->last_access;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",207
+0000042A A889                    		MOV.L 0CH[R0], R1
+0000042C A902                    		MOV.L 10H[R0], R2
+0000042E E5120101                		MOV.L 04H[R1], 04H[R2]
+00000432                         L129:	; bb58.split6
+                                 ;     208 
+                                 ;     209     if (cp->flags & SPIFFS_CACHE_FLAG_WRTHRU) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",209
+00000432 A901                    		MOV.L 10H[R0], R1
+00000434 F411                    		BTST #01H, [R1].B
+00000436 20rr                    		BEQ L131
+00000438                         L130:	; bb86
+                                 ;     210       // page is being updated, no write-cache, just pass thru
+                                 ;     211       return SPIFFS_HAL_WRITE(fs, addr, len, src);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",211
+00000438 AA89                    		MOV.L 2CH[R0], R1
+0000043A A81C                    		MOV.L 04H[R1], R4
+0000043C A98B                    		MOV.L 1CH[R0], R3
+0000043E AA02                    		MOV.L 20H[R0], R2
+00000440 AA09                    		MOV.L 24H[R0], R1
+00000442 7F14                    		JSR R4
+00000444 A009                    		MOV.L R1, 04H[R0]
+00000446 2Err                 B  		BRA L137
+00000448                         L131:	; bb96
+                                 ;     212     } else {
+                                 ;     213       return SPIFFS_OK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",213
+00000448 3E0100                  		MOV.L #00000000H, 04H[R0]
+0000044B 2Err                 B  		BRA L137
+0000044D                         L132:	; bb107
+                                 ;     214     }
+                                 ;     215   } else {
+                                 ;     216     // no cache page, no write cache - just write thru
+                                 ;     217     return SPIFFS_HAL_WRITE(fs, addr, len, src);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",217
+0000044D AA89                    		MOV.L 2CH[R0], R1
+0000044F A81C                    		MOV.L 04H[R1], R4
+00000451 A98B                    		MOV.L 1CH[R0], R3
+00000453 AA02                    		MOV.L 20H[R0], R2
+00000455 AA09                    		MOV.L 24H[R0], R1
+00000457 7F14                    		JSR R4
+00000459 A009                    		MOV.L R1, 04H[R0]
+0000045B 2Err                 B  		BRA L137
+0000045D                         L133:	; bb120
+0000045D 59012B                  		MOVU.B 2BH[R0], R1
+00000460 75211C                  		AND #1CH, R1
+00000463 755118                  		CMP #18H, R1
+00000466 10                   S  		BEQ L135
+00000467                         L134:	; bb126
+00000467 F80601                  		MOV.L #00000001H, [R0]
+0000046A 08                   S  		BRA L136
+0000046B                         L135:	; bb127
+0000046B F80600                  		MOV.L #00000000H, [R0]
+0000046E                         L136:	; bb128
+0000046E EC01                    		MOV.L [R0], R1
+00000470 6101                    		CMP #00H, R1
+00000472 3Brrrr               W  		BNE L118
+00000475 2Err                 B  		BRA L132
+00000477                         L137:	; bb134
+00000477 A809                    		MOV.L 04H[R0], R1
+00000479 A181                    		MOV.L R1, 18H[R0]
+                                 ;     218   }
+                                 ;     219 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",219
+0000047B 670C                    		RTSD #30H
+0000047D                         _spiffs_cache_page_get_by_fd:
+                                 		.STACK	_spiffs_cache_page_get_by_fd=36
+                                 ;     220 
+                                 ;     221 #if SPIFFS_CACHE_WR
+                                 ;     222 // returns the cache page that this fd refers, or null if no cache page
+                                 ;     223 spiffs_cache_page *spiffs_cache_page_get_by_fd(spiffs *fs, spiffs_fd *fd) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",223
+0000047D 7100E0                  		ADD #0FFFFFFE0H, R0
+00000480 A189                    		MOV.L R1, 1CH[R0]
+00000482 A182                    		MOV.L R2, 18H[R0]
+                                 ;     224   spiffs_cache *cache = spiffs_get_cache(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",224
+00000484 A989                    		MOV.L 1CH[R0], R1
+00000486 E5101202                		MOV.L 48H[R1], 08H[R0]
+0000048A                         L139:	; entry.split
+                                 ;     225 
+                                 ;     226   if ((cache->cpage_use_map & cache->cpage_use_mask) == 0) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",226
+0000048A A881                    		MOV.L 08H[R0], R1
+0000048C A89A                    		MOV.L 0CH[R1], R2
+0000048E 06A10C1202              		TST 08H[R1].L, R2
+00000493 18                   S  		BNE L141
+00000494                         L140:	; bb10
+                                 ;     227     // all cpages free, no cpage cannot be assigned to obj_id
+                                 ;     228     return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",228
+00000494 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000497 2Err                 B  		BRA L156
+00000499                         L141:	; bb21
+                                 ;     229   }
+                                 ;     230 
+                                 ;     231   int i;
+                                 ;     232   for (i = 0; i < cache->cpage_count; i++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",232
+00000499 3E0300                  		MOV.L #00000000H, 0CH[R0]
+0000049C 2Err                 B  		BRA L154
+0000049E                         L142:	; bb22
+                                 ;     233     spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",233
+0000049E A889                    		MOV.L 0CH[R0], R1
+000004A0 76111401                		MUL #0114H, R1
+000004A4 A882                    		MOV.L 08H[R0], R2
+000004A6 06892104                		ADD 10H[R2].L, R1
+000004AA A101                    		MOV.L R1, 10H[R0]
+000004AC                         L143:	; bb22.split
+                                 ;     234     if ((cache->cpage_use_map & (1<<i)) &&
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",234
+000004AC A881                    		MOV.L 08H[R0], R1
+000004AE A891                    		MOV.L 08H[R1], R1
+000004B0 A88A                    		MOV.L 0CH[R0], R2
+000004B2 FC6B12                  		BTST R2, R1
+000004B5 18                   S  		BNE L145
+000004B6 2Err                 B  		BRA L147
+000004B8                         L144:	; bb31
+                                 ;     235         (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) &&
+                                 ;     236         cp->obj_id == fd->obj_id) {
+                                 ;     237       return cp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",237
+000004B8 E5000401                		MOV.L 10H[R0], 04H[R0]
+000004BC 2Err                 B  		BRA L156
+000004BE                         L145:	; bb42
+000004BE A901                    		MOV.L 10H[R0], R1
+000004C0 F417                    		BTST #07H, [R1].B
+000004C2 10                   S  		BEQ L147
+000004C3                         L146:	; bb50
+000004C3 F80601                  		MOV.L #00000001H, [R0]
+000004C6 08                   S  		BRA L148
+000004C7                         L147:	; bb51
+000004C7 F80600                  		MOV.L #00000000H, [R0]
+000004CA                         L148:	; bb52
+000004CA EC01                    		MOV.L [R0], R1
+000004CC 6101                    		CMP #00H, R1
+000004CE 20rr                    		BEQ L151
+000004D0                         L149:	; bb56
+000004D0 A901                    		MOV.L 10H[R0], R1
+000004D2 B911                    		MOVU.W 08H[R1], R1
+000004D4 A982                    		MOV.L 18H[R0], R2
+000004D6 06C52103                		CMP 06H[R2].UW, R1
+000004DA 18                   S  		BNE L151
+000004DB                         L150:	; bb69
+000004DB F80601                  		MOV.L #00000001H, [R0]
+000004DE 08                   S  		BRA L152
+000004DF                         L151:	; bb70
+000004DF F80600                  		MOV.L #00000000H, [R0]
+000004E2                         L152:	; bb71
+000004E2 EC01                    		MOV.L [R0], R1
+000004E4 6101                    		CMP #00H, R1
+000004E6 21rr                    		BNE L144
+000004E8                         L153:	; bb76
+000004E8 A889                    		MOV.L 0CH[R0], R1
+000004EA 6211                    		ADD #01H, R1
+000004EC A089                    		MOV.L R1, 0CH[R0]
+000004EE                         L154:	; bb79
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",232
+000004EE A881                    		MOV.L 08H[R0], R1
+000004F0 581E                    		MOVU.B [R1], R14
+000004F2 06850E03                		CMP 0CH[R0].L, R14
+000004F6 2Arr                    		BGT L142
+000004F8                         L155:	; bb88
+                                 ;     238     }
+                                 ;     239   }
+                                 ;     240 
+                                 ;     241   return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",241
+000004F8 3E0100                  		MOV.L #00000000H, 04H[R0]
+000004FB                         L156:	; bb90
+000004FB A809                    		MOV.L 04H[R0], R1
+000004FD A109                    		MOV.L R1, 14H[R0]
+                                 ;     242 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",242
+000004FF 6708                    		RTSD #20H
+00000501                         _spiffs_cache_page_allocate_by_fd:
+                                 		.STACK	_spiffs_cache_page_allocate_by_fd=24
+                                 ;     243 
+                                 ;     244 // allocates a new cache page and refers this to given fd - flushes an old cache
+                                 ;     245 // page if all cache is busy
+                                 ;     246 spiffs_cache_page *spiffs_cache_page_allocate_by_fd(spiffs *fs, spiffs_fd *fd) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",246
+00000501 7100EC                  		ADD #0FFFFFFECH, R0
+00000504 A101                    		MOV.L R1, 10H[R0]
+00000506 A08A                    		MOV.L R2, 0CH[R0]
+                                 ;     247   // before this function is called, it is ensured that there is no already existing
+                                 ;     248   // cache page with same object id
+                                 ;     249   spiffs_cache_page_remove_oldest(fs, SPIFFS_CACHE_FLAG_TYPE_WR, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",249
+00000508 A901                    		MOV.L 10H[R0], R1
+0000050A 6603                    		MOV.L #00000000H, R3
+0000050C 754280                  		MOV.L #00000080H, R2
+0000050F 39rrrr               W  		BSR __$spiffs_cache_page_remove_oldest
+00000512                         L158:	; entry.split
+                                 ;     250   spiffs_cache_page *cp = spiffs_cache_page_allocate(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",250
+00000512 A901                    		MOV.L 10H[R0], R1
+00000514 39rrrr               W  		BSR __$spiffs_cache_page_allocate
+00000517 A009                    		MOV.L R1, 04H[R0]
+00000519                         L159:	; entry.split1
+                                 ;     251   if (cp == 0) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",251
+00000519 A809                    		MOV.L 04H[R0], R1
+0000051B 6101                    		CMP #00H, R1
+0000051D 18                   S  		BNE L161
+0000051E                         L160:	; bb8
+                                 ;     252     // could not get cache page
+                                 ;     253     return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",253
+0000051E F80600                  		MOV.L #00000000H, [R0]
+00000521 2Err                 B  		BRA L165
+00000523                         L161:	; bb13
+                                 ;     254   }
+                                 ;     255 
+                                 ;     256   cp->flags = SPIFFS_CACHE_FLAG_TYPE_WR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",256
+00000523 A809                    		MOV.L 04H[R0], R1
+00000525 F81480                  		MOV.B #80H, [R1]
+00000528                         L162:	; bb13.split
+                                 ;     257   cp->obj_id = fd->obj_id;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",257
+00000528 A889                    		MOV.L 0CH[R0], R1
+0000052A A80A                    		MOV.L 04H[R0], R2
+0000052C D5120304                		MOV.W 06H[R1], 08H[R2]
+00000530                         L163:	; bb13.split2
+                                 ;     258   fd->cache_page = cp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",258
+00000530 A809                    		MOV.L 04H[R0], R1
+00000532 A88A                    		MOV.L 0CH[R0], R2
+00000534 A221                    		MOV.L R1, 20H[R2]
+00000536                         L164:	; bb13.split3
+                                 ;     259   return cp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",259
+00000536 E10001                  		MOV.L 04H[R0], [R0]
+00000539                         L165:	; bb28
+00000539 EC01                    		MOV.L [R0], R1
+0000053B A081                    		MOV.L R1, 08H[R0]
+                                 ;     260 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",260
+0000053D 6705                    		RTSD #14H
+0000053F                         _spiffs_cache_fd_release:
+                                 		.STACK	_spiffs_cache_fd_release=28
+                                 ;     261 
+                                 ;     262 // unrefers all fds that this cache page refers to and releases the cache page
+                                 ;     263 void spiffs_cache_fd_release(spiffs *fs, spiffs_cache_page *cp) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",263
+0000053F 7100E8                  		ADD #0FFFFFFE8H, R0
+00000542 A109                    		MOV.L R1, 14H[R0]
+00000544 A102                    		MOV.L R2, 10H[R0]
+                                 ;     264   if (cp == 0) return;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",264
+00000546 6102                    		CMP #00H, R2
+00000548 20rr                    		BEQ L180
+0000054A                         L167:	; bb10
+                                 ;     265   u32_t i;
+                                 ;     266   spiffs_fd *fds = (spiffs_fd *)fs->fd_space;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",266
+0000054A A909                    		MOV.L 14H[R0], R1
+0000054C E5100A02                		MOV.L 28H[R1], 08H[R0]
+00000550                         L168:	; bb10.split
+                                 ;     267   for (i = 0; i < fs->fd_count; i++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",267
+00000550 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000553 2Err                 B  		BRA L177
+00000555                         L169:	; bb15
+                                 ;     268     spiffs_fd *cur_fd = &fds[i];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",268
+00000555 A809                    		MOV.L 04H[R0], R1
+00000557 751124                  		MUL #24H, R1
+0000055A 06890102                		ADD 08H[R0].L, R1
+0000055E A089                    		MOV.L R1, 0CH[R0]
+00000560                         L170:	; bb15.split
+                                 ;     269     if (cur_fd->file_nbr != 0 && cur_fd->cache_page == cp) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",269
+00000560 A889                    		MOV.L 0CH[R0], R1
+00000562 9891                    		MOV.W 04H[R1], R1
+00000564 6101                    		CMP #00H, R1
+00000566 18                   S  		BNE L172
+00000567 2Err                 B  		BRA L174
+00000569                         L171:	; bb20
+                                 ;     270       cur_fd->cache_page = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",270
+00000569 A889                    		MOV.L 0CH[R0], R1
+0000056B 3E1800                  		MOV.L #00000000H, 20H[R1]
+0000056E 2Err                 B  		BRA L176
+00000570                         L172:	; bb29
+00000570 A889                    		MOV.L 0CH[R0], R1
+00000572 AA11                    		MOV.L 20H[R1], R1
+00000574 06850104                		CMP 10H[R0].L, R1
+00000578 18                   S  		BNE L174
+00000579                         L173:	; bb36
+00000579 F80601                  		MOV.L #00000001H, [R0]
+0000057C 08                   S  		BRA L175
+0000057D                         L174:	; bb37
+0000057D F80600                  		MOV.L #00000000H, [R0]
+00000580                         L175:	; bb38
+00000580 EC01                    		MOV.L [R0], R1
+00000582 6101                    		CMP #00H, R1
+00000584 21rr                    		BNE L171
+00000586                         L176:	; bb43
+00000586 A809                    		MOV.L 04H[R0], R1
+00000588 6211                    		ADD #01H, R1
+0000058A A009                    		MOV.L R1, 04H[R0]
+0000058C                         L177:	; bb46
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",267
+0000058C A909                    		MOV.L 14H[R0], R1
+0000058E A80A                    		MOV.L 04H[R0], R2
+00000590 0685120B                		CMP 2CH[R1].L, R2
+00000594 23rr                    		BLTU L169
+00000596                         L178:	; bb54
+                                 ;     271     }
+                                 ;     272   }
+                                 ;     273   spiffs_cache_page_free(fs, cp->ix, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",273
+00000596 A901                    		MOV.L 10H[R0], R1
+00000598 B01A                    		MOVU.B 01H[R1], R2
+0000059A A909                    		MOV.L 14H[R0], R1
+0000059C 6603                    		MOV.L #00000000H, R3
+0000059E 39rrrr               W  		BSR __$spiffs_cache_page_free
+000005A1                         L179:	; bb54.split
+                                 ;     274 
+                                 ;     275   cp->obj_id = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",275
+000005A1 A901                    		MOV.L 10H[R0], R1
+000005A3 3D1400                  		MOV.W #0000H, 08H[R1]
+000005A6 6706                    		RTSD #18H
+000005A8                         L180:	; return
+                                 ;     276 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",276
+000005A8 6706                    		RTSD #18H
+000005AA                         _spiffs_cache_init:
+                                 		.STACK	_spiffs_cache_init=48
+                                 ;     277 
+                                 ;     278 #endif
+                                 ;     279 
+                                 ;     280 // initializes the cache
+                                 ;     281 void spiffs_cache_init(spiffs *fs) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",281
+000005AA 7100D4                  		ADD #0FFFFFFD4H, R0
+000005AD A281                    		MOV.L R1, 28H[R0]
+                                 ;     282   if (fs->cache == 0) return;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",282
+000005AF AC91                    		MOV.L 48H[R1], R1
+000005B1 6101                    		CMP #00H, R1
+000005B3 3Arrrr               W  		BEQ L202
+000005B6                         L182:	; bb14
+                                 ;     283   u32_t sz = fs->cache_size;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",283
+000005B6 AA81                    		MOV.L 28H[R0], R1
+000005B8 E11013                  		MOV.L 4CH[R1], [R0]
+000005BB                         L183:	; bb14.split
+                                 ;     284   u32_t cache_mask = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",284
+000005BB 3E0100                  		MOV.L #00000000H, 04H[R0]
+000005BE                         L184:	; bb14.split1
+                                 ;     285   int i;
+                                 ;     286   int cache_entries =
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",286
+000005BE EC01                    		MOV.L [R0], R1
+000005C0 7111EC                  		ADD #0FFFFFFECH, R1
+000005C3 FD78911401              		DIVU #0114H, R1
+000005C8 A089                    		MOV.L R1, 0CH[R0]
+000005CA                         L185:	; bb14.split2
+                                 ;     287       (sz - sizeof(spiffs_cache)) / (SPIFFS_CACHE_PAGE_SIZE(fs));
+                                 ;     288   if (cache_entries <= 0) return;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",288
+000005CA A889                    		MOV.L 0CH[R0], R1
+000005CC 6101                    		CMP #00H, R1
+000005CE 2Arr                  * 		BLE L202
+         38rrrr                  
+000005D3                         L186:	; bb28
+                                 ;     289 
+                                 ;     290   for (i = 0; i < cache_entries; i++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",290
+000005D3 3E0200                  		MOV.L #00000000H, 08H[R0]
+000005D6 2Err                 B  		BRA L189
+000005D8                         L187:	; bb29
+                                 ;     291     cache_mask <<= 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",291
+000005D8 A809                    		MOV.L 04H[R0], R1
+000005DA 6C11                    		SHLL #01H, R1
+000005DC A009                    		MOV.L R1, 04H[R0]
+000005DE                         L188:	; bb29.split
+                                 ;     292     cache_mask |= 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",292
+000005DE A809                    		MOV.L 04H[R0], R1
+000005E0 7801                    		BSET #00H, R1
+000005E2 A009                    		MOV.L R1, 04H[R0]
+000005E4 A881                    		MOV.L 08H[R0], R1
+000005E6 6211                    		ADD #01H, R1
+000005E8 A081                    		MOV.L R1, 08H[R0]
+000005EA                         L189:	; bb36
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",290
+000005EA A881                    		MOV.L 08H[R0], R1
+000005EC 06850103                		CMP 0CH[R0].L, R1
+000005F0 29rr                    		BLT L187
+000005F2                         L190:	; bb42
+000005F2 6601                    		MOV.L #00000000H, R1
+                                 ;     293   }
+                                 ;     294 
+                                 ;     295   spiffs_cache cache;
+                                 ;     296   memset(&cache, 0, sizeof(spiffs_cache));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",296
+000005F4 A201                    		MOV.L R1, 20H[R0]
+000005F6 A189                    		MOV.L R1, 1CH[R0]
+000005F8 A181                    		MOV.L R1, 18H[R0]
+000005FA A109                    		MOV.L R1, 14H[R0]
+000005FC A101                    		MOV.L R1, 10H[R0]
+000005FE                         L191:	; bb42.split
+                                 ;     297   cache.cpage_count = cache_entries;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",297
+000005FE A889                    		MOV.L 0CH[R0], R1
+00000600 8401                    		MOV.B R1, 10H[R0]
+00000602                         L192:	; bb42.split3
+                                 ;     298   cache.cpages = (u8_t *)((u8_t *)fs->cache + sizeof(spiffs_cache));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",298
+00000602 AA81                    		MOV.L 28H[R0], R1
+00000604 AC91                    		MOV.L 48H[R1], R1
+00000606 711114                  		ADD #14H, R1
+00000609 A201                    		MOV.L R1, 20H[R0]
+0000060B                         L193:	; bb42.split4
+                                 ;     299 
+                                 ;     300   cache.cpage_use_map = 0xffffffff;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",300
+0000060B F90606FF                		MOV.L #0FFFFFFFFH, 18H[R0]
+0000060F                         L194:	; bb42.split5
+                                 ;     301   cache.cpage_use_mask = cache_mask;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",301
+0000060F E5000107                		MOV.L 04H[R0], 1CH[R0]
+00000613                         L195:	; bb42.split6
+                                 ;     302   memcpy(fs->cache, &cache, sizeof(spiffs_cache));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",302
+00000613 AA81                    		MOV.L 28H[R0], R1
+00000615 AC91                    		MOV.L 48H[R1], R1
+00000617 754314                  		MOV.L #00000014H, R3
+0000061A 710210                  		ADD #10H, R0, R2
+0000061D 7F8F                    		SMOVF
+0000061F                         L196:	; bb42.split7
+                                 ;     303 
+                                 ;     304   spiffs_cache *c = spiffs_get_cache(fs);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",304
+0000061F AA81                    		MOV.L 28H[R0], R1
+00000621 E5101209                		MOV.L 48H[R1], 24H[R0]
+00000625                         L197:	; bb42.split8
+                                 ;     305 
+                                 ;     306   memset(c->cpages, 0, c->cpage_count * SPIFFS_CACHE_PAGE_SIZE(fs));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",306
+00000625 AA09                    		MOV.L 24H[R0], R1
+00000627 5813                    		MOVU.B [R1], R3
+00000629 76131401                		MUL #0114H, R3
+0000062D A911                    		MOV.L 10H[R1], R1
+0000062F 6602                    		MOV.L #00000000H, R2
+00000631 7F88                    		SSTR.B
+00000633                         L198:	; bb42.split9
+                                 ;     307 
+                                 ;     308   c->cpage_use_map &= ~(c->cpage_use_mask);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",308
+00000633 AA09                    		MOV.L 24H[R0], R1
+00000635 A89A                    		MOV.L 0CH[R1], R2
+00000637 7E02                    		NOT R2
+00000639 06911202                		AND 08H[R1].L, R2
+0000063D A092                    		MOV.L R2, 08H[R1]
+0000063F                         L199:	; bb42.split10
+                                 ;     309   for (i = 0; i < cache.cpage_count; i++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",309
+0000063F 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000642 2Err                 B  		BRA L201
+00000644                         L200:	; bb78
+                                 ;     310     spiffs_get_cache_page_hdr(fs, c, i)->ix = i;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",310
+00000644 A881                    		MOV.L 08H[R0], R1
+00000646 EF12                    		MOV.L R1, R2
+00000648 76121401                		MUL #0114H, R2
+0000064C AA0B                    		MOV.L 24H[R0], R3
+0000064E 06893204                		ADD 10H[R3].L, R2
+00000652 8029                    		MOV.B R1, 01H[R2]
+00000654 A881                    		MOV.L 08H[R0], R1
+00000656 6211                    		ADD #01H, R1
+00000658 A081                    		MOV.L R1, 08H[R0]
+0000065A                         L201:	; bb91
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",309
+0000065A B401                    		MOVU.B 10H[R0], R1
+0000065C 06850102                		CMP 08H[R0].L, R1
+00000660 2Arr                    		BGT L200
+00000662                         L202:	; return
+                                 ;     311   }
+                                 ;     312 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\spiffs\spiffs_cache.c",312
+00000662 670B                    		RTSD #2CH
+                                 ;     313 
+                                 ;     314 #endif // SPIFFS_CACHE
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01393   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001636(00000664H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\spiffs_cache.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\spiffs_cache.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\spiffs\spiffs_cache.obj

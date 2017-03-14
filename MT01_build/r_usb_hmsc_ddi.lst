@@ -1,0 +1,604 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:02:56 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:02:56
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_usb_hmsc_ddi.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_usb_hmsc_ddi.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;r_usb_hmsc_ddi.c
+                                 
+                                 		.glb	_usb_ghmsc_DeviceTable
+                                 		.glb	_usb_ghmsc_ConfigTable
+                                 		.glb	_usb_ghmsc_InterfaceTable
+                                 		.glb	_usb_ghmsc_MaxDrive
+                                 		.glb	_usb_ghmsc_Devaddr
+                                 		.glb	_usb_ghmsc_Speed
+                                 		.glb	_usb_shmsc_InitSeq
+                                 		.glb	_usb_ghmsc_StrgCount
+                                 		.glb	_usb_hmsc_ClassCheck
+                                 		.glb	_R_usb_hmsc_alloc_drvno
+                                 		.glb	_usb_hmsc_SmpBotDescriptor
+                                 		.glb	_usb_hmsc_SmpPipeInfo
+                                 		.glb	_R_usb_hstd_ReturnEnuMGR
+                                 		.glb	_usb_hmsc_GetStringDescriptor1
+                                 		.glb	_usb_hmsc_class_check_result
+                                 		.glb	_usb_hmsc_GetStringDescriptor1Check
+                                 		.glb	_usb_hmsc_GetStringDescriptor2
+                                 		.glb	_usb_hmsc_GetStringDescriptor2Check
+                                 		.glb	_usb_hmsc_GetStringInfoCheck
+                                 		.glb	_R_usb_hmsc_ref_drvno
+                                 		.glb	_usb_hmsc_ClrData
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _usb_hmsc_ClassCheck:
+                                 		.STACK	_usb_hmsc_ClassCheck=28
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_usb_hmsc_ddi.c
+                                 ;      21 * Description  : USB Host MSC BOT ddi
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Support Multi device.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 /******************************************************************************
+                                 ;      30 Includes   <System Includes> , "Project Includes"
+                                 ;      31 ******************************************************************************/
+                                 ;      32 #include "r_usb_basic_if.h"
+                                 ;      33 #include "r_usb_hatapi_define.h"    /* Peripheral ATAPI Device extern */
+                                 ;      34 #include "r_usb_hmsc_define.h"      /* Host Mass Storage Class Driver define */
+                                 ;      35 #include "r_usb_hmsc_extern.h"      /* Host MSC grobal define */
+                                 ;      36 #include "r_usb_api.h"
+                                 ;      37 #include "r_usb_hmsc_config.h"
+                                 ;      38 #include "r_usb_hmsc_if.h"
+                                 ;      39 
+                                 ;      40 /******************************************************************************
+                                 ;      41 Renesas Abstracted HMSC Driver functions
+                                 ;      42 ******************************************************************************/
+                                 ;      43 
+                                 ;      44 /******************************************************************************
+                                 ;      45 Function Name   : usb_hmsc_ClassCheck
+                                 ;      46 Description     : check class
+                                 ;      47 Arguments       : USB_CLSINFO_t *mess : message
+                                 ;      48 Return value    : none
+                                 ;      49 ******************************************************************************/
+                                 ;      50 void usb_hmsc_ClassCheck(USB_UTR_t *ptr, USB_CLSINFO_t *mess)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",50
+00000000 7100EC                  		ADD #0FFFFFFECH, R0
+00000003 A101                    		MOV.L R1, 10H[R0]
+00000005 A08A                    		MOV.L R2, 0CH[R0]
+                                 ;      51 {
+                                 ;      52     uint16_t ofset, result;
+                                 ;      53     uint16_t strage_drive_no;
+                                 ;      54 
+                                 ;      55     result = USB_DONE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",55
+00000007 3D0400                  		MOV.W #0000H, 08H[R0]
+0000000A                         L11:	; entry.split
+                                 ;      56     switch( usb_shmsc_InitSeq[ptr->ip] )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",56
+0000000A A901                    		MOV.L 10H[R0], R1
+0000000C B991                    		MOVU.W 0CH[R1], R1
+0000000E FBE2rrrrrrrr            		MOV.L #_usb_shmsc_InitSeq, R14
+00000014 FED1EE                  		MOVU.W [R1,R14], R14
+00000017 612E                    		CMP #02H, R14
+00000019 3Arrrr               W  		BEQ L43
+0000001C                         L12:	; entry.split
+0000001C 611E                    		CMP #01H, R14
+0000001E 3Arrrr               W  		BEQ L38
+00000021                         L13:	; entry.split
+00000021 610E                    		CMP #00H, R14
+00000023 3Brrrr               W  		BNE L54
+00000026                         L14:	; bb12
+                                 ;      57     {
+                                 ;      58     case USB_SEQ_0:
+                                 ;      59         /* Check device count */
+                                 ;      60         if( usb_ghmsc_StrgCount == USB_MAXSTRAGE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",60
+00000026 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_StrgCount, R14
+0000002C 5CEE                    		MOVU.W [R14], R14
+0000002E 618E                    		CMP #08H, R14
+00000030 18                   S  		BNE L16
+00000031                         L15:	; bb13
+                                 ;      61         {
+                                 ;      62             USB_PRINTF0("### max device count over(HMSC) !\n");
+                                 ;      63             result = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",63
+00000031 F90904FFFF              		MOV.W #0FFFFH, 08H[R0]
+00000036                         L16:	; bb19
+                                 ;      64         }
+                                 ;      65 
+                                 ;      66         /* Check drive count */
+                                 ;      67         if( usb_ghmsc_MaxDrive >= USB_MAXDRIVE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",67
+00000036 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_MaxDrive, R14
+0000003C 5CEE                    		MOVU.W [R14], R14
+0000003E 755E10                  		CMP #10H, R14
+00000041 29rr                    		BLT L18
+00000043                         L17:	; bb20
+                                 ;      68         {
+                                 ;      69             USB_PRINTF1("    max drive over %d(HMSC) .\n", usb_ghmsc_MaxDrive);
+                                 ;      70             result = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",70
+00000043 F90904FFFF              		MOV.W #0FFFFH, 08H[R0]
+00000048                         L18:	; bb26
+                                 ;      71         }
+                                 ;      72 
+                                 ;      73         strage_drive_no = R_usb_hmsc_alloc_drvno( ptr->ip, usb_ghmsc_Devaddr[ptr->ip] );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",73
+00000048 A901                    		MOV.L 10H[R0], R1
+0000004A B991                    		MOVU.W 0CH[R1], R1
+0000004C FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_Devaddr, R14
+00000052 FED1E2                  		MOVU.W [R1,R14], R2
+00000055 05rrrrrr             A  		BSR _R_usb_hmsc_alloc_drvno
+00000059 9109                    		MOV.W R1, 0AH[R0]
+0000005B                         L19:	; bb26.split
+                                 ;      74 
+                                 ;      75         /* Descriptor check */
+                                 ;      76         ofset = usb_hmsc_SmpBotDescriptor(ptr, usb_ghmsc_InterfaceTable[ptr->ip], strage_drive_no);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",76
+0000005B A901                    		MOV.L 10H[R0], R1
+0000005D B992                    		MOVU.W 0CH[R1], R2
+0000005F FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_InterfaceTable, R14
+00000065 FE62E2                  		MOV.L [R2,R14], R2
+00000068 B90B                    		MOVU.W 0AH[R0], R3
+0000006A 05rrrrrr             A  		BSR _usb_hmsc_SmpBotDescriptor
+0000006E 9089                    		MOV.W R1, 06H[R0]
+00000070                         L20:	; bb26.split1
+                                 ;      77         if( ofset == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",77
+00000070 B889                    		MOVU.W 06H[R0], R1
+00000072 7701FFFF00              		CMP #0FFFFH, R1
+00000077 18                   S  		BNE L22
+00000078                         L21:	; bb47
+                                 ;      78         {
+                                 ;      79             USB_PRINTF0("### Descriptor search error(HMSC) !\n");
+                                 ;      80             result = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",80
+00000078 F90904FFFF              		MOV.W #0FFFFH, 08H[R0]
+0000007D                         L22:	; bb54
+                                 ;      81         }
+                                 ;      82 
+                                 ;      83         /* Serial number check */
+                                 ;      84         if( result != USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",84
+0000007D B901                    		MOVU.W 08H[R0], R1
+0000007F 7701FFFF00              		CMP #0FFFFH, R1
+00000084 3Arrrr               W  		BEQ L55
+00000087                         L23:	; bb56
+                                 ;      85         {
+                                 ;      86             /* no string device (STALL) */
+                                 ;      87             if( usb_ghmsc_DeviceTable[ptr->ip][14] == 0
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",87
+00000087 A901                    		MOV.L 10H[R0], R1
+00000089 B991                    		MOVU.W 0CH[R1], R1
+0000008B FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_DeviceTable, R14
+00000091 FE61E1                  		MOV.L [R1,R14], R1
+00000094 B391                    		MOVU.B 0EH[R1], R1
+00000096 6101                    		CMP #00H, R1
+00000098 20rr                    		BEQ L28
+0000009A 2Err                 B  		BRA L30
+0000009C                         L24:	; bb57
+                                 ;      88                 && usb_ghmsc_DeviceTable[ptr->ip][15] == 0
+                                 ;      89                 && usb_ghmsc_DeviceTable[ptr->ip][16] == 0 ) {
+                                 ;      90 
+                                 ;      91                 ofset = usb_hmsc_SmpPipeInfo(ptr, usb_ghmsc_InterfaceTable[ptr->ip]
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",91
+0000009C A903                    		MOV.L 10H[R0], R3
+0000009E B9B3                    		MOVU.W 0CH[R3], R3
+000000A0 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_Speed, R14
+000000A6 FED3E4                  		MOVU.W [R3,R14], R4
+000000A9 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_InterfaceTable, R14
+000000AF FE62E2                  		MOV.L [R2,R14], R2
+000000B2 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_ConfigTable, R14
+000000B8 FE63E3                  		MOV.L [R3,R14], R3
+000000BB B0B5                    		MOVU.B 02H[R3], R5
+000000BD B90B                    		MOVU.W 0AH[R0], R3
+000000BF 6040                    		SUB #04H, R0
+000000C1 D305                    		MOV.W R5, [R0]
+000000C3 05rrrrrr             A  		BSR _usb_hmsc_SmpPipeInfo
+000000C7 6240                    		ADD #04H, R0
+000000C9 9089                    		MOV.W R1, 06H[R0]
+000000CB                         L25:	; bb57.split2
+                                 ;      92                             , strage_drive_no, usb_ghmsc_Speed[ptr->ip]
+                                 ;      93                             , (uint16_t)usb_ghmsc_ConfigTable[ptr->ip][2]);
+                                 ;      94                 if( ofset == USB_ERROR ) {
+                                 ;      95                     USB_PRINTF0("### Device information error !\n");
+                                 ;      96                 }
+                                 ;      97                 R_usb_hstd_ReturnEnuMGR(ptr, ofset);    /* return to MGR */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",97
+000000CB B88A                    		MOVU.W 06H[R0], R2
+000000CD A901                    		MOV.L 10H[R0], R1
+000000CF 05rrrrrr             A  		BSR _R_usb_hstd_ReturnEnuMGR
+000000D3                         L26:	; bb57.split3
+                                 ;      98                 usb_shmsc_InitSeq[ptr->ip] = USB_SEQ_0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",98
+000000D3 A902                    		MOV.L 10H[R0], R2
+000000D5 B9A2                    		MOVU.W 0CH[R2], R2
+000000D7 FBE2rrrrrrrr            		MOV.L #_usb_shmsc_InitSeq, R14
+000000DD 660F                    		MOV.L #00000000H, R15
+000000DF FE12EF                  		MOV.W R15, [R2,R14]
+000000E2                         L27:	; bb57.split4
+                                 ;      99                 return;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",99
+000000E2 6705                    		RTSD #14H
+000000E4                         L28:	; bb110
+000000E4 A902                    		MOV.L 10H[R0], R2
+000000E6 B9A2                    		MOVU.W 0CH[R2], R2
+000000E8 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_DeviceTable, R14
+000000EE FE62E2                  		MOV.L [R2,R14], R2
+000000F1 B3AA                    		MOVU.B 0FH[R2], R2
+000000F3 6102                    		CMP #00H, R2
+000000F5 18                   S  		BNE L30
+000000F6                         L29:	; bb122
+000000F6 F80601                  		MOV.L #00000001H, [R0]
+000000F9 08                   S  		BRA L31
+000000FA                         L30:	; bb123
+000000FA F80600                  		MOV.L #00000000H, [R0]
+000000FD                         L31:	; bb124
+000000FD EC02                    		MOV.L [R0], R2
+000000FF 6102                    		CMP #00H, R2
+00000101 20rr                    		BEQ L34
+00000103                         L32:	; bb128
+00000103 A902                    		MOV.L 10H[R0], R2
+00000105 B9A2                    		MOVU.W 0CH[R2], R2
+00000107 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_DeviceTable, R14
+0000010D FE62E2                  		MOV.L [R2,R14], R2
+00000110 B422                    		MOVU.B 10H[R2], R2
+00000112 6102                    		CMP #00H, R2
+00000114 18                   S  		BNE L34
+00000115                         L33:	; bb140
+00000115 F80601                  		MOV.L #00000001H, [R0]
+00000118 08                   S  		BRA L35
+00000119                         L34:	; bb141
+00000119 F80600                  		MOV.L #00000000H, [R0]
+0000011C                         L35:	; bb142
+0000011C EC02                    		MOV.L [R0], R2
+0000011E 6102                    		CMP #00H, R2
+00000120 A901                    		MOV.L 10H[R0], R1
+00000122 B992                    		MOVU.W 0CH[R1], R2
+00000124 3Brrrr               W  		BNE L24
+00000127                         L36:	; bb147
+                                 ;     100             }
+                                 ;     101 
+                                 ;     102             ofset = usb_hmsc_GetStringDescriptor1(ptr, usb_ghmsc_Devaddr[ptr->ip],
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",102
+00000127 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_Devaddr, R14
+0000012D FED2E2                  		MOVU.W [R2,R14], R2
+00000130 A903                    		MOV.L 10H[R0], R3
+00000132 B9B3                    		MOVU.W 0CH[R3], R3
+00000134 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_DeviceTable, R14
+0000013A FE63E3                  		MOV.L [R3,R14], R3
+0000013D B433                    		MOVU.B 10H[R3], R3
+0000013F FB42rrrrrrrr            		MOV.L #_usb_hmsc_class_check_result, R4
+00000145 05rrrrrr             A  		BSR _usb_hmsc_GetStringDescriptor1
+00000149 9089                    		MOV.W R1, 06H[R0]
+0000014B                         L37:	; bb147.split
+                                 ;     103                      (uint16_t)usb_ghmsc_DeviceTable[ptr->ip][16],
+                                 ;     104                      (USB_CB_t)usb_hmsc_class_check_result );
+                                 ;     105             usb_shmsc_InitSeq[ptr->ip]++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",105
+0000014B A901                    		MOV.L 10H[R0], R1
+0000014D B991                    		MOVU.W 0CH[R1], R1
+0000014F FBE2rrrrrrrr            		MOV.L #_usb_shmsc_InitSeq, R14
+00000155 FE51EF                  		MOV.W [R1,R14], R15
+00000158 621F                    		ADD #01H, R15
+0000015A FE11EF                  		MOV.W R15, [R1,R14]
+0000015D 38rrrr               W  		BRA L55
+00000160                         L38:	; bb178
+                                 ;     106         }
+                                 ;     107         break;
+                                 ;     108 
+                                 ;     109     case USB_SEQ_1:
+                                 ;     110         ofset = usb_hmsc_GetStringDescriptor1Check(ptr, mess->result);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",110
+00000160 A889                    		MOV.L 0CH[R0], R1
+00000162 B99A                    		MOVU.W 0EH[R1], R2
+00000164 A901                    		MOV.L 10H[R0], R1
+00000166 05rrrrrr             A  		BSR _usb_hmsc_GetStringDescriptor1Check
+0000016A 9089                    		MOV.W R1, 06H[R0]
+0000016C                         L39:	; bb178.split
+                                 ;     111         if( ofset == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",111
+0000016C B889                    		MOVU.W 06H[R0], R1
+0000016E 7701FFFF00              		CMP #0FFFFH, R1
+00000173 18                   S  		BNE L41
+00000174                         L40:	; bb185
+                                 ;     112         {
+                                 ;     113             result = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",113
+00000174 F90904FFFF              		MOV.W #0FFFFH, 08H[R0]
+00000179 38rrrr               W  		BRA L55
+0000017C                         L41:	; bb186
+                                 ;     114         }
+                                 ;     115         else
+                                 ;     116         {
+                                 ;     117             ofset = usb_hmsc_GetStringDescriptor2(ptr, usb_ghmsc_Devaddr[ptr->ip],
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",117
+0000017C A901                    		MOV.L 10H[R0], R1
+0000017E B993                    		MOVU.W 0CH[R1], R3
+00000180 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_Devaddr, R14
+00000186 FED3E2                  		MOVU.W [R3,R14], R2
+00000189 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_DeviceTable, R14
+0000018F FE63E3                  		MOV.L [R3,R14], R3
+00000192 B3BB                    		MOVU.B 0FH[R3], R3
+00000194 FB42rrrrrrrr            		MOV.L #_usb_hmsc_class_check_result, R4
+0000019A 05rrrrrr             A  		BSR _usb_hmsc_GetStringDescriptor2
+0000019E 9089                    		MOV.W R1, 06H[R0]
+000001A0                         L42:	; bb186.split
+                                 ;     118                      (uint16_t)usb_ghmsc_DeviceTable[ptr->ip][15],
+                                 ;     119                      (USB_CB_t)usb_hmsc_class_check_result );
+                                 ;     120             usb_shmsc_InitSeq[ptr->ip]++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",120
+000001A0 A901                    		MOV.L 10H[R0], R1
+000001A2 B991                    		MOVU.W 0CH[R1], R1
+000001A4 FBE2rrrrrrrr            		MOV.L #_usb_shmsc_InitSeq, R14
+000001AA FE51EF                  		MOV.W [R1,R14], R15
+000001AD 621F                    		ADD #01H, R15
+000001AF FE11EF                  		MOV.W R15, [R1,R14]
+000001B2 38rrrr               W  		BRA L55
+000001B5                         L43:	; bb217
+                                 ;     121         }
+                                 ;     122         break;
+                                 ;     123 
+                                 ;     124     case USB_SEQ_2:
+                                 ;     125         /* Serial number check */
+                                 ;     126         ofset = usb_hmsc_GetStringDescriptor2Check(ptr, mess->result);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",126
+000001B5 A889                    		MOV.L 0CH[R0], R1
+000001B7 B99A                    		MOVU.W 0EH[R1], R2
+000001B9 A901                    		MOV.L 10H[R0], R1
+000001BB 05rrrrrr             A  		BSR _usb_hmsc_GetStringDescriptor2Check
+000001BF 9089                    		MOV.W R1, 06H[R0]
+000001C1                         L44:	; bb217.split
+                                 ;     127         if( ofset == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",127
+000001C1 B889                    		MOVU.W 06H[R0], R1
+000001C3 7701FFFF00              		CMP #0FFFFH, R1
+000001C8 18                   S  		BNE L46
+000001C9                         L45:	; bb224
+                                 ;     128         {
+                                 ;     129             result = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",129
+000001C9 F90904FFFF              		MOV.W #0FFFFH, 08H[R0]
+000001CE                         L46:	; bb230
+                                 ;     130         }
+                                 ;     131         
+                                 ;     132         ofset = usb_hmsc_GetStringInfoCheck(ptr, usb_ghmsc_Devaddr[ptr->ip]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",132
+000001CE A901                    		MOV.L 10H[R0], R1
+000001D0 B992                    		MOVU.W 0CH[R1], R2
+000001D2 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_Devaddr, R14
+000001D8 FED2E2                  		MOVU.W [R2,R14], R2
+000001DB 05rrrrrr             A  		BSR _usb_hmsc_GetStringInfoCheck
+000001DF 9089                    		MOV.W R1, 06H[R0]
+000001E1                         L47:	; bb230.split
+                                 ;     133         if( ofset == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",133
+000001E1 B889                    		MOVU.W 06H[R0], R1
+000001E3 7701FFFF00              		CMP #0FFFFH, R1
+000001E8 18                   S  		BNE L49
+000001E9                         L48:	; bb240
+                                 ;     134         {
+                                 ;     135             USB_PRINTF0("*** This device is No Serial Number\n");
+                                 ;     136             result = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",136
+000001E9 F90904FFFF              		MOV.W #0FFFFH, 08H[R0]
+000001EE                         L49:	; bb247
+                                 ;     137         }
+                                 ;     138         
+                                 ;     139         if( result != USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",139
+000001EE B901                    		MOVU.W 08H[R0], R1
+000001F0 7701FFFF00              		CMP #0FFFFH, R1
+000001F5 20rr                    		BEQ L55
+000001F7                         L50:	; bb248
+                                 ;     140         {
+                                 ;     141 
+                                 ;     142             strage_drive_no = R_usb_hmsc_ref_drvno( ptr->ip, usb_ghmsc_Devaddr[ptr->ip] );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",142
+000001F7 A901                    		MOV.L 10H[R0], R1
+000001F9 B991                    		MOVU.W 0CH[R1], R1
+000001FB FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_Devaddr, R14
+00000201 FED1E2                  		MOVU.W [R1,R14], R2
+00000204 05rrrrrr             A  		BSR _R_usb_hmsc_ref_drvno
+00000208 9109                    		MOV.W R1, 0AH[R0]
+0000020A                         L51:	; bb248.split
+                                 ;     143 
+                                 ;     144             /* Pipe Information table set */
+                                 ;     145             ofset = usb_hmsc_SmpPipeInfo(ptr, usb_ghmsc_InterfaceTable[ptr->ip],
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",145
+0000020A A901                    		MOV.L 10H[R0], R1
+0000020C B993                    		MOVU.W 0CH[R1], R3
+0000020E FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_Speed, R14
+00000214 FED3E4                  		MOVU.W [R3,R14], R4
+00000217 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_InterfaceTable, R14
+0000021D FE63E2                  		MOV.L [R3,R14], R2
+00000220 FBE2rrrrrrrr            		MOV.L #_usb_ghmsc_ConfigTable, R14
+00000226 FE63E3                  		MOV.L [R3,R14], R3
+00000229 B0B5                    		MOVU.B 02H[R3], R5
+0000022B B90B                    		MOVU.W 0AH[R0], R3
+0000022D 6040                    		SUB #04H, R0
+0000022F D305                    		MOV.W R5, [R0]
+00000231 05rrrrrr             A  		BSR _usb_hmsc_SmpPipeInfo
+00000235 6240                    		ADD #04H, R0
+00000237 9089                    		MOV.W R1, 06H[R0]
+00000239                         L52:	; bb248.split6
+                                 ;     146                      strage_drive_no, usb_ghmsc_Speed[ptr->ip],
+                                 ;     147                      (uint16_t)usb_ghmsc_ConfigTable[ptr->ip][2]);
+                                 ;     148             if( ofset == USB_ERROR )
+                                 ;     149             {
+                                 ;     150                 USB_PRINTF0("### Device information error !\n");
+                                 ;     151             }
+                                 ;     152             /* Return to MGR */
+                                 ;     153             R_usb_hstd_ReturnEnuMGR(ptr, ofset);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",153
+00000239 B88A                    		MOVU.W 06H[R0], R2
+0000023B A901                    		MOV.L 10H[R0], R1
+0000023D 05rrrrrr             A  		BSR _R_usb_hstd_ReturnEnuMGR
+00000241                         L53:	; bb248.split7
+                                 ;     154             usb_shmsc_InitSeq[ptr->ip] = USB_SEQ_0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",154
+00000241 A901                    		MOV.L 10H[R0], R1
+00000243 B991                    		MOVU.W 0CH[R1], R1
+00000245 FBE2rrrrrrrr            		MOV.L #_usb_shmsc_InitSeq, R14
+0000024B 660F                    		MOV.L #00000000H, R15
+0000024D FE11EF                  		MOV.W R15, [R1,R14]
+00000250 08                   S  		BRA L55
+00000251                         L54:	; bb304
+                                 ;     155         }
+                                 ;     156         break;
+                                 ;     157 
+                                 ;     158     default:
+                                 ;     159         result = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",159
+00000251 F90904FFFF              		MOV.W #0FFFFH, 08H[R0]
+00000256                         L55:	; bb306
+                                 ;     160         break;
+                                 ;     161     }
+                                 ;     162     
+                                 ;     163     if( result == USB_ERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",163
+00000256 B901                    		MOVU.W 08H[R0], R1
+00000258 7701FFFF00              		CMP #0FFFFH, R1
+0000025D 21rr                    		BNE L58
+0000025F                         L56:	; bb307
+                                 ;     164     {
+                                 ;     165         usb_shmsc_InitSeq[ptr->ip] = USB_SEQ_0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",165
+0000025F A901                    		MOV.L 10H[R0], R1
+00000261 B991                    		MOVU.W 0CH[R1], R1
+00000263 FBE2rrrrrrrr            		MOV.L #_usb_shmsc_InitSeq, R14
+00000269 660F                    		MOV.L #00000000H, R15
+0000026B FE11EF                  		MOV.W R15, [R1,R14]
+0000026E                         L57:	; bb307.split
+                                 ;     166         /* Return to MGR */
+                                 ;     167         R_usb_hstd_ReturnEnuMGR(ptr, USB_ERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",167
+0000026E A901                    		MOV.L 10H[R0], R1
+00000270 FB2EFFFF00              		MOV.L #0000FFFFH, R2
+00000275 05rrrrrr             A  		BSR _R_usb_hstd_ReturnEnuMGR
+00000279 6705                    		RTSD #14H
+0000027B                         L58:	; return
+                                 ;     168     }
+                                 ;     169 }   /* eof usb_hmsc_ClassCheck() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",169
+0000027B 6705                    		RTSD #14H
+0000027D                         _usb_hmsc_ClrData:
+                                 		.STACK	_usb_hmsc_ClrData=16
+                                 ;     170 
+                                 ;     171 
+                                 ;     172 /******************************************************************************
+                                 ;     173 Function Name   : usb_hmsc_ClrData
+                                 ;     174 Description     : data clear
+                                 ;     175 Arguments       : uint16_t len : 
+                                 ;     176                 : uint8_t *buf : 
+                                 ;     177 Return value    : none
+                                 ;     178 ******************************************************************************/
+                                 ;     179 void usb_hmsc_ClrData(uint16_t len, uint8_t *buf)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",179
+0000027D 60C0                    		SUB #0CH, R0
+0000027F 9109                    		MOV.W R1, 0AH[R0]
+00000281 A00A                    		MOV.L R2, 04H[R0]
+                                 ;     180 {
+                                 ;     181     uint16_t    i;
+                                 ;     182 
+                                 ;     183     for( i = 0; i < len; ++i )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",183
+00000283 3D0100                  		MOV.W #0000H, 02H[R0]
+00000286 2Err                 B  		BRA L61
+00000288                         L60:	; bb
+                                 ;     184     {
+                                 ;     185         *buf++ = 0x00;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",185
+00000288 A809                    		MOV.L 04H[R0], R1
+0000028A F81400                  		MOV.B #00H, [R1]
+0000028D A809                    		MOV.L 04H[R0], R1
+0000028F 6211                    		ADD #01H, R1
+00000291 A009                    		MOV.L R1, 04H[R0]
+00000293 9809                    		MOV.W 02H[R0], R1
+00000295 6211                    		ADD #01H, R1
+00000297 9009                    		MOV.W R1, 02H[R0]
+00000299                         L61:	; bb8
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",183
+00000299 B809                    		MOVU.W 02H[R0], R1
+0000029B 06C50105                		CMP 0AH[R0].UW, R1
+0000029F 29rr                    		BLT L60
+000002A1                         L62:	; return
+                                 ;     186     }
+                                 ;     187 }   /* eof usb_hmsc_ClrData() */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_hmsc\src\r_usb_hmsc_ddi.c",187
+000002A1 6703                    		RTSD #0CH
+                                 ;     188 
+                                 ;     189 
+                                 ;     190 /******************************************************************************
+                                 ;     191 End  Of File
+                                 ;     192 ******************************************************************************/
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00571   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000675(000002A3H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\r_usb_hmsc_ddi.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_usb_hmsc_ddi.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_usb_hmsc\src\r_usb_hmsc_ddi.obj

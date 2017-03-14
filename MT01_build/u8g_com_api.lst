@@ -1,0 +1,564 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:02:44 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:02:44
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=u8g_com_api.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=u8g_com_api.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;u8g_com_api.c
+                                 
+                                 		.glb	_u8g_InitCom
+                                 		.glb	_u8g_StopCom
+                                 		.glb	_u8g_SetChipSelect
+                                 		.glb	_u8g_SetResetLow
+                                 		.glb	_u8g_SetResetHigh
+                                 		.glb	_u8g_SetAddress
+                                 		.glb	_u8g_WriteByte
+                                 		.glb	_u8g_WriteSequence
+                                 		.glb	_u8g_WriteSequenceP
+                                 		.glb	_u8g_WriteEscSeqP
+                                 		.glb	_u8g_Delay
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _u8g_InitCom:
+                                 		.STACK	_u8g_InitCom=16
+                                 ;       1 /*
+                                 ;       2 
+                                 ;       3   u8g_com_api.c
+                                 ;       4 
+                                 ;       5   Universal 8bit Graphics Library
+                                 ;       6   
+                                 ;       7   Copyright (c) 2011, olikraus@gmail.com
+                                 ;       8   All rights reserved.
+                                 ;       9 
+                                 ;      10   Redistribution and use in source and binary forms, with or without modification, 
+                                 ;      11   are permitted provided that the following conditions are met:
+                                 ;      12 
+                                 ;      13   * Redistributions of source code must retain the above copyright notice, this list 
+                                 ;      14     of conditions and the following disclaimer.
+                                 ;      15     
+                                 ;      16   * Redistributions in binary form must reproduce the above copyright notice, this 
+                                 ;      17     list of conditions and the following disclaimer in the documentation and/or other 
+                                 ;      18     materials provided with the distribution.
+                                 ;      19 
+                                 ;      20   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+                                 ;      21   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+                                 ;      22   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+                                 ;      23   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+                                 ;      24   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+                                 ;      25   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+                                 ;      26   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+                                 ;      27   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+                                 ;      28   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+                                 ;      29   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+                                 ;      30   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+                                 ;      31   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+                                 ;      32   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+                                 ;      33   
+                                 ;      34   
+                                 ;      35 */
+                                 ;      36 
+                                 ;      37 #include "u8g.h"
+                                 ;      38 
+                                 ;      39 uint8_t u8g_InitCom(u8g_t *u8g, u8g_dev_t *dev, uint8_t clk_cycle_time)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",39
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
+00000004 A00A                    		MOV.L R2, 04H[R0]
+00000006 808B                    		MOV.B R3, 03H[R0]
+                                 ;      40 {
+                                 ;      41   return dev->com_fn(u8g, U8G_COM_MSG_INIT, clk_cycle_time, NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",41
+00000008 A809                    		MOV.L 04H[R0], R1
+0000000A A895                    		MOV.L 08H[R1], R5
+0000000C B08B                    		MOVU.B 03H[R0], R3
+0000000E A881                    		MOV.L 08H[R0], R1
+00000010 6604                    		MOV.L #00000000H, R4
+00000012 6612                    		MOV.L #00000001H, R2
+00000014 7F15                    		JSR R5
+00000016 8081                    		MOV.B R1, 02H[R0]
+00000018 B081                    		MOVU.B 02H[R0], R1
+0000001A                         L11:	; entry.split
+                                 ;      42 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",42
+0000001A 5B11                    		MOVU.B R1, R1
+0000001C 6703                    		RTSD #0CH
+0000001E                         _u8g_StopCom:
+                                 		.STACK	_u8g_StopCom=12
+                                 ;      43 
+                                 ;      44 void u8g_StopCom(u8g_t *u8g, u8g_dev_t *dev)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",44
+0000001E 6080                    		SUB #08H, R0
+00000020 A009                    		MOV.L R1, 04H[R0]
+00000022 E302                    		MOV.L R2, [R0]
+                                 ;      45 {
+                                 ;      46   dev->com_fn(u8g, U8G_COM_MSG_STOP, 0, NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",46
+00000024 A8A5                    		MOV.L 08H[R2], R5
+00000026 A809                    		MOV.L 04H[R0], R1
+00000028 6602                    		MOV.L #00000000H, R2
+0000002A EF23                    		MOV.L R2, R3
+0000002C EF24                    		MOV.L R2, R4
+0000002E 7F15                    		JSR R5
+00000030 6702                    		RTSD #08H
+00000032                         _u8g_SetChipSelect:
+                                 		.STACK	_u8g_SetChipSelect=16
+                                 ;      47 }
+                                 ;      48 
+                                 ;      49 /* cs contains the chip number, which should be enabled */
+                                 ;      50 void u8g_SetChipSelect(u8g_t *u8g, u8g_dev_t *dev, uint8_t cs)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",50
+00000032 60C0                    		SUB #0CH, R0
+00000034 A081                    		MOV.L R1, 08H[R0]
+00000036 A00A                    		MOV.L R2, 04H[R0]
+00000038 808B                    		MOV.B R3, 03H[R0]
+                                 ;      51 {
+                                 ;      52   dev->com_fn(u8g, U8G_COM_MSG_CHIP_SELECT, cs, NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",52
+0000003A A809                    		MOV.L 04H[R0], R1
+0000003C A895                    		MOV.L 08H[R1], R5
+0000003E B08B                    		MOVU.B 03H[R0], R3
+00000040 A881                    		MOV.L 08H[R0], R1
+00000042 6604                    		MOV.L #00000000H, R4
+00000044 6632                    		MOV.L #00000003H, R2
+00000046 7F15                    		JSR R5
+00000048 6703                    		RTSD #0CH
+0000004A                         _u8g_SetResetLow:
+                                 		.STACK	_u8g_SetResetLow=12
+                                 ;      53 }
+                                 ;      54 
+                                 ;      55 void u8g_SetResetLow(u8g_t *u8g, u8g_dev_t *dev)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",55
+0000004A 6080                    		SUB #08H, R0
+0000004C A009                    		MOV.L R1, 04H[R0]
+0000004E E302                    		MOV.L R2, [R0]
+                                 ;      56 {
+                                 ;      57   dev->com_fn(u8g, U8G_COM_MSG_RESET, 0, NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",57
+00000050 A8A5                    		MOV.L 08H[R2], R5
+00000052 A809                    		MOV.L 04H[R0], R1
+00000054 6603                    		MOV.L #00000000H, R3
+00000056 6642                    		MOV.L #00000004H, R2
+00000058 EF34                    		MOV.L R3, R4
+0000005A 7F15                    		JSR R5
+0000005C 6702                    		RTSD #08H
+0000005E                         _u8g_SetResetHigh:
+                                 		.STACK	_u8g_SetResetHigh=12
+                                 ;      58 }
+                                 ;      59 
+                                 ;      60 void u8g_SetResetHigh(u8g_t *u8g, u8g_dev_t *dev)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",60
+0000005E 6080                    		SUB #08H, R0
+00000060 A009                    		MOV.L R1, 04H[R0]
+00000062 E302                    		MOV.L R2, [R0]
+                                 ;      61 {
+                                 ;      62   dev->com_fn(u8g, U8G_COM_MSG_RESET, 1, NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",62
+00000064 A8A5                    		MOV.L 08H[R2], R5
+00000066 A809                    		MOV.L 04H[R0], R1
+00000068 6604                    		MOV.L #00000000H, R4
+0000006A 6613                    		MOV.L #00000001H, R3
+0000006C 6642                    		MOV.L #00000004H, R2
+0000006E 7F15                    		JSR R5
+00000070 6702                    		RTSD #08H
+00000072                         _u8g_SetAddress:
+                                 		.STACK	_u8g_SetAddress=16
+                                 ;      63 }
+                                 ;      64 
+                                 ;      65 
+                                 ;      66 void u8g_SetAddress(u8g_t *u8g, u8g_dev_t *dev, uint8_t address)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",66
+00000072 60C0                    		SUB #0CH, R0
+00000074 A081                    		MOV.L R1, 08H[R0]
+00000076 A00A                    		MOV.L R2, 04H[R0]
+00000078 808B                    		MOV.B R3, 03H[R0]
+                                 ;      67 {
+                                 ;      68   dev->com_fn(u8g, U8G_COM_MSG_ADDRESS, address, NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",68
+0000007A A809                    		MOV.L 04H[R0], R1
+0000007C A895                    		MOV.L 08H[R1], R5
+0000007E B08B                    		MOVU.B 03H[R0], R3
+00000080 A881                    		MOV.L 08H[R0], R1
+00000082 6604                    		MOV.L #00000000H, R4
+00000084 6622                    		MOV.L #00000002H, R2
+00000086 7F15                    		JSR R5
+00000088 6703                    		RTSD #0CH
+0000008A                         _u8g_WriteByte:
+                                 		.STACK	_u8g_WriteByte=16
+                                 ;      69 }
+                                 ;      70 
+                                 ;      71 uint8_t u8g_WriteByte(u8g_t *u8g, u8g_dev_t *dev, uint8_t val)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",71
+0000008A 60C0                    		SUB #0CH, R0
+0000008C A081                    		MOV.L R1, 08H[R0]
+0000008E A00A                    		MOV.L R2, 04H[R0]
+00000090 808B                    		MOV.B R3, 03H[R0]
+                                 ;      72 {
+                                 ;      73   return dev->com_fn(u8g, U8G_COM_MSG_WRITE_BYTE, val, NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",73
+00000092 A809                    		MOV.L 04H[R0], R1
+00000094 A895                    		MOV.L 08H[R1], R5
+00000096 B08B                    		MOVU.B 03H[R0], R3
+00000098 A881                    		MOV.L 08H[R0], R1
+0000009A 6604                    		MOV.L #00000000H, R4
+0000009C 6652                    		MOV.L #00000005H, R2
+0000009E 7F15                    		JSR R5
+000000A0 8081                    		MOV.B R1, 02H[R0]
+000000A2 B081                    		MOVU.B 02H[R0], R1
+000000A4                         L18:	; entry.split
+                                 ;      74 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",74
+000000A4 5B11                    		MOVU.B R1, R1
+000000A6 6703                    		RTSD #0CH
+000000A8                         _u8g_WriteSequence:
+                                 		.STACK	_u8g_WriteSequence=24
+                                 ;      75 
+                                 ;      76 uint8_t u8g_WriteSequence(u8g_t *u8g, u8g_dev_t *dev, uint8_t cnt, uint8_t *seq)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",76
+000000A8 7100EC                  		ADD #0FFFFFFECH, R0
+000000AB A101                    		MOV.L R1, 10H[R0]
+000000AD A08A                    		MOV.L R2, 0CH[R0]
+000000AF 828B                    		MOV.B R3, 0BH[R0]
+000000B1 A00C                    		MOV.L R4, 04H[R0]
+                                 ;      77 {
+                                 ;      78   return dev->com_fn(u8g, U8G_COM_MSG_WRITE_SEQ, cnt, seq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",78
+000000B3 A889                    		MOV.L 0CH[R0], R1
+000000B5 A895                    		MOV.L 08H[R1], R5
+000000B7 B28B                    		MOVU.B 0BH[R0], R3
+000000B9 A901                    		MOV.L 10H[R0], R1
+000000BB 6662                    		MOV.L #00000006H, R2
+000000BD 7F15                    		JSR R5
+000000BF 8089                    		MOV.B R1, 03H[R0]
+000000C1 B089                    		MOVU.B 03H[R0], R1
+000000C3                         L20:	; entry.split
+                                 ;      79 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",79
+000000C3 5B11                    		MOVU.B R1, R1
+000000C5 6705                    		RTSD #14H
+000000C7                         _u8g_WriteSequenceP:
+                                 		.STACK	_u8g_WriteSequenceP=24
+                                 ;      80 
+                                 ;      81 uint8_t u8g_WriteSequenceP(u8g_t *u8g, u8g_dev_t *dev, uint8_t cnt, const uint8_t *seq)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",81
+000000C7 7100EC                  		ADD #0FFFFFFECH, R0
+000000CA A101                    		MOV.L R1, 10H[R0]
+000000CC A08A                    		MOV.L R2, 0CH[R0]
+000000CE 828B                    		MOV.B R3, 0BH[R0]
+000000D0 A00C                    		MOV.L R4, 04H[R0]
+                                 ;      82 {
+                                 ;      83   return dev->com_fn(u8g, U8G_COM_MSG_WRITE_SEQ_P, cnt, (void *)seq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",83
+000000D2 A889                    		MOV.L 0CH[R0], R1
+000000D4 A895                    		MOV.L 08H[R1], R5
+000000D6 B28B                    		MOVU.B 0BH[R0], R3
+000000D8 A901                    		MOV.L 10H[R0], R1
+000000DA 6672                    		MOV.L #00000007H, R2
+000000DC 7F15                    		JSR R5
+000000DE 8089                    		MOV.B R1, 03H[R0]
+000000E0 B089                    		MOVU.B 03H[R0], R1
+000000E2                         L22:	; entry.split
+                                 ;      84 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",84
+000000E2 5B11                    		MOVU.B R1, R1
+000000E4 6705                    		RTSD #14H
+000000E6                         _u8g_WriteEscSeqP:
+                                 		.STACK	_u8g_WriteEscSeqP=20
+                                 ;      85 
+                                 ;      86 /*
+                                 ;      87   sequence := { direct_value | escape_sequence }
+                                 ;      88   direct_value := 0..254
+                                 ;      89   escape_sequence := value_255 | sequence_end | delay | adr | cs | not_used 
+                                 ;      90   value_255 := 255 255
+                                 ;      91   sequence_end = 255 254
+                                 ;      92   delay := 255 0..127
+                                 ;      93   adr := 255 0x0e0 .. 0x0ef 
+                                 ;      94   cs := 255 0x0d0 .. 0x0df 
+                                 ;      95   not_used := 255 101..254
+                                 ;      96 
+                                 ;      97 #define U8G_ESC_DLY(x) 255, ((x) & 0x7f)
+                                 ;      98 #define U8G_ESC_CS(x) 255, (0xd0 | ((x)&0x0f))
+                                 ;      99 #define U8G_ESC_ADR(x) 255, (0xe0 | ((x)&0x0f))
+                                 ;     100 #define U8G_ESC_VCC(x) 255, (0xbe | ((x)&0x01))
+                                 ;     101 #define U8G_ESC_END 255, 254
+                                 ;     102 #define U8G_ESC_255 255, 255
+                                 ;     103 #define U8G_ESC_RST(x) 255, (0xc0 | ((x)&0x0f))
+                                 ;     104 
+                                 ;     105 */
+                                 ;     106 uint8_t u8g_WriteEscSeqP(u8g_t *u8g, u8g_dev_t *dev, const uint8_t *esc_seq)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",106
+000000E6 7100F0                  		ADD #0FFFFFFF0H, R0
+000000E9 A089                    		MOV.L R1, 0CH[R0]
+000000EB A082                    		MOV.L R2, 08H[R0]
+000000ED A00B                    		MOV.L R3, 04H[R0]
+                                 ;     107 {
+                                 ;     108   uint8_t is_escape = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",108
+000000EF 3C0100                  		MOV.B #00H, 01H[R0]
+000000F2 38rrrr               W  		BRA L50
+000000F5                         L24:	; bb10
+                                 ;     109   uint8_t value;
+                                 ;     110   for(;;)
+                                 ;     111   {
+                                 ;     112     value = u8g_pgm_read(esc_seq);
+                                 ;     113     if ( is_escape == 0 )
+                                 ;     114     {
+                                 ;     115       if ( value != 255 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",115
+000000F5 7551FF                  		CMP #0FFH, R1
+000000F8 20rr                    		BEQ L27
+000000FA                         L25:	; bb12
+                                 ;     116       {
+                                 ;     117         if ( u8g_WriteByte(u8g, dev, value) == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",117
+000000FA B083                    		MOVU.B 02H[R0], R3
+000000FC A882                    		MOV.L 08H[R0], R2
+000000FE A889                    		MOV.L 0CH[R0], R1
+00000100 39rrrr               W  		BSR _u8g_WriteByte
+00000103 6101                    		CMP #00H, R1
+00000105 3Brrrr               W  		BNE L49
+00000108                         L26:	; bb13
+                                 ;     118           return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",118
+00000108 F80400                  		MOV.B #00H, [R0]
+0000010B 38rrrr               W  		BRA L53
+0000010E                         L27:	; bb23
+                                 ;     119       }
+                                 ;     120       else
+                                 ;     121       {
+                                 ;     122         is_escape = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",122
+0000010E 3C0101                  		MOV.B #01H, 01H[R0]
+00000111 38rrrr               W  		BRA L49
+00000114                         L28:	; bb31
+                                 ;     123       }
+                                 ;     124     }
+                                 ;     125     else
+                                 ;     126     {
+                                 ;     127       if ( value == 255 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",127
+00000114 7551FF                  		CMP #0FFH, R1
+00000117 21rr                    		BNE L31
+00000119                         L29:	; bb33
+                                 ;     128       {
+                                 ;     129         if ( u8g_WriteByte(u8g, dev, value) == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",129
+00000119 B083                    		MOVU.B 02H[R0], R3
+0000011B A882                    		MOV.L 08H[R0], R2
+0000011D A889                    		MOV.L 0CH[R0], R1
+0000011F 39rrrr               W  		BSR _u8g_WriteByte
+00000122 6101                    		CMP #00H, R1
+00000124 3Brrrr               W  		BNE L48
+00000127                         L30:	; bb34
+                                 ;     130           return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",130
+00000127 F80400                  		MOV.B #00H, [R0]
+0000012A 38rrrr               W  		BRA L53
+0000012D                         L31:	; bb46
+                                 ;     131       }
+                                 ;     132       else if ( value == 254 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",132
+0000012D B081                    		MOVU.B 02H[R0], R1
+0000012F 7551FE                  		CMP #0FEH, R1
+00000132 3Arrrr               W  		BEQ L52
+00000135                         L32:	; bb50
+                                 ;     133       {
+                                 ;     134         break;
+                                 ;     135       }
+                                 ;     136       else if ( value >= 0x0f0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",136
+00000135 B081                    		MOVU.B 02H[R0], R1
+00000137 7551EF                  		CMP #0EFH, R1
+0000013A 2Arr                    		BGT L48
+0000013C                         L33:	; bb53
+                                 ;     137       {
+                                 ;     138         /* not yet used, do nothing */
+                                 ;     139       }
+                                 ;     140       else if ( value >= 0xe0  )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",140
+0000013C B081                    		MOVU.B 02H[R0], R1
+0000013E 7551E0                  		CMP #0E0H, R1
+00000141 29rr                    		BLT L35
+00000143                         L34:	; bb54
+                                 ;     141       {
+                                 ;     142         u8g_SetAddress(u8g, dev, value & 0x0f);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",142
+00000143 B083                    		MOVU.B 02H[R0], R3
+00000145 A882                    		MOV.L 08H[R0], R2
+00000147 A889                    		MOV.L 0CH[R0], R1
+00000149 64F3                    		AND #0FH, R3
+0000014B 39rrrr               W  		BSR _u8g_SetAddress
+0000014E 2Err                 B  		BRA L48
+00000150                         L35:	; bb62
+                                 ;     143       }
+                                 ;     144       else if ( value >= 0xd0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",144
+00000150 B081                    		MOVU.B 02H[R0], R1
+00000152 7551D0                  		CMP #0D0H, R1
+00000155 29rr                    		BLT L37
+00000157                         L36:	; bb63
+                                 ;     145       {
+                                 ;     146         u8g_SetChipSelect(u8g, dev, value & 0x0f);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",146
+00000157 B083                    		MOVU.B 02H[R0], R3
+00000159 A882                    		MOV.L 08H[R0], R2
+0000015B A889                    		MOV.L 0CH[R0], R1
+0000015D 64F3                    		AND #0FH, R3
+0000015F 39rrrr               W  		BSR _u8g_SetChipSelect
+00000162 2Err                 B  		BRA L48
+00000164                         L37:	; bb71
+                                 ;     147       }
+                                 ;     148       else if ( value >= 0xc0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",148
+00000164 B081                    		MOVU.B 02H[R0], R1
+00000166 7551C0                  		CMP #0C0H, R1
+00000169 29rr                    		BLT L45
+0000016B                         L38:	; bb72
+                                 ;     149       {
+                                 ;     150         u8g_SetResetLow(u8g, dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",150
+0000016B A882                    		MOV.L 08H[R0], R2
+0000016D A889                    		MOV.L 0CH[R0], R1
+0000016F 39rrrr               W  		BSR _u8g_SetResetLow
+00000172                         L39:	; bb72.split
+                                 ;     151         value &= 0x0f;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",151
+00000172 B081                    		MOVU.B 02H[R0], R1
+00000174 64F1                    		AND #0FH, R1
+00000176 8081                    		MOV.B R1, 02H[R0]
+00000178                         L40:	; bb72.split1
+                                 ;     152         value <<= 4;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",152
+00000178 B081                    		MOVU.B 02H[R0], R1
+0000017A 6C41                    		SHLL #04H, R1
+0000017C 8081                    		MOV.B R1, 02H[R0]
+0000017E                         L41:	; bb72.split2
+                                 ;     153         value+=2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",153
+0000017E B081                    		MOVU.B 02H[R0], R1
+00000180 6221                    		ADD #02H, R1
+00000182 8081                    		MOV.B R1, 02H[R0]
+00000184                         L42:	; bb72.split3
+                                 ;     154         u8g_Delay(value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",154
+00000184 B081                    		MOVU.B 02H[R0], R1
+00000186 05rrrrrr             A  		BSR _u8g_Delay
+0000018A                         L43:	; bb72.split4
+                                 ;     155         u8g_SetResetHigh(u8g, dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",155
+0000018A A882                    		MOV.L 08H[R0], R2
+0000018C A889                    		MOV.L 0CH[R0], R1
+0000018E 39rrrr               W  		BSR _u8g_SetResetHigh
+00000191                         L44:	; bb72.split5
+                                 ;     156         u8g_Delay(value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",156
+00000191 B081                    		MOVU.B 02H[R0], R1
+00000193 05rrrrrr             A  		BSR _u8g_Delay
+00000197 2Err                 B  		BRA L48
+00000199                         L45:	; bb94
+                                 ;     157       }
+                                 ;     158       else if ( value >= 0xbe )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",158
+00000199 B081                    		MOVU.B 02H[R0], R1
+0000019B 7551BD                  		CMP #0BDH, R1
+0000019E 2Arr                    		BGT L48
+000001A0                         L46:	; bb97
+                                 ;     159       {
+                                 ;     160 	/* not yet implemented */
+                                 ;     161         /* u8g_SetVCC(u8g, dev, value & 0x01); */
+                                 ;     162       }
+                                 ;     163       else if ( value <= 127 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",163
+000001A0 B081                    		MOVU.B 02H[R0], R1
+000001A2 75517F                  		CMP #7FH, R1
+000001A5 2Arr                    		BGT L48
+000001A7                         L47:	; bb98
+                                 ;     164       {
+                                 ;     165         u8g_Delay(value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",165
+000001A7 B081                    		MOVU.B 02H[R0], R1
+000001A9 05rrrrrr             A  		BSR _u8g_Delay
+000001AD                         L48:	; bb148
+                                 ;     166       }
+                                 ;     167       is_escape = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",167
+000001AD 3C0100                  		MOV.B #00H, 01H[R0]
+000001B0                         L49:	; bb154
+                                 ;     168     }
+                                 ;     169     esc_seq++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",169
+000001B0 A809                    		MOV.L 04H[R0], R1
+000001B2 6211                    		ADD #01H, R1
+000001B4 A009                    		MOV.L R1, 04H[R0]
+000001B6                         L50:	; bb157.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",112
+000001B6 A809                    		MOV.L 04H[R0], R1
+000001B8 C41002                  		MOV.B [R1], 02H[R0]
+000001BB                         L51:	; bb157.split6
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",113
+000001BB B009                    		MOVU.B 01H[R0], R1
+000001BD 6101                    		CMP #00H, R1
+000001BF B081                    		MOVU.B 02H[R0], R1
+000001C1 3Arrrr               W  		BEQ L24
+000001C4 38rrrr               W  		BRA L28
+000001C7                         L52:	; bb159.split
+                                 ;     170   }
+                                 ;     171   return 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",171
+000001C7 F80401                  		MOV.B #01H, [R0]
+000001CA                         L53:	; bb161
+000001CA C40003                  		MOV.B [R0], 03H[R0]
+                                 ;     172 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api.c",172
+000001CD B089                    		MOVU.B 03H[R0], R1
+000001CF 6704                    		RTSD #10H
+                                 ;     173 
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00531   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000465(000001D1H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4D06\$ccrx\u8g_com_api.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\u8g_com_api.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\src\Display\u8g_com_api.obj

@@ -1,0 +1,377 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:03:12 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:03:12
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_fl_utilities.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_fl_utilities.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;r_fl_utilities.c
+                                 
+                                 		.glb	_fl_check_application
+                                 		.glb	_R_CRC_Compute
+                                 		.glb	_fl_reset
+                                 		.glb	_fl_signal
+                                 		.glb	_fl_check_bootloader_bypass
+                                 		.glb	_R_FL_GetVersion
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _fl_check_application:
+                                 		.STACK	_fl_check_application=12
+                                 ;       1 /*******************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only 
+                                 ;       4 * intended for use with Renesas products. No other uses are authorized. This 
+                                 ;       5 * software is owned by Renesas Electronics Corporation and is protected under
+                                 ;       6 * all applicable laws, including copyright laws.
+                                 ;       7 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       8 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+                                 ;       9 * LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE 
+                                 ;      10 * AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+                                 ;      11 * TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS 
+                                 ;      12 * ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE 
+                                 ;      13 * FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+                                 ;      14 * ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+                                 ;      15 * BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      16 * Renesas reserves the right, without notice, to make changes to this software
+                                 ;      17 * and to discontinue the availability of this software. By using this software,
+                                 ;      18 * you agree to the additional terms and conditions found by accessing the 
+                                 ;      19 * following link:
+                                 ;      20 * http://www.renesas.com/disclaimer *
+                                 ;      21 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      22 *******************************************************************************/
+                                 ;      23 /*******************************************************************************
+                                 ;      24 * File Name    : r_fl_utilities.c
+                                 ;      25 * Version      : 3.00
+                                 ;      26 * Description  : Contains functions for FlashLoader use such as CRC and Reset
+                                 ;      27 ******************************************************************************/  
+                                 ;      28 /******************************************************************************
+                                 ;      29 * History : DD.MM.YYYY Version Description
+                                 ;      30 *         : 05.04.2010 1.00    First Release
+                                 ;      31 *         : 22.03.2011 2.00    First Release for YRDK
+                                 ;      32 *         : 21.09.2011 2.01    Fixed calculation for timer register in 
+                                 ;      33 *                              fl_start_timer.
+                                 ;      34 *         : 23.02.2012 3.00    Removed 'LOWEST_ROM_ADDRESS' macro. Instead 
+                                 ;      35 *                              getting this info from Flash API. Made code
+                                 ;      36 *                              compliant with CS v4.0. Removed code to start
+                                 ;      37 *                              state machine timer because it is now the users
+                                 ;      38 *                              responsibility to call the state machine. Added
+                                 ;      39 *                              R_FL_GetVersion() function to this file.
+                                 ;      40 ******************************************************************************/
+                                 ;      41 
+                                 ;      42 /******************************************************************************
+                                 ;      43 Includes   <System Includes> , "Project Includes"
+                                 ;      44 ******************************************************************************/
+                                 ;      45 /* Used for offsetof() */
+                                 ;      46 #include <stddef.h>
+                                 ;      47 /* Flash Loader project includes. */
+                                 ;      48 #include "r_fl_includes.h"
+                                 ;      49 /* Used to get ROM_SIZE_BYTES which is in mcu_info.h and for LCD API. */
+                                 ;      50 #include "platform.h"
+                                 ;      51 /* Uses r_crc_rx package for CRC calculations. */
+                                 ;      52 #include "r_crc_rx_if.h"
+                                 ;      53 
+                                 ;      54 /******************************************************************************
+                                 ;      55 Macro definitions
+                                 ;      56 ******************************************************************************/
+                                 ;      57 /*  Bottom of User Flash Area */
+                                 ;      58 #define ROM_START_ADDRESS     (0x100000000-BSP_ROM_SIZE_BYTES)
+                                 ;      59 
+                                 ;      60 /******************************************************************************
+                                 ;      61 * Function Name: fl_check_application
+                                 ;      62 * Description  : Does a CRC on MCU flash to make sure current image is valid
+                                 ;      63 * Arguments    : none
+                                 ;      64 * Return value : CRC16-CCITT value of image in MCU flash
+                                 ;      65 ******************************************************************************/
+                                 ;      66 uint16_t fl_check_application(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",66
+00000000 6080                    		SUB #08H, R0
+                                 ;      67 {
+                                 ;      68     uint32_t start_address;
+                                 ;      69     uint16_t calc_crc;
+                                 ;      70     
+                                 ;      71     /* Get lowest flash address. ROM_PE_ADDR is the lowest address with the 
+                                 ;      72        MSB set to 0x00. To get the read address just make the MSB 0xFF. */
+                                 ;      73     start_address = ROM_START_ADDRESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",73
+00000002 F80E0000F0              		MOV.L #0FFF00000H, [R0]
+00000007                         L11:	; entry.split
+                                 ;      74     
+                                 ;      75     /* Calculate CRC up to the location where the linker put the CRC value */
+                                 ;      76     R_CRC_Compute( RX_LINKER_SEED, 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",76
+00000007 EC02                    		MOV.L [R0], R2
+00000009 FB32rrrrrrrr            		MOV.L #TOPOF APPHEADER_1, R3
+0000000F 6253                    		ADD #05H, R3
+00000011 4323                    		SUB R2, R3
+00000013 710404                  		ADD #04H, R0, R4
+00000016 FB1EFFFF00              		MOV.L #0000FFFFH, R1
+0000001B 05rrrrrr             A  		BSR _R_CRC_Compute
+0000001F                         L12:	; entry.split1
+                                 ;      77                    (uint8_t *) start_address,
+                                 ;      78                    ((uint32_t)__sectop("APPHEADER_1")) + \
+                                 ;      79                    offsetof(fl_image_header_t, raw_crc) - \
+                                 ;      80                    start_address,
+                                 ;      81                    &calc_crc);
+                                 ;      82 
+                                 ;      83     /* Move start_address to right after 'raw_crc' */                              
+                                 ;      84     start_address = ((uint32_t)__sectop("APPHEADER_1")) + \
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",84
+0000001F FB12rrrrrrrr            		MOV.L #TOPOF APPHEADER_1, R1
+00000025 6271                    		ADD #07H, R1
+00000027 E301                    		MOV.L R1, [R0]
+00000029                         L13:	; entry.split2
+                                 ;      85                     offsetof(fl_image_header_t, raw_crc) + \
+                                 ;      86                     sizeof(((fl_image_header_t *) 0)->raw_crc);                              
+                                 ;      87 
+                                 ;      88     /* Calculate the rest of flash after the CRC in memory */
+                                 ;      89     R_CRC_Compute( calc_crc, 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",89
+00000029 EC02                    		MOV.L [R0], R2
+0000002B B881                    		MOVU.W 04H[R0], R1
+0000002D FC0723                  		NEG R2, R3
+00000030 710404                  		ADD #04H, R0, R4
+00000033 05rrrrrr             A  		BSR _R_CRC_Compute
+00000037                         L14:	; entry.split3
+                                 ;      90                    (uint8_t *) start_address,
+                                 ;      91                    (0xFFFFFFFF - start_address) + 1,
+                                 ;      92                    &calc_crc);   
+                                 ;      93 
+                                 ;      94     /* The RX linker does a bitwise NOT on the data after the 
+                                 ;      95        CRC has finished */
+                                 ;      96     calc_crc = (uint16_t)(~calc_crc);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",96
+00000037 9881                    		MOV.W 04H[R0], R1
+00000039 7E01                    		NOT R1
+0000003B 9081                    		MOV.W R1, 04H[R0]
+0000003D                         L15:	; entry.split4
+                                 ;      97     
+                                 ;      98     return calc_crc;                                      
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",98
+0000003D D5000203                		MOV.W 04H[R0], 06H[R0]
+00000041 9889                    		MOV.W 06H[R0], R1
+00000043                         L16:	; entry.split5
+                                 ;      99 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",99
+00000043 5F11                    		MOVU.W R1, R1
+00000045 6702                    		RTSD #08H
+00000047                         _fl_reset:
+                                 		.STACK	_fl_reset=4
+                                 ;     100 /******************************************************************************
+                                 ;     101 End of function fl_check_application
+                                 ;     102 ******************************************************************************/
+                                 ;     103 
+                                 ;     104 /******************************************************************************
+                                 ;     105 * Function Name: fl_reset
+                                 ;     106 * Description  : Performs internal reset on the MCU. WDT is used in examples
+                                 ;     107 *                below.
+                                 ;     108 * Arguments    : none
+                                 ;     109 * Return value : none
+                                 ;     110 ******************************************************************************/
+                                 ;     111 void fl_reset(void)
+                                 ;     112 {   
+                                 ;     113 #if defined(BSP_MCU_RX61_ALL) || defined(BSP_MCU_RX62_ALL)
+                                 ;     114 
+                                 ;     115     /* Setup WDT so that it will cause internal reset */
+                                 ;     116     /* Count using PCLK/4, use in Watchdog timer mode */  
+                                 ;     117     /* Write to TCSR through WINA register */
+                                 ;     118     WDT.WRITE.WINA = 0xA540;                  
+                                 ;     119     
+                                 ;     120     /* Cause reset when watchdog overflows */
+                                 ;     121     /* Write to RSTE bit through WINB register */
+                                 ;     122     WDT.WRITE.WINB = 0x5A5F;    
+                                 ;     123     
+                                 ;     124     /* Start WDT */
+                                 ;     125     /* Write to TCSR through WINA register */
+                                 ;     126     WDT.WRITE.WINA = 0xA560;                      
+                                 ;     127 
+                                 ;     128 #elif defined(BSP_MCU_RX21_ALL) || defined(BSP_MCU_RX63_ALL)
+                                 ;     129 
+                                 ;     130     /* Setup WDT so that it will reset MCU as quickly as possible. */
+                                 ;     131     /* Reset on expiration of WDT. */
+                                 ;     132     WDT.WDTRCR.BYTE = 0x80;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",132
+00000047 FB1E208008              		MOV.L #00088020H, R1
+0000004C 3C1680                  		MOV.B #80H, 06H[R1]
+0000004F                         L18:	; entry.split
+                                 ;     133 
+                                 ;     134     /* Choose PCLK/4 and 1,024 cycles. */
+                                 ;     135     WDT.WDTCR.WORD = 0x0010;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",135
+0000004F FB1E208008              		MOV.L #00088020H, R1
+00000054 3D1110                  		MOV.W #0010H, 02H[R1]
+00000057                         L19:	; entry.split1
+                                 ;     136 
+                                 ;     137     /* Start WDT counting. This is done by writing 0x00 and then 0xFF. */
+                                 ;     138     WDT.WDTRR = 0x00;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",138
+00000057 FBEE208008              		MOV.L #00088020H, R14
+0000005C F8E400                  		MOV.B #00H, [R14]
+0000005F                         L20:	; entry.split2
+                                 ;     139     WDT.WDTRR = 0xFF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",139
+0000005F FBEE208008              		MOV.L #00088020H, R14
+00000064 F8E4FF                  		MOV.B #0FFH, [R14]
+00000067                         L21:	; bb1
+                                 ;     140 
+                                 ;     141 #else
+                                 ;     142     #error "Error! Add code to fl_reset() in r_fl_utilities.c for your MCU."
+                                 ;     143 #endif
+                                 ;     144                      
+                                 ;     145     while(1) 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",145
+00000067 2Err                 B  		BRA L21
+00000069                         _fl_signal:
+                                 		.STACK	_fl_signal=4
+                                 ;     146     {
+                                 ;     147         /* Wait for WDT reset */
+                                 ;     148     }
+                                 ;     149 }
+                                 ;     150 /******************************************************************************
+                                 ;     151 End of function fl_reset
+                                 ;     152 ******************************************************************************/
+                                 ;     153 
+                                 ;     154 /******************************************************************************
+                                 ;     155 * Function Name: fl_signal
+                                 ;     156 * Description  : Signal to outside world that no valid image is in MCU, only
+                                 ;     157 *                the FL Downloader state machine is running.
+                                 ;     158 * Arguments    : none
+                                 ;     159 * Return value : none
+                                 ;     160 ******************************************************************************/
+                                 ;     161 void fl_signal(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",161
+00000069 02                      		RTS
+0000006A                         _fl_check_bootloader_bypass:
+                                 		.STACK	_fl_check_bootloader_bypass=8
+                                 ;     162 {
+                                 ;     163 #if defined(BSP_BOARD_RSKRX62N) || defined(BSP_BOARD_RSKRX63N) || \
+                                 ;     164     defined(BSP_BOARD_RSKRX630) || defined(BSP_BOARD_RSKRX62T) || \
+                                 ;     165     defined(BSP_BOARD_RSKRX210)   
+                                 ;     166     LED0 = LED_ON;
+                                 ;     167     LED1 = LED_ON;
+                                 ;     168     LED2 = LED_ON;
+                                 ;     169     LED3 = LED_ON;
+                                 ;     170 #elif defined(BSP_BOARD_RDKRX62N) || defined(BSP_BOARD_RDKRX63N)
+                                 ;     171     /* The Glyph lib used for the LCD on the RDK will not fit in the 16KB
+                                 ;     172        User Boot area so we are just turning on LEDs. */
+                                 ;     173     LED4 = LED_ON;
+                                 ;     174     LED5 = LED_ON;
+                                 ;     175     LED6 = LED_ON;
+                                 ;     176     LED7 = LED_ON;
+                                 ;     177 #else
+                                 ;     178 
+                                 ;     179 #endif    
+                                 ;     180 }
+                                 ;     181 /******************************************************************************
+                                 ;     182 End of function fl_signal
+                                 ;     183 ******************************************************************************/
+                                 ;     184 
+                                 ;     185 /******************************************************************************
+                                 ;     186 * Function Name: fl_check_bootloader_bypass
+                                 ;     187 * Description  : Checks to see if the user is requesting that the Bootloader
+                                 ;     188 *                bypass normal load image and application checking and wants
+                                 ;     189 *                to just wait for a new load image.
+                                 ;     190 * Arguments    : none
+                                 ;     191 * Return value : true - 
+                                 ;     192 *                    Bypass is requested
+                                 ;     193 *                false - 
+                                 ;     194 *                    Bypass is not requested
+                                 ;     195 ******************************************************************************/
+                                 ;     196 bool fl_check_bootloader_bypass(void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",196
+0000006A 6040                    		SUB #04H, R0
+                                 ;     197 {
+                                 ;     198         /* Bypass is not requested */
+                                 ;     199         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",199
+0000006C 3C0300                  		MOV.B #00H, 03H[R0]
+0000006F B089                    		MOVU.B 03H[R0], R1
+00000071                         L24:	; entry.split
+                                 ;     200 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",200
+00000071 5B11                    		MOVU.B R1, R1
+00000073 6701                    		RTSD #04H
+00000075                         _R_FL_GetVersion:
+                                 		.STACK	_R_FL_GetVersion=8
+                                 ;     201 /******************************************************************************
+                                 ;     202 End of function fl_check_bootloader_bypass
+                                 ;     203 ******************************************************************************/
+                                 ;     204 
+                                 ;     205 /******************************************************************************
+                                 ;     206 * Function Name: R_FL_GetVersion
+                                 ;     207 * Description  : Returns the current version of this module. The version number
+                                 ;     208 *                is encoded where the top 2 bytes are the major version number 
+                                 ;     209 *                and the bottom 2 bytes are the minor version number. For 
+                                 ;     210 *                example, Version 4.25 would be returned as 0x00040019.
+                                 ;     211 * Arguments    : none
+                                 ;     212 * Return Value : Version of this module.
+                                 ;     213 ******************************************************************************/
+                                 ;     214 #pragma inline(R_FL_GetVersion)
+                                 ;     215 uint32_t R_FL_GetVersion (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",215
+00000075 6040                    		SUB #04H, R0
+                                 ;     216 {
+                                 ;     217     /* These version macros are defined in r_flash_loader_rx_if.h. */
+                                 ;     218     return ((((uint32_t)FLASH_LOADER_RX_VERSION_MAJOR) << 16) | (uint32_t)FLASH_LOADER_RX_VERSION_MINOR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",218
+00000077 F80E000003              		MOV.L #00030000H, [R0]
+0000007C FB1E000003              		MOV.L #00030000H, R1
+00000081                         L26:	; entry.split
+                                 ;     219 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_flash_loader_rx\src\r_fl_utilities.c",219
+00000081 6701                    		RTSD #04H
+                                 ;     220 /******************************************************************************
+                                 ;     221 End of function R_FL_GetVersion
+                                 ;     222 ******************************************************************************/
+                                 ;     223 
+                                 ;     224 
+                                 		.SECTION	APPHEADER_1,DATA
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00343   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000131(00000083H)  P
+DATA     0000000000(00000000H)  APPHEADER_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\r_fl_utilities.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_fl_utilities.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_flash_loader_rx\src\r_fl_utilities.obj

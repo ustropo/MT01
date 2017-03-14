@@ -1,0 +1,510 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:03:04 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:03:03
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_usb_cintfifo.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_usb_cintfifo.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;r_usb_cintfifo.c
+                                 
+                                 		.glb	_usb_gcstd_Pipe
+                                 		.glb	_usb_cstd_BrdyPipe
+                                 		.glb	_usb_cstd_brdy_pipe
+                                 		.glb	_usb_cstd_NrdyPipe
+                                 		.glb	_usb_creg_read_frmnum
+                                 		.glb	_usb_cstd_ForcedTermination
+                                 		.glb	_usb_cstd_nrdy_endprocess
+                                 		.glb	_usb_cstd_GetPipeType
+                                 		.glb	_usb_cstd_BempPipe
+                                 		.glb	_usb_cstd_GetPid
+                                 		.glb	_usb_cstd_Pipe2Fport
+                                 		.glb	_usb_cstd_DataEnd
+                                 		.glb	_usb_creg_read_pipectr
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _usb_cstd_BrdyPipe:
+                                 		.STACK	_usb_cstd_BrdyPipe=12
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_usb_cintfifo.c
+                                 ;      21 * Description  : USB Host and Peripheral interrupt code
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Added RX71M.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 
+                                 ;      30 /******************************************************************************
+                                 ;      31 Includes   <System Includes> , "Project Includes"
+                                 ;      32 ******************************************************************************/
+                                 ;      33 #include "r_usb_basic_if.h"
+                                 ;      34 #include "r_usb_reg_access.h"
+                                 ;      35 
+                                 ;      36 
+                                 ;      37 /******************************************************************************
+                                 ;      38 Constant macro definitions
+                                 ;      39 ******************************************************************************/
+                                 ;      40 
+                                 ;      41 
+                                 ;      42 /******************************************************************************
+                                 ;      43 External variables and functions
+                                 ;      44 ******************************************************************************/
+                                 ;      45 void    usb_cstd_nrdy_endprocess( USB_UTR_t *ptr, uint16_t pipe );
+                                 ;      46 extern void usb_cstd_brdy_pipe(void);
+                                 ;      47 /******************************************************************************
+                                 ;      48 Private global variables and functions
+                                 ;      49 ******************************************************************************/
+                                 ;      50 
+                                 ;      51 
+                                 ;      52 /******************************************************************************
+                                 ;      53 Function Name   : usb_cstd_BrdyPipe
+                                 ;      54 Description     : Search for the PIPE No. that BRDY interrupt occurred, and 
+                                 ;      55                   request data transmission/reception from the PIPE
+                                 ;      56 Arguments       : USB_UTR_t *ptr
+                                 ;      57                 : uint16_t bitsts       ; BRDYSTS Register & BRDYENB Register
+                                 ;      58 Return value    : none
+                                 ;      59 ******************************************************************************/
+                                 ;      60 void usb_cstd_BrdyPipe(USB_UTR_t *ptr, uint16_t bitsts)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",60
+00000000 6080                    		SUB #08H, R0
+00000002 A009                    		MOV.L R1, 04H[R0]
+00000004 900A                    		MOV.W R2, 02H[R0]
+                                 ;      61 {
+                                 ;      62     usb_cstd_brdy_pipe();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",62
+00000006 05rrrrrr             A  		BSR _usb_cstd_brdy_pipe
+0000000A 6702                    		RTSD #08H
+0000000C                         _usb_cstd_NrdyPipe:
+                                 		.STACK	_usb_cstd_NrdyPipe=16
+                                 ;      63 }
+                                 ;      64 /******************************************************************************
+                                 ;      65 End of function usb_cstd_BrdyPipe
+                                 ;      66 ******************************************************************************/
+                                 ;      67 
+                                 ;      68 
+                                 ;      69 /******************************************************************************
+                                 ;      70 Function Name   : usb_cstd_NrdyPipe
+                                 ;      71 Description     : Search for PIPE No. that occurred NRDY interrupt, and execute 
+                                 ;      72                   the process for PIPE when NRDY interrupt occurred
+                                 ;      73 Arguments       : USB_UTR_t *ptr
+                                 ;      74                 : uint16_t bitsts       ; NRDYSTS Register & NRDYENB Register
+                                 ;      75 Return value    : none
+                                 ;      76 ******************************************************************************/
+                                 ;      77 void usb_cstd_NrdyPipe(USB_UTR_t *ptr, uint16_t bitsts)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",77
+0000000C 60C0                    		SUB #0CH, R0
+0000000E A081                    		MOV.L R1, 08H[R0]
+00000010 908A                    		MOV.W R2, 06H[R0]
+                                 ;      78 {
+                                 ;      79 /* PERI spec                                                            */
+                                 ;      80 /*  Transmitting pipe                                                   */
+                                 ;      81 /* @5       a) only NRDY                                                */
+                                 ;      82 /* @1       b) NRDY+OVRN    (Isochronous)                               */
+                                 ;      83 /*  Receive pipe                                                        */
+                                 ;      84 /* @5       a) only NRDY                                                */
+                                 ;      85 /* @1       b) NRDY+OVRN    (Isochronous)                               */
+                                 ;      86 /* @2       c) only NRDY    (interval error of isochronous)             */
+                                 ;      87 /* HOST spec                                                            */
+                                 ;      88 /*  Transmitting pipe                                                   */
+                                 ;      89 /* @1       a) NRDY+OVRN    (Isochronous)                               */
+                                 ;      90 /* @4       b) NRDY+NAK     (Ignore)                                    */
+                                 ;      91 /* @3       c) NRDY+STALL   (Receive STALL)                             */
+                                 ;      92 /*  Receive pipe                                                        */
+                                 ;      93 /* @1       a) NRDY+OVRN    (Isochronous)                               */
+                                 ;      94 /* @4       b) NRDY+NAK     (Ignore)                                    */
+                                 ;      95 /* @2       c) NRDY         (Ignore of isochronous)                     */
+                                 ;      96 /* @2       d) NRDY         (CRC error of isochronous)                  */
+                                 ;      97 /* @3       e) NRDY+STALL   (Receive STALL)                             */
+                                 ;      98 
+                                 ;      99     uint16_t        buffer, i;
+                                 ;     100 
+                                 ;     101     for( i = USB_MIN_PIPE_NO; i <= USB_MAX_PIPE_NO; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",101
+00000012 3D0201                  		MOV.W #0001H, 04H[R0]
+00000015 2Err                 B  		BRA L21
+00000017                         L12:	; bb5
+00000017 661E                    		MOV.L #00000001H, R14
+                                 ;     102     {
+                                 ;     103         if( (bitsts & USB_BITSET(i)) != 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",103
+00000019 B881                    		MOVU.W 04H[R0], R1
+0000001B FD621E                  		SHLL R1, R14
+0000001E 06510E03                		AND 06H[R0].W, R14
+00000022 5FEE                    		MOVU.W R14, R14
+00000024 610E                    		CMP #00H, R14
+00000026 20rr                    		BEQ L20
+00000028                         L13:	; bb7
+                                 ;     104         {
+                                 ;     105             /* Interrupt check */
+                                 ;     106             if( usb_gcstd_Pipe[ptr->ip][i] != USB_NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",106
+00000028 A881                    		MOV.L 08H[R0], R1
+0000002A B991                    		MOVU.W 0CH[R1], R1
+0000002C 751128                  		MUL #28H, R1
+0000002F FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+00000035 4B1E                    		ADD R1, R14
+00000037 B881                    		MOVU.W 04H[R0], R1
+00000039 FE61EE                  		MOV.L [R1,R14], R14
+0000003C 610E                    		CMP #00H, R14
+0000003E 20rr                    		BEQ L20
+00000040                         L14:	; bb9
+                                 ;     107             {
+                                 ;     108                 if( usb_cstd_GetPipeType(ptr, i) == USB_ISO )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",108
+00000040 B882                    		MOVU.W 04H[R0], R2
+00000042 A881                    		MOV.L 08H[R0], R1
+00000044 05rrrrrr             A  		BSR _usb_cstd_GetPipeType
+00000048 770100C000              		CMP #0C000H, R1
+0000004D A881                    		MOV.L 08H[R0], R1
+0000004F 21rr                    		BNE L19
+00000051                         L15:	; bb10
+                                 ;     109                 {
+                                 ;     110                     /* Wait for About 60ns */
+                                 ;     111                     buffer = usb_creg_read_frmnum( ptr );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",111
+00000051 05rrrrrr             A  		BSR _usb_creg_read_frmnum
+00000055 9009                    		MOV.W R1, 02H[R0]
+00000057                         L16:	; bb10.split
+                                 ;     112                     if( (buffer & USB_OVRN) == USB_OVRN )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",112
+00000057 B809                    		MOVU.W 02H[R0], R1
+00000059 7721008000              		AND #8000H, R1
+0000005E 7701008000              		CMP #8000H, R1
+00000063 9882                    		MOV.W 04H[R0], R2
+00000065 A881                    		MOV.L 08H[R0], R1
+00000067 21rr                    		BNE L18
+00000069                         L17:	; bb13
+                                 ;     113                     {
+                                 ;     114                         /* @1 */
+                                 ;     115                         /* End of data transfer */
+                                 ;     116                         usb_cstd_ForcedTermination(ptr, i, (uint16_t)USB_DATA_OVR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",116
+00000069 5F22                    		MOVU.W R2, R2
+0000006B 6653                    		MOV.L #00000005H, R3
+0000006D 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+00000071 2Err                 B  		BRA L20
+00000073                         L18:	; bb16
+                                 ;     117                         USB_PRINTF1("###ISO OVRN %d\n", usb_gcstd_DataCnt[ptr->ip][i]);
+                                 ;     118                     }
+                                 ;     119                     else
+                                 ;     120                     {
+                                 ;     121                         /* @2 */
+                                 ;     122                         /* End of data transfer */
+                                 ;     123                         usb_cstd_ForcedTermination(ptr, i, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",123
+00000073 5F22                    		MOVU.W R2, R2
+00000075 6673                    		MOV.L #00000007H, R3
+00000077 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+0000007B 08                   S  		BRA L20
+0000007C                         L19:	; bb25
+                                 ;     124                     }
+                                 ;     125                 }
+                                 ;     126                 else
+                                 ;     127                 {
+                                 ;     128                     usb_cstd_nrdy_endprocess( ptr, i );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",128
+0000007C B882                    		MOVU.W 04H[R0], R2
+0000007E 05rrrrrr             A  		BSR _usb_cstd_nrdy_endprocess
+00000082                         L20:	; bb61
+00000082 9881                    		MOV.W 04H[R0], R1
+00000084 6211                    		ADD #01H, R1
+00000086 9081                    		MOV.W R1, 04H[R0]
+00000088                         L21:	; bb64
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",101
+00000088 B881                    		MOVU.W 04H[R0], R1
+0000008A 61A1                    		CMP #0AH, R1
+0000008C 23rr                    		BLTU L12
+0000008E                         L22:	; return
+                                 ;     129                 }
+                                 ;     130             }
+                                 ;     131         }
+                                 ;     132     }
+                                 ;     133 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",133
+0000008E 6703                    		RTSD #0CH
+00000090                         _usb_cstd_BempPipe:
+                                 		.STACK	_usb_cstd_BempPipe=16
+                                 ;     134 /******************************************************************************
+                                 ;     135 End of function usb_cstd_NrdyPipe
+                                 ;     136 ******************************************************************************/
+                                 ;     137 
+                                 ;     138 
+                                 ;     139 /******************************************************************************
+                                 ;     140 Function Name   : usb_cstd_BempPipe
+                                 ;     141 Description     : Search for PIPE No. that BEMP interrupt occurred, and complete data transmission for the PIPE
+                                 ;     142 Arguments       : USB_UTR_t *ptr
+                                 ;     143                 : uint16_t bitsts       ; BEMPSTS Register & BEMPENB Register
+                                 ;     144 Return value    : none
+                                 ;     145 ******************************************************************************/
+                                 ;     146 void usb_cstd_BempPipe(USB_UTR_t *ptr, uint16_t bitsts)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",146
+00000090 60C0                    		SUB #0CH, R0
+00000092 A081                    		MOV.L R1, 08H[R0]
+00000094 908A                    		MOV.W R2, 06H[R0]
+                                 ;     147 {
+                                 ;     148     uint16_t        buffer, i;
+                                 ;     149     uint16_t        useport;
+                                 ;     150 
+                                 ;     151     for( i = USB_MIN_PIPE_NO; i <= USB_PIPE5; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",151
+00000096 3D0101                  		MOV.W #0001H, 02H[R0]
+00000099 2Err                 B  		BRA L33
+0000009B                         L24:	; bb6
+0000009B 661E                    		MOV.L #00000001H, R14
+                                 ;     152     {
+                                 ;     153         if( (bitsts & USB_BITSET(i)) != 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",153
+0000009D B809                    		MOVU.W 02H[R0], R1
+0000009F FD621E                  		SHLL R1, R14
+000000A2 06510E03                		AND 06H[R0].W, R14
+000000A6 5FEE                    		MOVU.W R14, R14
+000000A8 610E                    		CMP #00H, R14
+000000AA 20rr                    		BEQ L32
+000000AC                         L25:	; bb8
+                                 ;     154         {
+                                 ;     155             /* Interrupt check */
+                                 ;     156             if( usb_gcstd_Pipe[ptr->ip][i] != USB_NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",156
+000000AC A881                    		MOV.L 08H[R0], R1
+000000AE B991                    		MOVU.W 0CH[R1], R1
+000000B0 751128                  		MUL #28H, R1
+000000B3 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+000000B9 4B1E                    		ADD R1, R14
+000000BB B809                    		MOVU.W 02H[R0], R1
+000000BD FE61EE                  		MOV.L [R1,R14], R14
+000000C0 610E                    		CMP #00H, R14
+000000C2 20rr                    		BEQ L32
+000000C4                         L26:	; bb9
+                                 ;     157             {
+                                 ;     158                 buffer = usb_cstd_GetPid(ptr, i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",158
+000000C4 B80A                    		MOVU.W 02H[R0], R2
+000000C6 A881                    		MOV.L 08H[R0], R1
+000000C8 05rrrrrr             A  		BSR _usb_cstd_GetPid
+000000CC D301                    		MOV.W R1, [R0]
+000000CE                         L27:	; bb9.split
+                                 ;     159                 /* MAX packet size error ? */
+                                 ;     160                 if( (buffer & USB_PID_STALL) == USB_PID_STALL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",160
+000000CE 5C01                    		MOVU.W [R0], R1
+000000D0 6421                    		AND #02H, R1
+000000D2 6121                    		CMP #02H, R1
+000000D4 980A                    		MOV.W 02H[R0], R2
+000000D6 A881                    		MOV.L 08H[R0], R1
+000000D8 21rr                    		BNE L29
+000000DA                         L28:	; bb13
+                                 ;     161                 {
+                                 ;     162                     USB_PRINTF1("### STALL Pipe %d\n", i);
+                                 ;     163                     usb_cstd_ForcedTermination(ptr, i, (uint16_t)USB_DATA_STALL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",163
+000000DA 5F22                    		MOVU.W R2, R2
+000000DC 6663                    		MOV.L #00000006H, R3
+000000DE 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+000000E2 2Err                 B  		BRA L32
+000000E4                         L29:	; bb17
+                                 ;     164                 }
+                                 ;     165                 else
+                                 ;     166                 {
+                                 ;     167                     if( (usb_creg_read_pipectr( ptr, i ) & USB_INBUFM) != USB_INBUFM )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",167
+000000E4 5F22                    		MOVU.W R2, R2
+000000E6 05rrrrrr             A  		BSR _usb_creg_read_pipectr
+000000EA 76210040                		AND #4000H, R1
+000000EE 76010040                		CMP #4000H, R1
+000000F2 20rr                    		BEQ L32
+000000F4                         L30:	; bb18
+                                 ;     168                     {
+                                 ;     169                         /* Pipe number to FIFO port select */
+                                 ;     170                         useport = usb_cstd_Pipe2Fport(ptr, i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",170
+000000F4 B80A                    		MOVU.W 02H[R0], R2
+000000F6 A881                    		MOV.L 08H[R0], R1
+000000F8 05rrrrrr             A  		BSR _usb_cstd_Pipe2Fport
+000000FC 9081                    		MOV.W R1, 04H[R0]
+000000FE                         L31:	; bb18.split1
+                                 ;     171                         if( useport == USB_D0DMA )
+                                 ;     172                         {
+                                 ;     173 #ifdef USB_DTC_ENABLE
+                                 ;     174                             usb_creg_clr_sts_bemp( ptr, i );
+                                 ;     175 #endif  /* USB_DTC_ENABLE */
+                                 ;     176                         }
+                                 ;     177                         /* End of data transfer */
+                                 ;     178                         usb_cstd_DataEnd(ptr, i, (uint16_t)USB_DATA_NONE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",178
+000000FE B80A                    		MOVU.W 02H[R0], R2
+00000100 A881                    		MOV.L 08H[R0], R1
+00000102 6613                    		MOV.L #00000001H, R3
+00000104 05rrrrrr             A  		BSR _usb_cstd_DataEnd
+00000108                         L32:	; bb72
+00000108 9809                    		MOV.W 02H[R0], R1
+0000010A 6211                    		ADD #01H, R1
+0000010C 9009                    		MOV.W R1, 02H[R0]
+0000010E                         L33:	; bb75
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",151
+0000010E B809                    		MOVU.W 02H[R0], R1
+00000110 6161                    		CMP #06H, R1
+00000112 23rr                    		BLTU L24
+00000114                         L34:	; bb81
+                                 ;     179                     }
+                                 ;     180                 }
+                                 ;     181             }
+                                 ;     182         }
+                                 ;     183     }
+                                 ;     184     for( i = USB_PIPE6; i <= USB_MAX_PIPE_NO; i++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",184
+00000114 3D0106                  		MOV.W #0006H, 02H[R0]
+00000117 2Err                 B  		BRA L42
+00000119                         L35:	; bb83
+00000119 661E                    		MOV.L #00000001H, R14
+                                 ;     185     {
+                                 ;     186         /* Interrupt check */
+                                 ;     187         if( (bitsts & USB_BITSET(i)) != 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",187
+0000011B B809                    		MOVU.W 02H[R0], R1
+0000011D FD621E                  		SHLL R1, R14
+00000120 06510E03                		AND 06H[R0].W, R14
+00000124 5FEE                    		MOVU.W R14, R14
+00000126 610E                    		CMP #00H, R14
+00000128 20rr                    		BEQ L41
+0000012A                         L36:	; bb85
+                                 ;     188         {
+                                 ;     189             if( usb_gcstd_Pipe[ptr->ip][i] != USB_NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",189
+0000012A A881                    		MOV.L 08H[R0], R1
+0000012C B991                    		MOVU.W 0CH[R1], R1
+0000012E 751128                  		MUL #28H, R1
+00000131 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+00000137 4B1E                    		ADD R1, R14
+00000139 B809                    		MOVU.W 02H[R0], R1
+0000013B FE61EE                  		MOV.L [R1,R14], R14
+0000013E 610E                    		CMP #00H, R14
+00000140 20rr                    		BEQ L41
+00000142                         L37:	; bb86
+                                 ;     190             {
+                                 ;     191                 buffer = usb_cstd_GetPid(ptr, i);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",191
+00000142 B80A                    		MOVU.W 02H[R0], R2
+00000144 A881                    		MOV.L 08H[R0], R1
+00000146 05rrrrrr             A  		BSR _usb_cstd_GetPid
+0000014A D301                    		MOV.W R1, [R0]
+0000014C                         L38:	; bb86.split
+                                 ;     192                 /* MAX packet size error ? */
+                                 ;     193                 if( (buffer & USB_PID_STALL) == USB_PID_STALL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",193
+0000014C 5C01                    		MOVU.W [R0], R1
+0000014E 6421                    		AND #02H, R1
+00000150 6121                    		CMP #02H, R1
+00000152 980A                    		MOV.W 02H[R0], R2
+00000154 A881                    		MOV.L 08H[R0], R1
+00000156 18                   S  		BNE L40
+00000157                         L39:	; bb91
+                                 ;     194                 {
+                                 ;     195                     USB_PRINTF1("### STALL Pipe %d\n", i);
+                                 ;     196                     usb_cstd_ForcedTermination(ptr, i, (uint16_t)USB_DATA_STALL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",196
+00000157 5F22                    		MOVU.W R2, R2
+00000159 6663                    		MOV.L #00000006H, R3
+0000015B 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+0000015F 08                   S  		BRA L41
+00000160                         L40:	; bb94
+                                 ;     197                 }
+                                 ;     198                 else
+                                 ;     199                 {
+                                 ;     200                     /* End of data transfer */
+                                 ;     201                     usb_cstd_DataEnd(ptr, i, (uint16_t)USB_DATA_NONE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",201
+00000160 5F22                    		MOVU.W R2, R2
+00000162 6613                    		MOV.L #00000001H, R3
+00000164 05rrrrrr             A  		BSR _usb_cstd_DataEnd
+00000168                         L41:	; bb129
+00000168 9809                    		MOV.W 02H[R0], R1
+0000016A 6211                    		ADD #01H, R1
+0000016C 9009                    		MOV.W R1, 02H[R0]
+0000016E                         L42:	; bb132
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",184
+0000016E B809                    		MOVU.W 02H[R0], R1
+00000170 61A1                    		CMP #0AH, R1
+00000172 23rr                    		BLTU L35
+00000174                         L43:	; return
+                                 ;     202                 }
+                                 ;     203             }
+                                 ;     204         }
+                                 ;     205     }
+                                 ;     206 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cintfifo.c",206
+00000174 6703                    		RTSD #0CH
+                                 ;     207 /******************************************************************************
+                                 ;     208 End of function usb_cstd_BempPipe
+                                 ;     209 ******************************************************************************/
+                                 ;     210 
+                                 ;     211 /******************************************************************************
+                                 ;     212 End  Of File
+                                 ;     213 ******************************************************************************/
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00477   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000374(00000176H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4D06\$ccrx\r_usb_cintfifo.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_usb_cintfifo.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_usb_basic\src\driver\comm\r_usb_cintfifo.obj

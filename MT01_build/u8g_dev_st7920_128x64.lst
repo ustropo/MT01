@@ -1,0 +1,668 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:02:46 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:02:46
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=u8g_dev_st7920_128x64.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=u8g_dev_st7920_128x64.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;u8g_dev_st7920_128x64.c
+                                 
+                                 		.glb	_u8g_dev_st7920_128x64_sw_spi_buf
+                                 		.glb	_u8g_dev_st7920_128x64_sw_spi_pb
+                                 		.glb	_u8g_dev_st7920_128x64_sw_spi
+                                 		.glb	_u8g_dev_st7920_128x64_hw_spi_buf
+                                 		.glb	_u8g_dev_st7920_128x64_hw_spi_pb
+                                 		.glb	_u8g_dev_st7920_128x64_hw_spi
+                                 		.glb	_u8g_dev_st7920_128x64_8bit_buf
+                                 		.glb	_u8g_dev_st7920_128x64_8bit_pb
+                                 		.glb	_u8g_dev_st7920_128x64_8bit
+                                 		.glb	_u8g_dev_st7920_128x64_custom_buf
+                                 		.glb	_u8g_dev_st7920_128x64_custom_pb
+                                 		.glb	_u8g_dev_st7920_128x64_custom
+                                 		.glb	_u8g_dev_st7920_128x64_4x_buf
+                                 		.glb	_u8g_dev_st7920_128x64_4x_pb
+                                 		.glb	_u8g_dev_st7920_128x64_4x_sw_spi
+                                 		.glb	_u8g_dev_st7920_128x64_4x_hw_spi
+                                 		.glb	_u8g_dev_st7920_128x64_4x_8bit
+                                 		.glb	_u8g_dev_st7920_128x64_4x_custom
+                                 		.glb	_u8g_dev_st7920_128x64_fn
+                                 		.glb	_u8g_dev_st7920_128x64_4x_fn
+                                 		.glb	_u8g_com_null_fn
+                                 		.glb	_u8g_com_rx_hw_spi_fn
+                                 		.glb	_u8g_com_arduino_st7920_custom_fn
+                                 		.glb	_u8g_InitCom
+                                 		.glb	_u8g_WriteEscSeqP
+                                 		.glb	_u8g_SetAddress
+                                 		.glb	_u8g_SetChipSelect
+                                 		.glb	_u8g_WriteByte
+                                 		.glb	_u8g_WriteSequence
+                                 		.glb	_u8g_dev_pb8h1_base_fn
+                                 		.glb	_u8g_dev_pb32h1_base_fn
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _u8g_dev_st7920_128x64_fn:
+                                 		.STACK	_u8g_dev_st7920_128x64_fn=36
+                                 ;       1 /*
+                                 ;       2 
+                                 ;       3   u8g_dev_st7920_128x64.c
+                                 ;       4 
+                                 ;       5   Universal 8bit Graphics Library
+                                 ;       6   
+                                 ;       7   Copyright (c) 2011, olikraus@gmail.com
+                                 ;       8   All rights reserved.
+                                 ;       9 
+                                 ;      10   Redistribution and use in source and binary forms, with or without modification, 
+                                 ;      11   are permitted provided that the following conditions are met:
+                                 ;      12 
+                                 ;      13   * Redistributions of source code must retain the above copyright notice, this list 
+                                 ;      14     of conditions and the following disclaimer.
+                                 ;      15     
+                                 ;      16   * Redistributions in binary form must reproduce the above copyright notice, this 
+                                 ;      17     list of conditions and the following disclaimer in the documentation and/or other 
+                                 ;      18     materials provided with the distribution.
+                                 ;      19 
+                                 ;      20   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+                                 ;      21   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+                                 ;      22   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+                                 ;      23   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+                                 ;      24   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+                                 ;      25   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+                                 ;      26   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+                                 ;      27   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+                                 ;      28   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+                                 ;      29   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+                                 ;      30   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+                                 ;      31   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+                                 ;      32   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+                                 ;      33   
+                                 ;      34   
+                                 ;      35 */
+                                 ;      36 
+                                 ;      37 #include "u8g.h"
+                                 ;      38 
+                                 ;      39 #define WIDTH 128
+                                 ;      40 #define HEIGHT 64
+                                 ;      41 #define PAGE_HEIGHT 8
+                                 ;      42 
+                                 ;      43 
+                                 ;      44 /* init sequence from https://github.com/adafruit/ST7565-LCD/blob/master/ST7565/ST7565.cpp */
+                                 ;      45 static const uint8_t u8g_dev_st7920_128x64_init_seq[] PROGMEM = {
+                                 ;      46   U8G_ESC_CS(0),             /* disable chip */
+                                 ;      47   U8G_ESC_ADR(0),           /* instruction mode */
+                                 ;      48   U8G_ESC_RST(15),           /* do reset low pulse with (15*16)+2 milliseconds (=maximum delay)*/
+                                 ;      49   U8G_ESC_DLY(100),         /* 8 Dez 2012: additional delay 100 ms because of reset*/
+                                 ;      50   U8G_ESC_CS(1),             /* enable chip */
+                                 ;      51   U8G_ESC_DLY(50),         /* delay 50 ms */
+                                 ;      52 
+                                 ;      53   0x038,                                /* 8 Bit interface (DL=1), basic instruction set (RE=0) */
+                                 ;      54   0x00c,                                /* display on, cursor & blink off; 0x08: all off */
+                                 ;      55   0x006,                                /* Entry mode: Cursor move to right ,DDRAM address counter (AC) plus 1, no shift */
+                                 ;      56   0x002,                                /* disable scroll, enable CGRAM adress */
+                                 ;      57   0x001,                                /* clear RAM, needs 1.6 ms */
+                                 ;      58   U8G_ESC_DLY(100),               /* delay 100 ms */
+                                 ;      59   
+                                 ;      60   U8G_ESC_CS(0),             /* disable chip */
+                                 ;      61   U8G_ESC_END                /* end of sequence */
+                                 ;      62 };
+                                 ;      63 
+                                 ;      64 uint8_t u8g_dev_st7920_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, void *arg)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",64
+00000000 7100E0                  		ADD #0FFFFFFE0H, R0
+00000003 A189                    		MOV.L R1, 1CH[R0]
+00000005 A182                    		MOV.L R2, 18H[R0]
+00000007 858B                    		MOV.B R3, 17H[R0]
+00000009 A104                    		MOV.L R4, 10H[R0]
+                                 ;      65 {
+                                 ;      66   switch(msg)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",66
+0000000B B589                    		MOVU.B 17H[R0], R1
+0000000D 755115                  		CMP #15H, R1
+00000010 20rr                    		BEQ L14
+00000012                         L11:	; entry
+00000012 61A1                    		CMP #0AH, R1
+00000014 3Brrrr               W  		BNE L33
+00000017                         L12:	; bb
+                                 ;      67   {
+                                 ;      68     case U8G_DEV_MSG_INIT:
+                                 ;      69       u8g_InitCom(u8g, dev, U8G_SPI_CLK_CYCLE_400NS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",69
+00000017 A982                    		MOV.L 18H[R0], R2
+00000019 A989                    		MOV.L 1CH[R0], R1
+0000001B 6633                    		MOV.L #00000003H, R3
+0000001D 05rrrrrr             A  		BSR _u8g_InitCom
+00000021                         L13:	; bb.split
+                                 ;      70       u8g_WriteEscSeqP(u8g, dev, u8g_dev_st7920_128x64_init_seq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",70
+00000021 A982                    		MOV.L 18H[R0], R2
+00000023 A989                    		MOV.L 1CH[R0], R1
+00000025 FB32rrrrrrrr            		MOV.L #__$u8g_dev_st7920_128x64_init_seq, R3
+0000002B 05rrrrrr             A  		BSR _u8g_WriteEscSeqP
+0000002F 38rrrr               W  		BRA L33
+00000032                         L14:	; bb18
+                                 ;      71       break;
+                                 ;      72     case U8G_DEV_MSG_STOP:
+                                 ;      73       break;
+                                 ;      74     case U8G_DEV_MSG_PAGE_NEXT:
+                                 ;      75       {
+                                 ;      76         uint8_t y, i;
+                                 ;      77         uint8_t *ptr;
+                                 ;      78         u8g_pb_t *pb = (u8g_pb_t *)(dev->dev_mem);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",78
+00000032 A981                    		MOV.L 18H[R0], R1
+00000034 E5100102                		MOV.L 04H[R1], 08H[R0]
+00000038                         L15:	; bb18.split
+                                 ;      79         
+                                 ;      80         u8g_SetAddress(u8g, dev, 0);           /* cmd mode */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",80
+00000038 A982                    		MOV.L 18H[R0], R2
+0000003A A989                    		MOV.L 1CH[R0], R1
+0000003C 6603                    		MOV.L #00000000H, R3
+0000003E 05rrrrrr             A  		BSR _u8g_SetAddress
+00000042                         L16:	; bb18.split1
+                                 ;      81         u8g_SetChipSelect(u8g, dev, 1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",81
+00000042 A982                    		MOV.L 18H[R0], R2
+00000044 A989                    		MOV.L 1CH[R0], R1
+00000046 6613                    		MOV.L #00000001H, R3
+00000048 05rrrrrr             A  		BSR _u8g_SetChipSelect
+0000004C                         L17:	; bb18.split2
+                                 ;      82         y = pb->p.page_y0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",82
+0000004C A881                    		MOV.L 08H[R0], R1
+0000004E C5100202                		MOV.B 02H[R1], 02H[R0]
+00000052                         L18:	; bb18.split3
+                                 ;      83         ptr = pb->buf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",83
+00000052 A881                    		MOV.L 08H[R0], R1
+00000054 E5100201                		MOV.L 08H[R1], 04H[R0]
+00000058                         L19:	; bb18.split4
+                                 ;      84         for( i = 0; i < 8; i ++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",84
+00000058 3C0300                  		MOV.B #00H, 03H[R0]
+0000005B 2Err                 B  		BRA L31
+0000005D                         L20:	; bb34
+0000005D 6603                    		MOV.L #00000000H, R3
+                                 ;      85         {
+                                 ;      86           u8g_SetAddress(u8g, dev, 0);           /* cmd mode */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",86
+0000005F 05rrrrrr             A  		BSR _u8g_SetAddress
+00000063                         L21:	; bb34.split
+                                 ;      87           u8g_WriteByte(u8g, dev, 0x03e );      /* enable extended mode */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",87
+00000063 A982                    		MOV.L 18H[R0], R2
+00000065 A989                    		MOV.L 1CH[R0], R1
+00000067 75433E                  		MOV.L #0000003EH, R3
+0000006A 05rrrrrr             A  		BSR _u8g_WriteByte
+0000006E                         L22:	; bb34.split5
+                                 ;      88 
+                                 ;      89           if ( y < 32 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",89
+0000006E B083                    		MOVU.B 02H[R0], R3
+00000070 75531F                  		CMP #1FH, R3
+00000073 A982                    		MOV.L 18H[R0], R2
+00000075 A989                    		MOV.L 1CH[R0], R1
+00000077 2Arr                    		BGT L25
+00000079                         L23:	; bb41
+                                 ;      90           {
+                                 ;      91                   u8g_WriteByte(u8g, dev, 0x080 | y );      /* y pos  */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",91
+00000079 7873                    		BSET #07H, R3
+0000007B 5B33                    		MOVU.B R3, R3
+0000007D 05rrrrrr             A  		BSR _u8g_WriteByte
+00000081                         L24:	; bb41.split
+                                 ;      92                   u8g_WriteByte(u8g, dev, 0x080  );      /* set x pos to 0*/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",92
+00000081 A982                    		MOV.L 18H[R0], R2
+00000083 A989                    		MOV.L 1CH[R0], R1
+00000085 754380                  		MOV.L #00000080H, R3
+00000088 05rrrrrr             A  		BSR _u8g_WriteByte
+0000008C 2Err                 B  		BRA L27
+0000008E                         L25:	; bb52
+                                 ;      93           }
+                                 ;      94           else
+                                 ;      95           {
+                                 ;      96                   u8g_WriteByte(u8g, dev, 0x080 | (y-32) );      /* y pos  */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",96
+0000008E 7133E0                  		ADD #0FFFFFFE0H, R3
+00000091 7873                    		BSET #07H, R3
+00000093 5B33                    		MOVU.B R3, R3
+00000095 05rrrrrr             A  		BSR _u8g_WriteByte
+00000099                         L26:	; bb52.split
+                                 ;      97                   u8g_WriteByte(u8g, dev, 0x080 | 8);      /* set x pos to 64*/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",97
+00000099 A982                    		MOV.L 18H[R0], R2
+0000009B A989                    		MOV.L 1CH[R0], R1
+0000009D 754388                  		MOV.L #00000088H, R3
+000000A0 05rrrrrr             A  		BSR _u8g_WriteByte
+000000A4                         L27:	; bb68
+                                 ;      98           }
+                                 ;      99           
+                                 ;     100           u8g_SetAddress(u8g, dev, 1);                  /* data mode */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",100
+000000A4 A982                    		MOV.L 18H[R0], R2
+000000A6 A989                    		MOV.L 1CH[R0], R1
+000000A8 6613                    		MOV.L #00000001H, R3
+000000AA 05rrrrrr             A  		BSR _u8g_SetAddress
+000000AE                         L28:	; bb68.split
+                                 ;     101           u8g_WriteSequence(u8g, dev, WIDTH/8, ptr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",101
+000000AE A80C                    		MOV.L 04H[R0], R4
+000000B0 A982                    		MOV.L 18H[R0], R2
+000000B2 A989                    		MOV.L 1CH[R0], R1
+000000B4 754310                  		MOV.L #00000010H, R3
+000000B7 05rrrrrr             A  		BSR _u8g_WriteSequence
+000000BB                         L29:	; bb68.split6
+                                 ;     102           ptr += WIDTH/8;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",102
+000000BB A809                    		MOV.L 04H[R0], R1
+000000BD 711110                  		ADD #10H, R1
+000000C0 A009                    		MOV.L R1, 04H[R0]
+000000C2                         L30:	; bb68.split7
+                                 ;     103           y++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",103
+000000C2 B081                    		MOVU.B 02H[R0], R1
+000000C4 6211                    		ADD #01H, R1
+000000C6 8081                    		MOV.B R1, 02H[R0]
+000000C8 B089                    		MOVU.B 03H[R0], R1
+000000CA 6211                    		ADD #01H, R1
+000000CC 8089                    		MOV.B R1, 03H[R0]
+000000CE                         L31:	; bb81
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",84
+000000CE B089                    		MOVU.B 03H[R0], R1
+000000D0 6181                    		CMP #08H, R1
+000000D2 A982                    		MOV.L 18H[R0], R2
+000000D4 A989                    		MOV.L 1CH[R0], R1
+000000D6 29rr                    		BLT L20
+000000D8                         L32:	; bb87
+000000D8 6603                    		MOV.L #00000000H, R3
+                                 ;     104         }
+                                 ;     105         u8g_SetChipSelect(u8g, dev, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",105
+000000DA 05rrrrrr             A  		BSR _u8g_SetChipSelect
+000000DE                         L33:	; bb90
+                                 ;     106       }
+                                 ;     107       break;
+                                 ;     108   }
+                                 ;     109   return u8g_dev_pb8h1_base_fn(u8g, dev, msg, arg);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",109
+000000DE A904                    		MOV.L 10H[R0], R4
+000000E0 B58B                    		MOVU.B 17H[R0], R3
+000000E2 A982                    		MOV.L 18H[R0], R2
+000000E4 A989                    		MOV.L 1CH[R0], R1
+000000E6 05rrrrrr             A  		BSR _u8g_dev_pb8h1_base_fn
+000000EA 8389                    		MOV.B R1, 0FH[R0]
+000000EC B389                    		MOVU.B 0FH[R0], R1
+000000EE                         L34:	; bb90.split
+                                 ;     110 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",110
+000000EE 5B11                    		MOVU.B R1, R1
+000000F0 6708                    		RTSD #20H
+000000F2                         _u8g_dev_st7920_128x64_4x_fn:
+                                 		.STACK	_u8g_dev_st7920_128x64_4x_fn=36
+                                 ;     111 
+                                 ;     112 uint8_t u8g_dev_st7920_128x64_4x_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, void *arg)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",112
+000000F2 7100E0                  		ADD #0FFFFFFE0H, R0
+000000F5 A189                    		MOV.L R1, 1CH[R0]
+000000F7 A182                    		MOV.L R2, 18H[R0]
+000000F9 858B                    		MOV.B R3, 17H[R0]
+000000FB A104                    		MOV.L R4, 10H[R0]
+                                 ;     113 {
+                                 ;     114   switch(msg)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",114
+000000FD B589                    		MOVU.B 17H[R0], R1
+000000FF 755115                  		CMP #15H, R1
+00000102 20rr                    		BEQ L39
+00000104                         L36:	; entry
+00000104 61A1                    		CMP #0AH, R1
+00000106 3Brrrr               W  		BNE L58
+00000109                         L37:	; bb
+                                 ;     115   {
+                                 ;     116     case U8G_DEV_MSG_INIT:
+                                 ;     117       u8g_InitCom(u8g, dev, U8G_SPI_CLK_CYCLE_400NS);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",117
+00000109 A982                    		MOV.L 18H[R0], R2
+0000010B A989                    		MOV.L 1CH[R0], R1
+0000010D 6633                    		MOV.L #00000003H, R3
+0000010F 05rrrrrr             A  		BSR _u8g_InitCom
+00000113                         L38:	; bb.split
+                                 ;     118       u8g_WriteEscSeqP(u8g, dev, u8g_dev_st7920_128x64_init_seq);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",118
+00000113 A982                    		MOV.L 18H[R0], R2
+00000115 A989                    		MOV.L 1CH[R0], R1
+00000117 FB32rrrrrrrr            		MOV.L #__$u8g_dev_st7920_128x64_init_seq, R3
+0000011D 05rrrrrr             A  		BSR _u8g_WriteEscSeqP
+00000121 38rrrr               W  		BRA L58
+00000124                         L39:	; bb18
+                                 ;     119       break;
+                                 ;     120     case U8G_DEV_MSG_STOP:
+                                 ;     121       break;
+                                 ;     122     case U8G_DEV_MSG_PAGE_NEXT:
+                                 ;     123       {
+                                 ;     124         uint8_t y, i;
+                                 ;     125         uint8_t *ptr;
+                                 ;     126         u8g_pb_t *pb = (u8g_pb_t *)(dev->dev_mem);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",126
+00000124 A981                    		MOV.L 18H[R0], R1
+00000126 E5100102                		MOV.L 04H[R1], 08H[R0]
+0000012A                         L40:	; bb18.split
+                                 ;     127         
+                                 ;     128         u8g_SetAddress(u8g, dev, 0);           /* cmd mode */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",128
+0000012A A982                    		MOV.L 18H[R0], R2
+0000012C A989                    		MOV.L 1CH[R0], R1
+0000012E 6603                    		MOV.L #00000000H, R3
+00000130 05rrrrrr             A  		BSR _u8g_SetAddress
+00000134                         L41:	; bb18.split1
+                                 ;     129         u8g_SetChipSelect(u8g, dev, 1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",129
+00000134 A982                    		MOV.L 18H[R0], R2
+00000136 A989                    		MOV.L 1CH[R0], R1
+00000138 6613                    		MOV.L #00000001H, R3
+0000013A 05rrrrrr             A  		BSR _u8g_SetChipSelect
+0000013E                         L42:	; bb18.split2
+                                 ;     130         y = pb->p.page_y0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",130
+0000013E A881                    		MOV.L 08H[R0], R1
+00000140 C5100202                		MOV.B 02H[R1], 02H[R0]
+00000144                         L43:	; bb18.split3
+                                 ;     131         ptr = pb->buf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",131
+00000144 A881                    		MOV.L 08H[R0], R1
+00000146 E5100201                		MOV.L 08H[R1], 04H[R0]
+0000014A                         L44:	; bb18.split4
+                                 ;     132         for( i = 0; i < 32; i ++ )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",132
+0000014A 3C0300                  		MOV.B #00H, 03H[R0]
+0000014D 2Err                 B  		BRA L56
+0000014F                         L45:	; bb34
+0000014F 6603                    		MOV.L #00000000H, R3
+                                 ;     133         {
+                                 ;     134           u8g_SetAddress(u8g, dev, 0);           /* cmd mode */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",134
+00000151 05rrrrrr             A  		BSR _u8g_SetAddress
+00000155                         L46:	; bb34.split
+                                 ;     135           u8g_WriteByte(u8g, dev, 0x03e );      /* enable extended mode */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",135
+00000155 A982                    		MOV.L 18H[R0], R2
+00000157 A989                    		MOV.L 1CH[R0], R1
+00000159 75433E                  		MOV.L #0000003EH, R3
+0000015C 05rrrrrr             A  		BSR _u8g_WriteByte
+00000160                         L47:	; bb34.split5
+                                 ;     136 
+                                 ;     137           if ( y < 32 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",137
+00000160 B083                    		MOVU.B 02H[R0], R3
+00000162 75531F                  		CMP #1FH, R3
+00000165 A982                    		MOV.L 18H[R0], R2
+00000167 A989                    		MOV.L 1CH[R0], R1
+00000169 2Arr                    		BGT L50
+0000016B                         L48:	; bb41
+                                 ;     138           {
+                                 ;     139                   u8g_WriteByte(u8g, dev, 0x080 | y );      /* y pos  */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",139
+0000016B 7873                    		BSET #07H, R3
+0000016D 5B33                    		MOVU.B R3, R3
+0000016F 05rrrrrr             A  		BSR _u8g_WriteByte
+00000173                         L49:	; bb41.split
+                                 ;     140                   u8g_WriteByte(u8g, dev, 0x080  );      /* set x pos to 0*/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",140
+00000173 A982                    		MOV.L 18H[R0], R2
+00000175 A989                    		MOV.L 1CH[R0], R1
+00000177 754380                  		MOV.L #00000080H, R3
+0000017A 05rrrrrr             A  		BSR _u8g_WriteByte
+0000017E 2Err                 B  		BRA L52
+00000180                         L50:	; bb52
+                                 ;     141           }
+                                 ;     142           else
+                                 ;     143           {
+                                 ;     144                   u8g_WriteByte(u8g, dev, 0x080 | (y-32) );      /* y pos  */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",144
+00000180 7133E0                  		ADD #0FFFFFFE0H, R3
+00000183 7873                    		BSET #07H, R3
+00000185 5B33                    		MOVU.B R3, R3
+00000187 05rrrrrr             A  		BSR _u8g_WriteByte
+0000018B                         L51:	; bb52.split
+                                 ;     145                   u8g_WriteByte(u8g, dev, 0x080 | 8);      /* set x pos to 64*/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",145
+0000018B A982                    		MOV.L 18H[R0], R2
+0000018D A989                    		MOV.L 1CH[R0], R1
+0000018F 754388                  		MOV.L #00000088H, R3
+00000192 05rrrrrr             A  		BSR _u8g_WriteByte
+00000196                         L52:	; bb68
+                                 ;     146           }
+                                 ;     147           
+                                 ;     148           u8g_SetAddress(u8g, dev, 1);                  /* data mode */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",148
+00000196 A982                    		MOV.L 18H[R0], R2
+00000198 A989                    		MOV.L 1CH[R0], R1
+0000019A 6613                    		MOV.L #00000001H, R3
+0000019C 05rrrrrr             A  		BSR _u8g_SetAddress
+000001A0                         L53:	; bb68.split
+                                 ;     149           u8g_WriteSequence(u8g, dev, WIDTH/8, ptr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",149
+000001A0 A80C                    		MOV.L 04H[R0], R4
+000001A2 A982                    		MOV.L 18H[R0], R2
+000001A4 A989                    		MOV.L 1CH[R0], R1
+000001A6 754310                  		MOV.L #00000010H, R3
+000001A9 05rrrrrr             A  		BSR _u8g_WriteSequence
+000001AD                         L54:	; bb68.split6
+                                 ;     150           ptr += WIDTH/8;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",150
+000001AD A809                    		MOV.L 04H[R0], R1
+000001AF 711110                  		ADD #10H, R1
+000001B2 A009                    		MOV.L R1, 04H[R0]
+000001B4                         L55:	; bb68.split7
+                                 ;     151           y++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",151
+000001B4 B081                    		MOVU.B 02H[R0], R1
+000001B6 6211                    		ADD #01H, R1
+000001B8 8081                    		MOV.B R1, 02H[R0]
+000001BA B089                    		MOVU.B 03H[R0], R1
+000001BC 6211                    		ADD #01H, R1
+000001BE 8089                    		MOV.B R1, 03H[R0]
+000001C0                         L56:	; bb81
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",132
+000001C0 B089                    		MOVU.B 03H[R0], R1
+000001C2 755120                  		CMP #20H, R1
+000001C5 A982                    		MOV.L 18H[R0], R2
+000001C7 A989                    		MOV.L 1CH[R0], R1
+000001C9 29rr                    		BLT L45
+000001CB                         L57:	; bb87
+000001CB 6603                    		MOV.L #00000000H, R3
+                                 ;     152         }
+                                 ;     153         u8g_SetChipSelect(u8g, dev, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",153
+000001CD 05rrrrrr             A  		BSR _u8g_SetChipSelect
+000001D1                         L58:	; bb90
+                                 ;     154       }
+                                 ;     155       break;
+                                 ;     156   }
+                                 ;     157   return u8g_dev_pb32h1_base_fn(u8g, dev, msg, arg);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",157
+000001D1 A904                    		MOV.L 10H[R0], R4
+000001D3 B58B                    		MOVU.B 17H[R0], R3
+000001D5 A982                    		MOV.L 18H[R0], R2
+000001D7 A989                    		MOV.L 1CH[R0], R1
+000001D9 05rrrrrr             A  		BSR _u8g_dev_pb32h1_base_fn
+000001DD 8389                    		MOV.B R1, 0FH[R0]
+000001DF B389                    		MOVU.B 0FH[R0], R1
+000001E1                         L59:	; bb90.split
+                                 ;     158 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_dev_st7920_128x64.c",158
+000001E1 5B11                    		MOVU.B R1, R1
+000001E3 6708                    		RTSD #20H
+                                 ;     159 
+                                 ;     160 U8G_PB_DEV(u8g_dev_st7920_128x64_sw_spi, WIDTH, HEIGHT, PAGE_HEIGHT, u8g_dev_st7920_128x64_fn, U8G_COM_ST7920_SW_SPI);
+                                 ;     161 U8G_PB_DEV(u8g_dev_st7920_128x64_hw_spi, WIDTH, HEIGHT, PAGE_HEIGHT, u8g_dev_st7920_128x64_fn, U8G_COM_ST7920_HW_SPI);
+                                 ;     162 U8G_PB_DEV(u8g_dev_st7920_128x64_8bit, WIDTH, HEIGHT, PAGE_HEIGHT, u8g_dev_st7920_128x64_fn, U8G_COM_FAST_PARALLEL);
+                                 ;     163 U8G_PB_DEV(u8g_dev_st7920_128x64_custom, WIDTH, HEIGHT, PAGE_HEIGHT, u8g_dev_st7920_128x64_fn, u8g_com_arduino_st7920_custom_fn);
+                                 ;     164 
+                                 ;     165 
+                                 ;     166 
+                                 ;     167 #define QWIDTH (WIDTH*4)
+                                 ;     168 uint8_t u8g_dev_st7920_128x64_4x_buf[QWIDTH] U8G_NOCOMMON ; 
+                                 ;     169 u8g_pb_t u8g_dev_st7920_128x64_4x_pb = { {32, HEIGHT, 0, 0, 0},  WIDTH, u8g_dev_st7920_128x64_4x_buf}; 
+                                 ;     170 u8g_dev_t u8g_dev_st7920_128x64_4x_sw_spi = { u8g_dev_st7920_128x64_4x_fn, &u8g_dev_st7920_128x64_4x_pb, U8G_COM_ST7920_SW_SPI };
+                                 ;     171 u8g_dev_t u8g_dev_st7920_128x64_4x_hw_spi = { u8g_dev_st7920_128x64_4x_fn, &u8g_dev_st7920_128x64_4x_pb, U8G_COM_ST7920_HW_SPI };
+                                 ;     172 u8g_dev_t u8g_dev_st7920_128x64_4x_8bit = { u8g_dev_st7920_128x64_4x_fn, &u8g_dev_st7920_128x64_4x_pb, U8G_COM_FAST_PARALLEL };
+                                 ;     173 u8g_dev_t u8g_dev_st7920_128x64_4x_custom = { u8g_dev_st7920_128x64_4x_fn, &u8g_dev_st7920_128x64_4x_pb, u8g_com_arduino_st7920_custom_fn };
+                                 ;     174 
+                                 ;     175 
+                                 		.SECTION	C_1,ROMDATA
+00000000                         __$u8g_dev_st7920_128x64_init_seq:
+00000000 FFD0FFE0                		.byte	0FFH,0D0H,0FFH,0E0H,0FFH,0CFH,0FFH
+         FFCFFF                  
+00000007 64                      		.byte	"d"
+00000008 FFD1FF                  		.byte	0FFH,0D1H,0FFH
+0000000B 3238                    		.byte	"28"
+0000000D 0C060201                		.byte	0CH,06H,02H,01H,0FFH
+         FF                      
+00000012 64                      		.byte	"d"
+00000013 FFD0FFFE                		.byte	0FFH,0D0H,0FFH,0FEH
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         _u8g_dev_st7920_128x64_sw_spi_pb:
+00000000 08                      		.byte	08H
+00000001 40                      		.byte	40H
+00000002 00                      		.byte	00H
+00000003 00                      		.byte	00H
+00000004 00                      		.byte	00H
+00000005 80                      		.byte	80H
+00000006 00                      		.byte	0
+00000007 00                      		.byte	0
+00000008 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_sw_spi_buf
+0000000C                         _u8g_dev_st7920_128x64_sw_spi:
+0000000C rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_fn
+00000010 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_sw_spi_pb
+00000014 rrrrrrrr                		.lword	_u8g_com_null_fn
+00000018                         _u8g_dev_st7920_128x64_hw_spi_pb:
+00000018 08                      		.byte	08H
+00000019 40                      		.byte	40H
+0000001A 00                      		.byte	00H
+0000001B 00                      		.byte	00H
+0000001C 00                      		.byte	00H
+0000001D 80                      		.byte	80H
+0000001E 00                      		.byte	0
+0000001F 00                      		.byte	0
+00000020 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_hw_spi_buf
+00000024                         _u8g_dev_st7920_128x64_hw_spi:
+00000024 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_fn
+00000028 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_hw_spi_pb
+0000002C rrrrrrrr                		.lword	_u8g_com_rx_hw_spi_fn
+00000030                         _u8g_dev_st7920_128x64_8bit_pb:
+00000030 08                      		.byte	08H
+00000031 40                      		.byte	40H
+00000032 00                      		.byte	00H
+00000033 00                      		.byte	00H
+00000034 00                      		.byte	00H
+00000035 80                      		.byte	80H
+00000036 00                      		.byte	0
+00000037 00                      		.byte	0
+00000038 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_8bit_buf
+0000003C                         _u8g_dev_st7920_128x64_8bit:
+0000003C rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_fn
+00000040 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_8bit_pb
+00000044 rrrrrrrr                		.lword	_u8g_com_null_fn
+00000048                         _u8g_dev_st7920_128x64_custom_pb:
+00000048 08                      		.byte	08H
+00000049 40                      		.byte	40H
+0000004A 00                      		.byte	00H
+0000004B 00                      		.byte	00H
+0000004C 00                      		.byte	00H
+0000004D 80                      		.byte	80H
+0000004E 00                      		.byte	0
+0000004F 00                      		.byte	0
+00000050 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_custom_buf
+00000054                         _u8g_dev_st7920_128x64_custom:
+00000054 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_fn
+00000058 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_custom_pb
+0000005C rrrrrrrr                		.lword	_u8g_com_arduino_st7920_custom_fn
+00000060                         _u8g_dev_st7920_128x64_4x_pb:
+00000060 20                      		.byte	20H
+00000061 40                      		.byte	40H
+00000062 00                      		.byte	00H
+00000063 00                      		.byte	00H
+00000064 00                      		.byte	00H
+00000065 80                      		.byte	80H
+00000066 00                      		.byte	0
+00000067 00                      		.byte	0
+00000068 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_4x_buf
+0000006C                         _u8g_dev_st7920_128x64_4x_sw_spi:
+0000006C rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_4x_fn
+00000070 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_4x_pb
+00000074 rrrrrrrr                		.lword	_u8g_com_null_fn
+00000078                         _u8g_dev_st7920_128x64_4x_hw_spi:
+00000078 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_4x_fn
+0000007C rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_4x_pb
+00000080 rrrrrrrr                		.lword	_u8g_com_rx_hw_spi_fn
+00000084                         _u8g_dev_st7920_128x64_4x_8bit:
+00000084 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_4x_fn
+00000088 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_4x_pb
+0000008C rrrrrrrr                		.lword	_u8g_com_null_fn
+00000090                         _u8g_dev_st7920_128x64_4x_custom:
+00000090 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_4x_fn
+00000094 rrrrrrrr                		.lword	_u8g_dev_st7920_128x64_4x_pb
+00000098 rrrrrrrr                		.lword	_u8g_com_arduino_st7920_custom_fn
+                                 		.SECTION	B_1,DATA
+00000000                         _u8g_dev_st7920_128x64_sw_spi_buf:
+00000000(00000080H)              		.blkb	128
+00000080                         _u8g_dev_st7920_128x64_hw_spi_buf:
+00000080(00000080H)              		.blkb	128
+00000100                         _u8g_dev_st7920_128x64_8bit_buf:
+00000100(00000080H)              		.blkb	128
+00000180                         _u8g_dev_st7920_128x64_custom_buf:
+00000180(00000080H)              		.blkb	128
+00000200                         _u8g_dev_st7920_128x64_4x_buf:
+00000200(00000200H)              		.blkb	512
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00630   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000485(000001E5H)  P
+ROMDATA  0000000023(00000017H)  C_1
+ROMDATA  0000000156(0000009CH)  D
+DATA     0000001024(00000400H)  B_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\u8g_dev_st7920_128x64.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\u8g_dev_st7920_128x64.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\src\Display\u8g_dev_st7920_128x64.obj

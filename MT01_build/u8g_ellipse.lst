@@ -1,0 +1,1308 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:02:46 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:02:46
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=u8g_ellipse.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=u8g_ellipse.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;u8g_ellipse.c
+                                 
+                                 		.glb	_u8g_DrawPixel
+                                 		.glb	_u8g_draw_ellipse
+                                 		.glb	_u8g_DrawEllipse
+                                 		.glb	_u8g_IsBBXIntersection
+                                 		.glb	_u8g_DrawVLine
+                                 		.glb	_u8g_draw_filled_ellipse
+                                 		.glb	_u8g_DrawFilledEllipse
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         __$u8g_draw_ellipse_section:
+                                 		.STACK	__$u8g_draw_ellipse_section=16
+                                 ;       1 /*
+                                 ;       2 
+                                 ;       3   u8g_ellipse.c
+                                 ;       4 
+                                 ;       5   Utility to draw empty and filled ellipses.
+                                 ;       6   
+                                 ;       7   Universal 8bit Graphics Library
+                                 ;       8   
+                                 ;       9   Copyright (c) 2011, bjthom@gmail.com
+                                 ;      10   All rights reserved.
+                                 ;      11 
+                                 ;      12   Redistribution and use in source and binary forms, with or without modification, 
+                                 ;      13   are permitted provided that the following conditions are met:
+                                 ;      14 
+                                 ;      15   * Redistributions of source code must retain the above copyright notice, this list 
+                                 ;      16     of conditions and the following disclaimer.
+                                 ;      17     
+                                 ;      18   * Redistributions in binary form must reproduce the above copyright notice, this 
+                                 ;      19     list of conditions and the following disclaimer in the documentation and/or other 
+                                 ;      20     materials provided with the distribution.
+                                 ;      21 
+                                 ;      22   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+                                 ;      23   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+                                 ;      24   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+                                 ;      25   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+                                 ;      26   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+                                 ;      27   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+                                 ;      28   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+                                 ;      29   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+                                 ;      30   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+                                 ;      31   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+                                 ;      32   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+                                 ;      33   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+                                 ;      34   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+                                 ;      35   
+                                 ;      36   Addition to the U8G Library as of 02/29/12
+                                 ;      37   Adapted from Bresenham's Algorithm and the following websites:
+                                 ;      38 	http://free.pages.at/easyfilter/bresenham.html
+                                 ;      39 	http://homepage.smc.edu/kennedy_john/belipse.pdf
+                                 ;      40   
+                                 ;      41 */
+                                 ;      42 
+                                 ;      43 #include "u8g.h"
+                                 ;      44 
+                                 ;      45 
+                                 ;      46 #ifdef WORK_IN_PROGRESS
+                                 ;      47 
+                                 ;      48 void u8g_DrawEllipseRect(u8g_t *u8g, u8g_uint_t x0, u8g_uint_t y0, u8g_uint_t x1, u8g_uint_t y1)
+                                 ;      49 {
+                                 ;      50 	int a = abs(x1 - x0);
+                                 ;      51 	int b = abs(y1 - y0);	//get diameters
+                                 ;      52 	int b1 = b&1;
+                                 ;      53 	long dx = 4*(1-a)*b*b;
+                                 ;      54 	long dy = 4*(b1+1)*a*a;
+                                 ;      55 	long err = dx+dy+b1*a*a;
+                                 ;      56 	long e2;
+                                 ;      57 	
+                                 ;      58 	if (x0 > x1) { x0 = x1; x1 += a; }
+                                 ;      59 	if (y0 > y1) { y0 = y1; } 
+                                 ;      60 	y0 += (b+1)/2;
+                                 ;      61 	y1 = y0-b1;
+                                 ;      62 	a *= 8*a;
+                                 ;      63 	b1 = 8*b*b;
+                                 ;      64 	
+                                 ;      65 	do {
+                                 ;      66 		u8g_DrawPixel(u8g, x1, y0);
+                                 ;      67 		u8g_DrawPixel(u8g, x0, y0);
+                                 ;      68 		u8g_DrawPixel(u8g, x0, y1);
+                                 ;      69 		u8g_DrawPixel(u8g, x1, y1);
+                                 ;      70 		e2 = 2*err;
+                                 ;      71 		if (e2 >= dx) {
+                                 ;      72 			x0++;
+                                 ;      73 			x1--;
+                                 ;      74 			err += dx += b1;
+                                 ;      75 		}
+                                 ;      76 		if (e2 <= dy) {
+                                 ;      77 			y0++;
+                                 ;      78 			y1--;
+                                 ;      79 			err += dy += a;
+                                 ;      80 		}
+                                 ;      81 	} while (x0 <= x1);
+                                 ;      82 	
+                                 ;      83 	while (y0-y1 < b) {
+                                 ;      84 		u8g_DrawPixel(u8g, x0-1, y0);
+                                 ;      85 		u8g_DrawPixel(u8g, x1+1, y0++);
+                                 ;      86 		u8g_DrawPixel(u8g, x0-1, y1);
+                                 ;      87 		u8g_DrawPixel(u8g, x1+1, y1--);
+                                 ;      88 	}
+                                 ;      89 }
+                                 ;      90 
+                                 ;      91 void u8g_DrawEllipse(u8g_t *u8g, u8g_uint_t x0, u8g_uint_t y0, u8g_uint_t xr, u8g_uint_t yr)
+                                 ;      92 {
+                                 ;      93 	u8g_DrawPixel(u8g, x0, y0+yr);
+                                 ;      94 	u8g_DrawPixel(u8g, x0, y0-yr);
+                                 ;      95 	u8g_DrawPixel(u8g, x0+xr, y0);
+                                 ;      96 	u8g_DrawPixel(u8g, x0-xr, y0);
+                                 ;      97 }
+                                 ;      98 
+                                 ;      99 #endif
+                                 ;     100 
+                                 ;     101 #if defined(U8G_16BIT)
+                                 ;     102 typedef  int32_t u8g_long_t;
+                                 ;     103 #else
+                                 ;     104 typedef  int16_t u8g_long_t;
+                                 ;     105 #endif
+                                 ;     106 
+                                 ;     107 
+                                 ;     108 /*
+                                 ;     109   Source: 
+                                 ;     110     ftp://pc.fk0.name/pub/books/programming/bezier-ellipse.pdf
+                                 ;     111     Foley, Computer Graphics, p 90
+                                 ;     112 */
+                                 ;     113 static void u8g_draw_ellipse_section(u8g_t *u8g, u8g_uint_t x, u8g_uint_t y, u8g_uint_t x0, u8g_uint_t y0, uint8_t option) U8G_NOINLINE;
+                                 ;     114 static void u8g_draw_ellipse_section(u8g_t *u8g, u8g_uint_t x, u8g_uint_t y, u8g_uint_t x0, u8g_uint_t y0, uint8_t option)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",114
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
+00000004 818A                    		MOV.B R2, 07H[R0]
+00000006 8183                    		MOV.B R3, 06H[R0]
+00000008 810C                    		MOV.B R4, 05H[R0]
+0000000A C5001004                		MOV.B 10H[R0], 04H[R0]
+0000000E C5001103                		MOV.B 11H[R0], 03H[R0]
+                                 ;     115 {
+                                 ;     116     /* upper right */
+                                 ;     117     if ( option & U8G_DRAW_UPPER_RIGHT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",117
+00000012 F50003                  		BTST #00H, 03H[R0].B
+00000015 20rr                    		BEQ L12
+00000017                         L11:	; bb7
+                                 ;     118     {
+                                 ;     119       u8g_DrawPixel(u8g, x0 + x, y0 - y);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",119
+00000017 B102                    		MOVU.B 04H[R0], R2
+00000019 410206                  		SUB 06H[R0].UB, R2
+0000001C B10C                    		MOVU.B 05H[R0], R4
+0000001E 490407                  		ADD 07H[R0].UB, R4
+00000021 A881                    		MOV.L 08H[R0], R1
+00000023 5B23                    		MOVU.B R2, R3
+00000025 5B42                    		MOVU.B R4, R2
+00000027 05rrrrrr             A  		BSR _u8g_DrawPixel
+0000002B                         L12:	; bb26
+                                 ;     120     }
+                                 ;     121     
+                                 ;     122     /* upper left */
+                                 ;     123     if ( option & U8G_DRAW_UPPER_LEFT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",123
+0000002B F50103                  		BTST #01H, 03H[R0].B
+0000002E 20rr                    		BEQ L14
+00000030                         L13:	; bb27
+                                 ;     124     {
+                                 ;     125       u8g_DrawPixel(u8g, x0 - x, y0 - y);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",125
+00000030 B102                    		MOVU.B 04H[R0], R2
+00000032 410206                  		SUB 06H[R0].UB, R2
+00000035 B10C                    		MOVU.B 05H[R0], R4
+00000037 410407                  		SUB 07H[R0].UB, R4
+0000003A A881                    		MOV.L 08H[R0], R1
+0000003C 5B23                    		MOVU.B R2, R3
+0000003E 5B42                    		MOVU.B R4, R2
+00000040 05rrrrrr             A  		BSR _u8g_DrawPixel
+00000044                         L14:	; bb48
+                                 ;     126     }
+                                 ;     127     
+                                 ;     128     /* lower right */
+                                 ;     129     if ( option & U8G_DRAW_LOWER_RIGHT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",129
+00000044 F50303                  		BTST #03H, 03H[R0].B
+00000047 20rr                    		BEQ L16
+00000049                         L15:	; bb49
+                                 ;     130     {
+                                 ;     131       u8g_DrawPixel(u8g, x0 + x, y0 + y);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",131
+00000049 B102                    		MOVU.B 04H[R0], R2
+0000004B 490206                  		ADD 06H[R0].UB, R2
+0000004E B10C                    		MOVU.B 05H[R0], R4
+00000050 490407                  		ADD 07H[R0].UB, R4
+00000053 A881                    		MOV.L 08H[R0], R1
+00000055 5B23                    		MOVU.B R2, R3
+00000057 5B42                    		MOVU.B R4, R2
+00000059 05rrrrrr             A  		BSR _u8g_DrawPixel
+0000005D                         L16:	; bb70
+                                 ;     132     }
+                                 ;     133     
+                                 ;     134     /* lower left */
+                                 ;     135     if ( option & U8G_DRAW_LOWER_LEFT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",135
+0000005D F50203                  		BTST #02H, 03H[R0].B
+00000060 20rr                    		BEQ L18
+00000062                         L17:	; bb71
+                                 ;     136     {
+                                 ;     137       u8g_DrawPixel(u8g, x0 - x, y0 + y);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",137
+00000062 B102                    		MOVU.B 04H[R0], R2
+00000064 490206                  		ADD 06H[R0].UB, R2
+00000067 B10C                    		MOVU.B 05H[R0], R4
+00000069 410407                  		SUB 07H[R0].UB, R4
+0000006C A881                    		MOV.L 08H[R0], R1
+0000006E 5B23                    		MOVU.B R2, R3
+00000070 5B42                    		MOVU.B R4, R2
+00000072 05rrrrrr             A  		BSR _u8g_DrawPixel
+00000076 6703                    		RTSD #0CH
+00000078                         L18:	; return
+                                 ;     138     }
+                                 ;     139 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",139
+00000078 6703                    		RTSD #0CH
+0000007A                         _u8g_draw_ellipse:
+                                 		.STACK	_u8g_draw_ellipse=36
+                                 ;     140 
+                                 ;     141 void u8g_draw_ellipse(u8g_t *u8g, u8g_uint_t x0, u8g_uint_t y0, u8g_uint_t rx, u8g_uint_t ry, uint8_t option)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",141
+0000007A 7100E4                  		ADD #0FFFFFFE4H, R0
+0000007D A181                    		MOV.L R1, 18H[R0]
+0000007F 858A                    		MOV.B R2, 17H[R0]
+00000081 8583                    		MOV.B R3, 16H[R0]
+00000083 850C                    		MOV.B R4, 15H[R0]
+00000085 C5002014                		MOV.B 20H[R0], 14H[R0]
+00000089 C5002113                		MOV.B 21H[R0], 13H[R0]
+                                 ;     142 {
+                                 ;     143   u8g_uint_t x, y;
+                                 ;     144   u8g_long_t xchg, ychg;
+                                 ;     145   u8g_long_t err;
+                                 ;     146   u8g_long_t rxrx2;
+                                 ;     147   u8g_long_t ryry2;
+                                 ;     148   u8g_long_t stopx, stopy;
+                                 ;     149   
+                                 ;     150   rxrx2 = rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",150
+0000008D B509                    		MOVU.B 15H[R0], R1
+0000008F 9109                    		MOV.W R1, 0AH[R0]
+00000091                         L20:	; entry.split
+                                 ;     151   rxrx2 *= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",151
+00000091 9909                    		MOV.W 0AH[R0], R1
+00000093 4D0115                  		MUL 15H[R0].UB, R1
+00000096 9109                    		MOV.W R1, 0AH[R0]
+00000098                         L21:	; entry.split1
+                                 ;     152   rxrx2 *= 2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",152
+00000098 9909                    		MOV.W 0AH[R0], R1
+0000009A 6C11                    		SHLL #01H, R1
+0000009C 9109                    		MOV.W R1, 0AH[R0]
+0000009E                         L22:	; entry.split2
+                                 ;     153   
+                                 ;     154   ryry2 = ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",154
+0000009E B501                    		MOVU.B 14H[R0], R1
+000000A0 9181                    		MOV.W R1, 0CH[R0]
+000000A2                         L23:	; entry.split3
+                                 ;     155   ryry2 *= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",155
+000000A2 9981                    		MOV.W 0CH[R0], R1
+000000A4 4D0114                  		MUL 14H[R0].UB, R1
+000000A7 9181                    		MOV.W R1, 0CH[R0]
+000000A9                         L24:	; entry.split4
+                                 ;     156   ryry2 *= 2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",156
+000000A9 9981                    		MOV.W 0CH[R0], R1
+000000AB 6C11                    		SHLL #01H, R1
+000000AD 9181                    		MOV.W R1, 0CH[R0]
+000000AF                         L25:	; entry.split5
+                                 ;     157   
+                                 ;     158   x = rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",158
+000000AF C5001502                		MOV.B 15H[R0], 02H[R0]
+000000B3                         L26:	; entry.split6
+                                 ;     159   y = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",159
+000000B3 3C0300                  		MOV.B #00H, 03H[R0]
+000000B6                         L27:	; entry.split7
+                                 ;     160   
+                                 ;     161   xchg = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",161
+000000B6 3D0201                  		MOV.W #0001H, 04H[R0]
+000000B9                         L28:	; entry.split8
+                                 ;     162   xchg -= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",162
+000000B9 9881                    		MOV.W 04H[R0], R1
+000000BB 410115                  		SUB 15H[R0].UB, R1
+000000BE 9081                    		MOV.W R1, 04H[R0]
+000000C0                         L29:	; entry.split9
+                                 ;     163   xchg -= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",163
+000000C0 9881                    		MOV.W 04H[R0], R1
+000000C2 410115                  		SUB 15H[R0].UB, R1
+000000C5 9081                    		MOV.W R1, 04H[R0]
+000000C7                         L30:	; entry.split10
+                                 ;     164   xchg *= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",164
+000000C7 9881                    		MOV.W 04H[R0], R1
+000000C9 4D0114                  		MUL 14H[R0].UB, R1
+000000CC 9081                    		MOV.W R1, 04H[R0]
+000000CE                         L31:	; entry.split11
+                                 ;     165   xchg *= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",165
+000000CE 9881                    		MOV.W 04H[R0], R1
+000000D0 4D0114                  		MUL 14H[R0].UB, R1
+000000D3 9081                    		MOV.W R1, 04H[R0]
+000000D5                         L32:	; entry.split12
+                                 ;     166   
+                                 ;     167   ychg = rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",167
+000000D5 B509                    		MOVU.B 15H[R0], R1
+000000D7 9089                    		MOV.W R1, 06H[R0]
+000000D9                         L33:	; entry.split13
+                                 ;     168   ychg *= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",168
+000000D9 9889                    		MOV.W 06H[R0], R1
+000000DB 4D0115                  		MUL 15H[R0].UB, R1
+000000DE 9089                    		MOV.W R1, 06H[R0]
+000000E0                         L34:	; entry.split14
+                                 ;     169   
+                                 ;     170   err = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",170
+000000E0 3D0400                  		MOV.W #0000H, 08H[R0]
+000000E3                         L35:	; entry.split15
+                                 ;     171   
+                                 ;     172   stopx = ryry2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",172
+000000E3 D5000607                		MOV.W 0CH[R0], 0EH[R0]
+000000E7                         L36:	; entry.split16
+                                 ;     173   stopx *= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",173
+000000E7 9989                    		MOV.W 0EH[R0], R1
+000000E9 4D0115                  		MUL 15H[R0].UB, R1
+000000EC 9189                    		MOV.W R1, 0EH[R0]
+000000EE                         L37:	; entry.split17
+                                 ;     174   stopy = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",174
+000000EE 3D0800                  		MOV.W #0000H, 10H[R0]
+000000F1 2Err                 B  		BRA L48
+000000F3                         L38:	; bb
+                                 ;     175   
+                                 ;     176   while( stopx >= stopy )
+                                 ;     177   {
+                                 ;     178     u8g_draw_ellipse_section(u8g, x, y, x0, y0, option);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",178
+000000F3 B48D                    		MOVU.B 13H[R0], R5
+000000F5 590F16                  		MOVU.B 16H[R0], R15
+000000F8 B58C                    		MOVU.B 17H[R0], R4
+000000FA B08B                    		MOVU.B 03H[R0], R3
+000000FC B082                    		MOVU.B 02H[R0], R2
+000000FE A981                    		MOV.L 18H[R0], R1
+00000100 6040                    		SUB #04H, R0
+00000102 800D                    		MOV.B R5, 01H[R0]
+00000104 C30F                    		MOV.B R15, [R0]
+00000106 39rrrr               W  		BSR __$u8g_draw_ellipse_section
+00000109 6240                    		ADD #04H, R0
+0000010B                         L39:	; bb.split
+                                 ;     179     y++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",179
+0000010B B089                    		MOVU.B 03H[R0], R1
+0000010D 6211                    		ADD #01H, R1
+0000010F 8089                    		MOV.B R1, 03H[R0]
+00000111                         L40:	; bb.split18
+                                 ;     180     stopy += rxrx2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",180
+00000111 9A01                    		MOV.W 10H[R0], R1
+00000113 06490105                		ADD 0AH[R0].W, R1
+00000117 9201                    		MOV.W R1, 10H[R0]
+00000119                         L41:	; bb.split19
+                                 ;     181     err += ychg;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",181
+00000119 9901                    		MOV.W 08H[R0], R1
+0000011B 06490103                		ADD 06H[R0].W, R1
+0000011F 9101                    		MOV.W R1, 08H[R0]
+00000121                         L42:	; bb.split20
+                                 ;     182     ychg += rxrx2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",182
+00000121 9889                    		MOV.W 06H[R0], R1
+00000123 06490105                		ADD 0AH[R0].W, R1
+00000127 9089                    		MOV.W R1, 06H[R0]
+00000129                         L43:	; bb.split21
+                                 ;     183     if ( 2*err+xchg > 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",183
+00000129 9901                    		MOV.W 08H[R0], R1
+0000012B 6C11                    		SHLL #01H, R1
+0000012D 06490102                		ADD 04H[R0].W, R1
+00000131 6101                    		CMP #00H, R1
+00000133 2Brr                    		BLE L48
+00000135                         L44:	; bb106
+                                 ;     184     {
+                                 ;     185       x--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",185
+00000135 B081                    		MOVU.B 02H[R0], R1
+00000137 6011                    		SUB #01H, R1
+00000139 8081                    		MOV.B R1, 02H[R0]
+0000013B                         L45:	; bb106.split
+                                 ;     186       stopx -= ryry2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",186
+0000013B 9989                    		MOV.W 0EH[R0], R1
+0000013D 06410106                		SUB 0CH[R0].W, R1
+00000141 9189                    		MOV.W R1, 0EH[R0]
+00000143                         L46:	; bb106.split22
+                                 ;     187       err += xchg;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",187
+00000143 9901                    		MOV.W 08H[R0], R1
+00000145 06490102                		ADD 04H[R0].W, R1
+00000149 9101                    		MOV.W R1, 08H[R0]
+0000014B                         L47:	; bb106.split23
+                                 ;     188       xchg += ryry2;      
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",188
+0000014B 9881                    		MOV.W 04H[R0], R1
+0000014D 06490106                		ADD 0CH[R0].W, R1
+00000151 9081                    		MOV.W R1, 04H[R0]
+00000153                         L48:	; bb136
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",176
+00000153 9989                    		MOV.W 0EH[R0], R1
+00000155 06450108                		CMP 10H[R0].W, R1
+00000159 28rr                    		BGE L38
+0000015B                         L49:	; bb144
+                                 ;     189     }
+                                 ;     190   }
+                                 ;     191 
+                                 ;     192   x = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",192
+0000015B 3C0200                  		MOV.B #00H, 02H[R0]
+0000015E                         L50:	; bb144.split
+                                 ;     193   y = ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",193
+0000015E C5001403                		MOV.B 14H[R0], 03H[R0]
+00000162                         L51:	; bb144.split24
+                                 ;     194   
+                                 ;     195   xchg = ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",195
+00000162 B501                    		MOVU.B 14H[R0], R1
+00000164 9081                    		MOV.W R1, 04H[R0]
+00000166                         L52:	; bb144.split25
+                                 ;     196   xchg *= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",196
+00000166 9881                    		MOV.W 04H[R0], R1
+00000168 4D0114                  		MUL 14H[R0].UB, R1
+0000016B 9081                    		MOV.W R1, 04H[R0]
+0000016D                         L53:	; bb144.split26
+                                 ;     197   
+                                 ;     198   ychg = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",198
+0000016D 3D0301                  		MOV.W #0001H, 06H[R0]
+00000170                         L54:	; bb144.split27
+                                 ;     199   ychg -= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",199
+00000170 9889                    		MOV.W 06H[R0], R1
+00000172 410114                  		SUB 14H[R0].UB, R1
+00000175 9089                    		MOV.W R1, 06H[R0]
+00000177                         L55:	; bb144.split28
+                                 ;     200   ychg -= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",200
+00000177 9889                    		MOV.W 06H[R0], R1
+00000179 410114                  		SUB 14H[R0].UB, R1
+0000017C 9089                    		MOV.W R1, 06H[R0]
+0000017E                         L56:	; bb144.split29
+                                 ;     201   ychg *= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",201
+0000017E 9889                    		MOV.W 06H[R0], R1
+00000180 4D0115                  		MUL 15H[R0].UB, R1
+00000183 9089                    		MOV.W R1, 06H[R0]
+00000185                         L57:	; bb144.split30
+                                 ;     202   ychg *= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",202
+00000185 9889                    		MOV.W 06H[R0], R1
+00000187 4D0115                  		MUL 15H[R0].UB, R1
+0000018A 9089                    		MOV.W R1, 06H[R0]
+0000018C                         L58:	; bb144.split31
+                                 ;     203   
+                                 ;     204   err = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",204
+0000018C 3D0400                  		MOV.W #0000H, 08H[R0]
+0000018F                         L59:	; bb144.split32
+                                 ;     205   
+                                 ;     206   stopx = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",206
+0000018F 3D0700                  		MOV.W #0000H, 0EH[R0]
+00000192                         L60:	; bb144.split33
+                                 ;     207 
+                                 ;     208   stopy = rxrx2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",208
+00000192 D5000508                		MOV.W 0AH[R0], 10H[R0]
+00000196                         L61:	; bb144.split34
+                                 ;     209   stopy *= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",209
+00000196 9A01                    		MOV.W 10H[R0], R1
+00000198 4D0114                  		MUL 14H[R0].UB, R1
+0000019B 9201                    		MOV.W R1, 10H[R0]
+0000019D 2Err                 B  		BRA L72
+0000019F                         L62:	; bb185
+                                 ;     210   
+                                 ;     211 
+                                 ;     212   while( stopx <= stopy )
+                                 ;     213   {
+                                 ;     214     u8g_draw_ellipse_section(u8g, x, y, x0, y0, option);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",214
+0000019F B48D                    		MOVU.B 13H[R0], R5
+000001A1 590F16                  		MOVU.B 16H[R0], R15
+000001A4 B58C                    		MOVU.B 17H[R0], R4
+000001A6 B08B                    		MOVU.B 03H[R0], R3
+000001A8 B082                    		MOVU.B 02H[R0], R2
+000001AA A981                    		MOV.L 18H[R0], R1
+000001AC 6040                    		SUB #04H, R0
+000001AE 800D                    		MOV.B R5, 01H[R0]
+000001B0 C30F                    		MOV.B R15, [R0]
+000001B2 39rrrr               W  		BSR __$u8g_draw_ellipse_section
+000001B5 6240                    		ADD #04H, R0
+000001B7                         L63:	; bb185.split
+                                 ;     215     x++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",215
+000001B7 B081                    		MOVU.B 02H[R0], R1
+000001B9 6211                    		ADD #01H, R1
+000001BB 8081                    		MOV.B R1, 02H[R0]
+000001BD                         L64:	; bb185.split35
+                                 ;     216     stopx += ryry2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",216
+000001BD 9989                    		MOV.W 0EH[R0], R1
+000001BF 06490106                		ADD 0CH[R0].W, R1
+000001C3 9189                    		MOV.W R1, 0EH[R0]
+000001C5                         L65:	; bb185.split36
+                                 ;     217     err += xchg;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",217
+000001C5 9901                    		MOV.W 08H[R0], R1
+000001C7 06490102                		ADD 04H[R0].W, R1
+000001CB 9101                    		MOV.W R1, 08H[R0]
+000001CD                         L66:	; bb185.split37
+                                 ;     218     xchg += ryry2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",218
+000001CD 9881                    		MOV.W 04H[R0], R1
+000001CF 06490106                		ADD 0CH[R0].W, R1
+000001D3 9081                    		MOV.W R1, 04H[R0]
+000001D5                         L67:	; bb185.split38
+                                 ;     219     if ( 2*err+ychg > 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",219
+000001D5 9901                    		MOV.W 08H[R0], R1
+000001D7 6C11                    		SHLL #01H, R1
+000001D9 06490103                		ADD 06H[R0].W, R1
+000001DD 6101                    		CMP #00H, R1
+000001DF 2Brr                    		BLE L72
+000001E1                         L68:	; bb213
+                                 ;     220     {
+                                 ;     221       y--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",221
+000001E1 B089                    		MOVU.B 03H[R0], R1
+000001E3 6011                    		SUB #01H, R1
+000001E5 8089                    		MOV.B R1, 03H[R0]
+000001E7                         L69:	; bb213.split
+                                 ;     222       stopy -= rxrx2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",222
+000001E7 9A01                    		MOV.W 10H[R0], R1
+000001E9 06410105                		SUB 0AH[R0].W, R1
+000001ED 9201                    		MOV.W R1, 10H[R0]
+000001EF                         L70:	; bb213.split39
+                                 ;     223       err += ychg;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",223
+000001EF 9901                    		MOV.W 08H[R0], R1
+000001F1 06490103                		ADD 06H[R0].W, R1
+000001F5 9101                    		MOV.W R1, 08H[R0]
+000001F7                         L71:	; bb213.split40
+                                 ;     224       ychg += rxrx2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",224
+000001F7 9889                    		MOV.W 06H[R0], R1
+000001F9 06490105                		ADD 0AH[R0].W, R1
+000001FD 9089                    		MOV.W R1, 06H[R0]
+000001FF                         L72:	; bb244
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",212
+000001FF 9989                    		MOV.W 0EH[R0], R1
+00000201 06450108                		CMP 10H[R0].W, R1
+00000205 2Brr                    		BLE L62
+00000207                         L73:	; return
+                                 ;     225     }
+                                 ;     226   }
+                                 ;     227   
+                                 ;     228 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",228
+00000207 6707                    		RTSD #1CH
+00000209                         _u8g_DrawEllipse:
+                                 		.STACK	_u8g_DrawEllipse=24
+                                 ;     229 
+                                 ;     230 void u8g_DrawEllipse(u8g_t *u8g, u8g_uint_t x0, u8g_uint_t y0, u8g_uint_t rx, u8g_uint_t ry, uint8_t option)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",230
+00000209 7100F0                  		ADD #0FFFFFFF0H, R0
+0000020C A089                    		MOV.L R1, 0CH[R0]
+0000020E 828A                    		MOV.B R2, 0BH[R0]
+00000210 8283                    		MOV.B R3, 0AH[R0]
+00000212 820C                    		MOV.B R4, 09H[R0]
+00000214 C5001408                		MOV.B 14H[R0], 08H[R0]
+00000218 C5001507                		MOV.B 15H[R0], 07H[R0]
+                                 ;     231 {
+                                 ;     232   /* check for bounding box */
+                                 ;     233   {
+                                 ;     234     u8g_uint_t rxp, rxp2;
+                                 ;     235     u8g_uint_t ryp, ryp2;
+                                 ;     236     
+                                 ;     237     rxp = rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",237
+0000021C C5000903                		MOV.B 09H[R0], 03H[R0]
+00000220                         L75:	; entry.split
+                                 ;     238     rxp++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",238
+00000220 B089                    		MOVU.B 03H[R0], R1
+00000222 6211                    		ADD #01H, R1
+00000224 8089                    		MOV.B R1, 03H[R0]
+00000226                         L76:	; entry.split1
+                                 ;     239     rxp2 = rxp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",239
+00000226 C5000304                		MOV.B 03H[R0], 04H[R0]
+0000022A                         L77:	; entry.split2
+                                 ;     240     rxp2 *= 2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",240
+0000022A B101                    		MOVU.B 04H[R0], R1
+0000022C 6C11                    		SHLL #01H, R1
+0000022E 8101                    		MOV.B R1, 04H[R0]
+00000230                         L78:	; entry.split3
+                                 ;     241 
+                                 ;     242     ryp = ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",242
+00000230 C5000805                		MOV.B 08H[R0], 05H[R0]
+00000234                         L79:	; entry.split4
+                                 ;     243     ryp++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",243
+00000234 B109                    		MOVU.B 05H[R0], R1
+00000236 6211                    		ADD #01H, R1
+00000238 8109                    		MOV.B R1, 05H[R0]
+0000023A                         L80:	; entry.split5
+                                 ;     244     ryp2 = ryp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",244
+0000023A C5000506                		MOV.B 05H[R0], 06H[R0]
+0000023E                         L81:	; entry.split6
+                                 ;     245     ryp2 *= 2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",245
+0000023E B181                    		MOVU.B 06H[R0], R1
+00000240 6C11                    		SHLL #01H, R1
+00000242 8181                    		MOV.B R1, 06H[R0]
+00000244                         L82:	; entry.split7
+                                 ;     246     
+                                 ;     247     if ( u8g_IsBBXIntersection(u8g, x0-rxp, y0-ryp, rxp2, ryp2) == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",247
+00000244 B282                    		MOVU.B 0AH[R0], R2
+00000246 410205                  		SUB 05H[R0].UB, R2
+00000249 B28D                    		MOVU.B 0BH[R0], R5
+0000024B 410503                  		SUB 03H[R0].UB, R5
+0000024E B183                    		MOVU.B 06H[R0], R3
+00000250 B104                    		MOVU.B 04H[R0], R4
+00000252 A889                    		MOV.L 0CH[R0], R1
+00000254 6040                    		SUB #04H, R0
+00000256 C303                    		MOV.B R3, [R0]
+00000258 5B23                    		MOVU.B R2, R3
+0000025A 5B52                    		MOVU.B R5, R2
+0000025C 05rrrrrr             A  		BSR _u8g_IsBBXIntersection
+00000260 6240                    		ADD #04H, R0
+00000262 6101                    		CMP #00H, R1
+00000264 20rr                    		BEQ L84
+00000266                         L83:	; bb47
+                                 ;     248       return;    
+                                 ;     249   }
+                                 ;     250   
+                                 ;     251   u8g_draw_ellipse(u8g, x0, y0, rx, ry, option);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",251
+00000266 B18D                    		MOVU.B 07H[R0], R5
+00000268 590F08                  		MOVU.B 08H[R0], R15
+0000026B B20C                    		MOVU.B 09H[R0], R4
+0000026D B283                    		MOVU.B 0AH[R0], R3
+0000026F B28A                    		MOVU.B 0BH[R0], R2
+00000271 A889                    		MOV.L 0CH[R0], R1
+00000273 6040                    		SUB #04H, R0
+00000275 800D                    		MOV.B R5, 01H[R0]
+00000277 C30F                    		MOV.B R15, [R0]
+00000279 39rrrr               W  		BSR _u8g_draw_ellipse
+0000027C 6240                    		ADD #04H, R0
+0000027E 6704                    		RTSD #10H
+00000280                         L84:	; return
+                                 ;     252 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",252
+00000280 6704                    		RTSD #10H
+00000282                         __$u8g_draw_filled_ellipse_section:
+                                 		.STACK	__$u8g_draw_filled_ellipse_section=16
+                                 ;     253 
+                                 ;     254 static void u8g_draw_filled_ellipse_section(u8g_t *u8g, u8g_uint_t x, u8g_uint_t y, u8g_uint_t x0, u8g_uint_t y0, uint8_t option) U8G_NOINLINE;
+                                 ;     255 static void u8g_draw_filled_ellipse_section(u8g_t *u8g, u8g_uint_t x, u8g_uint_t y, u8g_uint_t x0, u8g_uint_t y0, uint8_t option)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",255
+00000282 60C0                    		SUB #0CH, R0
+00000284 A081                    		MOV.L R1, 08H[R0]
+00000286 818A                    		MOV.B R2, 07H[R0]
+00000288 8183                    		MOV.B R3, 06H[R0]
+0000028A 810C                    		MOV.B R4, 05H[R0]
+0000028C C5001004                		MOV.B 10H[R0], 04H[R0]
+00000290 C5001103                		MOV.B 11H[R0], 03H[R0]
+                                 ;     256 {
+                                 ;     257     /* upper right */
+                                 ;     258     if ( option & U8G_DRAW_UPPER_RIGHT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",258
+00000294 F50003                  		BTST #00H, 03H[R0].B
+00000297 20rr                    		BEQ L87
+00000299                         L86:	; bb7
+                                 ;     259     {
+                                 ;     260       u8g_DrawVLine(u8g, x0+x, y0-y, y+1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",260
+00000299 B10A                    		MOVU.B 05H[R0], R2
+0000029B 490207                  		ADD 07H[R0].UB, R2
+0000029E B184                    		MOVU.B 06H[R0], R4
+000002A0 B103                    		MOVU.B 04H[R0], R3
+000002A2 A881                    		MOV.L 08H[R0], R1
+000002A4 4343                    		SUB R4, R3
+000002A6 5B33                    		MOVU.B R3, R3
+000002A8 6214                    		ADD #01H, R4
+000002AA 5B44                    		MOVU.B R4, R4
+000002AC 5B22                    		MOVU.B R2, R2
+000002AE 05rrrrrr             A  		BSR _u8g_DrawVLine
+000002B2                         L87:	; bb30
+                                 ;     261     }
+                                 ;     262     
+                                 ;     263     /* upper left */
+                                 ;     264     if ( option & U8G_DRAW_UPPER_LEFT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",264
+000002B2 F50103                  		BTST #01H, 03H[R0].B
+000002B5 20rr                    		BEQ L89
+000002B7                         L88:	; bb31
+                                 ;     265     {
+                                 ;     266       u8g_DrawVLine(u8g, x0-x, y0-y, y+1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",266
+000002B7 B10A                    		MOVU.B 05H[R0], R2
+000002B9 410207                  		SUB 07H[R0].UB, R2
+000002BC B184                    		MOVU.B 06H[R0], R4
+000002BE B103                    		MOVU.B 04H[R0], R3
+000002C0 A881                    		MOV.L 08H[R0], R1
+000002C2 4343                    		SUB R4, R3
+000002C4 5B33                    		MOVU.B R3, R3
+000002C6 6214                    		ADD #01H, R4
+000002C8 5B44                    		MOVU.B R4, R4
+000002CA 5B22                    		MOVU.B R2, R2
+000002CC 05rrrrrr             A  		BSR _u8g_DrawVLine
+000002D0                         L89:	; bb56
+                                 ;     267     }
+                                 ;     268     
+                                 ;     269     /* lower right */
+                                 ;     270     if ( option & U8G_DRAW_LOWER_RIGHT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",270
+000002D0 F50303                  		BTST #03H, 03H[R0].B
+000002D3 20rr                    		BEQ L91
+000002D5                         L90:	; bb57
+                                 ;     271     {
+                                 ;     272       u8g_DrawVLine(u8g, x0+x, y0, y+1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",272
+000002D5 B10A                    		MOVU.B 05H[R0], R2
+000002D7 490207                  		ADD 07H[R0].UB, R2
+000002DA B184                    		MOVU.B 06H[R0], R4
+000002DC B103                    		MOVU.B 04H[R0], R3
+000002DE A881                    		MOV.L 08H[R0], R1
+000002E0 6214                    		ADD #01H, R4
+000002E2 5B44                    		MOVU.B R4, R4
+000002E4 5B22                    		MOVU.B R2, R2
+000002E6 05rrrrrr             A  		BSR _u8g_DrawVLine
+000002EA                         L91:	; bb77
+                                 ;     273     }
+                                 ;     274     
+                                 ;     275     /* lower left */
+                                 ;     276     if ( option & U8G_DRAW_LOWER_LEFT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",276
+000002EA F50203                  		BTST #02H, 03H[R0].B
+000002ED 20rr                    		BEQ L93
+000002EF                         L92:	; bb78
+                                 ;     277     {
+                                 ;     278       u8g_DrawVLine(u8g, x0-x, y0, y+1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",278
+000002EF B10A                    		MOVU.B 05H[R0], R2
+000002F1 410207                  		SUB 07H[R0].UB, R2
+000002F4 B184                    		MOVU.B 06H[R0], R4
+000002F6 B103                    		MOVU.B 04H[R0], R3
+000002F8 A881                    		MOV.L 08H[R0], R1
+000002FA 6214                    		ADD #01H, R4
+000002FC 5B44                    		MOVU.B R4, R4
+000002FE 5B22                    		MOVU.B R2, R2
+00000300 05rrrrrr             A  		BSR _u8g_DrawVLine
+00000304 6703                    		RTSD #0CH
+00000306                         L93:	; return
+                                 ;     279     }
+                                 ;     280 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",280
+00000306 6703                    		RTSD #0CH
+00000308                         _u8g_draw_filled_ellipse:
+                                 		.STACK	_u8g_draw_filled_ellipse=36
+                                 ;     281 
+                                 ;     282 void u8g_draw_filled_ellipse(u8g_t *u8g, u8g_uint_t x0, u8g_uint_t y0, u8g_uint_t rx, u8g_uint_t ry, uint8_t option)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",282
+00000308 7100E4                  		ADD #0FFFFFFE4H, R0
+0000030B A181                    		MOV.L R1, 18H[R0]
+0000030D 858A                    		MOV.B R2, 17H[R0]
+0000030F 8583                    		MOV.B R3, 16H[R0]
+00000311 850C                    		MOV.B R4, 15H[R0]
+00000313 C5002014                		MOV.B 20H[R0], 14H[R0]
+00000317 C5002113                		MOV.B 21H[R0], 13H[R0]
+                                 ;     283 {
+                                 ;     284   u8g_uint_t x, y;
+                                 ;     285   u8g_long_t xchg, ychg;
+                                 ;     286   u8g_long_t err;
+                                 ;     287   u8g_long_t rxrx2;
+                                 ;     288   u8g_long_t ryry2;
+                                 ;     289   u8g_long_t stopx, stopy;
+                                 ;     290   
+                                 ;     291   rxrx2 = rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",291
+0000031B B509                    		MOVU.B 15H[R0], R1
+0000031D 9109                    		MOV.W R1, 0AH[R0]
+0000031F                         L95:	; entry.split
+                                 ;     292   rxrx2 *= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",292
+0000031F 9909                    		MOV.W 0AH[R0], R1
+00000321 4D0115                  		MUL 15H[R0].UB, R1
+00000324 9109                    		MOV.W R1, 0AH[R0]
+00000326                         L96:	; entry.split1
+                                 ;     293   rxrx2 *= 2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",293
+00000326 9909                    		MOV.W 0AH[R0], R1
+00000328 6C11                    		SHLL #01H, R1
+0000032A 9109                    		MOV.W R1, 0AH[R0]
+0000032C                         L97:	; entry.split2
+                                 ;     294   
+                                 ;     295   ryry2 = ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",295
+0000032C B501                    		MOVU.B 14H[R0], R1
+0000032E 9181                    		MOV.W R1, 0CH[R0]
+00000330                         L98:	; entry.split3
+                                 ;     296   ryry2 *= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",296
+00000330 9981                    		MOV.W 0CH[R0], R1
+00000332 4D0114                  		MUL 14H[R0].UB, R1
+00000335 9181                    		MOV.W R1, 0CH[R0]
+00000337                         L99:	; entry.split4
+                                 ;     297   ryry2 *= 2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",297
+00000337 9981                    		MOV.W 0CH[R0], R1
+00000339 6C11                    		SHLL #01H, R1
+0000033B 9181                    		MOV.W R1, 0CH[R0]
+0000033D                         L100:	; entry.split5
+                                 ;     298   
+                                 ;     299   x = rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",299
+0000033D C5001502                		MOV.B 15H[R0], 02H[R0]
+00000341                         L101:	; entry.split6
+                                 ;     300   y = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",300
+00000341 3C0300                  		MOV.B #00H, 03H[R0]
+00000344                         L102:	; entry.split7
+                                 ;     301   
+                                 ;     302   xchg = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",302
+00000344 3D0201                  		MOV.W #0001H, 04H[R0]
+00000347                         L103:	; entry.split8
+                                 ;     303   xchg -= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",303
+00000347 9881                    		MOV.W 04H[R0], R1
+00000349 410115                  		SUB 15H[R0].UB, R1
+0000034C 9081                    		MOV.W R1, 04H[R0]
+0000034E                         L104:	; entry.split9
+                                 ;     304   xchg -= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",304
+0000034E 9881                    		MOV.W 04H[R0], R1
+00000350 410115                  		SUB 15H[R0].UB, R1
+00000353 9081                    		MOV.W R1, 04H[R0]
+00000355                         L105:	; entry.split10
+                                 ;     305   xchg *= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",305
+00000355 9881                    		MOV.W 04H[R0], R1
+00000357 4D0114                  		MUL 14H[R0].UB, R1
+0000035A 9081                    		MOV.W R1, 04H[R0]
+0000035C                         L106:	; entry.split11
+                                 ;     306   xchg *= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",306
+0000035C 9881                    		MOV.W 04H[R0], R1
+0000035E 4D0114                  		MUL 14H[R0].UB, R1
+00000361 9081                    		MOV.W R1, 04H[R0]
+00000363                         L107:	; entry.split12
+                                 ;     307   
+                                 ;     308   ychg = rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",308
+00000363 B509                    		MOVU.B 15H[R0], R1
+00000365 9089                    		MOV.W R1, 06H[R0]
+00000367                         L108:	; entry.split13
+                                 ;     309   ychg *= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",309
+00000367 9889                    		MOV.W 06H[R0], R1
+00000369 4D0115                  		MUL 15H[R0].UB, R1
+0000036C 9089                    		MOV.W R1, 06H[R0]
+0000036E                         L109:	; entry.split14
+                                 ;     310   
+                                 ;     311   err = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",311
+0000036E 3D0400                  		MOV.W #0000H, 08H[R0]
+00000371                         L110:	; entry.split15
+                                 ;     312   
+                                 ;     313   stopx = ryry2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",313
+00000371 D5000607                		MOV.W 0CH[R0], 0EH[R0]
+00000375                         L111:	; entry.split16
+                                 ;     314   stopx *= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",314
+00000375 9989                    		MOV.W 0EH[R0], R1
+00000377 4D0115                  		MUL 15H[R0].UB, R1
+0000037A 9189                    		MOV.W R1, 0EH[R0]
+0000037C                         L112:	; entry.split17
+                                 ;     315   stopy = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",315
+0000037C 3D0800                  		MOV.W #0000H, 10H[R0]
+0000037F 2Err                 B  		BRA L123
+00000381                         L113:	; bb
+                                 ;     316   
+                                 ;     317   while( stopx >= stopy )
+                                 ;     318   {
+                                 ;     319     u8g_draw_filled_ellipse_section(u8g, x, y, x0, y0, option);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",319
+00000381 B48D                    		MOVU.B 13H[R0], R5
+00000383 590F16                  		MOVU.B 16H[R0], R15
+00000386 B58C                    		MOVU.B 17H[R0], R4
+00000388 B08B                    		MOVU.B 03H[R0], R3
+0000038A B082                    		MOVU.B 02H[R0], R2
+0000038C A981                    		MOV.L 18H[R0], R1
+0000038E 6040                    		SUB #04H, R0
+00000390 800D                    		MOV.B R5, 01H[R0]
+00000392 C30F                    		MOV.B R15, [R0]
+00000394 39rrrr               W  		BSR __$u8g_draw_filled_ellipse_section
+00000397 6240                    		ADD #04H, R0
+00000399                         L114:	; bb.split
+                                 ;     320     y++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",320
+00000399 B089                    		MOVU.B 03H[R0], R1
+0000039B 6211                    		ADD #01H, R1
+0000039D 8089                    		MOV.B R1, 03H[R0]
+0000039F                         L115:	; bb.split18
+                                 ;     321     stopy += rxrx2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",321
+0000039F 9A01                    		MOV.W 10H[R0], R1
+000003A1 06490105                		ADD 0AH[R0].W, R1
+000003A5 9201                    		MOV.W R1, 10H[R0]
+000003A7                         L116:	; bb.split19
+                                 ;     322     err += ychg;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",322
+000003A7 9901                    		MOV.W 08H[R0], R1
+000003A9 06490103                		ADD 06H[R0].W, R1
+000003AD 9101                    		MOV.W R1, 08H[R0]
+000003AF                         L117:	; bb.split20
+                                 ;     323     ychg += rxrx2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",323
+000003AF 9889                    		MOV.W 06H[R0], R1
+000003B1 06490105                		ADD 0AH[R0].W, R1
+000003B5 9089                    		MOV.W R1, 06H[R0]
+000003B7                         L118:	; bb.split21
+                                 ;     324     if ( 2*err+xchg > 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",324
+000003B7 9901                    		MOV.W 08H[R0], R1
+000003B9 6C11                    		SHLL #01H, R1
+000003BB 06490102                		ADD 04H[R0].W, R1
+000003BF 6101                    		CMP #00H, R1
+000003C1 2Brr                    		BLE L123
+000003C3                         L119:	; bb106
+                                 ;     325     {
+                                 ;     326       x--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",326
+000003C3 B081                    		MOVU.B 02H[R0], R1
+000003C5 6011                    		SUB #01H, R1
+000003C7 8081                    		MOV.B R1, 02H[R0]
+000003C9                         L120:	; bb106.split
+                                 ;     327       stopx -= ryry2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",327
+000003C9 9989                    		MOV.W 0EH[R0], R1
+000003CB 06410106                		SUB 0CH[R0].W, R1
+000003CF 9189                    		MOV.W R1, 0EH[R0]
+000003D1                         L121:	; bb106.split22
+                                 ;     328       err += xchg;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",328
+000003D1 9901                    		MOV.W 08H[R0], R1
+000003D3 06490102                		ADD 04H[R0].W, R1
+000003D7 9101                    		MOV.W R1, 08H[R0]
+000003D9                         L122:	; bb106.split23
+                                 ;     329       xchg += ryry2;      
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",329
+000003D9 9881                    		MOV.W 04H[R0], R1
+000003DB 06490106                		ADD 0CH[R0].W, R1
+000003DF 9081                    		MOV.W R1, 04H[R0]
+000003E1                         L123:	; bb136
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",317
+000003E1 9989                    		MOV.W 0EH[R0], R1
+000003E3 06450108                		CMP 10H[R0].W, R1
+000003E7 28rr                    		BGE L113
+000003E9                         L124:	; bb144
+                                 ;     330     }
+                                 ;     331   }
+                                 ;     332 
+                                 ;     333   x = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",333
+000003E9 3C0200                  		MOV.B #00H, 02H[R0]
+000003EC                         L125:	; bb144.split
+                                 ;     334   y = ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",334
+000003EC C5001403                		MOV.B 14H[R0], 03H[R0]
+000003F0                         L126:	; bb144.split24
+                                 ;     335   
+                                 ;     336   xchg = ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",336
+000003F0 B501                    		MOVU.B 14H[R0], R1
+000003F2 9081                    		MOV.W R1, 04H[R0]
+000003F4                         L127:	; bb144.split25
+                                 ;     337   xchg *= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",337
+000003F4 9881                    		MOV.W 04H[R0], R1
+000003F6 4D0114                  		MUL 14H[R0].UB, R1
+000003F9 9081                    		MOV.W R1, 04H[R0]
+000003FB                         L128:	; bb144.split26
+                                 ;     338   
+                                 ;     339   ychg = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",339
+000003FB 3D0301                  		MOV.W #0001H, 06H[R0]
+000003FE                         L129:	; bb144.split27
+                                 ;     340   ychg -= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",340
+000003FE 9889                    		MOV.W 06H[R0], R1
+00000400 410114                  		SUB 14H[R0].UB, R1
+00000403 9089                    		MOV.W R1, 06H[R0]
+00000405                         L130:	; bb144.split28
+                                 ;     341   ychg -= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",341
+00000405 9889                    		MOV.W 06H[R0], R1
+00000407 410114                  		SUB 14H[R0].UB, R1
+0000040A 9089                    		MOV.W R1, 06H[R0]
+0000040C                         L131:	; bb144.split29
+                                 ;     342   ychg *= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",342
+0000040C 9889                    		MOV.W 06H[R0], R1
+0000040E 4D0115                  		MUL 15H[R0].UB, R1
+00000411 9089                    		MOV.W R1, 06H[R0]
+00000413                         L132:	; bb144.split30
+                                 ;     343   ychg *= rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",343
+00000413 9889                    		MOV.W 06H[R0], R1
+00000415 4D0115                  		MUL 15H[R0].UB, R1
+00000418 9089                    		MOV.W R1, 06H[R0]
+0000041A                         L133:	; bb144.split31
+                                 ;     344   
+                                 ;     345   err = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",345
+0000041A 3D0400                  		MOV.W #0000H, 08H[R0]
+0000041D                         L134:	; bb144.split32
+                                 ;     346   
+                                 ;     347   stopx = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",347
+0000041D 3D0700                  		MOV.W #0000H, 0EH[R0]
+00000420                         L135:	; bb144.split33
+                                 ;     348 
+                                 ;     349   stopy = rxrx2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",349
+00000420 D5000508                		MOV.W 0AH[R0], 10H[R0]
+00000424                         L136:	; bb144.split34
+                                 ;     350   stopy *= ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",350
+00000424 9A01                    		MOV.W 10H[R0], R1
+00000426 4D0114                  		MUL 14H[R0].UB, R1
+00000429 9201                    		MOV.W R1, 10H[R0]
+0000042B 2Err                 B  		BRA L147
+0000042D                         L137:	; bb185
+                                 ;     351   
+                                 ;     352 
+                                 ;     353   while( stopx <= stopy )
+                                 ;     354   {
+                                 ;     355     u8g_draw_filled_ellipse_section(u8g, x, y, x0, y0, option);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",355
+0000042D B48D                    		MOVU.B 13H[R0], R5
+0000042F 590F16                  		MOVU.B 16H[R0], R15
+00000432 B58C                    		MOVU.B 17H[R0], R4
+00000434 B08B                    		MOVU.B 03H[R0], R3
+00000436 B082                    		MOVU.B 02H[R0], R2
+00000438 A981                    		MOV.L 18H[R0], R1
+0000043A 6040                    		SUB #04H, R0
+0000043C 800D                    		MOV.B R5, 01H[R0]
+0000043E C30F                    		MOV.B R15, [R0]
+00000440 39rrrr               W  		BSR __$u8g_draw_filled_ellipse_section
+00000443 6240                    		ADD #04H, R0
+00000445                         L138:	; bb185.split
+                                 ;     356     x++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",356
+00000445 B081                    		MOVU.B 02H[R0], R1
+00000447 6211                    		ADD #01H, R1
+00000449 8081                    		MOV.B R1, 02H[R0]
+0000044B                         L139:	; bb185.split35
+                                 ;     357     stopx += ryry2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",357
+0000044B 9989                    		MOV.W 0EH[R0], R1
+0000044D 06490106                		ADD 0CH[R0].W, R1
+00000451 9189                    		MOV.W R1, 0EH[R0]
+00000453                         L140:	; bb185.split36
+                                 ;     358     err += xchg;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",358
+00000453 9901                    		MOV.W 08H[R0], R1
+00000455 06490102                		ADD 04H[R0].W, R1
+00000459 9101                    		MOV.W R1, 08H[R0]
+0000045B                         L141:	; bb185.split37
+                                 ;     359     xchg += ryry2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",359
+0000045B 9881                    		MOV.W 04H[R0], R1
+0000045D 06490106                		ADD 0CH[R0].W, R1
+00000461 9081                    		MOV.W R1, 04H[R0]
+00000463                         L142:	; bb185.split38
+                                 ;     360     if ( 2*err+ychg > 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",360
+00000463 9901                    		MOV.W 08H[R0], R1
+00000465 6C11                    		SHLL #01H, R1
+00000467 06490103                		ADD 06H[R0].W, R1
+0000046B 6101                    		CMP #00H, R1
+0000046D 2Brr                    		BLE L147
+0000046F                         L143:	; bb213
+                                 ;     361     {
+                                 ;     362       y--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",362
+0000046F B089                    		MOVU.B 03H[R0], R1
+00000471 6011                    		SUB #01H, R1
+00000473 8089                    		MOV.B R1, 03H[R0]
+00000475                         L144:	; bb213.split
+                                 ;     363       stopy -= rxrx2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",363
+00000475 9A01                    		MOV.W 10H[R0], R1
+00000477 06410105                		SUB 0AH[R0].W, R1
+0000047B 9201                    		MOV.W R1, 10H[R0]
+0000047D                         L145:	; bb213.split39
+                                 ;     364       err += ychg;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",364
+0000047D 9901                    		MOV.W 08H[R0], R1
+0000047F 06490103                		ADD 06H[R0].W, R1
+00000483 9101                    		MOV.W R1, 08H[R0]
+00000485                         L146:	; bb213.split40
+                                 ;     365       ychg += rxrx2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",365
+00000485 9889                    		MOV.W 06H[R0], R1
+00000487 06490105                		ADD 0AH[R0].W, R1
+0000048B 9089                    		MOV.W R1, 06H[R0]
+0000048D                         L147:	; bb244
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",353
+0000048D 9989                    		MOV.W 0EH[R0], R1
+0000048F 06450108                		CMP 10H[R0].W, R1
+00000493 2Brr                    		BLE L137
+00000495                         L148:	; return
+                                 ;     366     }
+                                 ;     367   }
+                                 ;     368   
+                                 ;     369 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",369
+00000495 6707                    		RTSD #1CH
+00000497                         _u8g_DrawFilledEllipse:
+                                 		.STACK	_u8g_DrawFilledEllipse=24
+                                 ;     370 
+                                 ;     371 void u8g_DrawFilledEllipse(u8g_t *u8g, u8g_uint_t x0, u8g_uint_t y0, u8g_uint_t rx, u8g_uint_t ry, uint8_t option)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",371
+00000497 7100F0                  		ADD #0FFFFFFF0H, R0
+0000049A A089                    		MOV.L R1, 0CH[R0]
+0000049C 828A                    		MOV.B R2, 0BH[R0]
+0000049E 8283                    		MOV.B R3, 0AH[R0]
+000004A0 820C                    		MOV.B R4, 09H[R0]
+000004A2 C5001408                		MOV.B 14H[R0], 08H[R0]
+000004A6 C5001507                		MOV.B 15H[R0], 07H[R0]
+                                 ;     372 {
+                                 ;     373   /* check for bounding box */
+                                 ;     374   {
+                                 ;     375     u8g_uint_t rxp, rxp2;
+                                 ;     376     u8g_uint_t ryp, ryp2;
+                                 ;     377     
+                                 ;     378     rxp = rx;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",378
+000004AA C5000903                		MOV.B 09H[R0], 03H[R0]
+000004AE                         L150:	; entry.split
+                                 ;     379     rxp++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",379
+000004AE B089                    		MOVU.B 03H[R0], R1
+000004B0 6211                    		ADD #01H, R1
+000004B2 8089                    		MOV.B R1, 03H[R0]
+000004B4                         L151:	; entry.split1
+                                 ;     380     rxp2 = rxp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",380
+000004B4 C5000304                		MOV.B 03H[R0], 04H[R0]
+000004B8                         L152:	; entry.split2
+                                 ;     381     rxp2 *= 2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",381
+000004B8 B101                    		MOVU.B 04H[R0], R1
+000004BA 6C11                    		SHLL #01H, R1
+000004BC 8101                    		MOV.B R1, 04H[R0]
+000004BE                         L153:	; entry.split3
+                                 ;     382 
+                                 ;     383     ryp = ry;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",383
+000004BE C5000805                		MOV.B 08H[R0], 05H[R0]
+000004C2                         L154:	; entry.split4
+                                 ;     384     ryp++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",384
+000004C2 B109                    		MOVU.B 05H[R0], R1
+000004C4 6211                    		ADD #01H, R1
+000004C6 8109                    		MOV.B R1, 05H[R0]
+000004C8                         L155:	; entry.split5
+                                 ;     385     ryp2 = ryp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",385
+000004C8 C5000506                		MOV.B 05H[R0], 06H[R0]
+000004CC                         L156:	; entry.split6
+                                 ;     386     ryp2 *= 2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",386
+000004CC B181                    		MOVU.B 06H[R0], R1
+000004CE 6C11                    		SHLL #01H, R1
+000004D0 8181                    		MOV.B R1, 06H[R0]
+000004D2                         L157:	; entry.split7
+                                 ;     387     
+                                 ;     388     if ( u8g_IsBBXIntersection(u8g, x0-rxp, y0-ryp, rxp2, ryp2) == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",388
+000004D2 B282                    		MOVU.B 0AH[R0], R2
+000004D4 410205                  		SUB 05H[R0].UB, R2
+000004D7 B28D                    		MOVU.B 0BH[R0], R5
+000004D9 410503                  		SUB 03H[R0].UB, R5
+000004DC B183                    		MOVU.B 06H[R0], R3
+000004DE B104                    		MOVU.B 04H[R0], R4
+000004E0 A889                    		MOV.L 0CH[R0], R1
+000004E2 6040                    		SUB #04H, R0
+000004E4 C303                    		MOV.B R3, [R0]
+000004E6 5B23                    		MOVU.B R2, R3
+000004E8 5B52                    		MOVU.B R5, R2
+000004EA 05rrrrrr             A  		BSR _u8g_IsBBXIntersection
+000004EE 6240                    		ADD #04H, R0
+000004F0 6101                    		CMP #00H, R1
+000004F2 20rr                    		BEQ L159
+000004F4                         L158:	; bb47
+                                 ;     389       return;    
+                                 ;     390   }
+                                 ;     391   
+                                 ;     392   u8g_draw_filled_ellipse(u8g, x0, y0, rx, ry, option);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",392
+000004F4 B18D                    		MOVU.B 07H[R0], R5
+000004F6 590F08                  		MOVU.B 08H[R0], R15
+000004F9 B20C                    		MOVU.B 09H[R0], R4
+000004FB B283                    		MOVU.B 0AH[R0], R3
+000004FD B28A                    		MOVU.B 0BH[R0], R2
+000004FF A889                    		MOV.L 0CH[R0], R1
+00000501 6040                    		SUB #04H, R0
+00000503 800D                    		MOV.B R5, 01H[R0]
+00000505 C30F                    		MOV.B R15, [R0]
+00000507 39rrrr               W  		BSR _u8g_draw_filled_ellipse
+0000050A 6240                    		ADD #04H, R0
+0000050C 6704                    		RTSD #10H
+0000050E                         L159:	; return
+                                 ;     393 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_ellipse.c",393
+0000050E 6704                    		RTSD #10H
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01275   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001296(00000510H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx305E\$ccrx\u8g_ellipse.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\u8g_ellipse.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\src\Display\u8g_ellipse.obj

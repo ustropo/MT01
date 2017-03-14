@@ -1,0 +1,2040 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:03:03 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:03:03
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_usb_cdataio.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_usb_cdataio.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;r_usb_cdataio.c
+                                 
+                                 		.glb	_usb_ghstd_IgnoreCnt
+                                 		.glb	_usb_gcstd_DataCnt
+                                 		.glb	_usb_gcstd_Dma0Dir
+                                 		.glb	_usb_gcstd_Dma0Size
+                                 		.glb	_usb_gcstd_Dma0Fifo
+                                 		.glb	_usb_gcstd_Dma0Pipe
+                                 		.glb	_usb_gcstd_DataPtr
+                                 		.glb	_usb_gcstd_Pipe
+                                 		.glb	_usb_gcstd_XckeMode
+                                 		.glb	_usb_gcstd_HsEnable
+                                 		.glb	_usb_cstd_SendStart
+                                 		.glb	_usb_cstd_Buf2Fifo
+                                 		.glb	_usb_cstd_write_data
+                                 		.glb	_usb_cstd_DoSqtgl
+                                 		.glb	_usb_creg_clr_sts_bemp
+                                 		.glb	_usb_creg_clr_sts_brdy
+                                 		.glb	_usb_cstd_Pipe2Fport
+                                 		.glb	_usb_cstd_SetBuf
+                                 		.glb	_usb_cstd_ForcedTermination
+                                 		.glb	_usb_creg_clr_brdyenb
+                                 		.glb	_usb_creg_set_brdyenb
+                                 		.glb	_usb_cstd_NrdyEnable
+                                 		.glb	_usb_creg_set_bempenb
+                                 		.glb	_usb_cstd_is_set_frdy
+                                 		.glb	_usb_cstd_GetBufSize
+                                 		.glb	_usb_cstd_GetMaxPacketSize
+                                 		.glb	_usb_cstd_write_fifo
+                                 		.glb	_usb_creg_read_fifoctr
+                                 		.glb	_usb_creg_set_bval
+                                 		.glb	_usb_cstd_ReceiveStart
+                                 		.glb	_usb_cstd_chg_curpipe
+                                 		.glb	_usb_cstd_SetTransactionCounter
+                                 		.glb	_usb_cstd_Fifo2Buf
+                                 		.glb	_usb_cstd_read_data
+                                 		.glb	_usb_cstd_DataEnd
+                                 		.glb	_usb_cstd_SetNak
+                                 		.glb	_usb_cstd_is_host_mode
+                                 		.glb	_usb_creg_set_bclr
+                                 		.glb	_usb_cstd_read_fifo
+                                 		.glb	_usb_creg_clr_nrdyenb
+                                 		.glb	_usb_creg_clr_bempenb
+                                 		.glb	_usb_cstd_ClrTransactionCounter
+                                 		.glb	_usb_creg_read_pipectr
+                                 		.glb	_usb_cstd_GetPipeDir
+                                 		.glb	_usb_cstd_GetPipeType
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _usb_cstd_SendStart:
+                                 		.STACK	_usb_cstd_SendStart=20
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+                                 ;       5 * applicable laws, including copyright laws.
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014(2015) Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_usb_cdataio.c
+                                 ;      21 * Description  : USB Host and Peripheral low level data I/O code
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description
+                                 ;      25 *         : 04.01.2014 1.00 First Release
+                                 ;      26 *         : 30.01.2015 1.01    Added RX71M.
+                                 ;      27 ***********************************************************************************************************************/
+                                 ;      28 
+                                 ;      29 
+                                 ;      30 /******************************************************************************
+                                 ;      31 Includes   <System Includes> , "Project Includes"
+                                 ;      32 ******************************************************************************/
+                                 ;      33 #include "r_usb_basic_if.h"
+                                 ;      34 #include "r_usb_reg_access.h"
+                                 ;      35 
+                                 ;      36 
+                                 ;      37 /******************************************************************************
+                                 ;      38 Constant macro definitions
+                                 ;      39 ******************************************************************************/
+                                 ;      40 
+                                 ;      41 /******************************************************************************
+                                 ;      42 External variables and functions
+                                 ;      43 ******************************************************************************/
+                                 ;      44 
+                                 ;      45 /******************************************************************************
+                                 ;      46 Static variables and functions
+                                 ;      47 ******************************************************************************/
+                                 ;      48 static  void usb_cstd_SelectNak(USB_UTR_t *ptr, uint16_t pipe);
+                                 ;      49 
+                                 ;      50 
+                                 ;      51 /******************************************************************************
+                                 ;      52 Private global variables and functions
+                                 ;      53 ******************************************************************************/
+                                 ;      54 /* USB data transfer */
+                                 ;      55 /* PIPEn Buffer counter */
+                                 ;      56 uint32_t        usb_gcstd_DataCnt[USB_NUM_USBIP][USB_MAX_PIPE_NO + 1u];
+                                 ;      57 /* DMA0 direction */
+                                 ;      58 uint16_t        usb_gcstd_Dma0Dir[USB_NUM_USBIP];
+                                 ;      59 /* DMA0 buffer size */
+                                 ;      60 uint32_t        usb_gcstd_Dma0Size[USB_NUM_USBIP];
+                                 ;      61 /* DMA0 FIFO buffer size */
+                                 ;      62 uint16_t        usb_gcstd_Dma0Fifo[USB_NUM_USBIP];
+                                 ;      63 /* DMA0 pipe number */
+                                 ;      64 uint16_t        usb_gcstd_Dma0Pipe[USB_NUM_USBIP];
+                                 ;      65 /* PIPEn Buffer pointer(8bit) */
+                                 ;      66 uint8_t         *usb_gcstd_DataPtr[USB_NUM_USBIP][USB_MAX_PIPE_NO + 1u];
+                                 ;      67 /* Message pipe */
+                                 ;      68 USB_UTR_t       *usb_gcstd_Pipe[USB_NUM_USBIP][USB_MAX_PIPE_NO + 1u];
+                                 ;      69 /* XCKE Mode Flag */
+                                 ;      70 uint16_t        usb_gcstd_XckeMode;
+                                 ;      71 /* Hi-speed enable */
+                                 ;      72 uint16_t        usb_gcstd_HsEnable[USB_NUM_USBIP];
+                                 ;      73 
+                                 ;      74 /******************************************************************************
+                                 ;      75 Private global variables and functions
+                                 ;      76 ******************************************************************************/
+                                 ;      77 
+                                 ;      78 /******************************************************************************
+                                 ;      79 Renesas Abstracted common data I/O functions
+                                 ;      80 ******************************************************************************/
+                                 ;      81 
+                                 ;      82 
+                                 ;      83 /******************************************************************************
+                                 ;      84 Function Name   : usb_cstd_SendStart
+                                 ;      85 Description     : Start data transmission using CPU/DMA transfer to USB host/
+                                 ;      86                 : /device.
+                                 ;      87 Arguments       : USB_UTR_t *ptr : USB internal structure. Selects e.g. channel.
+                                 ;      88                 : uint16_t pipe  : Pipe no.
+                                 ;      89 Return value    : none
+                                 ;      90 ******************************************************************************/
+                                 ;      91 void usb_cstd_SendStart(USB_UTR_t *ptr, uint16_t pipe)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",91
+00000000 7100F0                  		ADD #0FFFFFFF0H, R0
+00000003 A089                    		MOV.L R1, 0CH[R0]
+00000005 910A                    		MOV.W R2, 0AH[R0]
+                                 ;      92 {
+                                 ;      93     USB_UTR_t       *pp;
+                                 ;      94     uint32_t        length;
+                                 ;      95     uint16_t        useport;
+                                 ;      96 
+                                 ;      97     /* Evacuation pointer */
+                                 ;      98     pp = usb_gcstd_Pipe[ptr->ip][pipe];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",98
+00000007 A889                    		MOV.L 0CH[R0], R1
+00000009 B991                    		MOVU.W 0CH[R1], R1
+0000000B 751128                  		MUL #28H, R1
+0000000E FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+00000014 4B1E                    		ADD R1, R14
+00000016 B909                    		MOVU.W 0AH[R0], R1
+00000018 FE61E1                  		MOV.L [R1,R14], R1
+0000001B E301                    		MOV.L R1, [R0]
+0000001D                         L11:	; entry.split
+                                 ;      99     length  = pp->tranlen;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",99
+0000001D EC01                    		MOV.L [R0], R1
+0000001F E5100601                		MOV.L 18H[R1], 04H[R0]
+00000023                         L12:	; entry.split1
+                                 ;     100 
+                                 ;     101     /* Check transfer count */
+                                 ;     102     if( pp->segment == USB_TRAN_CONT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",102
+00000023 EC01                    		MOV.L [R0], R1
+00000025 591E25                  		MOVU.B 25H[R1], R14
+00000028 610E                    		CMP #00H, R14
+0000002A 21rr                    		BNE L14
+0000002C                         L13:	; bb18
+                                 ;     103     {
+                                 ;     104         /* Sequence toggle */
+                                 ;     105         usb_cstd_DoSqtgl(ptr, pipe, pp->pipectr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",105
+0000002C EC01                    		MOV.L [R0], R1
+0000002E BC1B                    		MOVU.W 22H[R1], R3
+00000030 B90A                    		MOVU.W 0AH[R0], R2
+00000032 A889                    		MOV.L 0CH[R0], R1
+00000034 05rrrrrr             A  		BSR _usb_cstd_DoSqtgl
+00000038                         L14:	; bb30
+                                 ;     106     }
+                                 ;     107 
+                                 ;     108     /* Select NAK */
+                                 ;     109     usb_cstd_SelectNak(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",109
+00000038 B90A                    		MOVU.W 0AH[R0], R2
+0000003A A889                    		MOV.L 0CH[R0], R1
+0000003C 39rrrr               W  		BSR __$usb_cstd_SelectNak
+0000003F                         L15:	; bb30.split
+                                 ;     110     /* Set data count */
+                                 ;     111     usb_gcstd_DataCnt[ptr->ip][pipe] = length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",111
+0000003F A889                    		MOV.L 0CH[R0], R1
+00000041 B991                    		MOVU.W 0CH[R1], R1
+00000043 751128                  		MUL #28H, R1
+00000046 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+0000004C 4B1E                    		ADD R1, R14
+0000004E A809                    		MOV.L 04H[R0], R1
+00000050 B90A                    		MOVU.W 0AH[R0], R2
+00000052 FE22E1                  		MOV.L R1, [R2,R14]
+00000055                         L16:	; bb30.split2
+                                 ;     112     /* Set data pointer */
+                                 ;     113     usb_gcstd_DataPtr[ptr->ip][pipe] = (uint8_t*)pp->tranadr;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",113
+00000055 A889                    		MOV.L 0CH[R0], R1
+00000057 B991                    		MOVU.W 0CH[R1], R1
+00000059 751128                  		MUL #28H, R1
+0000005C FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataPtr, R14
+00000062 4B1E                    		ADD R1, R14
+00000064 EC01                    		MOV.L [R0], R1
+00000066 A919                    		MOV.L 14H[R1], R1
+00000068 B90A                    		MOVU.W 0AH[R0], R2
+0000006A FE22E1                  		MOV.L R1, [R2,R14]
+0000006D                         L17:	; bb30.split3
+                                 ;     114 #if USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP
+                                 ;     115     /* Ignore count clear */
+                                 ;     116     usb_ghstd_IgnoreCnt[ptr->ip][pipe] = (uint16_t)0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",116
+0000006D A889                    		MOV.L 0CH[R0], R1
+0000006F B991                    		MOVU.W 0CH[R1], R1
+00000071 751114                  		MUL #14H, R1
+00000074 FBE2rrrrrrrr            		MOV.L #_usb_ghstd_IgnoreCnt, R14
+0000007A 4B1E                    		ADD R1, R14
+0000007C 660F                    		MOV.L #00000000H, R15
+0000007E B909                    		MOVU.W 0AH[R0], R1
+00000080 FE11EF                  		MOV.W R15, [R1,R14]
+00000083                         L18:	; bb30.split4
+                                 ;     117 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP */
+                                 ;     118 
+                                 ;     119     /* BEMP Status Clear */
+                                 ;     120     usb_creg_clr_sts_bemp( ptr, pipe );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",120
+00000083 B90A                    		MOVU.W 0AH[R0], R2
+00000085 A889                    		MOV.L 0CH[R0], R1
+00000087 05rrrrrr             A  		BSR _usb_creg_clr_sts_bemp
+0000008B                         L19:	; bb30.split5
+                                 ;     121     /* BRDY Status Clear */
+                                 ;     122     usb_creg_clr_sts_brdy( ptr, pipe );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",122
+0000008B B90A                    		MOVU.W 0AH[R0], R2
+0000008D A889                    		MOV.L 0CH[R0], R1
+0000008F 05rrrrrr             A  		BSR _usb_creg_clr_sts_brdy
+00000093                         L20:	; bb30.split6
+                                 ;     123 
+                                 ;     124     /* Pipe number to FIFO port select */
+                                 ;     125     useport = usb_cstd_Pipe2Fport(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",125
+00000093 B90A                    		MOVU.W 0AH[R0], R2
+00000095 A889                    		MOV.L 0CH[R0], R1
+00000097 05rrrrrr             A  		BSR _usb_cstd_Pipe2Fport
+0000009B 9101                    		MOV.W R1, 08H[R0]
+0000009D                         L21:	; bb30.split7
+                                 ;     126     /* Check use FIFO access */
+                                 ;     127     switch( useport )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",127
+0000009D B901                    		MOVU.W 08H[R0], R1
+0000009F 6131                    		CMP #03H, R1
+000000A1 20rr                    		BEQ L27
+000000A3                         L22:	; bb30.split7
+000000A3 6111                    		CMP #01H, R1
+000000A5 20rr                    		BEQ L26
+000000A7                         L23:	; bb30.split7
+000000A7 6101                    		CMP #00H, R1
+000000A9 21rr                    		BNE L29
+000000AB                         L24:	; bb73
+                                 ;     128     {
+                                 ;     129     /* CFIFO use */
+                                 ;     130     case USB_CUSE:
+                                 ;     131         /* Buffer to FIFO data write */
+                                 ;     132         usb_cstd_Buf2Fifo(ptr, pipe, useport);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",132
+000000AB B903                    		MOVU.W 08H[R0], R3
+000000AD B90A                    		MOVU.W 0AH[R0], R2
+000000AF A889                    		MOV.L 0CH[R0], R1
+000000B1 39rrrr               W  		BSR _usb_cstd_Buf2Fifo
+000000B4                         L25:	; bb73.split
+                                 ;     133         /* Set BUF */
+                                 ;     134         usb_cstd_SetBuf(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",134
+000000B4 B90A                    		MOVU.W 0AH[R0], R2
+000000B6 A889                    		MOV.L 0CH[R0], R1
+000000B8 05rrrrrr             A  		BSR _usb_cstd_SetBuf
+000000BC 6704                    		RTSD #10H
+000000BE                         L26:	; bb80
+                                 ;     135         break;
+                                 ;     136     /* D0FIFO use */
+                                 ;     137     case USB_D0USE:
+                                 ;     138         /* D0 FIFO access is NG */
+                                 ;     139         USB_PRINTF1("### USB-ITRON is not support(SND-D0USE:pipe%d)\n", pipe);
+                                 ;     140         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",140
+000000BE B90A                    		MOVU.W 0AH[R0], R2
+000000C0 A889                    		MOV.L 0CH[R0], R1
+000000C2 6673                    		MOV.L #00000007H, R3
+000000C4 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+000000C8 6704                    		RTSD #10H
+000000CA                         L27:	; bb83
+                                 ;     141         break;
+                                 ;     142     /* D1FIFO use */
+                                 ;     143     case USB_D1USE:
+                                 ;     144         /* Buffer to FIFO data write */
+                                 ;     145         usb_cstd_Buf2Fifo(ptr, pipe, useport);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",145
+000000CA B903                    		MOVU.W 08H[R0], R3
+000000CC B90A                    		MOVU.W 0AH[R0], R2
+000000CE A889                    		MOV.L 0CH[R0], R1
+000000D0 39rrrr               W  		BSR _usb_cstd_Buf2Fifo
+000000D3                         L28:	; bb83.split
+                                 ;     146         /* Set BUF */
+                                 ;     147         usb_cstd_SetBuf(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",147
+000000D3 B90A                    		MOVU.W 0AH[R0], R2
+000000D5 A889                    		MOV.L 0CH[R0], R1
+000000D7 05rrrrrr             A  		BSR _usb_cstd_SetBuf
+000000DB 6704                    		RTSD #10H
+000000DD                         L29:	; bb89
+                                 ;     148         break;
+                                 ;     149 
+                                 ;     150 #ifdef USB_DTC_ENABLE
+                                 ;     151     /* D0FIFO DMA */
+                                 ;     152     case USB_D0DMA:
+                                 ;     153         /* Setting for use PIPE number */
+                                 ;     154         usb_gcstd_Dma0Pipe[ptr->ip] = pipe;
+                                 ;     155         /* PIPE direction */
+                                 ;     156         usb_gcstd_Dma0Dir[ptr->ip]  = usb_cstd_GetPipeDir(ptr, pipe);
+                                 ;     157         /* Buffer size */
+                                 ;     158         usb_gcstd_Dma0Fifo[ptr->ip] = usb_cstd_GetBufSize(ptr, pipe);
+                                 ;     159         /* Check data count */
+                                 ;     160         if( usb_gcstd_DataCnt[ptr->ip][usb_gcstd_Dma0Pipe[ptr->ip]] <= usb_gcstd_Dma0Fifo[ptr->ip] )
+                                 ;     161         {
+                                 ;     162             /* Transfer data size */
+                                 ;     163             usb_gcstd_Dma0Size[ptr->ip] = (uint16_t)usb_gcstd_DataCnt[ptr->ip][usb_gcstd_Dma0Pipe[ptr->ip]];
+                                 ;     164             /* Enable Empty Interrupt */
+                                 ;     165             usb_creg_set_bempenb(ptr, usb_gcstd_Dma0Pipe[ptr->ip]);
+                                 ;     166         }
+                                 ;     167         else
+                                 ;     168         {
+                                 ;     169             /* Data size == FIFO size */
+                                 ;     170             usb_gcstd_Dma0Size[ptr->ip] = usb_gcstd_Dma0Fifo[ptr->ip];
+                                 ;     171         }
+                                 ;     172 
+                                 ;     173         usb_cstd_Buf2fifoStartDma( ptr, pipe, useport );
+                                 ;     174 
+                                 ;     175         /* Set BUF */
+                                 ;     176         usb_cstd_SetBuf(ptr, pipe);
+                                 ;     177         break;
+                                 ;     178     /* D1FIFO DMA */
+                                 ;     179     case USB_D1DMA:
+                                 ;     180         /* D1 FIFO access is NG */
+                                 ;     181         USB_PRINTF1("### USB-ITRON is not support(SND-D1DMA:pipe%d)\n", pipe);
+                                 ;     182         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_ERR);
+                                 ;     183         break;
+                                 ;     184 #endif    /* USB_DTC_ENABLE */
+                                 ;     185 
+                                 ;     186     default:
+                                 ;     187         /* Access is NG */
+                                 ;     188         USB_PRINTF1("### USB-ITRON is not support(SND-else:pipe%d)\n", pipe);
+                                 ;     189         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",189
+000000DD B90A                    		MOVU.W 0AH[R0], R2
+000000DF A889                    		MOV.L 0CH[R0], R1
+000000E1 6673                    		MOV.L #00000007H, R3
+000000E3 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+000000E7 6704                    		RTSD #10H
+000000E9                         _usb_cstd_Buf2Fifo:
+                                 		.STACK	_usb_cstd_Buf2Fifo=16
+                                 ;     190         break;
+                                 ;     191     }
+                                 ;     192 }
+                                 ;     193 /******************************************************************************
+                                 ;     194 End of function usb_cstd_SendStart
+                                 ;     195 ******************************************************************************/
+                                 ;     196 
+                                 ;     197 
+                                 ;     198 /******************************************************************************
+                                 ;     199 Function Name   : usb_cstd_Buf2Fifo
+                                 ;     200 Description     : Set USB registers as required to write from data buffer to USB 
+                                 ;     201                 : FIFO, to have USB FIFO to write data to bus.
+                                 ;     202 Arguments       : USB_UTR_t *ptr : USB internal structure. Selects e.g. channel.
+                                 ;     203                 : uint16_t pipe     : Pipe no.
+                                 ;     204                 : uint16_t useport  : Port no.
+                                 ;     205 Return value    : none
+                                 ;     206 ******************************************************************************/
+                                 ;     207 void usb_cstd_Buf2Fifo(USB_UTR_t *ptr, uint16_t pipe, uint16_t useport)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",207
+000000E9 60C0                    		SUB #0CH, R0
+000000EB A081                    		MOV.L R1, 08H[R0]
+000000ED 908A                    		MOV.W R2, 06H[R0]
+000000EF 9083                    		MOV.W R3, 04H[R0]
+                                 ;     208 {
+                                 ;     209     uint16_t    end_flag;
+                                 ;     210 
+                                 ;     211     /* Disable Ready Interrupt */
+                                 ;     212     usb_creg_clr_brdyenb(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",212
+000000F1 B88A                    		MOVU.W 06H[R0], R2
+000000F3 A881                    		MOV.L 08H[R0], R1
+000000F5 05rrrrrr             A  		BSR _usb_creg_clr_brdyenb
+000000F9                         L31:	; entry.split
+                                 ;     213 #if USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP
+                                 ;     214     /* Ignore count clear */
+                                 ;     215     usb_ghstd_IgnoreCnt[ptr->ip][pipe] = (uint16_t)0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",215
+000000F9 A881                    		MOV.L 08H[R0], R1
+000000FB B991                    		MOVU.W 0CH[R1], R1
+000000FD 751114                  		MUL #14H, R1
+00000100 FBE2rrrrrrrr            		MOV.L #_usb_ghstd_IgnoreCnt, R14
+00000106 4B1E                    		ADD R1, R14
+00000108 660F                    		MOV.L #00000000H, R15
+0000010A B889                    		MOVU.W 06H[R0], R1
+0000010C FE11EF                  		MOV.W R15, [R1,R14]
+0000010F                         L32:	; entry.split1
+                                 ;     216 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP */
+                                 ;     217 
+                                 ;     218     end_flag = usb_cstd_write_data( ptr, pipe, useport );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",218
+0000010F B883                    		MOVU.W 04H[R0], R3
+00000111 B88A                    		MOVU.W 06H[R0], R2
+00000113 A881                    		MOV.L 08H[R0], R1
+00000115 39rrrr               W  		BSR _usb_cstd_write_data
+00000118 9009                    		MOV.W R1, 02H[R0]
+0000011A                         L33:	; entry.split2
+                                 ;     219 
+                                 ;     220     /* Check FIFO access sequence */
+                                 ;     221     switch( end_flag )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",221
+0000011A B809                    		MOVU.W 02H[R0], R1
+0000011C 6121                    		CMP #02H, R1
+0000011E 23rr                    		BLTU L38
+00000120                         L34:	; entry.split2
+00000120 7701FFFF00              		CMP #0FFFFH, R1
+00000125 20rr                    		BEQ L40
+00000127                         L35:	; entry.split2
+00000127 6121                    		CMP #02H, R1
+00000129 21rr                    		BNE L41
+0000012B                         L36:	; bb
+                                 ;     222     {
+                                 ;     223     case USB_WRITING:
+                                 ;     224         /* Continue of data write */
+                                 ;     225         /* Enable Ready Interrupt */
+                                 ;     226         usb_creg_set_brdyenb(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",226
+0000012B B88A                    		MOVU.W 06H[R0], R2
+0000012D A881                    		MOV.L 08H[R0], R1
+0000012F 05rrrrrr             A  		BSR _usb_creg_set_brdyenb
+00000133                         L37:	; bb.split
+                                 ;     227         /* Enable Not Ready Interrupt */
+                                 ;     228         usb_cstd_NrdyEnable(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",228
+00000133 B88A                    		MOVU.W 06H[R0], R2
+00000135 A881                    		MOV.L 08H[R0], R1
+00000137 05rrrrrr             A  		BSR _usb_cstd_NrdyEnable
+0000013B 6703                    		RTSD #0CH
+0000013D                         L38:	; bb25
+                                 ;     229         break;
+                                 ;     230     case USB_WRITEEND:
+                                 ;     231         /* End of data write */
+                                 ;     232         /* continue */
+                                 ;     233     case USB_WRITESHRT:
+                                 ;     234         /* End of data write */
+                                 ;     235         /* Enable Empty Interrupt */
+                                 ;     236         usb_creg_set_bempenb(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",236
+0000013D B88A                    		MOVU.W 06H[R0], R2
+0000013F A881                    		MOV.L 08H[R0], R1
+00000141 05rrrrrr             A  		BSR _usb_creg_set_bempenb
+00000145                         L39:	; bb25.split
+                                 ;     237         /* Enable Not Ready Interrupt */
+                                 ;     238         usb_cstd_NrdyEnable(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",238
+00000145 B88A                    		MOVU.W 06H[R0], R2
+00000147 A881                    		MOV.L 08H[R0], R1
+00000149 05rrrrrr             A  		BSR _usb_cstd_NrdyEnable
+0000014D 6703                    		RTSD #0CH
+0000014F                         L40:	; bb30
+                                 ;     239         break;
+                                 ;     240     case USB_FIFOERROR:
+                                 ;     241         /* FIFO access error */
+                                 ;     242         USB_PRINTF0("### FIFO access error \n");
+                                 ;     243         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",243
+0000014F B88A                    		MOVU.W 06H[R0], R2
+00000151 A881                    		MOV.L 08H[R0], R1
+00000153 6673                    		MOV.L #00000007H, R3
+00000155 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+00000159 6703                    		RTSD #0CH
+0000015B                         L41:	; bb33
+                                 ;     244         break;
+                                 ;     245     default:
+                                 ;     246         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",246
+0000015B B88A                    		MOVU.W 06H[R0], R2
+0000015D A881                    		MOV.L 08H[R0], R1
+0000015F 6673                    		MOV.L #00000007H, R3
+00000161 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+00000165 6703                    		RTSD #0CH
+00000167                         _usb_cstd_write_data:
+                                 		.STACK	_usb_cstd_write_data=40
+                                 ;     247         break;
+                                 ;     248     }
+                                 ;     249 }
+                                 ;     250 /******************************************************************************
+                                 ;     251 End of function usb_cstd_Buf2Fifo
+                                 ;     252 ******************************************************************************/
+                                 ;     253 
+                                 ;     254 
+                                 ;     255 /******************************************************************************
+                                 ;     256 Function Name   : usb_cstd_write_data
+                                 ;     257 Description     : Switch PIPE, request the USB FIFO to write data, and manage 
+                                 ;     258                 : the size of written data.
+                                 ;     259 Arguments       : USB_UTR_t *ptr : USB internal structure. Selects e.g. channel.
+                                 ;     260                 : uint16_t pipe         : Pipe no.
+                                 ;     261                 : uint16_t pipemode     : CUSE/D0DMA/D1DMA
+                                 ;     262 Return value    : uint16_t end_flag
+                                 ;     263 ******************************************************************************/
+                                 ;     264 uint16_t usb_cstd_write_data(USB_UTR_t *ptr, uint16_t pipe, uint16_t pipemode )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",264
+00000167 6E67                    		PUSHM R6-R7
+00000169 7100E4                  		ADD #0FFFFFFE4H, R0
+0000016C A181                    		MOV.L R1, 18H[R0]
+0000016E 928A                    		MOV.W R2, 16H[R0]
+00000170 9283                    		MOV.W R3, 14H[R0]
+                                 ;     265 {
+                                 ;     266     uint16_t    size, count, buffer, mxps;
+                                 ;     267     uint16_t    end_flag;
+                                 ;     268 
+                                 ;     269     /* Changes FIFO port by the pipe. */
+                                 ;     270     if( (pipemode == USB_CUSE) && (pipe == USB_PIPE0) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",270
+00000172 6103                    		CMP #00H, R3
+00000174 20rr                    		BEQ L45
+00000176 2Err                 B  		BRA L47
+00000178                         L43:	; bb9
+                                 ;     271     {
+                                 ;     272         buffer = usb_cstd_is_set_frdy(ptr, pipe, (uint16_t)USB_CUSE, (uint16_t)USB_ISEL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",272
+00000178 5F22                    		MOVU.W R2, R2
+0000017A 754420                  		MOV.L #00000020H, R4
+0000017D 6603                    		MOV.L #00000000H, R3
+0000017F 05rrrrrr             A  		BSR _usb_cstd_is_set_frdy
+00000183 9181                    		MOV.W R1, 0CH[R0]
+00000185 2Err                 B  		BRA L49
+00000187                         L44:	; bb13
+                                 ;     273     }
+                                 ;     274     else
+                                 ;     275     {
+                                 ;     276         buffer = usb_cstd_is_set_frdy(ptr, pipe, (uint16_t)pipemode, USB_NO);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",276
+00000187 BA83                    		MOVU.W 14H[R0], R3
+00000189 5F22                    		MOVU.W R2, R2
+0000018B 6604                    		MOV.L #00000000H, R4
+0000018D 05rrrrrr             A  		BSR _usb_cstd_is_set_frdy
+00000191 9181                    		MOV.W R1, 0CH[R0]
+00000193 2Err                 B  		BRA L49
+00000195                         L45:	; bb22
+00000195 BA8A                    		MOVU.W 16H[R0], R2
+00000197 6102                    		CMP #00H, R2
+00000199 18                   S  		BNE L47
+0000019A                         L46:	; bb27
+0000019A F80601                  		MOV.L #00000001H, [R0]
+0000019D 08                   S  		BRA L48
+0000019E                         L47:	; bb28
+0000019E F80600                  		MOV.L #00000000H, [R0]
+000001A1                         L48:	; bb29
+000001A1 EC02                    		MOV.L [R0], R2
+000001A3 6102                    		CMP #00H, R2
+000001A5 9A8A                    		MOV.W 16H[R0], R2
+000001A7 A981                    		MOV.L 18H[R0], R1
+000001A9 21rr                    		BNE L43
+000001AB 2Err                 B  		BRA L44
+000001AD                         L49:	; bb34
+                                 ;     277     }
+                                 ;     278 
+                                 ;     279     /* Check error */
+                                 ;     280     if( buffer == USB_FIFOERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",280
+000001AD B981                    		MOVU.W 0CH[R0], R1
+000001AF 7701FFFF00              		CMP #0FFFFH, R1
+000001B4 18                   S  		BNE L51
+000001B5                         L50:	; bb35
+                                 ;     281     {
+                                 ;     282         /* FIFO access error */
+                                 ;     283         return (USB_FIFOERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",283
+000001B5 F90903FFFF              		MOV.W #0FFFFH, 06H[R0]
+000001BA 38rrrr               W  		BRA L72
+000001BD                         L51:	; bb42
+                                 ;     284     }
+                                 ;     285     /* Data buffer size */
+                                 ;     286     size = usb_cstd_GetBufSize(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",286
+000001BD BA8A                    		MOVU.W 16H[R0], R2
+000001BF A981                    		MOV.L 18H[R0], R1
+000001C1 05rrrrrr             A  		BSR _usb_cstd_GetBufSize
+000001C5 9101                    		MOV.W R1, 08H[R0]
+000001C7                         L52:	; bb42.split
+                                 ;     287     /* Max Packet Size */
+                                 ;     288     mxps = usb_cstd_GetMaxPacketSize(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",288
+000001C7 BA8A                    		MOVU.W 16H[R0], R2
+000001C9 A981                    		MOV.L 18H[R0], R1
+000001CB 05rrrrrr             A  		BSR _usb_cstd_GetMaxPacketSize
+000001CF 9189                    		MOV.W R1, 0EH[R0]
+000001D1                         L53:	; bb42.split1
+                                 ;     289 
+                                 ;     290     /* Data size check */
+                                 ;     291     if( usb_gcstd_DataCnt[ptr->ip][pipe] <= (uint32_t)size )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",291
+000001D1 A981                    		MOV.L 18H[R0], R1
+000001D3 B991                    		MOVU.W 0CH[R1], R1
+000001D5 751128                  		MUL #28H, R1
+000001D8 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+000001DE 4B1E                    		ADD R1, R14
+000001E0 BA89                    		MOVU.W 16H[R0], R1
+000001E2 FE61EE                  		MOV.L [R1,R14], R14
+000001E5 B901                    		MOVU.W 08H[R0], R1
+000001E7 47E1                    		CMP R14, R1
+000001E9 23rr                    		BLTU L62
+000001EB                         L54:	; bb50
+                                 ;     292     {
+                                 ;     293         count = (uint16_t)usb_gcstd_DataCnt[ptr->ip][pipe];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",293
+000001EB A981                    		MOV.L 18H[R0], R1
+000001ED B991                    		MOVU.W 0CH[R1], R1
+000001EF 751128                  		MUL #28H, R1
+000001F2 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+000001F8 4B1E                    		ADD R1, R14
+000001FA BA89                    		MOVU.W 16H[R0], R1
+000001FC FE61E1                  		MOV.L [R1,R14], R1
+000001FF 9109                    		MOV.W R1, 0AH[R0]
+00000201                         L55:	; bb50.split
+                                 ;     294         /* Data count check */
+                                 ;     295         if( count == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",295
+00000201 B909                    		MOVU.W 0AH[R0], R1
+00000203 6101                    		CMP #00H, R1
+00000205 18                   S  		BNE L57
+00000206                         L56:	; bb63
+                                 ;     296         {
+                                 ;     297             /* Null Packet is end of write */
+                                 ;     298             end_flag = USB_WRITESHRT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",298
+00000206 3D0801                  		MOV.W #0001H, 10H[R0]
+00000209 2Err                 B  		BRA L64
+0000020B                         L57:	; bb65
+                                 ;     299         }
+                                 ;     300         else if( (count % mxps) != 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",300
+0000020B B909                    		MOVU.W 0AH[R0], R1
+0000020D B98A                    		MOVU.W 0EH[R0], R2
+0000020F EF1E                    		MOV.L R1, R14
+00000211 FC272E                  		DIVU R2, R14
+00000214 4F2E                    		MUL R2, R14
+00000216 43E1                    		SUB R14, R1
+00000218 6101                    		CMP #00H, R1
+0000021A 10                   S  		BEQ L59
+0000021B                         L58:	; bb66
+                                 ;     301         {
+                                 ;     302             /* Short Packet is end of write */
+                                 ;     303             end_flag = USB_WRITESHRT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",303
+0000021B 3D0801                  		MOV.W #0001H, 10H[R0]
+0000021E 2Err                 B  		BRA L64
+00000220                         L59:	; bb68
+                                 ;     304         }
+                                 ;     305         else
+                                 ;     306         {
+                                 ;     307             if( pipe == USB_PIPE0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",307
+00000220 BA89                    		MOVU.W 16H[R0], R1
+00000222 6101                    		CMP #00H, R1
+00000224 18                   S  		BNE L61
+00000225                         L60:	; bb69
+                                 ;     308             {
+                                 ;     309                 /* Just Send Size */
+                                 ;     310                 end_flag = USB_WRITING;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",310
+00000225 3D0802                  		MOV.W #0002H, 10H[R0]
+00000228 2Err                 B  		BRA L64
+0000022A                         L61:	; bb70
+                                 ;     311             }
+                                 ;     312             else
+                                 ;     313             {
+                                 ;     314                 /* Write continues */
+                                 ;     315                 end_flag = USB_WRITEEND;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",315
+0000022A 3D0800                  		MOV.W #0000H, 10H[R0]
+0000022D 08                   S  		BRA L64
+0000022E                         L62:	; bb92
+                                 ;     316             }
+                                 ;     317         }
+                                 ;     318     }
+                                 ;     319     else
+                                 ;     320     {
+                                 ;     321         /* Write continues */
+                                 ;     322         end_flag = USB_WRITING;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",322
+0000022E 3D0802                  		MOV.W #0002H, 10H[R0]
+00000231                         L63:	; bb92.split
+                                 ;     323         count = size;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",323
+00000231 D5000405                		MOV.W 08H[R0], 0AH[R0]
+00000235                         L64:	; bb109
+                                 ;     324     }
+                                 ;     325 
+                                 ;     326     usb_gcstd_DataPtr[ptr->ip][pipe] = usb_cstd_write_fifo( ptr, count, pipemode, usb_gcstd_DataPtr[ptr->ip][pipe] );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",326
+00000235 A981                    		MOV.L 18H[R0], R1
+00000237 B992                    		MOVU.W 0CH[R1], R2
+00000239 751228                  		MUL #28H, R2
+0000023C FB62rrrrrrrr            		MOV.L #_usb_gcstd_DataPtr, R6
+00000242 4B26                    		ADD R2, R6
+00000244 BA8F                    		MOVU.W 16H[R0], R7
+00000246 FE6764                  		MOV.L [R7,R6], R4
+00000249 BA83                    		MOVU.W 14H[R0], R3
+0000024B B90A                    		MOVU.W 0AH[R0], R2
+0000024D 05rrrrrr             A  		BSR _usb_cstd_write_fifo
+00000251 FE2761                  		MOV.L R1, [R7,R6]
+00000254                         L65:	; bb109.split
+                                 ;     327 
+                                 ;     328     /* Check data count to remain */
+                                 ;     329     if( usb_gcstd_DataCnt[ptr->ip][pipe] < (uint32_t)size )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",329
+00000254 A981                    		MOV.L 18H[R0], R1
+00000256 B991                    		MOVU.W 0CH[R1], R1
+00000258 751128                  		MUL #28H, R1
+0000025B FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+00000261 4B1E                    		ADD R1, R14
+00000263 BA89                    		MOVU.W 16H[R0], R1
+00000265 FE61EF                  		MOV.L [R1,R14], R15
+00000268 B902                    		MOVU.W 08H[R0], R2
+0000026A 47F2                    		CMP R15, R2
+0000026C 25rr                    		BLEU L70
+0000026E                         L66:	; bb134
+0000026E 660F                    		MOV.L #00000000H, R15
+                                 ;     330     {
+                                 ;     331         /* Clear data count */
+                                 ;     332         usb_gcstd_DataCnt[ptr->ip][pipe] = (uint32_t)0u;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",332
+00000270 FE21EF                  		MOV.L R15, [R1,R14]
+00000273                         L67:	; bb134.split
+                                 ;     333         /* Read CFIFOCTR */
+                                 ;     334         buffer = usb_creg_read_fifoctr( ptr, pipemode );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",334
+00000273 BA82                    		MOVU.W 14H[R0], R2
+00000275 A981                    		MOV.L 18H[R0], R1
+00000277 05rrrrrr             A  		BSR _usb_creg_read_fifoctr
+0000027B 9181                    		MOV.W R1, 0CH[R0]
+0000027D                         L68:	; bb134.split2
+                                 ;     335         /* Check BVAL */
+                                 ;     336         if( (buffer & USB_BVAL) == 0u )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",336
+0000027D B981                    		MOVU.W 0CH[R0], R1
+0000027F 7CF1                    		BTST #0FH, R1
+00000281 21rr                    		BNE L71
+00000283                         L69:	; bb148
+                                 ;     337         {
+                                 ;     338             /* Short Packet */
+                                 ;     339             usb_creg_set_bval( ptr, pipemode );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",339
+00000283 BA82                    		MOVU.W 14H[R0], R2
+00000285 A981                    		MOV.L 18H[R0], R1
+00000287 05rrrrrr             A  		BSR _usb_creg_set_bval
+0000028B 2Err                 B  		BRA L71
+0000028D                         L70:	; bb158
+                                 ;     340         }
+                                 ;     341     }
+                                 ;     342     else
+                                 ;     343     {
+                                 ;     344         /* Total data count - count */
+                                 ;     345         usb_gcstd_DataCnt[ptr->ip][pipe] -= count;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",345
+0000028D FE61EF                  		MOV.L [R1,R14], R15
+00000290 06C10F05                		SUB 0AH[R0].UW, R15
+00000294 FE21EF                  		MOV.L R15, [R1,R14]
+00000297                         L71:	; bb187
+                                 ;     346     }
+                                 ;     347     /* End or Err or Continue */
+                                 ;     348     return end_flag;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",348
+00000297 D5000803                		MOV.W 10H[R0], 06H[R0]
+0000029B                         L72:	; bb190
+0000029B D5000309                		MOV.W 06H[R0], 12H[R0]
+                                 ;     349 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",349
+0000029F BA09                    		MOVU.W 12H[R0], R1
+000002A1 3F6709                  		RTSD #24H, R6-R7
+000002A4                         _usb_cstd_ReceiveStart:
+                                 		.STACK	_usb_cstd_ReceiveStart=24
+                                 ;     350 /******************************************************************************
+                                 ;     351 End of function usb_cstd_write_data
+                                 ;     352 ******************************************************************************/
+                                 ;     353 
+                                 ;     354 
+                                 ;     355 /******************************************************************************
+                                 ;     356 Function Name   : usb_cstd_ReceiveStart
+                                 ;     357 Description     : Start data reception using CPU/DMA transfer to USB Host/USB
+                                 ;     358                 : device.
+                                 ;     359 Arguments       : USB_UTR_t *ptr : USB internal structure. Selects e.g. channel.
+                                 ;     360                 : uint16_t pipe  : Pipe no.
+                                 ;     361 Return value    : none
+                                 ;     362 ******************************************************************************/
+                                 ;     363 void usb_cstd_ReceiveStart(USB_UTR_t *ptr, uint16_t pipe)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",363
+000002A4 7100EC                  		ADD #0FFFFFFECH, R0
+000002A7 A101                    		MOV.L R1, 10H[R0]
+000002A9 918A                    		MOV.W R2, 0EH[R0]
+                                 ;     364 {
+                                 ;     365     USB_UTR_t       *pp;
+                                 ;     366     uint32_t        length;
+                                 ;     367     uint16_t        mxps, useport;
+                                 ;     368 #ifdef ISO_USE
+                                 ;     369 //    uint16_t        bsts;
+                                 ;     370 #endif /* ISO_USE */
+                                 ;     371 
+                                 ;     372     /* Evacuation pointer */
+                                 ;     373     pp      = usb_gcstd_Pipe[ptr->ip][pipe];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",373
+000002AB A901                    		MOV.L 10H[R0], R1
+000002AD B991                    		MOVU.W 0CH[R1], R1
+000002AF 751128                  		MUL #28H, R1
+000002B2 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+000002B8 4B1E                    		ADD R1, R14
+000002BA B989                    		MOVU.W 0EH[R0], R1
+000002BC FE61E1                  		MOV.L [R1,R14], R1
+000002BF E301                    		MOV.L R1, [R0]
+000002C1                         L74:	; entry.split
+                                 ;     374     length  = pp->tranlen;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",374
+000002C1 EC01                    		MOV.L [R0], R1
+000002C3 E5100601                		MOV.L 18H[R1], 04H[R0]
+000002C7                         L75:	; entry.split1
+                                 ;     375 
+                                 ;     376     /* Check transfer count */
+                                 ;     377     if( pp->segment == USB_TRAN_CONT )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",377
+000002C7 EC01                    		MOV.L [R0], R1
+000002C9 591E25                  		MOVU.B 25H[R1], R14
+000002CC 610E                    		CMP #00H, R14
+000002CE 21rr                    		BNE L77
+000002D0                         L76:	; bb19
+                                 ;     378     {
+                                 ;     379         /* Sequence toggle */
+                                 ;     380         usb_cstd_DoSqtgl(ptr, pipe, pp->pipectr);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",380
+000002D0 EC01                    		MOV.L [R0], R1
+000002D2 BC1B                    		MOVU.W 22H[R1], R3
+000002D4 B98A                    		MOVU.W 0EH[R0], R2
+000002D6 A901                    		MOV.L 10H[R0], R1
+000002D8 05rrrrrr             A  		BSR _usb_cstd_DoSqtgl
+000002DC                         L77:	; bb31
+                                 ;     381     }
+                                 ;     382 
+                                 ;     383     /* Select NAK */
+                                 ;     384     usb_cstd_SelectNak(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",384
+000002DC B98A                    		MOVU.W 0EH[R0], R2
+000002DE A901                    		MOV.L 10H[R0], R1
+000002E0 39rrrr               W  		BSR __$usb_cstd_SelectNak
+000002E3                         L78:	; bb31.split
+                                 ;     385     /* Set data count */
+                                 ;     386     usb_gcstd_DataCnt[ptr->ip][pipe] = length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",386
+000002E3 A901                    		MOV.L 10H[R0], R1
+000002E5 B991                    		MOVU.W 0CH[R1], R1
+000002E7 751128                  		MUL #28H, R1
+000002EA FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+000002F0 4B1E                    		ADD R1, R14
+000002F2 A809                    		MOV.L 04H[R0], R1
+000002F4 B98A                    		MOVU.W 0EH[R0], R2
+000002F6 FE22E1                  		MOV.L R1, [R2,R14]
+000002F9                         L79:	; bb31.split2
+                                 ;     387     /* Set data pointer */
+                                 ;     388     usb_gcstd_DataPtr[ptr->ip][pipe] = (uint8_t*)pp->tranadr;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",388
+000002F9 A901                    		MOV.L 10H[R0], R1
+000002FB B991                    		MOVU.W 0CH[R1], R1
+000002FD 751128                  		MUL #28H, R1
+00000300 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataPtr, R14
+00000306 4B1E                    		ADD R1, R14
+00000308 EC01                    		MOV.L [R0], R1
+0000030A A919                    		MOV.L 14H[R1], R1
+0000030C B98A                    		MOVU.W 0EH[R0], R2
+0000030E FE22E1                  		MOV.L R1, [R2,R14]
+00000311                         L80:	; bb31.split3
+                                 ;     389 
+                                 ;     390 #if USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP
+                                 ;     391     /* Ignore count clear */
+                                 ;     392     usb_ghstd_IgnoreCnt[ptr->ip][pipe] = (uint16_t)0u;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",392
+00000311 A901                    		MOV.L 10H[R0], R1
+00000313 B991                    		MOVU.W 0CH[R1], R1
+00000315 751114                  		MUL #14H, R1
+00000318 FBE2rrrrrrrr            		MOV.L #_usb_ghstd_IgnoreCnt, R14
+0000031E 4B1E                    		ADD R1, R14
+00000320 660F                    		MOV.L #00000000H, R15
+00000322 B989                    		MOVU.W 0EH[R0], R1
+00000324 FE11EF                  		MOV.W R15, [R1,R14]
+00000327                         L81:	; bb31.split4
+                                 ;     393 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP */
+                                 ;     394 
+                                 ;     395     /* Pipe number to FIFO port select */
+                                 ;     396     useport = usb_cstd_Pipe2Fport(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",396
+00000327 B98A                    		MOVU.W 0EH[R0], R2
+00000329 A901                    		MOV.L 10H[R0], R1
+0000032B 05rrrrrr             A  		BSR _usb_cstd_Pipe2Fport
+0000032F 9181                    		MOV.W R1, 0CH[R0]
+00000331                         L82:	; bb31.split5
+                                 ;     397 
+                                 ;     398     /* Check use FIFO access */
+                                 ;     399     switch( useport )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",399
+00000331 B981                    		MOVU.W 0CH[R0], R1
+00000333 6101                    		CMP #00H, R1
+00000335 20rr                    		BEQ L86
+00000337                         L83:	; bb31.split5
+00000337 6131                    		CMP #03H, R1
+00000339 20rr                    		BEQ L86
+0000033B                         L84:	; bb31.split5
+0000033B 6111                    		CMP #01H, R1
+0000033D 21rr                    		BNE L95
+0000033F                         L85:	; bb70
+                                 ;     400     {
+                                 ;     401     /* D0FIFO use */
+                                 ;     402     case USB_D0USE:
+                                 ;     403         /* D0 FIFO access is NG */
+                                 ;     404         USB_PRINTF1("### USB-ITRON is not support(RCV-D0USE:pipe%d)\n", pipe);
+                                 ;     405         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",405
+0000033F B98A                    		MOVU.W 0EH[R0], R2
+00000341 A901                    		MOV.L 10H[R0], R1
+00000343 6673                    		MOV.L #00000007H, R3
+00000345 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+00000349 6705                    		RTSD #14H
+0000034B                         L86:	; bb73
+                                 ;     406         break;
+                                 ;     407         
+                                 ;     408     /* CFIFO use */
+                                 ;     409     case USB_CUSE:
+                                 ;     410         /* continue */
+                                 ;     411         
+                                 ;     412     /* D1FIFO use */
+                                 ;     413     case USB_D1USE:
+                                 ;     414         /* Changes the FIFO port by the pipe. */
+                                 ;     415         usb_cstd_chg_curpipe(ptr, pipe, useport, USB_NO);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",415
+0000034B B983                    		MOVU.W 0CH[R0], R3
+0000034D B98A                    		MOVU.W 0EH[R0], R2
+0000034F A901                    		MOV.L 10H[R0], R1
+00000351 6604                    		MOV.L #00000000H, R4
+00000353 05rrrrrr             A  		BSR _usb_cstd_chg_curpipe
+00000357                         L87:	; bb73.split
+                                 ;     416         /* Max Packet Size */
+                                 ;     417         mxps = usb_cstd_GetMaxPacketSize(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",417
+00000357 B98A                    		MOVU.W 0EH[R0], R2
+00000359 A901                    		MOV.L 10H[R0], R1
+0000035B 05rrrrrr             A  		BSR _usb_cstd_GetMaxPacketSize
+0000035F 9109                    		MOV.W R1, 0AH[R0]
+00000361                         L88:	; bb73.split6
+                                 ;     418         if( length != (uint32_t)0u )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",418
+00000361 A809                    		MOV.L 04H[R0], R1
+00000363 6101                    		CMP #00H, R1
+00000365 20rr                    		BEQ L92
+00000367                         L89:	; bb82
+                                 ;     419         {
+                                 ;     420             /* Data length check */
+                                 ;     421             if( (length % mxps) == (uint32_t)0u )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",421
+00000367 A809                    		MOV.L 04H[R0], R1
+00000369 B90A                    		MOVU.W 0AH[R0], R2
+0000036B EF1E                    		MOV.L R1, R14
+0000036D FC272E                  		DIVU R2, R14
+00000370 4FE2                    		MUL R14, R2
+00000372 4321                    		SUB R2, R1
+00000374 6101                    		CMP #00H, R1
+00000376 998A                    		MOV.W 0EH[R0], R2
+00000378 A901                    		MOV.L 10H[R0], R1
+0000037A 21rr                    		BNE L91
+0000037C                         L90:	; bb83
+                                 ;     422             {
+                                 ;     423                 /* Set Transaction counter */
+                                 ;     424                 usb_cstd_SetTransactionCounter(ptr, pipe, (uint16_t)(length / mxps));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",424
+0000037C 5FE3                    		MOVU.W R14, R3
+0000037E 5F22                    		MOVU.W R2, R2
+00000380 05rrrrrr             A  		BSR _usb_cstd_SetTransactionCounter
+00000384 2Err                 B  		BRA L92
+00000386                         L91:	; bb92
+                                 ;     425             }
+                                 ;     426             else
+                                 ;     427             {
+                                 ;     428                 /* Set Transaction counter */
+                                 ;     429                 usb_cstd_SetTransactionCounter(ptr, pipe, (uint16_t)((length / mxps) + (uint32_t)1u));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",429
+00000386 621E                    		ADD #01H, R14
+00000388 5FE3                    		MOVU.W R14, R3
+0000038A 5F22                    		MOVU.W R2, R2
+0000038C 05rrrrrr             A  		BSR _usb_cstd_SetTransactionCounter
+00000390                         L92:	; bb113
+                                 ;     430             }
+                                 ;     431         }
+                                 ;     432         /* Set BUF */
+                                 ;     433         usb_cstd_SetBuf(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",433
+00000390 B98A                    		MOVU.W 0EH[R0], R2
+00000392 A901                    		MOV.L 10H[R0], R1
+00000394 05rrrrrr             A  		BSR _usb_cstd_SetBuf
+00000398                         L93:	; bb113.split
+                                 ;     434         /* Enable Ready Interrupt */
+                                 ;     435         usb_creg_set_brdyenb(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",435
+00000398 B98A                    		MOVU.W 0EH[R0], R2
+0000039A A901                    		MOV.L 10H[R0], R1
+0000039C 05rrrrrr             A  		BSR _usb_creg_set_brdyenb
+000003A0                         L94:	; bb113.split7
+                                 ;     436         /* Enable Not Ready Interrupt */
+                                 ;     437         usb_cstd_NrdyEnable(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",437
+000003A0 B98A                    		MOVU.W 0EH[R0], R2
+000003A2 A901                    		MOV.L 10H[R0], R1
+000003A4 05rrrrrr             A  		BSR _usb_cstd_NrdyEnable
+000003A8 6705                    		RTSD #14H
+000003AA                         L95:	; bb120
+                                 ;     438         break;
+                                 ;     439         
+                                 ;     440 #ifdef USB_DTC_ENABLE
+                                 ;     441     /* D0FIFO DMA */
+                                 ;     442     case USB_D0DMA:
+                                 ;     443         /* Setting for use PIPE number */
+                                 ;     444         usb_gcstd_Dma0Pipe[ptr->ip] = pipe;
+                                 ;     445         /* PIPE direction */
+                                 ;     446         usb_gcstd_Dma0Dir[ptr->ip]  = usb_cstd_GetPipeDir(ptr, pipe);
+                                 ;     447         /* Buffer size */
+                                 ;     448         usb_gcstd_Dma0Fifo[ptr->ip] = usb_cstd_GetBufSize(ptr, pipe);
+                                 ;     449         /* Check data count */
+                                 ;     450         if( usb_gcstd_DataCnt[ptr->ip][usb_gcstd_Dma0Pipe[ptr->ip]] < usb_gcstd_Dma0Fifo[ptr->ip] )
+                                 ;     451         {
+                                 ;     452             /* Transfer data size */
+                                 ;     453             usb_gcstd_Dma0Size[ptr->ip] = (uint16_t)usb_gcstd_DataCnt[ptr->ip][usb_gcstd_Dma0Pipe[ptr->ip]];
+                                 ;     454         }
+                                 ;     455         else
+                                 ;     456         {
+                                 ;     457             /* Data size == FIFO size */
+                                 ;     458             usb_gcstd_Dma0Size[ptr->ip] = usb_gcstd_Dma0Fifo[ptr->ip];
+                                 ;     459         }
+                                 ;     460 
+                                 ;     461         usb_cstd_Fifo2BufStartDma( ptr, pipe, useport, length );
+                                 ;     462 
+                                 ;     463         break;
+                                 ;     464         
+                                 ;     465     /* D1FIFO DMA */
+                                 ;     466     case USB_D1DMA:
+                                 ;     467         /* D1 FIFO access is NG */
+                                 ;     468         USB_PRINTF1("### USB-ITRON is not support(RCV-D1DMA:pipe%d)\n", pipe);
+                                 ;     469         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_ERR);
+                                 ;     470         break;
+                                 ;     471 #endif    /* USB_DTC_ENABLE */
+                                 ;     472 
+                                 ;     473     default:
+                                 ;     474         USB_PRINTF1("### USB-ITRON is not support(RCV-else:pipe%d)\n", pipe);
+                                 ;     475         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",475
+000003AA B98A                    		MOVU.W 0EH[R0], R2
+000003AC A901                    		MOV.L 10H[R0], R1
+000003AE 6673                    		MOV.L #00000007H, R3
+000003B0 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+000003B4 6705                    		RTSD #14H
+000003B6                         _usb_cstd_Fifo2Buf:
+                                 		.STACK	_usb_cstd_Fifo2Buf=16
+                                 ;     476         break;
+                                 ;     477     }
+                                 ;     478 }
+                                 ;     479 /******************************************************************************
+                                 ;     480 End of function usb_cstd_ReceiveStart
+                                 ;     481 ******************************************************************************/
+                                 ;     482 
+                                 ;     483 
+                                 ;     484 /******************************************************************************
+                                 ;     485 Function Name   : usb_cstd_Fifo2Buf
+                                 ;     486 Description     : Request readout from USB FIFO to buffer and process depending
+                                 ;     487                 : on status; read complete or reading.
+                                 ;     488 Arguments       : USB_UTR_t *ptr : USB internal structure. Selects e.g. channel.
+                                 ;     489                 : uint16_t pipe  : Pipe no.
+                                 ;     490 Return value    : none
+                                 ;     491 ******************************************************************************/
+                                 ;     492 void usb_cstd_Fifo2Buf(USB_UTR_t *ptr, uint16_t pipe, uint16_t useport)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",492
+000003B6 60C0                    		SUB #0CH, R0
+000003B8 A081                    		MOV.L R1, 08H[R0]
+000003BA 908A                    		MOV.W R2, 06H[R0]
+000003BC 9083                    		MOV.W R3, 04H[R0]
+                                 ;     493 {
+                                 ;     494     uint16_t    end_flag;
+                                 ;     495 
+                                 ;     496 #if USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP
+                                 ;     497     /* Ignore count clear */
+                                 ;     498     usb_ghstd_IgnoreCnt[ptr->ip][pipe] = (uint16_t)0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",498
+000003BE A881                    		MOV.L 08H[R0], R1
+000003C0 B991                    		MOVU.W 0CH[R1], R1
+000003C2 751114                  		MUL #14H, R1
+000003C5 FBE2rrrrrrrr            		MOV.L #_usb_ghstd_IgnoreCnt, R14
+000003CB 4B1E                    		ADD R1, R14
+000003CD 660F                    		MOV.L #00000000H, R15
+000003CF B889                    		MOVU.W 06H[R0], R1
+000003D1 FE11EF                  		MOV.W R15, [R1,R14]
+000003D4                         L97:	; entry.split
+                                 ;     499 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP */
+                                 ;     500     end_flag = USB_ERROR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",500
+000003D4 F90901FFFF              		MOV.W #0FFFFH, 02H[R0]
+000003D9                         L98:	; entry.split1
+                                 ;     501 
+                                 ;     502     end_flag = usb_cstd_read_data( ptr, pipe, useport );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",502
+000003D9 B883                    		MOVU.W 04H[R0], R3
+000003DB B88A                    		MOVU.W 06H[R0], R2
+000003DD A881                    		MOV.L 08H[R0], R1
+000003DF 39rrrr               W  		BSR _usb_cstd_read_data
+000003E2 9009                    		MOV.W R1, 02H[R0]
+000003E4                         L99:	; entry.split2
+                                 ;     503 
+                                 ;     504     /* Check FIFO access sequence */
+                                 ;     505     switch( end_flag )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",505
+000003E4 B809                    		MOVU.W 02H[R0], R1
+000003E6 7701FFFF00              		CMP #0FFFFH, R1
+000003EB 20rr                    		BEQ L107
+000003ED                         L100:	; entry.split2
+000003ED 6111                    		CMP #01H, R1
+000003EF 20rr                    		BEQ L105
+000003F1                         L101:	; entry.split2
+000003F1 6121                    		CMP #02H, R1
+000003F3 20rr                    		BEQ L109
+000003F5                         L102:	; entry.split2
+000003F5 6131                    		CMP #03H, R1
+000003F7 20rr                    		BEQ L106
+000003F9                         L103:	; entry.split2
+000003F9 6101                    		CMP #00H, R1
+000003FB 21rr                    		BNE L108
+000003FD                         L104:	; bb19
+                                 ;     506     {
+                                 ;     507     case USB_READING:
+                                 ;     508         /* Continue of data read */
+                                 ;     509         break;
+                                 ;     510         
+                                 ;     511     case USB_READEND:
+                                 ;     512         /* End of data read */
+                                 ;     513         usb_cstd_DataEnd(ptr, pipe, (uint16_t)USB_DATA_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",513
+000003FD B88A                    		MOVU.W 06H[R0], R2
+000003FF A881                    		MOV.L 08H[R0], R1
+00000401 6633                    		MOV.L #00000003H, R3
+00000403 39rrrr               W  		BSR _usb_cstd_DataEnd
+00000406 6703                    		RTSD #0CH
+00000408                         L105:	; bb22
+                                 ;     514         break;
+                                 ;     515         
+                                 ;     516     case USB_READSHRT:
+                                 ;     517         /* End of data read */
+                                 ;     518         usb_cstd_DataEnd(ptr, pipe, (uint16_t)USB_DATA_SHT);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",518
+00000408 B88A                    		MOVU.W 06H[R0], R2
+0000040A A881                    		MOV.L 08H[R0], R1
+0000040C 6643                    		MOV.L #00000004H, R3
+0000040E 39rrrr               W  		BSR _usb_cstd_DataEnd
+00000411 6703                    		RTSD #0CH
+00000413                         L106:	; bb25
+                                 ;     519         break;
+                                 ;     520         
+                                 ;     521     case USB_READOVER:
+                                 ;     522         /* Buffer over */
+                                 ;     523         USB_PRINTF1("### Receive data over PIPE%d\n",pipe);
+                                 ;     524         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_OVR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",524
+00000413 B88A                    		MOVU.W 06H[R0], R2
+00000415 A881                    		MOV.L 08H[R0], R1
+00000417 6653                    		MOV.L #00000005H, R3
+00000419 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+0000041D 6703                    		RTSD #0CH
+0000041F                         L107:	; bb28
+                                 ;     525         break;
+                                 ;     526         
+                                 ;     527     case USB_FIFOERROR:
+                                 ;     528         /* FIFO access error */
+                                 ;     529         USB_PRINTF0("### FIFO access error \n");
+                                 ;     530         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",530
+0000041F B88A                    		MOVU.W 06H[R0], R2
+00000421 A881                    		MOV.L 08H[R0], R1
+00000423 6673                    		MOV.L #00000007H, R3
+00000425 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+00000429 6703                    		RTSD #0CH
+0000042B                         L108:	; bb31
+                                 ;     531         break;
+                                 ;     532         
+                                 ;     533     default:
+                                 ;     534         usb_cstd_ForcedTermination(ptr, pipe, (uint16_t)USB_DATA_ERR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",534
+0000042B B88A                    		MOVU.W 06H[R0], R2
+0000042D A881                    		MOV.L 08H[R0], R1
+0000042F 6673                    		MOV.L #00000007H, R3
+00000431 05rrrrrr             A  		BSR _usb_cstd_ForcedTermination
+00000435 6703                    		RTSD #0CH
+00000437                         L109:	; return
+                                 ;     535         break;
+                                 ;     536     }
+                                 ;     537 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",537
+00000437 6703                    		RTSD #0CH
+00000439                         _usb_cstd_read_data:
+                                 		.STACK	_usb_cstd_read_data=44
+                                 ;     538 /******************************************************************************
+                                 ;     539 End of function usb_cstd_Fifo2Buf
+                                 ;     540 ******************************************************************************/
+                                 ;     541 
+                                 ;     542 
+                                 ;     543 /******************************************************************************
+                                 ;     544 Function Name   : usb_cstd_read_data
+                                 ;     545 Description     : Request to read data from USB FIFO, and manage the size of 
+                                 ;     546                 : the data read.
+                                 ;     547 Arguments       : uint16_t pipe            : Pipe no.
+                                 ;     548 Return value    : uint16_t end_flag
+                                 ;     549 ******************************************************************************/
+                                 ;     550 uint16_t usb_cstd_read_data(USB_UTR_t *ptr, uint16_t pipe, uint16_t pipemode)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",550
+00000439 6E68                    		PUSHM R6-R8
+0000043B 7100E4                  		ADD #0FFFFFFE4H, R0
+0000043E A181                    		MOV.L R1, 18H[R0]
+00000440 928A                    		MOV.W R2, 16H[R0]
+00000442 9283                    		MOV.W R3, 14H[R0]
+                                 ;     551 {
+                                 ;     552     uint16_t    count, buffer, mxps, dtln;
+                                 ;     553     uint16_t    end_flag;
+                                 ;     554 
+                                 ;     555     /* Changes FIFO port by the pipe. */
+                                 ;     556     buffer = usb_cstd_is_set_frdy(ptr, pipe, (uint16_t)pipemode, USB_NO);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",556
+00000444 BA83                    		MOVU.W 14H[R0], R3
+00000446 BA8A                    		MOVU.W 16H[R0], R2
+00000448 A981                    		MOV.L 18H[R0], R1
+0000044A 6604                    		MOV.L #00000000H, R4
+0000044C 05rrrrrr             A  		BSR _usb_cstd_is_set_frdy
+00000450 9109                    		MOV.W R1, 0AH[R0]
+00000452                         L111:	; entry.split
+                                 ;     557     if( buffer == USB_FIFOERROR )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",557
+00000452 B909                    		MOVU.W 0AH[R0], R1
+00000454 7701FFFF00              		CMP #0FFFFH, R1
+00000459 18                   S  		BNE L113
+0000045A                         L112:	; bb13
+                                 ;     558     {
+                                 ;     559 //#ifndef ISO_USE
+                                 ;     560         /* FIFO access error */
+                                 ;     561         return (USB_FIFOERROR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",561
+0000045A F90903FFFF              		MOV.W #0FFFFH, 06H[R0]
+0000045F 38rrrr               W  		BRA L144
+00000462                         L113:	; bb19
+                                 ;     562 //#endif
+                                 ;     563     }
+                                 ;     564     dtln = (uint16_t)(buffer & USB_DTLN);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",564
+00000462 B909                    		MOVU.W 0AH[R0], R1
+00000464 7621FF0F                		AND #0FFFH, R1
+00000468 9189                    		MOV.W R1, 0EH[R0]
+0000046A                         L114:	; bb19.split
+                                 ;     565     /* Max Packet Size */
+                                 ;     566     mxps = usb_cstd_GetMaxPacketSize(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",566
+0000046A BA8A                    		MOVU.W 16H[R0], R2
+0000046C A981                    		MOV.L 18H[R0], R1
+0000046E 05rrrrrr             A  		BSR _usb_cstd_GetMaxPacketSize
+00000472 9181                    		MOV.W R1, 0CH[R0]
+00000474                         L115:	; bb19.split1
+                                 ;     567 
+                                 ;     568     if( usb_gcstd_DataCnt[ptr->ip][pipe] < dtln )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",568
+00000474 A981                    		MOV.L 18H[R0], R1
+00000476 B991                    		MOVU.W 0CH[R1], R1
+00000478 751128                  		MUL #28H, R1
+0000047B FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+00000481 4B1E                    		ADD R1, R14
+00000483 BA89                    		MOVU.W 16H[R0], R1
+00000485 FE61EE                  		MOV.L [R1,R14], R14
+00000488 B989                    		MOVU.W 0EH[R0], R1
+0000048A 47E1                    		CMP R14, R1
+0000048C 25rr                    		BLEU L120
+0000048E                         L116:	; bb28
+                                 ;     569     {
+                                 ;     570         /* Buffer Over ? */
+                                 ;     571         end_flag = USB_READOVER;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",571
+0000048E 3D0803                  		MOV.W #0003H, 10H[R0]
+00000491                         L117:	; bb28.split
+                                 ;     572         /* Set NAK */
+                                 ;     573         usb_cstd_SetNak(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",573
+00000491 BA8A                    		MOVU.W 16H[R0], R2
+00000493 A981                    		MOV.L 18H[R0], R1
+00000495 05rrrrrr             A  		BSR _usb_cstd_SetNak
+00000499                         L118:	; bb28.split2
+                                 ;     574         count = (uint16_t)usb_gcstd_DataCnt[ptr->ip][pipe];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",574
+00000499 A981                    		MOV.L 18H[R0], R1
+0000049B B991                    		MOVU.W 0CH[R1], R1
+0000049D 751128                  		MUL #28H, R1
+000004A0 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+000004A6 4B1E                    		ADD R1, R14
+000004A8 BA89                    		MOVU.W 16H[R0], R1
+000004AA FE61E1                  		MOV.L [R1,R14], R1
+000004AD 9101                    		MOV.W R1, 08H[R0]
+000004AF                         L119:	; bb28.split3
+                                 ;     575         usb_gcstd_DataCnt[ptr->ip][pipe] = dtln;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",575
+000004AF A981                    		MOV.L 18H[R0], R1
+000004B1 B991                    		MOVU.W 0CH[R1], R1
+000004B3 751128                  		MUL #28H, R1
+000004B6 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+000004BC 4B1E                    		ADD R1, R14
+000004BE B989                    		MOVU.W 0EH[R0], R1
+000004C0 BA8A                    		MOVU.W 16H[R0], R2
+000004C2 FE22E1                  		MOV.L R1, [R2,R14]
+000004C5 38rrrr               W  		BRA L139
+000004C8                         L120:	; bb54
+                                 ;     576     }
+                                 ;     577     else if( usb_gcstd_DataCnt[ptr->ip][pipe] == dtln )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",577
+000004C8 A981                    		MOV.L 18H[R0], R1
+000004CA B991                    		MOVU.W 0CH[R1], R1
+000004CC 751128                  		MUL #28H, R1
+000004CF FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+000004D5 4B1E                    		ADD R1, R14
+000004D7 BA89                    		MOVU.W 16H[R0], R1
+000004D9 FE61EE                  		MOV.L [R1,R14], R14
+000004DC B989                    		MOVU.W 0EH[R0], R1
+000004DE 9101                    		MOV.W R1, 08H[R0]
+000004E0 47E1                    		CMP R14, R1
+000004E2 21rr                    		BNE L132
+000004E4                         L121:	; bb55.split
+                                 ;     578     {
+                                 ;     579         /* Just Receive Size */
+                                 ;     580         count = dtln;
+                                 ;     581         if( (pipe == USB_PIPE0) && ((dtln % mxps) == 0) )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",581
+000004E4 BA89                    		MOVU.W 16H[R0], R1
+000004E6 6101                    		CMP #00H, R1
+000004E8 20rr                    		BEQ L128
+000004EA 2Err                 B  		BRA L130
+000004EC                         L122:	; bb59
+                                 ;     582         {
+                                 ;     583             /* Just Receive Size */
+                                 ;     584             if( usb_cstd_is_host_mode(ptr) == USB_NO )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",584
+000004EC A981                    		MOV.L 18H[R0], R1
+000004EE 05rrrrrr             A  		BSR _usb_cstd_is_host_mode
+000004F2 6101                    		CMP #00H, R1
+000004F4 18                   S  		BNE L124
+000004F5                         L123:	; bb60
+                                 ;     585             {
+                                 ;     586                 /* Peripheral Function */
+                                 ;     587                 end_flag = USB_READING;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",587
+000004F5 3D0802                  		MOV.W #0002H, 10H[R0]
+000004F8 2Err                 B  		BRA L139
+000004FA                         L124:	; bb61
+                                 ;     588             }
+                                 ;     589             else
+                                 ;     590             {
+                                 ;     591                 /* Host Function */
+                                 ;     592                 end_flag = USB_READEND;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",592
+000004FA 3D0800                  		MOV.W #0000H, 10H[R0]
+000004FD                         L125:	; bb61.split
+                                 ;     593                 /* Set NAK */
+                                 ;     594                 usb_cstd_SelectNak(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",594
+000004FD BA8A                    		MOVU.W 16H[R0], R2
+000004FF A981                    		MOV.L 18H[R0], R1
+00000501 39rrrr               W  		BSR __$usb_cstd_SelectNak
+00000504 2Err                 B  		BRA L139
+00000506                         L126:	; bb71
+                                 ;     595             }
+                                 ;     596         }
+                                 ;     597         else
+                                 ;     598         {
+                                 ;     599             end_flag = USB_READEND;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",599
+00000506 3D0800                  		MOV.W #0000H, 10H[R0]
+00000509                         L127:	; bb71.split
+                                 ;     600             /* Set NAK */
+                                 ;     601             usb_cstd_SelectNak(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",601
+00000509 BA8A                    		MOVU.W 16H[R0], R2
+0000050B A981                    		MOV.L 18H[R0], R1
+0000050D 39rrrr               W  		BSR __$usb_cstd_SelectNak
+00000510 2Err                 B  		BRA L139
+00000512                         L128:	; bb78
+00000512 B989                    		MOVU.W 0EH[R0], R1
+00000514 B982                    		MOVU.W 0CH[R0], R2
+00000516 EF1E                    		MOV.L R1, R14
+00000518 FC272E                  		DIVU R2, R14
+0000051B 4F2E                    		MUL R2, R14
+0000051D 43E1                    		SUB R14, R1
+0000051F 6101                    		CMP #00H, R1
+00000521 18                   S  		BNE L130
+00000522                         L129:	; bb86
+00000522 F80601                  		MOV.L #00000001H, [R0]
+00000525 08                   S  		BRA L131
+00000526                         L130:	; bb87
+00000526 F80600                  		MOV.L #00000000H, [R0]
+00000529                         L131:	; bb88
+00000529 EC01                    		MOV.L [R0], R1
+0000052B 6101                    		CMP #00H, R1
+0000052D 21rr                    		BNE L122
+0000052F 2Err                 B  		BRA L126
+00000531                         L132:	; bb94.split
+                                 ;     602         }
+                                 ;     603     }
+                                 ;     604     else
+                                 ;     605     {
+                                 ;     606         /* Continus Receive data */
+                                 ;     607         count = dtln;
+                                 ;     608         end_flag = USB_READING;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",608
+00000531 3D0802                  		MOV.W #0002H, 10H[R0]
+00000534                         L133:	; bb94.split4
+                                 ;     609         if( count == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",609
+00000534 B901                    		MOVU.W 08H[R0], R1
+00000536 6101                    		CMP #00H, R1
+00000538 21rr                    		BNE L136
+0000053A                         L134:	; bb97
+                                 ;     610         {
+                                 ;     611             /* Null Packet receive */
+                                 ;     612             end_flag = USB_READSHRT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",612
+0000053A 3D0801                  		MOV.W #0001H, 10H[R0]
+0000053D                         L135:	; bb97.split
+                                 ;     613             /* Select NAK */
+                                 ;     614             usb_cstd_SelectNak(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",614
+0000053D BA8A                    		MOVU.W 16H[R0], R2
+0000053F A981                    		MOV.L 18H[R0], R1
+00000541 39rrrr               W  		BSR __$usb_cstd_SelectNak
+00000544                         L136:	; bb106
+                                 ;     615         }
+                                 ;     616         if( (count % mxps) != 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",616
+00000544 B901                    		MOVU.W 08H[R0], R1
+00000546 B982                    		MOVU.W 0CH[R0], R2
+00000548 EF1E                    		MOV.L R1, R14
+0000054A FC272E                  		DIVU R2, R14
+0000054D 4F2E                    		MUL R2, R14
+0000054F 43E1                    		SUB R14, R1
+00000551 6101                    		CMP #00H, R1
+00000553 20rr                    		BEQ L139
+00000555                         L137:	; bb107
+                                 ;     617         {
+                                 ;     618             /* Null Packet receive */
+                                 ;     619             end_flag = USB_READSHRT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",619
+00000555 3D0801                  		MOV.W #0001H, 10H[R0]
+00000558                         L138:	; bb107.split
+                                 ;     620             /* Select NAK */
+                                 ;     621             usb_cstd_SelectNak(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",621
+00000558 BA8A                    		MOVU.W 16H[R0], R2
+0000055A A981                    		MOV.L 18H[R0], R1
+0000055C 39rrrr               W  		BSR __$usb_cstd_SelectNak
+0000055F                         L139:	; bb151
+                                 ;     622         }
+                                 ;     623     }
+                                 ;     624 
+                                 ;     625     if( dtln == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",625
+0000055F B989                    		MOVU.W 0EH[R0], R1
+00000561 6101                    		CMP #00H, R1
+00000563 A981                    		MOV.L 18H[R0], R1
+00000565 18                   S  		BNE L141
+00000566                         L140:	; bb152
+                                 ;     626     {
+                                 ;     627         /* 0 length packet */
+                                 ;     628         /* Clear BVAL */
+                                 ;     629         usb_creg_set_bclr( ptr, pipemode );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",629
+00000566 BA82                    		MOVU.W 14H[R0], R2
+00000568 05rrrrrr             A  		BSR _usb_creg_set_bclr
+0000056C 2Err                 B  		BRA L142
+0000056E                         L141:	; bb155
+                                 ;     630     }
+                                 ;     631     else
+                                 ;     632     {
+                                 ;     633         usb_gcstd_DataPtr[ptr->ip][pipe] = usb_cstd_read_fifo( ptr, count, pipemode, usb_gcstd_DataPtr[ptr->ip][pipe] );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",633
+0000056E A985                    		MOV.L 18H[R0], R5
+00000570 B9D2                    		MOVU.W 0CH[R5], R2
+00000572 751228                  		MUL #28H, R2
+00000575 FB62rrrrrrrr            		MOV.L #_usb_gcstd_DataPtr, R6
+0000057B 4B62                    		ADD R6, R2
+0000057D BA8F                    		MOVU.W 16H[R0], R7
+0000057F FE6724                  		MOV.L [R7,R2], R4
+00000582 5D1806                  		MOVU.W 0CH[R1], R8
+00000585 BA83                    		MOVU.W 14H[R0], R3
+00000587 B902                    		MOVU.W 08H[R0], R2
+00000589 EF51                    		MOV.L R5, R1
+0000058B 05rrrrrr             A  		BSR _usb_cstd_read_fifo
+0000058F 751828                  		MUL #28H, R8
+00000592 4B86                    		ADD R8, R6
+00000594 FE2761                  		MOV.L R1, [R7,R6]
+00000597                         L142:	; bb184
+                                 ;     634     }
+                                 ;     635     usb_gcstd_DataCnt[ptr->ip][pipe] -= count;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",635
+00000597 A981                    		MOV.L 18H[R0], R1
+00000599 B991                    		MOVU.W 0CH[R1], R1
+0000059B 751128                  		MUL #28H, R1
+0000059E FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+000005A4 4B1E                    		ADD R1, R14
+000005A6 BA89                    		MOVU.W 16H[R0], R1
+000005A8 FE61EF                  		MOV.L [R1,R14], R15
+000005AB 06C10F04                		SUB 08H[R0].UW, R15
+000005AF FE21EF                  		MOV.L R15, [R1,R14]
+000005B2                         L143:	; bb184.split
+                                 ;     636 
+                                 ;     637     /* End or Err or Continue */
+                                 ;     638     return (end_flag);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",638
+000005B2 D5000803                		MOV.W 10H[R0], 06H[R0]
+000005B6                         L144:	; bb200
+000005B6 D5000309                		MOV.W 06H[R0], 12H[R0]
+                                 ;     639 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",639
+000005BA BA09                    		MOVU.W 12H[R0], R1
+000005BC 3F680A                  		RTSD #28H, R6-R8
+000005BF                         _usb_cstd_DataEnd:
+                                 		.STACK	_usb_cstd_DataEnd=20
+                                 ;     640 /******************************************************************************
+                                 ;     641 End of function usb_cstd_read_data
+                                 ;     642 ******************************************************************************/
+                                 ;     643 
+                                 ;     644 
+                                 ;     645 /******************************************************************************
+                                 ;     646 Function Name   : usb_cstd_DataEnd
+                                 ;     647 Description     : Set USB registers as appropriate after data transmission/re-
+                                 ;     648                 : ception, and call the callback function as transmission/recep-
+                                 ;     649                 : tion is complete.
+                                 ;     650 Arguments       : uint16_t pipe     : Pipe no.
+                                 ;     651                 : uint16_t status   : Transfer status type.
+                                 ;     652 Return value    : none
+                                 ;     653 ******************************************************************************/
+                                 ;     654 void usb_cstd_DataEnd(USB_UTR_t *ptr, uint16_t pipe, uint16_t status)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",654
+000005BF 7EA6                    		PUSH.L R6
+000005C1 60C0                    		SUB #0CH, R0
+000005C3 A081                    		MOV.L R1, 08H[R0]
+000005C5 908A                    		MOV.W R2, 06H[R0]
+000005C7 9083                    		MOV.W R3, 04H[R0]
+                                 ;     655 {
+                                 ;     656     uint16_t    useport;
+                                 ;     657 
+                                 ;     658     /* PID = NAK */
+                                 ;     659     /* Set NAK */
+                                 ;     660     usb_cstd_SelectNak(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",660
+000005C9 B88A                    		MOVU.W 06H[R0], R2
+000005CB A881                    		MOV.L 08H[R0], R1
+000005CD 39rrrr               W  		BSR __$usb_cstd_SelectNak
+000005D0                         L146:	; entry.split
+                                 ;     661     /* Pipe number to FIFO port select */
+                                 ;     662     useport = usb_cstd_Pipe2Fport(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",662
+000005D0 B88A                    		MOVU.W 06H[R0], R2
+000005D2 A881                    		MOV.L 08H[R0], R1
+000005D4 05rrrrrr             A  		BSR _usb_cstd_Pipe2Fport
+000005D8 9009                    		MOV.W R1, 02H[R0]
+000005DA                         L147:	; entry.split1
+                                 ;     663 
+                                 ;     664     /* Disable Interrupt */
+                                 ;     665     /* Disable Ready Interrupt */
+                                 ;     666     usb_creg_clr_brdyenb(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",666
+000005DA B88A                    		MOVU.W 06H[R0], R2
+000005DC A881                    		MOV.L 08H[R0], R1
+000005DE 05rrrrrr             A  		BSR _usb_creg_clr_brdyenb
+000005E2                         L148:	; entry.split2
+                                 ;     667     /* Disable Not Ready Interrupt */
+                                 ;     668     usb_creg_clr_nrdyenb(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",668
+000005E2 B88A                    		MOVU.W 06H[R0], R2
+000005E4 A881                    		MOV.L 08H[R0], R1
+000005E6 05rrrrrr             A  		BSR _usb_creg_clr_nrdyenb
+000005EA                         L149:	; entry.split3
+                                 ;     669     /* Disable Empty Interrupt */
+                                 ;     670     usb_creg_clr_bempenb(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",670
+000005EA B88A                    		MOVU.W 06H[R0], R2
+000005EC A881                    		MOV.L 08H[R0], R1
+000005EE 05rrrrrr             A  		BSR _usb_creg_clr_bempenb
+000005F2                         L150:	; entry.split4
+                                 ;     671 
+                                 ;     672     /* Disable Transaction count */
+                                 ;     673     usb_cstd_ClrTransactionCounter(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",673
+000005F2 B88A                    		MOVU.W 06H[R0], R2
+000005F4 A881                    		MOV.L 08H[R0], R1
+000005F6 05rrrrrr             A  		BSR _usb_cstd_ClrTransactionCounter
+000005FA                         L151:	; entry.split6
+                                 ;     674 
+                                 ;     675     /* Check use FIFO */
+                                 ;     676     switch( useport )
+                                 ;     677     {
+                                 ;     678     /* CFIFO use */
+                                 ;     679     case USB_CUSE:
+                                 ;     680         break;
+                                 ;     681     /* D0FIFO use */
+                                 ;     682     case USB_D0USE:
+                                 ;     683         break;
+                                 ;     684 
+                                 ;     685 #ifdef USB_DTC_ENABLE
+                                 ;     686     /* D0FIFO DMA */
+                                 ;     687     case USB_D0DMA:
+                                 ;     688         /* DMA buffer clear mode clear */
+                                 ;     689         usb_creg_clr_dclrm( ptr, USB_D0DMA );
+                                 ;     690         if(ptr -> ip == USB_USBIP_0)
+                                 ;     691         {
+                                 ;     692             usb_creg_set_mbw( ptr, USB_D0DMA, USB0_D0FIFO_MBW );
+                                 ;     693         }
+                                 ;     694         else if (ptr -> ip == USB_USBIP_1)
+                                 ;     695         {
+                                 ;     696             usb_creg_set_mbw( ptr, USB_D0DMA, USB1_D0FIFO_MBW );
+                                 ;     697         }
+                                 ;     698         usb_creg_write_dmacfg( ptr, USB_D0DMA, USB_CPU_ADR_RD_WR );
+                                 ;     699         break;
+                                 ;     700 #endif    /* USB_DTC_ENABLE */
+                                 ;     701 
+                                 ;     702     /* D1FIFO use */
+                                 ;     703     case USB_D1USE:
+                                 ;     704         break;
+                                 ;     705 
+                                 ;     706 #ifdef USB_DTC_ENABLE
+                                 ;     707     /* D1FIFO DMA */
+                                 ;     708     case USB_D1DMA:
+                                 ;     709         /* continue */
+                                 ;     710 #endif    /* USB_DTC_ENABLE */
+                                 ;     711 
+                                 ;     712     default:
+                                 ;     713         break;
+                                 ;     714     }
+                                 ;     715 
+                                 ;     716     /* Call Back */
+                                 ;     717     if( usb_gcstd_Pipe[ptr->ip][pipe] != USB_NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",717
+000005FA A881                    		MOV.L 08H[R0], R1
+000005FC B991                    		MOVU.W 0CH[R1], R1
+000005FE 751128                  		MUL #28H, R1
+00000601 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+00000607 4B1E                    		ADD R1, R14
+00000609 B889                    		MOVU.W 06H[R0], R1
+0000060B FE61EE                  		MOV.L [R1,R14], R14
+0000060E 610E                    		CMP #00H, R14
+00000610 3Arrrr               W  		BEQ L169
+00000613                         L152:	; bb25
+                                 ;     718     {
+                                 ;     719         /* Check PIPE TYPE */
+                                 ;     720         if( usb_cstd_GetPipeType(ptr, pipe) != USB_ISO )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",720
+00000613 B88A                    		MOVU.W 06H[R0], R2
+00000615 A881                    		MOV.L 08H[R0], R1
+00000617 05rrrrrr             A  		BSR _usb_cstd_GetPipeType
+0000061B A882                    		MOV.L 08H[R0], R2
+0000061D B9A2                    		MOVU.W 0CH[R2], R2
+0000061F 751228                  		MUL #28H, R2
+00000622 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_DataCnt, R14
+00000628 4B2E                    		ADD R2, R14
+0000062A B88B                    		MOVU.W 06H[R0], R3
+0000062C FE63E4                  		MOV.L [R3,R14], R4
+0000062F FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+00000635 4BE2                    		ADD R14, R2
+00000637 FE6322                  		MOV.L [R3,R2], R2
+0000063A A1A4                    		MOV.L R4, 18H[R2]
+0000063C A882                    		MOV.L 08H[R0], R2
+0000063E B9A2                    		MOVU.W 0CH[R2], R2
+00000640 751228                  		MUL #28H, R2
+00000643 4B2E                    		ADD R2, R14
+00000645 770100C000              		CMP #0C000H, R1
+0000064A B889                    		MOVU.W 06H[R0], R1
+0000064C FE61E6                  		MOV.L [R1,R14], R6
+0000064F 3Arrrr               W  		BEQ L160
+00000652                         L153:	; bb26.split
+                                 ;     721         {
+                                 ;     722             /* Transfer information set */
+                                 ;     723             usb_gcstd_Pipe[ptr->ip][pipe]->tranlen  = usb_gcstd_DataCnt[ptr->ip][pipe];
+                                 ;     724             usb_gcstd_Pipe[ptr->ip][pipe]->status   = status;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",724
+00000652 D5060210                		MOV.W 04H[R0], 20H[R6]
+00000656                         L154:	; bb26.split7
+                                 ;     725             usb_gcstd_Pipe[ptr->ip][pipe]->pipectr  = usb_creg_read_pipectr(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",725
+00000656 A881                    		MOV.L 08H[R0], R1
+00000658 B996                    		MOVU.W 0CH[R1], R6
+0000065A 751628                  		MUL #28H, R6
+0000065D FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+00000663 4B6E                    		ADD R6, R14
+00000665 B88A                    		MOVU.W 06H[R0], R2
+00000667 FE62E6                  		MOV.L [R2,R14], R6
+0000066A 05rrrrrr             A  		BSR _usb_creg_read_pipectr
+0000066E 9469                    		MOV.W R1, 22H[R6]
+00000670                         L155:	; bb26.split8
+                                 ;     726 #if USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP
+                                 ;     727             usb_gcstd_Pipe[ptr->ip][pipe]->errcnt   = (uint8_t)usb_ghstd_IgnoreCnt[ptr->ip][pipe];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",727
+00000670 A886                    		MOV.L 08H[R0], R6
+00000672 B9E6                    		MOVU.W 0CH[R6], R6
+00000674 EF6E                    		MOV.L R6, R14
+00000676 751E14                  		MUL #14H, R14
+00000679 FBF2rrrrrrrr            		MOV.L #_usb_ghstd_IgnoreCnt, R15
+0000067F 4BEF                    		ADD R14, R15
+00000681 751628                  		MUL #28H, R6
+00000684 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+0000068A 4B6E                    		ADD R6, R14
+0000068C B88E                    		MOVU.W 06H[R0], R6
+0000068E FE66EE                  		MOV.L [R6,R14], R14
+00000691 6C16                    		SHLL #01H, R6
+00000693 FECF6F                  		MOVU.B [R15,R6], R15
+00000696 C7EF24                  		MOV.B R15, 24H[R14]
+00000699                         L156:	; bb26.split9
+                                 ;     728 #else  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP */
+                                 ;     729             usb_gcstd_Pipe[ptr->ip][pipe]->errcnt   = 0;
+                                 ;     730 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP */
+                                 ;     731 
+                                 ;     732             usb_gcstd_Pipe[ptr->ip][pipe]->ipp  = ptr->ipp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",732
+00000699 A886                    		MOV.L 08H[R0], R6
+0000069B B9E1                    		MOVU.W 0CH[R6], R1
+0000069D 751128                  		MUL #28H, R1
+000006A0 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+000006A6 4B1E                    		ADD R1, R14
+000006A8 B889                    		MOVU.W 06H[R0], R1
+000006AA FE61EE                  		MOV.L [R1,R14], R14
+000006AD E56E0202                		MOV.L 08H[R6], 08H[R14]
+000006B1                         L157:	; bb26.split10
+                                 ;     733             usb_gcstd_Pipe[ptr->ip][pipe]->ip   = ptr->ip;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",733
+000006B1 A886                    		MOV.L 08H[R0], R6
+000006B3 B9E6                    		MOVU.W 0CH[R6], R6
+000006B5 EF6E                    		MOV.L R6, R14
+000006B7 751E28                  		MUL #28H, R14
+000006BA FBF2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R15
+000006C0 4BEF                    		ADD R14, R15
+000006C2 B889                    		MOVU.W 06H[R0], R1
+000006C4 FE61F1                  		MOV.L [R1,R15], R1
+000006C7 9196                    		MOV.W R6, 0CH[R1]
+000006C9                         L158:	; bb26.split11
+                                 ;     734 
+                                 ;     735             (usb_gcstd_Pipe[ptr->ip][pipe]->complete)(usb_gcstd_Pipe[ptr->ip][pipe], 0, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",735
+000006C9 A886                    		MOV.L 08H[R0], R6
+000006CB B9E6                    		MOVU.W 0CH[R6], R6
+000006CD 751628                  		MUL #28H, R6
+000006D0 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+000006D6 4B6E                    		ADD R6, R14
+000006D8 B88E                    		MOVU.W 06H[R0], R6
+000006DA FE66E1                  		MOV.L [R6,R14], R1
+000006DD A916                    		MOV.L 10H[R1], R6
+000006DF 6602                    		MOV.L #00000000H, R2
+000006E1 EF23                    		MOV.L R2, R3
+000006E3 7F16                    		JSR R6
+000006E5                         L159:	; bb26.split12
+                                 ;     736             usb_gcstd_Pipe[ptr->ip][pipe] = (USB_UTR_t*)USB_NULL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",736
+000006E5 A886                    		MOV.L 08H[R0], R6
+000006E7 B9E6                    		MOVU.W 0CH[R6], R6
+000006E9 751628                  		MUL #28H, R6
+000006EC FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+000006F2 4B6E                    		ADD R6, R14
+000006F4 660F                    		MOV.L #00000000H, R15
+000006F6 B88E                    		MOVU.W 06H[R0], R6
+000006F8 FE26EF                  		MOV.L R15, [R6,R14]
+000006FB 3F6604                  		RTSD #10H, R6-R6
+000006FE                         L160:	; bb157.split
+                                 ;     737         }
+                                 ;     738         else
+                                 ;     739         {
+                                 ;     740             /* Transfer information set */
+                                 ;     741             usb_gcstd_Pipe[ptr->ip][pipe]->tranlen  = usb_gcstd_DataCnt[ptr->ip][pipe];
+                                 ;     742             usb_gcstd_Pipe[ptr->ip][pipe]->pipectr  = usb_creg_read_pipectr(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",742
+000006FE B88A                    		MOVU.W 06H[R0], R2
+00000700 A881                    		MOV.L 08H[R0], R1
+00000702 05rrrrrr             A  		BSR _usb_creg_read_pipectr
+00000706 9469                    		MOV.W R1, 22H[R6]
+00000708                         L161:	; bb157.split13
+                                 ;     743 #if USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP
+                                 ;     744             usb_gcstd_Pipe[ptr->ip][pipe]->errcnt   = (uint8_t)usb_ghstd_IgnoreCnt[ptr->ip][pipe];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",744
+00000708 A881                    		MOV.L 08H[R0], R1
+0000070A B991                    		MOVU.W 0CH[R1], R1
+0000070C EF1E                    		MOV.L R1, R14
+0000070E 751E14                  		MUL #14H, R14
+00000711 FBF2rrrrrrrr            		MOV.L #_usb_ghstd_IgnoreCnt, R15
+00000717 4BEF                    		ADD R14, R15
+00000719 751128                  		MUL #28H, R1
+0000071C FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+00000722 4B1E                    		ADD R1, R14
+00000724 B889                    		MOVU.W 06H[R0], R1
+00000726 FE61EE                  		MOV.L [R1,R14], R14
+00000729 6C11                    		SHLL #01H, R1
+0000072B FECF1F                  		MOVU.B [R15,R1], R15
+0000072E C7EF24                  		MOV.B R15, 24H[R14]
+00000731                         L162:	; bb157.split14
+                                 ;     745 #else  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP */
+                                 ;     746             usb_gcstd_Pipe[ptr->ip][pipe]->errcnt   = 0;
+                                 ;     747 #endif  /* USB_FUNCSEL_USBIP0_PP == USB_HOST_PP || USB_FUNCSEL_USBIP1_PP == USB_HOST_PP */
+                                 ;     748 
+                                 ;     749             usb_gcstd_Pipe[ptr->ip][pipe]->ipp  = ptr->ipp;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",749
+00000731 A881                    		MOV.L 08H[R0], R1
+00000733 B992                    		MOVU.W 0CH[R1], R2
+00000735 751228                  		MUL #28H, R2
+00000738 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+0000073E 4B2E                    		ADD R2, R14
+00000740 B88A                    		MOVU.W 06H[R0], R2
+00000742 FE62EE                  		MOV.L [R2,R14], R14
+00000745 E51E0202                		MOV.L 08H[R1], 08H[R14]
+00000749                         L163:	; bb157.split15
+                                 ;     750             usb_gcstd_Pipe[ptr->ip][pipe]->ip   = ptr->ip;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",750
+00000749 A881                    		MOV.L 08H[R0], R1
+0000074B B991                    		MOVU.W 0CH[R1], R1
+0000074D EF1E                    		MOV.L R1, R14
+0000074F 751E28                  		MUL #28H, R14
+00000752 FBF2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R15
+00000758 4BEF                    		ADD R14, R15
+0000075A B88A                    		MOVU.W 06H[R0], R2
+0000075C FE62F2                  		MOV.L [R2,R15], R2
+0000075F 91A1                    		MOV.W R1, 0CH[R2]
+00000761                         L164:	; bb157.split16
+                                 ;     751 
+                                 ;     752             /* Data Transfer (restart) */
+                                 ;     753             if( usb_cstd_GetPipeDir(ptr, pipe) == USB_BUF2FIFO )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",753
+00000761 B88A                    		MOVU.W 06H[R0], R2
+00000763 A881                    		MOV.L 08H[R0], R1
+00000765 05rrrrrr             A  		BSR _usb_cstd_GetPipeDir
+00000769 A882                    		MOV.L 08H[R0], R2
+0000076B B9A2                    		MOVU.W 0CH[R2], R2
+0000076D 751228                  		MUL #28H, R2
+00000770 FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+00000776 4B2E                    		ADD R2, R14
+00000778 755110                  		CMP #10H, R1
+0000077B B889                    		MOVU.W 06H[R0], R1
+0000077D FE61E1                  		MOV.L [R1,R14], R1
+00000780 21rr                    		BNE L167
+00000782                         L165:	; bb246
+                                 ;     754             {
+                                 ;     755                 /* OUT Transfer */
+                                 ;     756                 usb_gcstd_Pipe[ptr->ip][pipe]->status   = USB_DATA_WRITING;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",756
+00000782 3D9014                  		MOV.W #0014H, 20H[R1]
+00000785                         L166:	; bb246.split
+                                 ;     757                 (usb_gcstd_Pipe[ptr->ip][pipe]->complete)(usb_gcstd_Pipe[ptr->ip][pipe], 0, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",757
+00000785 A881                    		MOV.L 08H[R0], R1
+00000787 B991                    		MOVU.W 0CH[R1], R1
+00000789 751128                  		MUL #28H, R1
+0000078C FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+00000792 4B1E                    		ADD R1, R14
+00000794 B889                    		MOVU.W 06H[R0], R1
+00000796 FE61E1                  		MOV.L [R1,R14], R1
+00000799 A914                    		MOV.L 10H[R1], R4
+0000079B 6602                    		MOV.L #00000000H, R2
+0000079D EF23                    		MOV.L R2, R3
+0000079F 7F14                    		JSR R4
+000007A1 3F6604                  		RTSD #10H, R6-R6
+000007A4                         L167:	; bb280
+                                 ;     758             }
+                                 ;     759             else
+                                 ;     760             {
+                                 ;     761                 /* IN Transfer */
+                                 ;     762                 usb_gcstd_Pipe[ptr->ip][pipe]->status   = USB_DATA_READING;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",762
+000007A4 3D9013                  		MOV.W #0013H, 20H[R1]
+000007A7                         L168:	; bb280.split
+                                 ;     763                 (usb_gcstd_Pipe[ptr->ip][pipe]->complete)(usb_gcstd_Pipe[ptr->ip][pipe], 0, 0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",763
+000007A7 A881                    		MOV.L 08H[R0], R1
+000007A9 B991                    		MOVU.W 0CH[R1], R1
+000007AB 751128                  		MUL #28H, R1
+000007AE FBE2rrrrrrrr            		MOV.L #_usb_gcstd_Pipe, R14
+000007B4 4B1E                    		ADD R1, R14
+000007B6 B889                    		MOVU.W 06H[R0], R1
+000007B8 FE61E1                  		MOV.L [R1,R14], R1
+000007BB A914                    		MOV.L 10H[R1], R4
+000007BD 6602                    		MOV.L #00000000H, R2
+000007BF EF23                    		MOV.L R2, R3
+000007C1 7F14                    		JSR R4
+000007C3 3F6604                  		RTSD #10H, R6-R6
+000007C6                         L169:	; return
+                                 ;     764             }
+                                 ;     765         }
+                                 ;     766     }
+                                 ;     767 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",767
+000007C6 3F6604                  		RTSD #10H, R6-R6
+000007C9                         __$usb_cstd_SelectNak:
+                                 		.STACK	__$usb_cstd_SelectNak=12
+                                 ;     768 /******************************************************************************
+                                 ;     769 End of function usb_cstd_DataEnd
+                                 ;     770 ******************************************************************************/
+                                 ;     771 
+                                 ;     772 /******************************************************************************
+                                 ;     773 Function Name   : void usb_cstd_SelectNak(uint16_t pipe)
+                                 ;     774 Description     : Set the specified pipe PID to send a NAK if the transfer type 
+                                 ;     775                 : is BULK/INT. 
+                                 ;     776 Arguments       : uint16_t pipe     : Pipe number.
+                                 ;     777 Return value    : none
+                                 ;     778 ******************************************************************************/
+                                 ;     779 void usb_cstd_SelectNak(USB_UTR_t *ptr, uint16_t pipe)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",779
+000007C9 6080                    		SUB #08H, R0
+000007CB A009                    		MOV.L R1, 04H[R0]
+000007CD 900A                    		MOV.W R2, 02H[R0]
+                                 ;     780 {
+                                 ;     781     /* Check PIPE TYPE */
+                                 ;     782     if( usb_cstd_GetPipeType(ptr, pipe) != USB_ISO )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",782
+000007CF B80A                    		MOVU.W 02H[R0], R2
+000007D1 A809                    		MOV.L 04H[R0], R1
+000007D3 05rrrrrr             A  		BSR _usb_cstd_GetPipeType
+000007D7 770100C000              		CMP #0C000H, R1
+000007DC 20rr                    		BEQ L172
+000007DE                         L171:	; bb3
+                                 ;     783     {
+                                 ;     784         usb_cstd_SetNak(ptr, pipe);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",784
+000007DE B80A                    		MOVU.W 02H[R0], R2
+000007E0 A809                    		MOV.L 04H[R0], R1
+000007E2 05rrrrrr             A  		BSR _usb_cstd_SetNak
+000007E6 6702                    		RTSD #08H
+000007E8                         L172:	; return
+                                 ;     785     }
+                                 ;     786 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_usb_basic\src\driver\comm\r_usb_cdataio.c",786
+000007E8 6702                    		RTSD #08H
+                                 ;     787 /******************************************************************************
+                                 ;     788 End of function usb_cstd_SelectNak
+                                 ;     789 ******************************************************************************/
+                                 ;     790 
+                                 ;     791 /******************************************************************************
+                                 ;     792 End  Of File
+                                 ;     793 ******************************************************************************/
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _usb_gcstd_DataCnt:
+00000000(00000050H)              		.blkl	20
+00000050                         _usb_gcstd_Dma0Size:
+00000050(00000008H)              		.blkl	2
+00000058                         _usb_gcstd_DataPtr:
+00000058(00000050H)              		.blkl	20
+000000A8                         _usb_gcstd_Pipe:
+000000A8(00000050H)              		.blkl	20
+                                 		.SECTION	B_2,DATA,ALIGN=2
+00000000                         _usb_gcstd_Dma0Dir:
+00000000(00000004H)              		.blkw	2
+00000004                         _usb_gcstd_Dma0Fifo:
+00000004(00000004H)              		.blkw	2
+00000008                         _usb_gcstd_Dma0Pipe:
+00000008(00000004H)              		.blkw	2
+0000000C                         _usb_gcstd_XckeMode:
+0000000C(00000002H)              		.blkw	1
+0000000E                         _usb_gcstd_HsEnable:
+0000000E(00000004H)              		.blkw	2
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     02005   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000002026(000007EAH)  P
+DATA     0000000248(000000F8H)  B
+DATA     0000000018(00000012H)  B_2
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx305E\$ccrx\r_usb_cdataio.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_usb_cdataio.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_usb_basic\src\driver\comm\r_usb_cdataio.obj

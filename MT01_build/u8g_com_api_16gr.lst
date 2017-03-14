@@ -1,0 +1,373 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:02:44 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:02:44
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=u8g_com_api_16gr.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=u8g_com_api_16gr.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;u8g_com_api_16gr.c
+                                 
+                                 		.glb	_u8g_WriteByteBWTo16GrDevice
+                                 		.glb	_u8g_WriteSequenceBWTo16GrDevice
+                                 		.glb	_u8g_WriteByte4LTo16GrDevice
+                                 		.glb	_u8g_WriteSequence4LTo16GrDevice
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _u8g_WriteByteBWTo16GrDevice:
+                                 		.STACK	_u8g_WriteByteBWTo16GrDevice=16
+                                 ;       1 /*
+                                 ;       2 
+                                 ;       3   u8g_com_api_16gr.c
+                                 ;       4   
+                                 ;       5   Extension of the com api for devices with 16 graylevels (4 bit per pixel).
+                                 ;       6   This should fit to the 8h and 16h architectures (pb8v1, pb8v2, pb16v1, pb16v2), 
+                                 ;       7   mainly intended for SSD OLEDs
+                                 ;       8 
+                                 ;       9   Universal 8bit Graphics Library
+                                 ;      10   
+                                 ;      11   Copyright (c) 2011, olikraus@gmail.com
+                                 ;      12   All rights reserved.
+                                 ;      13 
+                                 ;      14   Redistribution and use in source and binary forms, with or without modification, 
+                                 ;      15   are permitted provided that the following conditions are met:
+                                 ;      16 
+                                 ;      17   * Redistributions of source code must retain the above copyright notice, this list 
+                                 ;      18     of conditions and the following disclaimer.
+                                 ;      19     
+                                 ;      20   * Redistributions in binary form must reproduce the above copyright notice, this 
+                                 ;      21     list of conditions and the following disclaimer in the documentation and/or other 
+                                 ;      22     materials provided with the distribution.
+                                 ;      23 
+                                 ;      24   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+                                 ;      25   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+                                 ;      26   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+                                 ;      27   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+                                 ;      28   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+                                 ;      29   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+                                 ;      30   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+                                 ;      31   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+                                 ;      32   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+                                 ;      33   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+                                 ;      34   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+                                 ;      35   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+                                 ;      36   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+                                 ;      37   
+                                 ;      38   
+                                 ;      39 */
+                                 ;      40 
+                                 ;      41 #include "u8g.h"
+                                 ;      42 
+                                 ;      43 /* interpret b as a monochrome bit pattern, write value 15 for high bit and value 0 for a low bit */
+                                 ;      44 /* topbit (msb) is sent last */
+                                 ;      45 /* example: b = 0x083 will send 0xff, 0x00, 0x00, 0xf0 */
+                                 ;      46 uint8_t u8g_WriteByteBWTo16GrDevice(u8g_t *u8g, u8g_dev_t *dev, uint8_t b)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",46
+00000000 60C0                    		SUB #0CH, R0
+00000002 A081                    		MOV.L R1, 08H[R0]
+00000004 A00A                    		MOV.L R2, 04H[R0]
+00000006 808B                    		MOV.B R3, 03H[R0]
+                                 ;      47 {
+                                 ;      48   static uint8_t buf[4];
+                                 ;      49   static uint8_t map[4] = { 0, 0x00f, 0x0f0, 0x0ff };
+                                 ;      50   buf [3] = map[b & 3];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",50
+00000008 B089                    		MOVU.B 03H[R0], R1
+0000000A 6431                    		AND #03H, R1
+0000000C FBE2rrrrrrrr            		MOV.L #__$map$2, R14
+00000012 FECE11                  		MOVU.B [R14,R1], R1
+00000015 FB22rrrrrrrr            		MOV.L #__$buf$1, R2
+0000001B 80A9                    		MOV.B R1, 03H[R2]
+0000001D                         L11:	; entry.split
+                                 ;      51   b>>=2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",51
+0000001D B089                    		MOVU.B 03H[R0], R1
+0000001F 6821                    		SHLR #02H, R1
+00000021 8089                    		MOV.B R1, 03H[R0]
+00000023                         L12:	; entry.split1
+                                 ;      52   buf [2] = map[b & 3];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",52
+00000023 B089                    		MOVU.B 03H[R0], R1
+00000025 6431                    		AND #03H, R1
+00000027 FBE2rrrrrrrr            		MOV.L #__$map$2, R14
+0000002D FECE11                  		MOVU.B [R14,R1], R1
+00000030 FB22rrrrrrrr            		MOV.L #__$buf$1, R2
+00000036 80A1                    		MOV.B R1, 02H[R2]
+00000038                         L13:	; entry.split2
+                                 ;      53   b>>=2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",53
+00000038 B089                    		MOVU.B 03H[R0], R1
+0000003A 6821                    		SHLR #02H, R1
+0000003C 8089                    		MOV.B R1, 03H[R0]
+0000003E                         L14:	; entry.split3
+                                 ;      54   buf [1] = map[b & 3];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",54
+0000003E B089                    		MOVU.B 03H[R0], R1
+00000040 6431                    		AND #03H, R1
+00000042 FBE2rrrrrrrr            		MOV.L #__$map$2, R14
+00000048 FECE11                  		MOVU.B [R14,R1], R1
+0000004B FB22rrrrrrrr            		MOV.L #__$buf$1, R2
+00000051 8029                    		MOV.B R1, 01H[R2]
+00000053                         L15:	; entry.split4
+                                 ;      55   b>>=2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",55
+00000053 B089                    		MOVU.B 03H[R0], R1
+00000055 6821                    		SHLR #02H, R1
+00000057 8089                    		MOV.B R1, 03H[R0]
+00000059                         L16:	; entry.split5
+                                 ;      56   buf [0] = map[b & 3];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",56
+00000059 B089                    		MOVU.B 03H[R0], R1
+0000005B 6431                    		AND #03H, R1
+0000005D FBE2rrrrrrrr            		MOV.L #__$map$2, R14
+00000063 FECE1E                  		MOVU.B [R14,R1], R14
+00000066 FBF2rrrrrrrr            		MOV.L #__$buf$1, R15
+0000006C C3FE                    		MOV.B R14, [R15]
+0000006E                         L17:	; entry.split6
+                                 ;      57   return dev->com_fn(u8g, U8G_COM_MSG_WRITE_SEQ, 4, buf);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",57
+0000006E A809                    		MOV.L 04H[R0], R1
+00000070 A895                    		MOV.L 08H[R1], R5
+00000072 A881                    		MOV.L 08H[R0], R1
+00000074 FB42rrrrrrrr            		MOV.L #__$buf$1, R4
+0000007A 6643                    		MOV.L #00000004H, R3
+0000007C 6662                    		MOV.L #00000006H, R2
+0000007E 7F15                    		JSR R5
+00000080 8081                    		MOV.B R1, 02H[R0]
+00000082 B081                    		MOVU.B 02H[R0], R1
+00000084                         L18:	; entry.split7
+                                 ;      58 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",58
+00000084 5B11                    		MOVU.B R1, R1
+00000086 6703                    		RTSD #0CH
+00000088                         _u8g_WriteSequenceBWTo16GrDevice:
+                                 		.STACK	_u8g_WriteSequenceBWTo16GrDevice=24
+                                 ;      59 
+                                 ;      60 uint8_t u8g_WriteSequenceBWTo16GrDevice(u8g_t *u8g, u8g_dev_t *dev, uint8_t cnt, uint8_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",60
+00000088 7100EC                  		ADD #0FFFFFFECH, R0
+0000008B A101                    		MOV.L R1, 10H[R0]
+0000008D A08A                    		MOV.L R2, 0CH[R0]
+0000008F 828B                    		MOV.B R3, 0BH[R0]
+00000091 A00C                    		MOV.L R4, 04H[R0]
+00000093                         L20:	; bb5
+                                 ;      61 {
+                                 ;      62   do
+                                 ;      63   {
+                                 ;      64     if ( u8g_WriteByteBWTo16GrDevice(u8g, dev, *ptr++) == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",64
+00000093 A80B                    		MOV.L 04H[R0], R3
+00000095 713401                  		ADD #01H, R3, R4
+00000098 A88A                    		MOV.L 0CH[R0], R2
+0000009A A901                    		MOV.L 10H[R0], R1
+0000009C A00C                    		MOV.L R4, 04H[R0]
+0000009E 5833                    		MOVU.B [R3], R3
+000000A0 39rrrr               W  		BSR _u8g_WriteByteBWTo16GrDevice
+000000A3 6101                    		CMP #00H, R1
+000000A5 18                   S  		BNE L22
+000000A6                         L21:	; bb6
+                                 ;      65       return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",65
+000000A6 3C0200                  		MOV.B #00H, 02H[R0]
+000000A9 2Err                 B  		BRA L25
+000000AB                         L22:	; bb18
+                                 ;      66     cnt--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",66
+000000AB B289                    		MOVU.B 0BH[R0], R1
+000000AD 6011                    		SUB #01H, R1
+000000AF 8289                    		MOV.B R1, 0BH[R0]
+000000B1                         L23:	; bb18.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",62
+000000B1 B289                    		MOVU.B 0BH[R0], R1
+000000B3 6101                    		CMP #00H, R1
+000000B5 21rr                    		BNE L20
+000000B7                         L24:	; bb26
+                                 ;      67   } while( cnt != 0 );
+                                 ;      68   return 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",68
+000000B7 3C0201                  		MOV.B #01H, 02H[R0]
+000000BA                         L25:	; bb28
+000000BA C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;      69 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",69
+000000BE B089                    		MOVU.B 03H[R0], R1
+000000C0 6705                    		RTSD #14H
+000000C2                         _u8g_WriteByte4LTo16GrDevice:
+                                 		.STACK	_u8g_WriteByte4LTo16GrDevice=16
+                                 ;      70 
+                                 ;      71 /* interpret b as a 4L bit pattern, write values 0x000, 0x004, 0x008, 0x00c */
+                                 ;      72 uint8_t u8g_WriteByte4LTo16GrDevice(u8g_t *u8g, u8g_dev_t *dev, uint8_t b)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",72
+000000C2 60C0                    		SUB #0CH, R0
+000000C4 A081                    		MOV.L R1, 08H[R0]
+000000C6 A00A                    		MOV.L R2, 04H[R0]
+000000C8 808B                    		MOV.B R3, 03H[R0]
+                                 ;      73 {
+                                 ;      74   //static uint8_t map[16] = { 0x000, 0x004, 0x008, 0x00c, 0x040, 0x044, 0x048, 0x04c, 0x080, 0x084, 0x088, 0x08c, 0x0c0, 0x0c4, 0x0c8, 0x0cc};
+                                 ;      75   //static uint8_t map[16] = { 0x000, 0x004, 0x00a, 0x00f, 0x040, 0x044, 0x04a, 0x04f, 0x0a0, 0x0a4, 0x0aa, 0x0af, 0x0f0, 0x0f4, 0x0fa, 0x0ff};
+                                 ;      76   static uint8_t map[16] = { 0x000, 0x040, 0x0a0, 0x0f0, 0x004, 0x044, 0x0a4, 0x0f4, 0x00a, 0x04a, 0x0aa, 0x0fa, 0x00f, 0x04f, 0x0af, 0x0ff};
+                                 ;      77   uint8_t bb;
+                                 ;      78   bb = b;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",78
+000000CA 800B                    		MOV.B R3, 01H[R0]
+000000CC                         L27:	; entry.split
+                                 ;      79   bb &= 15;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",79
+000000CC B009                    		MOVU.B 01H[R0], R1
+000000CE 64F1                    		AND #0FH, R1
+000000D0 8009                    		MOV.B R1, 01H[R0]
+000000D2                         L28:	; entry.split1
+                                 ;      80   b>>=4;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",80
+000000D2 B089                    		MOVU.B 03H[R0], R1
+000000D4 6841                    		SHLR #04H, R1
+000000D6 8089                    		MOV.B R1, 03H[R0]
+000000D8                         L29:	; entry.split2
+                                 ;      81   dev->com_fn(u8g, U8G_COM_MSG_WRITE_BYTE, map[bb], NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",81
+000000D8 B009                    		MOVU.B 01H[R0], R1
+000000DA FBE2rrrrrrrr            		MOV.L #__$map$3, R14
+000000E0 FECE13                  		MOVU.B [R14,R1], R3
+000000E3 A809                    		MOV.L 04H[R0], R1
+000000E5 A895                    		MOV.L 08H[R1], R5
+000000E7 A881                    		MOV.L 08H[R0], R1
+000000E9 6604                    		MOV.L #00000000H, R4
+000000EB 6652                    		MOV.L #00000005H, R2
+000000ED 7F15                    		JSR R5
+000000EF                         L30:	; entry.split3
+                                 ;      82   return dev->com_fn(u8g, U8G_COM_MSG_WRITE_BYTE, map[b], NULL);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",82
+000000EF B089                    		MOVU.B 03H[R0], R1
+000000F1 FBE2rrrrrrrr            		MOV.L #__$map$3, R14
+000000F7 FECE13                  		MOVU.B [R14,R1], R3
+000000FA A809                    		MOV.L 04H[R0], R1
+000000FC A895                    		MOV.L 08H[R1], R5
+000000FE A881                    		MOV.L 08H[R0], R1
+00000100 6604                    		MOV.L #00000000H, R4
+00000102 6652                    		MOV.L #00000005H, R2
+00000104 7F15                    		JSR R5
+00000106 8081                    		MOV.B R1, 02H[R0]
+00000108 B081                    		MOVU.B 02H[R0], R1
+0000010A                         L31:	; entry.split4
+                                 ;      83 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",83
+0000010A 5B11                    		MOVU.B R1, R1
+0000010C 6703                    		RTSD #0CH
+0000010E                         _u8g_WriteSequence4LTo16GrDevice:
+                                 		.STACK	_u8g_WriteSequence4LTo16GrDevice=24
+                                 ;      84 
+                                 ;      85 uint8_t u8g_WriteSequence4LTo16GrDevice(u8g_t *u8g, u8g_dev_t *dev, uint8_t cnt, uint8_t *ptr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",85
+0000010E 7100EC                  		ADD #0FFFFFFECH, R0
+00000111 A101                    		MOV.L R1, 10H[R0]
+00000113 A08A                    		MOV.L R2, 0CH[R0]
+00000115 828B                    		MOV.B R3, 0BH[R0]
+00000117 A00C                    		MOV.L R4, 04H[R0]
+00000119                         L33:	; bb5
+                                 ;      86 {
+                                 ;      87   do
+                                 ;      88   {
+                                 ;      89     if ( u8g_WriteByte4LTo16GrDevice(u8g, dev, *ptr++) == 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",89
+00000119 A80B                    		MOV.L 04H[R0], R3
+0000011B 713401                  		ADD #01H, R3, R4
+0000011E A88A                    		MOV.L 0CH[R0], R2
+00000120 A901                    		MOV.L 10H[R0], R1
+00000122 A00C                    		MOV.L R4, 04H[R0]
+00000124 5833                    		MOVU.B [R3], R3
+00000126 39rrrr               W  		BSR _u8g_WriteByte4LTo16GrDevice
+00000129 6101                    		CMP #00H, R1
+0000012B 18                   S  		BNE L35
+0000012C                         L34:	; bb6
+                                 ;      90       return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",90
+0000012C 3C0200                  		MOV.B #00H, 02H[R0]
+0000012F 2Err                 B  		BRA L38
+00000131                         L35:	; bb18
+                                 ;      91     cnt--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",91
+00000131 B289                    		MOVU.B 0BH[R0], R1
+00000133 6011                    		SUB #01H, R1
+00000135 8289                    		MOV.B R1, 0BH[R0]
+00000137                         L36:	; bb18.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",87
+00000137 B289                    		MOVU.B 0BH[R0], R1
+00000139 6101                    		CMP #00H, R1
+0000013B 21rr                    		BNE L33
+0000013D                         L37:	; bb26
+                                 ;      92   } while( cnt != 0 );
+                                 ;      93   return 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",93
+0000013D 3C0201                  		MOV.B #01H, 02H[R0]
+00000140                         L38:	; bb28
+00000140 C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;      94 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_com_api_16gr.c",94
+00000144 B089                    		MOVU.B 03H[R0], R1
+00000146 6705                    		RTSD #14H
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$map$2:
+00000000 000FF0FF                		.byte	00H,0FH,0F0H,0FFH
+00000004                         __$map$3:
+00000004 00                      		.byte	00H
+00000005 40                      		.byte	"@"
+00000006 A0F004                  		.byte	0A0H,0F0H,04H
+00000009 44                      		.byte	"D"
+0000000A A4F40A                  		.byte	0A4H,0F4H,0AH
+0000000D 4A                      		.byte	"J"
+0000000E AAFA0F                  		.byte	0AAH,0FAH,0FH
+00000011 4F                      		.byte	"O"
+00000012 AFFF                    		.byte	0AFH,0FFH
+                                 		.SECTION	B_1,DATA
+00000000                         __$buf$1:
+00000000(00000004H)              		.blkb	4
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00338   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000328(00000148H)  P
+ROMDATA  0000000020(00000014H)  D_1
+DATA     0000000004(00000004H)  B_1
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4DB7\$ccrx\u8g_com_api_16gr.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\u8g_com_api_16gr.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\src\Display\u8g_com_api_16gr.obj

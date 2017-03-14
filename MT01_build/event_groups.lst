@@ -1,0 +1,1608 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:03:20 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:03:20
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=event_groups.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=event_groups.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;event_groups.c
+                                 
+                                 		.glb	_xEventGroupCreate
+                                 		.glb	_pvPortMalloc
+                                 		.glb	_vListInitialise
+                                 		.glb	_xEventGroupSync
+                                 		.glb	_vAssertCalled
+                                 		.glb	_xTaskGetSchedulerState
+                                 		.glb	_vTaskSuspendAll
+                                 		.glb	_vTaskPlaceOnUnorderedEventList
+                                 		.glb	_xTaskResumeAll
+                                 		.glb	_uxTaskResetEventItemValue
+                                 		.glb	_vTaskEnterCritical
+                                 		.glb	_vTaskExitCritical
+                                 		.glb	_xEventGroupWaitBits
+                                 		.glb	_xEventGroupClearBits
+                                 		.glb	_xEventGroupClearBitsFromISR
+                                 		.glb	_xTimerPendFunctionCallFromISR
+                                 		.glb	_xEventGroupGetBitsFromISR
+                                 		.glb	_xEventGroupSetBits
+                                 		.glb	_xTaskRemoveFromUnorderedEventList
+                                 		.glb	_vEventGroupDelete
+                                 		.glb	_vPortFree
+                                 		.glb	_vEventGroupSetBitsCallback
+                                 		.glb	_vEventGroupClearBitsCallback
+                                 		.glb	_xEventGroupSetBitsFromISR
+                                 		.glb	_uxEventGroupGetNumber
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _xEventGroupCreate:
+                                 		.STACK	_xEventGroupCreate=12
+                                 ;       1 /*
+                                 ;       2     FreeRTOS V8.2.1 - Copyright (C) 2015 Real Time Engineers Ltd.
+                                 ;       3     All rights reserved
+                                 ;       4 
+                                 ;       5     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
+                                 ;       6 
+                                 ;       7     This file is part of the FreeRTOS distribution.
+                                 ;       8 
+                                 ;       9     FreeRTOS is free software; you can redistribute it and/or modify it under
+                                 ;      10     the terms of the GNU General Public License (version 2) as published by the
+                                 ;      11     Free Software Foundation >>!AND MODIFIED BY!<< the FreeRTOS exception.
+                                 ;      12 
+                                 ;      13     ***************************************************************************
+                                 ;      14     >>!   NOTE: The modification to the GPL is included to allow you to     !<<
+                                 ;      15     >>!   distribute a combined work that includes FreeRTOS without being   !<<
+                                 ;      16     >>!   obliged to provide the source code for proprietary components     !<<
+                                 ;      17     >>!   outside of the FreeRTOS kernel.                                   !<<
+                                 ;      18     ***************************************************************************
+                                 ;      19 
+                                 ;      20     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
+                                 ;      21     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+                                 ;      22     FOR A PARTICULAR PURPOSE.  Full license text is available on the following
+                                 ;      23     link: http://www.freertos.org/a00114.html
+                                 ;      24 
+                                 ;      25     ***************************************************************************
+                                 ;      26      *                                                                       *
+                                 ;      27      *    FreeRTOS provides completely free yet professionally developed,    *
+                                 ;      28      *    robust, strictly quality controlled, supported, and cross          *
+                                 ;      29      *    platform software that is more than just the market leader, it     *
+                                 ;      30      *    is the industry's de facto standard.                               *
+                                 ;      31      *                                                                       *
+                                 ;      32      *    Help yourself get started quickly while simultaneously helping     *
+                                 ;      33      *    to support the FreeRTOS project by purchasing a FreeRTOS           *
+                                 ;      34      *    tutorial book, reference manual, or both:                          *
+                                 ;      35      *    http://www.FreeRTOS.org/Documentation                              *
+                                 ;      36      *                                                                       *
+                                 ;      37     ***************************************************************************
+                                 ;      38 
+                                 ;      39     http://www.FreeRTOS.org/FAQHelp.html - Having a problem?  Start by reading
+                                 ;      40     the FAQ page "My application does not run, what could be wrong?".  Have you
+                                 ;      41     defined configASSERT()?
+                                 ;      42 
+                                 ;      43     http://www.FreeRTOS.org/support - In return for receiving this top quality
+                                 ;      44     embedded software for free we request you assist our global community by
+                                 ;      45     participating in the support forum.
+                                 ;      46 
+                                 ;      47     http://www.FreeRTOS.org/training - Investing in training allows your team to
+                                 ;      48     be as productive as possible as early as possible.  Now you can receive
+                                 ;      49     FreeRTOS training directly from Richard Barry, CEO of Real Time Engineers
+                                 ;      50     Ltd, and the world's leading authority on the world's leading RTOS.
+                                 ;      51 
+                                 ;      52     http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+                                 ;      53     including FreeRTOS+Trace - an indispensable productivity tool, a DOS
+                                 ;      54     compatible FAT file system, and our tiny thread aware UDP/IP stack.
+                                 ;      55 
+                                 ;      56     http://www.FreeRTOS.org/labs - Where new FreeRTOS products go to incubate.
+                                 ;      57     Come and try FreeRTOS+TCP, our new open source TCP/IP stack for FreeRTOS.
+                                 ;      58 
+                                 ;      59     http://www.OpenRTOS.com - Real Time Engineers ltd. license FreeRTOS to High
+                                 ;      60     Integrity Systems ltd. to sell under the OpenRTOS brand.  Low cost OpenRTOS
+                                 ;      61     licenses offer ticketed support, indemnification and commercial middleware.
+                                 ;      62 
+                                 ;      63     http://www.SafeRTOS.com - High Integrity Systems also provide a safety
+                                 ;      64     engineered and independently SIL3 certified version for use in safety and
+                                 ;      65     mission critical applications that require provable dependability.
+                                 ;      66 
+                                 ;      67     1 tab == 4 spaces!
+                                 ;      68 */
+                                 ;      69 
+                                 ;      70 /* Standard includes. */
+                                 ;      71 #include <stdlib.h>
+                                 ;      72 
+                                 ;      73 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
+                                 ;      74 all the API functions to use the MPU wrappers.  That should only be done when
+                                 ;      75 task.h is included from an application file. */
+                                 ;      76 #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+                                 ;      77 
+                                 ;      78 /* FreeRTOS includes. */
+                                 ;      79 #include "FreeRTOS.h"
+                                 ;      80 #include "task.h"
+                                 ;      81 #include "timers.h"
+                                 ;      82 #include "event_groups.h"
+                                 ;      83 
+                                 ;      84 /* Lint e961 and e750 are suppressed as a MISRA exception justified because the
+                                 ;      85 MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined for the
+                                 ;      86 header files above, but not in this file, in order to generate the correct
+                                 ;      87 privileged Vs unprivileged linkage and placement. */
+                                 ;      88 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750. */
+                                 ;      89 
+                                 ;      90 #if ( INCLUDE_xEventGroupSetBitFromISR == 1 ) && ( configUSE_TIMERS == 0 )
+                                 ;      91 	#error configUSE_TIMERS must be set to 1 to make the xEventGroupSetBitFromISR() function available.
+                                 ;      92 #endif
+                                 ;      93 
+                                 ;      94 #if ( INCLUDE_xEventGroupSetBitFromISR == 1 ) && ( INCLUDE_xTimerPendFunctionCall == 0 )
+                                 ;      95 	#error INCLUDE_xTimerPendFunctionCall must also be set to one to make the xEventGroupSetBitFromISR() function available.
+                                 ;      96 #endif
+                                 ;      97 
+                                 ;      98 /* The following bit fields convey control information in a task's event list
+                                 ;      99 item value.  It is important they don't clash with the
+                                 ;     100 taskEVENT_LIST_ITEM_VALUE_IN_USE definition. */
+                                 ;     101 #if configUSE_16_BIT_TICKS == 1
+                                 ;     102 	#define eventCLEAR_EVENTS_ON_EXIT_BIT	0x0100U
+                                 ;     103 	#define eventUNBLOCKED_DUE_TO_BIT_SET	0x0200U
+                                 ;     104 	#define eventWAIT_FOR_ALL_BITS			0x0400U
+                                 ;     105 	#define eventEVENT_BITS_CONTROL_BYTES	0xff00U
+                                 ;     106 #else
+                                 ;     107 	#define eventCLEAR_EVENTS_ON_EXIT_BIT	0x01000000UL
+                                 ;     108 	#define eventUNBLOCKED_DUE_TO_BIT_SET	0x02000000UL
+                                 ;     109 	#define eventWAIT_FOR_ALL_BITS			0x04000000UL
+                                 ;     110 	#define eventEVENT_BITS_CONTROL_BYTES	0xff000000UL
+                                 ;     111 #endif
+                                 ;     112 
+                                 ;     113 typedef struct xEventGroupDefinition
+                                 ;     114 {
+                                 ;     115 	EventBits_t uxEventBits;
+                                 ;     116 	List_t xTasksWaitingForBits;		/*< List of tasks waiting for a bit to be set. */
+                                 ;     117 
+                                 ;     118 	#if( configUSE_TRACE_FACILITY == 1 )
+                                 ;     119 		UBaseType_t uxEventGroupNumber;
+                                 ;     120 	#endif
+                                 ;     121 
+                                 ;     122 } EventGroup_t;
+                                 ;     123 
+                                 ;     124 /*-----------------------------------------------------------*/
+                                 ;     125 
+                                 ;     126 /*
+                                 ;     127  * Test the bits set in uxCurrentEventBits to see if the wait condition is met.
+                                 ;     128  * The wait condition is defined by xWaitForAllBits.  If xWaitForAllBits is
+                                 ;     129  * pdTRUE then the wait condition is met if all the bits set in uxBitsToWaitFor
+                                 ;     130  * are also set in uxCurrentEventBits.  If xWaitForAllBits is pdFALSE then the
+                                 ;     131  * wait condition is met if any of the bits set in uxBitsToWait for are also set
+                                 ;     132  * in uxCurrentEventBits.
+                                 ;     133  */
+                                 ;     134 static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, const EventBits_t uxBitsToWaitFor, const BaseType_t xWaitForAllBits );
+                                 ;     135 
+                                 ;     136 /*-----------------------------------------------------------*/
+                                 ;     137 
+                                 ;     138 EventGroupHandle_t xEventGroupCreate( void )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",138
+00000000 6080                    		SUB #08H, R0
+00000002 75411C                  		MOV.L #0000001CH, R1
+                                 ;     139 {
+                                 ;     140 EventGroup_t *pxEventBits;
+                                 ;     141 
+                                 ;     142 	pxEventBits = ( EventGroup_t * ) pvPortMalloc( sizeof( EventGroup_t ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",142
+00000005 05rrrrrr             A  		BSR _pvPortMalloc
+00000009 E301                    		MOV.L R1, [R0]
+0000000B                         L11:	; entry.split
+                                 ;     143 	if( pxEventBits != NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",143
+0000000B EC01                    		MOV.L [R0], R1
+0000000D 6101                    		CMP #00H, R1
+0000000F 20rr                    		BEQ L14
+00000011                         L12:	; bb4
+                                 ;     144 	{
+                                 ;     145 		pxEventBits->uxEventBits = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",145
+00000011 EC01                    		MOV.L [R0], R1
+00000013 F81600                  		MOV.L #00000000H, [R1]
+00000016                         L13:	; bb4.split
+                                 ;     146 		vListInitialise( &( pxEventBits->xTasksWaitingForBits ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",146
+00000016 EC01                    		MOV.L [R0], R1
+00000018 6241                    		ADD #04H, R1
+0000001A 05rrrrrr             A  		BSR _vListInitialise
+0000001E                         L14:	; bb13
+                                 ;     147 		traceEVENT_GROUP_CREATE( pxEventBits );
+                                 ;     148 	}
+                                 ;     149 	else
+                                 ;     150 	{
+                                 ;     151 		traceEVENT_GROUP_CREATE_FAILED();
+                                 ;     152 	}
+                                 ;     153 
+                                 ;     154 	return ( EventGroupHandle_t ) pxEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",154
+0000001E EC01                    		MOV.L [R0], R1
+00000020 A009                    		MOV.L R1, 04H[R0]
+00000022                         L15:	; bb13.split
+                                 ;     155 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",155
+00000022 6702                    		RTSD #08H
+00000024                         _xEventGroupSync:
+                                 		.STACK	_xEventGroupSync=48
+                                 ;     156 /*-----------------------------------------------------------*/
+                                 ;     157 
+                                 ;     158 EventBits_t xEventGroupSync( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, const EventBits_t uxBitsToWaitFor, TickType_t xTicksToWait )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",158
+00000024 7100D4                  		ADD #0FFFFFFD4H, R0
+00000027 A281                    		MOV.L R1, 28H[R0]
+00000029 A20A                    		MOV.L R2, 24H[R0]
+0000002B A203                    		MOV.L R3, 20H[R0]
+0000002D A18C                    		MOV.L R4, 1CH[R0]
+                                 ;     159 {
+                                 ;     160 EventBits_t uxOriginalBitValue, uxReturn;
+                                 ;     161 EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",161
+0000002F E5000A03                		MOV.L 28H[R0], 0CH[R0]
+00000033                         L17:	; entry.split
+                                 ;     162 BaseType_t xAlreadyYielded;
+                                 ;     163 BaseType_t xTimeoutOccurred = pdFALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",163
+00000033 3E0500                  		MOV.L #00000000H, 14H[R0]
+00000036                         L18:	; entry.split1
+00000036 FBE2000000FF            		MOV.L #0FF000000H, R14
+                                 ;     164 
+                                 ;     165 	configASSERT( ( uxBitsToWaitFor & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",165
+0000003C 06A10C0E08              		TST 20H[R0].L, R14
+00000041 10                   S  		BEQ L20
+00000042                         L19:	; bb12
+00000042 05rrrrrr             A  		BSR _vAssertCalled
+00000046                         L20:	; bb20
+                                 ;     166 	configASSERT( uxBitsToWaitFor != 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",166
+00000046 AA01                    		MOV.L 20H[R0], R1
+00000048 6101                    		CMP #00H, R1
+0000004A 18                   S  		BNE L22
+0000004B                         L21:	; bb21
+0000004B 05rrrrrr             A  		BSR _vAssertCalled
+0000004F                         L22:	; bb29
+                                 ;     167 	#if ( ( INCLUDE_xTaskGetSchedulerState == 1 ) || ( configUSE_TIMERS == 1 ) )
+                                 ;     168 	{
+                                 ;     169 		configASSERT( !( ( xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED ) && ( xTicksToWait != 0 ) ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",169
+0000004F 05rrrrrr             A  		BSR _xTaskGetSchedulerState
+00000053 6101                    		CMP #00H, R1
+00000055 10                   S  		BEQ L24
+00000056 2Err                 B  		BRA L26
+00000058                         L23:	; bb30
+00000058 05rrrrrr             A  		BSR _vAssertCalled
+0000005C 2Err                 B  		BRA L31
+0000005E                         L24:	; bb34
+0000005E A989                    		MOV.L 1CH[R0], R1
+00000060 6101                    		CMP #00H, R1
+00000062 10                   S  		BEQ L26
+00000063                         L25:	; bb38
+00000063 F80601                  		MOV.L #00000001H, [R0]
+00000066 08                   S  		BRA L27
+00000067                         L26:	; bb39
+00000067 F80600                  		MOV.L #00000000H, [R0]
+0000006A                         L27:	; bb40
+0000006A EC01                    		MOV.L [R0], R1
+0000006C 6101                    		CMP #00H, R1
+0000006E 10                   S  		BEQ L29
+0000006F                         L28:	; bb44
+0000006F F80600                  		MOV.L #00000000H, [R0]
+00000072 08                   S  		BRA L30
+00000073                         L29:	; bb45
+00000073 F80601                  		MOV.L #00000001H, [R0]
+00000076                         L30:	; bb46
+00000076 EC01                    		MOV.L [R0], R1
+00000078 6101                    		CMP #00H, R1
+0000007A 20rr                    		BEQ L23
+0000007C                         L31:	; bb52
+                                 ;     170 	}
+                                 ;     171 	#endif
+                                 ;     172 
+                                 ;     173 	vTaskSuspendAll();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",173
+0000007C 05rrrrrr             A  		BSR _vTaskSuspendAll
+00000080                         L32:	; bb52.split
+                                 ;     174 	{
+                                 ;     175 		uxOriginalBitValue = pxEventBits->uxEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",175
+00000080 A889                    		MOV.L 0CH[R0], R1
+00000082 E41001                  		MOV.L [R1], 04H[R0]
+00000085                         L33:	; bb52.split2
+                                 ;     176 
+                                 ;     177 		( void ) xEventGroupSetBits( xEventGroup, uxBitsToSet );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",177
+00000085 AA0A                    		MOV.L 24H[R0], R2
+00000087 AA81                    		MOV.L 28H[R0], R1
+00000089 39rrrr               W  		BSR _xEventGroupSetBits
+0000008C                         L34:	; bb52.split3
+                                 ;     178 
+                                 ;     179 		if( ( ( uxOriginalBitValue | uxBitsToSet ) & uxBitsToWaitFor ) == uxBitsToWaitFor )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",179
+0000008C A809                    		MOV.L 04H[R0], R1
+0000008E 06950109                		OR 24H[R0].L, R1
+00000092 AA02                    		MOV.L 20H[R0], R2
+00000094 5321                    		AND R2, R1
+00000096 4721                    		CMP R2, R1
+00000098 21rr                    		BNE L38
+0000009A                         L35:	; bb60
+                                 ;     180 		{
+                                 ;     181 			/* All the rendezvous bits are now set - no need to block. */
+                                 ;     182 			uxReturn = ( uxOriginalBitValue | uxBitsToSet );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",182
+0000009A A809                    		MOV.L 04H[R0], R1
+0000009C 06950109                		OR 24H[R0].L, R1
+000000A0 A081                    		MOV.L R1, 08H[R0]
+000000A2                         L36:	; bb60.split
+                                 ;     183 
+                                 ;     184 			/* Rendezvous always clear the bits.  They will have been cleared
+                                 ;     185 			already unless this is the only task in the rendezvous. */
+                                 ;     186 			pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",186
+000000A2 AA01                    		MOV.L 20H[R0], R1
+000000A4 7E01                    		NOT R1
+000000A6 A88A                    		MOV.L 0CH[R0], R2
+000000A8 069021                  		AND [R2].L, R1
+000000AB E321                    		MOV.L R1, [R2]
+000000AD                         L37:	; bb60.split4
+                                 ;     187 
+                                 ;     188 			xTicksToWait = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",188
+000000AD 3E0700                  		MOV.L #00000000H, 1CH[R0]
+000000B0 2Err                 B  		BRA L42
+000000B2                         L38:	; bb70
+                                 ;     189 		}
+                                 ;     190 		else
+                                 ;     191 		{
+                                 ;     192 			if( xTicksToWait != ( TickType_t ) 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",192
+000000B2 A989                    		MOV.L 1CH[R0], R1
+000000B4 6101                    		CMP #00H, R1
+000000B6 A889                    		MOV.L 0CH[R0], R1
+000000B8 20rr                    		BEQ L41
+000000BA                         L39:	; bb71
+                                 ;     193 			{
+                                 ;     194 				traceEVENT_GROUP_SYNC_BLOCK( xEventGroup, uxBitsToSet, uxBitsToWaitFor );
+                                 ;     195 
+                                 ;     196 				/* Store the bits that the calling task is waiting for in the
+                                 ;     197 				task's event list item so the kernel knows when a match is
+                                 ;     198 				found.  Then enter the blocked state. */
+                                 ;     199 				vTaskPlaceOnUnorderedEventList( &( pxEventBits->xTasksWaitingForBits ), ( uxBitsToWaitFor | eventCLEAR_EVENTS_ON_EXIT_BIT | even
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",199
+000000BA A98B                    		MOV.L 1CH[R0], R3
+000000BC AA02                    		MOV.L 20H[R0], R2
+000000BE 743200000005            		OR #05000000H, R2
+000000C4 6241                    		ADD #04H, R1
+000000C6 05rrrrrr             A  		BSR _vTaskPlaceOnUnorderedEventList
+000000CA                         L40:	; bb71.split
+                                 ;     200 
+                                 ;     201 				/* This assignment is obsolete as uxReturn will get set after
+                                 ;     202 				the task unblocks, but some compilers mistakenly generate a
+                                 ;     203 				warning about uxReturn being returned without being set if the
+                                 ;     204 				assignment is omitted. */
+                                 ;     205 				uxReturn = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",205
+000000CA 3E0200                  		MOV.L #00000000H, 08H[R0]
+000000CD 08                   S  		BRA L42
+000000CE                         L41:	; bb78
+                                 ;     206 			}
+                                 ;     207 			else
+                                 ;     208 			{
+                                 ;     209 				/* The rendezvous bits were not set, but no block time was
+                                 ;     210 				specified - just return the current event bit value. */
+                                 ;     211 				uxReturn = pxEventBits->uxEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",211
+000000CE E41002                  		MOV.L [R1], 08H[R0]
+000000D1                         L42:	; bb96
+                                 ;     212 			}
+                                 ;     213 		}
+                                 ;     214 	}
+                                 ;     215 	xAlreadyYielded = xTaskResumeAll();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",215
+000000D1 05rrrrrr             A  		BSR _xTaskResumeAll
+000000D5 A101                    		MOV.L R1, 10H[R0]
+000000D7                         L43:	; bb96.split
+                                 ;     216 
+                                 ;     217 	if( xTicksToWait != ( TickType_t ) 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",217
+000000D7 A989                    		MOV.L 1CH[R0], R1
+000000D9 6101                    		CMP #00H, R1
+000000DB 20rr                    		BEQ L55
+000000DD                         L44:	; bb100
+                                 ;     218 	{
+                                 ;     219 		if( xAlreadyYielded == pdFALSE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",219
+000000DD A901                    		MOV.L 10H[R0], R1
+000000DF 6101                    		CMP #00H, R1
+000000E1 21rr                    		BNE L46
+000000E3                         L45:	; bb101
+                                 ;     220 		{
+                                 ;     221 			portYIELD_WITHIN_API();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",221
+                                 		._LINE_TOP  inline_asm
+                                  
+000000E3 7EA5                    	PUSH.L R5
+                                 	 
+000000E5 FB5EE07208              	MOV.L #553696, R5
+000000EA F85401                  	MOV.B #1, [R5]
+                                 	 
+000000ED EC55                    	MOV.L [R5], R5
+                                 	 
+000000EF 7EB5                    	POP R5
+                                 		._LINE_END  inline_asm
+000000F1                         L46:	; bb107
+                                 ;     222 		}
+                                 ;     223 		else
+                                 ;     224 		{
+                                 ;     225 			mtCOVERAGE_TEST_MARKER();
+                                 ;     226 		}
+                                 ;     227 
+                                 ;     228 		/* The task blocked to wait for its required bits to be set - at this
+                                 ;     229 		point either the required bits were set or the block time expired.  If
+                                 ;     230 		the required bits were set they will have been stored in the task's
+                                 ;     231 		event list item, and they should now be retrieved then cleared. */
+                                 ;     232 		uxReturn = uxTaskResetEventItemValue();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",232
+000000F1 05rrrrrr             A  		BSR _uxTaskResetEventItemValue
+000000F5 A081                    		MOV.L R1, 08H[R0]
+000000F7                         L47:	; bb107.split
+                                 ;     233 
+                                 ;     234 		if( ( uxReturn & eventUNBLOCKED_DUE_TO_BIT_SET ) == ( EventBits_t ) 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",234
+000000F7 A881                    		MOV.L 08H[R0], R1
+000000F9 7D91                    		BTST #19H, R1
+000000FB 21rr                    		BNE L54
+000000FD                         L48:	; bb110
+                                 ;     235 		{
+                                 ;     236 			/* The task timed out, just return the current event bit value. */
+                                 ;     237 			taskENTER_CRITICAL();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",237
+000000FD 05rrrrrr             A  		BSR _vTaskEnterCritical
+00000101                         L49:	; bb110.split
+                                 ;     238 			{
+                                 ;     239 				uxReturn = pxEventBits->uxEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",239
+00000101 A889                    		MOV.L 0CH[R0], R1
+00000103 E41002                  		MOV.L [R1], 08H[R0]
+00000106                         L50:	; bb110.split5
+                                 ;     240 
+                                 ;     241 				/* Although the task got here because it timed out before the
+                                 ;     242 				bits it was waiting for were set, it is possible that since it
+                                 ;     243 				unblocked another task has set the bits.  If this is the case
+                                 ;     244 				then it needs to clear the bits before exiting. */
+                                 ;     245 				if( ( uxReturn & uxBitsToWaitFor ) == uxBitsToWaitFor )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",245
+00000106 AA01                    		MOV.L 20H[R0], R1
+00000108 EF1E                    		MOV.L R1, R14
+0000010A 06910E02                		AND 08H[R0].L, R14
+0000010E 471E                    		CMP R1, R14
+00000110 21rr                    		BNE L52
+00000112                         L51:	; bb115
+                                 ;     246 				{
+                                 ;     247 					pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",247
+00000112 AA01                    		MOV.L 20H[R0], R1
+00000114 7E01                    		NOT R1
+00000116 A88A                    		MOV.L 0CH[R0], R2
+00000118 069021                  		AND [R2].L, R1
+0000011B E321                    		MOV.L R1, [R2]
+0000011D                         L52:	; bb129
+                                 ;     248 				}
+                                 ;     249 				else
+                                 ;     250 				{
+                                 ;     251 					mtCOVERAGE_TEST_MARKER();
+                                 ;     252 				}
+                                 ;     253 			}
+                                 ;     254 			taskEXIT_CRITICAL();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",254
+0000011D 05rrrrrr             A  		BSR _vTaskExitCritical
+00000121                         L53:	; bb129.split
+                                 ;     255 
+                                 ;     256 			xTimeoutOccurred = pdTRUE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",256
+00000121 3E0501                  		MOV.L #00000001H, 14H[R0]
+00000124                         L54:	; bb136
+                                 ;     257 		}
+                                 ;     258 		else
+                                 ;     259 		{
+                                 ;     260 			/* The task unblocked because the bits were set. */
+                                 ;     261 		}
+                                 ;     262 
+                                 ;     263 		/* Control bits might be set as the task had blocked should not be
+                                 ;     264 		returned. */
+                                 ;     265 		uxReturn &= ~eventEVENT_BITS_CONTROL_BYTES;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",265
+00000124 A881                    		MOV.L 08H[R0], R1
+00000126 7421FFFFFF00            		AND #00FFFFFFH, R1
+0000012C A081                    		MOV.L R1, 08H[R0]
+0000012E                         L55:	; bb143.split
+                                 ;     266 	}
+                                 ;     267 
+                                 ;     268 	traceEVENT_GROUP_SYNC_END( xEventGroup, uxBitsToSet, uxBitsToWaitFor, xTimeoutOccurred );
+                                 ;     269 
+                                 ;     270 	return uxReturn;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",270
+0000012E A881                    		MOV.L 08H[R0], R1
+00000130 A181                    		MOV.L R1, 18H[R0]
+00000132                         L56:	; bb143.split6
+                                 ;     271 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",271
+00000132 670B                    		RTSD #2CH
+00000134                         _xEventGroupWaitBits:
+                                 		.STACK	_xEventGroupWaitBits=60
+                                 ;     272 /*-----------------------------------------------------------*/
+                                 ;     273 
+                                 ;     274 EventBits_t xEventGroupWaitBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToWaitFor, const BaseType_t xClearOnExit, const BaseType_t xWaitForA
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",274
+00000134 7100C8                  		ADD #0FFFFFFC8H, R0
+00000137 A309                    		MOV.L R1, 34H[R0]
+00000139 A302                    		MOV.L R2, 30H[R0]
+0000013B A28B                    		MOV.L R3, 2CH[R0]
+0000013D A284                    		MOV.L R4, 28H[R0]
+0000013F E5000F09                		MOV.L 3CH[R0], 24H[R0]
+                                 ;     275 {
+                                 ;     276 EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",276
+00000143 E5000D01                		MOV.L 34H[R0], 04H[R0]
+00000147                         L58:	; entry.split
+                                 ;     277 EventBits_t uxReturn, uxControlBits = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",277
+00000147 3E0300                  		MOV.L #00000000H, 0CH[R0]
+0000014A                         L59:	; entry.split1
+                                 ;     278 BaseType_t xWaitConditionMet, xAlreadyYielded;
+                                 ;     279 BaseType_t xTimeoutOccurred = pdFALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",279
+0000014A 3E0600                  		MOV.L #00000000H, 18H[R0]
+0000014D                         L60:	; entry.split2
+                                 ;     280 
+                                 ;     281 	/* Check the user is not attempting to wait on the bits used by the kernel
+                                 ;     282 	itself, and that at least one bit is being requested. */
+                                 ;     283 	configASSERT( xEventGroup );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",283
+0000014D AB09                    		MOV.L 34H[R0], R1
+0000014F 6101                    		CMP #00H, R1
+00000151 18                   S  		BNE L62
+00000152                         L61:	; bb15
+00000152 05rrrrrr             A  		BSR _vAssertCalled
+00000156                         L62:	; bb20
+00000156 FBE2000000FF            		MOV.L #0FF000000H, R14
+                                 ;     284 	configASSERT( ( uxBitsToWaitFor & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",284
+0000015C 06A10C0E0C              		TST 30H[R0].L, R14
+00000161 10                   S  		BEQ L64
+00000162                         L63:	; bb21
+00000162 05rrrrrr             A  		BSR _vAssertCalled
+00000166                         L64:	; bb30
+                                 ;     285 	configASSERT( uxBitsToWaitFor != 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",285
+00000166 AB01                    		MOV.L 30H[R0], R1
+00000168 6101                    		CMP #00H, R1
+0000016A 18                   S  		BNE L66
+0000016B                         L65:	; bb31
+0000016B 05rrrrrr             A  		BSR _vAssertCalled
+0000016F                         L66:	; bb39
+                                 ;     286 	#if ( ( INCLUDE_xTaskGetSchedulerState == 1 ) || ( configUSE_TIMERS == 1 ) )
+                                 ;     287 	{
+                                 ;     288 		configASSERT( !( ( xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED ) && ( xTicksToWait != 0 ) ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",288
+0000016F 05rrrrrr             A  		BSR _xTaskGetSchedulerState
+00000173 6101                    		CMP #00H, R1
+00000175 10                   S  		BEQ L68
+00000176 2Err                 B  		BRA L70
+00000178                         L67:	; bb40
+00000178 05rrrrrr             A  		BSR _vAssertCalled
+0000017C 2Err                 B  		BRA L75
+0000017E                         L68:	; bb44
+0000017E AA09                    		MOV.L 24H[R0], R1
+00000180 6101                    		CMP #00H, R1
+00000182 10                   S  		BEQ L70
+00000183                         L69:	; bb48
+00000183 F80601                  		MOV.L #00000001H, [R0]
+00000186 08                   S  		BRA L71
+00000187                         L70:	; bb49
+00000187 F80600                  		MOV.L #00000000H, [R0]
+0000018A                         L71:	; bb50
+0000018A EC01                    		MOV.L [R0], R1
+0000018C 6101                    		CMP #00H, R1
+0000018E 10                   S  		BEQ L73
+0000018F                         L72:	; bb54
+0000018F F80600                  		MOV.L #00000000H, [R0]
+00000192 08                   S  		BRA L74
+00000193                         L73:	; bb55
+00000193 F80601                  		MOV.L #00000001H, [R0]
+00000196                         L74:	; bb56
+00000196 EC01                    		MOV.L [R0], R1
+00000198 6101                    		CMP #00H, R1
+0000019A 20rr                    		BEQ L67
+0000019C                         L75:	; bb62
+                                 ;     289 	}
+                                 ;     290 	#endif
+                                 ;     291 
+                                 ;     292 	vTaskSuspendAll();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",292
+0000019C 05rrrrrr             A  		BSR _vTaskSuspendAll
+000001A0                         L76:	; bb62.split
+                                 ;     293 	{
+                                 ;     294 		const EventBits_t uxCurrentEventBits = pxEventBits->uxEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",294
+000001A0 A809                    		MOV.L 04H[R0], R1
+000001A2 E41007                  		MOV.L [R1], 1CH[R0]
+000001A5                         L77:	; bb62.split3
+                                 ;     295 
+                                 ;     296 		/* Check to see if the wait condition is already met or not. */
+                                 ;     297 		xWaitConditionMet = prvTestWaitCondition( uxCurrentEventBits, uxBitsToWaitFor, xWaitForAllBits );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",297
+000001A5 AA83                    		MOV.L 28H[R0], R3
+000001A7 AB02                    		MOV.L 30H[R0], R2
+000001A9 A989                    		MOV.L 1CH[R0], R1
+000001AB 39rrrr               W  		BSR __$prvTestWaitCondition
+000001AE A101                    		MOV.L R1, 10H[R0]
+000001B0                         L78:	; bb62.split4
+                                 ;     298 
+                                 ;     299 		if( xWaitConditionMet != pdFALSE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",299
+000001B0 A901                    		MOV.L 10H[R0], R1
+000001B2 6101                    		CMP #00H, R1
+000001B4 20rr                    		BEQ L83
+000001B6                         L79:	; bb71
+                                 ;     300 		{
+                                 ;     301 			/* The wait condition has already been met so there is no need to
+                                 ;     302 			block. */
+                                 ;     303 			uxReturn = uxCurrentEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",303
+000001B6 E5000702                		MOV.L 1CH[R0], 08H[R0]
+000001BA                         L80:	; bb71.split
+                                 ;     304 			xTicksToWait = ( TickType_t ) 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",304
+000001BA 3E0900                  		MOV.L #00000000H, 24H[R0]
+000001BD                         L81:	; bb71.split5
+                                 ;     305 
+                                 ;     306 			/* Clear the wait bits if requested to do so. */
+                                 ;     307 			if( xClearOnExit != pdFALSE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",307
+000001BD AA89                    		MOV.L 2CH[R0], R1
+000001BF 6101                    		CMP #00H, R1
+000001C1 20rr                    		BEQ L91
+000001C3                         L82:	; bb74
+                                 ;     308 			{
+                                 ;     309 				pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",309
+000001C3 AB01                    		MOV.L 30H[R0], R1
+000001C5 7E01                    		NOT R1
+000001C7 A80A                    		MOV.L 04H[R0], R2
+000001C9 069021                  		AND [R2].L, R1
+000001CC E321                    		MOV.L R1, [R2]
+000001CE 2Err                 B  		BRA L91
+000001D0                         L83:	; bb87
+                                 ;     310 			}
+                                 ;     311 			else
+                                 ;     312 			{
+                                 ;     313 				mtCOVERAGE_TEST_MARKER();
+                                 ;     314 			}
+                                 ;     315 		}
+                                 ;     316 		else if( xTicksToWait == ( TickType_t ) 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",316
+000001D0 AA09                    		MOV.L 24H[R0], R1
+000001D2 6101                    		CMP #00H, R1
+000001D4 18                   S  		BNE L85
+000001D5                         L84:	; bb88
+                                 ;     317 		{
+                                 ;     318 			/* The wait condition has not been met, but no block time was
+                                 ;     319 			specified, so just return the current value. */
+                                 ;     320 			uxReturn = uxCurrentEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",320
+000001D5 E5000702                		MOV.L 1CH[R0], 08H[R0]
+000001D9 2Err                 B  		BRA L91
+000001DB                         L85:	; bb91
+                                 ;     321 		}
+                                 ;     322 		else
+                                 ;     323 		{
+                                 ;     324 			/* The task is going to block to wait for its required bits to be
+                                 ;     325 			set.  uxControlBits are used to remember the specified behaviour of
+                                 ;     326 			this call to xEventGroupWaitBits() - for use when the event bits
+                                 ;     327 			unblock the task. */
+                                 ;     328 			if( xClearOnExit != pdFALSE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",328
+000001DB AA89                    		MOV.L 2CH[R0], R1
+000001DD 6101                    		CMP #00H, R1
+000001DF 10                   S  		BEQ L87
+000001E0                         L86:	; bb92
+                                 ;     329 			{
+                                 ;     330 				uxControlBits |= eventCLEAR_EVENTS_ON_EXIT_BIT;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",330
+000001E0 A889                    		MOV.L 0CH[R0], R1
+000001E2 7981                    		BSET #18H, R1
+000001E4 A089                    		MOV.L R1, 0CH[R0]
+000001E6                         L87:	; bb101
+                                 ;     331 			}
+                                 ;     332 			else
+                                 ;     333 			{
+                                 ;     334 				mtCOVERAGE_TEST_MARKER();
+                                 ;     335 			}
+                                 ;     336 
+                                 ;     337 			if( xWaitForAllBits != pdFALSE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",337
+000001E6 AA81                    		MOV.L 28H[R0], R1
+000001E8 6101                    		CMP #00H, R1
+000001EA 10                   S  		BEQ L89
+000001EB                         L88:	; bb102
+                                 ;     338 			{
+                                 ;     339 				uxControlBits |= eventWAIT_FOR_ALL_BITS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",339
+000001EB A889                    		MOV.L 0CH[R0], R1
+000001ED 79A1                    		BSET #1AH, R1
+000001EF A089                    		MOV.L R1, 0CH[R0]
+000001F1                         L89:	; bb110
+                                 ;     340 			}
+                                 ;     341 			else
+                                 ;     342 			{
+                                 ;     343 				mtCOVERAGE_TEST_MARKER();
+                                 ;     344 			}
+                                 ;     345 
+                                 ;     346 			/* Store the bits that the calling task is waiting for in the
+                                 ;     347 			task's event list item so the kernel knows when a match is
+                                 ;     348 			found.  Then enter the blocked state. */
+                                 ;     349 			vTaskPlaceOnUnorderedEventList( &( pxEventBits->xTasksWaitingForBits ), ( uxBitsToWaitFor | uxControlBits ), xTicksToWait );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",349
+000001F1 AB02                    		MOV.L 30H[R0], R2
+000001F3 06950203                		OR 0CH[R0].L, R2
+000001F7 AA0B                    		MOV.L 24H[R0], R3
+000001F9 A809                    		MOV.L 04H[R0], R1
+000001FB 6241                    		ADD #04H, R1
+000001FD 05rrrrrr             A  		BSR _vTaskPlaceOnUnorderedEventList
+00000201                         L90:	; bb110.split
+                                 ;     350 
+                                 ;     351 			/* This is obsolete as it will get set after the task unblocks, but
+                                 ;     352 			some compilers mistakenly generate a warning about the variable
+                                 ;     353 			being returned without being set if it is not done. */
+                                 ;     354 			uxReturn = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",354
+00000201 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000204                         L91:	; bb126
+                                 ;     355 
+                                 ;     356 			traceEVENT_GROUP_WAIT_BITS_BLOCK( xEventGroup, uxBitsToWaitFor );
+                                 ;     357 		}
+                                 ;     358 	}
+                                 ;     359 	xAlreadyYielded = xTaskResumeAll();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",359
+00000204 05rrrrrr             A  		BSR _xTaskResumeAll
+00000208 A109                    		MOV.L R1, 14H[R0]
+0000020A                         L92:	; bb126.split
+                                 ;     360 
+                                 ;     361 	if( xTicksToWait != ( TickType_t ) 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",361
+0000020A AA09                    		MOV.L 24H[R0], R1
+0000020C 6101                    		CMP #00H, R1
+0000020E 20rr                    		BEQ L105
+00000210                         L93:	; bb130
+                                 ;     362 	{
+                                 ;     363 		if( xAlreadyYielded == pdFALSE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",363
+00000210 A909                    		MOV.L 14H[R0], R1
+00000212 6101                    		CMP #00H, R1
+00000214 21rr                    		BNE L95
+00000216                         L94:	; bb131
+                                 ;     364 		{
+                                 ;     365 			portYIELD_WITHIN_API();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",365
+                                 		._LINE_TOP  inline_asm
+                                  
+00000216 7EA5                    	PUSH.L R5
+                                 	 
+00000218 FB5EE07208              	MOV.L #553696, R5
+0000021D F85401                  	MOV.B #1, [R5]
+                                 	 
+00000220 EC55                    	MOV.L [R5], R5
+                                 	 
+00000222 7EB5                    	POP R5
+                                 		._LINE_END  inline_asm
+00000224                         L95:	; bb137
+                                 ;     366 		}
+                                 ;     367 		else
+                                 ;     368 		{
+                                 ;     369 			mtCOVERAGE_TEST_MARKER();
+                                 ;     370 		}
+                                 ;     371 
+                                 ;     372 		/* The task blocked to wait for its required bits to be set - at this
+                                 ;     373 		point either the required bits were set or the block time expired.  If
+                                 ;     374 		the required bits were set they will have been stored in the task's
+                                 ;     375 		event list item, and they should now be retrieved then cleared. */
+                                 ;     376 		uxReturn = uxTaskResetEventItemValue();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",376
+00000224 05rrrrrr             A  		BSR _uxTaskResetEventItemValue
+00000228 A081                    		MOV.L R1, 08H[R0]
+0000022A                         L96:	; bb137.split
+                                 ;     377 
+                                 ;     378 		if( ( uxReturn & eventUNBLOCKED_DUE_TO_BIT_SET ) == ( EventBits_t ) 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",378
+0000022A A881                    		MOV.L 08H[R0], R1
+0000022C 7D91                    		BTST #19H, R1
+0000022E 21rr                    		BNE L104
+00000230                         L97:	; bb140
+                                 ;     379 		{
+                                 ;     380 			taskENTER_CRITICAL();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",380
+00000230 05rrrrrr             A  		BSR _vTaskEnterCritical
+00000234                         L98:	; bb140.split
+                                 ;     381 			{
+                                 ;     382 				/* The task timed out, just return the current event bit value. */
+                                 ;     383 				uxReturn = pxEventBits->uxEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",383
+00000234 A809                    		MOV.L 04H[R0], R1
+00000236 E41002                  		MOV.L [R1], 08H[R0]
+00000239                         L99:	; bb140.split6
+                                 ;     384 
+                                 ;     385 				/* It is possible that the event bits were updated between this
+                                 ;     386 				task leaving the Blocked state and running again. */
+                                 ;     387 				if( prvTestWaitCondition( uxReturn, uxBitsToWaitFor, xWaitForAllBits ) != pdFALSE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",387
+00000239 AA83                    		MOV.L 28H[R0], R3
+0000023B AB02                    		MOV.L 30H[R0], R2
+0000023D A881                    		MOV.L 08H[R0], R1
+0000023F 39rrrr               W  		BSR __$prvTestWaitCondition
+00000242 6101                    		CMP #00H, R1
+00000244 20rr                    		BEQ L102
+00000246                         L100:	; bb146
+                                 ;     388 				{
+                                 ;     389 					if( xClearOnExit != pdFALSE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",389
+00000246 AA89                    		MOV.L 2CH[R0], R1
+00000248 6101                    		CMP #00H, R1
+0000024A 20rr                    		BEQ L102
+0000024C                         L101:	; bb147
+                                 ;     390 					{
+                                 ;     391 						pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",391
+0000024C AB01                    		MOV.L 30H[R0], R1
+0000024E 7E01                    		NOT R1
+00000250 A80A                    		MOV.L 04H[R0], R2
+00000252 069021                  		AND [R2].L, R1
+00000255 E321                    		MOV.L R1, [R2]
+00000257                         L102:	; bb167
+                                 ;     392 					}
+                                 ;     393 					else
+                                 ;     394 					{
+                                 ;     395 						mtCOVERAGE_TEST_MARKER();
+                                 ;     396 					}
+                                 ;     397 				}
+                                 ;     398 				else
+                                 ;     399 				{
+                                 ;     400 					mtCOVERAGE_TEST_MARKER();
+                                 ;     401 				}
+                                 ;     402 			}
+                                 ;     403 			taskEXIT_CRITICAL();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",403
+00000257 05rrrrrr             A  		BSR _vTaskExitCritical
+0000025B                         L103:	; bb167.split
+                                 ;     404 
+                                 ;     405 			/* Prevent compiler warnings when trace macros are not used. */
+                                 ;     406 			xTimeoutOccurred = pdFALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",406
+0000025B 3E0600                  		MOV.L #00000000H, 18H[R0]
+0000025E                         L104:	; bb174
+                                 ;     407 		}
+                                 ;     408 		else
+                                 ;     409 		{
+                                 ;     410 			/* The task unblocked because the bits were set. */
+                                 ;     411 		}
+                                 ;     412 
+                                 ;     413 		/* The task blocked so control bits may have been set. */
+                                 ;     414 		uxReturn &= ~eventEVENT_BITS_CONTROL_BYTES;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",414
+0000025E A881                    		MOV.L 08H[R0], R1
+00000260 7421FFFFFF00            		AND #00FFFFFFH, R1
+00000266 A081                    		MOV.L R1, 08H[R0]
+00000268                         L105:	; bb181.split
+                                 ;     415 	}
+                                 ;     416 	traceEVENT_GROUP_WAIT_BITS_END( xEventGroup, uxBitsToWaitFor, xTimeoutOccurred );
+                                 ;     417 
+                                 ;     418 	return uxReturn;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",418
+00000268 A881                    		MOV.L 08H[R0], R1
+0000026A A201                    		MOV.L R1, 20H[R0]
+0000026C                         L106:	; bb181.split7
+                                 ;     419 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",419
+0000026C 670E                    		RTSD #38H
+0000026E                         _xEventGroupClearBits:
+                                 		.STACK	_xEventGroupClearBits=24
+                                 ;     420 /*-----------------------------------------------------------*/
+                                 ;     421 
+                                 ;     422 EventBits_t xEventGroupClearBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",422
+0000026E 7100EC                  		ADD #0FFFFFFECH, R0
+00000271 A101                    		MOV.L R1, 10H[R0]
+00000273 A08A                    		MOV.L R2, 0CH[R0]
+                                 ;     423 {
+                                 ;     424 EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",424
+00000275 E10004                  		MOV.L 10H[R0], [R0]
+00000278                         L108:	; entry.split
+                                 ;     425 EventBits_t uxReturn;
+                                 ;     426 
+                                 ;     427 	/* Check the user is not attempting to clear the bits used by the kernel
+                                 ;     428 	itself. */
+                                 ;     429 	configASSERT( xEventGroup );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",429
+00000278 A901                    		MOV.L 10H[R0], R1
+0000027A 6101                    		CMP #00H, R1
+0000027C 18                   S  		BNE L110
+0000027D                         L109:	; bb7
+0000027D 05rrrrrr             A  		BSR _vAssertCalled
+00000281                         L110:	; bb12
+00000281 FBE2000000FF            		MOV.L #0FF000000H, R14
+                                 ;     430 	configASSERT( ( uxBitsToClear & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",430
+00000287 06A10C0E03              		TST 0CH[R0].L, R14
+0000028C 10                   S  		BEQ L112
+0000028D                         L111:	; bb13
+0000028D 05rrrrrr             A  		BSR _vAssertCalled
+00000291                         L112:	; bb21
+                                 ;     431 
+                                 ;     432 	taskENTER_CRITICAL();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",432
+00000291 05rrrrrr             A  		BSR _vTaskEnterCritical
+00000295                         L113:	; bb21.split
+                                 ;     433 	{
+                                 ;     434 		traceEVENT_GROUP_CLEAR_BITS( xEventGroup, uxBitsToClear );
+                                 ;     435 
+                                 ;     436 		/* The value returned is the event group value prior to the bits being
+                                 ;     437 		cleared. */
+                                 ;     438 		uxReturn = pxEventBits->uxEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",438
+00000295 EC01                    		MOV.L [R0], R1
+00000297 E41001                  		MOV.L [R1], 04H[R0]
+0000029A                         L114:	; bb21.split1
+                                 ;     439 
+                                 ;     440 		/* Clear the bits. */
+                                 ;     441 		pxEventBits->uxEventBits &= ~uxBitsToClear;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",441
+0000029A A889                    		MOV.L 0CH[R0], R1
+0000029C 7E01                    		NOT R1
+0000029E EC02                    		MOV.L [R0], R2
+000002A0 069021                  		AND [R2].L, R1
+000002A3 E321                    		MOV.L R1, [R2]
+000002A5                         L115:	; bb21.split2
+                                 ;     442 	}
+                                 ;     443 	taskEXIT_CRITICAL();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",443
+000002A5 05rrrrrr             A  		BSR _vTaskExitCritical
+000002A9                         L116:	; bb21.split3
+                                 ;     444 
+                                 ;     445 	return uxReturn;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",445
+000002A9 A809                    		MOV.L 04H[R0], R1
+000002AB A081                    		MOV.L R1, 08H[R0]
+000002AD                         L117:	; bb21.split4
+                                 ;     446 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",446
+000002AD 6705                    		RTSD #14H
+000002AF                         _xEventGroupClearBitsFromISR:
+                                 		.STACK	_xEventGroupClearBitsFromISR=20
+                                 ;     447 /*-----------------------------------------------------------*/
+                                 ;     448 
+                                 ;     449 #if ( ( configUSE_TRACE_FACILITY == 1 ) && ( INCLUDE_xTimerPendFunctionCall == 1 ) && ( configUSE_TIMERS == 1 ) )
+                                 ;     450 
+                                 ;     451 	BaseType_t xEventGroupClearBitsFromISR( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",451
+000002AF 7100F0                  		ADD #0FFFFFFF0H, R0
+000002B2 EF23                    		MOV.L R2, R3
+000002B4 A089                    		MOV.L R1, 0CH[R0]
+000002B6 A083                    		MOV.L R3, 08H[R0]
+                                 ;     452 	{
+                                 ;     453 		BaseType_t xReturn;
+                                 ;     454 
+                                 ;     455 		traceEVENT_GROUP_CLEAR_BITS_FROM_ISR( xEventGroup, uxBitsToClear );
+                                 ;     456 		xReturn = xTimerPendFunctionCallFromISR( vEventGroupClearBitsCallback, ( void * ) xEventGroup, ( uint32_t ) uxBitsToClear, NULL );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",456
+000002B8 A88A                    		MOV.L 0CH[R0], R2
+000002BA 6604                    		MOV.L #00000000H, R4
+000002BC FB12rrrrrrrr            		MOV.L #_vEventGroupClearBitsCallback, R1
+000002C2 05rrrrrr             A  		BSR _xTimerPendFunctionCallFromISR
+000002C6 E301                    		MOV.L R1, [R0]
+000002C8                         L119:	; entry.split
+                                 ;     457 
+                                 ;     458 		return xReturn;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",458
+000002C8 EC01                    		MOV.L [R0], R1
+000002CA A009                    		MOV.L R1, 04H[R0]
+000002CC                         L120:	; entry.split1
+                                 ;     459 	}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",459
+000002CC 6704                    		RTSD #10H
+000002CE                         _xEventGroupGetBitsFromISR:
+                                 		.STACK	_xEventGroupGetBitsFromISR=24
+                                 ;     460 
+                                 ;     461 #endif
+                                 ;     462 /*-----------------------------------------------------------*/
+                                 ;     463 
+                                 ;     464 EventBits_t xEventGroupGetBitsFromISR( EventGroupHandle_t xEventGroup )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",464
+000002CE 7100EC                  		ADD #0FFFFFFECH, R0
+000002D1 A101                    		MOV.L R1, 10H[R0]
+                                 ;     465 {
+                                 ;     466 UBaseType_t uxSavedInterruptStatus;
+                                 ;     467 EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",467
+000002D3 A009                    		MOV.L R1, 04H[R0]
+000002D5                         L122:	; entry.split
+                                 ;     468 EventBits_t uxReturn;
+                                 ;     469 
+                                 ;     470 	uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",470
+000002D5 FD6A0E                  		MVFC PSW, R14
+000002D8 FD67E1                  		REVL R14, R1
+000002DB 64F1                    		AND #0FH, R1
+000002DD E301                    		MOV.L R1, [R0]
+000002DF 757005                  		MVTIPL #05H
+000002E2                         L123:	; entry.split1
+                                 ;     471 	{
+                                 ;     472 		uxReturn = pxEventBits->uxEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",472
+000002E2 A809                    		MOV.L 04H[R0], R1
+000002E4 E41002                  		MOV.L [R1], 08H[R0]
+000002E7                         L124:	; entry.split2
+                                 ;     473 	}
+                                 ;     474 	portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",474
+000002E7 EC01                    		MOV.L [R0], R1
+000002E9 6DC1                    		SHLL #1CH, R1
+000002EB 6841                    		SHLR #04H, R1
+000002ED FD6A0E                  		MVFC PSW, R14
+000002F0 742EFFFFFFF0            		AND #0F0FFFFFFH, R14
+000002F6 57E1                    		OR R14, R1
+000002F8 FD6810                  		MVTC R1, PSW
+000002FB                         L125:	; entry.split3
+                                 ;     475 
+                                 ;     476 	return uxReturn;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",476
+000002FB A881                    		MOV.L 08H[R0], R1
+000002FD A089                    		MOV.L R1, 0CH[R0]
+000002FF                         L126:	; entry.split4
+                                 ;     477 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",477
+000002FF 6705                    		RTSD #14H
+00000301                         _xEventGroupSetBits:
+                                 		.STACK	_xEventGroupSetBits=52
+                                 ;     478 /*-----------------------------------------------------------*/
+                                 ;     479 
+                                 ;     480 EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",480
+00000301 7100D0                  		ADD #0FFFFFFD0H, R0
+00000304 A289                    		MOV.L R1, 2CH[R0]
+00000306 A282                    		MOV.L R2, 28H[R0]
+                                 ;     481 {
+                                 ;     482 ListItem_t *pxListItem, *pxNext;
+                                 ;     483 ListItem_t const *pxListEnd;
+                                 ;     484 List_t *pxList;
+                                 ;     485 EventBits_t uxBitsToClear = 0, uxBitsWaitedFor, uxControlBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",485
+00000308 3E0400                  		MOV.L #00000000H, 10H[R0]
+0000030B                         L128:	; entry.split
+                                 ;     486 EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",486
+0000030B E5000B07                		MOV.L 2CH[R0], 1CH[R0]
+0000030F                         L129:	; entry.split1
+                                 ;     487 BaseType_t xMatchFound = pdFALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",487
+0000030F 3E0800                  		MOV.L #00000000H, 20H[R0]
+00000312                         L130:	; entry.split2
+                                 ;     488 
+                                 ;     489 	/* Check the user is not attempting to set the bits used by the kernel
+                                 ;     490 	itself. */
+                                 ;     491 	configASSERT( xEventGroup );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",491
+00000312 AA89                    		MOV.L 2CH[R0], R1
+00000314 6101                    		CMP #00H, R1
+00000316 18                   S  		BNE L132
+00000317                         L131:	; bb14
+00000317 05rrrrrr             A  		BSR _vAssertCalled
+0000031B                         L132:	; bb19
+0000031B FBE2000000FF            		MOV.L #0FF000000H, R14
+                                 ;     492 	configASSERT( ( uxBitsToSet & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",492
+00000321 06A10C0E0A              		TST 28H[R0].L, R14
+00000326 10                   S  		BEQ L134
+00000327                         L133:	; bb20
+00000327 05rrrrrr             A  		BSR _vAssertCalled
+0000032B                         L134:	; bb28
+                                 ;     493 
+                                 ;     494 	pxList = &( pxEventBits->xTasksWaitingForBits );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",494
+0000032B A989                    		MOV.L 1CH[R0], R1
+0000032D 6241                    		ADD #04H, R1
+0000032F A089                    		MOV.L R1, 0CH[R0]
+00000331                         L135:	; bb28.split
+                                 ;     495 	pxListEnd = listGET_END_MARKER( pxList ); /*lint !e826 !e740 The mini list structure is used as the list end to save RAM.  This is checked and valid. */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",495
+00000331 A889                    		MOV.L 0CH[R0], R1
+00000333 6281                    		ADD #08H, R1
+00000335 A081                    		MOV.L R1, 08H[R0]
+00000337                         L136:	; bb28.split3
+                                 ;     496 	vTaskSuspendAll();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",496
+00000337 05rrrrrr             A  		BSR _vTaskSuspendAll
+0000033B                         L137:	; bb28.split4
+                                 ;     497 	{
+                                 ;     498 		traceEVENT_GROUP_SET_BITS( xEventGroup, uxBitsToSet );
+                                 ;     499 
+                                 ;     500 		pxListItem = listGET_HEAD_ENTRY( pxList );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",500
+0000033B A889                    		MOV.L 0CH[R0], R1
+0000033D E11003                  		MOV.L 0CH[R1], [R0]
+00000340                         L138:	; bb28.split5
+                                 ;     501 
+                                 ;     502 		/* Set the bits. */
+                                 ;     503 		pxEventBits->uxEventBits |= uxBitsToSet;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",503
+00000340 A989                    		MOV.L 1CH[R0], R1
+00000342 EC1E                    		MOV.L [R1], R14
+00000344 06950E0A                		OR 28H[R0].L, R14
+00000348 E31E                    		MOV.L R14, [R1]
+0000034A 2Err                 B  		BRA L154
+0000034C                         L139:	; bb43
+                                 ;     504 
+                                 ;     505 		/* See if the new bit value should unblock any tasks. */
+                                 ;     506 		while( pxListItem != pxListEnd )
+                                 ;     507 		{
+                                 ;     508 			pxNext = listGET_NEXT( pxListItem );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",508
+0000034C EC01                    		MOV.L [R0], R1
+0000034E E5100101                		MOV.L 04H[R1], 04H[R0]
+00000352                         L140:	; bb43.split
+                                 ;     509 			uxBitsWaitedFor = listGET_LIST_ITEM_VALUE( pxListItem );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",509
+00000352 EC01                    		MOV.L [R0], R1
+00000354 E41005                  		MOV.L [R1], 14H[R0]
+00000357                         L141:	; bb43.split6
+                                 ;     510 			xMatchFound = pdFALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",510
+00000357 3E0800                  		MOV.L #00000000H, 20H[R0]
+0000035A                         L142:	; bb43.split7
+                                 ;     511 
+                                 ;     512 			/* Split the bits waited for from the control bits. */
+                                 ;     513 			uxControlBits = uxBitsWaitedFor & eventEVENT_BITS_CONTROL_BYTES;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",513
+0000035A A909                    		MOV.L 14H[R0], R1
+0000035C 7421000000FF            		AND #0FF000000H, R1
+00000362 A181                    		MOV.L R1, 18H[R0]
+00000364                         L143:	; bb43.split8
+                                 ;     514 			uxBitsWaitedFor &= ~eventEVENT_BITS_CONTROL_BYTES;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",514
+00000364 A909                    		MOV.L 14H[R0], R1
+00000366 7421FFFFFF00            		AND #00FFFFFFH, R1
+0000036C A109                    		MOV.L R1, 14H[R0]
+0000036E                         L144:	; bb43.split9
+                                 ;     515 
+                                 ;     516 			if( ( uxControlBits & eventWAIT_FOR_ALL_BITS ) == ( EventBits_t ) 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",516
+0000036E A989                    		MOV.L 1CH[R0], R1
+00000370 EC1E                    		MOV.L [R1], R14
+00000372 06910E05                		AND 14H[R0].L, R14
+00000376 A981                    		MOV.L 18H[R0], R1
+00000378 7DA1                    		BTST #1AH, R1
+0000037A 18                   S  		BNE L147
+0000037B                         L145:	; bb56
+                                 ;     517 			{
+                                 ;     518 				/* Just looking for single bit being set. */
+                                 ;     519 				if( ( uxBitsWaitedFor & pxEventBits->uxEventBits ) != ( EventBits_t ) 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",519
+0000037B 610E                    		CMP #00H, R14
+0000037D 20rr                    		BEQ L149
+0000037F                         L146:	; bb57
+                                 ;     520 				{
+                                 ;     521 					xMatchFound = pdTRUE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",521
+0000037F 3E0801                  		MOV.L #00000001H, 20H[R0]
+00000382 08                   S  		BRA L149
+00000383                         L147:	; bb69
+                                 ;     522 				}
+                                 ;     523 				else
+                                 ;     524 				{
+                                 ;     525 					mtCOVERAGE_TEST_MARKER();
+                                 ;     526 				}
+                                 ;     527 			}
+                                 ;     528 			else if( ( uxBitsWaitedFor & pxEventBits->uxEventBits ) == uxBitsWaitedFor )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",528
+00000383 06850E05                		CMP 14H[R0].L, R14
+00000387 18                   S  		BNE L149
+00000388                         L148:	; bb70
+                                 ;     529 			{
+                                 ;     530 				/* All bits are set. */
+                                 ;     531 				xMatchFound = pdTRUE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",531
+00000388 3E0801                  		MOV.L #00000001H, 20H[R0]
+0000038B                         L149:	; bb88
+                                 ;     532 			}
+                                 ;     533 			else
+                                 ;     534 			{
+                                 ;     535 				/* Need all bits to be set, but not all the bits were set. */
+                                 ;     536 			}
+                                 ;     537 
+                                 ;     538 			if( xMatchFound != pdFALSE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",538
+0000038B AA01                    		MOV.L 20H[R0], R1
+0000038D 6101                    		CMP #00H, R1
+0000038F 20rr                    		BEQ L153
+00000391                         L150:	; bb90
+                                 ;     539 			{
+                                 ;     540 				/* The bits match.  Should the bits be cleared on exit? */
+                                 ;     541 				if( ( uxControlBits & eventCLEAR_EVENTS_ON_EXIT_BIT ) != ( EventBits_t ) 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",541
+00000391 A981                    		MOV.L 18H[R0], R1
+00000393 7D81                    		BTST #18H, R1
+00000395 10                   S  		BEQ L152
+00000396                         L151:	; bb91
+                                 ;     542 				{
+                                 ;     543 					uxBitsToClear |= uxBitsWaitedFor;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",543
+00000396 A901                    		MOV.L 10H[R0], R1
+00000398 06950105                		OR 14H[R0].L, R1
+0000039C A101                    		MOV.L R1, 10H[R0]
+0000039E                         L152:	; bb101
+                                 ;     544 				}
+                                 ;     545 				else
+                                 ;     546 				{
+                                 ;     547 					mtCOVERAGE_TEST_MARKER();
+                                 ;     548 				}
+                                 ;     549 
+                                 ;     550 				/* Store the actual event flag value in the task's event list
+                                 ;     551 				item before removing the task from the event list.  The
+                                 ;     552 				eventUNBLOCKED_DUE_TO_BIT_SET bit is set so the task knows
+                                 ;     553 				that is was unblocked due to its required bits matching, rather
+                                 ;     554 				than because it timed out. */
+                                 ;     555 				( void ) xTaskRemoveFromUnorderedEventList( pxListItem, pxEventBits->uxEventBits | eventUNBLOCKED_DUE_TO_BIT_SET );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",555
+0000039E A989                    		MOV.L 1CH[R0], R1
+000003A0 EC12                    		MOV.L [R1], R2
+000003A2 EC01                    		MOV.L [R0], R1
+000003A4 7992                    		BSET #19H, R2
+000003A6 05rrrrrr             A  		BSR _xTaskRemoveFromUnorderedEventList
+000003AA                         L153:	; bb112
+                                 ;     556 			}
+                                 ;     557 
+                                 ;     558 			/* Move onto the next list item.  Note pxListItem->pxNext is not
+                                 ;     559 			used here as the list item may have been removed from the event list
+                                 ;     560 			and inserted into the ready/pending reading list. */
+                                 ;     561 			pxListItem = pxNext;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",561
+000003AA E10001                  		MOV.L 04H[R0], [R0]
+000003AD                         L154:	; bb114
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",506
+000003AD EC01                    		MOV.L [R0], R1
+000003AF 06850102                		CMP 08H[R0].L, R1
+000003B3 21rr                    		BNE L139
+000003B5                         L155:	; bb120
+                                 ;     562 		}
+                                 ;     563 
+                                 ;     564 		/* Clear any bits that matched when the eventCLEAR_EVENTS_ON_EXIT_BIT
+                                 ;     565 		bit was set in the control word. */
+                                 ;     566 		pxEventBits->uxEventBits &= ~uxBitsToClear;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",566
+000003B5 A901                    		MOV.L 10H[R0], R1
+000003B7 7E01                    		NOT R1
+000003B9 A98A                    		MOV.L 1CH[R0], R2
+000003BB 069021                  		AND [R2].L, R1
+000003BE E321                    		MOV.L R1, [R2]
+000003C0                         L156:	; bb120.split
+                                 ;     567 	}
+                                 ;     568 	( void ) xTaskResumeAll();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",568
+000003C0 05rrrrrr             A  		BSR _xTaskResumeAll
+000003C4                         L157:	; bb120.split10
+                                 ;     569 
+                                 ;     570 	return pxEventBits->uxEventBits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",570
+000003C4 A989                    		MOV.L 1CH[R0], R1
+000003C6 EC11                    		MOV.L [R1], R1
+000003C8 A209                    		MOV.L R1, 24H[R0]
+000003CA                         L158:	; bb120.split11
+                                 ;     571 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",571
+000003CA 670C                    		RTSD #30H
+000003CC                         _vEventGroupDelete:
+                                 		.STACK	_vEventGroupDelete=16
+                                 ;     572 /*-----------------------------------------------------------*/
+                                 ;     573 
+                                 ;     574 void vEventGroupDelete( EventGroupHandle_t xEventGroup )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",574
+000003CC 60C0                    		SUB #0CH, R0
+000003CE A081                    		MOV.L R1, 08H[R0]
+                                 ;     575 {
+                                 ;     576 EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",576
+000003D0 E301                    		MOV.L R1, [R0]
+000003D2                         L160:	; entry.split
+                                 ;     577 const List_t *pxTasksWaitingForBits = &( pxEventBits->xTasksWaitingForBits );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",577
+000003D2 EC01                    		MOV.L [R0], R1
+000003D4 6241                    		ADD #04H, R1
+000003D6 A009                    		MOV.L R1, 04H[R0]
+000003D8                         L161:	; entry.split1
+                                 ;     578 
+                                 ;     579 	vTaskSuspendAll();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",579
+000003D8 05rrrrrr             A  		BSR _vTaskSuspendAll
+000003DC 2Err                 B  		BRA L165
+000003DE                         L162:	; bb7
+                                 ;     580 	{
+                                 ;     581 		traceEVENT_GROUP_DELETE( xEventGroup );
+                                 ;     582 
+                                 ;     583 		while( listCURRENT_LIST_LENGTH( pxTasksWaitingForBits ) > ( UBaseType_t ) 0 )
+                                 ;     584 		{
+                                 ;     585 			/* Unblock the task, returning 0 as the event list is being deleted
+                                 ;     586 			and	cannot therefore have any bits set. */
+                                 ;     587 			configASSERT( pxTasksWaitingForBits->xListEnd.pxNext != ( ListItem_t * ) &( pxTasksWaitingForBits->xListEnd ) );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",587
+000003DE A809                    		MOV.L 04H[R0], R1
+000003E0 711E08                  		ADD #08H, R1, R14
+000003E3 06851E03                		CMP 0CH[R1].L, R14
+000003E7 18                   S  		BNE L164
+000003E8                         L163:	; bb8
+000003E8 05rrrrrr             A  		BSR _vAssertCalled
+000003EC                         L164:	; bb20
+                                 ;     588 			( void ) xTaskRemoveFromUnorderedEventList( pxTasksWaitingForBits->xListEnd.pxNext, eventUNBLOCKED_DUE_TO_BIT_SET );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",588
+000003EC A809                    		MOV.L 04H[R0], R1
+000003EE A899                    		MOV.L 0CH[R1], R1
+000003F0 FB2200000002            		MOV.L #02000000H, R2
+000003F6 05rrrrrr             A  		BSR _xTaskRemoveFromUnorderedEventList
+000003FA                         L165:	; bb26
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",583
+000003FA A809                    		MOV.L 04H[R0], R1
+000003FC EC1E                    		MOV.L [R1], R14
+000003FE 610E                    		CMP #00H, R14
+00000400 21rr                    		BNE L162
+00000402                         L166:	; bb33
+                                 ;     589 		}
+                                 ;     590 
+                                 ;     591 		vPortFree( pxEventBits );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",591
+00000402 EC01                    		MOV.L [R0], R1
+00000404 05rrrrrr             A  		BSR _vPortFree
+00000408                         L167:	; bb33.split
+                                 ;     592 	}
+                                 ;     593 	( void ) xTaskResumeAll();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",593
+00000408 05rrrrrr             A  		BSR _xTaskResumeAll
+0000040C 6703                    		RTSD #0CH
+0000040E                         _vEventGroupSetBitsCallback:
+                                 		.STACK	_vEventGroupSetBitsCallback=12
+                                 ;     594 }
+                                 ;     595 /*-----------------------------------------------------------*/
+                                 ;     596 
+                                 ;     597 /* For internal use only - execute a 'set bits' command that was pended from
+                                 ;     598 an interrupt. */
+                                 ;     599 void vEventGroupSetBitsCallback( void *pvEventGroup, const uint32_t ulBitsToSet )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",599
+0000040E 6080                    		SUB #08H, R0
+00000410 A009                    		MOV.L R1, 04H[R0]
+00000412 E302                    		MOV.L R2, [R0]
+                                 ;     600 {
+                                 ;     601 	( void ) xEventGroupSetBits( pvEventGroup, ( EventBits_t ) ulBitsToSet );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",601
+00000414 A809                    		MOV.L 04H[R0], R1
+00000416 39rrrr               W  		BSR _xEventGroupSetBits
+00000419 6702                    		RTSD #08H
+0000041B                         _vEventGroupClearBitsCallback:
+                                 		.STACK	_vEventGroupClearBitsCallback=12
+                                 ;     602 }
+                                 ;     603 /*-----------------------------------------------------------*/
+                                 ;     604 
+                                 ;     605 /* For internal use only - execute a 'clear bits' command that was pended from
+                                 ;     606 an interrupt. */
+                                 ;     607 void vEventGroupClearBitsCallback( void *pvEventGroup, const uint32_t ulBitsToClear )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",607
+0000041B 6080                    		SUB #08H, R0
+0000041D A009                    		MOV.L R1, 04H[R0]
+0000041F E302                    		MOV.L R2, [R0]
+                                 ;     608 {
+                                 ;     609 	( void ) xEventGroupClearBits( pvEventGroup, ( EventBits_t ) ulBitsToClear );
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",609
+00000421 A809                    		MOV.L 04H[R0], R1
+00000423 39rrrr               W  		BSR _xEventGroupClearBits
+00000426 6702                    		RTSD #08H
+00000428                         __$prvTestWaitCondition:
+                                 		.STACK	__$prvTestWaitCondition=24
+                                 ;     610 }
+                                 ;     611 /*-----------------------------------------------------------*/
+                                 ;     612 
+                                 ;     613 static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, const EventBits_t uxBitsToWaitFor, const BaseType_t xWaitForAllBits )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",613
+00000428 7100EC                  		ADD #0FFFFFFECH, R0
+0000042B A101                    		MOV.L R1, 10H[R0]
+0000042D A08A                    		MOV.L R2, 0CH[R0]
+0000042F A083                    		MOV.L R3, 08H[R0]
+                                 ;     614 {
+                                 ;     615 BaseType_t xWaitConditionMet = pdFALSE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",615
+00000431 F80600                  		MOV.L #00000000H, [R0]
+00000434                         L171:	; entry.split
+                                 ;     616 
+                                 ;     617 	if( xWaitForAllBits == pdFALSE )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",617
+00000434 A901                    		MOV.L 10H[R0], R1
+00000436 06910103                		AND 0CH[R0].L, R1
+0000043A A882                    		MOV.L 08H[R0], R2
+0000043C 6102                    		CMP #00H, R2
+0000043E 18                   S  		BNE L174
+0000043F                         L172:	; bb6
+                                 ;     618 	{
+                                 ;     619 		/* Task only has to wait for one bit within uxBitsToWaitFor to be
+                                 ;     620 		set.  Is one already set? */
+                                 ;     621 		if( ( uxCurrentEventBits & uxBitsToWaitFor ) != ( EventBits_t ) 0 )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",621
+0000043F 6101                    		CMP #00H, R1
+00000441 20rr                    		BEQ L176
+00000443                         L173:	; bb7
+                                 ;     622 		{
+                                 ;     623 			xWaitConditionMet = pdTRUE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",623
+00000443 F80601                  		MOV.L #00000001H, [R0]
+00000446 08                   S  		BRA L176
+00000447                         L174:	; bb16
+                                 ;     624 		}
+                                 ;     625 		else
+                                 ;     626 		{
+                                 ;     627 			mtCOVERAGE_TEST_MARKER();
+                                 ;     628 		}
+                                 ;     629 	}
+                                 ;     630 	else
+                                 ;     631 	{
+                                 ;     632 		/* Task has to wait for all the bits in uxBitsToWaitFor to be set.
+                                 ;     633 		Are they set already? */
+                                 ;     634 		if( ( uxCurrentEventBits & uxBitsToWaitFor ) == uxBitsToWaitFor )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",634
+00000447 06850103                		CMP 0CH[R0].L, R1
+0000044B 18                   S  		BNE L176
+0000044C                         L175:	; bb17
+                                 ;     635 		{
+                                 ;     636 			xWaitConditionMet = pdTRUE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",636
+0000044C F80601                  		MOV.L #00000001H, [R0]
+0000044F                         L176:	; bb31
+                                 ;     637 		}
+                                 ;     638 		else
+                                 ;     639 		{
+                                 ;     640 			mtCOVERAGE_TEST_MARKER();
+                                 ;     641 		}
+                                 ;     642 	}
+                                 ;     643 
+                                 ;     644 	return xWaitConditionMet;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",644
+0000044F EC01                    		MOV.L [R0], R1
+00000451 A009                    		MOV.L R1, 04H[R0]
+00000453                         L177:	; bb31.split
+                                 ;     645 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",645
+00000453 6705                    		RTSD #14H
+00000455                         _xEventGroupSetBitsFromISR:
+                                 		.STACK	_xEventGroupSetBitsFromISR=24
+                                 ;     646 /*-----------------------------------------------------------*/
+                                 ;     647 
+                                 ;     648 #if ( ( configUSE_TRACE_FACILITY == 1 ) && ( INCLUDE_xTimerPendFunctionCall == 1 ) && ( configUSE_TIMERS == 1 ) )
+                                 ;     649 
+                                 ;     650 	BaseType_t xEventGroupSetBitsFromISR( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, BaseType_t *pxHigherPriorityTaskWoken )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",650
+00000455 7100EC                  		ADD #0FFFFFFECH, R0
+00000458 EF34                    		MOV.L R3, R4
+0000045A A101                    		MOV.L R1, 10H[R0]
+0000045C A08A                    		MOV.L R2, 0CH[R0]
+0000045E A084                    		MOV.L R4, 08H[R0]
+                                 ;     651 	{
+                                 ;     652 	BaseType_t xReturn;
+                                 ;     653 
+                                 ;     654 		traceEVENT_GROUP_SET_BITS_FROM_ISR( xEventGroup, uxBitsToSet );
+                                 ;     655 		xReturn = xTimerPendFunctionCallFromISR( vEventGroupSetBitsCallback, ( void * ) xEventGroup, ( uint32_t ) uxBitsToSet, pxHigherPriorityTaskWoken
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",655
+00000460 A88B                    		MOV.L 0CH[R0], R3
+00000462 A902                    		MOV.L 10H[R0], R2
+00000464 FB12rrrrrrrr            		MOV.L #_vEventGroupSetBitsCallback, R1
+0000046A 05rrrrrr             A  		BSR _xTimerPendFunctionCallFromISR
+0000046E E301                    		MOV.L R1, [R0]
+00000470                         L179:	; entry.split
+                                 ;     656 
+                                 ;     657 		return xReturn;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",657
+00000470 EC01                    		MOV.L [R0], R1
+00000472 A009                    		MOV.L R1, 04H[R0]
+00000474                         L180:	; entry.split1
+                                 ;     658 	}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",658
+00000474 6705                    		RTSD #14H
+00000476                         _uxEventGroupGetNumber:
+                                 		.STACK	_uxEventGroupGetNumber=20
+                                 ;     659 
+                                 ;     660 #endif
+                                 ;     661 /*-----------------------------------------------------------*/
+                                 ;     662 
+                                 ;     663 #if (configUSE_TRACE_FACILITY == 1)
+                                 ;     664 
+                                 ;     665 	UBaseType_t uxEventGroupGetNumber( void* xEventGroup )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",665
+00000476 7100F0                  		ADD #0FFFFFFF0H, R0
+00000479 A089                    		MOV.L R1, 0CH[R0]
+                                 ;     666 	{
+                                 ;     667 	UBaseType_t xReturn;
+                                 ;     668 	EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",668
+0000047B A009                    		MOV.L R1, 04H[R0]
+0000047D                         L182:	; entry.split
+                                 ;     669 
+                                 ;     670 		if( xEventGroup == NULL )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",670
+0000047D A889                    		MOV.L 0CH[R0], R1
+0000047F 6101                    		CMP #00H, R1
+00000481 18                   S  		BNE L184
+00000482                         L183:	; bb6
+                                 ;     671 		{
+                                 ;     672 			xReturn = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",672
+00000482 F80600                  		MOV.L #00000000H, [R0]
+00000485 08                   S  		BRA L185
+00000486                         L184:	; bb7
+                                 ;     673 		}
+                                 ;     674 		else
+                                 ;     675 		{
+                                 ;     676 			xReturn = pxEventBits->uxEventGroupNumber;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",676
+00000486 A809                    		MOV.L 04H[R0], R1
+00000488 E11006                  		MOV.L 18H[R1], [R0]
+0000048B                         L185:	; bb14
+                                 ;     677 		}
+                                 ;     678 
+                                 ;     679 		return xReturn;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",679
+0000048B EC01                    		MOV.L [R0], R1
+0000048D A081                    		MOV.L R1, 08H[R0]
+0000048F                         L186:	; bb14.split
+                                 ;     680 	}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\FreeRTOS\Source\event_groups.c",680
+0000048F 6704                    		RTSD #10H
+                                 ;     681 
+                                 ;     682 #endif
+                                 ;     683 
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01575   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001169(00000491H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4DB7\$ccrx\event_groups.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\event_groups.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\FreeRTOS\Source\event_groups.obj

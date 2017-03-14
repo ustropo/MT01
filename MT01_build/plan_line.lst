@@ -1,0 +1,2371 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:02:37 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:02:37
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=plan_line.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=plan_line.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;plan_line.c
+                                 
+                                 		.glb	_cm
+                                 		.glb	_mm
+                                 		.glb	_mr
+                                 		.glb	_mp_zero_segment_velocity
+                                 		.glb	_mp_get_runtime_velocity
+                                 		.glb	_mp_get_runtime_absolute_position
+                                 		.glb	_mp_set_runtime_work_offset
+                                 		.glb	_mp_get_runtime_work_position
+                                 		.glb	_mp_get_runtime_busy
+                                 		.glb	_st_runtime_isbusy
+                                 		.glb	_mp_aline
+                                 		.glb	_sqrt
+                                 		.glb	_pow
+                                 		.glb	_mp_get_run_buffer
+                                 		.glb	_cm_hard_alarm
+                                 		.glb	_mp_get_write_buffer
+                                 		.glb	_mp_exec_aline
+                                 		.glb	_cbrt
+                                 		.glb	_cm_get_path_control
+                                 		.glb	_min3
+                                 		.glb	_mp_get_target_velocity
+                                 		.glb	_mp_commit_write_buffer
+                                 		.glb	_fmaxf
+                                 		.glb	_fminf
+                                 		.glb	_max4
+                                 		.glb	_min4
+                                 		.glb	_mp_calculate_trapezoid
+                                 		.glb	_mp_get_first_buffer
+                                 		.glb	_mp_plan_hold_callback
+                                 		.glb	_get_axis_vector_length
+                                 		.glb	_mp_get_target_length
+                                 		.glb	_mp_get_last_buffer
+                                 		.glb	_mp_copy_buffer
+                                 		.glb	_mp_end_hold
+                                 		.glb	_cm_set_motion_state
+                                 		.glb	_st_request_exec_move
+                                 		.glb	_mp_plan_zmove_callback
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _mp_zero_segment_velocity:
+                                 		.STACK	_mp_zero_segment_velocity=4
+                                 ;       1 /*
+                                 ;       2  * plan_line.c - acceleration managed line planning and motion execution
+                                 ;       3  * This file is part of the TinyG project
+                                 ;       4  *
+                                 ;       5  * Copyright (c) 2010 - 2015 Alden S. Hart, Jr.
+                                 ;       6  * Copyright (c) 2012 - 2015 Rob Giseburt
+                                 ;       7  *
+                                 ;       8  * This file ("the software") is free software: you can redistribute it and/or modify
+                                 ;       9  * it under the terms of the GNU General Public License, version 2 as published by the
+                                 ;      10  * Free Software Foundation. You should have received a copy of the GNU General Public
+                                 ;      11  * License, version 2 along with the software.  If not, see <http://www.gnu.org/licenses/>.
+                                 ;      12  *
+                                 ;      13  * As a special exception, you may use this file as part of a software library without
+                                 ;      14  * restriction. Specifically, if other files instantiate templates or use macros or
+                                 ;      15  * inline functions from this file, or you compile this file and link it with  other
+                                 ;      16  * files to produce an executable, this file does not by itself cause the resulting
+                                 ;      17  * executable to be covered by the GNU General Public License. This exception does not
+                                 ;      18  * however invalidate any other reasons why the executable file might be covered by the
+                                 ;      19  * GNU General Public License.
+                                 ;      20  *
+                                 ;      21  * THE SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY
+                                 ;      22  * WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                 ;      23  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+                                 ;      24  * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                 ;      25  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+                                 ;      26  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                                 ;      27  */
+                                 ;      28 
+                                 ;      29 #include "tinyg.h"
+                                 ;      30 #include "config.h"
+                                 ;      31 #include "controller.h"
+                                 ;      32 #include "canonical_machine.h"
+                                 ;      33 #include "planner.h"
+                                 ;      34 #include "stepper.h"
+                                 ;      35 #include "report.h"
+                                 ;      36 #include "util.h"
+                                 ;      37 #include "eeprom.h"
+                                 ;      38 #include "settings.h"
+                                 ;      39 
+                                 ;      40 // aline planner routines / feedhold planning
+                                 ;      41 //static void _calc_move_times(GCodeState_t *gms, const float position[]);
+                                 ;      42 static void _calc_move_times(GCodeState_t *gms, const float axis_length[], const float axis_square[]);
+                                 ;      43 static void _plan_block_list(mpBuf_t *bf, uint8_t *mr_flag);
+                                 ;      44 static float _get_junction_vmax(const float a_unit[], const float b_unit[]);
+                                 ;      45 static void _reset_replannable_list(void);
+                                 ;      46 
+                                 ;      47 /* Runtime-specific setters and getters
+                                 ;      48  *
+                                 ;      49  * mp_zero_segment_velocity() 		- correct velocity in last segment for reporting purposes
+                                 ;      50  * mp_get_runtime_velocity() 		- returns current velocity (aggregate)
+                                 ;      51  * mp_get_runtime_machine_position()- returns current axis position in machine coordinates
+                                 ;      52  * mp_set_runtime_work_offset()		- set offsets in the MR struct
+                                 ;      53  * mp_get_runtime_work_position() 	- returns current axis position in work coordinates
+                                 ;      54  *									  that were in effect at move planning time
+                                 ;      55  */
+                                 ;      56 
+                                 ;      57 void mp_zero_segment_velocity() { mr.segment_velocity = 0;}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",57
+00000000 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000006 F9E64800                		MOV.L #00000000H, 0120H[R14]
+0000000A 02                      		RTS
+0000000B                         _mp_get_runtime_velocity:
+                                 		.STACK	_mp_get_runtime_velocity=8
+                                 ;      58 float mp_get_runtime_velocity(void) { return (mr.segment_velocity);}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",58
+0000000B 6040                    		SUB #04H, R0
+0000000D FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000013 EDE148                  		MOV.L 0120H[R14], R1
+00000016 E301                    		MOV.L R1, [R0]
+00000018 6701                    		RTSD #04H
+0000001A                         _mp_get_runtime_absolute_position:
+                                 		.STACK	_mp_get_runtime_absolute_position=12
+                                 ;      59 float mp_get_runtime_absolute_position(uint8_t axis) { return (mr.position[axis]);}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",59
+0000001A 6080                    		SUB #08H, R0
+0000001C 8189                    		MOV.B R1, 07H[R0]
+0000001E B189                    		MOVU.B 07H[R0], R1
+00000020 6C21                    		SHLL #02H, R1
+00000022 FB22rrrrrrrr            		MOV.L #_mr, R2
+00000028 4B12                    		ADD R1, R2
+0000002A ABA1                    		MOV.L 38H[R2], R1
+0000002C E301                    		MOV.L R1, [R0]
+0000002E 6702                    		RTSD #08H
+00000030                         _mp_set_runtime_work_offset:
+                                 		.STACK	_mp_set_runtime_work_offset=8
+                                 ;      60 void mp_set_runtime_work_offset(float offset[]) { copy_vector(mr.gm.work_offset, offset);}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",60
+00000030 6040                    		SUB #04H, R0
+00000032 EF12                    		MOV.L R1, R2
+00000034 E302                    		MOV.L R2, [R0]
+00000036 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000003C 72116001                		ADD #0160H, R1
+00000040 754318                  		MOV.L #00000018H, R3
+00000043 7F8F                    		SMOVF
+00000045 6701                    		RTSD #04H
+00000047                         _mp_get_runtime_work_position:
+                                 		.STACK	_mp_get_runtime_work_position=12
+                                 ;      61 float mp_get_runtime_work_position(uint8_t axis) { return (mr.position[axis] - mr.gm.work_offset[axis]);}
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",61
+00000047 6080                    		SUB #08H, R0
+00000049 8189                    		MOV.B R1, 07H[R0]
+0000004B B189                    		MOVU.B 07H[R0], R1
+0000004D 6C21                    		SHLL #02H, R1
+0000004F FB22rrrrrrrr            		MOV.L #_mr, R2
+00000055 4B12                    		ADD R1, R2
+00000057 ABA1                    		MOV.L 38H[R2], R1
+00000059 FC812158                		FSUB 0160H[R2].L, R1
+0000005D E301                    		MOV.L R1, [R0]
+0000005F 6702                    		RTSD #08H
+00000061                         _mp_get_runtime_busy:
+                                 		.STACK	_mp_get_runtime_busy=12
+                                 ;      62 
+                                 ;      63 /*
+                                 ;      64  * mp_get_runtime_busy() - return TRUE if motion control busy (i.e. robot is moving)
+                                 ;      65  *
+                                 ;      66  *	Use this function to sync to the queue. If you wait until it returns
+                                 ;      67  *	FALSE you know the queue is empty and the motors have stopped.
+                                 ;      68  */
+                                 ;      69 
+                                 ;      70 uint8_t mp_get_runtime_busy()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",70
+00000061 6080                    		SUB #08H, R0
+                                 ;      71 {
+                                 ;      72 	if ((st_runtime_isbusy() == true) || (mr.move_state == MOVE_RUN)) return (true);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",72
+00000063 05rrrrrr             A  		BSR _st_runtime_isbusy
+00000067 6111                    		CMP #01H, R1
+00000069 20rr                    		BEQ L18
+0000006B 08                   S  		BRA L17
+0000006C                         L16:	; bb1
+0000006C 3C0601                  		MOV.B #01H, 06H[R0]
+0000006F 2Err                 B  		BRA L22
+00000071                         L17:	; bb7
+00000071 FB12rrrrrrrr            		MOV.L #_mr, R1
+00000077 B091                    		MOVU.B 02H[R1], R1
+00000079 6121                    		CMP #02H, R1
+0000007B 18                   S  		BNE L19
+0000007C                         L18:	; bb12
+0000007C F80601                  		MOV.L #00000001H, [R0]
+0000007F 08                   S  		BRA L20
+00000080                         L19:	; bb13
+00000080 F80600                  		MOV.L #00000000H, [R0]
+00000083                         L20:	; bb14
+00000083 EC01                    		MOV.L [R0], R1
+00000085 6101                    		CMP #00H, R1
+00000087 21rr                    		BNE L16
+00000089                         L21:	; bb18
+                                 ;      73 	return (false);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",73
+00000089 3C0600                  		MOV.B #00H, 06H[R0]
+0000008C                         L22:	; bb20
+0000008C C5000607                		MOV.B 06H[R0], 07H[R0]
+                                 ;      74 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",74
+00000090 B189                    		MOVU.B 07H[R0], R1
+00000092 6702                    		RTSD #08H
+00000094                         _mp_aline:
+                                 		.STACK	_mp_aline=120
+                                 ;      75 
+                                 ;      76 /****************************************************************************************
+                                 ;      77  * mp_aline() - plan a line with acceleration / deceleration
+                                 ;      78  *
+                                 ;      79  *	This function uses constant jerk motion equations to plan acceleration and deceleration
+                                 ;      80  *	The jerk is the rate of change of acceleration; it's the 1st derivative of acceleration,
+                                 ;      81  *	and the 3rd derivative of position. Jerk is a measure of impact to the machine.
+                                 ;      82  *	Controlling jerk smooths transitions between moves and allows for faster feeds while
+                                 ;      83  *	controlling machine oscillations and other undesirable side-effects.
+                                 ;      84  *
+                                 ;      85  * 	Note All math is done in absolute coordinates using single precision floating point (float).
+                                 ;      86  *
+                                 ;      87  *	Note: Returning a status that is not STAT_OK means the endpoint is NOT advanced. So lines
+                                 ;      88  *	that are too short to move will accumulate and get executed once the accumulated error
+                                 ;      89  *	exceeds the minimums.
+                                 ;      90  */
+                                 ;      91 /*
+                                 ;      92 #define axis_length bf->body_length
+                                 ;      93 #define axis_velocity bf->cruise_velocity
+                                 ;      94 #define axis_tail bf->tail_length
+                                 ;      95 #define longest_tail bf->head_length
+                                 ;      96 */
+                                 ;      97 stat_t mp_aline(GCodeState_t *gm_in)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",97
+00000094 7EA6                    		PUSH.L R6
+00000096 710090                  		ADD #0FFFFFF90H, R0
+00000099 A689                    		MOV.L R1, 6CH[R0]
+                                 ;      98 {
+                                 ;      99 	mpBuf_t *bf; 						// current move pointer
+                                 ;     100 	float exact_stop = 0;				// preset this value OFF
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",100
+0000009B 3E0200                  		MOV.L #00000000H, 08H[R0]
+0000009E                         L24:	; entry.split
+                                 ;     101 	float junction_velocity;
+                                 ;     102 	uint8_t mr_flag = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",102
+0000009E 3C8300                  		MOV.B #00H, 13H[R0]
+000000A1                         L25:	; entry.split1
+                                 ;     103 
+                                 ;     104 	// compute some reusable terms
+                                 ;     105 	float axis_length[AXES];
+                                 ;     106 	float axis_square[AXES];
+                                 ;     107 	float length_square = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",107
+000000A1 3E8100                  		MOV.L #00000000H, 44H[R0]
+000000A4                         L26:	; entry.split2
+                                 ;     108 
+                                 ;     109 	for (uint8_t axis=0; axis<AXES; axis++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",109
+000000A4 F9045B00                		MOV.B #00H, 5BH[R0]
+000000A8 2Err                 B  		BRA L30
+000000AA                         L27:	; bb
+                                 ;     110 		axis_length[axis] = gm_in->target[axis] - mm.position[axis];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",110
+000000AA 59015B                  		MOVU.B 5BH[R0], R1
+000000AD FDC212                  		SHLL #02H, R1, R2
+000000B0 FBE2rrrrrrrr            		MOV.L #_mm, R14
+000000B6 4B2E                    		ADD R2, R14
+000000B8 0689021B                		ADD 6CH[R0].L, R2
+000000BC A8A2                    		MOV.L 08H[R2], R2
+000000BE FC81E201                		FSUB 04H[R14].L, R2
+000000C2 710E14                  		ADD #14H, R0, R14
+000000C5 FE21E2                  		MOV.L R2, [R1,R14]
+000000C8                         L28:	; bb.split
+                                 ;     111 		axis_square[axis] = square(axis_length[axis]);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",111
+000000C8 59015B                  		MOVU.B 5BH[R0], R1
+000000CB 710E14                  		ADD #14H, R0, R14
+000000CE FE61EE                  		MOV.L [R1,R14], R14
+000000D1 FC8FEE                  		FMUL R14, R14
+000000D4 710F2C                  		ADD #2CH, R0, R15
+000000D7 FE21FE                  		MOV.L R14, [R1,R15]
+000000DA                         L29:	; bb.split3
+000000DA 710E2C                  		ADD #2CH, R0, R14
+                                 ;     112 		length_square += axis_square[axis];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",112
+000000DD 59015B                  		MOVU.B 5BH[R0], R1
+000000E0 FE61E1                  		MOV.L [R1,R14], R1
+000000E3 FC890111                		FADD 44H[R0].L, R1
+000000E7 A409                    		MOV.L R1, 44H[R0]
+000000E9 59015B                  		MOVU.B 5BH[R0], R1
+000000EC 6211                    		ADD #01H, R1
+000000EE C7015B                  		MOV.B R1, 5BH[R0]
+000000F1                         L30:	; bb59
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",109
+000000F1 59015B                  		MOVU.B 5BH[R0], R1
+000000F4 6161                    		CMP #06H, R1
+000000F6 29rr                    		BLT L27
+000000F8                         L31:	; bb64
+                                 ;     113 	}
+                                 ;     114 	float length = sqrt(length_square);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",114
+000000F8 AC09                    		MOV.L 44H[R0], R1
+000000FA 05rrrrrr             A  		BSR _sqrt
+000000FE A481                    		MOV.L R1, 48H[R0]
+00000100                         L32:	; bb64.split
+                                 ;     115 
+                                 ;     116 	if (fp_ZERO(length)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",116
+00000100 AC81                    		MOV.L 48H[R0], R1
+00000102 7BF1                    		BCLR #1FH, R1
+00000104 FD7211BD378635          		FCMP #358637BDH, R1
+0000010B 26rr                    		BPZ L34
+0000010D                         L33:	; bb68
+                                 ;     117 //		sr_request_status_report();
+                                 ;     118 		return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",118
+0000010D 3C0300                  		MOV.B #00H, 03H[R0]
+00000110 38rrrr               W  		BRA L81
+00000113                         L34:	; bb75
+                                 ;     119 	}
+                                 ;     120 
+                                 ;     121 	// If _calc_move_times() says the move will take less than the minimum move time
+                                 ;     122 	// get a more accurate time estimate based on starting velocity and acceleration.
+                                 ;     123 	// The time of the move is determined by its initial velocity (Vi) and how much
+                                 ;     124 	// acceleration will be occur. For this we need to look at the exit velocity of
+                                 ;     125 	// the previous block. There are 3 possible cases:
+                                 ;     126 	//	(1) There is no previous block. Vi = 0
+                                 ;     127 	//	(2) Previous block is optimally planned. Vi = previous block's exit_velocity
+                                 ;     128 	//	(3) Previous block is not optimally planned. Vi <= previous block's entry_velocity + delta_velocity
+                                 ;     129 
+                                 ;     130 	_calc_move_times(gm_in, axis_length, axis_square);						// set move time and minimum time in the state
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",130
+00000113 AE89                    		MOV.L 6CH[R0], R1
+00000115 71032C                  		ADD #2CH, R0, R3
+00000118 710214                  		ADD #14H, R0, R2
+0000011B 39rrrr               W  		BSR __$_calc_move_times
+0000011E                         L35:	; bb75.split
+                                 ;     131 	if (gm_in->move_time < MIN_BLOCK_TIME) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",131
+0000011E AE89                    		MOV.L 6CH[R0], R1
+00000120 AB91                    		MOV.L 38H[R1], R1
+00000122 FD721117B75137          		FCMP #3751B717H, R1
+00000129 26rr                    		BPZ L45
+0000012B                         L36:	; bb80
+                                 ;     132 		float delta_velocity = pow(length, 0.66666666) * mm.cbrt_jerk;		// max velocity change for this move
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",132
+0000012B AC81                    		MOV.L 48H[R0], R1
+0000012D FB22ABAA2A3F            		MOV.L #3F2AAAABH, R2
+00000133 05rrrrrr             A  		BSR _pow
+00000137 FBE2rrrrrrrr            		MOV.L #_mm, R14
+0000013D FC8DE109                		FMUL 24H[R14].L, R1
+00000141 A589                    		MOV.L R1, 5CH[R0]
+00000143                         L37:	; bb80.split
+                                 ;     133 		float entry_velocity = 0;											// pre-set as if no previous blo
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",133
+00000143 3E8800                  		MOV.L #00000000H, 60H[R0]
+00000146                         L38:	; bb80.split4
+                                 ;     134 		if ((bf = mp_get_run_buffer()) != NULL) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",134
+00000146 05rrrrrr             A  		BSR _mp_get_run_buffer
+0000014A A009                    		MOV.L R1, 04H[R0]
+0000014C 6101                    		CMP #00H, R1
+0000014E 20rr                    		BEQ L42
+00000150                         L39:	; bb87
+                                 ;     135 			if (bf->replannable == true) {									// not optimally planned
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",135
+00000150 A809                    		MOV.L 04H[R0], R1
+00000152 B612                    		MOVU.B 18H[R1], R2
+00000154 6112                    		CMP #01H, R2
+00000156 21rr                    		BNE L41
+00000158                         L40:	; bb88
+                                 ;     136 				entry_velocity = bf->entry_velocity + bf->delta_vmax;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",136
+00000158 AC19                    		MOV.L 44H[R1], R1
+0000015A A80A                    		MOV.L 04H[R0], R2
+0000015C FC892117                		FADD 5CH[R2].L, R1
+00000160 A601                    		MOV.L R1, 60H[R0]
+00000162 08                   S  		BRA L42
+00000163                         L41:	; bb96
+                                 ;     137 			} else {														// optimally pla
+                                 ;     138 				entry_velocity = bf->exit_velocity;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",138
+00000163 E5101318                		MOV.L 4CH[R1], 60H[R0]
+00000167                         L42:	; bb113
+                                 ;     139 			}
+                                 ;     140 		}
+                                 ;     141 		float move_time = (2 * length) / (2*entry_velocity + delta_velocity);// compute execution time for this move
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",141
+00000167 AC81                    		MOV.L 48H[R0], R1
+00000169 FC8B11                  		FADD R1, R1
+0000016C AE02                    		MOV.L 60H[R0], R2
+0000016E FC8B22                  		FADD R2, R2
+00000171 FC890217                		FADD 5CH[R0].L, R2
+00000175 FC9321                  		FDIV R2, R1
+00000178 A609                    		MOV.L R1, 64H[R0]
+0000017A                         L43:	; bb113.split
+                                 ;     142 		if (move_time < MIN_BLOCK_TIME)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",142
+0000017A AE09                    		MOV.L 64H[R0], R1
+0000017C FD721117B75137          		FCMP #3751B717H, R1
+00000183 26rr                    		BPZ L45
+00000185                         L44:	; bb122
+                                 ;     143 			return (STAT_MINIMUM_TIME_MOVE);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",143
+00000185 3C03CA                  		MOV.B #0CAH, 03H[R0]
+00000188 38rrrr               W  		BRA L81
+0000018B                         L45:	; bb136
+                                 ;     144 	}
+                                 ;     145 
+                                 ;     146 	// get a cleared buffer and setup move variables
+                                 ;     147 	if ((bf = mp_get_write_buffer()) == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",147
+0000018B 05rrrrrr             A  		BSR _mp_get_write_buffer
+0000018F A009                    		MOV.L R1, 04H[R0]
+00000191 6101                    		CMP #00H, R1
+00000193 21rr                    		BNE L47
+00000195                         L46:	; bb137
+00000195 66E1                    		MOV.L #0000000EH, R1
+                                 ;     148         return(cm_hard_alarm(STAT_BUFFER_FULL_FATAL));                  // never supposed to fail
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",148
+00000197 05rrrrrr             A  		BSR _cm_hard_alarm
+0000019B 8089                    		MOV.B R1, 03H[R0]
+0000019D 38rrrr               W  		BRA L81
+000001A0                         L47:	; bb145
+                                 ;     149 	bf->bf_func = mp_exec_aline;										// register the callback to the exec function
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",149
+000001A0 A809                    		MOV.L 04H[R0], R1
+000001A2 FB22rrrrrrrr            		MOV.L #_mp_exec_aline, R2
+000001A8 A092                    		MOV.L R2, 08H[R1]
+000001AA                         L48:	; bb145.split
+                                 ;     150 	bf->length = length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",150
+000001AA AC81                    		MOV.L 48H[R0], R1
+000001AC A80A                    		MOV.L 04H[R0], R2
+000001AE A329                    		MOV.L R1, 34H[R2]
+000001B0                         L49:	; bb145.split5
+                                 ;     151 	memcpy(&bf->gm, gm_in, sizeof(GCodeState_t));						// copy model state into planner buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",151
+000001B0 A809                    		MOV.L 04H[R0], R1
+000001B2 711174                  		ADD #74H, R1
+000001B5 75435C                  		MOV.L #0000005CH, R3
+000001B8 AE8A                    		MOV.L 6CH[R0], R2
+000001BA 7F8F                    		SMOVF
+000001BC                         L50:	; bb145.split6
+                                 ;     152 
+                                 ;     153 	// Compute the unit vector and find the right jerk to use (combined operations)
+                                 ;     154 	// To determine the jerk value to use for the block we want to find the axis for which
+                                 ;     155 	// the jerk cannot be exceeded - the 'jerk-limit' axis. This is the axis for which
+                                 ;     156 	// the time to decelerate from the target velocity to zero would be the longest.
+                                 ;     157 	//
+                                 ;     158 	//	We can determine the "longest" deceleration in terms of time or distance.
+                                 ;     159 	//
+                                 ;     160 	//  The math for time-to-decelerate T from speed S to speed E with constant
+                                 ;     161 	//  jerk J is:
+                                 ;     162 	//
+                                 ;     163 	//		T = 2*sqrt((S-E)/J[n])
+                                 ;     164 	//
+                                 ;     165 	//	Since E is always zero in this calculation, we can simplify:
+                                 ;     166 	//		T = 2*sqrt(S/J[n])
+                                 ;     167 	//
+                                 ;     168 	//	The math for distance-to-decelerate l from speed S to speed E with constant
+                                 ;     169 	//  jerk J is:
+                                 ;     170 	//
+                                 ;     171 	//		l = (S+E)*sqrt((S-E)/J)
+                                 ;     172 	//
+                                 ;     173 	//	Since E is always zero in this calculation, we can simplify:
+                                 ;     174 	//		l = S*sqrt(S/J)
+                                 ;     175 	//
+                                 ;     176 	//  The final value we want is to know which one is *longest*, compared to the others,
+                                 ;     177 	//	so we don't need the actual value. This means that the scale of the value doesn't
+                                 ;     178 	//	matter, so for T we can remove the "2 *" and For L we can remove the "S*".
+                                 ;     179 	//	This leaves both to be simply "sqrt(S/J)". Since we don't need the scale,
+                                 ;     180 	//	it doesn't matter what speed we're coming from, so S can be replaced with 1.
+                                 ;     181 	//
+                                 ;     182 	//  However, we *do* need to compensate for the fact that each axis contributes
+                                 ;     183 	//	differently to the move, so we will scale each contribution C[n] by the
+                                 ;     184 	//	proportion of the axis movement length D[n] to the total length of the move L.
+                                 ;     185 	//	Using that, we construct the following, with these definitions:
+                                 ;     186 	//
+                                 ;     187 	//		J[n] = max_jerk for axis n
+                                 ;     188 	//		D[n] = distance traveled for this move for axis n
+                                 ;     189 	//		L = total length of the move in all axes
+                                 ;     190 	//		C[n] = "axis contribution" of axis n
+                                 ;     191 	//
+                                 ;     192 	// For each axis n: C[n] = sqrt(1/J[n]) * (D[n]/L)
+                                 ;     193 	//
+                                 ;     194 	//	Keeping in mind that we only need a rank compared to the other axes, we can further
+                                 ;     195 	//	optimize the calculations::
+                                 ;     196 	//
+                                 ;     197 	//	Square the expression to remove the square root:
+                                 ;     198 	//		C[n]^2 = (1/J[n]) * (D[n]/L)^2	(We don't care the C is squared, we'll use it that way.)
+                                 ;     199 	//
+                                 ;     200 	//	Re-arranged to optimize divides for pre-calculated values, we create a value
+                                 ;     201 	//  M that we compute once:
+                                 ;     202 	//		M = (1/(L^2))
+                                 ;     203 	//  Then we use it in the calculations for every axis:
+                                 ;     204 	//		C[n] = (1/J[n]) * D[n]^2 * M
+                                 ;     205 	//
+                                 ;     206 	//  Also note that we already have (1/J[n]) calculated for each axis, which simplifies it further.
+                                 ;     207 	//
+                                 ;     208 	// Finally, the selected jerk term needs to be scaled by the reciprocal of the absolute value
+                                 ;     209 	// of the jerk-limit axis's unit vector term. This way when the move is finally decomposed into
+                                 ;     210 	// its constituent axes for execution the jerk for that axis will be at it's maximum value.
+                                 ;     211 
+                                 ;     212 	float C;					// contribution term. C = T * a
+                                 ;     213 	float maxC = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",213
+000001BC 3E8400                  		MOV.L #00000000H, 50H[R0]
+000001BF                         L51:	; bb145.split7
+000001BF FB120000803F            		MOV.L #3F800000H, R1
+                                 ;     214 	float recip_L2 = 1/length_square;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",214
+000001C5 FC910111                		FDIV 44H[R0].L, R1
+000001C9 A509                    		MOV.L R1, 54H[R0]
+000001CB                         L52:	; bb145.split8
+                                 ;     215 
+                                 ;     216 	for (uint8_t axis=0; axis<AXES; axis++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",216
+000001CB F9046A00                		MOV.B #00H, 6AH[R0]
+000001CF 2Err                 B  		BRA L60
+000001D1                         L53:	; bb159
+000001D1 710E14                  		ADD #14H, R0, R14
+                                 ;     217 		if (fabs(axis_length[axis]) > 0) {								// You cannot use the fp_XXX comparisons here!
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",217
+000001D4 59016A                  		MOVU.B 6AH[R0], R1
+000001D7 FE61EE                  		MOV.L [R1,R14], R14
+000001DA 7BFE                    		BCLR #1FH, R14
+000001DC 660F                    		MOV.L #00000000H, R15
+000001DE FC87EF                  		FCMP R14, R15
+000001E1 26rr                    		BPZ L59
+000001E3                         L54:	; bb160
+                                 ;     218 			bf->unit[axis] = axis_length[axis] / bf->length;			// compute unit vector term (zeros are already zero)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",218
+000001E3 59016A                  		MOVU.B 6AH[R0], R1
+000001E6 710E14                  		ADD #14H, R0, R14
+000001E9 FE61E2                  		MOV.L [R1,R14], R2
+000001EC A80B                    		MOV.L 04H[R0], R3
+000001EE FC91320D                		FDIV 34H[R3].L, R2
+000001F2 6C21                    		SHLL #02H, R1
+000001F4 4B13                    		ADD R1, R3
+000001F6 A1BA                    		MOV.L R2, 1CH[R3]
+000001F8                         L55:	; bb160.split
+                                 ;     219 			C = axis_square[axis] * recip_L2 * cm.a[axis].recip_jerk;	// squaring axis_length ensures it's positive
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",219
+000001F8 59016A                  		MOVU.B 6AH[R0], R1
+000001FB 710E2C                  		ADD #2CH, R0, R14
+000001FE FE61E2                  		MOV.L [R1,R14], R2
+00000201 751138                  		MUL #38H, R1
+00000204 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000020A 4B1E                    		ADD R1, R14
+0000020C FC8D0215                		FMUL 54H[R0].L, R2
+00000210 FC8DE23A                		FMUL 0E8H[R14].L, R2
+00000214 A48A                    		MOV.L R2, 4CH[R0]
+00000216                         L56:	; bb160.split9
+                                 ;     220 			if (C > maxC) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",220
+00000216 AD01                    		MOV.L 50H[R0], R1
+00000218 FC850113                		FCMP 4CH[R0].L, R1
+0000021C 26rr                    		BPZ L59
+0000021E                         L57:	; bb190
+                                 ;     221 				maxC = C;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",221
+0000021E E5001314                		MOV.L 4CH[R0], 50H[R0]
+00000222                         L58:	; bb190.split
+                                 ;     222 				bf->jerk_axis = axis;						// also needed for junction vmax calculation
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",222
+00000222 59016A                  		MOVU.B 6AH[R0], R1
+00000225 A80A                    		MOV.L 04H[R0], R2
+00000227 C72164                  		MOV.B R1, 64H[R2]
+0000022A                         L59:	; bb210
+0000022A 59016A                  		MOVU.B 6AH[R0], R1
+0000022D 6211                    		ADD #01H, R1
+0000022F C7016A                  		MOV.B R1, 6AH[R0]
+00000232                         L60:	; bb213
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",216
+00000232 59016A                  		MOVU.B 6AH[R0], R1
+00000235 6161                    		CMP #06H, R1
+00000237 29rr                    		BLT L53
+00000239                         L61:	; bb219
+                                 ;     223 			}
+                                 ;     224 		}
+                                 ;     225 	}
+                                 ;     226 	// set up and pre-compute the jerk terms needed for this round of planning
+                                 ;     227 	bf->jerk = cm.a[bf->jerk_axis].jerk_max * JERK_MULTIPLIER / fabs(bf->unit[bf->jerk_axis]);	// scale the jerk
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",227
+00000239 A809                    		MOV.L 04H[R0], R1
+0000023B 591264                  		MOVU.B 64H[R1], R2
+0000023E EF2E                    		MOV.L R2, R14
+00000240 751E38                  		MUL #38H, R14
+00000243 FBF2rrrrrrrr            		MOV.L #_cm, R15
+00000249 4BEF                    		ADD R14, R15
+0000024B EDF338                  		MOV.L 0E0H[R15], R3
+0000024E FD723300247449          		FMUL #49742400H, R3
+00000255 6C22                    		SHLL #02H, R2
+00000257 4B12                    		ADD R1, R2
+00000259 A9AA                    		MOV.L 1CH[R2], R2
+0000025B 7BF2                    		BCLR #1FH, R2
+0000025D FC9323                  		FDIV R2, R3
+00000260 A693                    		MOV.L R3, 68H[R1]
+00000262                         L62:	; bb219.split
+                                 ;     228 
+                                 ;     229 	if (fabs(bf->jerk - mm.jerk) > JERK_MATCH_PRECISION) {	// specialized comparison for tolerance of delta
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",229
+00000262 A809                    		MOV.L 04H[R0], R1
+00000264 AE91                    		MOV.L 68H[R1], R1
+00000266 FBE2rrrrrrrr            		MOV.L #_mm, R14
+0000026C FC81E107                		FSUB 1CH[R14].L, R1
+00000270 7BF1                    		BCLR #1FH, R1
+00000272 FBE200007A44            		MOV.L #447A0000H, R14
+00000278 FC871E                  		FCMP R1, R14
+0000027B 26rr                    		BPZ L66
+0000027D                         L63:	; bb242
+                                 ;     230 		mm.jerk = bf->jerk;									// used before this point next time around
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",230
+0000027D A809                    		MOV.L 04H[R0], R1
+0000027F FBE2rrrrrrrr            		MOV.L #_mm, R14
+00000285 E51E1A07                		MOV.L 68H[R1], 1CH[R14]
+00000289                         L64:	; bb242.split
+00000289 FB120000803F            		MOV.L #3F800000H, R1
+                                 ;     231 		mm.recip_jerk = 1/bf->jerk;							// compute cached jerk terms used by planning
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",231
+0000028F A80A                    		MOV.L 04H[R0], R2
+00000291 FC91211A                		FDIV 68H[R2].L, R1
+00000295 FB22rrrrrrrr            		MOV.L #_mm, R2
+0000029B A221                    		MOV.L R1, 20H[R2]
+0000029D                         L65:	; bb242.split10
+                                 ;     232 		mm.cbrt_jerk = cbrt(bf->jerk);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",232
+0000029D A809                    		MOV.L 04H[R0], R1
+0000029F AE91                    		MOV.L 68H[R1], R1
+000002A1 05rrrrrr             A  		BSR _cbrt
+000002A5 FB22rrrrrrrr            		MOV.L #_mm, R2
+000002AB A229                    		MOV.L R1, 24H[R2]
+000002AD                         L66:	; bb263
+                                 ;     233 	}
+                                 ;     234 	bf->recip_jerk = mm.recip_jerk;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",234
+000002AD FBE2rrrrrrrr            		MOV.L #_mm, R14
+000002B3 A809                    		MOV.L 04H[R0], R1
+000002B5 E5E1081B                		MOV.L 20H[R14], 6CH[R1]
+000002B9                         L67:	; bb263.split
+                                 ;     235 	bf->cbrt_jerk = mm.cbrt_jerk;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",235
+000002B9 FBE2rrrrrrrr            		MOV.L #_mm, R14
+000002BF A809                    		MOV.L 04H[R0], R1
+000002C1 E5E1091C                		MOV.L 24H[R14], 70H[R1]
+000002C5                         L68:	; bb263.split11
+                                 ;     236 
+                                 ;     237 	// finish up the current block variables
+                                 ;     238 	if (cm_get_path_control(MODEL) != PATH_EXACT_STOP) { 	// exact stop cases already zeroed
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",238
+000002C5 FB12rrrrrrrr            		MOV.L #_cm, R1
+000002CB 72115402                		ADD #0254H, R1
+000002CF 05rrrrrr             A  		BSR _cm_get_path_control
+000002D3 6111                    		CMP #01H, R1
+000002D5 20rr                    		BEQ L71
+000002D7                         L69:	; bb271
+                                 ;     239 		bf->replannable = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",239
+000002D7 A809                    		MOV.L 04H[R0], R1
+000002D9 3C9801                  		MOV.B #01H, 18H[R1]
+000002DC                         L70:	; bb271.split
+                                 ;     240 		exact_stop = 8675309;								// an arbitrarily large floating point number
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",240
+000002DC F90202ED5F044B          		MOV.L #4B045FEDH, 08H[R0]
+000002E3                         L71:	; bb279
+                                 ;     241 	}
+                                 ;     242 	bf->cruise_vmax = bf->length / bf->gm.move_time;		// target velocity requested
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",242
+000002E3 A809                    		MOV.L 04H[R0], R1
+000002E5 AB1A                    		MOV.L 34H[R1], R2
+000002E7 FC91122B                		FDIV 0ACH[R1].L, R2
+000002EB A51A                    		MOV.L R2, 54H[R1]
+000002ED                         L72:	; bb279.split
+                                 ;     243 	junction_velocity = _get_junction_vmax(bf->pv->unit, bf->unit);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",243
+000002ED A80A                    		MOV.L 04H[R0], R2
+000002EF EC21                    		MOV.L [R2], R1
+000002F1 71221C                  		ADD #1CH, R2
+000002F4 71111C                  		ADD #1CH, R1
+000002F7 39rrrr               W  		BSR __$_get_junction_vmax
+000002FA A089                    		MOV.L R1, 0CH[R0]
+000002FC                         L73:	; bb279.split12
+                                 ;     244 	bf->entry_vmax = min3(bf->cruise_vmax, junction_velocity, exact_stop);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",244
+000002FC A80E                    		MOV.L 04H[R0], R6
+000002FE AD69                    		MOV.L 54H[R6], R1
+00000300 A883                    		MOV.L 08H[R0], R3
+00000302 A88A                    		MOV.L 0CH[R0], R2
+00000304 05rrrrrr             A  		BSR _min3
+00000308 A561                    		MOV.L R1, 50H[R6]
+0000030A                         L74:	; bb279.split13
+                                 ;     245 	bf->delta_vmax = mp_get_target_velocity(0, bf->length, bf);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",245
+0000030A A80E                    		MOV.L 04H[R0], R6
+0000030C AB6A                    		MOV.L 34H[R6], R2
+0000030E 6601                    		MOV.L #00000000H, R1
+00000310 EF63                    		MOV.L R6, R3
+00000312 05rrrrrr             A  		BSR _mp_get_target_velocity
+00000316 A5E9                    		MOV.L R1, 5CH[R6]
+00000318                         L75:	; bb279.split14
+                                 ;     246 	bf->exit_vmax = min3(bf->cruise_vmax, (bf->entry_vmax + bf->delta_vmax), exact_stop);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",246
+00000318 A80E                    		MOV.L 04H[R0], R6
+0000031A AD62                    		MOV.L 50H[R6], R2
+0000031C FC896217                		FADD 5CH[R6].L, R2
+00000320 AD69                    		MOV.L 54H[R6], R1
+00000322 A883                    		MOV.L 08H[R0], R3
+00000324 05rrrrrr             A  		BSR _min3
+00000328 A5E1                    		MOV.L R1, 58H[R6]
+0000032A                         L76:	; bb279.split15
+                                 ;     247 	bf->braking_velocity = bf->delta_vmax;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",247
+0000032A A809                    		MOV.L 04H[R0], R1
+0000032C E5111718                		MOV.L 5CH[R1], 60H[R1]
+00000330                         L77:	; bb279.split16
+                                 ;     248 
+                                 ;     249 	// Note: these next lines must remain in exact order. Position must update before committing the buffer.
+                                 ;     250 	_plan_block_list(bf, &mr_flag);				// replan block list
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",250
+00000330 A809                    		MOV.L 04H[R0], R1
+00000332 710213                  		ADD #13H, R0, R2
+00000335 39rrrr               W  		BSR __$_plan_block_list
+00000338                         L78:	; bb279.split17
+                                 ;     251 	copy_vector(mm.position, bf->gm.target);	// set the planner position
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",251
+00000338 A80A                    		MOV.L 04H[R0], R2
+0000033A 71227C                  		ADD #7CH, R2
+0000033D FB12rrrrrrrr            		MOV.L #_mm, R1
+00000343 6241                    		ADD #04H, R1
+00000345 754318                  		MOV.L #00000018H, R3
+00000348 7F8F                    		SMOVF
+0000034A                         L79:	; bb279.split18
+0000034A 6611                    		MOV.L #00000001H, R1
+                                 ;     252 	mp_commit_write_buffer(MOVE_TYPE_ALINE); 	// commit current block (must follow the position update)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",252
+0000034C 05rrrrrr             A  		BSR _mp_commit_write_buffer
+00000350                         L80:	; bb279.split19
+                                 ;     253 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",253
+00000350 3C0300                  		MOV.B #00H, 03H[R0]
+00000353                         L81:	; bb340
+00000353 C500036B                		MOV.B 03H[R0], 6BH[R0]
+                                 ;     254 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",254
+00000357 59016B                  		MOVU.B 6BH[R0], R1
+0000035A 3F661D                  		RTSD #74H, R6-R6
+0000035D                         __$_calc_move_times:
+                                 		.STACK	__$_calc_move_times=48
+                                 ;     255 
+                                 ;     256 /***** ALINE HELPERS *****
+                                 ;     257  * _calc_move_times()
+                                 ;     258  * _plan_block_list()
+                                 ;     259  * _get_junction_vmax()
+                                 ;     260  * _reset_replannable_list()
+                                 ;     261  */
+                                 ;     262 
+                                 ;     263 /*
+                                 ;     264  * _calc_move_times() - compute optimal and minimum move times into the gcode_state
+                                 ;     265  *
+                                 ;     266  *	"Minimum time" is the fastest the move can be performed given the velocity constraints on each
+                                 ;     267  *	participating axis - regardless of the feed rate requested. The minimum time is the time limited
+                                 ;     268  *	by the rate-limiting axis. The minimum time is needed to compute the optimal time and is
+                                 ;     269  *	recorded for possible feed override computation..
+                                 ;     270  *
+                                 ;     271  *	"Optimal time" is either the time resulting from the requested feed rate or the minimum time if
+                                 ;     272  *	the requested feed rate is not achievable. Optimal times for traverses are always the minimum time.
+                                 ;     273  *
+                                 ;     274  *	The gcode state must have targets set prior by having cm_set_target(). Axis modes are taken into
+                                 ;     275  *	account by this.
+                                 ;     276  *
+                                 ;     277  *	The following times are compared and the longest is returned:
+                                 ;     278  *	  -	G93 inverse time (if G93 is active)
+                                 ;     279  *	  -	time for coordinated move at requested feed rate
+                                 ;     280  *	  -	time that the slowest axis would require for the move
+                                 ;     281  *
+                                 ;     282  *	Sets the following variables in the gcode_state struct
+                                 ;     283  *	  - move_time is set to optimal time
+                                 ;     284  *	  - minimum_time is set to minimum time
+                                 ;     285  */
+                                 ;     286 /* --- NIST RS274NGC_v3 Guidance ---
+                                 ;     287  *
+                                 ;     288  *	The following is verbatim text from NIST RS274NGC_v3. As I interpret A for moves that
+                                 ;     289  *	combine both linear and rotational movement, the feed rate should apply to the XYZ
+                                 ;     290  *	movement, with the rotational axis (or axes) timed to start and end at the same time
+                                 ;     291  *	the linear move is performed. It is possible under this case for the rotational move
+                                 ;     292  *	to rate-limit the linear move.
+                                 ;     293  *
+                                 ;     294  * 	2.1.2.5 Feed Rate
+                                 ;     295  *
+                                 ;     296  *	The rate at which the controlled point or the axes move is nominally a steady rate
+                                 ;     297  *	which may be set by the user. In the Interpreter, the interpretation of the feed
+                                 ;     298  *	rate is as follows unless inverse time feed rate mode is being used in the
+                                 ;     299  *	RS274/NGC view (see Section 3.5.19). The canonical machining functions view of feed
+                                 ;     300  *	rate, as described in Section 4.3.5.1, has conditions under which the set feed rate
+                                 ;     301  *	is applied differently, but none of these is used in the Interpreter.
+                                 ;     302  *
+                                 ;     303  *	A. 	For motion involving one or more of the X, Y, and Z axes (with or without
+                                 ;     304  *		simultaneous rotational axis motion), the feed rate means length units per
+                                 ;     305  *		minute along the programmed XYZ path, as if the rotational axes were not moving.
+                                 ;     306  *
+                                 ;     307  *	B.	For motion of one rotational axis with X, Y, and Z axes not moving, the
+                                 ;     308  *		feed rate means degrees per minute rotation of the rotational axis.
+                                 ;     309  *
+                                 ;     310  *	C.	For motion of two or three rotational axes with X, Y, and Z axes not moving,
+                                 ;     311  *		the rate is applied as follows. Let dA, dB, and dC be the angles in degrees
+                                 ;     312  *		through which the A, B, and C axes, respectively, must move.
+                                 ;     313  *		Let D = sqrt(dA^2 + dB^2 + dC^2). Conceptually, D is a measure of total
+                                 ;     314  *		angular motion, using the usual Euclidean metric. Let T be the amount of
+                                 ;     315  *		time required to move through D degrees at the current feed rate in degrees
+                                 ;     316  *		per minute. The rotational axes should be moved in coordinated linear motion
+                                 ;     317  *		so that the elapsed time from the start to the end of the motion is T plus
+                                 ;     318  *		any time required for acceleration or deceleration.
+                                 ;     319  */
+                                 ;     320 
+                                 ;     321 static void _calc_move_times(GCodeState_t *gms, const float axis_length[], const float axis_square[])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",321
+0000035D 7EA6                    		PUSH.L R6
+0000035F 7100D8                  		ADD #0FFFFFFD8H, R0
+00000362 A209                    		MOV.L R1, 24H[R0]
+00000364 A202                    		MOV.L R2, 20H[R0]
+00000366 A18B                    		MOV.L R3, 1CH[R0]
+                                 ;     322 										// gms = Gcode model state
+                                 ;     323 {
+                                 ;     324 	float inv_time=0;				// inverse time if doing a feed in G93 mode
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",324
+00000368 F80600                  		MOV.L #00000000H, [R0]
+0000036B                         L83:	; entry.split
+                                 ;     325 	float xyz_time=0;				// coordinated move linear part at requested feed rate
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",325
+0000036B 3E0100                  		MOV.L #00000000H, 04H[R0]
+0000036E                         L84:	; entry.split1
+                                 ;     326 	float abc_time=0;				// coordinated move rotary part at requested feed rate
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",326
+0000036E 3E0200                  		MOV.L #00000000H, 08H[R0]
+00000371                         L85:	; entry.split2
+                                 ;     327 	float max_time=0;				// time required for the rate-limiting axis
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",327
+00000371 3E0300                  		MOV.L #00000000H, 0CH[R0]
+00000374                         L86:	; entry.split3
+                                 ;     328 	float tmp_time=0;				// used in computation
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",328
+00000374 3E0400                  		MOV.L #00000000H, 10H[R0]
+00000377                         L87:	; entry.split4
+                                 ;     329 	gms->minimum_time = 8675309;	// arbitrarily large number
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",329
+00000377 AA09                    		MOV.L 24H[R0], R1
+00000379 F9120FED5F044B          		MOV.L #4B045FEDH, 3CH[R1]
+00000380                         L88:	; entry.split5
+                                 ;     330 
+                                 ;     331 	// compute times for feed motion
+                                 ;     332 	if (gms->motion_mode != MOTION_MODE_STRAIGHT_TRAVERSE) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",332
+00000380 AA09                    		MOV.L 24H[R0], R1
+00000382 B111                    		MOVU.B 04H[R1], R1
+00000384 6101                    		CMP #00H, R1
+00000386 20rr                    		BEQ L96
+00000388                         L89:	; bb13
+                                 ;     333 		if (gms->feed_rate_mode == INVERSE_TIME_MODE) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",333
+00000388 AA09                    		MOV.L 24H[R0], R1
+0000038A 591E4C                  		MOVU.B 4CH[R1], R14
+0000038D 610E                    		CMP #00H, R14
+0000038F AC11                    		MOV.L 40H[R1], R1
+00000391 21rr                    		BNE L92
+00000393                         L90:	; bb14
+                                 ;     334 			inv_time = gms->feed_rate;	// NB: feed rate was un-inverted to minutes by cm_set_feed_rate()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",334
+00000393 E301                    		MOV.L R1, [R0]
+00000395                         L91:	; bb14.split
+                                 ;     335             // inject feed rate override here for inverse time moves
+                                 ;     336 #ifdef VEL_CHANGE
+                                 ;     337             if (cm.gmx.feed_rate_override_enable) {
+                                 ;     338             	if(axis_length[AXIS_Z] == 0)
+                                 ;     339             		inv_time /=  cm.gmx.feed_rate_override_factor;
+                                 ;     340             }
+                                 ;     341 #endif
+                                 ;     342 			gms->feed_rate_mode = UNITS_PER_MINUTE_MODE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",342
+00000395 AA09                    		MOV.L 24H[R0], R1
+00000397 F9144C01                		MOV.B #01H, 4CH[R1]
+0000039B 2Err                 B  		BRA L96
+0000039D                         L92:	; bb20
+                                 ;     343 		} else {
+                                 ;     344 #ifdef VEL_CHANGE
+                                 ;     345             // inject feed rate override here
+                                 ;     346             float feed_rate;
+                                 ;     347             if(cm.gmx.feed_rate_override_enable && axis_length[AXIS_Z] == 0){
+                                 ;     348             	feed_rate = gms->feed_rate * cm.gmx.feed_rate_override_factor;
+                                 ;     349             	if(feed_rate > X_FEEDRATE_MAX)
+                                 ;     350             		feed_rate = X_FEEDRATE_MAX;
+                                 ;     351             	if(feed_rate < 10)
+                                 ;     352             		feed_rate = 10;
+                                 ;     353             }
+                                 ;     354             else
+                                 ;     355             {
+                                 ;     356             	feed_rate = gms->feed_rate;
+                                 ;     357             }
+                                 ;     358 #else
+                                 ;     359             float feed_rate = gms->feed_rate;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",359
+0000039D A109                    		MOV.L R1, 14H[R0]
+0000039F                         L93:	; bb20.split
+                                 ;     360 #endif
+                                 ;     361 
+                                 ;     362 			// compute length of linear move in millimeters. Feed rate is provided as mm/min
+                                 ;     363 			xyz_time = sqrt(axis_square[AXIS_X] + axis_square[AXIS_Y] + axis_square[AXIS_Z]) / feed_rate;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",363
+0000039F A98A                    		MOV.L 1CH[R0], R2
+000003A1 EC21                    		MOV.L [R2], R1
+000003A3 FC892101                		FADD 04H[R2].L, R1
+000003A7 FC892102                		FADD 08H[R2].L, R1
+000003AB 05rrrrrr             A  		BSR _sqrt
+000003AF FC910105                		FDIV 14H[R0].L, R1
+000003B3 A009                    		MOV.L R1, 04H[R0]
+000003B5                         L94:	; bb20.split6
+                                 ;     364 
+                                 ;     365 			// if no linear axes, compute length of multi-axis rotary move in degrees. Feed rate is provided as degrees/min
+                                 ;     366 			if (fp_ZERO(xyz_time)) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",366
+000003B5 A809                    		MOV.L 04H[R0], R1
+000003B7 7BF1                    		BCLR #1FH, R1
+000003B9 FD7211BD378635          		FCMP #358637BDH, R1
+000003C0 26rr                    		BPZ L96
+000003C2                         L95:	; bb39
+                                 ;     367 				abc_time = sqrt(axis_square[AXIS_A] + axis_square[AXIS_B] + axis_square[AXIS_C]) / feed_rate;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",367
+000003C2 A98A                    		MOV.L 1CH[R0], R2
+000003C4 A8A9                    		MOV.L 0CH[R2], R1
+000003C6 FC892104                		FADD 10H[R2].L, R1
+000003CA FC892105                		FADD 14H[R2].L, R1
+000003CE 05rrrrrr             A  		BSR _sqrt
+000003D2 FC910105                		FDIV 14H[R0].L, R1
+000003D6 A081                    		MOV.L R1, 08H[R0]
+000003D8                         L96:	; bb74
+                                 ;     368 			}
+                                 ;     369 		}
+                                 ;     370 	}
+                                 ;     371 	for (uint8_t axis = AXIS_X; axis < AXES; axis++) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",371
+000003D8 3C8B00                  		MOV.B #00H, 1BH[R0]
+000003DB 2Err                 B  		BRA L104
+000003DD                         L97:	; bb76
+                                 ;     372 		if (gms->motion_mode == MOTION_MODE_STRAIGHT_TRAVERSE) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",372
+000003DD AA01                    		MOV.L 20H[R0], R1
+000003DF B68A                    		MOVU.B 1BH[R0], R2
+000003E1 FE6211                  		MOV.L [R2,R1], R1
+000003E4 B166                    		MOVU.B 04H[R6], R6
+000003E6 6106                    		CMP #00H, R6
+000003E8 21rr                    		BNE L99
+000003EA                         L98:	; bb77
+                                 ;     373 			tmp_time = fabs(axis_length[axis]) / cm.a[axis].velocity_max;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",373
+000003EA B68E                    		MOVU.B 1BH[R0], R6
+000003EC 751638                  		MUL #38H, R6
+000003EF FBE2rrrrrrrr            		MOV.L #_cm, R14
+000003F5 4B6E                    		ADD R6, R14
+000003F7 7BF1                    		BCLR #1FH, R1
+000003F9 FC91E135                		FDIV 0D4H[R14].L, R1
+000003FD A101                    		MOV.L R1, 10H[R0]
+000003FF 2Err                 B  		BRA L100
+00000401                         L99:	; bb90
+                                 ;     374 		} else { // MOTION_MODE_STRAIGHT_FEED
+                                 ;     375 			tmp_time = fabs(axis_length[axis]) / cm.a[axis].feedrate_max;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",375
+00000401 B68E                    		MOVU.B 1BH[R0], R6
+00000403 751638                  		MUL #38H, R6
+00000406 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000040C 4B6E                    		ADD R6, R14
+0000040E 7BF1                    		BCLR #1FH, R1
+00000410 FC91E134                		FDIV 0D0H[R14].L, R1
+00000414 A101                    		MOV.L R1, 10H[R0]
+00000416                         L100:	; bb110
+                                 ;     376 		}
+                                 ;     377 		max_time = fmaxf(max_time, tmp_time);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",377
+00000416 A902                    		MOV.L 10H[R0], R2
+00000418 A889                    		MOV.L 0CH[R0], R1
+0000041A 05rrrrrr             A  		BSR _fmaxf
+0000041E A089                    		MOV.L R1, 0CH[R0]
+00000420                         L101:	; bb110.split
+00000420 660E                    		MOV.L #00000000H, R14
+                                 ;     378 
+                                 ;     379 		if (tmp_time > 0) { 	// collect minimum time if this axis is not zero
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",379
+00000422 FC850E04                		FCMP 10H[R0].L, R14
+00000426 26rr                    		BPZ L103
+00000428                         L102:	; bb115
+                                 ;     380 			gms->minimum_time = fminf(gms->minimum_time, tmp_time);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",380
+00000428 AA0E                    		MOV.L 24H[R0], R6
+0000042A ABE9                    		MOV.L 3CH[R6], R1
+0000042C A902                    		MOV.L 10H[R0], R2
+0000042E 05rrrrrr             A  		BSR _fminf
+00000432 A3E9                    		MOV.L R1, 3CH[R6]
+00000434                         L103:	; bb127
+00000434 B68E                    		MOVU.B 1BH[R0], R6
+00000436 6216                    		ADD #01H, R6
+00000438 868E                    		MOV.B R6, 1BH[R0]
+0000043A                         L104:	; bb130
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",371
+0000043A B68E                    		MOVU.B 1BH[R0], R6
+0000043C 6166                    		CMP #06H, R6
+0000043E AA0E                    		MOV.L 24H[R0], R6
+00000440 29rr                    		BLT L97
+00000442                         L105:	; bb136
+                                 ;     381 		}
+                                 ;     382 	}
+                                 ;     383 	gms->move_time = max4(inv_time, max_time, xyz_time, abc_time);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",383
+00000442 A884                    		MOV.L 08H[R0], R4
+00000444 A80B                    		MOV.L 04H[R0], R3
+00000446 A88A                    		MOV.L 0CH[R0], R2
+00000448 EC01                    		MOV.L [R0], R1
+0000044A 05rrrrrr             A  		BSR _max4
+0000044E A3E1                    		MOV.L R1, 38H[R6]
+00000450 3F660B                  		RTSD #2CH, R6-R6
+00000453                         __$_plan_block_list:
+                                 		.STACK	__$_plan_block_list=24
+                                 ;     384 }
+                                 ;     385 
+                                 ;     386 /* _plan_block_list() - plans the entire block list
+                                 ;     387  *
+                                 ;     388  *	The block list is the circular buffer of planner buffers (bf's). The block currently
+                                 ;     389  *	being planned is the "bf" block. The "first block" is the next block to execute;
+                                 ;     390  *	queued immediately behind the currently executing block, aka the "running" block.
+                                 ;     391  *	In some cases there is no first block because the list is empty or there is only
+                                 ;     392  *	one block and it is already running.
+                                 ;     393  *
+                                 ;     394  *	If blocks following the first block are already optimally planned (non replannable)
+                                 ;     395  *	the first block that is not optimally planned becomes the effective first block.
+                                 ;     396  *
+                                 ;     397  *	_plan_block_list() plans all blocks between and including the (effective) first block
+                                 ;     398  *	and the bf. It sets entry, exit and cruise v's from vmax's then calls trapezoid generation.
+                                 ;     399  *
+                                 ;     400  *	Variables that must be provided in the mpBuffers that will be processed:
+                                 ;     401  *
+                                 ;     402  *	  bf (function arg)		- end of block list (last block in time)
+                                 ;     403  *	  bf->replannable		- start of block list set by last FALSE value [Note 1]
+                                 ;     404  *	  bf->move_type			- typically MOVE_TYPE_ALINE. Other move_types should be set to
+                                 ;     405  *							  length=0, entry_vmax=0 and exit_vmax=0 and are treated
+                                 ;     406  *							  as a momentary stop (plan to zero and from zero).
+                                 ;     407  *
+                                 ;     408  *	  bf->length			- provides block length
+                                 ;     409  *	  bf->entry_vmax		- used during forward planning to set entry velocity
+                                 ;     410  *	  bf->cruise_vmax		- used during forward planning to set cruise velocity
+                                 ;     411  *	  bf->exit_vmax			- used during forward planning to set exit velocity
+                                 ;     412  *	  bf->delta_vmax		- used during forward planning to set exit velocity
+                                 ;     413  *
+                                 ;     414  *	  bf->recip_jerk		- used during trapezoid generation
+                                 ;     415  *	  bf->cbrt_jerk			- used during trapezoid generation
+                                 ;     416  *
+                                 ;     417  *	Variables that will be set during processing:
+                                 ;     418  *
+                                 ;     419  *	  bf->replannable		- set if the block becomes optimally planned
+                                 ;     420  *
+                                 ;     421  *	  bf->braking_velocity	- set during backward planning
+                                 ;     422  *	  bf->entry_velocity	- set during forward planning
+                                 ;     423  *	  bf->cruise_velocity	- set during forward planning
+                                 ;     424  *	  bf->exit_velocity		- set during forward planning
+                                 ;     425  *
+                                 ;     426  *	  bf->head_length		- set during trapezoid generation
+                                 ;     427  *	  bf->body_length		- set during trapezoid generation
+                                 ;     428  *	  bf->tail_length		- set during trapezoid generation
+                                 ;     429  *
+                                 ;     430  *	Variables that are ignored but here's what you would expect them to be:
+                                 ;     431  *	  bf->move_state		- NEW for all blocks but the earliest
+                                 ;     432  *	  bf->target[]			- block target position
+                                 ;     433  *	  bf->unit[]			- block unit vector
+                                 ;     434  *	  bf->time				- gets set later
+                                 ;     435  *	  bf->jerk				- source of the other jerk variables. Used in mr.
+                                 ;     436  */
+                                 ;     437 /* Notes:
+                                 ;     438  *	[1]	Whether or not a block is planned is controlled by the bf->replannable
+                                 ;     439  *		setting (set TRUE if it should be). Replan flags are checked during the
+                                 ;     440  *		backwards pass and prune the replan list to include only the the latest
+                                 ;     441  *		blocks that require planning
+                                 ;     442  *
+                                 ;     443  *		In normal operation the first block (currently running block) is not
+                                 ;     444  *		replanned, but may be for feedholds and feed overrides. In these cases
+                                 ;     445  *		the prep routines modify the contents of the mr buffer and re-shuffle
+                                 ;     446  *		the block list, re-enlisting the current bf buffer with new parameters.
+                                 ;     447  *		These routines also set all blocks in the list to be replannable so the
+                                 ;     448  *		list can be recomputed regardless of exact stops and previous replanning
+                                 ;     449  *		optimizations.
+                                 ;     450  *
+                                 ;     451  *	[2] The mr_flag is used to tell replan to account for mr buffer's exit velocity (Vx)
+                                 ;     452  *		mr's Vx is always found in the provided bf buffer. Used to replan feedholds
+                                 ;     453  */
+                                 ;     454 static void _plan_block_list(mpBuf_t *bf, uint8_t *mr_flag)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",454
+00000453 7EA6                    		PUSH.L R6
+00000455 7100F0                  		ADD #0FFFFFFF0H, R0
+00000458 A089                    		MOV.L R1, 0CH[R0]
+0000045A A082                    		MOV.L R2, 08H[R0]
+                                 ;     455 {
+                                 ;     456 	mpBuf_t *bp = bf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",456
+0000045C E5000301                		MOV.L 0CH[R0], 04H[R0]
+00000460 2Err                 B  		BRA L109
+00000462                         L107:	; bb4
+                                 ;     457 
+                                 ;     458 	// Backward planning pass. Find first block and update the braking velocities.
+                                 ;     459 	// At the end *bp points to the buffer before the first block.
+                                 ;     460 	while ((bp = mp_get_prev_buffer(bp)) != bf) {
+                                 ;     461 		if (bp->replannable == false) { break; }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",461
+00000462 A809                    		MOV.L 04H[R0], R1
+00000464 B611                    		MOVU.B 18H[R1], R1
+00000466 6101                    		CMP #00H, R1
+00000468 3Arrrr               W  		BEQ L135
+0000046B                         L108:	; bb13
+                                 ;     462 		bp->braking_velocity = fminf(bp->nx->entry_vmax, bp->nx->braking_velocity) + bp->delta_vmax;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",462
+0000046B A80E                    		MOV.L 04H[R0], R6
+0000046D A869                    		MOV.L 04H[R6], R1
+0000046F AE12                    		MOV.L 60H[R1], R2
+00000471 AD11                    		MOV.L 50H[R1], R1
+00000473 05rrrrrr             A  		BSR _fminf
+00000477 A80A                    		MOV.L 04H[R0], R2
+00000479 FC892117                		FADD 5CH[R2].L, R1
+0000047D A661                    		MOV.L R1, 60H[R6]
+0000047F                         L109:	; bb31
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",460
+0000047F A809                    		MOV.L 04H[R0], R1
+00000481 EC11                    		MOV.L [R1], R1
+00000483 A009                    		MOV.L R1, 04H[R0]
+00000485 06850103                		CMP 0CH[R0].L, R1
+00000489 21rr                    		BNE L107
+0000048B 38rrrr               W  		BRA L135
+0000048E                         L110:	; bb43
+                                 ;     463 	}
+                                 ;     464 
+                                 ;     465 	// forward planning pass - recomputes trapezoids in the list from the first block to the bf block.
+                                 ;     466 	while ((bp = mp_get_next_buffer(bp)) != bf) {
+                                 ;     467 		if ((bp->pv == bf) || (*mr_flag == true))  {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",467
+0000048E EC1E                    		MOV.L [R1], R14
+00000490 06850E03                		CMP 0CH[R0].L, R14
+00000494 20rr                    		BEQ L115
+00000496 2Err                 B  		BRA L114
+00000498                         L111:	; bb44
+                                 ;     468 			bp->entry_velocity = bp->entry_vmax;		// first block in the list
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",468
+00000498 E5111411                		MOV.L 50H[R1], 44H[R1]
+0000049C                         L112:	; bb44.split
+                                 ;     469 			*mr_flag = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",469
+0000049C A881                    		MOV.L 08H[R0], R1
+0000049E F81400                  		MOV.B #00H, [R1]
+000004A1 2Err                 B  		BRA L118
+000004A3                         L113:	; bb51
+                                 ;     470 		} else {
+                                 ;     471 			bp->entry_velocity = bp->pv->exit_velocity;	// other blocks in the list
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",471
+000004A3 EC1E                    		MOV.L [R1], R14
+000004A5 E5E11311                		MOV.L 4CH[R14], 44H[R1]
+000004A9 2Err                 B  		BRA L118
+000004AB                         L114:	; bb65
+000004AB A881                    		MOV.L 08H[R0], R1
+000004AD 581E                    		MOVU.B [R1], R14
+000004AF 611E                    		CMP #01H, R14
+000004B1 18                   S  		BNE L116
+000004B2                         L115:	; bb71
+000004B2 F80601                  		MOV.L #00000001H, [R0]
+000004B5 08                   S  		BRA L117
+000004B6                         L116:	; bb72
+000004B6 F80600                  		MOV.L #00000000H, [R0]
+000004B9                         L117:	; bb73
+000004B9 EC01                    		MOV.L [R0], R1
+000004BB 6101                    		CMP #00H, R1
+000004BD A809                    		MOV.L 04H[R0], R1
+000004BF 21rr                    		BNE L111
+000004C1 2Err                 B  		BRA L113
+000004C3                         L118:	; bb78
+                                 ;     472 		}
+                                 ;     473 		bp->cruise_velocity = bp->cruise_vmax;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",473
+000004C3 A809                    		MOV.L 04H[R0], R1
+000004C5 E5111512                		MOV.L 54H[R1], 48H[R1]
+000004C9                         L119:	; bb78.split
+                                 ;     474 		bp->exit_velocity = min4( bp->exit_vmax,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",474
+000004C9 A80E                    		MOV.L 04H[R0], R6
+000004CB AC6C                    		MOV.L 44H[R6], R4
+000004CD FC896417                		FADD 5CH[R6].L, R4
+000004D1 ADE1                    		MOV.L 58H[R6], R1
+000004D3 A86A                    		MOV.L 04H[R6], R2
+000004D5 AE23                    		MOV.L 60H[R2], R3
+000004D7 AD22                    		MOV.L 50H[R2], R2
+000004D9 05rrrrrr             A  		BSR _min4
+000004DD A4E9                    		MOV.L R1, 4CH[R6]
+000004DF                         L120:	; bb78.split1
+                                 ;     475 								  bp->nx->entry_vmax,
+                                 ;     476 								  bp->nx->braking_velocity,
+                                 ;     477 								 (bp->entry_velocity + bp->delta_vmax) );
+                                 ;     478 
+                                 ;     479 		mp_calculate_trapezoid(bp);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",479
+000004DF A809                    		MOV.L 04H[R0], R1
+000004E1 05rrrrrr             A  		BSR _mp_calculate_trapezoid
+000004E5                         L121:	; bb78.split2
+                                 ;     480 
+                                 ;     481 		// test for optimally planned trapezoids - only need to check various exit conditions
+                                 ;     482 		if  ( ( (fp_EQ(bp->exit_velocity, bp->exit_vmax)) ||
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",482
+000004E5 A809                    		MOV.L 04H[R0], R1
+000004E7 AC9A                    		MOV.L 4CH[R1], R2
+000004E9 FC811216                		FSUB 58H[R1].L, R2
+000004ED 7BF2                    		BCLR #1FH, R2
+000004EF FD7212BD378635          		FCMP #358637BDH, R2
+000004F6 27rr                    		BN L124
+000004F8 08                   S  		BRA L123
+000004F9                         L122:	; bb109
+                                 ;     483 				(fp_EQ(bp->exit_velocity, bp->nx->entry_vmax)) ) ||
+                                 ;     484 			  ( (bp->pv->replannable == false) &&
+                                 ;     485 				(fp_EQ(bp->exit_velocity, (bp->entry_velocity + bp->delta_vmax))) ) ) {
+                                 ;     486 			bp->replannable = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",486
+000004F9 A809                    		MOV.L 04H[R0], R1
+000004FB 3C9800                  		MOV.B #00H, 18H[R1]
+000004FE 2Err                 B  		BRA L135
+00000500                         L123:	; bb122
+00000500 A809                    		MOV.L 04H[R0], R1
+00000502 AC9A                    		MOV.L 4CH[R1], R2
+00000504 A819                    		MOV.L 04H[R1], R1
+00000506 FC811214                		FSUB 50H[R1].L, R2
+0000050A 7BF2                    		BCLR #1FH, R2
+0000050C FD7212BD378635          		FCMP #358637BDH, R2
+00000513 26rr                    		BPZ L125
+00000515                         L124:	; bb135
+00000515 F80601                  		MOV.L #00000001H, [R0]
+00000518 08                   S  		BRA L126
+00000519                         L125:	; bb136
+00000519 F80600                  		MOV.L #00000000H, [R0]
+0000051C                         L126:	; bb137
+0000051C EC01                    		MOV.L [R0], R1
+0000051E 6101                    		CMP #00H, R1
+00000520 21rr                    		BNE L132
+00000522                         L127:	; bb141
+00000522 A809                    		MOV.L 04H[R0], R1
+00000524 EC11                    		MOV.L [R1], R1
+00000526 B611                    		MOVU.B 18H[R1], R1
+00000528 6101                    		CMP #00H, R1
+0000052A 21rr                    		BNE L130
+0000052C                         L128:	; bb150
+0000052C A809                    		MOV.L 04H[R0], R1
+0000052E AC1A                    		MOV.L 44H[R1], R2
+00000530 FC891217                		FADD 5CH[R1].L, R2
+00000534 AC99                    		MOV.L 4CH[R1], R1
+00000536 FC8321                  		FSUB R2, R1
+00000539 7BF1                    		BCLR #1FH, R1
+0000053B FD7211BD378635          		FCMP #358637BDH, R1
+00000542 26rr                    		BPZ L130
+00000544                         L129:	; bb165
+00000544 F80601                  		MOV.L #00000001H, [R0]
+00000547 08                   S  		BRA L131
+00000548                         L130:	; bb166
+00000548 F80600                  		MOV.L #00000000H, [R0]
+0000054B                         L131:	; bb167
+0000054B EC01                    		MOV.L [R0], R1
+0000054D 6101                    		CMP #00H, R1
+0000054F 10                   S  		BEQ L133
+00000550                         L132:	; bb171
+00000550 F80601                  		MOV.L #00000001H, [R0]
+00000553 08                   S  		BRA L134
+00000554                         L133:	; bb172
+00000554 F80600                  		MOV.L #00000000H, [R0]
+00000557                         L134:	; bb173
+00000557 EC01                    		MOV.L [R0], R1
+00000559 6101                    		CMP #00H, R1
+0000055B 21rr                    		BNE L122
+0000055D                         L135:	; bb179
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",466
+0000055D A809                    		MOV.L 04H[R0], R1
+0000055F A819                    		MOV.L 04H[R1], R1
+00000561 A009                    		MOV.L R1, 04H[R0]
+00000563 06850103                		CMP 0CH[R0].L, R1
+00000567 3Brrrr               W  		BNE L110
+0000056A                         L136:	; bb188
+                                 ;     487 		}
+                                 ;     488 	}
+                                 ;     489 	// finish up the last block move
+                                 ;     490 	bp->entry_velocity = bp->pv->exit_velocity;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",490
+0000056A A80A                    		MOV.L 04H[R0], R2
+0000056C EC2E                    		MOV.L [R2], R14
+0000056E E5E11311                		MOV.L 4CH[R14], 44H[R1]
+00000572                         L137:	; bb188.split
+                                 ;     491 	bp->cruise_velocity = bp->cruise_vmax;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",491
+00000572 A809                    		MOV.L 04H[R0], R1
+00000574 E5111512                		MOV.L 54H[R1], 48H[R1]
+00000578                         L138:	; bb188.split3
+                                 ;     492 	bp->exit_velocity = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",492
+00000578 A809                    		MOV.L 04H[R0], R1
+0000057A 3E9300                  		MOV.L #00000000H, 4CH[R1]
+0000057D                         L139:	; bb188.split4
+                                 ;     493 	mp_calculate_trapezoid(bp);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",493
+0000057D A809                    		MOV.L 04H[R0], R1
+0000057F 05rrrrrr             A  		BSR _mp_calculate_trapezoid
+00000583 3F6605                  		RTSD #14H, R6-R6
+00000586                         __$_reset_replannable_list:
+                                 		.STACK	__$_reset_replannable_list=16
+                                 ;     494 }
+                                 ;     495 
+                                 ;     496 /*
+                                 ;     497  *	_reset_replannable_list() - resets all blocks in the planning list to be replannable
+                                 ;     498  */
+                                 ;     499 static void _reset_replannable_list()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",499
+00000586 60C0                    		SUB #0CH, R0
+                                 ;     500 {
+                                 ;     501 	mpBuf_t *bf = mp_get_first_buffer();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",501
+00000588 05rrrrrr             A  		BSR _mp_get_first_buffer
+0000058C A009                    		MOV.L R1, 04H[R0]
+0000058E                         L141:	; entry.split
+                                 ;     502 	if (bf == NULL) return;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",502
+0000058E A809                    		MOV.L 04H[R0], R1
+00000590 6101                    		CMP #00H, R1
+00000592 20rr                    		BEQ L149
+00000594                         L142:	; bb8
+                                 ;     503 	mpBuf_t *bp = bf;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",503
+00000594 E5000102                		MOV.L 04H[R0], 08H[R0]
+00000598                         L143:	; bb10
+                                 ;     504 	do {
+                                 ;     505 		bp->replannable = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",505
+00000598 A881                    		MOV.L 08H[R0], R1
+0000059A 3C9801                  		MOV.B #01H, 18H[R1]
+0000059D                         L144:	; bb10.split
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",504
+0000059D A881                    		MOV.L 08H[R0], R1
+0000059F A819                    		MOV.L 04H[R1], R1
+000005A1 A081                    		MOV.L R1, 08H[R0]
+000005A3 06850101                		CMP 04H[R0].L, R1
+000005A7 20rr                    		BEQ L147
+000005A9                         L145:	; bb20
+000005A9 A881                    		MOV.L 08H[R0], R1
+000005AB B599                    		MOVU.B 17H[R1], R1
+000005AD 6101                    		CMP #00H, R1
+000005AF 10                   S  		BEQ L147
+000005B0                         L146:	; bb27
+000005B0 F80601                  		MOV.L #00000001H, [R0]
+000005B3 08                   S  		BRA L148
+000005B4                         L147:	; bb28
+000005B4 F80600                  		MOV.L #00000000H, [R0]
+000005B7                         L148:	; bb29
+000005B7 EC01                    		MOV.L [R0], R1
+000005B9 6101                    		CMP #00H, R1
+000005BB 21rr                    		BNE L143
+000005BD                         L149:	; return
+                                 ;     506 	} while (((bp = mp_get_next_buffer(bp)) != bf) && (bp->move_state != MOVE_OFF));
+                                 ;     507 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",507
+000005BD 6703                    		RTSD #0CH
+000005BF                         __$_get_junction_vmax:
+                                 		.STACK	__$_get_junction_vmax=52
+                                 ;     508 
+                                 ;     509 /*
+                                 ;     510  * _get_junction_vmax() - Sonny's algorithm - simple
+                                 ;     511  *
+                                 ;     512  *  Computes the maximum allowable junction speed by finding the velocity that will yield
+                                 ;     513  *	the centripetal acceleration in the corner_acceleration value. The value of delta sets
+                                 ;     514  *	the effective radius of curvature. Here's Sonny's (Sungeun K. Jeon's) explanation
+                                 ;     515  *	of what's going on:
+                                 ;     516  *
+                                 ;     517  *	"First let's assume that at a junction we only look a centripetal acceleration to simply
+                                 ;     518  *	things. At a junction of two lines, let's place a circle such that both lines are tangent
+                                 ;     519  *	to the circle. The circular segment joining the lines represents the path for constant
+                                 ;     520  *	centripetal acceleration. This creates a deviation from the path (let's call this delta),
+                                 ;     521  *	which is the distance from the junction to the edge of the circular segment. Delta needs
+                                 ;     522  *	to be defined, so let's replace the term max_jerk (see note 1) with max_junction_deviation,
+                                 ;     523  *	or "delta". This indirectly sets the radius of the circle, and hence limits the velocity
+                                 ;     524  *	by the centripetal acceleration. Think of the this as widening the race track. If a race
+                                 ;     525  *	car is driving on a track only as wide as a car, it'll have to slow down a lot to turn
+                                 ;     526  *	corners. If we widen the track a bit, the car can start to use the track to go into the
+                                 ;     527  *	turn. The wider it is, the faster through the corner it can go.
+                                 ;     528  *
+                                 ;     529  * (Note 1: "max_jerk" refers to the old grbl/marlin max_jerk" approximation term, not the
+                                 ;     530  *	tinyG jerk terms)
+                                 ;     531  *
+                                 ;     532  *	If you do the geometry in terms of the known variables, you get:
+                                 ;     533  *		sin(theta/2) = R/(R+delta)  Re-arranging in terms of circle radius (R)
+                                 ;     534  *		R = delta*sin(theta/2)/(1-sin(theta/2).
+                                 ;     535  *
+                                 ;     536  *	Theta is the angle between line segments given by:
+                                 ;     537  *		cos(theta) = dot(a,b)/(norm(a)*norm(b)).
+                                 ;     538  *
+                                 ;     539  *	Most of these calculations are already done in the planner. To remove the acos()
+                                 ;     540  *	and sin() computations, use the trig half angle identity:
+                                 ;     541  *		sin(theta/2) = +/- sqrt((1-cos(theta))/2).
+                                 ;     542  *
+                                 ;     543  *	For our applications, this should always be positive. Now just plug the equations into
+                                 ;     544  *	the centripetal acceleration equation: v_c = sqrt(a_max*R). You'll see that there are
+                                 ;     545  *	only two sqrt computations and no sine/cosines."
+                                 ;     546  *
+                                 ;     547  *	How to compute the radius using brute-force trig:
+                                 ;     548  *		float theta = acos(costheta);
+                                 ;     549  *		float radius = delta * sin(theta/2)/(1-sin(theta/2));
+                                 ;     550  */
+                                 ;     551 /*  This version extends Chamnit's algorithm by computing a value for delta that takes
+                                 ;     552  *	the contributions of the individual axes in the move into account. This allows the
+                                 ;     553  *	control radius to vary by axis. This is necessary to support axes that have
+                                 ;     554  *	different dynamics; such as a Z axis that doesn't move as fast as X and Y (such as a
+                                 ;     555  *	screw driven Z axis on machine with a belt driven XY - like a Shapeoko), or rotary
+                                 ;     556  *	axes ABC that have completely different dynamics than their linear counterparts.
+                                 ;     557  *
+                                 ;     558  *	The function takes the absolute values of the sum of the unit vector components as
+                                 ;     559  *	a measure of contribution to the move, then scales the delta values from the non-zero
+                                 ;     560  *	axes into a composite delta to be used for the move. Shown for an XY vector:
+                                 ;     561  *
+                                 ;     562  *	 	U[i]	Unit sum of i'th axis	fabs(unit_a[i]) + fabs(unit_b[i])
+                                 ;     563  *	 	Usum	Length of sums			Ux + Uy
+                                 ;     564  *	 	d		Delta of sums			(Dx*Ux+DY*UY)/Usum
+                                 ;     565  */
+                                 ;     566 
+                                 ;     567 static float _get_junction_vmax(const float a_unit[], const float b_unit[])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",567
+000005BF 7EA6                    		PUSH.L R6
+000005C1 7100D4                  		ADD #0FFFFFFD4H, R0
+000005C4 A281                    		MOV.L R1, 28H[R0]
+000005C6 A20A                    		MOV.L R2, 24H[R0]
+                                 ;     568 {
+                                 ;     569 	float costheta = - (a_unit[AXIS_X] * b_unit[AXIS_X])
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",569
+000005C8 AA81                    		MOV.L 28H[R0], R1
+000005CA A81B                    		MOV.L 04H[R1], R3
+000005CC FC8D2301                		FMUL 04H[R2].L, R3
+000005D0 EC14                    		MOV.L [R1], R4
+000005D2 FC8C24                  		FMUL [R2].L, R4
+000005D5 FDFFF4                  		BNOT #1FH, R4
+000005D8 FC8334                  		FSUB R3, R4
+000005DB A893                    		MOV.L 08H[R1], R3
+000005DD FC8D2302                		FMUL 08H[R2].L, R3
+000005E1 FC8334                  		FSUB R3, R4
+000005E4 A89B                    		MOV.L 0CH[R1], R3
+000005E6 FC8D2303                		FMUL 0CH[R2].L, R3
+000005EA FC8334                  		FSUB R3, R4
+000005ED A913                    		MOV.L 10H[R1], R3
+000005EF FC8D2304                		FMUL 10H[R2].L, R3
+000005F3 FC8334                  		FSUB R3, R4
+000005F6 A919                    		MOV.L 14H[R1], R1
+000005F8 FC8D2105                		FMUL 14H[R2].L, R1
+000005FC FC8314                  		FSUB R1, R4
+000005FF A00C                    		MOV.L R4, 04H[R0]
+00000601                         L151:	; entry.split
+                                 ;     570 					 - (a_unit[AXIS_Y] * b_unit[AXIS_Y])
+                                 ;     571 					 - (a_unit[AXIS_Z] * b_unit[AXIS_Z])
+                                 ;     572 					 - (a_unit[AXIS_A] * b_unit[AXIS_A])
+                                 ;     573 					 - (a_unit[AXIS_B] * b_unit[AXIS_B])
+                                 ;     574 					 - (a_unit[AXIS_C] * b_unit[AXIS_C]);
+                                 ;     575 
+                                 ;     576 	if (costheta < -0.99) { return (10000000); } 		// straight line cases
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",576
+00000601 A809                    		MOV.L 04H[R0], R1
+00000603 FD7211A4707DBF          		FCMP #0BF7D70A4H, R1
+0000060A 26rr                    		BPZ L153
+0000060C                         L152:	; bb58
+0000060C F8028096184B            		MOV.L #4B189680H, [R0]
+00000612 38rrrr               W  		BRA L172
+00000615                         L153:	; bb64
+00000615 FBE2A4707D3F            		MOV.L #3F7D70A4H, R14
+                                 ;     577 	if (costheta > 0.99)  { return (0); } 				// reversal cases
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",577
+0000061B FC850E01                		FCMP 04H[R0].L, R14
+0000061F 26rr                    		BPZ L155
+00000621                         L154:	; bb65
+00000621 F80600                  		MOV.L #00000000H, [R0]
+00000624 38rrrr               W  		BRA L172
+00000627                         L155:	; bb71
+                                 ;     578 
+                                 ;     579 	// Fuse the junction deviations into a vector sum
+                                 ;     580 	float a_delta = square(a_unit[AXIS_X] * cm.a[AXIS_X].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",580
+00000627 AA81                    		MOV.L 28H[R0], R1
+00000629 EC11                    		MOV.L [R1], R1
+0000062B FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000631 FC8DE13B                		FMUL 0ECH[R14].L, R1
+00000635 FC8F11                  		FMUL R1, R1
+00000638 A081                    		MOV.L R1, 08H[R0]
+0000063A                         L156:	; bb71.split
+                                 ;     581 	a_delta += square(a_unit[AXIS_Y] * cm.a[AXIS_Y].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",581
+0000063A AA81                    		MOV.L 28H[R0], R1
+0000063C A819                    		MOV.L 04H[R1], R1
+0000063E FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000644 FC8DE149                		FMUL 0124H[R14].L, R1
+00000648 FC8F11                  		FMUL R1, R1
+0000064B FC890102                		FADD 08H[R0].L, R1
+0000064F A081                    		MOV.L R1, 08H[R0]
+00000651                         L157:	; bb71.split1
+                                 ;     582 	a_delta += square(a_unit[AXIS_Z] * cm.a[AXIS_Z].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",582
+00000651 AA81                    		MOV.L 28H[R0], R1
+00000653 A891                    		MOV.L 08H[R1], R1
+00000655 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000065B FC8DE157                		FMUL 015CH[R14].L, R1
+0000065F FC8F11                  		FMUL R1, R1
+00000662 FC890102                		FADD 08H[R0].L, R1
+00000666 A081                    		MOV.L R1, 08H[R0]
+00000668                         L158:	; bb71.split2
+                                 ;     583 	a_delta += square(a_unit[AXIS_A] * cm.a[AXIS_A].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",583
+00000668 AA81                    		MOV.L 28H[R0], R1
+0000066A A899                    		MOV.L 0CH[R1], R1
+0000066C FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000672 FC8DE165                		FMUL 0194H[R14].L, R1
+00000676 FC8F11                  		FMUL R1, R1
+00000679 FC890102                		FADD 08H[R0].L, R1
+0000067D A081                    		MOV.L R1, 08H[R0]
+0000067F                         L159:	; bb71.split3
+                                 ;     584 	a_delta += square(a_unit[AXIS_B] * cm.a[AXIS_B].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",584
+0000067F AA81                    		MOV.L 28H[R0], R1
+00000681 A911                    		MOV.L 10H[R1], R1
+00000683 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000689 FC8DE173                		FMUL 01CCH[R14].L, R1
+0000068D FC8F11                  		FMUL R1, R1
+00000690 FC890102                		FADD 08H[R0].L, R1
+00000694 A081                    		MOV.L R1, 08H[R0]
+00000696                         L160:	; bb71.split4
+                                 ;     585 	a_delta += square(a_unit[AXIS_C] * cm.a[AXIS_C].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",585
+00000696 AA81                    		MOV.L 28H[R0], R1
+00000698 A919                    		MOV.L 14H[R1], R1
+0000069A FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006A0 FC8DE181                		FMUL 0204H[R14].L, R1
+000006A4 FC8F11                  		FMUL R1, R1
+000006A7 FC890102                		FADD 08H[R0].L, R1
+000006AB A081                    		MOV.L R1, 08H[R0]
+000006AD                         L161:	; bb71.split5
+                                 ;     586 
+                                 ;     587 	float b_delta = square(b_unit[AXIS_X] * cm.a[AXIS_X].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",587
+000006AD AA09                    		MOV.L 24H[R0], R1
+000006AF EC11                    		MOV.L [R1], R1
+000006B1 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006B7 FC8DE13B                		FMUL 0ECH[R14].L, R1
+000006BB FC8F11                  		FMUL R1, R1
+000006BE A089                    		MOV.L R1, 0CH[R0]
+000006C0                         L162:	; bb71.split6
+                                 ;     588 	b_delta += square(b_unit[AXIS_Y] * cm.a[AXIS_Y].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",588
+000006C0 AA09                    		MOV.L 24H[R0], R1
+000006C2 A819                    		MOV.L 04H[R1], R1
+000006C4 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006CA FC8DE149                		FMUL 0124H[R14].L, R1
+000006CE FC8F11                  		FMUL R1, R1
+000006D1 FC890103                		FADD 0CH[R0].L, R1
+000006D5 A089                    		MOV.L R1, 0CH[R0]
+000006D7                         L163:	; bb71.split7
+                                 ;     589 	b_delta += square(b_unit[AXIS_Z] * cm.a[AXIS_Z].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",589
+000006D7 AA09                    		MOV.L 24H[R0], R1
+000006D9 A891                    		MOV.L 08H[R1], R1
+000006DB FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006E1 FC8DE157                		FMUL 015CH[R14].L, R1
+000006E5 FC8F11                  		FMUL R1, R1
+000006E8 FC890103                		FADD 0CH[R0].L, R1
+000006EC A089                    		MOV.L R1, 0CH[R0]
+000006EE                         L164:	; bb71.split8
+                                 ;     590 	b_delta += square(b_unit[AXIS_A] * cm.a[AXIS_A].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",590
+000006EE AA09                    		MOV.L 24H[R0], R1
+000006F0 A899                    		MOV.L 0CH[R1], R1
+000006F2 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000006F8 FC8DE165                		FMUL 0194H[R14].L, R1
+000006FC FC8F11                  		FMUL R1, R1
+000006FF FC890103                		FADD 0CH[R0].L, R1
+00000703 A089                    		MOV.L R1, 0CH[R0]
+00000705                         L165:	; bb71.split9
+                                 ;     591 	b_delta += square(b_unit[AXIS_B] * cm.a[AXIS_B].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",591
+00000705 AA09                    		MOV.L 24H[R0], R1
+00000707 A911                    		MOV.L 10H[R1], R1
+00000709 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000070F FC8DE173                		FMUL 01CCH[R14].L, R1
+00000713 FC8F11                  		FMUL R1, R1
+00000716 FC890103                		FADD 0CH[R0].L, R1
+0000071A A089                    		MOV.L R1, 0CH[R0]
+0000071C                         L166:	; bb71.split10
+                                 ;     592 	b_delta += square(b_unit[AXIS_C] * cm.a[AXIS_C].junction_dev);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",592
+0000071C AA09                    		MOV.L 24H[R0], R1
+0000071E A919                    		MOV.L 14H[R1], R1
+00000720 FBE2rrrrrrrr            		MOV.L #_cm, R14
+00000726 FC8DE181                		FMUL 0204H[R14].L, R1
+0000072A FC8F11                  		FMUL R1, R1
+0000072D FC890103                		FADD 0CH[R0].L, R1
+00000731 A089                    		MOV.L R1, 0CH[R0]
+00000733                         L167:	; bb71.split11
+                                 ;     593 
+                                 ;     594 	float delta = (sqrt(a_delta) + sqrt(b_delta))/2;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",594
+00000733 A881                    		MOV.L 08H[R0], R1
+00000735 05rrrrrr             A  		BSR _sqrt
+00000739 EF16                    		MOV.L R1, R6
+0000073B A889                    		MOV.L 0CH[R0], R1
+0000073D 05rrrrrr             A  		BSR _sqrt
+00000741 FC8B16                  		FADD R1, R6
+00000744 FD724600000040          		FDIV #40000000H, R6
+0000074B A106                    		MOV.L R6, 10H[R0]
+0000074D                         L168:	; bb71.split12
+0000074D FB120000803F            		MOV.L #3F800000H, R1
+                                 ;     595 	float sintheta_over2 = sqrt((1 - costheta)/2);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",595
+00000753 FC810101                		FSUB 04H[R0].L, R1
+00000757 FD724100000040          		FDIV #40000000H, R1
+0000075E 05rrrrrr             A  		BSR _sqrt
+00000762 A109                    		MOV.L R1, 14H[R0]
+00000764                         L169:	; bb71.split13
+                                 ;     596 	float radius = delta * sintheta_over2 / (1-sintheta_over2);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",596
+00000764 A909                    		MOV.L 14H[R0], R1
+00000766 FBE20000803F            		MOV.L #3F800000H, R14
+0000076C FC831E                  		FSUB R1, R14
+0000076F FC8D0104                		FMUL 10H[R0].L, R1
+00000773 FC93E1                  		FDIV R14, R1
+00000776 A181                    		MOV.L R1, 18H[R0]
+00000778                         L170:	; bb71.split14
+                                 ;     597 	float velocity = sqrt(radius * cm.junction_acceleration);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",597
+00000778 FB12rrrrrrrr            		MOV.L #_cm, R1
+0000077E A819                    		MOV.L 04H[R1], R1
+00000780 FC8D0106                		FMUL 18H[R0].L, R1
+00000784 05rrrrrr             A  		BSR _sqrt
+00000788 A189                    		MOV.L R1, 1CH[R0]
+0000078A                         L171:	; bb71.split15
+                                 ;     598 //	printf ("v:%f\n", velocity);	//+++++
+                                 ;     599 	return (velocity);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",599
+0000078A E10007                  		MOV.L 1CH[R0], [R0]
+0000078D                         L172:	; bb246
+0000078D EC01                    		MOV.L [R0], R1
+0000078F A201                    		MOV.L R1, 20H[R0]
+                                 ;     600 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",600
+00000791 3F660C                  		RTSD #30H, R6-R6
+00000794                         __$_compute_next_segment_velocity:
+                                 		.STACK	__$_compute_next_segment_velocity=12
+                                 ;     601 
+                                 ;     602 /*************************************************************************
+                                 ;     603  * feedholds - functions for performing holds
+                                 ;     604  *
+                                 ;     605  * mp_plan_hold_callback() - replan block list to execute hold
+                                 ;     606  * mp_end_hold() 		   - release the hold and restart block list
+                                 ;     607  *
+                                 ;     608  *	Feedhold is executed as cm.hold_state transitions executed inside
+                                 ;     609  *	_exec_aline() and main loop callbacks to these functions:
+                                 ;     610  *	mp_plan_hold_callback() and mp_end_hold().
+                                 ;     611  */
+                                 ;     612 /*	Holds work like this:
+                                 ;     613  *
+                                 ;     614  * 	  - Hold is asserted by calling cm_feedhold() (usually invoked via a ! char)
+                                 ;     615  *		If hold_state is OFF and motion_state is RUNning it sets
+                                 ;     616  *		hold_state to SYNC and motion_state to HOLD.
+                                 ;     617  *
+                                 ;     618  *	  - Hold state == SYNC tells the aline exec routine to execute the next aline
+                                 ;     619  *		segment then set hold_state to PLAN. This gives the planner sufficient
+                                 ;     620  *		time to replan the block list for the hold before the next aline segment
+                                 ;     621  *		needs to be processed.
+                                 ;     622  *
+                                 ;     623  *	  - Hold state == PLAN tells the planner to replan the mr buffer, the current
+                                 ;     624  *		run buffer (bf), and any subsequent bf buffers as necessary to execute a
+                                 ;     625  *		hold. Hold planning replans the planner buffer queue down to zero and then
+                                 ;     626  *		back up from zero. Hold state is set to DECEL when planning is complete.
+                                 ;     627  *
+                                 ;     628  *	  - Hold state == DECEL persists until the aline execution runs to zero
+                                 ;     629  *		velocity, at which point hold state transitions to HOLD.
+                                 ;     630  *
+                                 ;     631  *	  - Hold state == HOLD persists until the cycle is restarted. A cycle start
+                                 ;     632  *		is an asynchronous event that sets the cycle_start_flag TRUE. It can
+                                 ;     633  *		occur any time after the hold is requested - either before or after
+                                 ;     634  *		motion stops.
+                                 ;     635  *
+                                 ;     636  *	  - mp_end_hold() is executed from cm_feedhold_sequencing_callback() once the
+                                 ;     637  *		hold state == HOLD and a cycle_start has been requested.This sets the hold
+                                 ;     638  *		state to OFF which enables _exec_aline() to continue processing. Move
+                                 ;     639  *		execution begins with the first buffer after the hold.
+                                 ;     640  *
+                                 ;     641  *	Terms used:
+                                 ;     642  *	 - mr is the runtime buffer. It was initially loaded from the bf buffer
+                                 ;     643  *	 - bp+0 is the "companion" bf buffer to the mr buffer.
+                                 ;     644  *	 - bp+1 is the bf buffer following bp+0. This runs through bp+N
+                                 ;     645  *	 - bp (by itself) just refers to the current buffer being adjusted / replanned
+                                 ;     646  *
+                                 ;     647  *	Details: Planning re-uses bp+0 as an "extra" buffer. Normally bp+0 is returned
+                                 ;     648  *		to the buffer pool as it is redundant once mr is loaded. Use the extra
+                                 ;     649  *		buffer to split the move in two where the hold decelerates to zero. Use
+                                 ;     650  *		one buffer to go to zero, the other to replan up from zero. All buffers past
+                                 ;     651  *		that point are unaffected other than that they need to be replanned for velocity.
+                                 ;     652  *
+                                 ;     653  *	Note: There are multiple opportunities for more efficient organization of
+                                 ;     654  *		  code in this module, but the code is so complicated I just left it
+                                 ;     655  *		  organized for clarity and hoped for the best from compiler optimization.
+                                 ;     656  */
+                                 ;     657 
+                                 ;     658 static float _compute_next_segment_velocity()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",658
+00000794 6080                    		SUB #08H, R0
+                                 ;     659 {
+                                 ;     660 	if (mr.section == SECTION_BODY) return (mr.segment_velocity);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",660
+00000796 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000079C B09A                    		MOVU.B 03H[R1], R2
+0000079E 6112                    		CMP #01H, R2
+000007A0 ED1148                  		MOV.L 0120H[R1], R1
+000007A3 18                   S  		BNE L175
+000007A4                         L174:	; bb1
+000007A4 E301                    		MOV.L R1, [R0]
+000007A6 2Err                 B  		BRA L176
+000007A8                         L175:	; bb8
+                                 ;     661 #ifdef __JERK_EXEC
+                                 ;     662 	return (mr.segment_velocity);	// an approximation
+                                 ;     663 #else
+                                 ;     664 	return (mr.segment_velocity + mr.forward_diff_5);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",664
+000007A8 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000007AE FC89E14F                		FADD 013CH[R14].L, R1
+000007B2 E301                    		MOV.L R1, [R0]
+000007B4                         L176:	; bb13
+000007B4 EC01                    		MOV.L [R0], R1
+000007B6 A009                    		MOV.L R1, 04H[R0]
+                                 ;     665 #endif
+                                 ;     666 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",666
+000007B8 6702                    		RTSD #08H
+000007BA                         _mp_plan_hold_callback:
+                                 		.STACK	_mp_plan_hold_callback=44
+                                 ;     667 
+                                 ;     668 stat_t mp_plan_hold_callback()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",668
+000007BA 6E67                    		PUSHM R6-R7
+000007BC 7100E0                  		ADD #0FFFFFFE0H, R0
+                                 ;     669 {
+                                 ;     670 	if (cm.hold_state != FEEDHOLD_PLAN)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",670
+000007BF FBE2rrrrrrrr            		MOV.L #_cm, R14
+000007C5 5AEE2002                		MOVU.B 0220H[R14], R14
+000007C9 612E                    		CMP #02H, R14
+000007CB 10                   S  		BEQ L179
+000007CC                         L178:	; bb7
+                                 ;     671         return (STAT_NOOP);                     // not planning a feedhold
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",671
+000007CC 3C0703                  		MOV.B #03H, 07H[R0]
+000007CF 38rrrr               W  		BRA L235
+000007D2                         L179:	; bb14
+                                 ;     672 
+                                 ;     673 	mpBuf_t *bp; 				                // working buffer pointer
+                                 ;     674 	if ((bp = mp_get_run_buffer()) == NULL)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",674
+000007D2 05rrrrrr             A  		BSR _mp_get_run_buffer
+000007D6 A081                    		MOV.L R1, 08H[R0]
+000007D8 6101                    		CMP #00H, R1
+000007DA 18                   S  		BNE L181
+000007DB                         L180:	; bb15
+                                 ;     675         return (STAT_NOOP);                     // Oops! nothing's running
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",675
+000007DB 3C0703                  		MOV.B #03H, 07H[R0]
+000007DE 38rrrr               W  		BRA L235
+000007E1                         L181:	; bb22
+                                 ;     676 
+                                 ;     677 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",677
+000007E1 3C0F01                  		MOV.B #01H, 0FH[R0]
+000007E4                         L182:	; bb22.split
+                                 ;     678 	float mr_available_length;                  // available length left in mr buffer for deceleration
+                                 ;     679 	float braking_velocity;                     // velocity left to shed to brake to zero
+                                 ;     680 	float braking_length;                       // distance required to brake to zero from braking_velocity
+                                 ;     681 
+                                 ;     682 	// examine and process mr buffer
+                                 ;     683 	mr_available_length = get_axis_vector_length(mr.target, mr.position);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",683
+000007E4 FB12rrrrrrrr            		MOV.L #_mr, R1
+000007EA 711238                  		ADD #38H, R1, R2
+000007ED 711120                  		ADD #20H, R1
+000007F0 05rrrrrr             A  		BSR _get_axis_vector_length
+000007F4 A101                    		MOV.L R1, 10H[R0]
+000007F6                         L183:	; bb22.split1
+                                 ;     684 
+                                 ;     685 /*	mr_available_length =
+                                 ;     686 		(sqrt(square(mr.endpoint[AXIS_X] - mr.position[AXIS_X]) +
+                                 ;     687 			  square(mr.endpoint[AXIS_Y] - mr.position[AXIS_Y]) +
+                                 ;     688 			  square(mr.endpoint[AXIS_Z] - mr.position[AXIS_Z]) +
+                                 ;     689 			  square(mr.endpoint[AXIS_A] - mr.position[AXIS_A]) +
+                                 ;     690 			  square(mr.endpoint[AXIS_B] - mr.position[AXIS_B]) +
+                                 ;     691 			  square(mr.endpoint[AXIS_C] - mr.position[AXIS_C])));
+                                 ;     692 
+                                 ;     693 */
+                                 ;     694 
+                                 ;     695 	// compute next_segment velocity
+                                 ;     696 //	braking_velocity = mr.segment_velocity;
+                                 ;     697 //	if (mr.section != SECTION_BODY) { braking_velocity += mr.forward_diff_1;}
+                                 ;     698 	braking_velocity = _compute_next_segment_velocity();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",698
+000007F6 39rrrr               W  		BSR __$_compute_next_segment_velocity
+000007F9 A109                    		MOV.L R1, 14H[R0]
+000007FB                         L184:	; bb22.split2
+                                 ;     699 	braking_length = mp_get_target_length(braking_velocity, 0, bp); // bp is OK to use here
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",699
+000007FB A883                    		MOV.L 08H[R0], R3
+000007FD A909                    		MOV.L 14H[R0], R1
+000007FF 6602                    		MOV.L #00000000H, R2
+00000801 05rrrrrr             A  		BSR _mp_get_target_length
+00000805 A181                    		MOV.L R1, 18H[R0]
+00000807                         L185:	; bb22.split3
+                                 ;     700 
+                                 ;     701 	// Hack to prevent Case 2 moves for perfect-fit decels. Happens in homing situations
+                                 ;     702 	// The real fix: The braking velocity cannot simply be the mr.segment_velocity as this
+                                 ;     703 	// is the velocity of the last segment, not the one that's going to be executed next.
+                                 ;     704 	// The braking_velocity needs to be the velocity of the next segment that has not yet
+                                 ;     705 	// been computed. In the mean time, this hack will work.
+                                 ;     706 	if ((braking_length > mr_available_length) && (fp_ZERO(bp->exit_velocity))) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",706
+00000807 A901                    		MOV.L 10H[R0], R1
+00000809 FC850106                		FCMP 18H[R0].L, R1
+0000080D 27rr                    		BN L187
+0000080F 2Err                 B  		BRA L189
+00000811                         L186:	; bb29
+                                 ;     707 		braking_length = mr_available_length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",707
+00000811 E5000406                		MOV.L 10H[R0], 18H[R0]
+00000815 2Err                 B  		BRA L191
+00000817                         L187:	; bb35
+00000817 A881                    		MOV.L 08H[R0], R1
+00000819 AC99                    		MOV.L 4CH[R1], R1
+0000081B 7BF1                    		BCLR #1FH, R1
+0000081D FD7211BD378635          		FCMP #358637BDH, R1
+00000824 26rr                    		BPZ L189
+00000826                         L188:	; bb42
+00000826 F80601                  		MOV.L #00000001H, [R0]
+00000829 08                   S  		BRA L190
+0000082A                         L189:	; bb43
+0000082A F80600                  		MOV.L #00000000H, [R0]
+0000082D                         L190:	; bb44
+0000082D EC01                    		MOV.L [R0], R1
+0000082F 6101                    		CMP #00H, R1
+00000831 21rr                    		BNE L186
+00000833                         L191:	; bb50
+                                 ;     708 	}
+                                 ;     709 
+                                 ;     710 	// Case 1: deceleration fits entirely into the length remaining in mr buffer
+                                 ;     711 	if (braking_length <= mr_available_length) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",711
+00000833 A901                    		MOV.L 10H[R0], R1
+00000835 FC850106                		FCMP 18H[R0].L, R1
+00000839 29rr                    		BLT L205
+0000083B                         L192:	; bb51
+                                 ;     712 		// set mr to a tail to perform the deceleration
+                                 ;     713 		mr.exit_velocity = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",713
+0000083B FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000841 F9E64500                		MOV.L #00000000H, 0114H[R14]
+00000845                         L193:	; bb51.split
+                                 ;     714 		mr.tail_length = braking_length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",714
+00000845 FBE2rrrrrrrr            		MOV.L #_mr, R14
+0000084B E50E0642                		MOV.L 18H[R0], 0108H[R14]
+0000084F                         L194:	; bb51.split4
+                                 ;     715 		mr.cruise_velocity = braking_velocity;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",715
+0000084F FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000855 E50E0544                		MOV.L 14H[R0], 0110H[R14]
+00000859                         L195:	; bb51.split5
+                                 ;     716 		mr.section = SECTION_TAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",716
+00000859 FB12rrrrrrrr            		MOV.L #_mr, R1
+0000085F 3C1302                  		MOV.B #02H, 03H[R1]
+00000862                         L196:	; bb51.split6
+                                 ;     717 		mr.section_state = SECTION_NEW;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",717
+00000862 FB12rrrrrrrr            		MOV.L #_mr, R1
+00000868 3C1401                  		MOV.B #01H, 04H[R1]
+0000086B                         L197:	; bb51.split7
+                                 ;     718 
+                                 ;     719 		// re-use bp+0 to be the hold point and to run the remaining block length
+                                 ;     720 		bp->length = mr_available_length - braking_length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",720
+0000086B A901                    		MOV.L 10H[R0], R1
+0000086D FC810106                		FSUB 18H[R0].L, R1
+00000871 A882                    		MOV.L 08H[R0], R2
+00000873 A329                    		MOV.L R1, 34H[R2]
+00000875                         L198:	; bb51.split8
+                                 ;     721 		bp->delta_vmax = mp_get_target_velocity(0, bp->length, bp);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",721
+00000875 A886                    		MOV.L 08H[R0], R6
+00000877 AB6A                    		MOV.L 34H[R6], R2
+00000879 6601                    		MOV.L #00000000H, R1
+0000087B EF63                    		MOV.L R6, R3
+0000087D 05rrrrrr             A  		BSR _mp_get_target_velocity
+00000881 A5E9                    		MOV.L R1, 5CH[R6]
+00000883                         L199:	; bb51.split9
+                                 ;     722 		bp->entry_vmax = 0;						// set bp+0 as hold point
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",722
+00000883 A881                    		MOV.L 08H[R0], R1
+00000885 3E9400                  		MOV.L #00000000H, 50H[R1]
+00000888                         L200:	; bb51.split10
+                                 ;     723 		bp->move_state = MOVE_NEW;				// tell _exec to re-use the bf buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",723
+00000888 A881                    		MOV.L 08H[R0], R1
+0000088A 3C9701                  		MOV.B #01H, 17H[R1]
+0000088D                         L201:	; bb51.split11
+                                 ;     724 
+                                 ;     725 		_reset_replannable_list();				// make it replan all the blocks
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",725
+0000088D 39rrrr               W  		BSR __$_reset_replannable_list
+00000890                         L202:	; bb51.split12
+                                 ;     726 		_plan_block_list(mp_get_last_buffer(), &mr_flag);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",726
+00000890 05rrrrrr             A  		BSR _mp_get_last_buffer
+00000894 71020F                  		ADD #0FH, R0, R2
+00000897 39rrrr               W  		BSR __$_plan_block_list
+0000089A                         L203:	; bb51.split13
+                                 ;     727 		cm.hold_state = FEEDHOLD_DECEL;			// set state to decelerate and exit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",727
+0000089A FBE2rrrrrrrr            		MOV.L #_cm, R14
+000008A0 FAE4200203              		MOV.B #03H, 0220H[R14]
+000008A5                         L204:	; bb51.split14
+                                 ;     728 		return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",728
+000008A5 3C0700                  		MOV.B #00H, 07H[R0]
+000008A8 38rrrr               W  		BRA L235
+000008AB                         L205:	; bb77
+                                 ;     729 	}
+                                 ;     730 
+                                 ;     731 	// Case 2: deceleration exceeds length remaining in mr buffer
+                                 ;     732 	// First, replan mr to minimum (but non-zero) exit velocity
+                                 ;     733 
+                                 ;     734 	mr.section = SECTION_TAIL;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",734
+000008AB FB12rrrrrrrr            		MOV.L #_mr, R1
+000008B1 3C1302                  		MOV.B #02H, 03H[R1]
+000008B4                         L206:	; bb77.split
+                                 ;     735 	mr.section_state = SECTION_NEW;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",735
+000008B4 FB12rrrrrrrr            		MOV.L #_mr, R1
+000008BA 3C1401                  		MOV.B #01H, 04H[R1]
+000008BD                         L207:	; bb77.split15
+                                 ;     736 	mr.tail_length = mr_available_length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",736
+000008BD FBE2rrrrrrrr            		MOV.L #_mr, R14
+000008C3 E50E0442                		MOV.L 10H[R0], 0108H[R14]
+000008C7                         L208:	; bb77.split16
+                                 ;     737 	mr.cruise_velocity = braking_velocity;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",737
+000008C7 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000008CD E50E0544                		MOV.L 14H[R0], 0110H[R14]
+000008D1                         L209:	; bb77.split17
+                                 ;     738 	mr.exit_velocity = braking_velocity - mp_get_target_velocity(0, mr_available_length, bp);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",738
+000008D1 A883                    		MOV.L 08H[R0], R3
+000008D3 A902                    		MOV.L 10H[R0], R2
+000008D5 A90E                    		MOV.L 14H[R0], R6
+000008D7 6601                    		MOV.L #00000000H, R1
+000008D9 05rrrrrr             A  		BSR _mp_get_target_velocity
+000008DD FC8316                  		FSUB R1, R6
+000008E0 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000008E6 E7E645                  		MOV.L R6, 0114H[R14]
+000008E9                         L210:	; bb77.split18
+                                 ;     739 
+                                 ;     740 	// Find the point where deceleration reaches zero. This could span multiple buffers.
+                                 ;     741 	braking_velocity = mr.exit_velocity;		// adjust braking velocity downward
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",741
+000008E9 FBE2rrrrrrrr            		MOV.L #_mr, R14
+000008EF E5E04505                		MOV.L 0114H[R14], 14H[R0]
+000008F3                         L211:	; bb77.split19
+                                 ;     742 	bp->move_state = MOVE_NEW;					// tell _exec to re-use buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",742
+000008F3 A881                    		MOV.L 08H[R0], R1
+000008F5 3C9701                  		MOV.B #01H, 17H[R1]
+000008F8                         L212:	; bb77.split20
+                                 ;     743 	for (uint8_t i=0; i<PLANNER_BUFFER_POOL_SIZE; i++) {// a safety to avoid wraparound
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",743
+000008F8 3C8E00                  		MOV.B #00H, 1EH[R0]
+000008FB 2Err                 B  		BRA L223
+000008FD                         L213:	; bb88
+                                 ;     744 		mp_copy_buffer(bp, bp->nx);				// copy bp+1 into bp+0 (and onward...)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",744
+000008FD A881                    		MOV.L 08H[R0], R1
+000008FF A81A                    		MOV.L 04H[R1], R2
+00000901 05rrrrrr             A  		BSR _mp_copy_buffer
+00000905                         L214:	; bb88.split
+                                 ;     745 		if (bp->move_type != MOVE_TYPE_ALINE) {	// skip any non-move buffers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",745
+00000905 A881                    		MOV.L 08H[R0], R1
+00000907 B51A                    		MOVU.B 15H[R1], R2
+00000909 6112                    		CMP #01H, R2
+0000090B 10                   S  		BEQ L216
+0000090C                         L215:	; bb94
+                                 ;     746 			bp = mp_get_next_buffer(bp);		// point to next buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",746
+0000090C E5100102                		MOV.L 04H[R1], 08H[R0]
+00000910 2Err                 B  		BRA L222
+00000912                         L216:	; bb106
+                                 ;     747 			continue;
+                                 ;     748 		}
+                                 ;     749 		bp->entry_vmax = braking_velocity;		// velocity we need to shed
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",749
+00000912 E5010514                		MOV.L 14H[R0], 50H[R1]
+00000916                         L217:	; bb106.split
+                                 ;     750 		braking_length = mp_get_target_length(braking_velocity, 0, bp);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",750
+00000916 A883                    		MOV.L 08H[R0], R3
+00000918 A909                    		MOV.L 14H[R0], R1
+0000091A 6602                    		MOV.L #00000000H, R2
+0000091C 05rrrrrr             A  		BSR _mp_get_target_length
+00000920 A181                    		MOV.L R1, 18H[R0]
+00000922                         L218:	; bb106.split21
+                                 ;     751 
+                                 ;     752 		if (braking_length > bp->length) {		// decel does not fit in bp buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",752
+00000922 A881                    		MOV.L 08H[R0], R1
+00000924 AB19                    		MOV.L 34H[R1], R1
+00000926 FC850106                		FCMP 18H[R0].L, R1
+0000092A 26rr                    		BPZ L224
+0000092C                         L219:	; bb114
+                                 ;     753 			bp->exit_vmax = braking_velocity - mp_get_target_velocity(0, bp->length, bp);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",753
+0000092C A886                    		MOV.L 08H[R0], R6
+0000092E AB6A                    		MOV.L 34H[R6], R2
+00000930 A90F                    		MOV.L 14H[R0], R7
+00000932 6601                    		MOV.L #00000000H, R1
+00000934 EF63                    		MOV.L R6, R3
+00000936 05rrrrrr             A  		BSR _mp_get_target_velocity
+0000093A FC8317                  		FSUB R1, R7
+0000093D A5E7                    		MOV.L R7, 58H[R6]
+0000093F                         L220:	; bb114.split
+                                 ;     754 			braking_velocity = bp->exit_vmax;	// braking velocity for next buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",754
+0000093F A881                    		MOV.L 08H[R0], R1
+00000941 E5101605                		MOV.L 58H[R1], 14H[R0]
+00000945                         L221:	; bb114.split22
+                                 ;     755 			bp = mp_get_next_buffer(bp);		// point to next buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",755
+00000945 A881                    		MOV.L 08H[R0], R1
+00000947 E5100102                		MOV.L 04H[R1], 08H[R0]
+0000094B                         L222:	; bb140
+0000094B B781                    		MOVU.B 1EH[R0], R1
+0000094D 6211                    		ADD #01H, R1
+0000094F 8781                    		MOV.B R1, 1EH[R0]
+00000951                         L223:	; bb143
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",743
+00000951 B781                    		MOVU.B 1EH[R0], R1
+00000953 755120                  		CMP #20H, R1
+00000956 29rr                    		BLT L213
+00000958                         L224:	; bb150
+                                 ;     756 			continue;
+                                 ;     757 		}
+                                 ;     758 		break;
+                                 ;     759 	}
+                                 ;     760 	// Deceleration now fits in the current bp buffer
+                                 ;     761 	// Plan the first buffer of the pair as the decel, the second as the accel
+                                 ;     762 	bp->length = braking_length;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",762
+00000958 A981                    		MOV.L 18H[R0], R1
+0000095A A882                    		MOV.L 08H[R0], R2
+0000095C A329                    		MOV.L R1, 34H[R2]
+0000095E                         L225:	; bb150.split
+                                 ;     763 	bp->exit_vmax = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",763
+0000095E A881                    		MOV.L 08H[R0], R1
+00000960 3E9600                  		MOV.L #00000000H, 58H[R1]
+00000963                         L226:	; bb150.split24
+                                 ;     764 
+                                 ;     765 	bp = mp_get_next_buffer(bp);				// point to the acceleration buffer
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",765
+00000963 A881                    		MOV.L 08H[R0], R1
+00000965 E5100102                		MOV.L 04H[R1], 08H[R0]
+00000969                         L227:	; bb150.split25
+                                 ;     766 	bp->entry_vmax = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",766
+00000969 A881                    		MOV.L 08H[R0], R1
+0000096B 3E9400                  		MOV.L #00000000H, 50H[R1]
+0000096E                         L228:	; bb150.split26
+                                 ;     767 	bp->length -= braking_length;				// the buffers were identical (and hence their lengths)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",767
+0000096E A881                    		MOV.L 08H[R0], R1
+00000970 AB1A                    		MOV.L 34H[R1], R2
+00000972 FC810206                		FSUB 18H[R0].L, R2
+00000976 A31A                    		MOV.L R2, 34H[R1]
+00000978                         L229:	; bb150.split27
+                                 ;     768 	bp->delta_vmax = mp_get_target_velocity(0, bp->length, bp);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",768
+00000978 A886                    		MOV.L 08H[R0], R6
+0000097A AB6A                    		MOV.L 34H[R6], R2
+0000097C 6601                    		MOV.L #00000000H, R1
+0000097E EF63                    		MOV.L R6, R3
+00000980 05rrrrrr             A  		BSR _mp_get_target_velocity
+00000984 A5E9                    		MOV.L R1, 5CH[R6]
+00000986                         L230:	; bb150.split28
+                                 ;     769 	bp->exit_vmax = bp->delta_vmax;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",769
+00000986 A881                    		MOV.L 08H[R0], R1
+00000988 E5111716                		MOV.L 5CH[R1], 58H[R1]
+0000098C                         L231:	; bb150.split29
+                                 ;     770 
+                                 ;     771 	_reset_replannable_list();					// make it replan all the blocks
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",771
+0000098C 39rrrr               W  		BSR __$_reset_replannable_list
+0000098F                         L232:	; bb150.split30
+                                 ;     772 	_plan_block_list(mp_get_last_buffer(), &mr_flag);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",772
+0000098F 05rrrrrr             A  		BSR _mp_get_last_buffer
+00000993 71020F                  		ADD #0FH, R0, R2
+00000996 39rrrr               W  		BSR __$_plan_block_list
+00000999                         L233:	; bb150.split31
+                                 ;     773 	cm.hold_state = FEEDHOLD_DECEL;				// set state to decelerate and exit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",773
+00000999 FBE2rrrrrrrr            		MOV.L #_cm, R14
+0000099F FAE4200203              		MOV.B #03H, 0220H[R14]
+000009A4                         L234:	; bb150.split32
+                                 ;     774 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",774
+000009A4 3C0700                  		MOV.B #00H, 07H[R0]
+000009A7                         L235:	; bb180
+000009A7 C500071F                		MOV.B 07H[R0], 1FH[R0]
+                                 ;     775 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",775
+000009AB B789                    		MOVU.B 1FH[R0], R1
+000009AD 3F670A                  		RTSD #28H, R6-R7
+000009B0                         _mp_end_hold:
+                                 		.STACK	_mp_end_hold=8
+                                 ;     776 
+                                 ;     777 /*
+                                 ;     778  * mp_end_hold() - end a feedhold
+                                 ;     779  */
+                                 ;     780 stat_t mp_end_hold()
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",780
+000009B0 6040                    		SUB #04H, R0
+                                 ;     781 {
+                                 ;     782 	if (cm.hold_state == FEEDHOLD_END_HOLD) {
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",782
+000009B2 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000009B8 5AEE2002                		MOVU.B 0220H[R14], R14
+000009BC 615E                    		CMP #05H, R14
+000009BE 21rr                    		BNE L243
+000009C0                         L237:	; bb1
+                                 ;     783 		cm.hold_state = FEEDHOLD_OFF;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",783
+000009C0 FBE2rrrrrrrr            		MOV.L #_cm, R14
+000009C6 FAE4200200              		MOV.B #00H, 0220H[R14]
+000009CB                         L238:	; bb1.split
+                                 ;     784 		if ((mp_get_run_buffer()) == NULL) {	// NULL means nothing's running
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",784
+000009CB 05rrrrrr             A  		BSR _mp_get_run_buffer
+000009CF 6101                    		CMP #00H, R1
+000009D1 21rr                    		BNE L241
+000009D3                         L239:	; bb3
+000009D3 6601                    		MOV.L #00000000H, R1
+                                 ;     785 			cm_set_motion_state(MOTION_STOP);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",785
+000009D5 05rrrrrr             A  		BSR _cm_set_motion_state
+000009D9                         L240:	; bb3.split
+                                 ;     786 			return (STAT_NOOP);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",786
+000009D9 3C0203                  		MOV.B #03H, 02H[R0]
+000009DC 2Err                 B  		BRA L244
+000009DE                         L241:	; bb8
+                                 ;     787 		}
+                                 ;     788 		cm.motion_state = MOTION_RUN;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",788
+000009DE FBE2rrrrrrrr            		MOV.L #_cm, R14
+000009E4 FAE41F0201              		MOV.B #01H, 021FH[R14]
+000009E9                         L242:	; bb8.split
+                                 ;     789 		st_request_exec_move();					// restart the steppers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",789
+000009E9 05rrrrrr             A  		BSR _st_request_exec_move
+000009ED                         L243:	; bb14
+                                 ;     790 	}
+                                 ;     791 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",791
+000009ED 3C0200                  		MOV.B #00H, 02H[R0]
+000009F0                         L244:	; bb16
+000009F0 C5000203                		MOV.B 02H[R0], 03H[R0]
+                                 ;     792 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",792
+000009F4 B089                    		MOVU.B 03H[R0], R1
+000009F6 6701                    		RTSD #04H
+000009F8                         _mp_plan_zmove_callback:
+                                 		.STACK	_mp_plan_zmove_callback=24
+                                 ;     793 
+                                 ;     794 stat_t mp_plan_zmove_callback(mpBuf_t *bf, float zmoving)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",794
+000009F8 7100EC                  		ADD #0FFFFFFECH, R0
+000009FB A101                    		MOV.L R1, 10H[R0]
+000009FD A08A                    		MOV.L R2, 0CH[R0]
+                                 ;     795 {
+                                 ;     796 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",796
+000009FF 3C0301                  		MOV.B #01H, 03H[R0]
+00000A02                         L246:	; entry.split
+                                 ;     797 	float value;
+                                 ;     798 	//if (configFlags[MODOMAQUINA] == MODO_PLASMA){
+                                 ;     799 		value = mr.gm.target[AXIS_Z] - bf->gm.target[AXIS_Z];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",799
+00000A02 FBE2rrrrrrrr            		MOV.L #_mr, R14
+00000A08 EDE154                  		MOV.L 0150H[R14], R1
+00000A0B A902                    		MOV.L 10H[R0], R2
+00000A0D FC812121                		FSUB 84H[R2].L, R1
+00000A11 A009                    		MOV.L R1, 04H[R0]
+00000A13                         L247:	; entry.split1
+                                 ;     800 		if(bf->unit[AXIS_Z] > 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",800
+00000A13 A901                    		MOV.L 10H[R0], R1
+00000A15 660E                    		MOV.L #00000000H, R14
+00000A17 FC851E09                		FCMP 24H[R1].L, R14
+00000A1B A809                    		MOV.L 04H[R0], R1
+00000A1D 26rr                    		BPZ L250
+00000A1F                         L248:	; bb14
+00000A1F 660E                    		MOV.L #00000000H, R14
+                                 ;     801 		{
+                                 ;     802 			if(value>0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",802
+00000A21 FC871E                  		FCMP R1, R14
+00000A24 26rr                    		BPZ L252
+00000A26                         L249:	; bb15
+                                 ;     803 			{
+                                 ;     804 					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",804
+00000A26 A901                    		MOV.L 10H[R0], R1
+00000A28 AA1A                    		MOV.L 24H[R1], R2
+00000A2A FDFFF2                  		BNOT #1FH, R2
+00000A2D A21A                    		MOV.L R2, 24H[R1]
+00000A2F 2Err                 B  		BRA L252
+00000A31                         L250:	; bb31
+                                 ;     805 			}
+                                 ;     806 		}
+                                 ;     807 		else
+                                 ;     808 		{
+                                 ;     809 			if(value<0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",809
+00000A31 FD721100000000          		FCMP #00000000H, R1
+00000A38 26rr                    		BPZ L252
+00000A3A                         L251:	; bb32
+                                 ;     810 			{
+                                 ;     811 					bf->unit[AXIS_Z] = bf->unit[AXIS_Z]*(-1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",811
+00000A3A A901                    		MOV.L 10H[R0], R1
+00000A3C AA1A                    		MOV.L 24H[R1], R2
+00000A3E FDFFF2                  		BNOT #1FH, R2
+00000A41 A21A                    		MOV.L R2, 24H[R1]
+00000A43                         L252:	; bb56
+                                 ;     812 			}
+                                 ;     813 		}
+                                 ;     814 		bf->length =fabs(value);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",814
+00000A43 A809                    		MOV.L 04H[R0], R1
+00000A45 7BF1                    		BCLR #1FH, R1
+00000A47 A902                    		MOV.L 10H[R0], R2
+00000A49 A329                    		MOV.L R1, 34H[R2]
+00000A4B                         L253:	; bb56.split
+                                 ;     815 
+                                 ;     816 		bf->replannable = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",816
+00000A4B A901                    		MOV.L 10H[R0], R1
+00000A4D 3C9801                  		MOV.B #01H, 18H[R1]
+00000A50                         L254:	; bb56.split2
+                                 ;     817 		_plan_block_list(bf, &mr_flag);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",817
+00000A50 A901                    		MOV.L 10H[R0], R1
+00000A52 710203                  		ADD #03H, R0, R2
+00000A55 39rrrr               W  		BSR __$_plan_block_list
+00000A58                         L255:	; bb56.split3
+                                 ;     818 	//}
+                                 ;     819 
+                                 ;     820 	return (STAT_OK);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",820
+00000A58 3C0B00                  		MOV.B #00H, 0BH[R0]
+00000A5B B289                    		MOVU.B 0BH[R0], R1
+00000A5D                         L256:	; bb56.split4
+                                 ;     821 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\cnc\plan_line.c",821
+00000A5D 5B11                    		MOVU.B R1, R1
+00000A5F 6705                    		RTSD #14H
+                                 ;     822 #ifdef VEL_CHANGE
+                                 ;     823 stat_t mp_plan_feedrateoverride_callback(mpBuf_t *bf)
+                                 ;     824 {
+                                 ;     825 
+                                 ;     826 	uint8_t mr_flag = true;                     // used to tell replan to account for mr buffer Vx
+                                 ;     827 
+                                 ;     828 //	if (bf == NULL) return (STAT_ERROR);
+                                 ;     829 //	mpBuf_t *bp = bf;
+                                 ;     830 //	do {
+                                 ;     831 //		switch(bp->gm.motion_mode)
+                                 ;     832 //		{
+                                 ;     833 //			case MOTION_MODE_STRAIGHT_FEED:
+                                 ;     834 //			case MOTION_MODE_CW_ARC:
+                                 ;     835 //			case MOTION_MODE_CCW_ARC:
+                                 ;     836 //				if (bp->unit[AXIS_Z] == 0)
+                                 ;     837 //				{
+                                 ;     838 //					bp->cruise_vmax = bp->gm.feed_rate*cm.gmx.feed_rate_override_factor;
+                                 ;     839 //					bp->exit_vmax = bp->cruise_vmax;
+                                 ;     840 //					bp->cruise_velocity = bp->cruise_vmax;
+                                 ;     841 //				}
+                                 ;     842 //				break;
+                                 ;     843 //			default:
+                                 ;     844 //		}
+                                 ;     845 //	} while (((bp = mp_get_next_buffer(bp)) != bf));
+                                 ;     846 //	mr.segment_velocity = mr.gm.feed_rate*cm.gmx.feed_rate_override_factor;
+                                 ;     847 //	if(mr.segment_velocity > X_FEEDRATE_MAX)
+                                 ;     848 //		mr.segment_velocity = X_FEEDRATE_MAX;
+                                 ;     849 //	if(mr.segment_velocity < 10)
+                                 ;     850 //		mr.segment_velocity = 10;
+                                 ;     851 	if (mr.exit_velocity == mr.cruise_velocity && mr.cruise_velocity == mr.entry_velocity)
+                                 ;     852 	{
+                                 ;     853 		configVarPl[PL_CONFIG_VELOC_CORTE] = configVarPl[PL_CONFIG_VELOC_CORTE]*cm.gmx.feed_rate_override_factor;
+                                 ;     854 		mr.exit_velocity = mr.exit_velocity*cm.gmx.feed_rate_override_factor;
+                                 ;     855 		mr.cruise_velocity = mr.cruise_velocity*cm.gmx.feed_rate_override_factor;
+                                 ;     856 		mr.entry_velocity = mr.entry_velocity*cm.gmx.feed_rate_override_factor;
+                                 ;     857 		_reset_replannable_list();				// make it replan all the blocks
+                                 ;     858 		_plan_block_list(bf, &mr_flag);
+                                 ;     859 	}
+                                 ;     860 	return (STAT_OK);
+                                 ;     861 }
+                                 ;     862 #endif
+                                 ;     863 
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     02338   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000002657(00000A61H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx4D06\$ccrx\plan_line.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\plan_line.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\src\cnc\plan_line.obj

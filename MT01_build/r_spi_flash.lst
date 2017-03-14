@@ -1,0 +1,1666 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:03:10 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:03:10
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_spi_flash.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_spi_flash.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;r_spi_flash.c
+                                 
+                                 		.glb	_g_transfer_complete
+                                 		.glb	_spiflash_setbaud
+                                 		.glb	_spiflash_result
+                                 		.glb	_R_SF_Init
+                                 		.glb	_R_BSP_RegisterProtectDisable
+                                 		.glb	_R_BSP_RegisterProtectEnable
+                                 		.glb	_R_BSP_HardwareLock
+                                 		.glb	_R_SF_Erase
+                                 		.glb	_R_SF_WriteData
+                                 		.glb	_R_SF_ReadData
+                                 		.glb	_R_SF_ReadStatus
+                                 		.glb	_R_SF_ReadID
+                                 		.glb	_R_SF_GetVersion
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         __$sf_write_enable:
+                                 		.STACK	__$sf_write_enable=8
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.    
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name	   : r_spi_flash.c
+                                 ;      21 * Description  : This module implements the protocol used by many SPI flashes. This code does not support some of the 
+                                 ;      22 *                more advanced commands that are specific to some SPI flash chips.
+                                 ;      23 ***********************************************************************************************************************/
+                                 ;      24 /***********************************************************************************************************************
+                                 ;      25 * History : DD.MM.YYYY Version Description           
+                                 ;      26 *         : 29.02.2012 1.00    First Release            
+                                 ;      27 *         : 20.04.2012 1.10    Added support for Numonyx M25P16 SPI flash.
+                                 ;      28 *         : 10.05.2012 1.20    Updated to be compliant with FIT Module Spec v0.7. Improved locking mechanics to be more
+                                 ;      29 *                              efficient.
+                                 ;      30 *         : 13.02.2013 1.30    Updated to be compliant with FIT Module Spec v1.02
+                                 ;      31 ***********************************************************************************************************************/
+                                 ;      32 
+                                 ;      33 /***********************************************************************************************************************
+                                 ;      34 Includes   <System Includes> , "Project Includes"
+                                 ;      35 ***********************************************************************************************************************/
+                                 ;      36 /* Fixed-size integer typedefs. */
+                                 ;      37 #include <stdint.h>
+                                 ;      38 /* bool support. */
+                                 ;      39 #include <stdbool.h>
+                                 ;      40 /* min() support. */
+                                 ;      41 #include <machine.h>
+                                 ;      42 /* Board support. */
+                                 ;      43 #include "platform.h"
+                                 ;      44 /* This code relies on the r_rspi_rx package. */
+                                 ;      45 #include "r_rspi_rx_if.h"
+                                 ;      46 /* Configuration for this package. */
+                                 ;      47 #include "r_spi_flash_config.h"
+                                 ;      48 
+                                 ;      49 #include "r_spi_flash_if.h"
+                                 ;      50 
+                                 ;      51 volatile bool g_transfer_complete = false;
+                                 ;      52 
+                                 ;      53 rspi_cmd_baud_t spiflash_setbaud;
+                                 ;      54 rspi_err_t spiflash_result;
+                                 ;      55 
+                                 ;      56 /***********************************************************************************************************************
+                                 ;      57 Private global variables and functions
+                                 ;      58 ***********************************************************************************************************************/
+                                 ;      59 static void    sf_open(uint8_t channel);
+                                 ;      60 static void    sf_close(uint8_t channel);
+                                 ;      61 static void    sf_write_enable(uint8_t channel);
+                                 ;      62 static void    sf_write_protect(uint8_t channel);
+                                 ;      63 static void    sf_write_unprotect(uint8_t channel);
+                                 ;      64 static bool    sf_lock_channel(uint8_t channel);
+                                 ;      65 static bool    sf_unlock_channel(uint8_t channel);
+                                 ;      66 static uint8_t sf_read_status (uint8_t channel);
+                                 ;      67 
+                                 ;      68 static bool RSPI1_SendReceive( uint8_t const *pSrc, uint8_t *pDest, uint16_t usBytes);
+                                 ;      69 static bool RSPI1_Read( uint8_t *pDest, uint16_t usBytes);
+                                 ;      70 static bool RSPI1_Write( const uint8_t *pSrc, uint16_t usBytes);
+                                 ;      71 static bool RSPI1_rx_buffer_full (void);
+                                 ;      72 
+                                 ;      73 /***********************************************************************************************************************
+                                 ;      74 * Function Name: sf_write_enable
+                                 ;      75 * Description  : Sets Write Enable Latch bit
+                                 ;      76 * Arguments    : channel -
+                                 ;      77 *                    Which SPI channel to use.
+                                 ;      78 * Return Value : none
+                                 ;      79 ***********************************************************************************************************************/
+                                 ;      80 static void sf_write_enable (uint8_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",80
+00000000 6040                    		SUB #04H, R0
+00000002 8089                    		MOV.B R1, 03H[R0]
+                                 ;      81 {
+                                 ;      82     /* Send write enable command */
+                                 ;      83     uint8_t val = SF_CMD_WRITE_ENABLE;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",83
+00000004 3C0206                  		MOV.B #06H, 02H[R0]
+00000007                         L11:	; entry.split
+                                 ;      84     
+                                 ;      85     /* Initialize peripheral for SPI */
+                                 ;      86     sf_open(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",86
+00000007 B089                    		MOVU.B 03H[R0], R1
+00000009 39rrrr               W  		BSR __$sf_open
+0000000C                         L12:	; entry.split1
+0000000C 6612                    		MOV.L #00000001H, R2
+0000000E 710102                  		ADD #02H, R0, R1
+                                 ;      87     
+                                 ;      88     RSPI1_Write(&val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",88
+00000011 39rrrr               W  		BSR __$RSPI1_Write
+00000014                         L13:	; entry.split2
+                                 ;      89     /* Close peripheral for SPI */
+                                 ;      90     sf_close(channel);  
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",90
+00000014 B089                    		MOVU.B 03H[R0], R1
+00000016 39rrrr               W  		BSR __$sf_close
+00000019 6701                    		RTSD #04H
+0000001B                         __$sf_write_protect:
+                                 		.STACK	__$sf_write_protect=8
+                                 ;      91 }
+                                 ;      92 
+                                 ;      93 
+                                 ;      94 /***********************************************************************************************************************
+                                 ;      95 * Function Name: sf_write_protect
+                                 ;      96 * Description  : Sets the Status Register Write Disable (SRWD) bit. Setting this bit locks the status register from 
+                                 ;      97 *                being rewritten if the Write Protect pin is high.  If the pin is low, then the status register can be 
+                                 ;      98 *                changed. You must set/clear the Block Protect Bits at this time too.
+                                 ;      99 * Arguments    : channel -
+                                 ;     100 *                    Which SPI channel to use.
+                                 ;     101 * Return Value : none
+                                 ;     102 ***********************************************************************************************************************/
+                                 ;     103 static void sf_write_protect (uint8_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",103
+0000001B 6040                    		SUB #04H, R0
+0000001D 8089                    		MOV.B R1, 03H[R0]
+                                 ;     104 {
+                                 ;     105     uint8_t val[2];
+                                 ;     106     
+                                 ;     107     /* Send write enable command */
+                                 ;     108     sf_write_enable(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",108
+0000001F B089                    		MOVU.B 03H[R0], R1
+00000021 39rrrr               W  		BSR __$sf_write_enable
+00000024                         L15:	; entry.split
+                                 ;     109     
+                                 ;     110     /* Initialize peripheral for SPI */
+                                 ;     111     sf_open(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",111
+00000024 B089                    		MOVU.B 03H[R0], R1
+00000026 39rrrr               W  		BSR __$sf_open
+00000029                         L16:	; entry.split1
+                                 ;     112     
+                                 ;     113     /* This section writes data.  The first character is the write command */
+                                 ;     114     val[0] = SF_CMD_WRITE_STATUS_REG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",114
+00000029 3C0101                  		MOV.B #01H, 01H[R0]
+0000002C                         L17:	; entry.split2
+                                 ;     115     val[1] = SF_WP_BIT_MASK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",115
+0000002C 3C0280                  		MOV.B #80H, 02H[R0]
+0000002F                         L18:	; entry.split3
+0000002F 6622                    		MOV.L #00000002H, R2
+00000031 710101                  		ADD #01H, R0, R1
+                                 ;     116     RSPI1_Write(val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",116
+00000034 39rrrr               W  		BSR __$RSPI1_Write
+00000037                         L19:	; entry.split4
+                                 ;     117 
+                                 ;     118     /* Close peripheral for SPI */
+                                 ;     119     sf_close(channel);  
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",119
+00000037 B089                    		MOVU.B 03H[R0], R1
+00000039 39rrrr               W  		BSR __$sf_close
+0000003C 6701                    		RTSD #04H
+0000003E                         __$sf_write_unprotect:
+                                 		.STACK	__$sf_write_unprotect=8
+                                 ;     120 }
+                                 ;     121 
+                                 ;     122 /***********************************************************************************************************************
+                                 ;     123 * Function Name: sf_write_unprotect
+                                 ;     124 * Description  : Clears the Status Register Write Disable (SRWD) bit, if the Write Protect pin is high. Clearing this 
+                                 ;     125 *                bit unlocks the status register for rewriting. The Write Protect pin must be high to clear the SRWD 
+                                 ;     126 *                bit. You can set/clear the Block Protect Bits at this time too.
+                                 ;     127 * Arguments    : channel -
+                                 ;     128 *                    Which SPI channel to use.
+                                 ;     129 * Return Value : none
+                                 ;     130 ***********************************************************************************************************************/
+                                 ;     131 static void sf_write_unprotect (uint8_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",131
+0000003E 6040                    		SUB #04H, R0
+00000040 8089                    		MOV.B R1, 03H[R0]
+                                 ;     132 {
+                                 ;     133     uint8_t val[2];
+                                 ;     134     
+                                 ;     135     /* Send write enable command */
+                                 ;     136     sf_write_enable(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",136
+00000042 B089                    		MOVU.B 03H[R0], R1
+00000044 39rrrr               W  		BSR __$sf_write_enable
+00000047                         L21:	; entry.split
+                                 ;     137     
+                                 ;     138     /* Initialize peripheral for SPI */
+                                 ;     139     sf_open(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",139
+00000047 B089                    		MOVU.B 03H[R0], R1
+00000049 39rrrr               W  		BSR __$sf_open
+0000004C                         L22:	; entry.split1
+                                 ;     140     
+                                 ;     141     /* This section writes data.  The first character is the write command */
+                                 ;     142     val[0] = SF_CMD_WRITE_STATUS_REG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",142
+0000004C 3C0101                  		MOV.B #01H, 01H[R0]
+0000004F                         L23:	; entry.split2
+                                 ;     143     val[1] = 0x0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",143
+0000004F 3C0200                  		MOV.B #00H, 02H[R0]
+00000052                         L24:	; entry.split3
+00000052 6622                    		MOV.L #00000002H, R2
+00000054 710101                  		ADD #01H, R0, R1
+                                 ;     144     RSPI1_Write(val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",144
+00000057 39rrrr               W  		BSR __$RSPI1_Write
+0000005A                         L25:	; entry.split4
+                                 ;     145 
+                                 ;     146     /* Close peripheral for SPI */
+                                 ;     147     sf_close(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",147
+0000005A B089                    		MOVU.B 03H[R0], R1
+0000005C 39rrrr               W  		BSR __$sf_close
+0000005F 6701                    		RTSD #04H
+00000061                         _R_SF_Init:
+                                 		.STACK	_R_SF_Init=8
+                                 ;     148   
+                                 ;     149 }
+                                 ;     150 
+                                 ;     151 void R_SF_Init(uint8_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",151
+00000061 6040                    		SUB #04H, R0
+00000063 8089                    		MOV.B R1, 03H[R0]
+00000065 75413C                  		MOV.L #0000003CH, R1
+                                 ;     152 {
+                                 ;     153 	bool lock;
+                                 ;     154     /* Initialize peripherals used for talking to SPI flash */
+                                 ;     155 	//R_RSPI_Open(channel, &spiflash_config, spiflash_callback, &spiflash_handle);
+                                 ;     156 	/* Get the looking */
+                                 ;     157     if(R_BSP_HardwareLock((mcu_lock_t)(BSP_LOCK_RSPI1)))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",157
+00000068 05rrrrrr             A  		BSR _R_BSP_HardwareLock
+0000006C 6101                    		CMP #00H, R1
+0000006E 20rr                    		BEQ L41
+00000070                         L27:	; bb3
+00000070 6611                    		MOV.L #00000001H, R1
+                                 ;     158     {
+                                 ;     159     	sf_close(1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",159
+00000072 39rrrr               W  		BSR __$sf_close
+00000075                         L28:	; bb3.split
+00000075 6611                    		MOV.L #00000001H, R1
+                                 ;     160 		R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",160
+00000077 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+0000007B                         L29:	; bb3.split1
+0000007B FBEE140008              		MOV.L #00080014H, R14
+                                 ;     161 		MSTP(RSPI1) = 0; /* Init peripheral */
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",161
+00000080 ECEF                    		MOV.L [R14], R15
+00000082 7B0F                    		BCLR #10H, R15
+00000084 E3EF                    		MOV.L R15, [R14]
+00000086                         L30:	; bb3.split2
+00000086 6611                    		MOV.L #00000001H, R1
+                                 ;     162 		R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",162
+00000088 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+0000008C                         L31:	; bb3.split3
+0000008C FBEE2A7308              		MOV.L #0008732AH, R14
+                                 ;     163         IPR(RSPI1, SPRI1) = 3;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",163
+00000091 58EF                    		MOVU.B [R14], R15
+00000093 653F                    		OR #03H, R15
+00000095 762FF300                		AND #0F3H, R15
+00000099 C3EF                    		MOV.B R15, [R14]
+0000009B                         L32:	; bb3.split4
+0000009B FBEE057208              		MOV.L #00087205H, R14
+                                 ;     164         IEN(RSPI1, SPRI1) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",164
+000000A0 F0EA                    		BCLR #02H, [R14].B
+000000A2                         L33:	; bb3.split5
+000000A2 FBEE057208              		MOV.L #00087205H, R14
+                                 ;     165         IEN(RSPI1, SPTI1) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",165
+000000A7 F0EB                    		BCLR #03H, [R14].B
+000000A9                         L34:	; bb3.split6
+000000A9 FBEE2A7008              		MOV.L #0008702AH, R14
+                                 ;     166         IR(RSPI1, SPRI1) = 0 ;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",166
+000000AE F0E8                    		BCLR #00H, [R14].B
+000000B0                         L35:	; bb3.split7
+                                 ;     167 
+                                 ;     168         RSPI1.SPCR.BYTE = 0x00; /*Clock synchronous operation; Master mode*/
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",168
+000000B0 FBEEA08308              		MOV.L #000883A0H, R14
+000000B5 F8E400                  		MOV.B #00H, [R14]
+000000B8                         L36:	; bb3.split8
+                                 ;     169         /* Set RSPI bit rate (SPBR) */
+                                 ;     170         /* -Set baud rate to 24Mbps (48MHz / (2 * (0 + 1) * 2^0) ) = 24Mbps */
+                                 ;     171         RSPI1.SPBR = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",171
+000000B8 FB1EA08308              		MOV.L #000883A0H, R1
+000000BD 3C1A00                  		MOV.B #00H, 0AH[R1]
+000000C0                         L37:	; bb3.split9
+                                 ;     172 
+                                 ;     173         /* Set RSPI data control register (SPDCR) */
+                                 ;     174         /* -SPDR is accessed in longwords (32 bits)
+                                 ;     175            -Transfer 1 frame at a time */
+                                 ;     176         RSPI1.SPDCR.BYTE = 0x20;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",176
+000000C0 FB1EA08308              		MOV.L #000883A0H, R1
+000000C5 3C1B20                  		MOV.B #20H, 0BH[R1]
+000000C8                         L38:	; bb3.split10
+                                 ;     177 
+                                 ;     178         /* Set RSPI control register 2 (SPCR2) */
+                                 ;     179         /* -Disable Idle interrupt */
+                                 ;     180         RSPI1.SPCR2.BYTE = 0x00;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",180
+000000C8 FB1EA08308              		MOV.L #000883A0H, R1
+000000CD 3C1F00                  		MOV.B #00H, 0FH[R1]
+000000D0                         L39:	; bb3.split11
+                                 ;     181 
+                                 ;     182         /* Set RSPI command register 0 (SPCMD0) */
+                                 ;     183         /* -MSB first
+                                 ;     184            -8 bits data length
+                                 ;     185            -SSL0 (handled manually)
+                                 ;     186            -Use bit rate % 1
+                                 ;     187             */
+                                 ;     188         RSPI1.SPCMD0.WORD = 0x0400;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",188
+000000D0 FBEEA08308              		MOV.L #000883A0H, R14
+000000D5 F9E9080004              		MOV.W #0400H, 10H[R14]
+000000DA                         L40:	; bb3.split12
+                                 ;     189 
+                                 ;     190         /* Set RSPI control register (SPCR) */
+                                 ;     191         /* -Clock synchronous operation (3-wire)
+                                 ;     192            -Full duplex operation
+                                 ;     193            -Master mode
+                                 ;     194            -SPTI and SPRI enabled in RSPI (have to check ICU also)
+                                 ;     195            -Enable RSPI function */
+                                 ;     196         RSPI1.SPCR.BYTE = 0xE9;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",196
+000000DA FBEEA08308              		MOV.L #000883A0H, R14
+000000DF F8E4E9                  		MOV.B #0E9H, [R14]
+000000E2 6701                    		RTSD #04H
+000000E4                         L41:	; return
+                                 ;     197 
+                                 ;     198 
+                                 ;     199 //        DMAC0.DMCNT.BIT.DTE = 0;
+                                 ;     200 //        ICU.DMRSR0 = 43; /*RSPI1 RX*/
+                                 ;     201 //        ICU.DMRSR1 = 44; /*RSPI1 TX*/
+                                 ;     202 //
+                                 ;     203 //        DMAC0.DMTMD.WORD = 0x0001;
+                                 ;     204 //        DMAC0.DMAMD.WORD =0x4040;
+                                 ;     205 //
+                                 ;     206 //        DMAC1.DMTMD.WORD = 0x0001;
+                                 ;     207 //        DMAC1.DMAMD.WORD =0x8040;
+                                 ;     208     }
+                                 ;     209 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",209
+000000E4 6701                    		RTSD #04H
+000000E6                         _R_SF_Erase:
+                                 		.STACK	_R_SF_Erase=24
+                                 ;     210 
+                                 ;     211 /***********************************************************************************************************************
+                                 ;     212 * Function Name: R_SF_Erase
+                                 ;     213 * Description  : Performs either a partial or whole chip erase. Erase size options are defined in sf_erase_sizes type
+                                 ;     214 *                in the header file for this particular SPI flash.
+                                 ;     215 * Arguments    : channel -
+                                 ;     216 *                    Which SPI channel to use.
+                                 ;     217 *                address - 
+                                 ;     218 *                    Address of sector to erase
+                                 ;     219 *                size -
+                                 ;     220 *                    Erase part of memory or whole memory. Options are in sf_erase_sizes type.
+                                 ;     221 * Return Value : true -
+                                 ;     222 *                    Erase was started.
+                                 ;     223 *                false -
+                                 ;     224 *                    Could not start erase.
+                                 ;     225 ***********************************************************************************************************************/
+                                 ;     226 bool R_SF_Erase (uint8_t channel, const uint32_t address, const sf_erase_sizes_t size)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",226
+000000E6 7100EC                  		ADD #0FFFFFFECH, R0
+000000E9 8489                    		MOV.B R1, 13H[R0]
+000000EB A08A                    		MOV.L R2, 0CH[R0]
+000000ED A083                    		MOV.L R3, 08H[R0]
+                                 ;     227 {
+                                 ;     228     bool    ret = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",228
+000000EF 3C0201                  		MOV.B #01H, 02H[R0]
+000000F2                         L43:	; entry.split
+                                 ;     229     uint8_t val[4];
+                                 ;     230 
+                                 ;     231     /* Attempt to obtain lock for SPI channel. */
+                                 ;     232     if (false == sf_lock_channel(channel))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",232
+000000F2 B489                    		MOVU.B 13H[R0], R1
+000000F4 39rrrr               W  		BSR __$sf_lock_channel
+000000F7 6101                    		CMP #00H, R1
+000000F9 18                   S  		BNE L45
+000000FA                         L44:	; bb6
+                                 ;     233     {
+                                 ;     234         /* This channel is already being used. Try again later. */
+                                 ;     235         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",235
+000000FA 3C0100                  		MOV.B #00H, 01H[R0]
+000000FD 38rrrr               W  		BRA L69
+00000100                         L45:	; bb13
+                                 ;     236     }
+                                 ;     237 
+                                 ;     238     /* Allow memory to be modified */
+                                 ;     239     sf_write_unprotect(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",239
+00000100 B489                    		MOVU.B 13H[R0], R1
+00000102 39rrrr               W  		BSR __$sf_write_unprotect
+00000105                         L46:	; bb16
+                                 ;     240 
+                                 ;     241     /* Wait for WIP bit to clear */
+                                 ;     242     while ((sf_read_status(channel) & SF_WIP_BIT_MASK) == 1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",242
+00000105 B489                    		MOVU.B 13H[R0], R1
+00000107 39rrrr               W  		BSR __$sf_read_status
+0000010A 6411                    		AND #01H, R1
+0000010C 6111                    		CMP #01H, R1
+0000010E 20rr                    		BEQ L46
+00000110                         L47:	; bb24
+                                 ;     243 
+                                 ;     244     /* Send write enable command */
+                                 ;     245     sf_write_enable(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",245
+00000110 B489                    		MOVU.B 13H[R0], R1
+00000112 39rrrr               W  		BSR __$sf_write_enable
+00000115                         L48:	; bb24.split
+                                 ;     246 
+                                 ;     247     /* Initialize peripheral for SPI */
+                                 ;     248     sf_open(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",248
+00000115 B489                    		MOVU.B 13H[R0], R1
+00000117 39rrrr               W  		BSR __$sf_open
+0000011A                         L49:	; bb24.split1
+                                 ;     249 
+                                 ;     250     /* Erase command */
+                                 ;     251     if (size == SF_ERASE_SECTOR)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",251
+0000011A A881                    		MOV.L 08H[R0], R1
+0000011C 6101                    		CMP #00H, R1
+0000011E 21rr                    		BNE L55
+00000120                         L50:	; bb28
+                                 ;     252     {
+                                 ;     253         /* Assign sector erase command. */
+                                 ;     254         val[0] = SF_CMD_ERASE_SECTOR;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",254
+00000120 3C0320                  		MOV.B #20H, 03H[R0]
+00000123                         L51:	; bb28.split
+                                 ;     255 
+                                 ;     256         /* Sector erase is one byte command and 24bit address */
+                                 ;     257         val[1] = (uint8_t)(address >> 16);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",257
+00000123 A889                    		MOV.L 0CH[R0], R1
+00000125 6901                    		SHLR #10H, R1
+00000127 8101                    		MOV.B R1, 04H[R0]
+00000129                         L52:	; bb28.split2
+                                 ;     258         val[2] = (uint8_t)(address >>  8);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",258
+00000129 A889                    		MOV.L 0CH[R0], R1
+0000012B 6881                    		SHLR #08H, R1
+0000012D 8109                    		MOV.B R1, 05H[R0]
+0000012F                         L53:	; bb28.split3
+                                 ;     259         val[3] = (uint8_t)(address >>  0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",259
+0000012F A889                    		MOV.L 0CH[R0], R1
+00000131 8181                    		MOV.B R1, 06H[R0]
+00000133                         L54:	; bb28.split4
+00000133 6642                    		MOV.L #00000004H, R2
+00000135 710103                  		ADD #03H, R0, R1
+                                 ;     260 
+                                 ;     261         RSPI1_Write(val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",261
+00000138 39rrrr               W  		BSR __$RSPI1_Write
+0000013B 2Err                 B  		BRA L65
+0000013D                         L55:	; bb49
+                                 ;     262     }
+                                 ;     263     else if(size == SF_ERASE_BULK)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",263
+0000013D A881                    		MOV.L 08H[R0], R1
+0000013F 6111                    		CMP #01H, R1
+00000141 21rr                    		BNE L58
+00000143                         L56:	; bb50
+                                 ;     264     {
+                                 ;     265         /* Assign bulk erase command. */
+                                 ;     266         val[0] = SF_CMD_ERASE_BULK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",266
+00000143 3C03C7                  		MOV.B #0C7H, 03H[R0]
+00000146                         L57:	; bb50.split
+00000146 6612                    		MOV.L #00000001H, R2
+00000148 710103                  		ADD #03H, R0, R1
+                                 ;     267 
+                                 ;     268         /* bulk erase is one byte command */
+                                 ;     269         RSPI1_Write(val,1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",269
+0000014B 39rrrr               W  		BSR __$RSPI1_Write
+0000014E 2Err                 B  		BRA L65
+00000150                         L58:	; bb56
+                                 ;     270     }
+                                 ;     271     else if (size == SF_ERASE_BLOCK)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",271
+00000150 A881                    		MOV.L 08H[R0], R1
+00000152 6121                    		CMP #02H, R1
+00000154 21rr                    		BNE L64
+00000156                         L59:	; bb57
+                                 ;     272     {
+                                 ;     273         /* Assign sector erase command. */
+                                 ;     274         val[0] = SF_CMD_ERASE_BLOCK;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",274
+00000156 3C03D8                  		MOV.B #0D8H, 03H[R0]
+00000159                         L60:	; bb57.split
+                                 ;     275 
+                                 ;     276         /* Sector erase is one byte command and 24bit address */
+                                 ;     277         val[1] = (uint8_t)(address >> 16);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",277
+00000159 A889                    		MOV.L 0CH[R0], R1
+0000015B 6901                    		SHLR #10H, R1
+0000015D 8101                    		MOV.B R1, 04H[R0]
+0000015F                         L61:	; bb57.split5
+                                 ;     278         val[2] = (uint8_t)(address >>  8);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",278
+0000015F A889                    		MOV.L 0CH[R0], R1
+00000161 6881                    		SHLR #08H, R1
+00000163 8109                    		MOV.B R1, 05H[R0]
+00000165                         L62:	; bb57.split6
+                                 ;     279         val[3] = (uint8_t)(address >>  0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",279
+00000165 A889                    		MOV.L 0CH[R0], R1
+00000167 8181                    		MOV.B R1, 06H[R0]
+00000169                         L63:	; bb57.split7
+00000169 6642                    		MOV.L #00000004H, R2
+0000016B 710103                  		ADD #03H, R0, R1
+                                 ;     280 
+                                 ;     281         RSPI1_Write(val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",281
+0000016E 39rrrr               W  		BSR __$RSPI1_Write
+00000171 08                   S  		BRA L65
+00000172                         L64:	; bb77
+                                 ;     282     }
+                                 ;     283     else
+                                 ;     284     {
+                                 ;     285         /* Bad command. */
+                                 ;     286         ret = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",286
+00000172 3C0200                  		MOV.B #00H, 02H[R0]
+00000175                         L65:	; bb92
+                                 ;     287     }
+                                 ;     288 
+                                 ;     289     /* Close peripheral for SPI */
+                                 ;     290     sf_close(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",290
+00000175 B489                    		MOVU.B 13H[R0], R1
+00000177 39rrrr               W  		BSR __$sf_close
+0000017A                         L66:	; bb92.split
+                                 ;     291 
+                                 ;     292     /* Protect memory from modification */
+                                 ;     293     sf_write_protect(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",293
+0000017A B489                    		MOVU.B 13H[R0], R1
+0000017C 39rrrr               W  		BSR __$sf_write_protect
+0000017F                         L67:	; bb92.split8
+                                 ;     294 
+                                 ;     295     /* Release lock on channel. */
+                                 ;     296     sf_unlock_channel(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",296
+0000017F B489                    		MOVU.B 13H[R0], R1
+00000181 39rrrr               W  		BSR __$sf_unlock_channel
+00000184                         L68:	; bb92.split9
+                                 ;     297 
+                                 ;     298     return ret;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",298
+00000184 C5000201                		MOV.B 02H[R0], 01H[R0]
+00000188                         L69:	; bb99
+00000188 C5000107                		MOV.B 01H[R0], 07H[R0]
+                                 ;     299 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",299
+0000018C B189                    		MOVU.B 07H[R0], R1
+0000018E 6705                    		RTSD #14H
+00000190                         _R_SF_WriteData:
+                                 		.STACK	_R_SF_WriteData=40
+                                 ;     300 
+                                 ;     301 /***********************************************************************************************************************
+                                 ;     302 * Function Name: R_SF_WriteData
+                                 ;     303 * Description  : Writes data to the external flash.
+                                 ;     304 * Arguments    : channel -
+                                 ;     305 *                    Which SPI channel to use.
+                                 ;     306 *                address -
+                                 ;     307 *                    Target address to write to.
+                                 ;     308 *                data - 
+                                 ;     309 *                    Location to retrieve data to write.
+                                 ;     310 *                size - 
+                                 ;     311 *                    Amount of data to write.
+                                 ;     312 * Return Value : true -
+                                 ;     313 *                    Data sent successfully.
+                                 ;     314 *                false -
+                                 ;     315 *                    Bad input parameters.
+                                 ;     316 ***********************************************************************************************************************/
+                                 ;     317 bool R_SF_WriteData (uint8_t channel, uint32_t address, uint8_t * data, uint32_t size)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",317
+00000190 7100DC                  		ADD #0FFFFFFDCH, R0
+00000193 C70123                  		MOV.B R1, 23H[R0]
+00000196 A18A                    		MOV.L R2, 1CH[R0]
+00000198 A183                    		MOV.L R3, 18H[R0]
+0000019A A10C                    		MOV.L R4, 14H[R0]
+                                 ;     318 {
+                                 ;     319     uint8_t  val[4];
+                                 ;     320 #if (SF_MEM_MAX_PROGRAM_BYTES > 1)               
+                                 ;     321     uint32_t next_page_addr;
+                                 ;     322 #endif    
+                                 ;     323     uint32_t bytes_to_write = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",323
+0000019C 3E0300                  		MOV.L #00000000H, 0CH[R0]
+0000019F                         L71:	; entry.split
+                                 ;     324 
+                                 ;     325     /* Attempt to obtain lock for SPI channel. */
+                                 ;     326     if (false == sf_lock_channel(channel))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",326
+0000019F 590123                  		MOVU.B 23H[R0], R1
+000001A2 39rrrr               W  		BSR __$sf_lock_channel
+000001A5 6101                    		CMP #00H, R1
+000001A7 18                   S  		BNE L73
+000001A8                         L72:	; bb8
+                                 ;     327     {
+                                 ;     328         /* This channel is already being used. Try again later. */
+                                 ;     329         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",329
+000001A8 3C0300                  		MOV.B #00H, 03H[R0]
+000001AB 38rrrr               W  		BRA L97
+000001AE                         L73:	; bb15
+                                 ;     330     }
+                                 ;     331         
+                                 ;     332     /* We only need to worry about being on a program boundary for the first write. If there are other writes
+                                 ;     333        needed after that then it will always be on a page boundary. */
+                                 ;     334        
+                                 ;     335     /* How many bytes to write this time? This will be either max program size or how many bytes are left. */
+                                 ;     336     bytes_to_write = (uint32_t)min(SF_MEM_MAX_PROGRAM_BYTES, size);   
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",336
+000001AE A909                    		MOV.L 14H[R0], R1
+000001B0 FD78510001              		MIN #0100H, R1
+000001B5 A089                    		MOV.L R1, 0CH[R0]
+000001B7                         L74:	; bb15.split
+                                 ;     337     
+                                 ;     338 #if (SF_MEM_MAX_PROGRAM_BYTES > 1)           
+                                 ;     339     /* Get address of start of next page. This is done by moving to next page and then masking off bottom bits. 
+                                 ;     340        Example: 
+                                 ;     341        SF_MEM_MAX_PROGRAM_BYTES = 0x100
+                                 ;     342        address = 0x1234
+                                 ;     343        next_page_addr = (0x1234 + 0x100) & (~(0x100-1))
+                                 ;     344        next_page_addr = (0x1334) & (~(0xFF))
+                                 ;     345        next_page_addr = (0x1334) & (0xFFFFFF00)
+                                 ;     346        next_page_addr = 0x00001300
+                                 ;     347       */
+                                 ;     348     next_page_addr = (address + SF_MEM_MAX_PROGRAM_BYTES) & (~((uint32_t)SF_MEM_MAX_PROGRAM_BYTES-1));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",348
+000001B7 A989                    		MOV.L 1CH[R0], R1
+000001B9 72110001                		ADD #0100H, R1
+000001BD 762100FF                		AND #0FFFFFF00H, R1
+000001C1 A081                    		MOV.L R1, 08H[R0]
+000001C3                         L75:	; bb15.split1
+                                 ;     349     
+                                 ;     350     /* If we are programming over a page boundary then we will need to split this up. */
+                                 ;     351     if ((address + bytes_to_write) > next_page_addr)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",351
+000001C3 A989                    		MOV.L 1CH[R0], R1
+000001C5 06890103                		ADD 0CH[R0].L, R1
+000001C9 06850102                		CMP 08H[R0].L, R1
+000001CD 25rr                    		BLEU L77
+000001CF                         L76:	; bb22
+                                 ;     352     {
+                                 ;     353         /* We are cannot write over page boundary so only write up to boundary. */
+                                 ;     354         bytes_to_write = next_page_addr - address;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",354
+000001CF A881                    		MOV.L 08H[R0], R1
+000001D1 06810107                		SUB 1CH[R0].L, R1
+000001D5 A089                    		MOV.L R1, 0CH[R0]
+000001D7                         L77:	; bb33
+                                 ;     355     }
+                                 ;     356 #endif
+                                 ;     357     
+                                 ;     358     /* Allow memory to be modified */
+                                 ;     359     sf_write_unprotect(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",359
+000001D7 590123                  		MOVU.B 23H[R0], R1
+000001DA 39rrrr               W  		BSR __$sf_write_unprotect
+000001DD 2Err                 B  		BRA L93
+000001DF                         L78:	; bb37
+                                 ;     360 
+                                 ;     361     while (size > 0)
+                                 ;     362     {
+                                 ;     363         /* Wait for WIP bit to clear */
+                                 ;     364         while((sf_read_status(channel) & SF_WIP_BIT_MASK) == 1);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",364
+000001DF 590123                  		MOVU.B 23H[R0], R1
+000001E2 39rrrr               W  		BSR __$sf_read_status
+000001E5 6411                    		AND #01H, R1
+000001E7 6111                    		CMP #01H, R1
+000001E9 20rr                    		BEQ L78
+000001EB                         L79:	; bb45
+                                 ;     365         
+                                 ;     366         /* Send write enable command */
+                                 ;     367         sf_write_enable(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",367
+000001EB 590123                  		MOVU.B 23H[R0], R1
+000001EE 39rrrr               W  		BSR __$sf_write_enable
+000001F1                         L80:	; bb45.split
+                                 ;     368         
+                                 ;     369         /* Initialize peripheral for SPI */
+                                 ;     370         sf_open(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",370
+000001F1 590123                  		MOVU.B 23H[R0], R1
+000001F4 39rrrr               W  		BSR __$sf_open
+000001F7                         L81:	; bb45.split2
+                                 ;     371         
+                                 ;     372         /* This section writes data.  The first character is the write command */
+                                 ;     373         val[0] = SF_CMD_PAGE_PROGRAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",373
+000001F7 3C0402                  		MOV.B #02H, 04H[R0]
+000001FA                         L82:	; bb45.split3
+                                 ;     374         val[1] = (uint8_t)(address >> 16);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",374
+000001FA A989                    		MOV.L 1CH[R0], R1
+000001FC 6901                    		SHLR #10H, R1
+000001FE 8109                    		MOV.B R1, 05H[R0]
+00000200                         L83:	; bb45.split4
+                                 ;     375         val[2] = (uint8_t)(address >>  8);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",375
+00000200 A989                    		MOV.L 1CH[R0], R1
+00000202 6881                    		SHLR #08H, R1
+00000204 8181                    		MOV.B R1, 06H[R0]
+00000206                         L84:	; bb45.split5
+                                 ;     376         val[3] = (uint8_t)(address >>  0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",376
+00000206 A989                    		MOV.L 1CH[R0], R1
+00000208 8189                    		MOV.B R1, 07H[R0]
+0000020A                         L85:	; bb45.split6
+0000020A 6642                    		MOV.L #00000004H, R2
+0000020C 710104                  		ADD #04H, R0, R1
+                                 ;     377         RSPI1_Write(&val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",377
+0000020F 39rrrr               W  		BSR __$RSPI1_Write
+00000212                         L86:	; bb45.split7
+                                 ;     378 
+                                 ;     379         /* Write data buffer to the flash */
+                                 ;     380         RSPI1_Write((uint8_t *)data,bytes_to_write);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",380
+00000212 B982                    		MOVU.W 0CH[R0], R2
+00000214 A981                    		MOV.L 18H[R0], R1
+00000216 39rrrr               W  		BSR __$RSPI1_Write
+00000219                         L87:	; bb45.split8
+                                 ;     381 
+                                 ;     382         /* Close peripheral for SPI */
+                                 ;     383         sf_close(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",383
+00000219 590123                  		MOVU.B 23H[R0], R1
+0000021C 39rrrr               W  		BSR __$sf_close
+0000021F                         L88:	; bb45.split9
+                                 ;     384 
+                                 ;     385         /* Decrement bytes left to write. */
+                                 ;     386         size -= bytes_to_write;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",386
+0000021F A909                    		MOV.L 14H[R0], R1
+00000221 06810103                		SUB 0CH[R0].L, R1
+00000225 A109                    		MOV.L R1, 14H[R0]
+00000227                         L89:	; bb45.split10
+                                 ;     387         /* Increment data pointer. */
+                                 ;     388         data += bytes_to_write;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",388
+00000227 A981                    		MOV.L 18H[R0], R1
+00000229 06890103                		ADD 0CH[R0].L, R1
+0000022D A181                    		MOV.L R1, 18H[R0]
+0000022F                         L90:	; bb45.split11
+                                 ;     389         /* Increment write address. */
+                                 ;     390         address += bytes_to_write;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",390
+0000022F A989                    		MOV.L 1CH[R0], R1
+00000231 06890103                		ADD 0CH[R0].L, R1
+00000235 A189                    		MOV.L R1, 1CH[R0]
+00000237                         L91:	; bb45.split12
+                                 ;     391         
+                                 ;     392         /* Update bytes_to_write for next loop iteration (if needed). */
+                                 ;     393         if (size > 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",393
+00000237 A909                    		MOV.L 14H[R0], R1
+00000239 6101                    		CMP #00H, R1
+0000023B 10                   S  		BEQ L93
+0000023C                         L92:	; bb82
+                                 ;     394         {
+                                 ;     395             /* How many bytes to write this time? This will be either max program size or how many bytes are left. */
+                                 ;     396             bytes_to_write = (uint32_t)min(SF_MEM_MAX_PROGRAM_BYTES, size);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",396
+0000023C A909                    		MOV.L 14H[R0], R1
+0000023E FD78510001              		MIN #0100H, R1
+00000243 A089                    		MOV.L R1, 0CH[R0]
+00000245                         L93:	; bb90
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",361
+00000245 A909                    		MOV.L 14H[R0], R1
+00000247 6101                    		CMP #00H, R1
+00000249 21rr                    		BNE L78
+0000024B                         L94:	; bb95
+                                 ;     397         }
+                                 ;     398     }
+                                 ;     399     
+                                 ;     400     /* Protect memory from modification */
+                                 ;     401     sf_write_protect(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",401
+0000024B 590123                  		MOVU.B 23H[R0], R1
+0000024E 39rrrr               W  		BSR __$sf_write_protect
+00000251                         L95:	; bb95.split
+                                 ;     402 
+                                 ;     403     /* Release lock on channel. */
+                                 ;     404     sf_unlock_channel(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",404
+00000251 590123                  		MOVU.B 23H[R0], R1
+00000254 39rrrr               W  		BSR __$sf_unlock_channel
+00000257                         L96:	; bb95.split13
+                                 ;     405     
+                                 ;     406     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",406
+00000257 3C0301                  		MOV.B #01H, 03H[R0]
+0000025A                         L97:	; bb100
+0000025A C5000313                		MOV.B 03H[R0], 13H[R0]
+                                 ;     407 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",407
+0000025E B489                    		MOVU.B 13H[R0], R1
+00000260 6709                    		RTSD #24H
+00000262                         _R_SF_ReadData:
+                                 		.STACK	_R_SF_ReadData=28
+                                 ;     408 
+                                 ;     409 /***********************************************************************************************************************
+                                 ;     410 * Function Name: R_SF_ReadData
+                                 ;     411 * Description  : Performs a read of the external flash to specified buffer.
+                                 ;     412 * Arguments    : channel -
+                                 ;     413 *                    Which SPI channel to use.
+                                 ;     414 *                address -
+                                 ;     415 *                    Target address to read from.
+                                 ;     416 *                data - 
+                                 ;     417 *                    Location to place read data.
+                                 ;     418 *                size - 
+                                 ;     419 *                    Amount of data to read.
+                                 ;     420 * Return Value : true - 
+                                 ;     421 *                    Success.
+                                 ;     422 *                false -
+                                 ;     423 *                    Failure.
+                                 ;     424 ***********************************************************************************************************************/
+                                 ;     425 bool R_SF_ReadData (uint8_t channel, const uint32_t address, uint8_t * data, const uint32_t size)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",425
+00000262 7100E8                  		ADD #0FFFFFFE8H, R0
+00000265 8589                    		MOV.B R1, 17H[R0]
+00000267 A102                    		MOV.L R2, 10H[R0]
+00000269 A08B                    		MOV.L R3, 0CH[R0]
+0000026B A084                    		MOV.L R4, 08H[R0]
+                                 ;     426 {
+                                 ;     427     uint8_t val[4];
+                                 ;     428 
+                                 ;     429     /* Attempt to obtain lock for SPI channel. */
+                                 ;     430     if (false == sf_lock_channel(channel))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",430
+0000026D B589                    		MOVU.B 17H[R0], R1
+0000026F 39rrrr               W  		BSR __$sf_lock_channel
+00000272 6101                    		CMP #00H, R1
+00000274 18                   S  		BNE L100
+00000275                         L99:	; bb6
+                                 ;     431     {
+                                 ;     432         /* This channel is already being used. Try again later. */
+                                 ;     433         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",433
+00000275 3C0200                  		MOV.B #00H, 02H[R0]
+00000278 2Err                 B  		BRA L110
+0000027A                         L100:	; bb13
+                                 ;     434     }
+                                 ;     435     
+                                 ;     436     /* Initialize peripheral for SPI */
+                                 ;     437     sf_open(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",437
+0000027A B589                    		MOVU.B 17H[R0], R1
+0000027C 39rrrr               W  		BSR __$sf_open
+0000027F                         L101:	; bb13.split
+                                 ;     438     
+                                 ;     439     /* This section reads back data.  The first character is the read command. */
+                                 ;     440     val[0] = SF_CMD_READ;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",440
+0000027F 3C0303                  		MOV.B #03H, 03H[R0]
+00000282                         L102:	; bb13.split1
+                                 ;     441     val[1] = (uint8_t)(address >> 16);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",441
+00000282 A901                    		MOV.L 10H[R0], R1
+00000284 6901                    		SHLR #10H, R1
+00000286 8101                    		MOV.B R1, 04H[R0]
+00000288                         L103:	; bb13.split2
+                                 ;     442     val[2] = (uint8_t)(address >>  8);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",442
+00000288 A901                    		MOV.L 10H[R0], R1
+0000028A 6881                    		SHLR #08H, R1
+0000028C 8109                    		MOV.B R1, 05H[R0]
+0000028E                         L104:	; bb13.split3
+                                 ;     443     val[3] = (uint8_t)(address >>  0);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",443
+0000028E A901                    		MOV.L 10H[R0], R1
+00000290 8181                    		MOV.B R1, 06H[R0]
+00000292                         L105:	; bb13.split4
+00000292 6642                    		MOV.L #00000004H, R2
+00000294 710103                  		ADD #03H, R0, R1
+                                 ;     444     RSPI1_Write(val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",444
+00000297 39rrrr               W  		BSR __$RSPI1_Write
+0000029A                         L106:	; bb13.split5
+                                 ;     445 
+                                 ;     446     /* Read data. */
+                                 ;     447 	RSPI1_Read(data,size);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",447
+0000029A B902                    		MOVU.W 08H[R0], R2
+0000029C A889                    		MOV.L 0CH[R0], R1
+0000029E 39rrrr               W  		BSR __$RSPI1_Read
+000002A1                         L107:	; bb13.split6
+                                 ;     448 
+                                 ;     449     /* Close peripheral for SPI */
+                                 ;     450     sf_close(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",450
+000002A1 B589                    		MOVU.B 17H[R0], R1
+000002A3 39rrrr               W  		BSR __$sf_close
+000002A6                         L108:	; bb13.split7
+                                 ;     451 
+                                 ;     452     /* Release lock on channel. */
+                                 ;     453     sf_unlock_channel(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",453
+000002A6 B589                    		MOVU.B 17H[R0], R1
+000002A8 39rrrr               W  		BSR __$sf_unlock_channel
+000002AB                         L109:	; bb13.split8
+                                 ;     454             
+                                 ;     455     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",455
+000002AB 3C0201                  		MOV.B #01H, 02H[R0]
+000002AE                         L110:	; bb42
+000002AE C5000207                		MOV.B 02H[R0], 07H[R0]
+                                 ;     456 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",456
+000002B2 B189                    		MOVU.B 07H[R0], R1
+000002B4 6706                    		RTSD #18H
+000002B6                         _R_SF_ReadStatus:
+                                 		.STACK	_R_SF_ReadStatus=8
+                                 ;     457 
+                                 ;     458 /***********************************************************************************************************************
+                                 ;     459 * Function Name: R_SF_ReadStatus
+                                 ;     460 * Description  : Reads flash status register and returns. This is just a wrapper function for sf_read_status(). This was
+                                 ;     461 *                done because other API functions need to read the status register and they will already have locked
+                                 ;     462 *                the RSPI channel. If the user wishes to read the status register themselves, then this function needs
+                                 ;     463 *                to exist to obtain the lock to make sure this does not interfere with other RSPI operations.
+                                 ;     464 * Arguments    : channel -
+                                 ;     465 *                    Which SPI channel to use.
+                                 ;     466 * Return Value : Status register contents from SPI flash 
+                                 ;     467 ***********************************************************************************************************************/
+                                 ;     468 uint8_t R_SF_ReadStatus (uint8_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",468
+000002B6 6040                    		SUB #04H, R0
+000002B8 8089                    		MOV.B R1, 03H[R0]
+                                 ;     469 {
+                                 ;     470     uint8_t status_reg;
+                                 ;     471 
+                                 ;     472     /* Attempt to obtain lock for SPI channel. */
+                                 ;     473     if (false == sf_lock_channel(channel))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",473
+000002BA B089                    		MOVU.B 03H[R0], R1
+000002BC 39rrrr               W  		BSR __$sf_lock_channel
+000002BF 6101                    		CMP #00H, R1
+000002C1 18                   S  		BNE L113
+000002C2                         L112:	; bb3
+                                 ;     474     {
+                                 ;     475         /* This channel is already being used. Try again later. */
+                                 ;     476         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",476
+000002C2 F80400                  		MOV.B #00H, [R0]
+000002C5 2Err                 B  		BRA L116
+000002C7                         L113:	; bb10
+                                 ;     477     }
+                                 ;     478     
+                                 ;     479     /* Read status register. */
+                                 ;     480     status_reg = sf_read_status(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",480
+000002C7 B089                    		MOVU.B 03H[R0], R1
+000002C9 39rrrr               W  		BSR __$sf_read_status
+000002CC 8009                    		MOV.B R1, 01H[R0]
+000002CE                         L114:	; bb10.split
+                                 ;     481 
+                                 ;     482     /* Release lock on channel. */
+                                 ;     483     sf_unlock_channel(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",483
+000002CE B089                    		MOVU.B 03H[R0], R1
+000002D0 39rrrr               W  		BSR __$sf_unlock_channel
+000002D3                         L115:	; bb10.split1
+                                 ;     484     
+                                 ;     485     return status_reg;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",485
+000002D3 C10001                  		MOV.B 01H[R0], [R0]
+000002D6                         L116:	; bb17
+000002D6 C40002                  		MOV.B [R0], 02H[R0]
+                                 ;     486 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",486
+000002D9 B081                    		MOVU.B 02H[R0], R1
+000002DB 6701                    		RTSD #04H
+000002DD                         _R_SF_ReadID:
+                                 		.STACK	_R_SF_ReadID=20
+                                 ;     487 
+                                 ;     488 /***********************************************************************************************************************
+                                 ;     489 * Function Name: R_SF_ReadID
+                                 ;     490 * Description  : Read identification of SPI Flash
+                                 ;     491 * Arguments    : channel -
+                                 ;     492 *                    Which SPI channel to use.
+                                 ;     493 *                data - 
+                                 ;     494 *                    Location to place read data.
+                                 ;     495 *                size -
+                                 ;     496 *                    Number of bytes to read.
+                                 ;     497 * Return Value : true -
+                                 ;     498 *                    Success.
+                                 ;     499 *                false -
+                                 ;     500 *                    Failure.
+                                 ;     501 ***********************************************************************************************************************/
+                                 ;     502 bool R_SF_ReadID (uint8_t channel, uint8_t * data, uint32_t size)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",502
+000002DD 7100F0                  		ADD #0FFFFFFF0H, R0
+000002E0 8389                    		MOV.B R1, 0FH[R0]
+000002E2 A082                    		MOV.L R2, 08H[R0]
+000002E4 A00B                    		MOV.L R3, 04H[R0]
+                                 ;     503 {
+                                 ;     504     uint8_t val;
+                                 ;     505 
+                                 ;     506     /* Attempt to obtain lock for SPI channel. */
+                                 ;     507     if (false == sf_lock_channel(channel))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",507
+000002E6 B389                    		MOVU.B 0FH[R0], R1
+000002E8 39rrrr               W  		BSR __$sf_lock_channel
+000002EB 6101                    		CMP #00H, R1
+000002ED 18                   S  		BNE L119
+000002EE                         L118:	; bb5
+                                 ;     508     {
+                                 ;     509         /* This channel is already being used. Try again later. */
+                                 ;     510         return false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",510
+000002EE 3C0100                  		MOV.B #00H, 01H[R0]
+000002F1 2Err                 B  		BRA L126
+000002F3                         L119:	; bb12
+                                 ;     511     }
+                                 ;     512     
+                                 ;     513     /* Initialize peripheral for SPI */
+                                 ;     514     sf_open(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",514
+000002F3 B389                    		MOVU.B 0FH[R0], R1
+000002F5 39rrrr               W  		BSR __$sf_open
+000002F8                         L120:	; bb12.split
+                                 ;     515     
+                                 ;     516     val = SF_CMD_READ_ID;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",516
+000002F8 3C029F                  		MOV.B #9FH, 02H[R0]
+000002FB                         L121:	; bb12.split1
+000002FB 6612                    		MOV.L #00000001H, R2
+000002FD 710102                  		ADD #02H, R0, R1
+                                 ;     517     
+                                 ;     518     /* Send command. */
+                                 ;     519     RSPI1_Write(&val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",519
+00000300 39rrrr               W  		BSR __$RSPI1_Write
+00000303                         L122:	; bb12.split2
+                                 ;     520 
+                                 ;     521     /* Read data. */
+                                 ;     522 	RSPI1_Read(data,size);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",522
+00000303 B882                    		MOVU.W 04H[R0], R2
+00000305 A881                    		MOV.L 08H[R0], R1
+00000307 39rrrr               W  		BSR __$RSPI1_Read
+0000030A                         L123:	; bb12.split3
+                                 ;     523 
+                                 ;     524     /* Close peripheral for SPI */
+                                 ;     525     sf_close(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",525
+0000030A B389                    		MOVU.B 0FH[R0], R1
+0000030C 39rrrr               W  		BSR __$sf_close
+0000030F                         L124:	; bb12.split4
+                                 ;     526 
+                                 ;     527     /* Release lock on channel. */
+                                 ;     528     sf_unlock_channel(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",528
+0000030F B389                    		MOVU.B 0FH[R0], R1
+00000311 39rrrr               W  		BSR __$sf_unlock_channel
+00000314                         L125:	; bb12.split5
+                                 ;     529     
+                                 ;     530     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",530
+00000314 3C0101                  		MOV.B #01H, 01H[R0]
+00000317                         L126:	; bb23
+00000317 C5000103                		MOV.B 01H[R0], 03H[R0]
+                                 ;     531 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",531
+0000031B B089                    		MOVU.B 03H[R0], R1
+0000031D 6704                    		RTSD #10H
+0000031F                         __$sf_open:
+                                 		.STACK	__$sf_open=8
+                                 ;     532 
+                                 ;     533 
+                                 ;     534 /***********************************************************************************************************************
+                                 ;     535 * Function Name: sf_open
+                                 ;     536 * Description  : Performs steps to get ready for SPI flash communications (not initialization of SPI MCU peripheral)
+                                 ;     537 * Arguments    : channel -
+                                 ;     538 *                    Which SPI channel to use.
+                                 ;     539 * Return Value : true -
+                                 ;     540 *                    Success.
+                                 ;     541 *                false -
+                                 ;     542 *                    Failure.
+                                 ;     543 ***********************************************************************************************************************/
+                                 ;     544 static void sf_open (uint8_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",544
+0000031F 6040                    		SUB #04H, R0
+00000321 8089                    		MOV.B R1, 03H[R0]
+00000323 FBEE2EC008              		MOV.L #0008C02EH, R14
+                                 ;     545 {
+                                 ;     546     /* Use chip select to select SPI flash. */
+                                 ;     547 	SPIFLASH_CS = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",547
+00000328 F0E8                    		BCLR #00H, [R14].B
+0000032A 6701                    		RTSD #04H
+0000032C                         __$sf_close:
+                                 		.STACK	__$sf_close=8
+                                 ;     548 }
+                                 ;     549 
+                                 ;     550 
+                                 ;     551 /***********************************************************************************************************************
+                                 ;     552 * Function Name: sf_close
+                                 ;     553 * Description  : Performs steps to close SPI flash communications
+                                 ;     554 * Arguments    : channel -
+                                 ;     555 *                    Which SPI channel to use.
+                                 ;     556 * Return Value : none
+                                 ;     557 ***********************************************************************************************************************/
+                                 ;     558 static void sf_close (uint8_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",558
+0000032C 6040                    		SUB #04H, R0
+0000032E 8089                    		MOV.B R1, 03H[R0]
+00000330 FBEE2EC008              		MOV.L #0008C02EH, R14
+                                 ;     559 {
+                                 ;     560     /* Deselect SPI flash. */
+                                 ;     561 	SPIFLASH_CS = 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",561
+00000335 F0E0                    		BSET #00H, [R14].B
+00000337 6701                    		RTSD #04H
+00000339                         __$sf_lock_channel:
+                                 		.STACK	__$sf_lock_channel=8
+                                 ;     562 }
+                                 ;     563 
+                                 ;     564 
+                                 ;     565 /***********************************************************************************************************************
+                                 ;     566 * Function Name: sf_lock_channel
+                                 ;     567 * Description  : Make sure we have permission to use RSPI channel
+                                 ;     568 * Arguments    : channel -
+                                 ;     569 *                    Which SPI channel to use.
+                                 ;     570 * Return Value : true -
+                                 ;     571 *                    Permission granted, we can use the channel
+                                 ;     572 *                false -
+                                 ;     573 *                    Channel already in use, try again later
+                                 ;     574 ***********************************************************************************************************************/
+                                 ;     575 static bool sf_lock_channel (uint8_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",575
+00000339 6040                    		SUB #04H, R0
+0000033B 8089                    		MOV.B R1, 03H[R0]
+                                 ;     576 {
+                                 ;     577     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",577
+0000033D 3C0201                  		MOV.B #01H, 02H[R0]
+00000340 B081                    		MOVU.B 02H[R0], R1
+00000342                         L130:	; entry.split
+                                 ;     578 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",578
+00000342 5B11                    		MOVU.B R1, R1
+00000344 6701                    		RTSD #04H
+00000346                         __$sf_unlock_channel:
+                                 		.STACK	__$sf_unlock_channel=8
+                                 ;     579 
+                                 ;     580 /***********************************************************************************************************************
+                                 ;     581 * Function Name: sf_unlock_channel
+                                 ;     582 * Description  : Release lock on RSPI channel so other processes can use it.
+                                 ;     583 * Arguments    : channel -
+                                 ;     584 *                    Which SPI channel to unlock.
+                                 ;     585 * Return Value : true -
+                                 ;     586 *                    Lock released.
+                                 ;     587 *                false -
+                                 ;     588 *                    Lock not released because we did not have permission for lock. Error!
+                                 ;     589 ***********************************************************************************************************************/
+                                 ;     590 static bool sf_unlock_channel (uint8_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",590
+00000346 6040                    		SUB #04H, R0
+00000348 8089                    		MOV.B R1, 03H[R0]
+                                 ;     591 {
+                                 ;     592     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",592
+0000034A 3C0201                  		MOV.B #01H, 02H[R0]
+0000034D B081                    		MOVU.B 02H[R0], R1
+0000034F                         L132:	; entry.split
+                                 ;     593 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",593
+0000034F 5B11                    		MOVU.B R1, R1
+00000351 6701                    		RTSD #04H
+00000353                         __$sf_read_status:
+                                 		.STACK	__$sf_read_status=8
+                                 ;     594 
+                                 ;     595 
+                                 ;     596 /***********************************************************************************************************************
+                                 ;     597 * Function Name: sf_read_status
+                                 ;     598 * Description  : Reads the status register on the SPI flash.
+                                 ;     599 * Arguments    : channel -
+                                 ;     600 *                    Which SPI channel to use..
+                                 ;     601 * Return Value : Status register contents from SPI flash 
+                                 ;     602 ***********************************************************************************************************************/
+                                 ;     603 static uint8_t sf_read_status (uint8_t channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",603
+00000353 6040                    		SUB #04H, R0
+00000355 8089                    		MOV.B R1, 03H[R0]
+                                 ;     604 {
+                                 ;     605     uint8_t val;
+                                 ;     606 
+                                 ;     607     /* Initialize peripheral for SPI */
+                                 ;     608     sf_open(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",608
+00000357 B089                    		MOVU.B 03H[R0], R1
+00000359 39rrrr               W  		BSR __$sf_open
+0000035C                         L134:	; entry.split
+                                 ;     609     
+                                 ;     610     val = SF_CMD_READ_STATUS_REG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",610
+0000035C 3C0105                  		MOV.B #05H, 01H[R0]
+0000035F                         L135:	; entry.split1
+0000035F 6612                    		MOV.L #00000001H, R2
+00000361 710101                  		ADD #01H, R0, R1
+                                 ;     611     
+                                 ;     612     /* Send command. */
+                                 ;     613     RSPI1_Write(&val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",613
+00000364 39rrrr               W  		BSR __$RSPI1_Write
+00000367                         L136:	; entry.split2
+00000367 6612                    		MOV.L #00000001H, R2
+00000369 710101                  		ADD #01H, R0, R1
+                                 ;     614 
+                                 ;     615     /* Read register. */
+                                 ;     616 	RSPI1_Read(&val,sizeof(val));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",616
+0000036C 39rrrr               W  		BSR __$RSPI1_Read
+0000036F                         L137:	; entry.split3
+                                 ;     617 
+                                 ;     618     /* close peripheral for SPI */
+                                 ;     619     sf_close(channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",619
+0000036F B089                    		MOVU.B 03H[R0], R1
+00000371 39rrrr               W  		BSR __$sf_close
+00000374                         L138:	; entry.split4
+                                 ;     620 
+                                 ;     621     return val;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",621
+00000374 C5000102                		MOV.B 01H[R0], 02H[R0]
+00000378 B081                    		MOVU.B 02H[R0], R1
+0000037A                         L139:	; entry.split5
+                                 ;     622 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",622
+0000037A 5B11                    		MOVU.B R1, R1
+0000037C 6701                    		RTSD #04H
+0000037E                         __$RSPI1_Read:
+                                 		.STACK	__$RSPI1_Read=16
+                                 ;     623 
+                                 ;     624 /***********************************************************************************************************************
+                                 ;     625 * Function Name: RSPI1_SendReceive
+                                 ;     626 * Description  : Performs SPI transfers. Can read and write at the same time.
+                                 ;     627 * Arguments    :
+                                 ;     628 *                pSrc -
+                                 ;     629 *                    pointer to data buffer with data to be transmitted.
+                                 ;     630 *                    If NULL, const 0xFF as source.
+                                 ;     631 *                pDest -
+                                 ;     632 *                    pointer to location to put the received data (can be same as pSrc if desired).
+                                 ;     633 *                    If NULL, receive data discarded.
+                                 ;     634 *                usBytes -
+                                 ;     635 *                    number of bytes to be sent/received
+                                 ;     636 * Return Value : true -
+                                 ;     637 *                    Operation completed.
+                                 ;     638 *                false -
+                                 ;     639 *                    This task did lock the RSPI fist.
+                                 ;     640 ***********************************************************************************************************************/
+                                 ;     641 static bool RSPI1_SendReceive( uint8_t const *pSrc,
+                                 ;     642                         uint8_t *pDest,
+                                 ;     643                         uint16_t usBytes)
+                                 ;     644 {
+                                 ;     645     uint16_t byte_count;
+                                 ;     646     volatile uint32_t temp;
+                                 ;     647 
+                                 ;     648     for (byte_count = 0; byte_count < usBytes; byte_count++)
+                                 ;     649     {
+                                 ;     650         /* Ensure transmit register is empty */
+                                 ;     651         while (RSPI1.SPSR.BIT.IDLNF) ;
+                                 ;     652 
+                                 ;     653         /* If just reading then transmit 0xFF */
+                                 ;     654         RSPI1.SPDR.LONG = (pSrc == NULL) ? 0xFF : pSrc[byte_count];
+                                 ;     655 
+                                 ;     656         while (false == RSPI1_rx_buffer_full())
+                                 ;     657         {
+                                 ;     658             /* Transfer is complete when a byte has been shifted in (full duplex) */
+                                 ;     659         }
+                                 ;     660 
+                                 ;     661         /* Read received data.  If transmit only, then ignore it */
+                                 ;     662         if (pDest == NULL)
+                                 ;     663         {
+                                 ;     664             temp = RSPI1.SPDR.LONG;
+                                 ;     665         }
+                                 ;     666         else
+                                 ;     667         {
+                                 ;     668             pDest[byte_count] = (uint8_t) (RSPI1.SPDR.LONG & 0xFF);
+                                 ;     669         }
+                                 ;     670 
+                                 ;     671     }
+                                 ;     672 
+                                 ;     673     return true;
+                                 ;     674 }
+                                 ;     675 
+                                 ;     676 /***********************************************************************************************************************
+                                 ;     677 * Function Name: R_RSPI_Read
+                                 ;     678 * Description  : Reads data using RSPI
+                                 ;     679 * Arguments    : channel -
+                                 ;     680 *                    Which channel to use
+                                 ;     681 *                pDest -
+                                 ;     682 *                    Pointer to location to put the received data.
+                                 ;     683 *                    Returned value will be incremented by number of bytes received.
+                                 ;     684 *                usBytes -
+                                 ;     685 *                    number of bytes to be received
+                                 ;     686 *                pid -
+                                 ;     687 *                    Unique task ID. Used to make sure tasks don't step on each other.
+                                 ;     688 * Return Value : true -
+                                 ;     689 *                    Operation completed.
+                                 ;     690 *                false -
+                                 ;     691 *                    This task did lock the RSPI fist.
+                                 ;     692 ***********************************************************************************************************************/
+                                 ;     693 static bool RSPI1_Read( uint8_t *pDest,
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",693
+0000037E 60C0                    		SUB #0CH, R0
+00000380 A081                    		MOV.L R1, 08H[R0]
+00000382 908A                    		MOV.W R2, 06H[R0]
+                                 ;     694                  uint16_t usBytes)
+                                 ;     695 {
+                                 ;     696     uint16_t byte_count;
+                                 ;     697     volatile uint32_t temp;
+                                 ;     698 
+                                 ;     699     for (byte_count = 0; byte_count < usBytes; byte_count++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",699
+00000384 3D0100                  		MOV.W #0000H, 02H[R0]
+00000387 2Err                 B  		BRA L145
+00000389                         L141:	; bb6
+                                 ;     700     {
+                                 ;     701         /* Ensure transmit register is empty */
+                                 ;     702         while (RSPI1.SPSR.BIT.IDLNF) ;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",702
+00000389 FB1EA08308              		MOV.L #000883A0H, R1
+0000038E B099                    		MOVU.B 03H[R1], R1
+00000390 6811                    		SHLR #01H, R1
+00000392 7C01                    		BTST #00H, R1
+00000394 21rr                    		BNE L141
+00000396                         L142:	; bb13
+                                 ;     703 
+                                 ;     704         /* If just reading then transmit 0xFF */
+                                 ;     705         RSPI1.SPDR.LONG = 0xFFFFFFFF ;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",705
+00000396 FBEEA08308              		MOV.L #000883A0H, R14
+0000039B F9E601FF                		MOV.L #0FFFFFFFFH, 04H[R14]
+0000039F                         L143:	; bb15
+                                 ;     706 
+                                 ;     707         while (false == RSPI1_rx_buffer_full())
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",707
+0000039F 39rrrr               W  		BSR __$RSPI1_rx_buffer_full
+000003A2 6101                    		CMP #00H, R1
+000003A4 20rr                    		BEQ L143
+000003A6                         L144:	; bb21
+                                 ;     708         {
+                                 ;     709             /* Transfer is complete when a byte has been shifted in (full duplex) */
+                                 ;     710         }
+                                 ;     711 
+                                 ;     712         /* Read received data.  If transmit only, then ignore it */
+                                 ;     713         pDest[byte_count] = (uint8_t) (RSPI1.SPDR.LONG & 0xFF);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",713
+000003A6 FB1EA08308              		MOV.L #000883A0H, R1
+000003AB B80A                    		MOVU.W 02H[R0], R2
+000003AD A883                    		MOV.L 08H[R0], R3
+000003AF A819                    		MOV.L 04H[R1], R1
+000003B1 FE0321                  		MOV.B R1, [R3,R2]
+000003B4 9809                    		MOV.W 02H[R0], R1
+000003B6 6211                    		ADD #01H, R1
+000003B8 9009                    		MOV.W R1, 02H[R0]
+000003BA                         L145:	; bb31
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",699
+000003BA B809                    		MOVU.W 02H[R0], R1
+000003BC 06C50103                		CMP 06H[R0].UW, R1
+000003C0 29rr                    		BLT L141
+000003C2                         L146:	; bb39
+                                 ;     714     }
+                                 ;     715 
+                                 ;     716     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",716
+000003C2 3C0501                  		MOV.B #01H, 05H[R0]
+000003C5 B109                    		MOVU.B 05H[R0], R1
+000003C7                         L147:	; bb39.split
+                                 ;     717 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",717
+000003C7 5B11                    		MOVU.B R1, R1
+000003C9 6703                    		RTSD #0CH
+000003CB                         __$RSPI1_Write:
+                                 		.STACK	__$RSPI1_Write=20
+                                 ;     718 
+                                 ;     719 
+                                 ;     720 /***********************************************************************************************************************
+                                 ;     721 * Function Name: R_RSPI_Write
+                                 ;     722 * Description  : Write to a SPI device
+                                 ;     723 * Arguments    : channel -
+                                 ;     724 *                    Which channel to use
+                                 ;     725 *                pSrc -
+                                 ;     726 *                    Pointer to data buffer with data to be transmitted.
+                                 ;     727 *                    Returned value will be incremented by number of attempted writes.
+                                 ;     728 *                usBytes -
+                                 ;     729 *                    Number of bytes to be sent
+                                 ;     730 *                pid -
+                                 ;     731 *                    Unique task ID. Used to make sure tasks don't step on each other.
+                                 ;     732 * Return Value : true -
+                                 ;     733 *                    Operation completed.
+                                 ;     734 *                false -
+                                 ;     735 *                    This task did lock the RSPI fist.
+                                 ;     736 ***********************************************************************************************************************/
+                                 ;     737 static bool RSPI1_Write( const uint8_t *pSrc, uint16_t usBytes)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",737
+000003CB 7100F0                  		ADD #0FFFFFFF0H, R0
+000003CE A089                    		MOV.L R1, 0CH[R0]
+000003D0 910A                    		MOV.W R2, 0AH[R0]
+                                 ;     738 {
+                                 ;     739     uint16_t byte_count;
+                                 ;     740     volatile uint32_t temp;
+                                 ;     741 
+                                 ;     742     for (byte_count = 0; byte_count < usBytes; byte_count++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",742
+000003D2 3D0100                  		MOV.W #0000H, 02H[R0]
+000003D5 2Err                 B  		BRA L153
+000003D7                         L149:	; bb6
+                                 ;     743     {
+                                 ;     744         /* Ensure transmit register is empty */
+                                 ;     745         while (RSPI1.SPSR.BIT.IDLNF) ;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",745
+000003D7 FB1EA08308              		MOV.L #000883A0H, R1
+000003DC B099                    		MOVU.B 03H[R1], R1
+000003DE 6811                    		SHLR #01H, R1
+000003E0 7C01                    		BTST #00H, R1
+000003E2 21rr                    		BNE L149
+000003E4                         L150:	; bb13
+                                 ;     746 
+                                 ;     747         /* If just reading then transmit 0xFF */
+                                 ;     748         RSPI1.SPDR.LONG = pSrc[byte_count];
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",748
+000003E4 B809                    		MOVU.W 02H[R0], R1
+000003E6 A88A                    		MOV.L 0CH[R0], R2
+000003E8 FEC211                  		MOVU.B [R2,R1], R1
+000003EB FB2EA08308              		MOV.L #000883A0H, R2
+000003F0 A029                    		MOV.L R1, 04H[R2]
+000003F2                         L151:	; bb21
+                                 ;     749 
+                                 ;     750         while (false == RSPI1_rx_buffer_full())
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",750
+000003F2 39rrrr               W  		BSR __$RSPI1_rx_buffer_full
+000003F5 6101                    		CMP #00H, R1
+000003F7 20rr                    		BEQ L151
+000003F9                         L152:	; bb27
+                                 ;     751         {
+                                 ;     752             /* Transfer is complete when a byte has been shifted in (full duplex) */
+                                 ;     753         }
+                                 ;     754 
+                                 ;     755         /* Read received data.  If transmit only, then ignore it */
+                                 ;     756         temp = RSPI1.SPDR.LONG;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",756
+000003F9 FBEEA08308              		MOV.L #000883A0H, R14
+000003FE E5E00101                		MOV.L 04H[R14], 04H[R0]
+00000402 9809                    		MOV.W 02H[R0], R1
+00000404 6211                    		ADD #01H, R1
+00000406 9009                    		MOV.W R1, 02H[R0]
+00000408                         L153:	; bb31
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",742
+00000408 B809                    		MOVU.W 02H[R0], R1
+0000040A 06C50105                		CMP 0AH[R0].UW, R1
+0000040E 29rr                    		BLT L149
+00000410                         L154:	; bb39
+                                 ;     757     }
+                                 ;     758 //    DMAC0.DMSAR = (uint32_t *)&RSPI1.SPDR.LONG;
+                                 ;     759 //    DMAC0.DMDAR = (uint32_t *)pSrc;
+                                 ;     760 //    DMAC0.DMCRA = usBytes;
+                                 ;     761 //
+                                 ;     762 //    DMAC1.DMSAR = (uint32_t *)pSrc;
+                                 ;     763 //    DMAC1.DMDAR = (uint32_t *)&RSPI1.SPDR.LONG;
+                                 ;     764 //    DMAC1.DMCRA = usBytes;
+                                 ;     765 //    temp1 = RSPI1.SPDR.LONG;
+                                 ;     766     return true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",766
+00000410 3C0901                  		MOV.B #01H, 09H[R0]
+00000413 B209                    		MOVU.B 09H[R0], R1
+00000415                         L155:	; bb39.split
+                                 ;     767 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",767
+00000415 5B11                    		MOVU.B R1, R1
+00000417 6704                    		RTSD #10H
+00000419                         __$RSPI1_rx_buffer_full:
+                                 		.STACK	__$RSPI1_rx_buffer_full=8
+                                 ;     768 
+                                 ;     769 /***********************************************************************************************************************
+                                 ;     770 * Function Name: rspi_rx_buffer_full
+                                 ;     771 * Description  : Returns whether the receive buffer full flag is set for a RSPI channel. Clear flag after read.
+                                 ;     772 * Arguments    : channel -
+                                 ;     773 *                    Which channel to use.
+                                 ;     774 * Return Value : true -
+                                 ;     775 *                    Flag is set.
+                                 ;     776 *                false -
+                                 ;     777 *                    Flag is not set.
+                                 ;     778 ***********************************************************************************************************************/
+                                 ;     779 static bool RSPI1_rx_buffer_full (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",779
+00000419 6040                    		SUB #04H, R0
+                                 ;     780 {
+                                 ;     781     bool flag_set = false;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",781
+0000041B 3C0200                  		MOV.B #00H, 02H[R0]
+0000041E                         L157:	; entry.split
+0000041E FBEE2A7008              		MOV.L #0008702AH, R14
+                                 ;     782 
+                                 ;     783         if (1 == IR(RSPI1, SPRI1))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",783
+00000423 58EE                    		MOVU.B [R14], R14
+00000425 641E                    		AND #01H, R14
+00000427 611E                    		CMP #01H, R14
+00000429 21rr                    		BNE L160
+0000042B                         L158:	; bb2
+0000042B FBEE2A7008              		MOV.L #0008702AH, R14
+                                 ;     784         {
+                                 ;     785             /* Clear bit. */
+                                 ;     786             IR(RSPI1, SPRI1) = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",786
+00000430 F0E8                    		BCLR #00H, [R14].B
+00000432                         L159:	; bb2.split
+                                 ;     787 
+                                 ;     788             flag_set = true;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",788
+00000432 3C0201                  		MOV.B #01H, 02H[R0]
+00000435                         L160:	; bb12
+                                 ;     789         }
+                                 ;     790     return flag_set;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",790
+00000435 C5000203                		MOV.B 02H[R0], 03H[R0]
+00000439 B089                    		MOVU.B 03H[R0], R1
+0000043B                         L161:	; bb12.split
+                                 ;     791 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",791
+0000043B 5B11                    		MOVU.B R1, R1
+0000043D 6701                    		RTSD #04H
+0000043F                         _R_SF_GetVersion:
+                                 		.STACK	_R_SF_GetVersion=8
+                                 ;     792 
+                                 ;     793 /***********************************************************************************************************************
+                                 ;     794 * Function Name: R_SF_GetVersion
+                                 ;     795 * Description  : Returns the current version of this module. The version number is encoded where the top 2 bytes are the
+                                 ;     796 *                major version number and the bottom 2 bytes are the minor version number. For example, Version 4.25 
+                                 ;     797 *                would be returned as 0x00040019.
+                                 ;     798 * Arguments    : none
+                                 ;     799 * Return Value : Version of this module.
+                                 ;     800 ***********************************************************************************************************************/
+                                 ;     801 #pragma inline(R_SF_GetVersion)
+                                 ;     802 uint32_t R_SF_GetVersion (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",802
+0000043F 6040                    		SUB #04H, R0
+                                 ;     803 {
+                                 ;     804     /* These version macros are defined in r_spi_flash_if.h. */
+                                 ;     805     return ((((uint32_t)SPI_FLASH_VERSION_MAJOR) << 16) | (uint32_t)SPI_FLASH_VERSION_MINOR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",805
+00000441 F80E1E0001              		MOV.L #0001001EH, [R0]
+00000446 FB1E1E0001              		MOV.L #0001001EH, R1
+0000044B                         L163:	; entry.split
+                                 ;     806 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_spi_flash\src\r_spi_flash.c",806
+0000044B 6701                    		RTSD #04H
+                                 ;     807 
+                                 ;     808 
+                                 		.SECTION	D_1,ROMDATA
+00000000                         _g_transfer_complete:
+00000000 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _spiflash_setbaud:
+00000000(00000004H)              		.blkl	1
+00000004                         _spiflash_result:
+00000004(00000004H)              		.blkl	1
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01631   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001101(0000044DH)  P
+ROMDATA  0000000001(00000001H)  D_1
+DATA     0000000008(00000008H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\r_spi_flash.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_spi_flash.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_spi_flash\src\r_spi_flash.obj

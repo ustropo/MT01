@@ -1,0 +1,2007 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:03:12 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:03:12
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=r_lvd_rx.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=r_lvd_rx.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;r_lvd_rx.c
+                                 
+                                 		.glb	_lvd1_isr_handler
+                                 		.glb	_lvd2_isr_handler
+                                 		.glb	_g_lvd_ch1_cb_args
+                                 		.glb	_g_lvd_ch2_cb_args
+                                 		.glb	_R_LVD_Open
+                                 		.glb	_R_BSP_RegisterProtectDisable
+                                 		.glb	_R_BSP_InterruptWrite
+                                 		.glb	_R_BSP_RegisterProtectEnable
+                                 		.glb	_R_LVD_Control
+                                 		.glb	_R_LVD_Close
+                                 		.glb	_R_LVD_GetVersion
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _R_LVD_Open:
+                                 		.STACK	_R_LVD_Open=28
+                                 ;       1 /***********************************************************************************************************************
+                                 ;       2 * DISCLAIMER
+                                 ;       3 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No 
+                                 ;       4 * other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all 
+                                 ;       5 * applicable laws, including copyright laws. 
+                                 ;       6 * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+                                 ;       7 * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, 
+                                 ;       8 * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM 
+                                 ;       9 * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES 
+                                 ;      10 * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS 
+                                 ;      11 * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                                 ;      12 * Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of 
+                                 ;      13 * this software. By using this software, you agree to the additional terms and conditions found by accessing the 
+                                 ;      14 * following link:
+                                 ;      15 * http://www.renesas.com/disclaimer 
+                                 ;      16 *
+                                 ;      17 * Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+                                 ;      18 ***********************************************************************************************************************/
+                                 ;      19 /***********************************************************************************************************************
+                                 ;      20 * File Name    : r_lvd_rx.c
+                                 ;      21 * Description  : This module implements the LVD API that can be used to configure the LVD module.
+                                 ;      22 ***********************************************************************************************************************/
+                                 ;      23 /**********************************************************************************************************************
+                                 ;      24 * History : DD.MM.YYYY Version Description           
+                                 ;      25 *         : 18.07.2013 1.00    First Release
+                                 ;      26 *         : 14.02.2014 1.10    Added support for RX110, RX113, RX210, RX63N
+                                 ;      27 *         : 22.12.2014 1.30    Added support for RX113.
+                                 ;      28 *         : 18.03.2015 1.40    Added support for RX64M, 71M.
+                                 ;      29 *         : 09.07.2015 1.50    Added support for RX231.
+                                 ;      30 ***********************************************************************************************************************/
+                                 ;      31 
+                                 ;      32 /***********************************************************************************************************************
+                                 ;      33 Includes   <System Includes> , "Project Includes"
+                                 ;      34 ***********************************************************************************************************************/
+                                 ;      35 /* include definition for NULL*/
+                                 ;      36 #include <stddef.h>
+                                 ;      37 /* Defines machine level functions used in this file */
+                                 ;      38 #include <machine.h>
+                                 ;      39 /* Includes board and MCU related header files. */
+                                 ;      40 #include "platform.h"
+                                 ;      41 /* Private header file for this package. */
+                                 ;      42 #include "r_lvd_rx.h"
+                                 ;      43 /* Public interface header file for this package. */
+                                 ;      44 #include "r_lvd_rx_if.h"
+                                 ;      45 /* Configuration for this package. */
+                                 ;      46 #include "r_lvd_rx_config.h"
+                                 ;      47 
+                                 ;      48 /***********************************************************************************************************************
+                                 ;      49 Macro definitions
+                                 ;      50 ***********************************************************************************************************************/
+                                 ;      51 
+                                 ;      52 /***********************************************************************************************************************
+                                 ;      53 Typedef definitions
+                                 ;      54 ***********************************************************************************************************************/
+                                 ;      55  
+                                 ;      56 /***********************************************************************************************************************
+                                 ;      57 Private global variables and functions
+                                 ;      58 ***********************************************************************************************************************/
+                                 ;      59 static lvd_err_t        lvd_level_set(lvd_channel_t e_channel, lvd_voltage_level_t e_voltage_level);
+                                 ;      60 static lvd_err_t        lvd_status_get(lvd_channel_t e_channel);
+                                 ;      61 static lvd_err_t        lvd_status_clear(lvd_channel_t e_channel);
+                                 ;      62 static void             lvd_delay(uint32_t time_us);
+                                 ;      63 
+                                 ;      64 void (*lvd1_isr_handler)(void *) = NULL;  // Function pointer for LVD Channel 1 ISR
+                                 ;      65 void (*lvd2_isr_handler)(void *) = NULL;  // Function pointer for LVD Channel 2 ISR
+                                 ;      66 static bool g_lvd_ch1_open = false;       // Flag to maintain Initialization status of LVD Channel 1
+                                 ;      67 static bool g_lvd_ch2_open = false;       // Flag to maintain Initialization status of LVD Channel 2
+                                 ;      68 lvd_int_cb_args_t g_lvd_ch1_cb_args;      // Callback argument structure for CH 1
+                                 ;      69 lvd_int_cb_args_t g_lvd_ch2_cb_args;      // Callback argument structure for CH 2
+                                 ;      70 
+                                 ;      71 /***********************************************************************************************************************
+                                 ;      72 * Function Name: R_LVD_Open
+                                 ;      73 * Description  : This function configures the LVD channel including voltage level, trigger type and sets the callback
+                                 ;      74 *                function. This function can only be called once for each channel after which R_LVD_Close has to be
+                                 ;      75 *                called before attempting to reconfigure the LVD channel.
+                                 ;      76 * Arguments    : lvd_channel_t e_channel
+                                 ;      77 *                       -Specify the channel
+                                 ;      78 *                lvd_voltage_level_t e_voltage_level
+                                 ;      79 *                       -Specify the LVD voltage level
+                                 ;      80 *                lvd_event_action_t e_event
+                                 ;      81 *                       -Specify the LVD event that should occur when the trigger specified in e-trigger is met.
+                                 ;      82 *                lvd_trigger_t e_trigger
+                                 ;      83 *                       -Specify the LVD voltage level triggering type. It can be configured for when the voltage
+                                 ;      84 *                       level rises above the triggering level,  or when it falls below or both conditions.
+                                 ;      85 *                void (*pcallback)(void)
+                                 ;      86 *                       -callback function pointer. This can be a null if e_event is LVD_EVENT_RESET or LVD_EVENT_POLL
+                                 ;      87 * Return Value :LVD_SUCCESS
+                                 ;      88 *               LVD_ERR_ILL_PARAM
+                                 ;      89 *               LVD_ERR_ILL_REINITIALIZATION
+                                 ;      90 *               LVD_ERR_VDET
+                                 ;      91 *
+                                 ;      92 ***********************************************************************************************************************/
+                                 ;      93 lvd_err_t R_LVD_Open(lvd_channel_t e_channel, lvd_config_t *p_cfg, void (*pcallback)(void *))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",93
+00000000 7100E8                  		ADD #0FFFFFFE8H, R0
+00000003 A109                    		MOV.L R1, 14H[R0]
+00000005 A102                    		MOV.L R2, 10H[R0]
+00000007 A08B                    		MOV.L R3, 0CH[R0]
+                                 ;      94 {
+                                 ;      95 #if (LVD_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;      96     if (e_channel >= LVD_CHANNEL_INVALID)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",96
+00000009 A909                    		MOV.L 14H[R0], R1
+0000000B 6131                    		CMP #03H, R1
+0000000D 29rr                    		BLT L12
+0000000F                         L11:	; bb4
+                                 ;      97     {
+                                 ;      98         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",98
+0000000F 3E0104                  		MOV.L #00000004H, 04H[R0]
+00000012 38rrrr               W  		BRA L120
+00000015                         L12:	; bb10
+                                 ;      99     }
+                                 ;     100 
+                                 ;     101     if (LVD_CHANNEL_2 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",101
+00000015 A909                    		MOV.L 14H[R0], R1
+00000017 6121                    		CMP #02H, R1
+00000019 21rr                    		BNE L19
+0000001B                         L13:	; bb12
+                                 ;     102     {
+                                 ;     103         if ((p_cfg->e_voltage_level < LVD_VOLTAGE_CH2_MIN) || (p_cfg->e_voltage_level > LVD_VOLTAGE_CH2_MAX))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",103
+0000001B A901                    		MOV.L 10H[R0], R1
+0000001D A819                    		MOV.L 04H[R1], R1
+0000001F 61A1                    		CMP #0AH, R1
+00000021 29rr                    		BLT L16
+00000023 08                   S  		BRA L15
+00000024                         L14:	; bb13
+                                 ;     104         {
+                                 ;     105             return LVD_ERR_VDET;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",105
+00000024 3E0101                  		MOV.L #00000001H, 04H[R0]
+00000027 38rrrr               W  		BRA L120
+0000002A                         L15:	; bb20
+0000002A A901                    		MOV.L 10H[R0], R1
+0000002C A819                    		MOV.L 04H[R1], R1
+0000002E 61B1                    		CMP #0BH, R1
+00000030 29rr                    		BLT L17
+00000032                         L16:	; bb26
+00000032 F80601                  		MOV.L #00000001H, [R0]
+00000035 08                   S  		BRA L18
+00000036                         L17:	; bb27
+00000036 F80600                  		MOV.L #00000000H, [R0]
+00000039                         L18:	; bb28
+00000039 EC01                    		MOV.L [R0], R1
+0000003B 6101                    		CMP #00H, R1
+0000003D 21rr                    		BNE L14
+0000003F 2Err                 B  		BRA L26
+00000041                         L19:	; bb35
+                                 ;     106         }
+                                 ;     107     }
+                                 ;     108     else if (LVD_CHANNEL_1 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",108
+00000041 A909                    		MOV.L 14H[R0], R1
+00000043 6111                    		CMP #01H, R1
+00000045 21rr                    		BNE L26
+00000047                         L20:	; bb37
+                                 ;     109     {
+                                 ;     110         if ((p_cfg->e_voltage_level < LVD_VOLTAGE_CH1_MIN) || (p_cfg->e_voltage_level > LVD_VOLTAGE_CH1_MAX))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",110
+00000047 A901                    		MOV.L 10H[R0], R1
+00000049 A819                    		MOV.L 04H[R1], R1
+0000004B 61A1                    		CMP #0AH, R1
+0000004D 29rr                    		BLT L23
+0000004F 08                   S  		BRA L22
+00000050                         L21:	; bb38
+                                 ;     111         {
+                                 ;     112             return LVD_ERR_VDET;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",112
+00000050 3E0101                  		MOV.L #00000001H, 04H[R0]
+00000053 38rrrr               W  		BRA L120
+00000056                         L22:	; bb45
+00000056 A901                    		MOV.L 10H[R0], R1
+00000058 A819                    		MOV.L 04H[R1], R1
+0000005A 61B1                    		CMP #0BH, R1
+0000005C 29rr                    		BLT L24
+0000005E                         L23:	; bb51
+0000005E F80601                  		MOV.L #00000001H, [R0]
+00000061 08                   S  		BRA L25
+00000062                         L24:	; bb52
+00000062 F80600                  		MOV.L #00000000H, [R0]
+00000065                         L25:	; bb53
+00000065 EC01                    		MOV.L [R0], R1
+00000067 6101                    		CMP #00H, R1
+00000069 21rr                    		BNE L21
+0000006B                         L26:	; bb69
+                                 ;     113         }
+                                 ;     114     }
+                                 ;     115 
+                                 ;     116     if (p_cfg->e_action >= LVD_ACTION_INVALID)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",116
+0000006B A901                    		MOV.L 10H[R0], R1
+0000006D EC1E                    		MOV.L [R1], R14
+0000006F 613E                    		CMP #03H, R14
+00000071 29rr                    		BLT L28
+00000073                         L27:	; bb70
+                                 ;     117     {
+                                 ;     118         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",118
+00000073 3E0104                  		MOV.L #00000004H, 04H[R0]
+00000076 38rrrr               W  		BRA L120
+00000079                         L28:	; bb79
+                                 ;     119     }
+                                 ;     120 
+                                 ;     121     if(p_cfg->e_trigger >= LVD_TRIGGER_INVALID)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",121
+00000079 A901                    		MOV.L 10H[R0], R1
+0000007B A891                    		MOV.L 08H[R1], R1
+0000007D 6131                    		CMP #03H, R1
+0000007F 29rr                    		BLT L30
+00000081                         L29:	; bb80
+                                 ;     122     {
+                                 ;     123         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",123
+00000081 3E0104                  		MOV.L #00000004H, 04H[R0]
+00000084 38rrrr               W  		BRA L120
+00000087                         L30:	; bb89
+                                 ;     124     }
+                                 ;     125 
+                                 ;     126     if (((pcallback == FIT_NO_FUNC) || (pcallback == NULL)) &&
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",126
+00000087 A889                    		MOV.L 0CH[R0], R1
+00000089 740100000010            		CMP #10000000H, R1
+0000008F 20rr                    		BEQ L33
+00000091 08                   S  		BRA L32
+00000092                         L31:	; bb90
+                                 ;     127          ((LVD_ACTION_RESET != p_cfg->e_action) && (LVD_ACTION_POLL != p_cfg->e_action)))
+                                 ;     128     {
+                                 ;     129         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",129
+00000092 3E0104                  		MOV.L #00000004H, 04H[R0]
+00000095 38rrrr               W  		BRA L120
+00000098                         L32:	; bb95
+00000098 A889                    		MOV.L 0CH[R0], R1
+0000009A 6101                    		CMP #00H, R1
+0000009C 18                   S  		BNE L34
+0000009D                         L33:	; bb99
+0000009D F80601                  		MOV.L #00000001H, [R0]
+000000A0 08                   S  		BRA L35
+000000A1                         L34:	; bb100
+000000A1 F80600                  		MOV.L #00000000H, [R0]
+000000A4                         L35:	; bb101
+000000A4 EC01                    		MOV.L [R0], R1
+000000A6 6101                    		CMP #00H, R1
+000000A8 20rr                    		BEQ L42
+000000AA                         L36:	; bb105
+000000AA A901                    		MOV.L 10H[R0], R1
+000000AC EC1E                    		MOV.L [R1], R14
+000000AE 610E                    		CMP #00H, R14
+000000B0 20rr                    		BEQ L39
+000000B2                         L37:	; bb111
+000000B2 A901                    		MOV.L 10H[R0], R1
+000000B4 EC1E                    		MOV.L [R1], R14
+000000B6 612E                    		CMP #02H, R14
+000000B8 10                   S  		BEQ L39
+000000B9                         L38:	; bb117
+000000B9 F80601                  		MOV.L #00000001H, [R0]
+000000BC 08                   S  		BRA L40
+000000BD                         L39:	; bb118
+000000BD F80600                  		MOV.L #00000000H, [R0]
+000000C0                         L40:	; bb119
+000000C0 EC01                    		MOV.L [R0], R1
+000000C2 6101                    		CMP #00H, R1
+000000C4 10                   S  		BEQ L42
+000000C5                         L41:	; bb123
+000000C5 F80601                  		MOV.L #00000001H, [R0]
+000000C8 08                   S  		BRA L43
+000000C9                         L42:	; bb124
+000000C9 F80600                  		MOV.L #00000000H, [R0]
+000000CC                         L43:	; bb125
+000000CC EC01                    		MOV.L [R0], R1
+000000CE 6101                    		CMP #00H, R1
+000000D0 21rr                    		BNE L31
+000000D2                         L44:	; bb131
+                                 ;     130     }
+                                 ;     131 
+                                 ;     132 #endif
+                                 ;     133 
+                                 ;     134     if (LVD_CHANNEL_1 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",134
+000000D2 A909                    		MOV.L 14H[R0], R1
+000000D4 6111                    		CMP #01H, R1
+000000D6 3Brrrr               W  		BNE L81
+000000D9                         L45:	; bb133
+                                 ;     135     {
+                                 ;     136 #if (LVD_CFG_CHANNEL_1_USED == 1)
+                                 ;     137         if (g_lvd_ch1_open == true)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",137
+000000D9 FBE2rrrrrrrr            		MOV.L #__$g_lvd_ch1_open, R14
+000000DF 58EE                    		MOVU.B [R14], R14
+000000E1 611E                    		CMP #01H, R14
+000000E3 18                   S  		BNE L47
+000000E4                         L46:	; bb134
+                                 ;     138         {
+                                 ;     139             return LVD_ERR_ILL_REINITIALIZATION;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",139
+000000E4 3E0103                  		MOV.L #00000003H, 04H[R0]
+000000E7 38rrrr               W  		BRA L120
+000000EA                         L47:	; bb141
+000000EA 6621                    		MOV.L #00000002H, R1
+                                 ;     140         }
+                                 ;     141 
+                                 ;     142         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LVD);      // unlock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",142
+000000EC 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+000000F0                         L48:	; bb141.split
+                                 ;     143         SYSTEM.LVDLVLR.BIT.LVD1LVL = p_cfg->e_voltage_level;    //set voltage level
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",143
+000000F0 A901                    		MOV.L 10H[R0], R1
+000000F2 B111                    		MOVU.B 04H[R1], R1
+000000F4 FBEE98C208              		MOV.L #0008C298H, R14
+000000F9 754FF0                  		MOV.L #000000F0H, R15
+000000FC 50EF                    		AND [R14].UB, R15
+000000FE 64F1                    		AND #0FH, R1
+00000100 571F                    		OR R1, R15
+00000102 C3EF                    		MOV.B R15, [R14]
+00000104                         L49:	; bb141.split1
+                                 ;     144 #if (BSP_MCU_RX210 == 1)
+                                 ;     145         SYSTEM.LVCMPCR.BIT.EXVREFINP1 = 0;          // Select internal reference voltage
+                                 ;     146         SYSTEM.LVCMPCR.BIT.EXVCCINP1 = 0;           // Select Vcc to compare
+                                 ;     147         SYSTEM.LVD1CR0.BIT.LVD1DFDIS = 1;           // Disable digital filter
+                                 ;     148 #endif
+                                 ;     149         if (LVD_ACTION_RESET == p_cfg->e_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",149
+00000104 A901                    		MOV.L 10H[R0], R1
+00000106 EC1E                    		MOV.L [R1], R14
+00000108 610E                    		CMP #00H, R14
+0000010A 21rr                    		BNE L58
+0000010C                         L50:	; bb151
+0000010C FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     150         {
+                                 ;     151             /*Disable Interrupt/RESET. Enable RESET on Vcc falling to or below Vdet1, Set Reset Negation Stabilization*/
+                                 ;     152             SYSTEM.LVD1CR0.BYTE = (uint8_t)( 0x40 | (LVD_CFG_STABILIZATION_CHANNEL_1 << 7));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",152
+00000111 F8E440                  		MOV.B #40H, [R14]
+00000114                         L51:	; bb151.split
+00000114 FBEEE10008              		MOV.L #000800E1H, R14
+                                 ;     153             SYSTEM.LVD1SR.BIT.LVD1DET = 0;          // Clear the passage detection status bit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",153
+00000119 F0E8                    		BCLR #00H, [R14].B
+0000011B                         L52:	; bb151.split2
+0000011B FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     154             // At least 2 PCLKB cycles req'd before LVDnRIE can be set after clearing. This is just an easy way to do it\
+                                 ;     155                The SFR registers are read over the peripheral bus and thus clocked by PCLKB
+                                 ;     156             if (SYSTEM.LVD1CR0.BIT.LVD1RIE == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",156
+00000120 F4E0                    		BTST #00H, [R14].B
+00000122 18                   S  		BNE L54
+00000123                         L53:	; bb156
+00000123 FBEEE10008              		MOV.L #000800E1H, R14
+                                 ;     157             {
+                                 ;     158                 SYSTEM.LVD1SR.BIT.LVD1DET = 0;      // 2 PCLKB delay
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",158
+00000128 F0E8                    		BCLR #00H, [R14].B
+0000012A                         L54:	; bb167
+0000012A FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     159             }
+                                 ;     160             SYSTEM.LVD1CR0.BIT.LVD1RIE = 1;         // Enable LVD1 Interrupt/RESET
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",160
+0000012F F0E0                    		BSET #00H, [R14].B
+00000131                         L55:	; bb167.split
+00000131 FBEE97C208              		MOV.L #0008C297H, R14
+                                 ;     161             SYSTEM.LVCMPCR.BIT.LVD1E = 1;           // Enable the LVD1 circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",161
+00000136 F0E5                    		BSET #05H, [R14].B
+00000138                         L56:	; bb167.split3
+00000138 FB1A2C01                		MOV.L #0000012CH, R1
+                                 ;     162             lvd_delay(300);                         // Implement 300usec wait
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",162
+0000013C 39rrrr               W  		BSR __$lvd_delay
+0000013F                         L57:	; bb167.split4
+0000013F FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     163             SYSTEM.LVD1CR0.BIT.LVD1CMPE = 1;        // Enable comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",163
+00000144 F0E2                    		BSET #02H, [R14].B
+00000146 38rrrr               W  		BRA L79
+00000149                         L58:	; bb178
+                                 ;     164         }
+                                 ;     165 #if ((BSP_MCU_RX111 == 1) || (BSP_MCU_RX110 == 1) || (BSP_MCU_RX113 == 1) || \
+                                 ;     166      (BSP_MCU_RX210 == 1) || (BSP_MCU_RX231 == 1))
+                                 ;     167         else if(LVD_ACTION_IRQ == p_cfg->e_action)
+                                 ;     168         {
+                                 ;     169             lvd1_isr_handler = pcallback;                   // assign interrupt callback
+                                 ;     170             g_lvd_ch1_cb_args.vector = BSP_INT_SRC_LVD1;    // Set vector source for ISR callback argument
+                                 ;     171 
+                                 ;     172             /*Disable Interrupt/RESET. Enable Interrupt on Vcc crossing Vdet1, Set Reset Negation Stabilization*/
+                                 ;     173             SYSTEM.LVD1CR0.BYTE = (uint8_t)( 0x80 & (LVD_CFG_STABILIZATION_CHANNEL_1 << 7));
+                                 ;     174             SYSTEM.LVD1CR1.BYTE = (uint8_t)(p_cfg->e_trigger | (0x04)); // Set detection type and IRQ interrupt
+                                 ;     175             SYSTEM.LVCMPCR.BIT.LVD1E = 1;           // Enable the LVD1 circuit
+                                 ;     176             lvd_delay(300);                         // Implement 300usec wait
+                                 ;     177             SYSTEM.LVD1CR0.BIT.LVD1CMPE = 1;        // Enable comparison output
+                                 ;     178             SYSTEM.LVD1CR0.BIT.LVD1RIE = 0;         // Disable LVD1 Interrupt/RESET. Set to 0 before clearing LVDnDET next
+                                 ;     179             SYSTEM.LVD1SR.BIT.LVD1DET = 0;          // Clear the passage detection status bit
+                                 ;     180             // At least 2 PCLKB cycles req'd before LVDnRIE can be set after clearing. This is just an easy way to do it\
+                                 ;     181                The SFR registers are read over the peripheral bus and thus clocked by PCLKB
+                                 ;     182             if (SYSTEM.LVD1CR0.BIT.LVD1RIE == 0)
+                                 ;     183             {
+                                 ;     184                 SYSTEM.LVD1SR.BIT.LVD1DET = 0;      // 2 PCLKB delay
+                                 ;     185             }
+                                 ;     186             SYSTEM.LVD1CR0.BIT.LVD1RIE = 1;         // Enable LVD1 Interrupt/RESET
+                                 ;     187             IPR(LVD,LVD1) = LVD_CFG_INTERRUPT_PRIORITY_CHANNEL_1;
+                                 ;     188             IEN(LVD,LVD1) = 1;
+                                 ;     189         }
+                                 ;     190 #endif
+                                 ;     191         else if(LVD_ACTION_NMI == p_cfg->e_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",191
+00000149 A901                    		MOV.L 10H[R0], R1
+0000014B EC1E                    		MOV.L [R1], R14
+0000014D 611E                    		CMP #01H, R14
+0000014F 21rr                    		BNE L73
+00000151                         L59:	; bb179
+                                 ;     192         {
+                                 ;     193             R_BSP_InterruptWrite(BSP_INT_SRC_LVD1, (bsp_int_cb_t)pcallback); // assign interrupt callback
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",193
+00000151 A88A                    		MOV.L 0CH[R0], R2
+00000153 6671                    		MOV.L #00000007H, R1
+00000155 05rrrrrr             A  		BSR _R_BSP_InterruptWrite
+00000159                         L60:	; bb179.split
+00000159 FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     194 
+                                 ;     195             /*Disable Interrupt/RESET. Enable Interrupt on Vcc crossing Vdet1, Set Reset Negation Stabilization*/
+                                 ;     196             SYSTEM.LVD1CR0.BYTE = (uint8_t)( 0x80 & (LVD_CFG_STABILIZATION_CHANNEL_1 << 7));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",196
+0000015E F8E400                  		MOV.B #00H, [R14]
+00000161                         L61:	; bb179.split5
+                                 ;     197             SYSTEM.LVD1CR1.BYTE = (uint8_t)(p_cfg->e_trigger & (0x07)); // Set detection type and NMI interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",197
+00000161 A901                    		MOV.L 10H[R0], R1
+00000163 A891                    		MOV.L 08H[R1], R1
+00000165 6471                    		AND #07H, R1
+00000167 FBEEE00008              		MOV.L #000800E0H, R14
+0000016C C3E1                    		MOV.B R1, [R14]
+0000016E                         L62:	; bb179.split6
+0000016E FBEE97C208              		MOV.L #0008C297H, R14
+                                 ;     198             SYSTEM.LVCMPCR.BIT.LVD1E = 1;           // Enable the LVD1 circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",198
+00000173 F0E5                    		BSET #05H, [R14].B
+00000175                         L63:	; bb179.split7
+00000175 FB1A2C01                		MOV.L #0000012CH, R1
+                                 ;     199             lvd_delay(300);                         // Implement 300usec wait
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",199
+00000179 39rrrr               W  		BSR __$lvd_delay
+0000017C                         L64:	; bb179.split8
+0000017C FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     200             SYSTEM.LVD1CR0.BIT.LVD1CMPE = 1;        // Enable comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",200
+00000181 F0E2                    		BSET #02H, [R14].B
+00000183                         L65:	; bb179.split9
+00000183 FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     201             SYSTEM.LVD1CR0.BIT.LVD1RIE = 0;         // Disable LVD1 Interrupt/RESET. Set to 0 before clearing LVDnDET next
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",201
+00000188 F0E8                    		BCLR #00H, [R14].B
+0000018A                         L66:	; bb179.split10
+0000018A FBEEE10008              		MOV.L #000800E1H, R14
+                                 ;     202             SYSTEM.LVD1SR.BIT.LVD1DET = 0;          // Clear the passage detection status bit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",202
+0000018F F0E8                    		BCLR #00H, [R14].B
+00000191                         L67:	; bb179.split11
+00000191 FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     203             // At least 2 PCLKB cycles req'd before LVDnRIE can be set after clearing. This is just an easy way to do it\
+                                 ;     204                The SFR registers are read over the peripheral bus and thus clocked by PCLKB
+                                 ;     205             if (SYSTEM.LVD1CR0.BIT.LVD1RIE == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",205
+00000196 F4E0                    		BTST #00H, [R14].B
+00000198 18                   S  		BNE L69
+00000199                         L68:	; bb200
+00000199 FBEEE10008              		MOV.L #000800E1H, R14
+                                 ;     206             {
+                                 ;     207                 SYSTEM.LVD1SR.BIT.LVD1DET = 0;      // 2 PCLKB delay
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",207
+0000019E F0E8                    		BCLR #00H, [R14].B
+000001A0                         L69:	; bb212
+000001A0 FBEE340008              		MOV.L #00080034H, R14
+                                 ;     208             }
+                                 ;     209 #if ((BSP_MCU_RX63N == 1) || (BSP_MCU_RX64M == 1) || (BSP_MCU_RX71M == 1))
+                                 ;     210             if (SYSTEM.LOCOCR.BIT.LCSTP == 1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",210
+000001A5 58EE                    		MOVU.B [R14], R14
+000001A7 641E                    		AND #01H, R14
+000001A9 611E                    		CMP #01H, R14
+000001AB 18                   S  		BNE L71
+000001AC                         L70:	; bb213
+000001AC FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     211             {
+                                 ;     212                 SYSTEM.LVD1CR0.BIT.LVD1DFDIS = 1;   // Disable digital filter if LOCO turned off. Otherwise LVD will not monitor.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",212
+000001B1 F0E1                    		BSET #01H, [R14].B
+000001B3                         L71:	; bb224
+000001B3 FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     213             }
+                                 ;     214 #endif
+                                 ;     215             SYSTEM.LVD1CR0.BIT.LVD1RIE = 1;         // Enable LVD1 Interrupt/RESET
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",215
+000001B8 F0E0                    		BSET #00H, [R14].B
+000001BA                         L72:	; bb224.split
+000001BA FBEE817508              		MOV.L #00087581H, R14
+                                 ;     216             ICU.NMIER.BIT.LVD1EN = 1;               // Enable the LVD NMI interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",216
+000001BF F0E4                    		BSET #04H, [R14].B
+000001C1 2Err                 B  		BRA L79
+000001C3                         L73:	; bb232
+                                 ;     217         }
+                                 ;     218         else if(LVD_ACTION_POLL == p_cfg->e_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",218
+000001C3 A901                    		MOV.L 10H[R0], R1
+000001C5 EC1E                    		MOV.L [R1], R14
+000001C7 612E                    		CMP #02H, R14
+000001C9 21rr                    		BNE L79
+000001CB                         L74:	; bb233
+000001CB FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     219         {
+                                 ;     220              /*Disable Interrupt/RESET. Set Reset Negation Stabilization*/
+                                 ;     221             SYSTEM.LVD1CR0.BYTE = (uint8_t)( 0x80 & (LVD_CFG_STABILIZATION_CHANNEL_1 << 7));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",221
+000001D0 F8E400                  		MOV.B #00H, [R14]
+000001D3                         L75:	; bb233.split
+000001D3 FBEE97C208              		MOV.L #0008C297H, R14
+                                 ;     222             SYSTEM.LVCMPCR.BIT.LVD1E = 1;           // Enable the LVD1 circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",222
+000001D8 F0E5                    		BSET #05H, [R14].B
+000001DA                         L76:	; bb233.split12
+000001DA FB1A2C01                		MOV.L #0000012CH, R1
+                                 ;     223             lvd_delay(300);                         // Implement 300usec wait
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",223
+000001DE 39rrrr               W  		BSR __$lvd_delay
+000001E1                         L77:	; bb233.split13
+000001E1 FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     224             SYSTEM.LVD1CR0.BIT.LVD1CMPE = 1;        // Enable comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",224
+000001E6 F0E2                    		BSET #02H, [R14].B
+000001E8                         L78:	; bb233.split14
+000001E8 FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     225             SYSTEM.LVD1CR0.BIT.LVD1RIE = 0;         // Disable LVD1 Interrupt/RESET. Set to 0 before clearing LVDnDET next
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",225
+000001ED F0E8                    		BCLR #00H, [R14].B
+000001EF                         L79:	; bb264
+000001EF 6621                    		MOV.L #00000002H, R1
+                                 ;     226         }
+                                 ;     227         else
+                                 ;     228         {
+                                 ;     229             //nothing here
+                                 ;     230         }
+                                 ;     231 
+                                 ;     232         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LVD);           // lock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",232
+000001F1 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+000001F5                         L80:	; bb264.split
+                                 ;     233         g_lvd_ch1_open = true;                                      // set static flag to prevent improper reintialization
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",233
+000001F5 FBE2rrrrrrrr            		MOV.L #__$g_lvd_ch1_open, R14
+000001FB F8E401                  		MOV.B #01H, [R14]
+000001FE 38rrrr               W  		BRA L119
+00000201                         L81:	; bb266
+                                 ;     234 #else
+                                 ;     235         return LVD_ERR_ILL_PARAM;                                   // Code not enabled for this channel
+                                 ;     236 #endif
+                                 ;     237     }
+                                 ;     238     else if (LVD_CHANNEL_2 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",238
+00000201 A909                    		MOV.L 14H[R0], R1
+00000203 6121                    		CMP #02H, R1
+00000205 3Brrrr               W  		BNE L119
+00000208                         L82:	; bb268
+                                 ;     239     {
+                                 ;     240 #if (LVD_CFG_CHANNEL_2_USED == 1)
+                                 ;     241         if (g_lvd_ch2_open == true)            // check for improper reinitialization
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",241
+00000208 FBE2rrrrrrrr            		MOV.L #__$g_lvd_ch2_open, R14
+0000020E 58EE                    		MOVU.B [R14], R14
+00000210 611E                    		CMP #01H, R14
+00000212 18                   S  		BNE L84
+00000213                         L83:	; bb269
+                                 ;     242         {
+                                 ;     243             return LVD_ERR_ILL_REINITIALIZATION;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",243
+00000213 3E0103                  		MOV.L #00000003H, 04H[R0]
+00000216 38rrrr               W  		BRA L120
+00000219                         L84:	; bb276
+00000219 6621                    		MOV.L #00000002H, R1
+                                 ;     244         }
+                                 ;     245 
+                                 ;     246         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LVD);          // unlock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",246
+0000021B 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+0000021F                         L85:	; bb276.split
+                                 ;     247         SYSTEM.LVDLVLR.BIT.LVD2LVL = p_cfg->e_voltage_level;        //set voltage level
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",247
+0000021F A901                    		MOV.L 10H[R0], R1
+00000221 B111                    		MOVU.B 04H[R1], R1
+00000223 6C41                    		SHLL #04H, R1
+00000225 FBEE98C208              		MOV.L #0008C298H, R14
+0000022A 58EF                    		MOVU.B [R14], R15
+0000022C 64FF                    		AND #0FH, R15
+0000022E 571F                    		OR R1, R15
+00000230 C3EF                    		MOV.B R15, [R14]
+00000232                         L86:	; bb276.split15
+                                 ;     248 #if (BSP_MCU_RX210 == 1)
+                                 ;     249         SYSTEM.LVCMPCR.BIT.EXVREFINP2 = 0;                          // Select internal reference voltage
+                                 ;     250         SYSTEM.LVD1CR0.BIT.LVD1DFDIS = 1;                           // Disable digital filter
+                                 ;     251 #endif
+                                 ;     252 #if ((BSP_MCU_RX63N == 1) || (BSP_MCU_RX64M == 1) || (BSP_MCU_RX71M == 1))
+                                 ;     253         //Only Vcc can be monitored.
+                                 ;     254 #else
+                                 ;     255         SYSTEM.LVCMPCR.BIT.EXVCCINP2 = LVD_CFG_VDET2_VCC_CMPA2;     // Select Vcc or CMPA2 to compare
+                                 ;     256 #endif
+                                 ;     257 
+                                 ;     258         if (LVD_ACTION_RESET == p_cfg->e_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",258
+00000232 A901                    		MOV.L 10H[R0], R1
+00000234 EC1E                    		MOV.L [R1], R14
+00000236 610E                    		CMP #00H, R14
+00000238 21rr                    		BNE L95
+0000023A                         L87:	; bb287
+0000023A FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     259         {
+                                 ;     260              /*Disable Interrupt/RESET. Enable RESET on Vcc falling to or below Vdet2, Set Reset Negation Stabilization*/
+                                 ;     261             SYSTEM.LVD2CR0.BYTE = (uint8_t)( 0x40 | (LVD_CFG_STABILIZATION_CHANNEL_2 << 7));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",261
+0000023F F8E440                  		MOV.B #40H, [R14]
+00000242                         L88:	; bb287.split
+00000242 FBEEE30008              		MOV.L #000800E3H, R14
+                                 ;     262             SYSTEM.LVD2SR.BIT.LVD2DET = 0;          // Clear the passage detection status bit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",262
+00000247 F0E8                    		BCLR #00H, [R14].B
+00000249                         L89:	; bb287.split16
+00000249 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     263             // At least 2 PCLKB cycles req'd before LVDnRIE can be set after clearing. This is just an easy way to do it\
+                                 ;     264                The SFR registers are read over the peripheral bus and thus clocked by PCLKB
+                                 ;     265             if (SYSTEM.LVD2CR0.BIT.LVD2RIE == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",265
+0000024E F4E0                    		BTST #00H, [R14].B
+00000250 18                   S  		BNE L91
+00000251                         L90:	; bb292
+00000251 FBEEE30008              		MOV.L #000800E3H, R14
+                                 ;     266             {
+                                 ;     267                 SYSTEM.LVD2SR.BIT.LVD2DET = 0;      // 2 PCLKB delay
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",267
+00000256 F0E8                    		BCLR #00H, [R14].B
+00000258                         L91:	; bb303
+00000258 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     268             }
+                                 ;     269             SYSTEM.LVD2CR0.BIT.LVD2RIE = 1;         // Enable LVD2 Interrupt/RESET
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",269
+0000025D F0E0                    		BSET #00H, [R14].B
+0000025F                         L92:	; bb303.split
+0000025F FBEE97C208              		MOV.L #0008C297H, R14
+                                 ;     270             SYSTEM.LVCMPCR.BIT.LVD2E = 1;           // Enable the LVD2 circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",270
+00000264 F0E6                    		BSET #06H, [R14].B
+00000266                         L93:	; bb303.split17
+00000266 FB1A2C01                		MOV.L #0000012CH, R1
+                                 ;     271             lvd_delay(300);                         // Implement 300usec wait
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",271
+0000026A 39rrrr               W  		BSR __$lvd_delay
+0000026D                         L94:	; bb303.split18
+0000026D FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     272             SYSTEM.LVD2CR0.BIT.LVD2CMPE = 1;        // Enable comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",272
+00000272 F0E2                    		BSET #02H, [R14].B
+00000274 38rrrr               W  		BRA L117
+00000277                         L95:	; bb314
+                                 ;     273         }
+                                 ;     274 #if ((BSP_MCU_RX111 == 1) || (BSP_MCU_RX110 == 1) || (BSP_MCU_RX113 == 1) || \
+                                 ;     275 	 (BSP_MCU_RX210 == 1) || (BSP_MCU_RX231 == 1))
+                                 ;     276         else if(LVD_ACTION_IRQ == p_cfg->e_action)
+                                 ;     277         {
+                                 ;     278             lvd2_isr_handler = pcallback;                   // assign interrupt callback
+                                 ;     279             g_lvd_ch2_cb_args.vector = BSP_INT_SRC_LVD2;    // Set vector source for ISR callback argument
+                                 ;     280 
+                                 ;     281             /*Disable Interrupt/RESET. Enable Interrupt on Vcc crossing Vdet1, Set Reset Negation Stabilization*/
+                                 ;     282             SYSTEM.LVD2CR0.BYTE = (uint8_t)( 0x80 & (LVD_CFG_STABILIZATION_CHANNEL_2 << 7));
+                                 ;     283             SYSTEM.LVD2CR1.BYTE = (uint8_t)(p_cfg->e_trigger | (0x04)); // Set detection type and IRQ interrupt
+                                 ;     284             SYSTEM.LVCMPCR.BIT.LVD2E = 1;           // Enable the LVD2 circuit
+                                 ;     285             lvd_delay(300);                         // Implement 300usec wait
+                                 ;     286             SYSTEM.LVD2CR0.BIT.LVD2CMPE = 1;        // Enable comparison output
+                                 ;     287             SYSTEM.LVD2CR0.BIT.LVD2RIE = 0;         // Disable LVD2 Interrupt/RESET. Set to 0 before clearing LVDnDET next
+                                 ;     288             SYSTEM.LVD2SR.BIT.LVD2DET = 0;          // Clear the passage detection status bit
+                                 ;     289             // At least 2 PCLKB cycles req'd before LVDnRIE can be set after clearing. This is just an easy way to do it\
+                                 ;     290                The SFR registers are read over the peripheral bus and thus clocked by PCLKB
+                                 ;     291             if (SYSTEM.LVD2CR0.BIT.LVD2RIE == 0)
+                                 ;     292             {
+                                 ;     293                 SYSTEM.LVD2SR.BIT.LVD2DET = 0;      // 2 PCLKB delay
+                                 ;     294             }
+                                 ;     295             SYSTEM.LVD2CR0.BIT.LVD2RIE = 1;         // Enable LVD2 Interrupt/RESET
+                                 ;     296             IPR(LVD,LVD2) = LVD_CFG_INTERRUPT_PRIORITY_CHANNEL_2;
+                                 ;     297             IEN(LVD,LVD2) = 1;
+                                 ;     298         }
+                                 ;     299 #endif
+                                 ;     300         else if(LVD_ACTION_NMI == p_cfg->e_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",300
+00000277 A901                    		MOV.L 10H[R0], R1
+00000279 EC1E                    		MOV.L [R1], R14
+0000027B 611E                    		CMP #01H, R14
+0000027D 21rr                    		BNE L110
+0000027F                         L96:	; bb315
+                                 ;     301         {
+                                 ;     302             R_BSP_InterruptWrite(BSP_INT_SRC_LVD2, (bsp_int_cb_t)pcallback); // assign interrupt callback
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",302
+0000027F A88A                    		MOV.L 0CH[R0], R2
+00000281 6681                    		MOV.L #00000008H, R1
+00000283 05rrrrrr             A  		BSR _R_BSP_InterruptWrite
+00000287                         L97:	; bb315.split
+00000287 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     303 
+                                 ;     304             /*Disable Interrupt/RESET. Enable Interrupt on Vcc crossing Vdet1, Set Reset Negation Stabilization*/
+                                 ;     305             SYSTEM.LVD2CR0.BYTE = (uint8_t)( 0x80 & (LVD_CFG_STABILIZATION_CHANNEL_2 << 7));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",305
+0000028C F8E400                  		MOV.B #00H, [R14]
+0000028F                         L98:	; bb315.split19
+                                 ;     306             SYSTEM.LVD2CR1.BYTE = (uint8_t)(p_cfg->e_trigger & (0x07)); // Set detection type and NMI interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",306
+0000028F A901                    		MOV.L 10H[R0], R1
+00000291 A891                    		MOV.L 08H[R1], R1
+00000293 6471                    		AND #07H, R1
+00000295 FBEEE20008              		MOV.L #000800E2H, R14
+0000029A C3E1                    		MOV.B R1, [R14]
+0000029C                         L99:	; bb315.split20
+0000029C FBEE97C208              		MOV.L #0008C297H, R14
+                                 ;     307             SYSTEM.LVCMPCR.BIT.LVD2E = 1;           // Enable the LVD2 circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",307
+000002A1 F0E6                    		BSET #06H, [R14].B
+000002A3                         L100:	; bb315.split21
+000002A3 FB1A2C01                		MOV.L #0000012CH, R1
+                                 ;     308             lvd_delay(300);                         // Implement 300usec wait
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",308
+000002A7 39rrrr               W  		BSR __$lvd_delay
+000002AA                         L101:	; bb315.split22
+000002AA FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     309             SYSTEM.LVD2CR0.BIT.LVD2CMPE = 1;        // Enable comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",309
+000002AF F0E2                    		BSET #02H, [R14].B
+000002B1                         L102:	; bb315.split23
+000002B1 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     310             SYSTEM.LVD2CR0.BIT.LVD2RIE = 0;         // Disable LVD2 Interrupt/RESET. Set to 0 before clearing LVDnDET next
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",310
+000002B6 F0E8                    		BCLR #00H, [R14].B
+000002B8                         L103:	; bb315.split24
+000002B8 FBEEE30008              		MOV.L #000800E3H, R14
+                                 ;     311             SYSTEM.LVD2SR.BIT.LVD2DET = 0;          // Clear the passage detection status bit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",311
+000002BD F0E8                    		BCLR #00H, [R14].B
+000002BF                         L104:	; bb315.split25
+000002BF FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     312             // At least 2 PCLKB cycles req'd before LVDnRIE can be set after clearing. This is just an easy way to do it\
+                                 ;     313                The SFR registers are read over the peripheral bus and thus clocked by PCLKB
+                                 ;     314             if (SYSTEM.LVD2CR0.BIT.LVD2RIE == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",314
+000002C4 F4E0                    		BTST #00H, [R14].B
+000002C6 18                   S  		BNE L106
+000002C7                         L105:	; bb336
+000002C7 FBEEE30008              		MOV.L #000800E3H, R14
+                                 ;     315             {
+                                 ;     316                 SYSTEM.LVD2SR.BIT.LVD2DET = 0;      // 2 PCLKB delay
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",316
+000002CC F0E8                    		BCLR #00H, [R14].B
+000002CE                         L106:	; bb347
+000002CE FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     317             }
+                                 ;     318             SYSTEM.LVD2CR0.BIT.LVD2RIE = 1;         // Enable LVD2 Interrupt/RESET
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",318
+000002D3 F0E0                    		BSET #00H, [R14].B
+000002D5                         L107:	; bb347.split
+000002D5 FBEE340008              		MOV.L #00080034H, R14
+                                 ;     319 #if ((BSP_MCU_RX63N == 1) || (BSP_MCU_RX64M == 1) || (BSP_MCU_RX71M == 1))
+                                 ;     320             if (SYSTEM.LOCOCR.BIT.LCSTP == 1)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",320
+000002DA 58EE                    		MOVU.B [R14], R14
+000002DC 641E                    		AND #01H, R14
+000002DE 611E                    		CMP #01H, R14
+000002E0 18                   S  		BNE L109
+000002E1                         L108:	; bb352
+000002E1 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     321             {
+                                 ;     322                 SYSTEM.LVD2CR0.BIT.LVD2DFDIS = 1;   // Disable digital filter if LOCO turned off. Otherwise LVD will not monitor.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",322
+000002E6 F0E1                    		BSET #01H, [R14].B
+000002E8                         L109:	; bb363
+000002E8 FBEE817508              		MOV.L #00087581H, R14
+                                 ;     323             }
+                                 ;     324 #endif
+                                 ;     325             ICU.NMIER.BIT.LVD2EN = 1;               // Enable the LVD NMI interrupt
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",325
+000002ED F0E5                    		BSET #05H, [R14].B
+000002EF 2Err                 B  		BRA L117
+000002F1                         L110:	; bb368
+                                 ;     326         }
+                                 ;     327         else if(LVD_ACTION_POLL == p_cfg->e_action)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",327
+000002F1 A901                    		MOV.L 10H[R0], R1
+000002F3 EC1E                    		MOV.L [R1], R14
+000002F5 612E                    		CMP #02H, R14
+000002F7 21rr                    		BNE L117
+000002F9                         L111:	; bb369
+000002F9 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     328         {
+                                 ;     329              /*Disable Interrupt/RESET. Set Reset Negation Stabilization*/
+                                 ;     330             SYSTEM.LVD2CR0.BYTE = (uint8_t)( 0x80 & (LVD_CFG_STABILIZATION_CHANNEL_2 << 7));
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",330
+000002FE F8E400                  		MOV.B #00H, [R14]
+00000301                         L112:	; bb369.split
+00000301 FBEE97C208              		MOV.L #0008C297H, R14
+                                 ;     331             SYSTEM.LVCMPCR.BIT.LVD2E = 1;           // Enable the LVD2 circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",331
+00000306 F0E6                    		BSET #06H, [R14].B
+00000308                         L113:	; bb369.split26
+00000308 FB1A2C01                		MOV.L #0000012CH, R1
+                                 ;     332             lvd_delay(300);                         // Implement 300usec wait
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",332
+0000030C 39rrrr               W  		BSR __$lvd_delay
+0000030F                         L114:	; bb369.split27
+0000030F FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     333             SYSTEM.LVD2CR0.BIT.LVD2CMPE = 1;        // Enable comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",333
+00000314 F0E2                    		BSET #02H, [R14].B
+00000316                         L115:	; bb369.split28
+00000316 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     334             SYSTEM.LVD2CR0.BIT.LVD2RIE = 0;         // Disable LVD2 Interrupt/RESET. Set to 0 before clearing LVDnDET next
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",334
+0000031B F0E8                    		BCLR #00H, [R14].B
+0000031D                         L116:	; bb369.split29
+0000031D FBEEE30008              		MOV.L #000800E3H, R14
+                                 ;     335             SYSTEM.LVD2SR.BIT.LVD2DET = 0;          // Clear the passage detection status bit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",335
+00000322 F0E8                    		BCLR #00H, [R14].B
+00000324                         L117:	; bb403
+00000324 6621                    		MOV.L #00000002H, R1
+                                 ;     336         }
+                                 ;     337         else
+                                 ;     338         {
+                                 ;     339             //nothing here
+                                 ;     340         }
+                                 ;     341 
+                                 ;     342         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LVD);           // lock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",342
+00000326 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+0000032A                         L118:	; bb403.split
+                                 ;     343         g_lvd_ch2_open = true;                                      // set static flag to prevent reintialization before closing channel
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",343
+0000032A FBE2rrrrrrrr            		MOV.L #__$g_lvd_ch2_open, R14
+00000330 F8E401                  		MOV.B #01H, [R14]
+00000333                         L119:	; bb414
+                                 ;     344 #else
+                                 ;     345         return LVD_ERR_ILL_PARAM;                                   // Code not enabled for this channel
+                                 ;     346 #endif
+                                 ;     347     }
+                                 ;     348     else
+                                 ;     349     {
+                                 ;     350         //nothing
+                                 ;     351     }
+                                 ;     352 
+                                 ;     353     return LVD_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",353
+00000333 3E0100                  		MOV.L #00000000H, 04H[R0]
+00000336                         L120:	; bb416
+00000336 A809                    		MOV.L 04H[R0], R1
+00000338 A081                    		MOV.L R1, 08H[R0]
+                                 ;     354 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",354
+0000033A 6706                    		RTSD #18H
+0000033C                         _R_LVD_Control:
+                                 		.STACK	_R_LVD_Control=28
+                                 ;     355 
+                                 ;     356 /***********************************************************************************************************************
+                                 ;     357 * Function Name: R_LVD_Control
+                                 ;     358 * Description  : This function is used as a routing function to implement a control and execute method for
+                                 ;     359 *                available LVD features including
+                                 ;     360 *                1. Changing detection voltage level
+                                 ;     361 *                2. Reading status of the LVD Channel
+                                 ;     362 *                3. Clearing the status of an LVD Channel
+                                 ;     363 * Arguments    : lvd_cmd_t const e_cmd
+                                 ;     364 *                       -Specify the command
+                                 ;     365 *                void *param
+                                 ;     366 *                       -Pointer to any arguments that may be required to execute the command.
+                                 ;     367 * Return Value : LVD_SUCCESS
+                                 ;     368 *                LVD_ERR_ILL_PARAM
+                                 ;     369 *                LVD_ERR_NOT_INITIALIZED
+                                 ;     370 *                LVD_ERR_VDET
+                                 ;     371 *                LVD_ERR_DISABLED
+                                 ;     372 *                LVD_ERR_VDET_BELOW_AND_NOT_CROSSED
+                                 ;     373 *                LVD_ERR_VDET_BELOW_AND_CROSSED
+                                 ;     374 *                LVD_ERR_VDET_ABOVE_AND_NOT_CROSSED
+                                 ;     375 *                LVD_ERR_VDET_ABOVE_AND_CROSSED
+                                 ;     376 ***********************************************************************************************************************/
+                                 ;     377 lvd_err_t R_LVD_Control(lvd_cmd_t const e_cmd, void *param)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",377
+0000033C 7100E8                  		ADD #0FFFFFFE8H, R0
+0000033F A109                    		MOV.L R1, 14H[R0]
+00000341 A102                    		MOV.L R2, 10H[R0]
+                                 ;     378 {
+                                 ;     379     lvd_err_t err;
+                                 ;     380 
+                                 ;     381 #if (LVD_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     382     if (e_cmd >= LVD_CMD_INVALID)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",382
+00000343 A909                    		MOV.L 14H[R0], R1
+00000345 6131                    		CMP #03H, R1
+00000347 29rr                    		BLT L123
+00000349                         L122:	; bb4
+                                 ;     383     {
+                                 ;     384         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",384
+00000349 3E0104                  		MOV.L #00000004H, 04H[R0]
+0000034C 2Err                 B  		BRA L137
+0000034E                         L123:	; bb10
+                                 ;     385     }
+                                 ;     386     if ((param == NULL) || (param == FIT_NO_PTR))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",386
+0000034E A901                    		MOV.L 10H[R0], R1
+00000350 6101                    		CMP #00H, R1
+00000352 20rr                    		BEQ L126
+00000354 08                   S  		BRA L125
+00000355                         L124:	; bb11
+                                 ;     387     {
+                                 ;     388         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",388
+00000355 3E0104                  		MOV.L #00000004H, 04H[R0]
+00000358 2Err                 B  		BRA L137
+0000035A                         L125:	; bb16
+0000035A A901                    		MOV.L 10H[R0], R1
+0000035C 740100000010            		CMP #10000000H, R1
+00000362 18                   S  		BNE L127
+00000363                         L126:	; bb20
+00000363 F80601                  		MOV.L #00000001H, [R0]
+00000366 08                   S  		BRA L128
+00000367                         L127:	; bb21
+00000367 F80600                  		MOV.L #00000000H, [R0]
+0000036A                         L128:	; bb22
+0000036A EC01                    		MOV.L [R0], R1
+0000036C 6101                    		CMP #00H, R1
+0000036E 21rr                    		BNE L124
+00000370                         L129:	; bb27
+                                 ;     389     }
+                                 ;     390 
+                                 ;     391 #endif
+                                 ;     392     switch (e_cmd)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",392
+00000370 A909                    		MOV.L 14H[R0], R1
+00000372 6121                    		CMP #02H, R1
+00000374 20rr                    		BEQ L134
+00000376                         L130:	; bb27
+00000376 6111                    		CMP #01H, R1
+00000378 20rr                    		BEQ L133
+0000037A                         L131:	; bb27
+0000037A 6101                    		CMP #00H, R1
+0000037C 21rr                    		BNE L135
+0000037E                         L132:	; bb29
+                                 ;     393     {
+                                 ;     394         case LVD_CMD_LEVEL_SET:
+                                 ;     395             err = lvd_level_set(((lvd_lvl_cfg_t *)param)->e_channel, ((lvd_lvl_cfg_t *)param)->e_voltage_lvl);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",395
+0000037E A901                    		MOV.L 10H[R0], R1
+00000380 A81A                    		MOV.L 04H[R1], R2
+00000382 EC11                    		MOV.L [R1], R1
+00000384 39rrrr               W  		BSR __$lvd_level_set
+00000387 A081                    		MOV.L R1, 08H[R0]
+00000389 2Err                 B  		BRA L136
+0000038B                         L133:	; bb39
+                                 ;     396         break;
+                                 ;     397 
+                                 ;     398         case LVD_CMD_STATUS_GET:
+                                 ;     399             err = lvd_status_get(((lvd_status_t *)param)->e_channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",399
+0000038B A901                    		MOV.L 10H[R0], R1
+0000038D EC11                    		MOV.L [R1], R1
+0000038F 39rrrr               W  		BSR __$lvd_status_get
+00000392 A081                    		MOV.L R1, 08H[R0]
+00000394 2Err                 B  		BRA L136
+00000396                         L134:	; bb45
+                                 ;     400         break;
+                                 ;     401 
+                                 ;     402         case LVD_CMD_STATUS_CLEAR:
+                                 ;     403             err = lvd_status_clear(((lvd_status_t *)param)->e_channel);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",403
+00000396 A901                    		MOV.L 10H[R0], R1
+00000398 EC11                    		MOV.L [R1], R1
+0000039A 39rrrr               W  		BSR __$lvd_status_clear
+0000039D A081                    		MOV.L R1, 08H[R0]
+0000039F 08                   S  		BRA L136
+000003A0                         L135:	; bb51
+                                 ;     404         break;
+                                 ;     405         default:
+                                 ;     406             err = LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",406
+000003A0 3E0204                  		MOV.L #00000004H, 08H[R0]
+000003A3                         L136:	; bb52
+                                 ;     407     }
+                                 ;     408 
+                                 ;     409     return err;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",409
+000003A3 E5000201                		MOV.L 08H[R0], 04H[R0]
+000003A7                         L137:	; bb55
+000003A7 A809                    		MOV.L 04H[R0], R1
+000003A9 A089                    		MOV.L R1, 0CH[R0]
+                                 ;     410 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",410
+000003AB 6706                    		RTSD #18H
+000003AD                         _R_LVD_Close:
+                                 		.STACK	_R_LVD_Close=16
+                                 ;     411 
+                                 ;     412 /***********************************************************************************************************************
+                                 ;     413 * Function Name: R_LVD_Close
+                                 ;     414 * Description  : This function closes the specified LVD channel.
+                                 ;     415 * Arguments    : lvd_channel_t e_channel
+                                 ;     416 *                       -Specify the channel
+                                 ;     417 * Return Value : LVD_SUCCESS
+                                 ;     418 *                LVD_ERR_ILL_PARAM
+                                 ;     419 ***********************************************************************************************************************/
+                                 ;     420 lvd_err_t R_LVD_Close(lvd_channel_t e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",420
+000003AD 60C0                    		SUB #0CH, R0
+000003AF A081                    		MOV.L R1, 08H[R0]
+                                 ;     421 {
+                                 ;     422 #if (LVD_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     423     if (e_channel >= LVD_CHANNEL_INVALID)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",423
+000003B1 6131                    		CMP #03H, R1
+000003B3 29rr                    		BLT L140
+000003B5                         L139:	; bb2
+                                 ;     424     {
+                                 ;     425         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",425
+000003B5 F80604                  		MOV.L #00000004H, [R0]
+000003B8 2Err                 B  		BRA L154
+000003BA                         L140:	; bb8
+                                 ;     426     }
+                                 ;     427 #endif
+                                 ;     428     if (LVD_CHANNEL_1 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",428
+000003BA A881                    		MOV.L 08H[R0], R1
+000003BC 6111                    		CMP #01H, R1
+000003BE 21rr                    		BNE L146
+000003C0                         L141:	; bb9
+000003C0 6621                    		MOV.L #00000002H, R1
+                                 ;     429     {
+                                 ;     430 #if (LVD_CFG_CHANNEL_1_USED ==1)
+                                 ;     431         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LVD);  // unlock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",431
+000003C2 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+000003C6                         L142:	; bb9.split
+                                 ;     432         SYSTEM.LVD1CR0.BYTE = 0x00;                         // Disable LVD Monitoring and comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",432
+000003C6 FB1E97C208              		MOV.L #0008C297H, R1
+000003CB 3C1300                  		MOV.B #00H, 03H[R1]
+000003CE                         L143:	; bb9.split1
+                                 ;     433         SYSTEM.LVCMPCR.BIT.LVD1E = 0;                       // Disable Voltage Detection circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",433
+000003CE FBEE97C208              		MOV.L #0008C297H, R14
+000003D3 F0ED                    		BCLR #05H, [R14].B
+000003D5                         L144:	; bb9.split2
+000003D5 6621                    		MOV.L #00000002H, R1
+                                 ;     434         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LVD);   // lock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",434
+000003D7 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+000003DB                         L145:	; bb9.split3
+                                 ;     435 #if ((BSP_MCU_RX111 == 1) || (BSP_MCU_RX110 == 1) || (BSP_MCU_RX113 == 1) || \
+                                 ;     436      (BSP_MCU_RX210 == 1) || (BSP_MCU_RX231 == 1))
+                                 ;     437         IEN(LVD,LVD1) = 0;                                  // Disable interrupt
+                                 ;     438 #endif
+                                 ;     439         g_lvd_ch1_open = false;                             // Set static status flag
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",439
+000003DB FBE2rrrrrrrr            		MOV.L #__$g_lvd_ch1_open, R14
+000003E1 F8E400                  		MOV.B #00H, [R14]
+000003E4 2Err                 B  		BRA L152
+000003E6                         L146:	; bb14
+                                 ;     440 #else
+                                 ;     441         return LVD_ERR_ILL_PARAM;                           // Code not enabled for this channel
+                                 ;     442 #endif
+                                 ;     443     }
+                                 ;     444     else if (LVD_CHANNEL_2 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",444
+000003E6 A881                    		MOV.L 08H[R0], R1
+000003E8 6121                    		CMP #02H, R1
+000003EA 21rr                    		BNE L152
+000003EC                         L147:	; bb15
+000003EC 6621                    		MOV.L #00000002H, R1
+                                 ;     445     {
+                                 ;     446 #if (LVD_CFG_CHANNEL_2_USED ==1)
+                                 ;     447         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LVD);  // unlock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",447
+000003EE 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+000003F2                         L148:	; bb15.split
+                                 ;     448         SYSTEM.LVD2CR0.BYTE = 0x00;                         // Disable LVD Monitoring and comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",448
+000003F2 FB1E97C208              		MOV.L #0008C297H, R1
+000003F7 3C1400                  		MOV.B #00H, 04H[R1]
+000003FA                         L149:	; bb15.split4
+                                 ;     449         SYSTEM.LVCMPCR.BIT.LVD2E = 0;                       // Disable Voltage Detection circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",449
+000003FA FBEE97C208              		MOV.L #0008C297H, R14
+000003FF F0EE                    		BCLR #06H, [R14].B
+00000401                         L150:	; bb15.split5
+00000401 6621                    		MOV.L #00000002H, R1
+                                 ;     450         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LVD);   // lock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",450
+00000403 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+00000407                         L151:	; bb15.split6
+                                 ;     451 #if ((BSP_MCU_RX111 == 1) || (BSP_MCU_RX110 == 1) || (BSP_MCU_RX113 == 1) || \
+                                 ;     452      (BSP_MCU_RX210 == 1) || (BSP_MCU_RX231 == 1))
+                                 ;     453         IEN(LVD,LVD2) = 0;                                  // Disable interrupt
+                                 ;     454 #endif
+                                 ;     455         g_lvd_ch2_open = false;                             // Set static status flag
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",455
+00000407 FBE2rrrrrrrr            		MOV.L #__$g_lvd_ch2_open, R14
+0000040D F8E400                  		MOV.B #00H, [R14]
+00000410                         L152:	; bb29
+                                 ;     456 #else
+                                 ;     457         return LVD_ERR_ILL_PARAM;                           // Code not enabled for this channel
+                                 ;     458 #endif
+                                 ;     459     }
+                                 ;     460     else
+                                 ;     461     {
+                                 ;     462         //nothing
+                                 ;     463     }
+                                 ;     464 
+                                 ;     465     lvd_status_clear(e_channel);                            // Clear Status registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",465
+00000410 A881                    		MOV.L 08H[R0], R1
+00000412 39rrrr               W  		BSR __$lvd_status_clear
+00000415                         L153:	; bb29.split
+                                 ;     466     return LVD_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",466
+00000415 F80600                  		MOV.L #00000000H, [R0]
+00000418                         L154:	; bb33
+00000418 EC01                    		MOV.L [R0], R1
+0000041A A009                    		MOV.L R1, 04H[R0]
+                                 ;     467 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",467
+0000041C 6703                    		RTSD #0CH
+0000041E                         __$lvd_level_set:
+                                 		.STACK	__$lvd_level_set=28
+                                 ;     468 
+                                 ;     469 /***********************************************************************************************************************
+                                 ;     470 * Function Name: lvd_level_set
+                                 ;     471 * Description  : This function can be used to change the voltage detection levels.
+                                 ;     472 *                Note that this function WILL clear the detection status bit.
+                                 ;     473 * Arguments    : lvd_channel_t e_channel
+                                 ;     474 *                       -Specify the channel
+                                 ;     475 *                lvd_voltage_level_t e_voltage_level
+                                 ;     476 *                       -Set the new voltage detection level
+                                 ;     477 * Return Value : LVD_SUCCESS
+                                 ;     478 *                LVD_ERR_ILL_PARAM
+                                 ;     479 *                LVD_ERR_NOT_INITIALIZED
+                                 ;     480 *                LVD_ERR_VDET
+                                 ;     481 ***********************************************************************************************************************/
+                                 ;     482 static lvd_err_t  lvd_level_set(lvd_channel_t e_channel, lvd_voltage_level_t e_voltage_level)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",482
+0000041E 7100E8                  		ADD #0FFFFFFE8H, R0
+00000421 A109                    		MOV.L R1, 14H[R0]
+00000423 A102                    		MOV.L R2, 10H[R0]
+                                 ;     483 {
+                                 ;     484     uint8_t temp_status_reg;
+                                 ;     485 
+                                 ;     486 #if (LVD_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     487     if (e_channel >= LVD_CHANNEL_INVALID)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",487
+00000425 A909                    		MOV.L 14H[R0], R1
+00000427 6131                    		CMP #03H, R1
+00000429 29rr                    		BLT L157
+0000042B                         L156:	; bb4
+                                 ;     488     {
+                                 ;     489         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",489
+0000042B 3E0104                  		MOV.L #00000004H, 04H[R0]
+0000042E 38rrrr               W  		BRA L208
+00000431                         L157:	; bb10
+                                 ;     490     }
+                                 ;     491 
+                                 ;     492     if (LVD_CHANNEL_2 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",492
+00000431 A909                    		MOV.L 14H[R0], R1
+00000433 6121                    		CMP #02H, R1
+00000435 21rr                    		BNE L164
+00000437                         L158:	; bb12
+                                 ;     493     {
+                                 ;     494         if ((e_voltage_level < LVD_VOLTAGE_CH2_MIN) || (e_voltage_level > LVD_VOLTAGE_CH2_MAX))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",494
+00000437 A901                    		MOV.L 10H[R0], R1
+00000439 61A1                    		CMP #0AH, R1
+0000043B 29rr                    		BLT L161
+0000043D 08                   S  		BRA L160
+0000043E                         L159:	; bb13
+                                 ;     495         {
+                                 ;     496             return LVD_ERR_VDET;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",496
+0000043E 3E0101                  		MOV.L #00000001H, 04H[R0]
+00000441 38rrrr               W  		BRA L208
+00000444                         L160:	; bb18
+00000444 A901                    		MOV.L 10H[R0], R1
+00000446 61B1                    		CMP #0BH, R1
+00000448 29rr                    		BLT L162
+0000044A                         L161:	; bb22
+0000044A F80601                  		MOV.L #00000001H, [R0]
+0000044D 08                   S  		BRA L163
+0000044E                         L162:	; bb23
+0000044E F80600                  		MOV.L #00000000H, [R0]
+00000451                         L163:	; bb24
+00000451 EC01                    		MOV.L [R0], R1
+00000453 6101                    		CMP #00H, R1
+00000455 21rr                    		BNE L159
+00000457 2Err                 B  		BRA L171
+00000459                         L164:	; bb31
+                                 ;     497         }
+                                 ;     498     }
+                                 ;     499     else if (LVD_CHANNEL_1 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",499
+00000459 A909                    		MOV.L 14H[R0], R1
+0000045B 6111                    		CMP #01H, R1
+0000045D 21rr                    		BNE L171
+0000045F                         L165:	; bb33
+                                 ;     500     {
+                                 ;     501         if ((e_voltage_level < LVD_VOLTAGE_CH1_MIN) || (e_voltage_level > LVD_VOLTAGE_CH1_MAX))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",501
+0000045F A901                    		MOV.L 10H[R0], R1
+00000461 61A1                    		CMP #0AH, R1
+00000463 29rr                    		BLT L168
+00000465 08                   S  		BRA L167
+00000466                         L166:	; bb34
+                                 ;     502         {
+                                 ;     503             return LVD_ERR_VDET;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",503
+00000466 3E0101                  		MOV.L #00000001H, 04H[R0]
+00000469 38rrrr               W  		BRA L208
+0000046C                         L167:	; bb39
+0000046C A901                    		MOV.L 10H[R0], R1
+0000046E 61B1                    		CMP #0BH, R1
+00000470 29rr                    		BLT L169
+00000472                         L168:	; bb43
+00000472 F80601                  		MOV.L #00000001H, [R0]
+00000475 08                   S  		BRA L170
+00000476                         L169:	; bb44
+00000476 F80600                  		MOV.L #00000000H, [R0]
+00000479                         L170:	; bb45
+00000479 EC01                    		MOV.L [R0], R1
+0000047B 6101                    		CMP #00H, R1
+0000047D 21rr                    		BNE L166
+0000047F                         L171:	; bb61
+                                 ;     504         }
+                                 ;     505     }
+                                 ;     506 #endif
+                                 ;     507 
+                                 ;     508     if (LVD_CHANNEL_1 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",508
+0000047F A909                    		MOV.L 14H[R0], R1
+00000481 6111                    		CMP #01H, R1
+00000483 3Brrrr               W  		BNE L189
+00000486                         L172:	; bb63
+                                 ;     509     {
+                                 ;     510 #if (LVD_CFG_CHANNEL_1_USED ==1)
+                                 ;     511         if (g_lvd_ch1_open == false)                        // check for initialization
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",511
+00000486 FBE2rrrrrrrr            		MOV.L #__$g_lvd_ch1_open, R14
+0000048C 58EE                    		MOVU.B [R14], R14
+0000048E 610E                    		CMP #00H, R14
+00000490 18                   S  		BNE L174
+00000491                         L173:	; bb64
+                                 ;     512         {
+                                 ;     513             return LVD_ERR_NOT_INITIALIZED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",513
+00000491 3E0102                  		MOV.L #00000002H, 04H[R0]
+00000494 38rrrr               W  		BRA L208
+00000497                         L174:	; bb71
+00000497 6621                    		MOV.L #00000002H, R1
+                                 ;     514         }
+                                 ;     515 
+                                 ;     516         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LVD);  // unlock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",516
+00000499 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+0000049D                         L175:	; bb71.split
+0000049D FBEE97C208              		MOV.L #0008C297H, R14
+                                 ;     517 
+                                 ;     518         SYSTEM.LVCMPCR.BIT.LVD1E = 0;                       //Disable the LVD1 circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",518
+000004A2 F0ED                    		BCLR #05H, [R14].B
+000004A4                         L176:	; bb71.split1
+000004A4 FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     519         SYSTEM.LVD1CR0.BIT.LVD1CMPE = 0;                    //Disable LVD comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",519
+000004A9 F0EA                    		BCLR #02H, [R14].B
+000004AB                         L177:	; bb71.split2
+000004AB FBEE98C208              		MOV.L #0008C298H, R14
+                                 ;     520         SYSTEM.LVDLVLR.BIT.LVD1LVL = e_voltage_level;       //set voltage level
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",520
+000004B0 B401                    		MOVU.B 10H[R0], R1
+000004B2 754FF0                  		MOV.L #000000F0H, R15
+000004B5 50EF                    		AND [R14].UB, R15
+000004B7 64F1                    		AND #0FH, R1
+000004B9 571F                    		OR R1, R15
+000004BB C3EF                    		MOV.B R15, [R14]
+000004BD                         L178:	; bb71.split3
+000004BD FBEE97C208              		MOV.L #0008C297H, R14
+                                 ;     521         SYSTEM.LVCMPCR.BIT.LVD1E = 1;                       // Enable the LVD1 circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",521
+000004C2 F0E5                    		BSET #05H, [R14].B
+000004C4                         L179:	; bb71.split4
+000004C4 FB1A2C01                		MOV.L #0000012CH, R1
+                                 ;     522         lvd_delay(300);                                     // Implement 300usec wait
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",522
+000004C8 39rrrr               W  		BSR __$lvd_delay
+000004CB                         L180:	; bb71.split5
+000004CB FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     523         SYSTEM.LVD1CR0.BIT.LVD1CMPE = 1;                    // Enable LVD comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",523
+000004D0 F0E2                    		BSET #02H, [R14].B
+000004D2                         L181:	; bb71.split6
+000004D2 FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     524         temp_status_reg = SYSTEM.LVD1CR0.BIT.LVD1RIE;        // save interrupt/reset setting
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",524
+000004D7 58E1                    		MOVU.B [R14], R1
+000004D9 6411                    		AND #01H, R1
+000004DB 8289                    		MOV.B R1, 0BH[R0]
+000004DD                         L182:	; bb71.split7
+000004DD FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     525         SYSTEM.LVD1CR0.BIT.LVD1RIE = 0;                     // Disable LVD2 Interrupt/RESET. Set to 0 before clearing LVDnDET next
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",525
+000004E2 F0E8                    		BCLR #00H, [R14].B
+000004E4                         L183:	; bb71.split8
+000004E4 FBEEE10008              		MOV.L #000800E1H, R14
+                                 ;     526         SYSTEM.LVD1SR.BIT.LVD1DET = 0;                      // Clear the passage detection status bit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",526
+000004E9 F0E8                    		BCLR #00H, [R14].B
+000004EB                         L184:	; bb71.split9
+000004EB FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     527         // At least 2 PCLKB cycles req'd before LVDnRIE can be set after clearing. This is just an easy way to do it\
+                                 ;     528            The SFR registers are read over the peripheral bus and thus clocked by PCLKB
+                                 ;     529         if (SYSTEM.LVD1CR0.BIT.LVD1RIE == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",529
+000004F0 F4E0                    		BTST #00H, [R14].B
+000004F2 18                   S  		BNE L186
+000004F3                         L185:	; bb100
+000004F3 FBEEE10008              		MOV.L #000800E1H, R14
+                                 ;     530         {
+                                 ;     531             SYSTEM.LVD1SR.BIT.LVD1DET = 0;                  // 2 PCLKB delay
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",531
+000004F8 F0E8                    		BCLR #00H, [R14].B
+000004FA                         L186:	; bb112
+                                 ;     532         }
+                                 ;     533         if (temp_status_reg)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",533
+000004FA B289                    		MOVU.B 0BH[R0], R1
+000004FC 6101                    		CMP #00H, R1
+000004FE 10                   S  		BEQ L188
+000004FF                         L187:	; bb113
+000004FF FBEE9AC208              		MOV.L #0008C29AH, R14
+                                 ;     534         {
+                                 ;     535             SYSTEM.LVD1CR0.BIT.LVD1RIE = 1;                 // Enable LVD1 Interrupt/RESET
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",535
+00000504 F0E0                    		BSET #00H, [R14].B
+00000506                         L188:	; bb122
+00000506 6621                    		MOV.L #00000002H, R1
+                                 ;     536         }
+                                 ;     537 
+                                 ;     538         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LVD);   // lock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",538
+00000508 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+0000050C 38rrrr               W  		BRA L207
+0000050F                         L189:	; bb124
+                                 ;     539 #else
+                                 ;     540         return LVD_ERR_ILL_PARAM;             // Code not enabled for this channel
+                                 ;     541 #endif
+                                 ;     542     }
+                                 ;     543     else if (LVD_CHANNEL_2 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",543
+0000050F A909                    		MOV.L 14H[R0], R1
+00000511 6121                    		CMP #02H, R1
+00000513 3Brrrr               W  		BNE L207
+00000516                         L190:	; bb126
+                                 ;     544     {
+                                 ;     545 #if (LVD_CFG_CHANNEL_2_USED ==1)
+                                 ;     546         if (g_lvd_ch2_open == false)                        // check for initialization
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",546
+00000516 FBE2rrrrrrrr            		MOV.L #__$g_lvd_ch2_open, R14
+0000051C 58EE                    		MOVU.B [R14], R14
+0000051E 610E                    		CMP #00H, R14
+00000520 18                   S  		BNE L192
+00000521                         L191:	; bb127
+                                 ;     547         {
+                                 ;     548             return LVD_ERR_NOT_INITIALIZED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",548
+00000521 3E0102                  		MOV.L #00000002H, 04H[R0]
+00000524 2Err                 B  		BRA L208
+00000526                         L192:	; bb134
+00000526 6621                    		MOV.L #00000002H, R1
+                                 ;     549         }
+                                 ;     550         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LVD);  // unlock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",550
+00000528 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+0000052C                         L193:	; bb134.split
+0000052C FBEE97C208              		MOV.L #0008C297H, R14
+                                 ;     551 
+                                 ;     552         SYSTEM.LVCMPCR.BIT.LVD2E = 0;                       //Disable the LVD2 circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",552
+00000531 F0EE                    		BCLR #06H, [R14].B
+00000533                         L194:	; bb134.split10
+00000533 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     553         SYSTEM.LVD2CR0.BIT.LVD2CMPE = 0;                    //Disable LVD comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",553
+00000538 F0EA                    		BCLR #02H, [R14].B
+0000053A                         L195:	; bb134.split11
+                                 ;     554         SYSTEM.LVDLVLR.BIT.LVD2LVL = e_voltage_level;       //set voltage level
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",554
+0000053A B401                    		MOVU.B 10H[R0], R1
+0000053C 6C41                    		SHLL #04H, R1
+0000053E FBEE98C208              		MOV.L #0008C298H, R14
+00000543 58EF                    		MOVU.B [R14], R15
+00000545 64FF                    		AND #0FH, R15
+00000547 571F                    		OR R1, R15
+00000549 C3EF                    		MOV.B R15, [R14]
+0000054B                         L196:	; bb134.split12
+0000054B FBEE97C208              		MOV.L #0008C297H, R14
+                                 ;     555         SYSTEM.LVCMPCR.BIT.LVD2E = 1;                       // Enable the LVD2 circuit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",555
+00000550 F0E6                    		BSET #06H, [R14].B
+00000552                         L197:	; bb134.split13
+00000552 FB1A2C01                		MOV.L #0000012CH, R1
+                                 ;     556         lvd_delay(300);                                     // Implement 300usec wait
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",556
+00000556 39rrrr               W  		BSR __$lvd_delay
+00000559                         L198:	; bb134.split14
+00000559 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     557         SYSTEM.LVD2CR0.BIT.LVD2CMPE = 1;                    // Enable LVD comparison output
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",557
+0000055E F0E2                    		BSET #02H, [R14].B
+00000560                         L199:	; bb134.split15
+00000560 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     558         temp_status_reg = SYSTEM.LVD2CR0.BIT.LVD2RIE;       // save interrupt/reset setting
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",558
+00000565 58E1                    		MOVU.B [R14], R1
+00000567 6411                    		AND #01H, R1
+00000569 8289                    		MOV.B R1, 0BH[R0]
+0000056B                         L200:	; bb134.split16
+0000056B FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     559         SYSTEM.LVD2CR0.BIT.LVD2RIE = 0;                     // Disable LVD2 Interrupt/RESET. Set to 0 before clearing LVDnDET next
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",559
+00000570 F0E8                    		BCLR #00H, [R14].B
+00000572                         L201:	; bb134.split17
+00000572 FBEEE30008              		MOV.L #000800E3H, R14
+                                 ;     560         SYSTEM.LVD2SR.BIT.LVD2DET = 0;                      // Clear the passage detection status bit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",560
+00000577 F0E8                    		BCLR #00H, [R14].B
+00000579                         L202:	; bb134.split18
+00000579 FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     561         // At least 2 PCLKB cycles req'd before LVDnRIE can be set after clearing. This is just an easy way to do it\
+                                 ;     562            The SFR registers are read over the peripheral bus and thus clocked by PCLKB
+                                 ;     563         if (SYSTEM.LVD2CR0.BIT.LVD2RIE == 0)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",563
+0000057E F4E0                    		BTST #00H, [R14].B
+00000580 18                   S  		BNE L204
+00000581                         L203:	; bb164
+00000581 FBEEE30008              		MOV.L #000800E3H, R14
+                                 ;     564         {
+                                 ;     565             SYSTEM.LVD2SR.BIT.LVD2DET = 0;                  // 2 PCLKB delay
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",565
+00000586 F0E8                    		BCLR #00H, [R14].B
+00000588                         L204:	; bb176
+                                 ;     566         }
+                                 ;     567         if (temp_status_reg)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",567
+00000588 B289                    		MOVU.B 0BH[R0], R1
+0000058A 6101                    		CMP #00H, R1
+0000058C 10                   S  		BEQ L206
+0000058D                         L205:	; bb177
+0000058D FBEE9BC208              		MOV.L #0008C29BH, R14
+                                 ;     568         {
+                                 ;     569             SYSTEM.LVD2CR0.BIT.LVD2RIE = 1;                 // Enable LVD2 Interrupt/RESET
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",569
+00000592 F0E0                    		BSET #00H, [R14].B
+00000594                         L206:	; bb186
+00000594 6621                    		MOV.L #00000002H, R1
+                                 ;     570         }
+                                 ;     571 
+                                 ;     572         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LVD); // lock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",572
+00000596 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+0000059A                         L207:	; bb196
+                                 ;     573 #else
+                                 ;     574         return LVD_ERR_ILL_PARAM;             // Code not enabled for this channel
+                                 ;     575 #endif
+                                 ;     576     }
+                                 ;     577 
+                                 ;     578     return LVD_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",578
+0000059A 3E0100                  		MOV.L #00000000H, 04H[R0]
+0000059D                         L208:	; bb198
+0000059D A809                    		MOV.L 04H[R0], R1
+0000059F A089                    		MOV.L R1, 0CH[R0]
+                                 ;     579 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",579
+000005A1 6706                    		RTSD #18H
+000005A3                         __$lvd_status_get:
+                                 		.STACK	__$lvd_status_get=24
+                                 ;     580 
+                                 ;     581 /***********************************************************************************************************************
+                                 ;     582 * Function Name: lvd_status_get
+                                 ;     583 * Description  : This function returns the status of the LVD circuit for the specified channel.
+                                 ;     584 * Arguments    : lvd_channel_t e_channel
+                                 ;     585 *                       -Specify the channel
+                                 ;     586 * Return Value : LVD_ERR_ILL_PARAM
+                                 ;     587 *                LVD_ERR_DISABLED
+                                 ;     588 *                LVD_ERR_VDET_BELOW_AND_NOT_CROSSED
+                                 ;     589 *                LVD_ERR_VDET_BELOW_AND_CROSSED
+                                 ;     590 *                LVD_ERR_VDET_ABOVE_AND_NOT_CROSSED
+                                 ;     591 *                LVD_ERR_VDET_ABOVE_AND_CROSSED
+                                 ;     592 ***********************************************************************************************************************/
+                                 ;     593 static lvd_err_t lvd_status_get(lvd_channel_t e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",593
+000005A3 7100EC                  		ADD #0FFFFFFECH, R0
+000005A6 A101                    		MOV.L R1, 10H[R0]
+                                 ;     594 {
+                                 ;     595     uint8_t temp_status_reg;
+                                 ;     596 
+                                 ;     597 #if (LVD_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     598     if (e_channel >= LVD_CHANNEL_INVALID)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",598
+000005A8 6131                    		CMP #03H, R1
+000005AA 29rr                    		BLT L211
+000005AC                         L210:	; bb3
+                                 ;     599     {
+                                 ;     600         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",600
+000005AC 3E0104                  		MOV.L #00000004H, 04H[R0]
+000005AF 38rrrr               W  		BRA L230
+000005B2                         L211:	; bb9
+                                 ;     601     }
+                                 ;     602 #endif
+                                 ;     603     if (LVD_CHANNEL_1 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",603
+000005B2 A901                    		MOV.L 10H[R0], R1
+000005B4 6111                    		CMP #01H, R1
+000005B6 21rr                    		BNE L220
+000005B8                         L212:	; bb11
+                                 ;     604     {
+                                 ;     605 #if (LVD_CFG_CHANNEL_1_USED ==1)
+                                 ;     606         if ((0 == SYSTEM.LVCMPCR.BIT.LVD1E) || (0 == SYSTEM.LVD1CR0.BIT.LVD1CMPE))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",606
+000005B8 FBEEE10008              		MOV.L #000800E1H, R14
+000005BD 5AEEB6C1                		MOVU.B 0C1B6H[R14], R14
+000005C1 685E                    		SHLR #05H, R14
+000005C3 7C0E                    		BTST #00H, R14
+000005C5 20rr                    		BEQ L217
+000005C7 2Err                 B  		BRA L216
+000005C9                         L213:	; bb12
+                                 ;     607         {
+                                 ;     608             return LVD_ERR_DISABLED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",608
+000005C9 3E0114                  		MOV.L #00000014H, 04H[R0]
+000005CC 38rrrr               W  		BRA L230
+000005CF                         L214:	; bb14
+                                 ;     609         }
+                                 ;     610         else
+                                 ;     611         {
+                                 ;     612             temp_status_reg = (uint8_t)(SYSTEM.LVD1SR.BYTE & 0x03);     // zero out the unused higher 6 bits
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",612
+000005CF FBEEE10008              		MOV.L #000800E1H, R14
+000005D4 58E1                    		MOVU.B [R14], R1
+000005D6 6431                    		AND #03H, R1
+000005D8 8289                    		MOV.B R1, 0BH[R0]
+000005DA                         L215:	; bb14.split
+                                 ;     613             return (lvd_err_t)(temp_status_reg | 0x10);                 // setting the msb to 1 for unique return error code
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",613
+000005DA B289                    		MOVU.B 0BH[R0], R1
+000005DC 7841                    		BSET #04H, R1
+000005DE A009                    		MOV.L R1, 04H[R0]
+000005E0 2Err                 B  		BRA L230
+000005E2                         L216:	; bb29
+000005E2 FBEEE10008              		MOV.L #000800E1H, R14
+000005E7 5AEEB9C1                		MOVU.B 0C1B9H[R14], R14
+000005EB 682E                    		SHLR #02H, R14
+000005ED 7C0E                    		BTST #00H, R14
+000005EF 18                   S  		BNE L218
+000005F0                         L217:	; bb36
+000005F0 F80601                  		MOV.L #00000001H, [R0]
+000005F3 08                   S  		BRA L219
+000005F4                         L218:	; bb37
+000005F4 F80600                  		MOV.L #00000000H, [R0]
+000005F7                         L219:	; bb38
+000005F7 EC01                    		MOV.L [R0], R1
+000005F9 6101                    		CMP #00H, R1
+000005FB 21rr                    		BNE L213
+000005FD 2Err                 B  		BRA L214
+000005FF                         L220:	; bb45
+                                 ;     614         }
+                                 ;     615 #else
+                                 ;     616         return LVD_ERR_ILL_PARAM;             // Code not enabled for this channel
+                                 ;     617 #endif
+                                 ;     618     }
+                                 ;     619     else if (LVD_CHANNEL_2 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",619
+000005FF A901                    		MOV.L 10H[R0], R1
+00000601 6121                    		CMP #02H, R1
+00000603 21rr                    		BNE L229
+00000605                         L221:	; bb47
+                                 ;     620     {
+                                 ;     621 #if (LVD_CFG_CHANNEL_2_USED ==1)
+                                 ;     622         if ((0 == SYSTEM.LVCMPCR.BIT.LVD2E) ||(0 == SYSTEM.LVD2CR0.BIT.LVD2CMPE))
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",622
+00000605 FBEEE10008              		MOV.L #000800E1H, R14
+0000060A 5AEEB6C1                		MOVU.B 0C1B6H[R14], R14
+0000060E 686E                    		SHLR #06H, R14
+00000610 7C0E                    		BTST #00H, R14
+00000612 20rr                    		BEQ L226
+00000614 2Err                 B  		BRA L225
+00000616                         L222:	; bb48
+                                 ;     623         {
+                                 ;     624             return LVD_ERR_DISABLED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",624
+00000616 3E0114                  		MOV.L #00000014H, 04H[R0]
+00000619 2Err                 B  		BRA L230
+0000061B                         L223:	; bb50
+                                 ;     625         }
+                                 ;     626         else
+                                 ;     627         {
+                                 ;     628             temp_status_reg = (uint8_t)(SYSTEM.LVD2SR.BYTE & 0x03);     // zero out the unused higher 6 bits;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",628
+0000061B FB1EE10008              		MOV.L #000800E1H, R1
+00000620 B091                    		MOVU.B 02H[R1], R1
+00000622 6431                    		AND #03H, R1
+00000624 8289                    		MOV.B R1, 0BH[R0]
+00000626                         L224:	; bb50.split
+                                 ;     629             return (lvd_err_t)(temp_status_reg | 0x10);                 // setting the msb to 1 for unique return error code
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",629
+00000626 B289                    		MOVU.B 0BH[R0], R1
+00000628 7841                    		BSET #04H, R1
+0000062A A009                    		MOV.L R1, 04H[R0]
+0000062C 2Err                 B  		BRA L230
+0000062E                         L225:	; bb65
+0000062E FBEEE10008              		MOV.L #000800E1H, R14
+00000633 5AEEBAC1                		MOVU.B 0C1BAH[R14], R14
+00000637 682E                    		SHLR #02H, R14
+00000639 7C0E                    		BTST #00H, R14
+0000063B 18                   S  		BNE L227
+0000063C                         L226:	; bb72
+0000063C F80601                  		MOV.L #00000001H, [R0]
+0000063F 08                   S  		BRA L228
+00000640                         L227:	; bb73
+00000640 F80600                  		MOV.L #00000000H, [R0]
+00000643                         L228:	; bb74
+00000643 EC01                    		MOV.L [R0], R1
+00000645 6101                    		CMP #00H, R1
+00000647 21rr                    		BNE L222
+00000649 2Err                 B  		BRA L223
+0000064B                         L229:	; bb80
+                                 ;     630         }
+                                 ;     631 #else
+                                 ;     632         return LVD_ERR_ILL_PARAM;             // Code not enabled for this channel
+                                 ;     633 #endif
+                                 ;     634     }
+                                 ;     635     else
+                                 ;     636     {
+                                 ;     637         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",637
+0000064B 3E0104                  		MOV.L #00000004H, 04H[R0]
+0000064E                         L230:	; bb92
+0000064E A809                    		MOV.L 04H[R0], R1
+00000650 A089                    		MOV.L R1, 0CH[R0]
+                                 ;     638     }
+                                 ;     639 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",639
+00000652 6705                    		RTSD #14H
+00000654                         __$lvd_status_clear:
+                                 		.STACK	__$lvd_status_clear=16
+                                 ;     640 
+                                 ;     641 /***********************************************************************************************************************
+                                 ;     642 * Function Name: lvd_status_clear
+                                 ;     643 * Description  : Clear the LVD passage detection status bit. This function clears the passage detection bit that is
+                                 ;     644 *                set when Vcc or voltage on the CMPA2 pin crosses the Level set by the configured LVD channel. This bit
+                                 ;     645 *                has to be cleared once it is set to allow for detection of future events on the same channel.
+                                 ;     646 * Arguments    : lvd_channel_t e_channel
+                                 ;     647 *                       -Specify the channel
+                                 ;     648 * Return Value : LVD_SUCCESS
+                                 ;     649 *                LVD_ERR_ILL_PARAM
+                                 ;     650 *                LVD_ERR_NOT_INITIALIZED
+                                 ;     651 ***********************************************************************************************************************/
+                                 ;     652 static lvd_err_t lvd_status_clear(lvd_channel_t e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",652
+00000654 60C0                    		SUB #0CH, R0
+00000656 A081                    		MOV.L R1, 08H[R0]
+                                 ;     653 {
+                                 ;     654 #if (LVD_CFG_PARAM_CHECKING_ENABLE == 1)
+                                 ;     655     if (e_channel >= LVD_CHANNEL_INVALID)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",655
+00000658 6131                    		CMP #03H, R1
+0000065A 29rr                    		BLT L233
+0000065C                         L232:	; bb2
+                                 ;     656     {
+                                 ;     657         return LVD_ERR_ILL_PARAM;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",657
+0000065C F80604                  		MOV.L #00000004H, [R0]
+0000065F 2Err                 B  		BRA L248
+00000661                         L233:	; bb8
+                                 ;     658     }
+                                 ;     659 #endif
+                                 ;     660     if (LVD_CHANNEL_1 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",660
+00000661 A881                    		MOV.L 08H[R0], R1
+00000663 6111                    		CMP #01H, R1
+00000665 21rr                    		BNE L239
+00000667                         L234:	; bb10
+                                 ;     661     {
+                                 ;     662 #if (LVD_CFG_CHANNEL_1_USED ==1)
+                                 ;     663         if (g_lvd_ch1_open == false)                        // check for initialization
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",663
+00000667 FBE2rrrrrrrr            		MOV.L #__$g_lvd_ch1_open, R14
+0000066D 58EE                    		MOVU.B [R14], R14
+0000066F 610E                    		CMP #00H, R14
+00000671 18                   S  		BNE L236
+00000672                         L235:	; bb11
+                                 ;     664         {
+                                 ;     665             return LVD_ERR_NOT_INITIALIZED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",665
+00000672 F80602                  		MOV.L #00000002H, [R0]
+00000675 2Err                 B  		BRA L248
+00000677                         L236:	; bb18
+00000677 6621                    		MOV.L #00000002H, R1
+                                 ;     666         }
+                                 ;     667         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LVD);  // unlock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",667
+00000679 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+0000067D                         L237:	; bb18.split
+                                 ;     668         SYSTEM.LVD1SR.BIT.LVD1DET = 0;                      // Clear the passage detection status bit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",668
+0000067D FBEEE10008              		MOV.L #000800E1H, R14
+00000682 F0E8                    		BCLR #00H, [R14].B
+00000684                         L238:	; bb18.split1
+00000684 6621                    		MOV.L #00000002H, R1
+                                 ;     669         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LVD);   // lock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",669
+00000686 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+0000068A 2Err                 B  		BRA L245
+0000068C                         L239:	; bb23
+                                 ;     670 #else
+                                 ;     671         return LVD_ERR_ILL_PARAM;                           // Code not enabled for this channel
+                                 ;     672 #endif
+                                 ;     673     }
+                                 ;     674     else if (LVD_CHANNEL_2 == e_channel)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",674
+0000068C A881                    		MOV.L 08H[R0], R1
+0000068E 6121                    		CMP #02H, R1
+00000690 21rr                    		BNE L245
+00000692                         L240:	; bb25
+                                 ;     675     {
+                                 ;     676 #if (LVD_CFG_CHANNEL_2_USED ==1)
+                                 ;     677         if (g_lvd_ch2_open == false)                        // check for initialization
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",677
+00000692 FBE2rrrrrrrr            		MOV.L #__$g_lvd_ch2_open, R14
+00000698 58EE                    		MOVU.B [R14], R14
+0000069A 610E                    		CMP #00H, R14
+0000069C 18                   S  		BNE L242
+0000069D                         L241:	; bb26
+                                 ;     678         {
+                                 ;     679             return LVD_ERR_NOT_INITIALIZED;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",679
+0000069D F80602                  		MOV.L #00000002H, [R0]
+000006A0 2Err                 B  		BRA L248
+000006A2                         L242:	; bb33
+000006A2 6621                    		MOV.L #00000002H, R1
+                                 ;     680         }
+                                 ;     681         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LVD);  // unlock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",681
+000006A4 05rrrrrr             A  		BSR _R_BSP_RegisterProtectDisable
+000006A8                         L243:	; bb33.split
+                                 ;     682         SYSTEM.LVD2SR.BIT.LVD2DET = 0;                      // Clear the passage detection status bit
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",682
+000006A8 FBEEE10008              		MOV.L #000800E1H, R14
+000006AD F1E802                  		BCLR #00H, 02H[R14].B
+000006B0                         L244:	; bb33.split2
+000006B0 6621                    		MOV.L #00000002H, R1
+                                 ;     683         R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LVD);   // lock LVD control registers
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",683
+000006B2 05rrrrrr             A  		BSR _R_BSP_RegisterProtectEnable
+000006B6                         L245:	; bb47
+                                 ;     684 #else
+                                 ;     685         return LVD_ERR_ILL_PARAM;                           // Code not enabled for this channel
+                                 ;     686 #endif
+                                 ;     687     }
+                                 ;     688     else
+                                 ;     689     {
+                                 ;     690         //nothing
+                                 ;     691     }
+                                 ;     692 
+                                 ;     693     nop();  // it takes two system clock cycles for the bit to the cleared.
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",693
+000006B6 03                      		NOP
+000006B7                         L246:	; bb47.split
+                                 ;     694     nop();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",694
+000006B7 03                      		NOP
+000006B8                         L247:	; bb47.split3
+                                 ;     695 
+                                 ;     696     return LVD_SUCCESS;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",696
+000006B8 F80600                  		MOV.L #00000000H, [R0]
+000006BB                         L248:	; bb49
+000006BB EC01                    		MOV.L [R0], R1
+000006BD A009                    		MOV.L R1, 04H[R0]
+                                 ;     697 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",697
+000006BF 6703                    		RTSD #0CH
+000006C1                         _R_LVD_GetVersion:
+                                 		.STACK	_R_LVD_GetVersion=8
+                                 ;     698 
+                                 ;     699 /***********************************************************************************************************************
+                                 ;     700 * Function Name: R_LVD_GetVersion
+                                 ;     701 * Description  : Returns the current version of this module. The version number is encoded where the top 2 bytes are the
+                                 ;     702 *                major version number and the bottom 2 bytes are the minor version number. For example, Version 4.25 
+                                 ;     703 *                would be returned as 0x00040019.
+                                 ;     704 * Arguments    : none
+                                 ;     705 * Return Value : Version of this module.
+                                 ;     706 ***********************************************************************************************************************/
+                                 ;     707 uint32_t R_LVD_GetVersion (void)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",707
+000006C1 6040                    		SUB #04H, R0
+                                 ;     708 {
+                                 ;     709     /* These version macros are defined in r_ldv_rx_if.h. */
+                                 ;     710     return ((((uint32_t)LVD_RX_VERSION_MAJOR) << 16) | (uint32_t)LVD_RX_VERSION_MINOR);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",710
+000006C3 F80E320001              		MOV.L #00010032H, [R0]
+000006C8 FB1E320001              		MOV.L #00010032H, R1
+000006CD                         L250:	; entry.split
+                                 ;     711 } 
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",711
+000006CD 6701                    		RTSD #04H
+000006CF                         __$lvd_delay:
+                                 		.STACK	__$lvd_delay=16
+                                 ;     712 
+                                 ;     713 /***********************************************************************************************************************
+                                 ;     714 * Function Name: lvd_delay
+                                 ;     715 * Description  : Implements a software time delay
+                                 ;     716 * Arguments    : time_us-
+                                 ;     717 *                       Time to delay in usec
+                                 ;     718 * Return Value : none
+                                 ;     719 ***********************************************************************************************************************/
+                                 ;     720 static void lvd_delay(uint32_t time_us)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",720
+000006CF 60C0                    		SUB #0CH, R0
+000006D1 A081                    		MOV.L R1, 08H[R0]
+                                 ;     721 {
+                                 ;     722     volatile uint32_t iclk_freq_hz, delay_count;
+                                 ;     723     volatile uint32_t delay_time;
+                                 ;     724     iclk_freq_hz = BSP_ICLK_HZ; // get the current iclk frequency
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",724
+000006D3 F80200D8B805            		MOV.L #05B8D800H, [R0]
+000006D9                         L252:	; entry.split
+                                 ;     725 
+                                 ;     726     //delay_time = ((time_us * (iclk_freq_hz/1000000))/12);
+                                 ;     727      /* The delay loops used below have been measured to take 12 cycles per iteration. This has been verified using the
+                                 ;     728        Renesas RX Toolchain with optimizations set to 2, size priority. The same result was obtained using 2, speed
+                                 ;     729        priority. The amount of times to run the loop is adjusted linearly based on this info along with the speed
+                                 ;     730        at which the core is running. */
+                                 ;     731    for(delay_count = 0; delay_count < ((time_us * (iclk_freq_hz/1000000))/12); delay_count++)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",731
+000006D9 3E0100                  		MOV.L #00000000H, 04H[R0]
+000006DC 08                   S  		BRA L254
+000006DD                         L253:	; bb
+                                 ;     732     {
+                                 ;     733         nop();
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",733
+000006DD 03                      		NOP
+000006DE A809                    		MOV.L 04H[R0], R1
+000006E0 6211                    		ADD #01H, R1
+000006E2 A009                    		MOV.L R1, 04H[R0]
+000006E4                         L254:	; bb6
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",731
+000006E4 A809                    		MOV.L 04H[R0], R1
+000006E6 A882                    		MOV.L 08H[R0], R2
+000006E8 EC03                    		MOV.L [R0], R3
+000006EA FD7C9340420F            		DIVU #000F4240H, R3
+000006F0 4F32                    		MUL R3, R2
+000006F2 FD74920C                		DIVU #0CH, R2
+000006F6 4712                    		CMP R1, R2
+000006F8 24rr                    		BGTU L253
+000006FA                         L255:	; return
+                                 ;     734     }
+                                 ;     735 
+                                 ;     736 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src\r_lvd_rx.c",736
+000006FA 6703                    		RTSD #0CH
+                                 ;     737 
+                                 ;     738 /***********************************************************************************************************************
+                                 ;     739 * Function Name: lvd1_isr
+                                 ;     740 * Description  : ISR for LVD channel 1
+                                 ;     741 * Arguments    : none
+                                 ;     742 * Return Value : none
+                                 ;     743 ***********************************************************************************************************************/
+                                 ;     744 #if (LVD_CFG_CHANNEL_1_USED ==1)
+                                 ;     745 #if ((BSP_MCU_RX111 == 1) || (BSP_MCU_RX110 == 1) || (BSP_MCU_RX113 == 1) || \
+                                 ;     746      (BSP_MCU_RX210 == 1) || (BSP_MCU_RX231 == 1))
+                                 ;     747 #pragma interrupt lvd1_isr(vect=VECT(LVD,LVD1))
+                                 ;     748 static void lvd1_isr(void)
+                                 ;     749 {
+                                 ;     750     if (lvd1_isr_handler != NULL)
+                                 ;     751     {
+                                 ;     752         lvd1_isr_handler((void *)&g_lvd_ch1_cb_args);
+                                 ;     753     }
+                                 ;     754 }
+                                 ;     755 #endif
+                                 ;     756 #endif
+                                 ;     757 /***********************************************************************************************************************
+                                 ;     758 * Function Name: lvd2_isr
+                                 ;     759 * Description  : ISR for LVD channel 2
+                                 ;     760 * Arguments    : none
+                                 ;     761 * Return Value : none
+                                 ;     762 ***********************************************************************************************************************/
+                                 ;     763 #if (LVD_CFG_CHANNEL_2_USED ==1)
+                                 ;     764 #if ((BSP_MCU_RX111 == 1) || (BSP_MCU_RX110 == 1) || (BSP_MCU_RX113 == 1) || \
+                                 ;     765      (BSP_MCU_RX210 == 1) || (BSP_MCU_RX231 == 1))
+                                 ;     766 #pragma interrupt lvd2_isr(vect=VECT(LVD,LVD2))
+                                 ;     767 static void lvd2_isr(void)
+                                 ;     768 {
+                                 ;     769     if (lvd2_isr_handler != NULL)
+                                 ;     770     {
+                                 ;     771         lvd2_isr_handler((void *)&g_lvd_ch2_cb_args);
+                                 ;     772     }
+                                 ;     773 }
+                                 ;     774 #endif
+                                 ;     775 #endif
+                                 		.SECTION	D,ROMDATA,ALIGN=4
+00000000                         _lvd1_isr_handler:
+00000000 00000000                		.lword	00000000H
+00000004                         _lvd2_isr_handler:
+00000004 00000000                		.lword	00000000H
+                                 		.SECTION	D_1,ROMDATA
+00000000                         __$g_lvd_ch1_open:
+00000000 00                      		.byte	00H
+00000001                         __$g_lvd_ch2_open:
+00000001 00                      		.byte	00H
+                                 		.SECTION	B,DATA,ALIGN=4
+00000000                         _g_lvd_ch1_cb_args:
+00000000(00000004H)              		.blkl	1
+00000004                         _g_lvd_ch2_cb_args:
+00000004(00000004H)              		.blkl	1
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     01971   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000001788(000006FCH)  P
+ROMDATA  0000000008(00000008H)  D
+ROMDATA  0000000002(00000002H)  D_1
+DATA     0000000008(00000008H)  B
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx124\$ccrx\r_lvd_rx.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_lvd_rx.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\r_lvd_rx\src\r_lvd_rx.obj

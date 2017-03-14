@@ -1,0 +1,254 @@
+* RX FAMILY ASSEMBLER V2.03.00.01 [24 Oct 2014] *  SOURCE LIST  Tue Mar 14 14:02:47 2017
+
+LOC.     OBJ.              0XMDA SOURCE STATEMENT
+
+                                 ;RX Family C/C++ Compiler (V2.03.00.03 [04 Dec 2014])  14-Mar-2017 14:02:47
+                                 
+                                 ;*** CPU TYPE ***
+                                 
+                                 ;-ISA=RXV1
+                                 
+                                 ;*** COMMAND PARAMETER ***
+                                 
+                                 ;-output=src=u8g_page.src
+                                 ;-lang=c99
+                                 ;-include=C:\PROGRA~2\Renesas\RX\2_3_0/include,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx,C:\Workspace\e2studio\git\MT01_master\r_lvd_rx\src,C:/Workspace/e2studio/
+                                 ;-debug
+                                 ;-show=source,conditionals,definitions,expansions
+                                 ;-listfile=u8g_page.lst
+                                 ;-isa=rxv1
+                                 ;-optimize=0
+                                 ;-fpu
+                                 ;-alias=noansi
+                                 ;-nologo
+                                 ;-nomessage
+                                 ;-define=__RX,COMPACTAXP=0,EASYMAK=1,MOBILE=0,FREE_RTOS_PP
+                                 ;u8g_page.c
+                                 
+                                 		.glb	_u8g_page_Init
+                                 		.glb	_u8g_page_First
+                                 		.glb	_u8g_page_Next
+                                 ;LineNo. C-SOURCE STATEMENT
+                                 
+                                 		.SECTION	P,CODE
+00000000                         _u8g_page_Init:
+                                 		.STACK	_u8g_page_Init=12
+                                 ;       1 /*
+                                 ;       2 
+                                 ;       3   u8g_page.c
+                                 ;       4   
+                                 ;       5   page helper functions, only called by the dev handler.
+                                 ;       6 
+                                 ;       7   Universal 8bit Graphics Library
+                                 ;       8   
+                                 ;       9   Copyright (c) 2011, olikraus@gmail.com
+                                 ;      10   All rights reserved.
+                                 ;      11 
+                                 ;      12   Redistribution and use in source and binary forms, with or without modification, 
+                                 ;      13   are permitted provided that the following conditions are met:
+                                 ;      14 
+                                 ;      15   * Redistributions of source code must retain the above copyright notice, this list 
+                                 ;      16     of conditions and the following disclaimer.
+                                 ;      17     
+                                 ;      18   * Redistributions in binary form must reproduce the above copyright notice, this 
+                                 ;      19     list of conditions and the following disclaimer in the documentation and/or other 
+                                 ;      20     materials provided with the distribution.
+                                 ;      21 
+                                 ;      22   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+                                 ;      23   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+                                 ;      24   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+                                 ;      25   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+                                 ;      26   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+                                 ;      27   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+                                 ;      28   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+                                 ;      29   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+                                 ;      30   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+                                 ;      31   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+                                 ;      32   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+                                 ;      33   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+                                 ;      34   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+                                 ;      35   
+                                 ;      36   
+                                 ;      37 */
+                                 ;      38 
+                                 ;      39 #include "u8g.h"
+                                 ;      40 
+                                 ;      41 /*
+                                 ;      42   setup page count structure
+                                 ;      43   conditions: page_height <= total_height
+                                 ;      44 */
+                                 ;      45 void u8g_page_Init(u8g_page_t *p, u8g_uint_t page_height, u8g_uint_t total_height )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",45
+00000000 6080                    		SUB #08H, R0
+00000002 A009                    		MOV.L R1, 04H[R0]
+00000004 808A                    		MOV.B R2, 03H[R0]
+00000006 8083                    		MOV.B R3, 02H[R0]
+                                 ;      46 {
+                                 ;      47   p->page_height = page_height;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",47
+00000008 B089                    		MOVU.B 03H[R0], R1
+0000000A A80A                    		MOV.L 04H[R0], R2
+0000000C C321                    		MOV.B R1, [R2]
+0000000E                         L11:	; entry.split
+                                 ;      48   p->total_height = total_height;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",48
+0000000E B081                    		MOVU.B 02H[R0], R1
+00000010 A80A                    		MOV.L 04H[R0], R2
+00000012 8029                    		MOV.B R1, 01H[R2]
+00000014                         L12:	; entry.split1
+                                 ;      49   p->page = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",49
+00000014 A809                    		MOV.L 04H[R0], R1
+00000016 3C1400                  		MOV.B #00H, 04H[R1]
+00000019                         L13:	; entry.split2
+                                 ;      50   u8g_page_First(p);
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",50
+00000019 A809                    		MOV.L 04H[R0], R1
+0000001B 39rrrr               W  		BSR _u8g_page_First
+0000001E 6702                    		RTSD #08H
+00000020                         _u8g_page_First:
+                                 		.STACK	_u8g_page_First=8
+                                 ;      51 }
+                                 ;      52 
+                                 ;      53 void u8g_page_First(u8g_page_t *p)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",53
+00000020 6040                    		SUB #04H, R0
+00000022 E301                    		MOV.L R1, [R0]
+                                 ;      54 {
+                                 ;      55   p->page_y0 = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",55
+00000024 3C1200                  		MOV.B #00H, 02H[R1]
+00000027                         L15:	; entry.split
+                                 ;      56   p->page_y1 = p->page_height;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",56
+00000027 EC01                    		MOV.L [R0], R1
+00000029 C41103                  		MOV.B [R1], 03H[R1]
+0000002C                         L16:	; entry.split1
+                                 ;      57   p->page_y1--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",57
+0000002C EC01                    		MOV.L [R0], R1
+0000002E B09A                    		MOVU.B 03H[R1], R2
+00000030 6012                    		SUB #01H, R2
+00000032 809A                    		MOV.B R2, 03H[R1]
+00000034                         L17:	; entry.split2
+                                 ;      58   p->page = 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",58
+00000034 EC01                    		MOV.L [R0], R1
+00000036 3C1400                  		MOV.B #00H, 04H[R1]
+00000039 6701                    		RTSD #04H
+0000003B                         _u8g_page_Next:
+                                 		.STACK	_u8g_page_Next=12
+                                 ;      59 }
+                                 ;      60 
+                                 ;      61 uint8_t u8g_page_Next(u8g_page_t * p)
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",61
+0000003B 6080                    		SUB #08H, R0
+0000003D A009                    		MOV.L R1, 04H[R0]
+                                 ;      62 {
+                                 ;      63   register u8g_uint_t y1;
+                                 ;      64   p->page_y0 += p->page_height;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",64
+0000003F 5812                    		MOVU.B [R1], R2
+00000041 491202                  		ADD 02H[R1].UB, R2
+00000044 8092                    		MOV.B R2, 02H[R1]
+00000046                         L19:	; entry.split
+                                 ;      65   if ( p->page_y0 >= p->total_height )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",65
+00000046 A809                    		MOV.L 04H[R0], R1
+00000048 B092                    		MOVU.B 02H[R1], R2
+0000004A 451201                  		CMP 01H[R1].UB, R2
+0000004D 29rr                    		BLT L21
+0000004F                         L20:	; bb13
+                                 ;      66     return 0;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",66
+0000004F 3C0100                  		MOV.B #00H, 01H[R0]
+00000052 2Err                 B  		BRA L29
+00000054                         L21:	; bb25
+                                 ;      67   p->page++;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",67
+00000054 A809                    		MOV.L 04H[R0], R1
+00000056 B112                    		MOVU.B 04H[R1], R2
+00000058 6212                    		ADD #01H, R2
+0000005A 8112                    		MOV.B R2, 04H[R1]
+0000005C                         L22:	; bb25.split
+                                 ;      68   y1 = p->page_y1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",68
+0000005C A809                    		MOV.L 04H[R0], R1
+0000005E C5100302                		MOV.B 03H[R1], 02H[R0]
+00000062                         L23:	; bb25.split1
+                                 ;      69   y1 += p->page_height;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",69
+00000062 A809                    		MOV.L 04H[R0], R1
+00000064 5811                    		MOVU.B [R1], R1
+00000066 490102                  		ADD 02H[R0].UB, R1
+00000069 8081                    		MOV.B R1, 02H[R0]
+0000006B                         L24:	; bb25.split2
+                                 ;      70   if ( y1 >= p->total_height )
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",70
+0000006B A809                    		MOV.L 04H[R0], R1
+0000006D B082                    		MOVU.B 02H[R0], R2
+0000006F 451201                  		CMP 01H[R1].UB, R2
+00000072 29rr                    		BLT L27
+00000074                         L25:	; bb42
+                                 ;      71   {
+                                 ;      72     y1 = p->total_height;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",72
+00000074 A809                    		MOV.L 04H[R0], R1
+00000076 C5100102                		MOV.B 01H[R1], 02H[R0]
+0000007A                         L26:	; bb42.split
+                                 ;      73     y1--;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",73
+0000007A B081                    		MOVU.B 02H[R0], R1
+0000007C 6011                    		SUB #01H, R1
+0000007E 8081                    		MOV.B R1, 02H[R0]
+00000080                         L27:	; bb57
+                                 ;      74   }
+                                 ;      75   p->page_y1 = y1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",75
+00000080 B081                    		MOVU.B 02H[R0], R1
+00000082 A80A                    		MOV.L 04H[R0], R2
+00000084 80A9                    		MOV.B R1, 03H[R2]
+00000086                         L28:	; bb57.split
+                                 ;      76   
+                                 ;      77   return 1;
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",77
+00000086 3C0101                  		MOV.B #01H, 01H[R0]
+00000089                         L29:	; bb62
+00000089 C5000103                		MOV.B 01H[R0], 03H[R0]
+                                 ;      78 }
+                                 		.LINE  "C:\Workspace\e2studio\git\MT01_master\src\Display\u8g_page.c",78
+0000008D B089                    		MOVU.B 03H[R0], R1
+0000008F 6702                    		RTSD #08H
+                                 ;      79 
+                                 ;      80 
+                                 ;      81 
+                                 		.END
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00221   LINES
+
+Section List
+
+Attr         Size               Name
+CODE     0000000145(00000091H)  P
+
+Cpu Type
+
+-ISA=RXV1 -FPU
+
+Command Parameter
+
+-subcommand=C:\Users\LAFONS~1\AppData\Local\Temp\$ccrx305E\$ccrx\u8g_page.src.cmd
+    -nologo
+    -isa=rxv1
+    -fpu
+    -show=conditionals,definitions,expansions
+    -define=__RXV1=1
+    -fint_register=0
+    -debug
+    -endian=little
+-listfile=C:\Workspace\e2studio\git\MT01_master\MT01_build\u8g_page.lst
+-output=C:\Workspace\e2studio\git\MT01_master\MT01_build\src\Display\u8g_page.obj
