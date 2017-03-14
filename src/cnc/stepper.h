@@ -424,6 +424,7 @@ typedef enum{
 extern stConfig_t st_cfg;				// config struct is exposed. The rest are private
 extern stPrepSingleton_t st_pre;		// only used by config_app diagnostics
 extern bool isDwell;
+extern float z_step_pulse;
 
 /**** FUNCTION PROTOTYPES ****/
 

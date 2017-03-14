@@ -69,3 +69,5 @@ src/eeprom/eeprom.obj src/eeprom/eeprom.d: C:\Workspace\e2studio\git\MT01_master
 C:\Workspace\e2studio\git\MT01_master\src\cnc\settings/settings_compacta.h:
 src/eeprom/eeprom.obj src/eeprom/eeprom.d: C:\Workspace\e2studio\git\MT01_master\src\cnc\settings/settings_mobile.h
 C:\Workspace\e2studio\git\MT01_master\src\cnc\settings/settings_mobile.h:
+src/eeprom/eeprom.obj src/eeprom/eeprom.d: ../src/eeprom/Maq_Initialization
+../src/eeprom/Maq_Initialization:

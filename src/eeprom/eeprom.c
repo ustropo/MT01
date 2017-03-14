@@ -29,10 +29,16 @@ const float configVarPlInit[PL_CONFIG_MAX] = {
 	120                              //!< Tensao do THC
 };
 
+
+const float configVarParMaqInit [MODEL_MAX][TYPE_MAX_MAQ - 1][CFG_PAR_MAQ_MAX] = {
+		#include "Maq_Initialization"
+};
+
 /*! configVarJogInit - Constante inicial de velocidade de jog*/
-const float configVarJogInit[JOG_MAX] = {
-	6000,                              //!< Velocidade inicial de jog rapido
-	500,                              //!< Velocidade inicial de jog lento
+const float configVarJogInit[TYPE_MAX_MAQ - 1][JOG_MAX] = {
+	{6000,500},
+	{6000,500},
+	{5000,500},
 };
 
 /*! configVarJogInit - Constante inicial de config de maquina*/
@@ -40,53 +46,53 @@ const float configVarMaqInit[CFG_MAQUINA_MAX - 1] = {
 	25,                               //!< Altura de deslocamento
 };
 
-/*! configVarParMaqInit - Constante inicial de parametrização da maquina */
-const float configVarParMaqInit_CP[CFG_PAR_MAQ_MAX] = {
-	M4_TRAVEL_PER_REV_CP,               //!< EIXO_X1
-	M3_TRAVEL_PER_REV_CP,               //!< EIXO_X2
-	M2_TRAVEL_PER_REV_CP,                //!< EIXO_Y
-	X_JERK_MAX_CP,                         //!< JERK X
-	Y_JERK_MAX_CP,                         //!< JERK Y
-	X_VELOCITY_MAX_CP,                     //!< VEL X
-	Y_VELOCITY_MAX_CP,                     //!< VEL Y
-	Z_VELOCITY_MAX_CP,                     //!< VEL Z
-	JUNCTION_DEVIATION_CP,                  //!< JUNCTION DEV
-	JUNCTION_ACCELERATION_CP,               //!< JUNCTION ACCEL
-	CHORDAL_TOLERANCE,
-	0
-};
-
-/*! configVarParMaqInit - Constante inicial de parametrização da maquina */
-const float configVarParMaqInit_EM[CFG_PAR_MAQ_MAX] = {
-	M4_TRAVEL_PER_REV_EM,               //!< EIXO_X1
-	M3_TRAVEL_PER_REV_EM,               //!< EIXO_X2
-	M2_TRAVEL_PER_REV_EM,                //!< EIXO_Y
-	X_JERK_MAX_EM,                         //!< JERK X
-	Y_JERK_MAX_EM,                         //!< JERK Y
-	X_VELOCITY_MAX_EM,                     //!< VEL X
-	Y_VELOCITY_MAX_EM,                     //!< VEL Y
-	Z_VELOCITY_MAX_EM,                     //!< VEL Z
-	JUNCTION_DEVIATION_EM,                  //!< JUNCTION DEV
-	JUNCTION_ACCELERATION_EM,               //!< JUNCTION ACCEL
-	CHORDAL_TOLERANCE,
-	0
-};
-
-/*! configVarParMaqInit - Constante inicial de parametrização da maquina */
-const float configVarParMaqInit_MB[CFG_PAR_MAQ_MAX] = {
-	M4_TRAVEL_PER_REV_MB,               //!< EIXO_X1
-	M3_TRAVEL_PER_REV_MB,               //!< EIXO_X2
-	M2_TRAVEL_PER_REV_MB,                //!< EIXO_Y
-	X_JERK_MAX_MB,                         //!< JERK X
-	Y_JERK_MAX_MB,                         //!< JERK Y
-	X_VELOCITY_MAX_MB,                     //!< VEL X
-	Y_VELOCITY_MAX_MB,                     //!< VEL Y
-	Z_VELOCITY_MAX_MB,                     //!< VEL Z
-	JUNCTION_DEVIATION_MB,                  //!< JUNCTION DEV
-	JUNCTION_ACCELERATION_MB,               //!< JUNCTION ACCEL
-	CHORDAL_TOLERANCE,
-	0
-};
+///*! configVarParMaqInit - Constante inicial de parametrização da maquina */
+//const float configVarParMaqInit_CP[CFG_PAR_MAQ_MAX] = {
+//	M4_TRAVEL_PER_REV_CP,               //!< EIXO_X1
+//	M3_TRAVEL_PER_REV_CP,               //!< EIXO_X2
+//	M2_TRAVEL_PER_REV_CP,                //!< EIXO_Y
+//	X_JERK_MAX_CP,                         //!< JERK X
+//	Y_JERK_MAX_CP,                         //!< JERK Y
+//	X_VELOCITY_MAX_CP,                     //!< VEL X
+//	Y_VELOCITY_MAX_CP,                     //!< VEL Y
+//	Z_VELOCITY_MAX_CP,                     //!< VEL Z
+//	JUNCTION_DEVIATION_CP,                  //!< JUNCTION DEV
+//	JUNCTION_ACCELERATION_CP,               //!< JUNCTION ACCEL
+//	CHORDAL_TOLERANCE,
+//	0
+//};
+//
+///*! configVarParMaqInit - Constante inicial de parametrização da maquina */
+//const float configVarParMaqInit_EM[CFG_PAR_MAQ_MAX] = {
+//	M4_TRAVEL_PER_REV_EM,               //!< EIXO_X1
+//	M3_TRAVEL_PER_REV_EM,               //!< EIXO_X2
+//	M2_TRAVEL_PER_REV_EM,                //!< EIXO_Y
+//	X_JERK_MAX_EM,                         //!< JERK X
+//	Y_JERK_MAX_EM,                         //!< JERK Y
+//	X_VELOCITY_MAX_EM,                     //!< VEL X
+//	Y_VELOCITY_MAX_EM,                     //!< VEL Y
+//	Z_VELOCITY_MAX_EM,                     //!< VEL Z
+//	JUNCTION_DEVIATION_EM,                  //!< JUNCTION DEV
+//	JUNCTION_ACCELERATION_EM,               //!< JUNCTION ACCEL
+//	CHORDAL_TOLERANCE,
+//	0
+//};
+//
+///*! configVarParMaqInit - Constante inicial de parametrização da maquina */
+//const float configVarParMaqInit_MB[CFG_PAR_MAQ_MAX] = {
+//	M4_TRAVEL_PER_REV_MB,               //!< EIXO_X1
+//	M3_TRAVEL_PER_REV_MB,               //!< EIXO_X2
+//	M2_TRAVEL_PER_REV_MB,                //!< EIXO_Y
+//	X_JERK_MAX_MB,                         //!< JERK X
+//	Y_JERK_MAX_MB,                         //!< JERK Y
+//	X_VELOCITY_MAX_MB,                     //!< VEL X
+//	Y_VELOCITY_MAX_MB,                     //!< VEL Y
+//	Z_VELOCITY_MAX_MB,                     //!< VEL Z
+//	JUNCTION_DEVIATION_MB,                  //!< JUNCTION DEV
+//	JUNCTION_ACCELERATION_MB,               //!< JUNCTION ACCEL
+//	CHORDAL_TOLERANCE,
+//	0
+//};
 
 uint32_t configFlagsInit[FLAG_MAX] = {MODO_PLASMA,1,DESABILITADO,HABILITADO};
 uint32_t configFlags[FLAG_MAX];
@@ -365,30 +371,11 @@ void eepromFormat(void)
 		}
 		memcpy(configVarOx,configVarOxInit,sizeof(configVarOx));
 		memcpy(configVarPl,configVarPlInit,sizeof(configVarPl));
-		memcpy(configVarJog,configVarJogInit,sizeof(configVarJog));
+		memcpy(configVarJog,configVarJogInit[g_maq.model - 1],sizeof(configVarJog));
 		memcpy(&configFlags,&configFlagsInit,sizeof(configFlags));
 		memcpy(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece));
 		memcpy(configVarMaq,configVarMaqInit,sizeof(configVarMaq));
-		if (g_maq.model == EASYMAK_MAQ)
-		{
-			memcpy(configVarParMaq,configVarParMaqInit_EM,sizeof(configVarParMaq));
-		}
-		else if (g_maq.model == COMPACTA_MAQ)
-		{
-			memcpy(configVarParMaq,configVarParMaqInit_CP,sizeof(configVarParMaq));
-		}
-		else if (g_maq.model == MOBILE_MAQ)
-		{
-			memcpy(configVarParMaq,configVarParMaqInit_MB,sizeof(configVarParMaq));
-		}
-
-		if (g_maq.crem)
-		{
-			configVarParMaq[CFG_PAR_MAQ_EIXO_X1] = CREM_HELI;
-			configVarParMaq[CFG_PAR_MAQ_EIXO_X2] = CREM_HELI;
-			configVarParMaq[CFG_PAR_MAQ_EIXO_Y]  = CREM_HELI;
-		}
-
+		memcpy(configVarParMaq,configVarParMaqInit[g_maq.crem][g_maq.model - 1],sizeof(configVarParMaq));
 		R_VEE_Open();
 		eepromWriteConfig(CONFIGVAR_OX);
 		eepromWriteConfig(CONFIGVAR_PL);
@@ -412,29 +399,12 @@ mem_check eepromIntegrityCheck(void)
 		res = MEM_FAIL;
 	if(memcmp(configVarPl,configVarPlInit,sizeof(configVarPl)))
 		res = MEM_FAIL;
-	if(memcmp(configVarJog,configVarJogInit,sizeof(configVarJog)))
-		res = MEM_FAIL;
 	if(memcmp(&configFlags,&configFlagsInit,sizeof(configFlags)))
 		res = MEM_FAIL;
 	if(memcmp(&zeroPiece,&zeroPieceInit,sizeof(zeroPiece)))
 		res = MEM_FAIL;
 	if(memcmp(configVarMaq,configVarMaqInit,sizeof(configVarMaq)))
 		res = MEM_FAIL;
-	if (g_maq.model == EASYMAK_MAQ)
-	{
-		if(memcmp(configVarParMaq,configVarParMaqInit_EM,sizeof(configVarParMaq)))
-			res = MEM_FAIL;
-	}
-	else if (g_maq.model == COMPACTA_MAQ)
-	{
-		if(memcmp(configVarParMaq,configVarParMaqInit_CP,sizeof(configVarParMaq)))
-			res = MEM_FAIL;
-	}
-	else if (g_maq.model == MOBILE_MAQ)
-	{
-		if(memcmp(configVarParMaq,configVarParMaqInit_MB,sizeof(configVarParMaq)))
-			res = MEM_FAIL;
-	}
 
 	return res;
 }

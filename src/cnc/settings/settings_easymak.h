@@ -13,23 +13,28 @@
 
 // *** motor settings ***
 
+// *** motor settings ***
 #define M1_MOTOR_MAP_EM				AXIS_Z
-#define M1_TRAVEL_PER_REV_EM		3
+#define M1_TRAVEL_PER_REV_RETA_EM	3
+#define M1_TRAVEL_PER_REV_HELI_EM	3
 #define M1_MICROSTEPS_EM			64
 #define M1_POLARITY_EM				0
 
 #define M2_MOTOR_MAP_EM				AXIS_Y  // Y1 - left side of machine
-#define M2_TRAVEL_PER_REV_EM		75.3982236862
+#define M2_TRAVEL_PER_REV_RETA_EM	CREM_RETA
+#define M2_TRAVEL_PER_REV_HELI_EM	CREM_HELI
 #define M2_MICROSTEPS_EM			64
 #define M2_POLARITY_EM				0
 
 #define M3_MOTOR_MAP_EM				AXIS_X  // X2 - right sif of machine
-#define M3_TRAVEL_PER_REV_EM		75.3982236862
+#define M3_TRAVEL_PER_REV_RETA_EM	CREM_RETA
+#define M3_TRAVEL_PER_REV_HELI_EM	CREM_HELI
 #define M3_MICROSTEPS_EM			64
 #define M3_POLARITY_EM				1
 
 #define M4_MOTOR_MAP_EM				AXIS_X
-#define M4_TRAVEL_PER_REV_EM		75.3982236862
+#define M4_TRAVEL_PER_REV_RETA_EM	CREM_RETA
+#define M4_TRAVEL_PER_REV_HELI_EM	CREM_HELI
 #define M4_MICROSTEPS_EM			64
 #define M4_POLARITY_EM				0
 

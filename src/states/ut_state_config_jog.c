@@ -85,7 +85,7 @@ static void init()
 		configs_jog[i].type = init_types[i];
 		configs_jog[i].name = init_names[i];
 		configs_jog[i].func_var = init_func[i];
-		configs_jog[i].valueMax = MOTOR_VMAX;
+		configs_jog[i].valueMax = fmin(configVarParMaq[CFG_PAR_MAQ_VEL_X],configVarParMaq[CFG_PAR_MAQ_VEL_Y]);
 		configs_jog[i].valueMin = MOTOR_VMIN;
 		configs_jog[i].step = 1;
 		configs_jog[i].unit = jog_unit;

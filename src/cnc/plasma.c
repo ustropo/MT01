@@ -122,7 +122,7 @@ float pl_thc_pid(void)
 {
 	float result = 0;
 	float THCVel = 0;
-	int16_t delay_thc;
+	int16_t ldelay_thc;
 	/* velocidade do THC proporcinal a velocidade de feddrate */
 	if (configVarPl[PL_CONFIG_VELOC_CORTE] < 3500)
 		THCVel = configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MULT;
@@ -130,19 +130,19 @@ float pl_thc_pid(void)
 		THCVel = configVarPl[PL_CONFIG_VELOC_CORTE]*THC_MULT_RAP;
 
 	/* reta do delay inversamente proporcinal a velocidade de feddrate */
-	delay_thc = (uint16_t)(17500 - configVarPl[PL_CONFIG_VELOC_CORTE]*5);
+	ldelay_thc = (uint16_t)(17500 - configVarPl[PL_CONFIG_VELOC_CORTE]*5);
 	/* limite maximo da velocidade do THC */
 	if(THCVel > THC_MAX)
 	{
 		THCVel = THC_MAX;
 	}
 	/* limite minimo do delay do THC */
-	if(delay_thc < 0)
+	if(ldelay_thc < 4000)
 	{
-		delay_thc = 0;
+		ldelay_thc = 4000;
 	}
 	pl_thc_read();
-	if(delay_thcGet() > delay_thc){
+	if(delay_thcGet() > ldelay_thc){
 		if(THC_real > THC_VMIN)
 		{
 			THC_err = configVarPl[PL_CONFIG_TENSAO_THC] - THC_real;

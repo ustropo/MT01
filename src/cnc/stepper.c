@@ -54,6 +54,7 @@ static stRunSingleton_t st_run;
 bool isDwell = false;
 extern bool zmoved;
 extern float zmove;
+float z_step_pulse;
 /**** Setup local functions ****/
 
 static void _load_move(void);
@@ -743,15 +744,7 @@ void timer_dwell_callback(void *pdata)
 	if(zmove != 0){
 		switch (g_maq.model)
 		{
-			case EASYMAK_MAQ:
-				step += Z_STEP_PULSE_EM;
-			break;
-			case COMPACTA_MAQ:
-				step += Z_STEP_PULSE_CP;
-			break;
-			case MOBILE_MAQ:
-				step += Z_STEP_PULSE_MB;
-			break;
+			step += z_step_pulse;
 		}
 		MOTOR1_STEP = !MOTOR1_STEP;		// turn step bit on
 	}

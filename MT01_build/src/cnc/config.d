@@ -17,6 +17,8 @@ src/cnc/config.obj src/cnc/config.d: ../src/cnc/text_parser.h
 ../src/cnc/text_parser.h:
 src/cnc/config.obj src/cnc/config.d: ../src/cnc/persistence.h
 ../src/cnc/persistence.h:
+src/cnc/config.obj src/cnc/config.d: ../src/cnc/stepper.h
+../src/cnc/stepper.h:
 src/cnc/config.obj src/cnc/config.d: ../src/cnc/hardware.h
 ../src/cnc/hardware.h:
 src/cnc/config.obj src/cnc/config.d: C:/Workspace/e2studio/git/MT01_master/r_bsp/platform.h

@@ -25,9 +25,9 @@ typedef enum
 typedef enum
 {
 	UNDEFINED_MAQ = 0,		//!< Undefined
+	EASYMAK_MAQ,				//!< Easymak
 	COMPACTA_MAQ,			//!< COMPACTA
 	MOBILE_MAQ,				//!< MOBILE
-	EASYMAK_MAQ,			//!< Easymak
 	TYPE_MAX_MAQ        //!< MAQ_TYPE_MAX
 } maq_name;
 
@@ -35,6 +35,7 @@ enum
 {
 	MODEL_RETA = 0,
 	MODEL_HELI,
+	MODEL_MAX
 };
 
 typedef struct

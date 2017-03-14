@@ -36,6 +36,7 @@
 #include "json_parser.h"
 #include "text_parser.h"
 #include "persistence.h"
+#include "stepper.h"
 #include "hardware.h"
 #include "settings.h"
 #include "help.h"
@@ -212,6 +213,7 @@ void config_init()
 	nv_set(nv);
 	nv_persist(nv);
 
+
 #endif
 }
 
@@ -247,11 +249,11 @@ static void _config_maq(maq_st lmaq, nvObj_t *nv)
 
 			/*****************************************************************************************************/
 				nv->index = nv_get_index("1", "tr");
-				nv->value = M1_TRAVEL_PER_REV_EM;
+				nv->value = M1_TRAVEL_PER_REV_RETA_EM;
 				strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
 				nv_set(nv);
 				nv_persist(nv);
-
+				z_step_pulse = (M1_TRAVEL_PER_REV_RETA_EM*M1_STEP_ANGLE)/(360*M1_MICROSTEPS_EM);
 			/*****************************************************************************************************/
 				nv->index = nv_get_index("1", "mi");
 				nv->value = M1_MICROSTEPS_EM;
@@ -330,11 +332,11 @@ static void _config_maq(maq_st lmaq, nvObj_t *nv)
 
 		/*****************************************************************************************************/
 			nv->index = nv_get_index("1", "tr");
-			nv->value = M1_TRAVEL_PER_REV_CP;
+			nv->value = M1_TRAVEL_PER_REV_RETA_CP;
 			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
 			nv_set(nv);
 			nv_persist(nv);
-
+			z_step_pulse = (M1_TRAVEL_PER_REV_RETA_CP*M1_STEP_ANGLE)/(360*M1_MICROSTEPS_CP);
 		/*****************************************************************************************************/
 			nv->index = nv_get_index("1", "mi");
 			nv->value = M1_MICROSTEPS_CP;
@@ -413,10 +415,12 @@ static void _config_maq(maq_st lmaq, nvObj_t *nv)
 
 		/*****************************************************************************************************/
 			nv->index = nv_get_index("1", "tr");
-			nv->value = M1_TRAVEL_PER_REV_MB;
+			nv->value = M1_TRAVEL_PER_REV_RETA_MB;
+			z_step_pulse = (M1_TRAVEL_PER_REV_RETA_MB*M1_STEP_ANGLE)/(360*M1_MICROSTEPS_MB);
 			if (lmaq.crem)
 			{
-				nv->value = CREM_HELI;
+				nv->value = M1_TRAVEL_PER_REV_HELI_MB;
+				z_step_pulse = (M1_TRAVEL_PER_REV_HELI_MB*M1_STEP_ANGLE)/(360*M1_MICROSTEPS_MB);
 			}
 			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
 			nv_set(nv);
