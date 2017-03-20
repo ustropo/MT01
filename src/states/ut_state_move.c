@@ -121,11 +121,11 @@ static void updatePosition(uint8_t menu)
 {
 	float x; float y; float z;
 	float vel;
-	char *lStr[7];
+	char *lStr[7] = {"","","","","","",""};
 	/* Display is only cleared once to improve performance */
-	lStr[4] = "";
-	lStr[6] = "";
-	lStr[1] = "";
+//	lStr[4] = "";
+//	lStr[6] = "";
+//	lStr[1] = "";
 	switch(menu)
 	{
 		case MANUAL: lStr[0] = gStrManual[0];

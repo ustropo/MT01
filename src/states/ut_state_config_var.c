@@ -36,7 +36,7 @@ extern bool sim;
 
 static void vTimerUpdateCallback( TimerHandle_t pxTimer );
 static uint8_t count = 0;
-static uint16_t mult = 1;
+static uint32_t mult = 1;
 uint8_t func_back = 0;
 static bool blink = 0;
 
@@ -180,7 +180,7 @@ void config_int(ut_config_var* var)
 	float *value = configsVar->value;
 	char szText[MAX_COLUMN];
 	uint32_t keyEntry;
-	uint16_t decNum = 1;
+	uint32_t decNum = 1;
 	uint16_t decCount = 0;
 	uint16_t decimalCount = 0;
 	uint16_t digits;
