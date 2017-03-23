@@ -16,6 +16,7 @@ RM := rm -rf *.sni *.dbg *.lst *.lis *.lpp *.map *.x *.lbp src/*.src src/*.p src
 -include src/cnc/subdir.mk
 -include src/cnc/xio/subdir.mk
 -include src/cnc/macros/subdir.mk
+-include src/Nextion/subdir.mk
 -include src/Display/subdir.mk
 -include src/Display/font/subdir.mk
 -include spiffs/subdir.mk
@@ -34,6 +35,7 @@ RM := rm -rf *.sni *.dbg *.lst *.lis *.lpp *.map *.x *.lbp src/*.src src/*.p src
 -include r_tfat_driver_rx/src/device/usb/subdir.mk
 -include r_tfat_driver_rx/src/device/sdhi/subdir.mk
 -include r_spi_flash/src/subdir.mk
+-include r_sci_async_rx/src/subdir.mk
 -include r_s12ad_rx/src/targets/rx63x/subdir.mk
 -include r_s12ad_rx/src/targets/rx210/subdir.mk
 -include r_s12ad_rx/src/targets/rx110_rx111/subdir.mk
@@ -191,6 +193,7 @@ clean:
 	-rm -rf "src/cnc"/*.obj "src/cnc"/*.d "src/cnc"/*.src "src/cnc"/*.p "src/cnc"/*.pp "src/cnc"/*.mrc "src/cnc"/*.prn
 	-rm -rf "src/cnc/xio"/*.obj "src/cnc/xio"/*.d "src/cnc/xio"/*.src "src/cnc/xio"/*.p "src/cnc/xio"/*.pp "src/cnc/xio"/*.mrc "src/cnc/xio"/*.prn
 	-rm -rf "src/cnc/macros"/*.obj "src/cnc/macros"/*.d "src/cnc/macros"/*.src "src/cnc/macros"/*.p "src/cnc/macros"/*.pp "src/cnc/macros"/*.mrc "src/cnc/macros"/*.prn
+	-rm -rf "src/Nextion"/*.obj "src/Nextion"/*.d "src/Nextion"/*.src "src/Nextion"/*.p "src/Nextion"/*.pp "src/Nextion"/*.mrc "src/Nextion"/*.prn
 	-rm -rf "src/Display"/*.obj "src/Display"/*.d "src/Display"/*.src "src/Display"/*.p "src/Display"/*.pp "src/Display"/*.mrc "src/Display"/*.prn
 	-rm -rf "src/Display/font"/*.obj "src/Display/font"/*.d "src/Display/font"/*.src "src/Display/font"/*.p "src/Display/font"/*.pp "src/Display/font"/*.mrc "src/Display/font"/*.prn
 	-rm -rf "spiffs"/*.obj "spiffs"/*.d "spiffs"/*.src "spiffs"/*.p "spiffs"/*.pp "spiffs"/*.mrc "spiffs"/*.prn
@@ -209,6 +212,7 @@ clean:
 	-rm -rf "r_tfat_driver_rx/src/device/usb"/*.obj "r_tfat_driver_rx/src/device/usb"/*.d "r_tfat_driver_rx/src/device/usb"/*.src "r_tfat_driver_rx/src/device/usb"/*.p "r_tfat_driver_rx/src/device/usb"/*.pp "r_tfat_driver_rx/src/device/usb"/*.mrc "r_tfat_driver_rx/src/device/usb"/*.prn
 	-rm -rf "r_tfat_driver_rx/src/device/sdhi"/*.obj "r_tfat_driver_rx/src/device/sdhi"/*.d "r_tfat_driver_rx/src/device/sdhi"/*.src "r_tfat_driver_rx/src/device/sdhi"/*.p "r_tfat_driver_rx/src/device/sdhi"/*.pp "r_tfat_driver_rx/src/device/sdhi"/*.mrc "r_tfat_driver_rx/src/device/sdhi"/*.prn
 	-rm -rf "r_spi_flash/src"/*.obj "r_spi_flash/src"/*.d "r_spi_flash/src"/*.src "r_spi_flash/src"/*.p "r_spi_flash/src"/*.pp "r_spi_flash/src"/*.mrc "r_spi_flash/src"/*.prn
+	-rm -rf "r_sci_async_rx/src"/*.obj "r_sci_async_rx/src"/*.d "r_sci_async_rx/src"/*.src "r_sci_async_rx/src"/*.p "r_sci_async_rx/src"/*.pp "r_sci_async_rx/src"/*.mrc "r_sci_async_rx/src"/*.prn
 	-rm -rf "r_s12ad_rx/src/targets/rx63x"/*.obj "r_s12ad_rx/src/targets/rx63x"/*.d "r_s12ad_rx/src/targets/rx63x"/*.src "r_s12ad_rx/src/targets/rx63x"/*.p "r_s12ad_rx/src/targets/rx63x"/*.pp "r_s12ad_rx/src/targets/rx63x"/*.mrc "r_s12ad_rx/src/targets/rx63x"/*.prn
 	-rm -rf "r_s12ad_rx/src/targets/rx210"/*.obj "r_s12ad_rx/src/targets/rx210"/*.d "r_s12ad_rx/src/targets/rx210"/*.src "r_s12ad_rx/src/targets/rx210"/*.p "r_s12ad_rx/src/targets/rx210"/*.pp "r_s12ad_rx/src/targets/rx210"/*.mrc "r_s12ad_rx/src/targets/rx210"/*.prn
 	-rm -rf "r_s12ad_rx/src/targets/rx110_rx111"/*.obj "r_s12ad_rx/src/targets/rx110_rx111"/*.d "r_s12ad_rx/src/targets/rx110_rx111"/*.src "r_s12ad_rx/src/targets/rx110_rx111"/*.p "r_s12ad_rx/src/targets/rx110_rx111"/*.pp "r_s12ad_rx/src/targets/rx110_rx111"/*.mrc "r_s12ad_rx/src/targets/rx110_rx111"/*.prn

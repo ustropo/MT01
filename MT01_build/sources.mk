@@ -64,6 +64,7 @@ src/config \
 src/cnc \
 src/cnc/xio \
 src/cnc/macros \
+src/Nextion \
 src/Display \
 src/Display/font \
 spiffs \
@@ -82,6 +83,7 @@ r_tfat_driver_rx/src/device/usb_mini \
 r_tfat_driver_rx/src/device/usb \
 r_tfat_driver_rx/src/device/sdhi \
 r_spi_flash/src \
+r_sci_async_rx/src \
 r_s12ad_rx/src/targets/rx63x \
 r_s12ad_rx/src/targets/rx210 \
 r_s12ad_rx/src/targets/rx110_rx111 \
