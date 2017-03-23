@@ -747,9 +747,10 @@ static stat_t _exec_aline_segment()
 		}
 		if(zmove != 0)
 		{
-			if (fp_ZERO(mr.unit[2]))
+			if (fp_ZERO(mr.unit[2]) && mr.gm.target[2] < 50.0)
 			{
 				mr.gm.target[2] += zmove;
+				zmoved = true;
 				/* Não corrigir a mais que 50 mm*/
 				if (mr.gm.target[2] > 50.0)
 				{
