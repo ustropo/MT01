@@ -109,7 +109,7 @@ stat_t M3_Macro(void)
 					state++; break;
 
 					/*6- Dwell do "TEMPO DE PERFURAÇÃO" */
-			case 5:	if (tempo_perfuracao > 0){
+			case 5:	if (tempo_perfuracao > 0.09){
 						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 						SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
 						SET_NON_MODAL_MACRO (parameter, tempo_perfuracao*1000);
@@ -163,7 +163,7 @@ stat_t M3_Macro(void)
 						tempo = 0;
 					}
 
-				    if (tempo > 0){
+				    if (tempo > 0.09){
 						SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 						SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
 						SET_NON_MODAL_MACRO (parameter, tempo*1000);
@@ -198,7 +198,7 @@ stat_t M3_Macro(void)
 							tempo = 0;
 						}
 
-						if(tempo > 0){
+						if(tempo > 0.09){
 							SET_NON_MODAL_MACRO (linenum,(uint32_t)linenumMacro);
 							SET_NON_MODAL_MACRO (next_action, NEXT_ACTION_DWELL);
 							SET_NON_MODAL_MACRO (parameter, tempo*1000);
