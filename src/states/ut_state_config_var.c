@@ -157,6 +157,7 @@ void config_bool(ut_config_var* var)
 	menu.selectedItem = *value % 2; // Just to be sure - it is really not necessary
 	/* Check if user selected a valid entry */
 	if(ut_menu_browse(&menu, DEFAULT_CONFIG_VAR_TOUT) < 0){
+		*value = 0;
 		func_back = 0xFF;
 		return;
 	}
@@ -414,14 +415,14 @@ ut_state ut_state_config_var(ut_context* pContext)
 				case CONFIG_AUTO_RODAR_PROG:
 				case CONFIG_AUTO_DESLOCAR_ZERO:
 				case CONFIG_AUTO_TESTAR_TAMANHO_PECA:
-					if(*Flag == 1)
+					if(*Flag == 1 && func_back == 1)
 					{
 						stateBack = (ut_state)pContext->value[1];
 						sim = false;
 					}
 					break;
 				case CONFIG_AUTO_MODO_SIM:
-					if(*Flag == 1)
+					if(*Flag == 1 && func_back == 1)
 					{
 						sim = true;
 						stateBack = (ut_state)pContext->value[1];
@@ -458,7 +459,8 @@ ut_state ut_state_config_var(ut_context* pContext)
 					break;
 				}
 			break;
-		case STATE_CONFIG_MAQUINA:
+
+			case STATE_CONFIG_MAQUINA:
 			switch(configsVar->currentItem)
 			{
 			case CFG_MAQUINA_PARAMETROS:
@@ -471,7 +473,10 @@ ut_state ut_state_config_var(ut_context* pContext)
 		break;
 	}
 	/* Avoid null handler */
-	if(configsVar->func_var) { configsVar->func_var(configsVar); }
+	if (func_back == 1)
+	{
+		if(configsVar->func_var) { configsVar->func_var(configsVar); }
+	}
 	switch(configsVar->currentState)
 	{
 		case STATE_CONFIG_AUTO_MODE:

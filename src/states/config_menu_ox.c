@@ -37,7 +37,7 @@ float ox_init_max[OX_CONFIG_MAX] =
 {
 	50,                                   //!< Altura de perfuração
 	50,                                   //!< Altura de corte
-	MOTOR_VMAX,                           //!< Velocidade de corte
+	7000,                           //!< Velocidade de corte
 	300,                                   //!< Tempo de aquecimento
 	60,                                   //!< Tempo de Perfuração
 };

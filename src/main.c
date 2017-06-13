@@ -103,7 +103,7 @@ void main(void)
 {
 	lvd_err_t err;
 	lvd_config_t channel1_cfg;
-	channel1_cfg.e_action = LVD_ACTION_RESET;
+ 	channel1_cfg.e_action = LVD_ACTION_RESET;
 	channel1_cfg.e_trigger = LVD_TRIGGER_FALL;
 	channel1_cfg.e_voltage_level =LVD_VOLTAGE_CH1_2_95;
 	err = R_LVD_Open(LVD_CHANNEL_1, &channel1_cfg, NULL);

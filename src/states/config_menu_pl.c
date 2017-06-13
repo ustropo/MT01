@@ -37,7 +37,7 @@ float pl_init_max[PL_CONFIG_MAX] =
 {
 	50,                                      //!< Altura de perfuração
 	50,                                      //!< Altura de corte
-	MOTOR_VMAX,                              //!< Velocidade de corte
+	7000,                              //!< Velocidade de corte
 	60,                              		 //!< Tempo de Perfuração
 	THC_VMAX,                                //!< Tensao do THC
 };

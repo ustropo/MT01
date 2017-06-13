@@ -85,6 +85,7 @@ void pl_arcook_init(void)
 void pl_thc_init(void)
 {
     adc_cfg_t config;
+    adc_time_t ad_conv_time;
     adc_ch_cfg_t ch_cfg;
 
     config.trigger = ADC_TRIG_SOFTWARE;
@@ -94,6 +95,9 @@ void pl_thc_init(void)
     config.clearing = ADC_CLEAR_AFTER_READ_ON;
     config.conv_speed = ADC_CONVERT_SPEED_PCLK;
     R_ADC_Open(ADC_MODE_SS_ONE_CH, &config, FIT_NO_FUNC);
+    ad_conv_time.reg_id = ADC_SST_CH0_TO_20;
+    ad_conv_time.num_states = 0xFF;
+    R_ADC_Control(ADC_CMD_SET_SAMPLE_STATE_CNT, &ad_conv_time);
 
     ch_cfg.chan_mask = ADC_MASK_CH3;
     R_ADC_Control(ADC_CMD_ENABLE_CHANS, &ch_cfg);
@@ -102,9 +106,9 @@ void pl_thc_init(void)
 void pl_thc_read(void)
 {
 	uint16_t u16thc_read;
-	uint16_t u16thc_sum = 0;
+	uint32_t u16thc_sum = 0;
 	uint16_t u16thc_value;
-	for(uint8_t i = 0; i < 8;i++){
+	for(uint8_t i = 0; i < 50;i++){
 		/* CAUSE SOFTWARE TRIGGER */
 		R_ADC_Control(ADC_CMD_SCAN_NOW, NULL);
 		/* WAIT FOR SCAN TO COMPLETE */
@@ -112,9 +116,9 @@ void pl_thc_read(void)
 		nop();
 		/* READ RESULT */
 		R_ADC_Read(ADC_REG_CH3, &u16thc_read);
-		u16thc_sum += u16thc_read;
+		u16thc_sum += (uint32_t)u16thc_read;
 	}
-	u16thc_value = u16thc_sum/8;
+	u16thc_value = (uint16_t)(u16thc_sum/50);
 	THC_real = (float)(((float)300/4095)*u16thc_value);
 }
 

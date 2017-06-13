@@ -95,6 +95,7 @@ static void init()
 		for(i = 0; i < CONFIG_AUTO_MAX; i++)
 		{
 			configs_auto[i].name = init_names[i];
+			configs_auto[i].value = &init_values[i];
 		}
 		return;
 	}

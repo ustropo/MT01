@@ -242,25 +242,25 @@ static void power_on(tmr_ch_t  channel)
 		case TMR_CH0:
 			MSTP(TMR0) = 0;
 			IR(TMR0, CMIA0)  = 0;                //Clear any previously pending interrupts
-			IPR(TMR0, CMIA0) = 5;   			 //Set interrupt priority
+			IPR(TMR0, CMIA0) = 15;   			 //Set interrupt priority
 			IEN(TMR0, CMIA0) = 1;                //Enable compare match interrupt
 		break;
 		case TMR_CH1:
 			MSTP(TMR1) = 0;
 			IR(TMR1, CMIA1)  = 0;                //Clear any previously pending interrupts
-			IPR(TMR1, CMIA1) = 5;   			 //Set interrupt priority
+			IPR(TMR1, CMIA1) = 15;   			 //Set interrupt priority
 			IEN(TMR1, CMIA1) = 1;                //Enable compare match interrupt
 		break;
 		case TMR_CH2:
 			MSTP(TMR2) = 0;
 			IR(TMR2, CMIA2)  = 0;                //Clear any previously pending interrupts
-			IPR(TMR2, CMIA2) = 5;   			 //Set interrupt priority
+			IPR(TMR2, CMIA2) = 15;   			 //Set interrupt priority
 			IEN(TMR2, CMIA2) = 1;                //Enable compare match interrupt
 		break;
 		case TMR_CH3:
 			MSTP(TMR3) = 0;
 			IR(TMR3, CMIA3)  = 0;                //Clear any previously pending interrupts
-			IPR(TMR3, CMIA3) = 5;   			 //Set interrupt priority
+			IPR(TMR3, CMIA3) = 15;   			 //Set interrupt priority
 			IEN(TMR3, CMIA3) = 1;                //Enable compare match interrupt
 		break;
 		default:

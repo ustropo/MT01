@@ -483,25 +483,28 @@ stat_t jog_Macro(void)
 				if ((JogkeyPressed & KEY_RIGHT ) == KEY_RIGHT || (JogkeyPressed & KEY_LEFT ) == KEY_LEFT)
 				{
 						SET_NON_MODAL_MACRO(target[AXIS_X], jogMaxDistance[AXIS_X]);
+						SET_NON_MODAL_MACRO (feed_rate, *velocidadeJog);
 						diagonalX = true;
 				}
 				if ((JogkeyPressed & KEY_UP ) == KEY_UP || (JogkeyPressed & KEY_DOWN ) == KEY_DOWN)
 				{
 						SET_NON_MODAL_MACRO(target[AXIS_Y], jogMaxDistance[AXIS_Y]);
+						SET_NON_MODAL_MACRO (feed_rate, *velocidadeJog);
 						diagonalY = true;
 				}
 				if ((JogkeyPressed & KEY_Z_DOWN ) == KEY_Z_DOWN || (JogkeyPressed & KEY_Z_UP ) == KEY_Z_UP)
 				{
 						SET_NON_MODAL_MACRO(target[AXIS_Z], jogMaxDistance[AXIS_Z]);
+						SET_NON_MODAL_MACRO (feed_rate, *velocidadeJog);
 				}
-				if(diagonalX && diagonalY)
-				{
-					SET_NON_MODAL_MACRO (feed_rate, *velocidadeJog*1.41);
-				}
-				else
-				{
-					SET_NON_MODAL_MACRO (feed_rate, *velocidadeJog);
-				}
+//				if(diagonalX && diagonalY)
+//				{
+//					SET_NON_MODAL_MACRO (feed_rate, *velocidadeJog*1.41);
+//				}
+//				else
+//				{
+//					SET_NON_MODAL_MACRO (feed_rate, *velocidadeJog);
+//				}
 				state++; break;
 		default:state = 0; macro_func_ptr = command_idle; return (STAT_OK);
 	}

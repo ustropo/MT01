@@ -293,7 +293,7 @@ void stepper_init()
     R_TMR_CreateOneShot((uint8_t)(1000000/FREQUENCY_SGI),load_timer_num,TIMER_LOAD);
     R_CMT_CreatePeriodic(FREQUENCY_DWELL,timer_dwell_callback,&timerDwell);
     R_CMT_Control(timerDwell,CMT_RX_CMD_PAUSE,0);
-
+    MOTOR3_STEP = 0;
 	// setup software interrupt load timer
 
 	// setup software interrupt exec timer & initial condition
@@ -695,7 +695,6 @@ void timer_dda_callback(void *pdata)
 		MOTOR4_STEP = FALSE;				// ~ 2 uSec
 
 		if (--st_run.dda_ticks_downcount != 0) return;
-
 		R_TMR_Control(TIMER_DDA, TMR_CLEAR, 0);				// disable DDA timer
 		_load_move();										// load the next move
 	}
