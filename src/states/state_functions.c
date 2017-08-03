@@ -46,8 +46,6 @@ uint32_t currentLineSel = 0;
 static char strLinhas[2][20];
 char** pstrLinhas;
 
-float zeroPiecebuffer[3] = {0,0,0};
-
 uint32_t selecionarlinhasMax(void)
 {
 	stat_t status;
@@ -165,10 +163,6 @@ void zerar_maquina(void *var)
 	uint32_t *value = lvar->value;
 	if(*value)
 	{
-		zeroPiecebuffer[AXIS_X] = 0;
-		zeroPiecebuffer[AXIS_Y] = 0;
-		zeroPiecebuffer[AXIS_Z] = 0;
-		eepromReadConfig(ZEROPIECE);
 		xTaskNotifyGive(xCncTaskHandle);
 		macro_func_ptr = ZerarMaquina_Macro;
 	}
@@ -180,19 +174,22 @@ void zerar_peca(void *var)
 	uint32_t *value = lvar->value;
 	if(*value)
 	{
-		zeroPiecebuffer[AXIS_X] += mp_get_runtime_absolute_position(AXIS_X);
-		zeroPiecebuffer[AXIS_Y] += mp_get_runtime_absolute_position(AXIS_Y);
-		zeroPiecebuffer[AXIS_Z] = 0;
-
-		zeroPiece[AXIS_X] = zeroPiecebuffer[AXIS_X];
-		zeroPiece[AXIS_Y] = zeroPiecebuffer[AXIS_Y];
-		zeroPiece[AXIS_Z] = 0;
+		if ((zero_flags & ZERO_PECA_FLAG) ==  ZERO_PECA_FLAG)
+		{
+			eepromReadConfig(ZEROPIECE);
+			zeroPiece[AXIS_X] += mp_get_runtime_absolute_position(AXIS_X);
+			zeroPiece[AXIS_Y] += mp_get_runtime_absolute_position(AXIS_Y);
+			zeroPiece[AXIS_Z] = 0;
+		}
+		else
+		{
+			zeroPiece[AXIS_X] = mp_get_runtime_absolute_position(AXIS_X);
+			zeroPiece[AXIS_Y] = mp_get_runtime_absolute_position(AXIS_Y);
+			zeroPiece[AXIS_Z] = 0;
+		}
 		eepromWriteConfig(ZEROPIECE);
 		xTaskNotifyGive(xCncTaskHandle);
-		macro_func_ptr = ZerarMaquina_Macro;
-		zeroPiece[AXIS_X] = 0;
-		zeroPiece[AXIS_Y] = 0;
-		zeroPiece[AXIS_Z] = 0;
+		macro_func_ptr = ZerarPeca_Macro;
 	}
 }
 

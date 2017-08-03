@@ -11,6 +11,9 @@
 #include "config.h"			// #2
 #include "eeprom.h"
 
+#define ZERO_PECA_FLAG 0x01
+#define ZERO_MAQ_FLAG  0x02
+
 extern stat_t (*macro_func_ptr)(void);
 extern stat_t (*macro_buffer)(void);
 extern int8_t macro;
@@ -21,6 +24,7 @@ extern float *velocidadeJog;
 extern ut_config_name_ox tempoDwell;
 extern bool xMacroArcoOkSync;
 extern float Xcord,Ycord;
+extern uint32_t zero_flags;
 
 stat_t M5_Macro(void);
 stat_t M4_Macro(void);

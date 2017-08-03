@@ -21,6 +21,8 @@
 #define WARNING_PAGES	5
 #define PAGE_DELAY		1000
 
+static uint32_t zero_ask = 0;
+
 /**
  * Warning messages!
  */
@@ -106,6 +108,7 @@ ut_state ut_state_warning(ut_context* pContext)
 		vTaskDelay(2000 / portTICK_PERIOD_MS);
 		configsVar->func_var = zerar_maquina;
 		configsVar->type = UT_CONFIG_BOOL;
+		configsVar->value = &zero_ask;
 		configsVar->currentState = STATE_WARNING;
 		configsVar->name = "ZERAR A MÁQUINA?";
 		pContext->value[0] = STATE_MAIN_MENU;
