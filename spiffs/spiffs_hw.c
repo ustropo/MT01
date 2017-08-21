@@ -74,12 +74,12 @@ const spiflash_config_t my_spiflash_config = {
   .addr_dummy_sz = 0, // using single line data, not quad or something
   .addr_endian = SPIFLASH_ENDIANNESS_BIG, // normally big endianess on addressing
   .sr_write_ms = 10,
-  .page_program_ms = 2,
+  .page_program_ms = 1,
   .block_erase_4_ms = 0,
   .block_erase_8_ms = 0, // not supported
   .block_erase_16_ms = 0, // not supported
   .block_erase_32_ms = 0,
-  .block_erase_64_ms = 130,
+  .block_erase_64_ms = 1,
   .chip_erase_ms = 35000
 };
 

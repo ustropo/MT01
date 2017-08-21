@@ -373,9 +373,9 @@ static int _spiflash_end_async(spiflash_t *spi, int res) {
     spi->busy_check_wait = BCW_CHECK;
     spi->hal->_spiflash_spi_cs(spi, 1);
     res = spi->hal->_spiflash_spi_txrx(spi, &spi->cmd_tbl->read_sr, 1, &spi->sr_data, 1);
-    if (spi->sr_data & 0x40 == 0x40)
+    if ((spi->sr_data & (uint8_t)0x40) == (uint8_t)0x40)
     {
-        res = spi->hal->_spiflash_spi_txrx(spi, &spi->cmd_tbl->clear_sr, 1, 0, 0);
+         res = spi->hal->_spiflash_spi_txrx(spi, &spi->cmd_tbl->clear_sr, 1, 0, 0);
     }
     return res;
   case BCW_CHECK:
