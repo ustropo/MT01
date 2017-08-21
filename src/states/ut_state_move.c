@@ -623,6 +623,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 						configsVar->type = UT_CONFIG_BOOL;
 						configsVar->name = "DESEJA SAIR?";
 						ut_state_config_var(pContext);
+						configsVar->currentState = STATE_CONFIG_AUTO_MODE;
 						iif_bind_filerunning();
 				}
 				if(*value || programEnd){
@@ -668,6 +669,7 @@ ut_state ut_state_auto_mode(ut_context* pContext)
 					zinhibitor = false;
 					if (programEnd)
 					{
+						configsVar->currentState = STATE_CONFIG_MANUAL_MODE;
 						return STATE_MANUAL_MODE;
 					}
 

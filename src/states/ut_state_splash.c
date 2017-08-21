@@ -254,7 +254,7 @@ ut_state ut_state_splash(ut_context* pContext)
 	/* Delay */
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 
-	R_FL_StateMachine();
+
 
     if(spiffs_init() == SPIFFS_ERR_NOT_A_FS)
     {
@@ -262,6 +262,7 @@ ut_state ut_state_splash(ut_context* pContext)
     	spiffs_format();
     }
 
+	R_FL_StateMachine();
 	/* Next state */
 	return STATE_WARNING;
 }

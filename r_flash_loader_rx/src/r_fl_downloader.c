@@ -56,6 +56,9 @@ Includes   <System Includes> , "Project Includes"
 #include "lcd.h"
 #include "lcd_menu.h"
 
+#include "spiffs_hw.h"
+#include "spiflash.h"
+
 #include <string.h>
 #include <stdio.h>
 
@@ -135,7 +138,7 @@ void R_FL_DownloaderInit(void)
     g_pfl_cur_app_header = (fl_image_header_t *)__sectop("APPHEADER_1");
     
     /* Initialize resources needed for using external memory */
-    fl_mem_init();
+  //  fl_mem_init();
 
     /* Initialize CRC. */
     R_CRC_Init();
@@ -198,18 +201,18 @@ void R_FL_StateMachine(void)
 			}
 
             res = f_lseek(&file,0);
-		    fl_mem_erase(0, FL_MEM_ERASE_BLOCK);
+			SPIFLASH_erase(&spif, address, SPIFFS_CFG_PHYS_ERASE_SZ(0));
 		    chargeIndex = 0;
 			ut_lcd_output_warning(gszCarMsg[chargeIndex]);
 		   while(!f_eof(&file)){
 				f_read(&file, g_fl_rx_buffer, sizeof(g_fl_rx_buffer), (UINT *)&file_rw_cnt);
 				if(memcmp(g_fl_rx_buffer, 0xFF, sizeof(g_fl_rx_buffer)) != 0)
-					fl_mem_write(address, g_fl_rx_buffer, sizeof(g_fl_rx_buffer));
+					SPIFLASH_write(&spif,address, sizeof(g_fl_rx_buffer),g_fl_rx_buffer);
 				address += sizeof(g_fl_rx_buffer);
 				if((address % 0x10000) == 0){
 					chargeIndex++;
 					ut_lcd_output_warning(gszCarMsg[chargeIndex]);
-				    fl_mem_erase(address, FL_MEM_ERASE_BLOCK);
+					SPIFLASH_erase(&spif, address, SPIFFS_CFG_PHYS_ERASE_SZ(0));
 				}
 				WDT_FEED
 		   }
