@@ -21,8 +21,10 @@ const ut_state geNextStatePar[CFG_PAR_MAQ_MAX] =
 	STATE_CONFIG_VAR,                //!< EIXO_X1
 	STATE_CONFIG_VAR,                //!< EIXO_X2
 	STATE_CONFIG_VAR,                //!< EIXO_Y
+	STATE_CONFIG_VAR,                //!< EIXO_Z
 	STATE_CONFIG_VAR,                //!< JERK X
 	STATE_CONFIG_VAR,                //!< JERK Y
+	STATE_CONFIG_VAR,                //!< JERK Z
 	STATE_CONFIG_VAR,                //!< VEL X
 	STATE_CONFIG_VAR,                //!< VEL Y
 	STATE_CONFIG_VAR,                //!< VEL Z
@@ -54,8 +56,10 @@ ut_config_type pm_init_types[CFG_PAR_MAQ_MAX] =
 	UT_CONFIG_INT,                 //!< EIXO_X1
 	UT_CONFIG_INT,                 //!< EIXO_X2
 	UT_CONFIG_INT,                 //!< EIXO_Y
+	UT_CONFIG_INT,                 //!< EIXO_Z
 	UT_CONFIG_INT,                 //!< JERK X
 	UT_CONFIG_INT,                 //!< JERK Y
+	UT_CONFIG_INT,                 //!< JERK Z
 	UT_CONFIG_INT,                 //!< VEL X
 	UT_CONFIG_INT,                 //!< VEL Y
 	UT_CONFIG_INT,                 //!< VEL Z
@@ -70,8 +74,10 @@ char* pm_init_names[CFG_PAR_MAQ_MAX] =
 	" EIXO X1",                    //!< EIXO_X1
 	" EIXO X2",                    //!< EIXO_X2
 	" EIXO Y",                     //!< EIXO_Y
+	" EIXO Z",                     //!< EIXO_Y
 	" JERK X",                     //!< JERK X
 	" JERK Y",                     //!< JERK Y
+	" JERK Z",                     //!< JERK Z
 	" VEL. MAX X",                 //!< VEL X
 	" VEL. MAX Y",                 //!< VEL Y
 	" VEL. MAX Z",                 //!< VEL Z
@@ -86,8 +92,10 @@ float pm_init_max[CFG_PAR_MAQ_MAX] =
 	200,                         //!< EIXO_X1
 	200,                         //!< EIXO_X2
 	200,                         //!< EIXO_Y
+	200,                         //!< EIXO_Z
 	10000,                       //!< JERK X
 	10000,                       //!< JERK Y
+	10000,                       //!< JERK Z
 	20000,                       //!< VEL X
 	20000,                       //!< VEL Y
 	20000,                       //!< VEL Z
@@ -102,8 +110,10 @@ float pm_init_min[CFG_PAR_MAQ_MAX] =
 	0,                        	 //!< EIXO_X1
 	0,                        	 //!< EIXO_X2
 	0,                        	 //!< EIXO_Y
+	0,                        	 //!< EIXO_Z
 	0,                           //!< JERK X
 	0,                           //!< JERK Y
+	0,                           //!< JERK Z
 	0,                           //!< VEL X
 	0,                           //!< VEL Y
 	0,                           //!< VEL Z
@@ -118,8 +128,10 @@ uint8_t pm_init_point[CFG_PAR_MAQ_MAX] =
 	1,                           //!< EIXO_X1
 	1,                           //!< EIXO_X2
 	1,                           //!< EIXO_Y
+	1,                           //!< EIXO_Z
 	0,                           //!< JERK X
 	0,                           //!< JERK Y
+	0,                           //!< JERK Z
 	0,                           //!< VEL X
 	0,                           //!< VEL Y
 	0,                           //!< VEL Z
@@ -134,8 +146,10 @@ float pm_init_step[CFG_PAR_MAQ_MAX] =
 	0.001,                         //!< EIXO_X1
 	0.001,                         //!< EIXO_X2
 	0.001,                         //!< EIXO_Y
+	0.001,                         //!< EIXO_Z
 	1,                           //!< JERK X
 	1,                           //!< JERK Y
+	1,                           //!< JERK Z
 	1,                           //!< VEL X
 	1,                           //!< VEL Y
 	1,                           //!< VEL Z
@@ -150,8 +164,10 @@ char* pm_init_unit[CFG_PAR_MAQ_MAX] =
 	"mm",                        //!< EIXO_X1
 	"mm",                        //!< EIXO_X2
 	"mm",                        //!< EIXO_Y
+	"mm",                        //!< EIXO_Z
 	"mm/min^3",                  //!< JERK X
 	"mm/min^3",                  //!< JERK Y
+	"mm/min^3",                  //!< JERK Z
 	"mm/min",                    //!< VEL X
 	"mm/min",                    //!< VEL Y
 	"mm/min",                    //!< VEL Z

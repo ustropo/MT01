@@ -39,6 +39,7 @@ const float configVarJogInit[TYPE_MAX_MAQ - 1][JOG_MAX] = {
 	{6000,500},
 	{6000,500},
 	{5000,500},
+	{6000,500},
 };
 
 /*! configVarJogInit - Constante inicial de config de maquina*/
@@ -281,6 +282,10 @@ maq_st check_machine_type(void)
 	else if (strcmp(str_src,"MOBILE") == 0)
 	{
 		ret.model = MOBILE_MAQ;
+	}
+	else if (strcmp(str_src,"UNIMAQ") == 0)
+	{
+		ret.model = UNIMAQ_MAQ;
 	}
 	memcpy(str_src,(uint8_t *)(0x00107FE0 + 12),10);
 	if (strcmp(str_src,"RETA") == 0)

@@ -254,6 +254,11 @@ static void _config_maq(maq_st lmaq, nvObj_t *nv)
 				nv_set(nv);
 				nv_persist(nv);
 				z_step_pulse = (M1_TRAVEL_PER_REV_RETA_EM*M1_STEP_ANGLE)/(360*M1_MICROSTEPS_EM);
+				if (lmaq.crem)
+				{
+					nv->value = M1_TRAVEL_PER_REV_HELI_EM;
+					z_step_pulse = (M1_TRAVEL_PER_REV_HELI_EM*M1_STEP_ANGLE)/(360*M1_MICROSTEPS_EM);
+				}
 			/*****************************************************************************************************/
 				nv->index = nv_get_index("1", "mi");
 				nv->value = M1_MICROSTEPS_EM;
@@ -471,6 +476,95 @@ static void _config_maq(maq_st lmaq, nvObj_t *nv)
 
 			nv->index = nv_get_index("4", "po");
 			nv->value = M4_POLARITY_MB;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+			/*****************************************************************************************************/
+		break;
+		case UNIMAQ_MAQ:
+			/*****************************************************************************************************/
+			nv->index = nv_get_index("1", "ma");
+			nv->value = M1_MOTOR_MAP_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+			nv->index = nv_get_index("2", "ma");
+			nv->value = M2_MOTOR_MAP_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+			nv->index = nv_get_index("3", "ma");
+			nv->value = M3_MOTOR_MAP_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+			nv->index = nv_get_index("4", "ma");
+			nv->value = M4_MOTOR_MAP_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+		/*****************************************************************************************************/
+			nv->index = nv_get_index("1", "tr");
+			nv->value = M1_TRAVEL_PER_REV_RETA_UN;
+			z_step_pulse = (M1_TRAVEL_PER_REV_RETA_UN*M1_STEP_ANGLE)/(360*M1_MICROSTEPS_UN);
+			if (lmaq.crem)
+			{
+				nv->value = M1_TRAVEL_PER_REV_HELI_UN;
+				z_step_pulse = (M1_TRAVEL_PER_REV_HELI_UN*M1_STEP_ANGLE)/(360*M1_MICROSTEPS_UN);
+			}
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+		/*****************************************************************************************************/
+			nv->index = nv_get_index("1", "mi");
+			nv->value = M1_MICROSTEPS_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+			nv->index = nv_get_index("2", "mi");
+			nv->value = M2_MICROSTEPS_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+			nv->index = nv_get_index("3", "mi");
+			nv->value = M3_MICROSTEPS_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+			nv->index = nv_get_index("4", "mi");
+			nv->value = M4_MICROSTEPS_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+			/*****************************************************************************************************/
+			nv->index = nv_get_index("1", "po");
+			nv->value = M1_POLARITY_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+			nv->index = nv_get_index("2", "po");
+			nv->value = M2_POLARITY_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+			nv->index = nv_get_index("3", "po");
+			nv->value = M3_POLARITY_UN;
+			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+			nv_set(nv);
+			nv_persist(nv);
+
+			nv->index = nv_get_index("4", "po");
+			nv->value = M4_POLARITY_UN;
 			strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
 			nv_set(nv);
 			nv_persist(nv);

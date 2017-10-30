@@ -108,7 +108,7 @@
 #include "settings/settings_easymak.h"				// Easymak Plasma
 #include "settings/settings_compacta.h"				// Compacta Plasma
 #include "settings/settings_mobile.h"				// Mobile Plasma
-
+#include "settings/settings_unimaq.h"				// Mobile Plasma
 
 
 

@@ -656,16 +656,16 @@ stat_t limit_test(void)
 		case 2: SET_NON_MODAL_MACRO (absolute_override, true);
 				state++; break;
 
-//		case 3: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
-//				SET_NON_MODAL_MACRO(target[AXIS_Z], altura_deslocamento);
-//				state++; break;
+		case 3: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_TRAVERSE);
+				SET_NON_MODAL_MACRO(target[AXIS_Z], altura_deslocamento);
+				state++; break;
 
-		case 3: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+		case 4: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 				SET_NON_MODAL_MACRO(target[AXIS_Y], 0);
 				SET_NON_MODAL_MACRO (feed_rate, 6000);
 				state++; break;
 
-		case 4: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+		case 5: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 				SET_NON_MODAL_MACRO(target[AXIS_X], 0);
 				state++; break;
 
@@ -673,7 +673,7 @@ stat_t limit_test(void)
 //				SET_NON_MODAL_MACRO (parameter, 1000);
 //				state++; break;
 
-		case 5: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+		case 6: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 				SET_NON_MODAL_MACRO(target[AXIS_Y], Ycord);
 				state++; break;
 
@@ -681,7 +681,7 @@ stat_t limit_test(void)
 //				SET_NON_MODAL_MACRO (parameter, 1000);
 //				state++; break;
 
-		case 6: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+		case 7: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 				SET_NON_MODAL_MACRO(target[AXIS_X], Xcord);
 				state++; break;
 
@@ -689,7 +689,7 @@ stat_t limit_test(void)
 //				SET_NON_MODAL_MACRO (parameter, 1000);
 //				state++; break;
 
-		case 7: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+		case 8: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 				SET_NON_MODAL_MACRO(target[AXIS_Y], 0);
 				state++; break;
 
@@ -697,7 +697,7 @@ stat_t limit_test(void)
 //				SET_NON_MODAL_MACRO (parameter, 1000);
 //				state++; break;
 
-		case 8: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
+		case 9: SET_MODAL_MACRO (MODAL_GROUP_G1, motion_mode, MOTION_MODE_STRAIGHT_FEED);
 				SET_NON_MODAL_MACRO(target[AXIS_X], 0);
 				state++; break;
 
@@ -705,7 +705,7 @@ stat_t limit_test(void)
 //				SET_NON_MODAL_MACRO (parameter, 1000);
 //				state++; break;
 
-		case 9: SET_MODAL_MACRO (MODAL_GROUP_M4, program_flow, PROGRAM_END);
+		case 10: SET_MODAL_MACRO (MODAL_GROUP_M4, program_flow, PROGRAM_END);
 				state++; break;
 
 		default:state = 0;  macro_func_ptr = _command_dispatch; return (STAT_OK);

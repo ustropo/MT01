@@ -35,7 +35,8 @@ static char* init_names[CFG_MODEL_MAX] =
 {
 	" EASYMAK",
 	" COMPACTAXP",
-	" MOBILE"
+	" MOBILE",
+	" UNIMAK",
 };
 
 static const char* gszConfigMenuTitle = "MODELO MÁQUINA";
@@ -108,6 +109,9 @@ ut_state ut_state_config_maq_model(ut_context* pContext)
 		case CFG_MODEL_MOBILE:
 			g_maq.model = MOBILE_MAQ;
 			break;
+		case CFG_MODEL_UNIMAQ:
+			g_maq.model = UNIMAQ_MAQ;
+			break;
 	}
 
 	configsVar->currentState = STATE_MAQ_MODEL_SELECTION;
@@ -141,6 +145,14 @@ ut_state ut_state_config_maq_model(ut_context* pContext)
 				machine_type_write("MOBILE","RETA");
 			else
 				machine_type_write("MOBILE","HELI");
+			g_maq = check_machine_type();
+			break;
+		case UNIMAQ_MAQ:
+			eepromFormat();
+			if (g_maq.crem == MODEL_RETA)
+				machine_type_write("UNIMAQ","RETA");
+			else
+				machine_type_write("UNIMAQ","HELI");
 			g_maq = check_machine_type();
 			break;
 	}

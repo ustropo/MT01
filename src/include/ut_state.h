@@ -120,8 +120,10 @@ typedef enum
 	CFG_PAR_MAQ_EIXO_X1,     			//!< EIXO_X1
 	CFG_PAR_MAQ_EIXO_X2,          		//!< EIXO_X2
 	CFG_PAR_MAQ_EIXO_Y,			  		//!< EIXO_Y
+	CFG_PAR_MAQ_EIXO_Z,			  		//!< EIXO_Z
 	CFG_PAR_MAQ_JERK_X,                 //!< JERK X
 	CFG_PAR_MAQ_JERK_Y,                 //!< JERK Y
+	CFG_PAR_MAQ_JERK_Z,                 //!< JERK Z
 	CFG_PAR_MAQ_VEL_X,                  //!< VEL X
 	CFG_PAR_MAQ_VEL_Y,                  //!< VEL Y
 	CFG_PAR_MAQ_VEL_Z,                  //!< VEL Z
@@ -137,6 +139,7 @@ typedef enum
 	CFG_MODEL_EASYMAK = 0,
 	CFG_MODEL_COMPACTA,
 	CFG_MODEL_MOBILE,
+	CFG_MODEL_UNIMAQ,
 	CFG_MODEL_MAX
 } ut_config_model;
 

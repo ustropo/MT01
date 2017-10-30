@@ -28,6 +28,7 @@ typedef enum
 	EASYMAK_MAQ,				//!< Easymak
 	COMPACTA_MAQ,			//!< COMPACTA
 	MOBILE_MAQ,				//!< MOBILE
+	UNIMAQ_MAQ,				//!< UNIMAQ
 	TYPE_MAX_MAQ        //!< MAQ_TYPE_MAX
 } maq_name;
 
