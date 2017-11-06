@@ -158,19 +158,26 @@ ut_state ut_state_config_manual_menu(ut_context* pContext)
 		case CONFIG_MANUAL_ZERAR_PECA:
 			if ((zero_flags & ZERO_MAQ_FLAG) !=  ZERO_MAQ_FLAG)
 			{
+
 				ut_lcd_output_warning("SEM\nREFERÊNCIA\nDA MÁQUINA\n");
 				/* Delay */
 				vTaskDelay(1000 / portTICK_PERIOD_MS);
-				return STATE_CONFIG_MANUAL_MODE;
+
 			}
 			break;
 		case CONFIG_MANUAL_DESLOCAR_ZERO:
+
 			if ((zero_flags & ZERO_MAQ_FLAG) !=  ZERO_MAQ_FLAG)
 			{
+				uint32_t *value = configsVar->value;
 				ut_lcd_output_warning("SEM\nREFERÊNCIA\nDA MÁQUINA\n");
 				/* Delay */
 				vTaskDelay(1000 / portTICK_PERIOD_MS);
-				return STATE_CONFIG_MANUAL_MODE;
+				configsVar->name = "DESEJA CONTINUAR?";
+				ut_state_config_var(pContext);
+				if (*value == false)
+					return STATE_CONFIG_MANUAL_MODE;
+				//return STATE_CONFIG_MANUAL_MODE;
 			}
 			ut_lcd_output_warning("CUIDADO!!!\nMOVIMENTO\nAUTOMÁTICO\n");
 			if(delay_esc(2000) == KEY_ESC)

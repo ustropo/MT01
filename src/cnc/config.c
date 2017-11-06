@@ -171,7 +171,7 @@ void config_init()
 		nv_persist(nv);
 	}
 
-	for (uint8_t i = 0; i < 2; i++ )
+	for (uint8_t i = 0; i < 3; i++ )
 	{
 		nv->index = nv_get_index(P_str_axis[i], "jm");
 		nv->value = configVarParMaq[CFG_PAR_MAQ_JERK_X + i];
@@ -191,6 +191,12 @@ void config_init()
 
 	nv->index = nv_get_index("", "ja");
 	nv->value = configVarParMaq[CFG_PAR_MAQ_JUNCTION_ACEL];
+	strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
+	nv_set(nv);
+	nv_persist(nv);
+
+	nv->index = nv_get_index("1", "tr");
+	nv->value = configVarParMaq[CFG_PAR_MAQ_EIXO_Z];
 	strncpy_P(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
 	nv_set(nv);
 	nv_persist(nv);
